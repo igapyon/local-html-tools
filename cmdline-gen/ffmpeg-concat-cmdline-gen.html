@@ -37,11 +37,12 @@
       const baseFile = lines[0].replace(/\.wav$/i, "");
       const outputFile = baseFile + "-concat.wav";
 
-      let cmd = "del filelist.txt\r\n";
+      let cmd = "";
 
-      for (const line of lines) {
-        cmd += `echo file '${line}' >> filelist.txt\r\n`;
-      }
+      lines.forEach((line, index) => {
+        const redirect = index === 0 ? ">" : ">>";
+        cmd += `echo file '${line}' ${redirect} filelist.txt\r\n`;
+      });
 
       cmd += `ffmpeg -f concat -safe 0 -i filelist.txt -c copy ${outputFile}`;
 
