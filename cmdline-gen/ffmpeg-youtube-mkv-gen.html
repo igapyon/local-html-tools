@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>FFmpeg YouTube動画生成コマンドジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold mb-6">YouTube向け FFmpeg コマンドジェネレータ (v20250624a)</h1>
+
+    <label class="block mb-2 font-semibold">音声ファイル（.wav）:</label>
+    <input type="text" id="audioFile" placeholder="例: 250503_TrMic-part1.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <label class="block mb-2 font-semibold">画像ファイル（.png, .jpg, .jpeg）:</label>
+    <input type="text" id="imageFile" placeholder="例: Borodin.png" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <button onclick="generateYoutubeCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
+      ffmpeg コマンド生成
+    </button>
+
+    <div class="relative">
+      <code id="youtubeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('youtubeCmd')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    function generateYoutubeCmd() {
+      const audioFile = document.getElementById("audioFile").value.trim();
+      const imageFile = document.getElementById("imageFile").value.trim();
+
+      if (!audioFile || !imageFile) {
+        alert("音声ファイルと画像ファイルを入力してください。");
+        return;
+      }
+
+      if (!audioFile.toLowerCase().endsWith(".wav")) {
+        alert("音声ファイルは .wav を指定してください。");
+        return;
+      }
+
+      if (!(/\.(png|jpg|jpeg)$/i.test(imageFile))) {
+        alert("画像ファイルは .png, .jpg, .jpeg のいずれかを指定してください。");
+        return;
+      }
+
+      const outputFile = audioFile.replace(/\.wav$/i, ".mkv");
+
+      const cmd = `ffmpeg -loop 1 -framerate 2 -i ${imageFile} -i ${audioFile} ` +
+                  `-c:v libx264 -preset medium -tune stillimage -crf 18 ` +
+                  `-c:a copy -shortest -pix_fmt yuv420p ${outputFile}`;
+
+      document.getElementById("youtubeCmd").textContent = cmd;
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

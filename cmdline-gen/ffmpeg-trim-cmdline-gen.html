@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>FFmpeg 切り出しコマンドジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold mb-6">FFmpeg 切り出しコマンドジェネレータ (v20250624a)</h1>
+
+    <label class="block mb-2 font-semibold">入力ファイル名（必須・例: 250503_130527_TrMic.wav）:</label>
+    <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <label class="block mb-2">開始時刻（任意・例: 3:10 または 1:15:30 または 190）:</label>
+    <input type="text" id="start" placeholder="例: 3:10 または 190 または 1:15:30" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <label class="block mb-2">終了時刻（任意・例: 12:45 または 0:12:45 または 765）:</label>
+    <input type="text" id="end" placeholder="例: 12:45 または 765 または 0:12:45" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <label class="block mb-2">出力パート番号（例: 1）:</label>
+    <input type="number" id="partNumber" min="1" placeholder="例: 1" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <button onclick="generateClipCommand()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mb-4">
+      切り出しコマンド生成
+    </button>
+
+    <div class="relative">
+      <code id="clipCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('clipCmd')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    function parseTime(input) {
+      const parts = input.split(":").map(Number);
+      if (parts.some(isNaN)) return NaN;
+      if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      if (parts.length === 2) return parts[0] * 60 + parts[1];
+      if (parts.length === 1) return parseFloat(parts[0]);
+      return NaN;
+    }
+
+    function generateClipCommand() {
+      const fileInput = document.getElementById("filename").value.trim();
+      const startInput = document.getElementById("start").value.trim();
+      const endInput = document.getElementById("end").value.trim();
+      const partNumber = document.getElementById("partNumber").value.trim() || "1";
+
+      if (!fileInput) return alert("入力ファイル名を入力してください。");
+      if (!/\.wav$/i.test(fileInput)) return alert("ファイル名は .wav で終わる必要があります。");
+
+      const startSec = startInput ? parseTime(startInput) : NaN;
+      const endSec = endInput ? parseTime(endInput) : NaN;
+
+      const startValid = !isNaN(startSec);
+      const endValid = !isNaN(endSec);
+
+      let ssPart = "";
+      let tPart = "";
+
+      if (startValid && endValid && endSec > startSec) {
+        ssPart = ` -ss ${Math.round(startSec)}`;
+        tPart  = ` -t ${Math.round(endSec - startSec)}`;
+      } else if (startValid) {
+        ssPart = ` -ss ${Math.round(startSec)}`;
+      } else if (endValid) {
+        tPart  = ` -t ${Math.round(endSec)}`;
+      }
+
+      const outFile = fileInput.replace(/(-|\.|)(loudnorm)?\.wav$/i, `-part${partNumber}.wav`);
+      const cmd = `ffmpeg${ssPart} -i ${fileInput}${tPart} -c copy ${outFile}`;
+
+      document.getElementById("clipCmd").textContent = cmd;
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
