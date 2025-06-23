@@ -12,11 +12,11 @@
     <label class="block mb-2 font-semibold">入力ファイル名（必須・例: 250503_130527_TrMic.wav）:</label>
     <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
 
-    <label class="block mb-2">開始時刻（例: 3:10 または 190）:</label>
-    <input type="text" id="start" placeholder="例: 3:10" class="border border-gray-300 rounded w-full p-2 mb-4">
+    <label class="block mb-2">開始時刻（任意・例: 3:10 または 1:15:30 または 190）:</label>
+    <input type="text" id="start" placeholder="例: 3:10 または 190 または 1:15:30" class="border border-gray-300 rounded w-full p-2 mb-4">
 
-    <label class="block mb-2">終了時刻（例: 12:45 または 765）:</label>
-    <input type="text" id="end" placeholder="例: 12:45" class="border border-gray-300 rounded w-full p-2 mb-4">
+    <label class="block mb-2">終了時刻（任意・例: 12:45 または 0:12:45 または 765）:</label>
+    <input type="text" id="end" placeholder="例: 12:45 または 765 または 0:12:45" class="border border-gray-300 rounded w-full p-2 mb-4">
 
     <label class="block mb-2">出力パート番号（例: 1）:</label>
     <input type="number" id="partNumber" min="1" placeholder="例: 1" class="border border-gray-300 rounded w-full p-2 mb-4">
@@ -37,39 +37,46 @@
 
   <script>
     function parseTime(input) {
-      if (input.includes(":")) {
-        const [min, sec] = input.split(":").map(Number);
-        return min * 60 + sec;
+      const parts = input.split(":").map(Number);
+      if (parts.some(isNaN)) return NaN;
+
+      if (parts.length === 3) {
+        const [hh, mm, ss] = parts;
+        return hh * 3600 + mm * 60 + ss;
+      } else if (parts.length === 2) {
+        const [mm, ss] = parts;
+        return mm * 60 + ss;
+      } else if (parts.length === 1) {
+        return parseFloat(parts[0]);
       }
-      return parseFloat(input);
+      return NaN;
     }
 
     function generateClipCommand() {
+      const fileInput = document.getElementById("filename").value.trim();
       const startInput = document.getElementById("start").value.trim();
       const endInput = document.getElementById("end").value.trim();
-      const fileInput = document.getElementById("filename").value.trim();
       const partNumber = document.getElementById("partNumber").value.trim() || "1";
 
       if (!fileInput) return alert("入力ファイル名を入力してください。");
-      if (!startInput || !endInput) return alert("開始・終了時刻を入力してください。");
+      if (!/\.wav$/i.test(fileInput)) return alert("ファイル名は .wav で終わる必要があります。");
 
-      const startSec = parseTime(startInput);
-      const endSec = parseTime(endInput);
+      const startSec = startInput ? parseTime(startInput) : NaN;
+      const endSec = endInput ? parseTime(endInput) : NaN;
 
-      if (isNaN(startSec) || isNaN(endSec) || endSec <= startSec) {
-        return alert("時間の形式が正しくないか、終了が開始より早くなっています。");
+      let duration = NaN;
+      if (!isNaN(startSec) && !isNaN(endSec) && endSec > startSec) {
+        duration = Math.round(endSec - startSec);
       }
 
-      if (!/\.wav$/i.test(fileInput)) {
-        return alert("ファイル名は .wav で終わる必要があります。");
-      }
-
-      const duration = Math.round(endSec - startSec);
-
-      // 出力ファイル名を -partN.wav に変換（3種対応）
       const outFile = fileInput.replace(/(-|\.|)(loudnorm)?\.wav$/i, `-part${partNumber}.wav`);
 
-      const cmd = `ffmpeg -ss ${Math.round(startSec)} -t ${duration} -i ${fileInput} -c copy ${outFile}`;
+      let cmd = "ffmpeg";
+      if (!isNaN(startSec)) cmd += ` -ss ${Math.round(startSec)}`;
+      cmd += ` -i ${fileInput}`;
+      if (!isNaN(duration)) cmd += ` -t ${duration}`;
+      cmd += ` -c copy ${outFile}`;
+
       document.getElementById("clipCmd").textContent = cmd;
     }
 
