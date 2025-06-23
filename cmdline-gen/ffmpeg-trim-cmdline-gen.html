@@ -9,14 +9,14 @@
   <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
     <h1 class="text-2xl font-bold mb-6">FFmpeg 切り出しコマンドジェネレータ</h1>
 
+    <label class="block mb-2 font-semibold">入力ファイル名（必須・例: 250503_130527_TrMic.wav）:</label>
+    <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
+
     <label class="block mb-2">開始時刻（例: 3:10 または 190）:</label>
     <input type="text" id="start" placeholder="例: 3:10" class="border border-gray-300 rounded w-full p-2 mb-4">
 
     <label class="block mb-2">終了時刻（例: 12:45 または 765）:</label>
     <input type="text" id="end" placeholder="例: 12:45" class="border border-gray-300 rounded w-full p-2 mb-4">
-
-    <label class="block mb-2">入力ファイル名（省略可・例: 250503_130527_TrMic.wav）:</label>
-    <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
 
     <label class="block mb-2">出力パート番号（例: 1）:</label>
     <input type="number" id="partNumber" min="1" placeholder="例: 1" class="border border-gray-300 rounded w-full p-2 mb-4">
@@ -47,9 +47,10 @@
     function generateClipCommand() {
       const startInput = document.getElementById("start").value.trim();
       const endInput = document.getElementById("end").value.trim();
-      const fileInput = document.getElementById("filename").value.trim() || "250503_130527_TrMic.wav";
+      const fileInput = document.getElementById("filename").value.trim();
       const partNumber = document.getElementById("partNumber").value.trim() || "1";
 
+      if (!fileInput) return alert("入力ファイル名を入力してください。");
       if (!startInput || !endInput) return alert("開始・終了時刻を入力してください。");
 
       const startSec = parseTime(startInput);
@@ -65,7 +66,7 @@
 
       const duration = Math.round(endSec - startSec);
 
-      // 出力ファイル名の生成（.wav, -loudnorm.wav, .loudnorm.wav 対応）
+      // 出力ファイル名を -partN.wav に変換（3種対応）
       const outFile = fileInput.replace(/(-|\.|)(loudnorm)?\.wav$/i, `-part${partNumber}.wav`);
 
       const cmd = `ffmpeg -ss ${Math.round(startSec)} -t ${duration} -i ${fileInput} -c copy ${outFile}`;
