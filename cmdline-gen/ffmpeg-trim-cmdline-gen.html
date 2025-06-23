@@ -26,7 +26,7 @@
     </button>
 
     <div class="relative">
-      <code id="clipCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
+      <code id="clipCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
       <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('clipCmd')">📋</button>
     </div>
 
@@ -39,16 +39,9 @@
     function parseTime(input) {
       const parts = input.split(":").map(Number);
       if (parts.some(isNaN)) return NaN;
-
-      if (parts.length === 3) {
-        const [hh, mm, ss] = parts;
-        return hh * 3600 + mm * 60 + ss;
-      } else if (parts.length === 2) {
-        const [mm, ss] = parts;
-        return mm * 60 + ss;
-      } else if (parts.length === 1) {
-        return parseFloat(parts[0]);
-      }
+      if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      if (parts.length === 2) return parts[0] * 60 + parts[1];
+      if (parts.length === 1) return parseFloat(parts[0]);
       return NaN;
     }
 
@@ -64,18 +57,23 @@
       const startSec = startInput ? parseTime(startInput) : NaN;
       const endSec = endInput ? parseTime(endInput) : NaN;
 
-      let duration = NaN;
-      if (!isNaN(startSec) && !isNaN(endSec) && endSec > startSec) {
-        duration = Math.round(endSec - startSec);
+      const startValid = !isNaN(startSec);
+      const endValid = !isNaN(endSec);
+
+      let ssPart = "";
+      let tPart = "";
+
+      if (startValid && endValid && endSec > startSec) {
+        ssPart = ` -ss ${Math.round(startSec)}`;
+        tPart  = ` -t ${Math.round(endSec - startSec)}`;
+      } else if (startValid) {
+        ssPart = ` -ss ${Math.round(startSec)}`;
+      } else if (endValid) {
+        tPart  = ` -t ${Math.round(endSec)}`;
       }
 
       const outFile = fileInput.replace(/(-|\.|)(loudnorm)?\.wav$/i, `-part${partNumber}.wav`);
-
-      let cmd = "ffmpeg";
-      if (!isNaN(startSec)) cmd += ` -ss ${Math.round(startSec)}`;
-      cmd += ` -i ${fileInput}`;
-      if (!isNaN(duration)) cmd += ` -t ${duration}`;
-      cmd += ` -c copy ${outFile}`;
+      const cmd = `ffmpeg${ssPart} -i ${fileInput}${tPart} -c copy ${outFile}`;
 
       document.getElementById("clipCmd").textContent = cmd;
     }
