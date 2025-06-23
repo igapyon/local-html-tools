@@ -1,0 +1,95 @@
+<!DOCTYPE ht1l>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>FFmpeg Loudnorm スクリプトジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold mb-6">FFmpeg Loudnorm スクリプトジェネレータ</h1>
+
+    <h2 class="text-xl font-semibold mt-4 mb-2">1. 測定フェーズコマンド</h2>
+    <label for="filename" class="block mb-1">音声ファイル名（例: 250503_130527_TrMic.WAV）:</label>
+    <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.WAV" class="border border-gray-300 rounded w-full p-2 mb-3">
+    <button onclick="generateAnalyzeCmd()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-3">測定用コマンド生成</button>
+    <div class="relative mb-4">
+      <code id="analyzeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('analyzeCmd')">📋</button>
+    </div>
+
+    <h2 class="text-xl font-semibold mt-6 mb-2">2. 実際の正規化コマンド</h2>
+    <label for="jsonInput" class="block mb-1">ラウドネス測定結果（ffmpeg出力全文）:</label>
+    <textarea id="jsonInput" rows="10" placeholder='ffmpeg の出力全文を貼り付けてください' class="border border-gray-300 rounded w-full p-2 mb-3"></textarea>
+    <button onclick="generateNormalizeCmd()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded mb-3">正規化コマンド生成</button>
+    <div class="relative">
+      <code id="normalizeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('normalizeCmd')">📋</button>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">コピーしました</div>
+
+  <script>
+    function generateAnalyzeCmd() {
+      const filename = document.getElementById("filename").value.trim();
+      if (!filename) return alert("ファイル名を入力してください。");
+      const outFile = filename.replace(/\.WAV$/i, "-loudnorm-meta.json");
+      const cmd = `ffmpeg -i ${filename} -af loudnorm=print_format=json -f null - 2>&1 | tee ${outFile}`;
+      document.getElementById("analyzeCmd").textContent = cmd;
+    }
+
+    function extractJson(text) {
+      const start = text.indexOf('{');
+      const end = text.lastIndexOf('}');
+      if (start === -1 || end === -1 || end <= start) throw new Error("JSON部分が見つかりません");
+      return text.substring(start, end + 1);
+    }
+
+    function generateNormalizeCmd() {
+      try {
+        const raw = document.getElementById("jsonInput").value;
+        const extracted = extractJson(raw);
+        const json = JSON.parse(extracted);
+        const inputFile = document.getElementById("filename").value.trim();
+        if (!inputFile) return alert("ファイル名を入力してください。");
+        const outFile = inputFile.replace(/\.WAV$/i, "-loudnorm.wav");
+
+        const cmd = `ffmpeg -i ${inputFile} \
+-af loudnorm=I=-16:TP=-1.5:LRA=15:` +
+          `measured_I=${json.input_i}:measured_TP=${json.input_tp}:measured_LRA=${json.input_lra}:` +
+          `measured_thresh=${json.input_thresh}:offset=${json.target_offset}:linear=true:print_format=summary \
+-ar 44100 -sample_fmt s16 -c:a pcm_s16le \
+${outFile}`;
+
+        document.getElementById("normalizeCmd").textContent = cmd;
+      } catch (e) {
+        alert("正しい JSON を含む ffmpeg 出力を貼り付けてください。\n" + e.message);
+      }
+    }
+
+    function copyToClipboard(elementId) {
+      const el = document.getElementById(elementId);
+      const temp = document.createElement("textarea");
+      temp.value = el.textContent;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
