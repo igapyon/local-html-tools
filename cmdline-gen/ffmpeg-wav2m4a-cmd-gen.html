@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>FFmpeg WAV→M4A 変換コマンドジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold mb-6">WAV → M4A FFmpeg コマンドジェネレータ</h1>
+
+    <label class="block mb-2 font-semibold">WAVファイル名（必須・例: sample.wav）:</label>
+    <input type="text" id="wavFile" placeholder="例: sample.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <label class="block mb-2 font-semibold">ビットレートを選択:</label>
+    <select id="bitrate" class="border border-gray-300 rounded w-full p-2 mb-4">
+      <option value="192k" selected>192 kbps（デフォルト）</option>
+      <option value="256k">256 kbps</option>
+      <option value="320k">320 kbps</option>
+    </select>
+
+    <button onclick="generateM4aCommand()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded mb-4">
+      ffmpeg コマンド生成
+    </button>
+
+    <div class="relative">
+      <code id="m4aCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('m4aCmd')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    function generateM4aCommand() {
+      const input = document.getElementById("wavFile").value.trim();
+      const bitrate = document.getElementById("bitrate").value;
+
+      if (!input) {
+        alert("WAVファイル名を入力してください。");
+        return;
+      }
+      if (!input.toLowerCase().endsWith(".wav")) {
+        alert("ファイル名は .wav で終わる必要があります。");
+        return;
+      }
+
+      const output = input.replace(/\.wav$/i, ".m4a");
+      const cmd = `ffmpeg -i ${input} -c:a aac -b:a ${bitrate} ${output}`;
+      document.getElementById("m4aCmd").textContent = cmd;
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
