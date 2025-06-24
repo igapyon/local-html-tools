@@ -47,8 +47,8 @@
         return;
       }
 
-      const output = input.replace(/\.wav$/i, ".m4a");
-      const cmd = `ffmpeg -i ${input} -c:a aac -b:a ${bitrate} ${output}`;
+      const output = input.replace(/\.wav$/i, `-${bitrate}.m4a`);
+      const cmd = `ffmpeg -i ${input} -c:a aac -b:a ${bitrate} ${output}`;      
       document.getElementById("m4aCmd").textContent = cmd;
     }
 
