@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>local-html-tools</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="container mx-auto px-4 py-8">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold">local-html-tools</h1>
+      <p class="mt-2 text-lg">ウェブブラウザで動く、FFmpegコマンドの自動生成ツール</p>
+    </header>
+
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-4">コンセプト</h2>
+        <p class="mb-2">このツール群は、お使いのコンピュータ上で直接動作する、一連のシンプルなHTMLファイルです。</p>
+        <p class="mb-2">各ツール（HTMLファイル）をウェブブラウザで開くと、専用の入力画面が表示されます。そこにファイル名などの必要な情報を入力するだけで、FFmpegで使えるコマンドラインのテキストが自動的に作成されます。</p>
+        <h3 class="text-xl font-semibold mt-4 mb-2">主な特徴</h3>
+        <ul class="list-disc list-inside">
+            <li><strong>ローカル動作</strong>: インターネット接続は不要で、お使いのPC内だけで完結します。</li>
+            <li><strong>簡単な操作</strong>: ウェブブラウザでファイルを開き、情報を入力するだけでコマンドが手に入ります。</li>
+            <li><strong>効率化</strong>: FFmpegの複雑なコマンドの構文を覚える必要がなく、手入力によるミスを防ぎます。</li>
+        </ul>
+    </div>
+
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-2xl font-semibold mb-4 text-center">ツール一覧</h2>
+      <div class="grid gap-4">
+        <a href="cmdline-gen/ffmpeg-concat-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">FFmpeg ファイル結合</h3>
+          <p class="text-gray-600">複数の.wavファイルを1つに結合するコマンドを生成します。</p>
+        </a>
+        <a href="cmdline-gen/ffmpeg-loudnorm-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">FFmpeg 音量正規化 (Loudnorm)</h3>
+          <p class="text-gray-600">.wavファイルの音量をラウドネス基準に合わせて正規化します。</p>
+        </a>
+        <a href="cmdline-gen/ffmpeg-trim-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">FFmpeg 切り出し (Trim)</h3>
+          <p class="text-gray-600">.wavファイルの一部を時間指定で切り出すコマンドを生成します。</p>
+        </a>
+        <a href="cmdline-gen/ffmpeg-wav2m4a-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">FFmpeg .wav から .m4a へ変換</h3>
+          <p class="text-gray-600">高品質な.wavファイルを圧縮された.m4a形式に変換します。</p>
+        </a>
+        <a href="cmdline-gen/ffmpeg-youtube-mkv-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">YouTube向け動画生成</h3>
+          <p class="text-gray-600">一枚の画像と音声ファイルから、YouTube投稿用の動画ファイル(.mkv)を生成します。</p>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
