@@ -63,12 +63,12 @@ limitations under the License.
     }
 
     function generateNormalizeCmd() {
-  try {
-    const raw = document.getElementById("jsonInput").value;
+      try {
+        const raw = document.getElementById("jsonInput").value;
 
-    // JSON部分の抽出（先にやってOK）
-    const extracted = extractJson(raw);
-    const json = JSON.parse(extracted);
+        // JSON部分の抽出（先にやってOK）
+        const extracted = extractJson(raw);
+        const json = JSON.parse(extracted);
 
     // ファイル名を取得（空欄なら ffmpeg ログから推測）
     const filenameInput = document.getElementById("filename");
