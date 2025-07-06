@@ -70,19 +70,19 @@ limitations under the License.
         const extracted = extractJson(raw);
         const json = JSON.parse(extracted);
 
-    // ファイル名を取得（空欄なら ffmpeg ログから推測）
-    const filenameInput = document.getElementById("filename");
-    let inputFile = filenameInput.value.trim();
+        // ファイル名を取得（空欄なら ffmpeg ログから推測）
+        const filenameInput = document.getElementById("filename");
+        let inputFile = filenameInput.value.trim();
 
-    if (!inputFile) {
-      const match = raw.match(/from '([^']+\.(wav|WAV|flac|aiff))'/);
-      if (match) {
-        inputFile = match[1];
-        filenameInput.value = inputFile;  // テキストボックスにも表示
-      } else {
-        alert("ファイル名を入力してください（または ffmpeg 出力に含まれる必要があります）。");
-        return;
-      }
+        if (!inputFile) {
+            const match = raw.match(/from '([^']+\.(wav|WAV|flac|aiff))'/);
+            if (match) {
+                inputFile = match[1];
+                filenameInput.value = inputFile;  // テキストボックスにも表示
+            } else {
+                alert("ファイル名を入力してください（または ffmpeg 出力に含まれる必要があります）。");
+                return;
+        }
     }
 
     const outFile = inputFile.replace(/\.(wav|WAV|flac|aiff)$/i, "-loudnorm.wav");
