@@ -63,26 +63,42 @@ limitations under the License.
     }
 
     function generateNormalizeCmd() {
-      try {
-        const raw = document.getElementById("jsonInput").value;
-        const extracted = extractJson(raw);
-        const json = JSON.parse(extracted);
-        const inputFile = document.getElementById("filename").value.trim();
-        if (!inputFile) return alert("ファイル名を入力してください。");
-        const outFile = inputFile.replace(/\.WAV$/i, "-loudnorm.wav");
+  try {
+    const raw = document.getElementById("jsonInput").value;
 
-        const cmd = `ffmpeg -i ${inputFile} \
+    // JSON部分の抽出（先にやってOK）
+    const extracted = extractJson(raw);
+    const json = JSON.parse(extracted);
+
+    // ファイル名を取得（空欄なら ffmpeg ログから推測）
+    const filenameInput = document.getElementById("filename");
+    let inputFile = filenameInput.value.trim();
+
+    if (!inputFile) {
+      const match = raw.match(/from '([^']+\.(wav|WAV|flac|aiff))'/);
+      if (match) {
+        inputFile = match[1];
+        filenameInput.value = inputFile;  // テキストボックスにも表示
+      } else {
+        alert("ファイル名を入力してください（または ffmpeg 出力に含まれる必要があります）。");
+        return;
+      }
+    }
+
+    const outFile = inputFile.replace(/\.(wav|WAV|flac|aiff)$/i, "-loudnorm.wav");
+
+    const cmd = `ffmpeg -i ${inputFile} \
 -af loudnorm=I=-16:TP=-1.5:LRA=15:` +
-          `measured_I=${json.input_i}:measured_TP=${json.input_tp}:measured_LRA=${json.input_lra}:` +
-          `measured_thresh=${json.input_thresh}:offset=${json.target_offset}:linear=true:print_format=summary \
+      `measured_I=${json.input_i}:measured_TP=${json.input_tp}:measured_LRA=${json.input_lra}:` +
+      `measured_thresh=${json.input_thresh}:offset=${json.target_offset}:linear=true:print_format=summary \
 -ar 44100 -sample_fmt s16 -c:a pcm_s16le \
 ${outFile}`;
 
-        document.getElementById("normalizeCmd").textContent = cmd;
-      } catch (e) {
-        alert("正しい JSON を含む ffmpeg 出力を貼り付けてください。\n" + e.message);
-      }
-    }
+    document.getElementById("normalizeCmd").textContent = cmd;
+  } catch (e) {
+    alert("正しい JSON を含む ffmpeg 出力を貼り付けてください。\n" + e.message);
+  }
+}
 
     function copyToClipboard(elementId) {
       const el = document.getElementById(elementId);
