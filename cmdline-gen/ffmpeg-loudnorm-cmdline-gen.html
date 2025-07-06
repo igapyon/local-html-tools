@@ -89,16 +89,16 @@ limitations under the License.
 
     const cmd = `ffmpeg -i ${inputFile} \
 -af loudnorm=I=-16:TP=-1.5:LRA=15:` +
-      `measured_I=${json.input_i}:measured_TP=${json.input_tp}:measured_LRA=${json.input_lra}:` +
-      `measured_thresh=${json.input_thresh}:offset=${json.target_offset}:linear=true:print_format=summary \
+          `measured_I=${json.input_i}:measured_TP=${json.input_tp}:measured_LRA=${json.input_lra}:` +
+          `measured_thresh=${json.input_thresh}:offset=${json.target_offset}:linear=true:print_format=summary \
 -ar 44100 -sample_fmt s16 -c:a pcm_s16le \
 ${outFile}`;
 
-    document.getElementById("normalizeCmd").textContent = cmd;
-  } catch (e) {
-    alert("正しい JSON を含む ffmpeg 出力を貼り付けてください。\n" + e.message);
-  }
-}
+        document.getElementById("normalizeCmd").textContent = cmd;
+      } catch (e) {
+        alert("正しい JSON を含む ffmpeg 出力を貼り付けてください。\n" + e.message);
+      }
+    }
 
     function copyToClipboard(elementId) {
       const el = document.getElementById(elementId);
