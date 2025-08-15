@@ -1,11 +1,7 @@
 <!--
 Copyright 2025 Toshiki Iga
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
+Licensed under the Apache License, Version 2.0
 -->
 <!DOCTYPE html>
 <html lang="ja">
@@ -16,7 +12,7 @@ You may obtain a copy of the License at
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
   <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-6">FFmpeg Loudnorm スクリプトジェネレータ (v20250815a)</h1>
+    <h1 class="text-2xl font-bold mb-6">FFmpeg Loudnorm スクリプトジェネレータ (v20250815b)</h1>
 
     <!-- 1. 測定フェーズ -->
     <h2 class="text-xl font-semibold mt-4 mb-2">1. 測定フェーズコマンド</h2>
@@ -29,7 +25,7 @@ You may obtain a copy of the License at
     </div>
 
     <!-- 2. 音質設定 -->
-    <h2 class="text-xl font-semibold mt-6 mb-2">音質設定</h2>
+    <h2 class="text-xl font-semibold mt-6 mb-2">2. 音質設定</h2>
     <div class="mb-4">
       <!-- ハイレゾ選択 -->
       <label class="inline-flex items-center mr-6">
@@ -50,7 +46,7 @@ You may obtain a copy of the License at
     </div>
 
     <!-- 3. 正規化フェーズ -->
-    <h2 class="text-xl font-semibold mt-6 mb-2">2. 実際の正規化コマンド</h2>
+    <h2 class="text-xl font-semibold mt-6 mb-2">3. 実際の正規化コマンド</h2>
     <label for="jsonInput" class="block mb-1">ラウドネス測定結果（ffmpeg出力全文）:</label>
     <textarea id="jsonInput" rows="10" placeholder='ffmpeg の出力全文を貼り付けてください' class="border border-gray-300 rounded w-full p-2 mb-3"></textarea>
     <button onclick="generateNormalizeCmd()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded mb-3">正規化コマンド生成</button>
@@ -99,29 +95,32 @@ You may obtain a copy of the License at
           }
         }
 
-        const outFile = inputFile.replace(/\.(wav|WAV|flac|aiff)$/i, "-loudnorm.wav");
-
         // モード設定
         const mode = document.querySelector('input[name="mode"]:checked').value;
-        let I, LRA, linear;
+        let I, LRA, linear, modeTag;
         if (mode === "natural") {
-          I = -18; LRA = 12; linear = "false";
+          I = -18; LRA = 12; linear = "false"; modeTag = "natural";
         } else {
-          I = -16; LRA = 15; linear = "true";
+          I = -16; LRA = 15; linear = "true"; modeTag = "strong";
         }
 
         // ローレゾ / ハイレゾ設定
         const hires = document.getElementById("hires").checked;
-        let ar, sample_fmt, codec;
+        let ar, sample_fmt, codec, rezTag;
         if (hires) {
           ar = 192000;
           sample_fmt = "s32";
           codec = "pcm_s24le";
+          rezTag = "hires";
         } else {
           ar = 44100;
           sample_fmt = "s16";
           codec = "pcm_s16le";
+          rezTag = "lores";
         }
+
+        // 出力ファイル名にタグ追加
+        const outFile = inputFile.replace(/\.(wav|WAV|flac|aiff)$/i, `-loudnorm-${rezTag}-${modeTag}.wav`);
 
         const cmd = `ffmpeg -i ${inputFile} \
 -af loudnorm=I=${I}:TP=-1.5:LRA=${LRA}:measured_I=${json.input_i}:measured_TP=${json.input_tp}:measured_LRA=${json.input_lra}:measured_thresh=${json.input_thresh}:offset=${json.target_offset}:linear=${linear}:print_format=summary \
