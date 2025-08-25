@@ -1,17 +1,7 @@
 <!--
 Copyright 2025 Toshiki Iga
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Licensed under the Apache License, Version 2.0
 -->
 <!DOCTYPE html>
 <html lang="ja">
@@ -22,8 +12,9 @@ limitations under the License.
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
   <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-6">FFmpeg Loudnorm スクリプトジェネレータ (v20250624a)</h1>
+    <h1 class="text-2xl font-bold mb-6">FFmpeg Loudnorm スクリプトジェネレータ (v20250815b)</h1>
 
+    <!-- 1. 測定フェーズ -->
     <h2 class="text-xl font-semibold mt-4 mb-2">1. 測定フェーズコマンド</h2>
     <label for="filename" class="block mb-1">音声ファイル名（例: 250503_130527_TrMic.WAV）:</label>
     <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.WAV" class="border border-gray-300 rounded w-full p-2 mb-3">
@@ -33,7 +24,29 @@ limitations under the License.
       <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('analyzeCmd')">📋</button>
     </div>
 
-    <h2 class="text-xl font-semibold mt-6 mb-2">2. 実際の正規化コマンド</h2>
+    <!-- 2. 音質設定 -->
+    <h2 class="text-xl font-semibold mt-6 mb-2">2. 音質設定</h2>
+    <div class="mb-4">
+      <!-- ハイレゾ選択 -->
+      <label class="inline-flex items-center mr-6">
+        <input type="checkbox" id="hires" class="mr-2">
+        ハイレゾ（192kHz / 24bit）
+      </label>
+    </div>
+    <div class="mb-4">
+      <!-- モード切り替え -->
+      <label class="inline-flex items-center mr-4">
+        <input type="radio" name="mode" value="strong" class="mr-2" checked>
+        音声しっかり
+      </label>
+      <label class="inline-flex items-center">
+        <input type="radio" name="mode" value="natural" class="mr-2">
+        自然モード
+      </label>
+    </div>
+
+    <!-- 3. 正規化フェーズ -->
+    <h2 class="text-xl font-semibold mt-6 mb-2">3. 実際の正規化コマンド</h2>
     <label for="jsonInput" class="block mb-1">ラウドネス測定結果（ffmpeg出力全文）:</label>
     <textarea id="jsonInput" rows="10" placeholder='ffmpeg の出力全文を貼り付けてください' class="border border-gray-300 rounded w-full p-2 mb-3"></textarea>
     <button onclick="generateNormalizeCmd()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded mb-3">正規化コマンド生成</button>
@@ -43,7 +56,7 @@ limitations under the License.
     </div>
   </div>
 
-  <!-- Toast container -->
+  <!-- Toast -->
   <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">コピーしました</div>
 
   <script>
@@ -65,33 +78,53 @@ limitations under the License.
     function generateNormalizeCmd() {
       try {
         const raw = document.getElementById("jsonInput").value;
-
-        // JSON部分の抽出（先にやってOK）
         const extracted = extractJson(raw);
         const json = JSON.parse(extracted);
 
-        // ファイル名を取得（空欄なら ffmpeg ログから推測）
         const filenameInput = document.getElementById("filename");
         let inputFile = filenameInput.value.trim();
 
         if (!inputFile) {
-            const match = raw.match(/from '([^']+\.(wav|WAV|flac|aiff))'/);
-            if (match) {
-                inputFile = match[1];
-                filenameInput.value = inputFile;  // テキストボックスにも表示
-            } else {
-                alert("ファイル名を入力してください（または ffmpeg 出力に含まれる必要があります）。");
-                return;
-            }
+          const match = raw.match(/from '([^']+\.(wav|WAV|flac|aiff))'/);
+          if (match) {
+            inputFile = match[1];
+            filenameInput.value = inputFile;
+          } else {
+            alert("ファイル名を入力してください（または ffmpeg 出力に含まれる必要があります）。");
+            return;
+          }
         }
 
-        const outFile = inputFile.replace(/\.(wav|WAV|flac|aiff)$/i, "-loudnorm.wav");
+        // モード設定
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        let I, LRA, linear, modeTag;
+        if (mode === "natural") {
+          I = -18; LRA = 12; linear = "false"; modeTag = "natural";
+        } else {
+          I = -16; LRA = 15; linear = "true"; modeTag = "strong";
+        }
+
+        // ローレゾ / ハイレゾ設定
+        const hires = document.getElementById("hires").checked;
+        let ar, sample_fmt, codec, rezTag;
+        if (hires) {
+          ar = 192000;
+          sample_fmt = "s32";
+          codec = "pcm_s24le";
+          rezTag = "hires";
+        } else {
+          ar = 44100;
+          sample_fmt = "s16";
+          codec = "pcm_s16le";
+          rezTag = "lores";
+        }
+
+        // 出力ファイル名にタグ追加
+        const outFile = inputFile.replace(/\.(wav|WAV|flac|aiff)$/i, `-loudnorm-${rezTag}-${modeTag}.wav`);
 
         const cmd = `ffmpeg -i ${inputFile} \
--af loudnorm=I=-16:TP=-1.5:LRA=15:` +
-          `measured_I=${json.input_i}:measured_TP=${json.input_tp}:measured_LRA=${json.input_lra}:` +
-          `measured_thresh=${json.input_thresh}:offset=${json.target_offset}:linear=true:print_format=summary \
--ar 44100 -sample_fmt s16 -c:a pcm_s16le \
+-af loudnorm=I=${I}:TP=-1.5:LRA=${LRA}:measured_I=${json.input_i}:measured_TP=${json.input_tp}:measured_LRA=${json.input_lra}:measured_thresh=${json.input_thresh}:offset=${json.target_offset}:linear=${linear}:print_format=summary \
+-ar ${ar} -sample_fmt ${sample_fmt} -c:a ${codec} \
 ${outFile}`;
 
         document.getElementById("normalizeCmd").textContent = cmd;
