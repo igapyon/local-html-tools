@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Tool outputs
+*.wav
+*.m4a
+*.mkv
+*.json
+filelist.txt
