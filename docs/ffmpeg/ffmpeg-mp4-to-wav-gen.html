@@ -1,0 +1,242 @@
+<!--
+Copyright 2025 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>FFmpeg MP4→WAV コマンドジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold mb-6">FFmpeg MP4→WAV コマンドジェネレータ (v20250815b)</h1>
+
+    <label class="block mb-2 font-semibold">MP4ファイル名（必須・例: sample.mp4）:</label>
+    <input type="text" id="mp4File" placeholder="例: sample.mp4" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <h2 class="text-xl font-semibold mt-4 mb-2">1. 解析用 ffprobe コマンド</h2>
+    <button onclick="generateProbeCommand()" class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded mb-3">
+      ffprobe コマンド生成
+    </button>
+    <div class="relative mb-4">
+      <code id="probeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('probeCmd')">📋</button>
+    </div>
+
+    <label class="block mb-2 font-semibold">ffprobe 出力（JSON/テキスト）:</label>
+    <textarea id="probeOutput" rows="6" placeholder="ffprobe の出力を貼り付けてください" class="border border-gray-300 rounded w-full p-2 mb-3"></textarea>
+    <button onclick="applyProbeResult()" class="bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded mb-4">
+      解析結果を反映
+    </button>
+    <p id="probeSummary" class="text-sm text-gray-600 mb-4">解析結果: 未反映</p>
+
+    <h2 class="text-xl font-semibold mt-4 mb-2">2. 抽出設定</h2>
+    <label class="block mb-2 font-semibold">サンプルレートを選択:</label>
+    <select id="sampleRate" class="border border-gray-300 rounded w-full p-2 mb-4">
+      <option value="44100" selected>44.1 kHz（標準）</option>
+      <option value="48000">48 kHz</option>
+      <option value="96000">96 kHz</option>
+      <option value="192000">192 kHz</option>
+    </select>
+
+    <label class="block mb-2 font-semibold">チャンネル数:</label>
+    <select id="channels" class="border border-gray-300 rounded w-full p-2 mb-4">
+      <option value="auto" selected>ソースに合わせる（自動）</option>
+      <option value="1">モノラル（1ch）</option>
+      <option value="2">ステレオ（2ch）</option>
+    </select>
+
+    <label class="block mb-2 font-semibold">ビット深度:</label>
+    <select id="bitDepth" class="border border-gray-300 rounded w-full p-2 mb-4">
+      <option value="pcm_s16le" selected>16-bit（標準）</option>
+      <option value="pcm_s24le">24-bit</option>
+      <option value="pcm_s32le">32-bit</option>
+    </select>
+
+    <button onclick="generateWavCommand()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mb-4">
+      ffmpeg コマンド生成
+    </button>
+
+    <div class="relative">
+      <code id="wavCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('wavCmd')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    function generateProbeCommand() {
+      const input = document.getElementById("mp4File").value.trim();
+      if (!input) {
+        alert("MP4ファイル名を入力してください。");
+        return;
+      }
+      const cmd = `ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate,channels,channel_layout -of json ${input}`;
+      document.getElementById("probeCmd").textContent = cmd;
+    }
+
+    function extractJson(text) {
+      const start = text.indexOf("{");
+      const end = text.lastIndexOf("}");
+      if (start === -1 || end === -1 || end <= start) return null;
+      return text.substring(start, end + 1);
+    }
+
+    function parseProbeOutput(raw) {
+      let sampleRate = null;
+      let channels = null;
+      let channelLayout = null;
+
+      const jsonText = extractJson(raw);
+      if (jsonText) {
+        try {
+          const parsed = JSON.parse(jsonText);
+          const stream = parsed.streams && parsed.streams[0];
+          if (stream) {
+            if (stream.sample_rate) sampleRate = String(stream.sample_rate);
+            if (stream.channels) channels = Number(stream.channels);
+            if (stream.channel_layout) channelLayout = String(stream.channel_layout);
+          }
+        } catch (e) {
+          // fall through to regex parsing
+        }
+      }
+
+      if (!sampleRate) {
+        const match = raw.match(/sample_rate"?\s*[:=]\s*"?(\d+)/i);
+        if (match) sampleRate = match[1];
+      }
+      if (!channels) {
+        const match = raw.match(/channels"?\s*[:=]\s*"?(\d+)/i);
+        if (match) channels = Number(match[1]);
+      }
+      if (!channelLayout) {
+        const match = raw.match(/channel_layout"?\s*[:=]\s*"?([a-z_]+)"/i);
+        if (match) channelLayout = match[1];
+      }
+
+      if (!channels && channelLayout) {
+        if (channelLayout === "mono") channels = 1;
+        if (channelLayout === "stereo") channels = 2;
+      }
+
+      return { sampleRate, channels, channelLayout };
+    }
+
+    function applyProbeResult() {
+      const raw = document.getElementById("probeOutput").value.trim();
+      if (!raw) {
+        alert("ffprobe 出力を貼り付けてください。");
+        return;
+      }
+
+      const { sampleRate, channels, channelLayout } = parseProbeOutput(raw);
+      const summaryParts = [];
+
+      if (sampleRate) {
+        const sampleSelect = document.getElementById("sampleRate");
+        let hasOption = false;
+        Array.from(sampleSelect.options).forEach(option => {
+          if (option.value === sampleRate) hasOption = true;
+        });
+        if (!hasOption) {
+          const option = document.createElement("option");
+          option.value = sampleRate;
+          option.textContent = `${sampleRate} Hz（ソース）`;
+          sampleSelect.appendChild(option);
+        }
+        sampleSelect.value = sampleRate;
+        summaryParts.push(`サンプルレート: ${sampleRate} Hz`);
+      }
+
+      if (channels) {
+        const channelSelect = document.getElementById("channels");
+        if (channels === 1 || channels === 2) {
+          channelSelect.value = String(channels);
+        } else {
+          channelSelect.value = "auto";
+          channelSelect.dataset.detectedChannels = String(channels);
+        }
+        summaryParts.push(`チャンネル数: ${channels}ch`);
+      } else if (channelLayout) {
+        summaryParts.push(`チャンネル構成: ${channelLayout}`);
+      }
+
+      document.getElementById("channels").dataset.detectedChannels = channels ? String(channels) : "";
+      document.getElementById("sampleRate").dataset.detectedSampleRate = sampleRate ? String(sampleRate) : "";
+
+      document.getElementById("probeSummary").textContent =
+        summaryParts.length ? `解析結果: ${summaryParts.join(" / ")}` : "解析結果: 解析できませんでした";
+    }
+
+    function generateWavCommand() {
+      const input = document.getElementById("mp4File").value.trim();
+      const sampleRateSelect = document.getElementById("sampleRate");
+      const sampleRate = sampleRateSelect.value;
+      const bitDepth = document.getElementById("bitDepth").value;
+      const channelsSelect = document.getElementById("channels");
+      const channelsValue = channelsSelect.value;
+      const detectedChannels = channelsSelect.dataset.detectedChannels;
+
+      if (!input) {
+        alert("MP4ファイル名を入力してください。");
+        return;
+      }
+      if (!input.toLowerCase().endsWith(".mp4")) {
+        alert("ファイル名は .mp4 で終わる必要があります。");
+        return;
+      }
+
+      const output = input.replace(/\.mp4$/i, `-audio-${sampleRate}.wav`);
+      let channelPart = "";
+      if (channelsValue === "auto") {
+        if (detectedChannels) {
+          channelPart = ` -ac ${detectedChannels}`;
+        }
+      } else {
+        channelPart = ` -ac ${channelsValue}`;
+      }
+      const cmd = `ffmpeg -i ${input} -vn${channelPart} -acodec ${bitDepth} -ar ${sampleRate} ${output}`;
+      document.getElementById("wavCmd").textContent = cmd;
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
