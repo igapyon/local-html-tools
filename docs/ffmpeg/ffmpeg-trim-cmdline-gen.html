@@ -24,8 +24,8 @@ limitations under the License.
   <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
     <h1 class="text-2xl font-bold mb-6">FFmpeg 切り出しコマンドジェネレータ (v20250624a)</h1>
 
-    <label class="block mb-2 font-semibold">入力ファイル名（必須・例: 250503_130527_TrMic.wav）:</label>
-    <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
+    <label class="block mb-2 font-semibold">入力ファイル名（必須・例: 250503_130527_TrMic.wav / sample.mp4）:</label>
+    <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.wav / sample.mp4" class="border border-gray-300 rounded w-full p-2 mb-4">
 
     <label class="block mb-2">開始時刻（任意・例: 3:10 または 1:15:30 または 190）:</label>
     <input type="text" id="start" placeholder="例: 3:10 または 190 または 1:15:30" class="border border-gray-300 rounded w-full p-2 mb-4">
@@ -67,7 +67,6 @@ limitations under the License.
       const partNumber = document.getElementById("partNumber").value.trim() || "1";
 
       if (!fileInput) return alert("入力ファイル名を入力してください。");
-      if (!/\.wav$/i.test(fileInput)) return alert("ファイル名は .wav で終わる必要があります。");
 
       const startSec = startInput ? parseTime(startInput) : NaN;
       const endSec = endInput ? parseTime(endInput) : NaN;
@@ -87,7 +86,10 @@ limitations under the License.
         tPart  = ` -t ${Math.round(endSec)}`;
       }
 
-      const outFile = fileInput.replace(/(-|\.|)(loudnorm)?\.wav$/i, `-part${partNumber}.wav`);
+      const extMatch = fileInput.match(/\.([^.]+)$/);
+      const extension = extMatch ? extMatch[1] : "wav";
+      const baseName = fileInput.replace(/\.[^/.]+$/i, "");
+      const outFile = `${baseName}-part${partNumber}.${extension}`;
       const cmd = `ffmpeg${ssPart} -i ${fileInput}${tPart} -c copy ${outFile}`;
 
       document.getElementById("clipCmd").textContent = cmd;
