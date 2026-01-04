@@ -92,6 +92,10 @@ limitations under the License.
     <label class="block mb-2 font-semibold">出力ファイル名（任意・空欄なら自動生成）:</label>
     <input type="text" id="outputFile" placeholder="例: output.mp4" class="border border-gray-300 rounded w-full p-2 mb-4">
 
+    <label class="block mb-2 font-semibold">音声タイミング調整（ms）:</label>
+    <input type="number" id="audioOffsetMs" placeholder="例: 120（+で遅らせる / -で先行）" class="border border-gray-300 rounded w-full p-2 mb-2">
+    <p class="text-sm text-gray-600 mb-4">正の値は音声を遅らせます。負の値は音声を前に出します。</p>
+
     <button onclick="generateReplaceAudioCmd()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mb-4">
       ffmpeg コマンド生成
     </button>
@@ -277,6 +281,7 @@ limitations under the License.
     function generateReplaceAudioCmd() {
       const videoFile = document.getElementById("videoFile").value.trim();
       const audioFile = document.getElementById("audioFile").value.trim();
+      const audioOffsetMs = document.getElementById("audioOffsetMs").value.trim();
       const audioCodec = document.getElementById("audioCodec").value;
       const audioBitrate = document.getElementById("audioBitrate").value;
       const outputInput = document.getElementById("outputFile").value.trim();
@@ -303,6 +308,18 @@ limitations under the License.
 
       const output = outputInput || inferOutputName(videoFile, audioFile, container);
 
+      let offsetPart = "";
+      if (audioOffsetMs) {
+        const offsetValue = Number(audioOffsetMs);
+        if (isNaN(offsetValue)) {
+          alert("音声タイミング調整は数値で指定してください。");
+          return;
+        }
+        if (offsetValue !== 0) {
+          offsetPart = ` -itsoffset ${(offsetValue / 1000).toFixed(3)}`;
+        }
+      }
+
       let sampleRatePart = "";
       if (sampleRateSelect.value === "auto") {
         const detectedSampleRate = sampleRateSelect.dataset.detectedSampleRate;
@@ -328,7 +345,7 @@ limitations under the License.
       }
 
       const bitratePart = audioCodec.startsWith("pcm_") ? "" : ` -b:a ${audioBitrate}`;
-      const cmd = `ffmpeg -i ${videoFile} -i ${audioFile} -map 0:v:0 -map 1:a:0 -c:v copy -c:a ${audioCodec}${sampleRatePart}${channelPart}${bitratePart} -shortest ${output}`;
+      const cmd = `ffmpeg -i ${videoFile}${offsetPart} -i ${audioFile} -map 0:v:0 -map 1:a:0 -c:v copy -c:a ${audioCodec}${sampleRatePart}${channelPart}${bitratePart} -shortest ${output}`;
       document.getElementById("replaceCmd").textContent = cmd;
     }
 
