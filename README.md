@@ -26,6 +26,7 @@ FFmpegのコマンドラインを生成するツールです。
 - **ffmpeg-wav2m4a-cmdline-gen.html**: .wavファイルを.m4aファイルに変換するためのコマンドを生成します。
 - **ffmpeg-youtube-mkv-gen.html**: .wav音声ファイルと静止画から、YouTube向けの動画(.mkv)コマンドを生成します。
 - **ffmpeg-mp4-to-wav-gen.html**: .mp4ファイルから音声をWAVとして取り出すコマンドを生成します。
+- **ffmpeg-replace-audio-with-wav-gen.html**: .mp4動画の音声をWAVに差し替えるコマンドを生成します。
 
 ## GitHub Pages
 

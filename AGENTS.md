@@ -17,3 +17,4 @@
 - `ffmpeg-wav2m4a-cmdline-gen.html` `.wav` を `.m4a` に変換するコマンドを生成（ビットレート選択）。
 - `ffmpeg-youtube-mkv-gen.html` 音声＋画像からYouTube向け `.mkv` を生成するコマンドを作成。
 - `ffmpeg-mp4-to-wav-gen.html` `.mp4` から音声をWAVとして抽出するコマンドを生成。
+- `ffmpeg-replace-audio-with-wav-gen.html` `.mp4` の音声をWAVへ差し替えるコマンドを生成。
