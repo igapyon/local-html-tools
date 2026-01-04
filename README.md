@@ -16,7 +16,7 @@
 
 つまり、「**ウェブブラウザで動く、FFmpegコマンドの自動生成ツール**」と言えます。
 
-## cmdline-gen
+## ffmpeg
 
 FFmpegのコマンドラインを生成するツールです。
 
@@ -25,3 +25,7 @@ FFmpegのコマンドラインを生成するツールです。
 - **ffmpeg-trim-cmdline-gen.html**: .wavファイルを切り出すためのコマンドを生成します。
 - **ffmpeg-wav2m4a-cmdline-gen.html**: .wavファイルを.m4aファイルに変換するためのコマンドを生成します。
 - **ffmpeg-youtube-mkv-gen.html**: .wav音声ファイルと静止画から、YouTube向けの動画(.mkv)コマンドを生成します。
+
+## GitHub Pages
+
+GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/ffmpeg/` 配下にあります。
