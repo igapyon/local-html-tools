@@ -25,7 +25,7 @@ limitations under the License.
     <h1 class="text-2xl font-bold mb-6">FFmpeg 音声差し替え（WAV）コマンドジェネレータ (v20250816a)</h1>
 
     <label class="block mb-2 font-semibold">元の動画ファイル（必須・例: input.mp4）:</label>
-    <input type="text" id="videoFile" placeholder="例: input.mp4" class="border border-gray-300 rounded w-full p-2 mb-4">
+    <input type="text" id="videoFile" placeholder="例: input.mp4 / input.mkv / input.mov" class="border border-gray-300 rounded w-full p-2 mb-4">
 
     <label class="block mb-2 font-semibold">差し替える音声ファイル（必須・例: new_audio.wav）:</label>
     <input type="text" id="audioFile" placeholder="例: new_audio.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
@@ -48,11 +48,20 @@ limitations under the License.
 
     <h2 class="text-xl font-semibold mt-4 mb-2">2. 出力音声設定</h2>
 
+    <label class="block mb-2 font-semibold">出力コンテナ:</label>
+    <select id="container" class="border border-gray-300 rounded w-full p-2 mb-4" onchange="handleContainerChange()">
+      <option value="mp4" selected>MP4</option>
+      <option value="mkv">MKV</option>
+      <option value="mov">MOV</option>
+    </select>
+
     <label class="block mb-2 font-semibold">音声エンコード:</label>
-    <select id="audioCodec" class="border border-gray-300 rounded w-full p-2 mb-4">
+    <select id="audioCodec" class="border border-gray-300 rounded w-full p-2 mb-4" onchange="handleCodecChange()">
       <option value="aac" selected>AAC（一般的）</option>
       <option value="libopus">Opus</option>
       <option value="ac3">AC-3</option>
+      <option value="pcm_s16le">PCM 16-bit（無圧縮）</option>
+      <option value="pcm_s24le">PCM 24-bit（無圧縮）</option>
     </select>
 
     <label class="block mb-2 font-semibold">サンプルレート:</label>
@@ -63,6 +72,7 @@ limitations under the License.
       <option value="96000">96 kHz</option>
       <option value="192000">192 kHz</option>
     </select>
+    <p id="sampleRateNote" class="text-sm text-gray-600 mb-4">AAC を選ぶと 96 kHz までに制限されます。</p>
 
     <label class="block mb-2 font-semibold">チャンネル数:</label>
     <select id="channels" class="border border-gray-300 rounded w-full p-2 mb-4">
@@ -77,6 +87,7 @@ limitations under the License.
       <option value="256k">256 kbps</option>
       <option value="320k">320 kbps</option>
     </select>
+    <p id="bitrateNote" class="text-sm text-gray-600 mb-4">PCM を選ぶとビットレート指定は無視されます。</p>
 
     <label class="block mb-2 font-semibold">出力ファイル名（任意・空欄なら自動生成）:</label>
     <input type="text" id="outputFile" placeholder="例: output.mp4" class="border border-gray-300 rounded w-full p-2 mb-4">
@@ -96,10 +107,10 @@ limitations under the License.
   </div>
 
   <script>
-    function inferOutputName(input, audio) {
+    function inferOutputName(input, audio, container) {
       const base = input.replace(/\.[^/.]+$/i, "");
       const audioBase = audio.replace(/\.[^/.]+$/i, "");
-      return `${base}-replace-${audioBase}.mp4`;
+      return `${base}-replace-${audioBase}.${container}`;
     }
 
     function generateProbeCommand() {
@@ -160,6 +171,57 @@ limitations under the License.
       return { sampleRate, channels, channelLayout };
     }
 
+    function clampSampleRateForCodec(sampleRate, codec) {
+      if (!sampleRate) return sampleRate;
+      if (codec === "aac" && Number(sampleRate) > 96000) {
+        return "96000";
+      }
+      return sampleRate;
+    }
+
+    function handleCodecChange() {
+      const codec = document.getElementById("audioCodec").value;
+      const containerSelect = document.getElementById("container");
+      const sampleSelect = document.getElementById("sampleRate");
+      const options = Array.from(sampleSelect.options);
+      options.forEach(option => {
+        if (option.value === "192000") {
+          option.disabled = (codec === "aac");
+        }
+      });
+
+      if (codec === "aac") {
+        if (sampleSelect.value === "192000") {
+          sampleSelect.value = "96000";
+        }
+        const detectedSampleRate = sampleSelect.dataset.detectedSampleRate;
+        if (detectedSampleRate && Number(detectedSampleRate) > 96000) {
+          sampleSelect.dataset.detectedSampleRate = "96000";
+        }
+      }
+
+      const pcmSelected = codec.startsWith("pcm_");
+      Array.from(containerSelect.options).forEach(option => {
+        if (option.value === "mp4") {
+          option.disabled = pcmSelected;
+        }
+      });
+      if (pcmSelected && containerSelect.value === "mp4") {
+        containerSelect.value = "mkv";
+      }
+
+      const bitrateSelect = document.getElementById("audioBitrate");
+      bitrateSelect.disabled = pcmSelected;
+    }
+
+    function handleContainerChange() {
+      const container = document.getElementById("container").value;
+      const outputInput = document.getElementById("outputFile");
+      if (!outputInput.value) {
+        outputInput.placeholder = `例: output.${container}`;
+      }
+    }
+
     function applyProbeResult() {
       const raw = document.getElementById("probeOutput").value.trim();
       if (!raw) {
@@ -167,23 +229,29 @@ limitations under the License.
         return;
       }
 
+      const codec = document.getElementById("audioCodec").value;
       const { sampleRate, channels, channelLayout } = parseProbeOutput(raw);
+      const normalizedSampleRate = clampSampleRateForCodec(sampleRate, codec);
       const summaryParts = [];
 
-      if (sampleRate) {
+      if (normalizedSampleRate) {
         const sampleSelect = document.getElementById("sampleRate");
         let hasOption = false;
         Array.from(sampleSelect.options).forEach(option => {
-          if (option.value === sampleRate) hasOption = true;
+          if (option.value === normalizedSampleRate) hasOption = true;
         });
         if (!hasOption) {
           const option = document.createElement("option");
-          option.value = sampleRate;
-          option.textContent = `${sampleRate} Hz（ソース）`;
+          option.value = normalizedSampleRate;
+          option.textContent = `${normalizedSampleRate} Hz（ソース）`;
           sampleSelect.appendChild(option);
         }
-        sampleSelect.value = sampleRate;
-        summaryParts.push(`サンプルレート: ${sampleRate} Hz`);
+        sampleSelect.value = normalizedSampleRate;
+        if (normalizedSampleRate !== sampleRate) {
+          summaryParts.push(`サンプルレート: ${sampleRate} Hz → ${normalizedSampleRate} Hz`);
+        } else {
+          summaryParts.push(`サンプルレート: ${normalizedSampleRate} Hz`);
+        }
       }
 
       if (channels) {
@@ -200,7 +268,7 @@ limitations under the License.
       }
 
       document.getElementById("channels").dataset.detectedChannels = channels ? String(channels) : "";
-      document.getElementById("sampleRate").dataset.detectedSampleRate = sampleRate ? String(sampleRate) : "";
+      document.getElementById("sampleRate").dataset.detectedSampleRate = normalizedSampleRate ? String(normalizedSampleRate) : "";
 
       document.getElementById("probeSummary").textContent =
         summaryParts.length ? `解析結果: ${summaryParts.join(" / ")}` : "解析結果: 解析できませんでした";
@@ -212,6 +280,7 @@ limitations under the License.
       const audioCodec = document.getElementById("audioCodec").value;
       const audioBitrate = document.getElementById("audioBitrate").value;
       const outputInput = document.getElementById("outputFile").value.trim();
+      const container = document.getElementById("container").value;
       const sampleRateSelect = document.getElementById("sampleRate");
       const channelsSelect = document.getElementById("channels");
 
@@ -223,8 +292,8 @@ limitations under the License.
         alert("音声ファイル名を入力してください。");
         return;
       }
-      if (!/\.mp4$/i.test(videoFile)) {
-        alert("動画ファイルは .mp4 を指定してください。");
+      if (!/\.(mp4|mkv|mov)$/i.test(videoFile)) {
+        alert("動画ファイルは .mp4 / .mkv / .mov を指定してください。");
         return;
       }
       if (!/\.wav$/i.test(audioFile)) {
@@ -232,7 +301,7 @@ limitations under the License.
         return;
       }
 
-      const output = outputInput || inferOutputName(videoFile, audioFile);
+      const output = outputInput || inferOutputName(videoFile, audioFile, container);
 
       let sampleRatePart = "";
       if (sampleRateSelect.value === "auto") {
@@ -241,7 +310,11 @@ limitations under the License.
           sampleRatePart = ` -ar ${detectedSampleRate}`;
         }
       } else {
-        sampleRatePart = ` -ar ${sampleRateSelect.value}`;
+        const selected = clampSampleRateForCodec(sampleRateSelect.value, audioCodec);
+        if (selected !== sampleRateSelect.value) {
+          sampleRateSelect.value = selected;
+        }
+        sampleRatePart = ` -ar ${selected}`;
       }
 
       let channelPart = "";
@@ -254,9 +327,13 @@ limitations under the License.
         channelPart = ` -ac ${channelsSelect.value}`;
       }
 
-      const cmd = `ffmpeg -i ${videoFile} -i ${audioFile} -map 0:v:0 -map 1:a:0 -c:v copy -c:a ${audioCodec}${sampleRatePart}${channelPart} -b:a ${audioBitrate} -shortest ${output}`;
+      const bitratePart = audioCodec.startsWith("pcm_") ? "" : ` -b:a ${audioBitrate}`;
+      const cmd = `ffmpeg -i ${videoFile} -i ${audioFile} -map 0:v:0 -map 1:a:0 -c:v copy -c:a ${audioCodec}${sampleRatePart}${channelPart}${bitratePart} -shortest ${output}`;
       document.getElementById("replaceCmd").textContent = cmd;
     }
+
+    handleCodecChange();
+    handleContainerChange();
 
     function copyToClipboard(id) {
       const text = document.getElementById(id).textContent;
