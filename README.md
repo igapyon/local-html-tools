@@ -30,3 +30,7 @@ FFmpegのコマンドラインを生成するツールです。
 
 GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/ffmpeg/` 配下にあります。
 公開URL: https://igapyon.github.io/local-html-tools/
+
+## 将来の拡張
+
+このプロジェクトは将来的に FFmpeg 以外のツール群にも対応する予定です。現状の FFmpeg 系ツールはその一部です。
