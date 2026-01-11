@@ -144,10 +144,16 @@ limitations under the License.
   </div>
 
   <script>
-    function inferOutputName(input, audio, container) {
+    function inferOutputName(input, audio, container, offsetMs) {
       const base = input.replace(/\.[^/.]+$/i, "");
       const audioBase = audio.replace(/\.[^/.]+$/i, "");
-      return `${base}-replace-${audioBase}.${container}`;
+      let offsetTag = "";
+      if (offsetMs) {
+        const normalized = String(offsetMs).trim();
+        const prefix = normalized.startsWith("-") ? "" : "+";
+        offsetTag = `-offset${prefix}${normalized}ms`;
+      }
+      return `${base}-replace-${audioBase}${offsetTag}.${container}`;
     }
 
     function generateProbeCommand() {
@@ -339,7 +345,7 @@ limitations under the License.
         return;
       }
 
-      const output = outputInput || inferOutputName(videoFile, audioFile, container);
+      const output = outputInput || inferOutputName(videoFile, audioFile, container, audioOffsetMs);
 
       let offsetPart = "";
       if (audioOffsetMs) {
