@@ -1,69 +1,57 @@
 <!--
 Copyright 2025 Toshiki Iga
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Licensed under the Apache License, Version 2.0
 -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>FFmpeg wav=>m4a コマンドジェネレータ</title>
+  <title>FFmpeg 無音区間検出コマンドジェネレータ</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
   <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
-
     <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
-      
       <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M4 6h16"/>
         <path d="M4 12h16"/>
         <path d="M4 18h16"/>
       </svg>
-    
     </button>
     <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
       <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
     </div>
-    <h1 class="text-2xl font-bold mb-6">FFmpeg wav=>m4a コマンドジェネレータ</h1>
+
+    <h1 class="text-2xl font-bold mb-6">FFmpeg 無音区間検出コマンドジェネレータ</h1>
 
     <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-      <span>WAVファイル名</span>
+      <span>音声ファイル名</span>
       <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
       <span class="relative inline-flex items-center group">
         <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
         <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-          例: sample.wav
+          例: input.wav / input.flac / input.mp3
         </span>
       </span>
       <span>：</span>
     </label>
-    <input type="text" id="wavFile" placeholder="例: sample.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
+    <input type="text" id="audioFile" placeholder="例: input.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
 
-    <label class="block mb-2 font-semibold">ビットレートを選択:</label>
-    <select id="bitrate" class="border border-gray-300 rounded w-full p-2 mb-4">
-      <option value="192k" selected>192 kbps（デフォルト）</option>
-      <option value="256k">256 kbps</option>
-      <option value="320k">320 kbps</option>
-    </select>
+    <label class="block mb-2 font-semibold">無音判定しきい値 (dB):</label>
+    <input type="number" id="noiseDb" step="1" value="-50" class="border border-gray-300 rounded w-full p-2 mb-4">
 
-    <button onclick="generateM4aCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
+    <label class="block mb-2 font-semibold">無音とみなす最小時間 (秒):</label>
+    <input type="number" id="minDuration" step="0.1" value="0.5" class="border border-gray-300 rounded w-full p-2 mb-4">
+    <p class="text-sm text-gray-600 mb-4">例: 0.5 は「0.5秒以上続いたら無音」とみなします。</p>
+
+    <button onclick="generateSilenceCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
       ffmpeg コマンド生成
     </button>
 
     <div class="relative">
-      <code id="m4aCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
-      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('m4aCmd')">📋</button>
+      <code id="silenceCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('silenceCmd')">📋</button>
     </div>
 
     <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
@@ -72,22 +60,28 @@ limitations under the License.
   </div>
 
   <script>
-    function generateM4aCommand() {
-      const input = document.getElementById("wavFile").value.trim();
-      const bitrate = document.getElementById("bitrate").value;
+    function generateSilenceCmd() {
+      const audioFile = document.getElementById("audioFile").value.trim();
+      const noiseDb = document.getElementById("noiseDb").value.trim();
+      const minDuration = document.getElementById("minDuration").value.trim();
 
-      if (!input) {
-        alert("WAVファイル名を入力してください。");
+      if (!audioFile) {
+        alert("音声ファイル名を入力してください。");
         return;
       }
-      if (!input.toLowerCase().endsWith(".wav")) {
-        alert("ファイル名は .wav で終わる必要があります。");
+      if (noiseDb === "" || isNaN(Number(noiseDb))) {
+        alert("しきい値(dB)は数値で入力してください。");
+        return;
+      }
+      if (minDuration === "" || isNaN(Number(minDuration))) {
+        alert("最小時間(秒)は数値で入力してください。");
         return;
       }
 
-      const output = input.replace(/\.wav$/i, `-${bitrate}.m4a`);
-      const cmd = `ffmpeg -i ${input} -c:a aac -b:a ${bitrate} ${output}`;      
-      document.getElementById("m4aCmd").textContent = cmd;
+      const base = audioFile.replace(/\.[^/.]+$/i, "");
+      const logFile = `${base}-silence.log`;
+      const cmd = `ffmpeg -i ${audioFile} -af silencedetect=noise=${noiseDb}dB:d=${minDuration} -f null - 2>&1 | tee ${logFile}`;
+      document.getElementById("silenceCmd").textContent = cmd;
     }
 
     function copyToClipboard(id) {
@@ -111,6 +105,7 @@ limitations under the License.
         toast.classList.add("opacity-0", "pointer-events-none");
       }, 2000);
     }
+
     function toggleMenu() {
       const panel = document.getElementById("menuPanel");
       if (!panel) return;

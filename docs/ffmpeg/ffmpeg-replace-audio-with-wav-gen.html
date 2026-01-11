@@ -21,17 +21,50 @@ limitations under the License.
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
-  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-6">FFmpeg 音声差し替え（WAV）コマンドジェネレータ (v20250816a)</h1>
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
 
-    <label class="block mb-2 font-semibold">元の動画ファイル（必須・例: input.mp4）:</label>
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </svg>
+    
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+    <h1 class="text-2xl font-bold mb-6">FFmpeg 音声差し替え（WAV）コマンドジェネレータ</h1>
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>元の動画ファイル</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          例: input.mp4
+        </span>
+      </span>
+      <span>：</span>
+    </label>
     <input type="text" id="videoFile" placeholder="例: input.mp4 / input.mkv / input.mov" class="border border-gray-300 rounded w-full p-2 mb-4">
 
-    <label class="block mb-2 font-semibold">差し替える音声ファイル（必須・例: new_audio.wav）:</label>
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>差し替える音声ファイル</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          例: new_audio.wav
+        </span>
+      </span>
+      <span>：</span>
+    </label>
     <input type="text" id="audioFile" placeholder="例: new_audio.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
 
     <h2 class="text-xl font-semibold mt-4 mb-2">1. WAV 解析（ffprobe）</h2>
-    <button onclick="generateProbeCommand()" class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded mb-3">
+    <button onclick="generateProbeCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-3">
       ffprobe コマンド生成
     </button>
     <div class="relative mb-4">
@@ -41,7 +74,7 @@ limitations under the License.
 
     <label class="block mb-2 font-semibold">ffprobe 出力（JSON/テキスト）:</label>
     <textarea id="probeOutput" rows="6" placeholder="ffprobe の出力を貼り付けてください" class="border border-gray-300 rounded w-full p-2 mb-3"></textarea>
-    <button onclick="applyProbeResult()" class="bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded mb-4">
+    <button onclick="applyProbeResult()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mb-4">
       解析結果を反映
     </button>
     <p id="probeSummary" class="text-sm text-gray-600 mb-4">解析結果: 未反映</p>
@@ -96,7 +129,7 @@ limitations under the License.
     <input type="number" id="audioOffsetMs" placeholder="例: 120（+で遅らせる / -で先行）" class="border border-gray-300 rounded w-full p-2 mb-2">
     <p class="text-sm text-gray-600 mb-4">正の値は音声を遅らせます。負の値は音声を前に出します。</p>
 
-    <button onclick="generateReplaceAudioCmd()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mb-4">
+    <button onclick="generateReplaceAudioCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
       ffmpeg コマンド生成
     </button>
 
@@ -372,6 +405,11 @@ limitations under the License.
         toast.classList.remove("opacity-100");
         toast.classList.add("opacity-0", "pointer-events-none");
       }, 2000);
+    }
+    function toggleMenu() {
+      const panel = document.getElementById("menuPanel");
+      if (!panel) return;
+      panel.classList.toggle("hidden");
     }
   </script>
 </body>
