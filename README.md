@@ -22,7 +22,7 @@ FFmpegのコマンドラインを生成するツールです。
 
 - **ffmpeg-concat-cmdline-gen.html**: 複数の.wavファイルを結合するためのコマンドを生成します。
 - **ffmpeg-loudnorm-cmdline-gen.html**: ラウドネス測定結果を基に、ハイレゾ対応やモード切り替えを含んだ正規化コマンドを生成します。
-- **ffmpeg-trim-cmdline-gen.html**: .wavファイルを切り出すためのコマンドを生成します。
+- **ffmpeg-trim-cmdline-gen.html**: 音声/動画ファイルを切り出すためのコマンドを生成します。
 - **ffmpeg-wav2m4a-cmdline-gen.html**: .wavファイルを.m4aファイルに変換するためのコマンドを生成します。
 - **ffmpeg-youtube-mkv-gen.html**: .wav音声ファイルと静止画から、YouTube向けの動画(.mkv)コマンドを生成します。
 - **ffmpeg-mp4-to-wav-gen.html**: .mp4ファイルから音声をWAVとして取り出すコマンドを生成します。
