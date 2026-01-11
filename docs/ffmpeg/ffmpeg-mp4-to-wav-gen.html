@@ -28,7 +28,7 @@ limitations under the License.
     <input type="text" id="mp4File" placeholder="例: sample.mp4" class="border border-gray-300 rounded w-full p-2 mb-4">
 
     <h2 class="text-xl font-semibold mt-4 mb-2">1. 解析用 ffprobe コマンド</h2>
-    <button onclick="generateProbeCommand()" class="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded mb-3">
+    <button onclick="generateProbeCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-3">
       ffprobe コマンド生成
     </button>
     <div class="relative mb-4">
@@ -38,7 +38,7 @@ limitations under the License.
 
     <label class="block mb-2 font-semibold">ffprobe 出力（JSON/テキスト）:</label>
     <textarea id="probeOutput" rows="6" placeholder="ffprobe の出力を貼り付けてください" class="border border-gray-300 rounded w-full p-2 mb-3"></textarea>
-    <button onclick="applyProbeResult()" class="bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded mb-4">
+    <button onclick="applyProbeResult()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mb-4">
       解析結果を反映
     </button>
     <p id="probeSummary" class="text-sm text-gray-600 mb-4">解析結果: 未反映</p>
@@ -66,7 +66,7 @@ limitations under the License.
       <option value="pcm_s32le">32-bit</option>
     </select>
 
-    <button onclick="generateWavCommand()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mb-4">
+    <button onclick="generateWavCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
       ffmpeg コマンド生成
     </button>
 

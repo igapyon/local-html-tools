@@ -167,7 +167,7 @@ Licensed under the Apache License, Version 2.0
 
     <!-- 2. 測定フェーズ -->
     <h2 class="text-xl font-semibold mt-6 mb-2">2. 測定フェーズコマンド</h2>
-    <button onclick="generateAnalyzeCmd()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-3">測定用コマンド生成</button>
+    <button onclick="generateAnalyzeCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-3">測定用コマンド生成</button>
     <div class="relative mb-4">
       <code id="analyzeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
       <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('analyzeCmd')">📋</button>
@@ -179,7 +179,7 @@ Licensed under the Apache License, Version 2.0
     <textarea id="jsonInput" rows="10" placeholder='ffmpeg の出力全文を貼り付けてください' class="border border-gray-300 rounded w-full p-2 mb-4"></textarea>
 
     <div class="tab-panel" data-tab="tab-icu" id="finish-normalize">
-      <button onclick="generateNormalizeCmd()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded mb-3">正規化コマンド生成</button>
+      <button onclick="generateNormalizeCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-3">正規化コマンド生成</button>
       <div class="relative">
         <code id="normalizeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
         <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('normalizeCmd')">📋</button>
@@ -187,7 +187,7 @@ Licensed under the Apache License, Version 2.0
     </div>
 
     <div class="tab-panel" data-tab="tab-gain" id="finish-gain" hidden>
-      <button onclick="generateGainCmd()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded mb-3">単純ゲインコマンド生成</button>
+      <button onclick="generateGainCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-3">単純ゲインコマンド生成</button>
       <div class="relative">
         <code id="gainCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
         <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('gainCmd')">📋</button>
