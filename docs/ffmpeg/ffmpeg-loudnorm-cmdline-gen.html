@@ -186,7 +186,9 @@ Licensed under the Apache License, Version 2.0
 
     <div class="tab-panel" data-tab="tab-gain" id="tab-gain" hidden>
       <h2 class="text-xl font-semibold mb-2">1. 単純ゲイン</h2>
-      <p class="text-sm text-gray-600 mb-4">測定結果の input_i と選択モードの I の差分を dB で計算し、volume=+XdB を生成します。</p>
+      <p class="text-sm text-gray-600 mb-4">測定結果の input_tp を基準に、ピークが目標TPに到達する分だけゲインします。</p>
+      <label class="block mb-2 font-semibold">目標TP (dBTP):</label>
+      <input type="number" id="gainTargetTp" step="0.1" value="-1.0" class="border border-gray-300 rounded w-full p-2 mb-4">
     </div>
 
     <!-- 2. 測定フェーズ -->
@@ -324,20 +326,24 @@ ${outFile}`;
           }
         }
 
-        const modeConfig = getModeConfig();
-        const targetI = modeConfig.I;
-        const inputI = Number(json.input_i);
-        if (isNaN(inputI)) {
-          alert("input_i が解析できません。ffmpeg 出力を確認してください。");
+        const targetTP = Number(document.getElementById("gainTargetTp").value);
+        if (isNaN(targetTP)) {
+          alert("目標TPは数値で入力してください。");
           return;
         }
 
-        const gain = Math.round((targetI - inputI) * 10) / 10;
+        const inputTP = Number(json.input_tp);
+        if (isNaN(inputTP)) {
+          alert("input_tp が解析できません。ffmpeg 出力を確認してください。");
+          return;
+        }
+
+        const gain = Math.round((targetTP - inputTP) * 10) / 10;
         const gainLabel = `${gain >= 0 ? "+" : ""}${gain}dB`;
 
         const { ar, sample_fmt, codec, rezTag } = getRezConfig();
-        const modeTag = modeConfig.tag;
-        const outFile = inputFile.replace(/\.(wav|WAV|flac|aiff)$/i, `-gain-${rezTag}-${modeTag}-${gainLabel}.wav`);
+        const tpTag = `tp${targetTP.toFixed(1).replace(".", "p")}`;
+        const outFile = inputFile.replace(/\.(wav|WAV|flac|aiff)$/i, `-gain-${rezTag}-${tpTag}-${gainLabel}.wav`);
         const cmd = `ffmpeg -i ${inputFile} -af volume=${gainLabel} -ar ${ar} -sample_fmt ${sample_fmt} -c:a ${codec} ${outFile}`;
 
         document.getElementById("gainCmd").textContent = cmd;
