@@ -37,7 +37,17 @@ limitations under the License.
     </div>
     <h1 class="text-2xl font-bold mb-6">FFmpeg ファイル結合コマンドジェネレータ</h1>
 
-    <label class="block mb-2 font-semibold">結合する .wav ファイル（1行に1ファイル）:</label>
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>結合する .wav ファイル</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          例: file1.wav / file2.wav（1行に1ファイル）
+        </span>
+      </span>
+      <span>：</span>
+    </label>
     <textarea id="fileList" rows="8" placeholder="例:\nfile1.wav\nfile2.wav" class="border border-gray-300 rounded w-full p-2 mb-4"></textarea>
 
     <button onclick="generateConcatCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">

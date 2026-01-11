@@ -37,7 +37,17 @@ limitations under the License.
     </div>
     <h1 class="text-2xl font-bold mb-6">FFmpeg 切り出しコマンドジェネレータ</h1>
 
-    <label class="block mb-2 font-semibold">入力ファイル名（必須・例: 250503_130527_TrMic.wav / sample.mp4）:</label>
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>入力ファイル名</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          例: 250503_130527_TrMic.wav / sample.mp4
+        </span>
+      </span>
+      <span>：</span>
+    </label>
     <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.wav / sample.mp4" class="border border-gray-300 rounded w-full p-2 mb-4">
 
     <label class="block mb-2">開始時刻（任意・例: 3:10 または 1:15:30 または 190）:</label>
