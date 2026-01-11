@@ -9,140 +9,189 @@ Licensed under the Apache License, Version 2.0
   <meta charset="UTF-8">
   <title>FFmpeg Loudnorm スクリプトジェネレータ</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .tab-list {
+      border-bottom: 1px solid #e5e7eb;
+      gap: 0.5rem;
+    }
+    .tab-button {
+      border: 1px solid #e5e7eb;
+      border-bottom: none;
+      background: #f3f4f6;
+      padding: 0.4rem 0.9rem;
+      margin-bottom: -1px;
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #374151;
+    }
+    .tab-button[aria-selected="true"] {
+      background: #ffffff;
+      border-color: #94a3b8;
+      color: #0f172a;
+    }
+    .tab-panel {
+      border: 1px solid #e5e7eb;
+      border-top: none;
+      padding: 1rem;
+      background: #ffffff;
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
+    }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
   <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
     <h1 class="text-2xl font-bold mb-6">FFmpeg Loudnorm スクリプトジェネレータ (v20250815b)</h1>
 
-    <!-- 1. 測定フェーズ -->
-    <h2 class="text-xl font-semibold mt-4 mb-2">1. 測定フェーズコマンド</h2>
     <label for="filename" class="block mb-1">音声ファイル名（例: 250503_130527_TrMic.WAV）:</label>
-    <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.WAV" class="border border-gray-300 rounded w-full p-2 mb-3">
+    <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.WAV" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <div class="tab-list flex flex-wrap mb-4" role="tablist" aria-label="処理方式の切り替え">
+      <button type="button" class="tab-button" data-target="tab-icu" aria-selected="true" aria-controls="tab-icu">
+        ICUラウドネス調整
+      </button>
+      <button type="button" class="tab-button" data-target="tab-gain" aria-selected="false" aria-controls="tab-gain">
+        単純ゲイン
+      </button>
+    </div>
+
+    <div class="tab-panel" data-tab="tab-icu" id="tab-icu">
+      <h2 class="text-xl font-semibold mb-2">1. 音質設定（ICUラウドネス調整）</h2>
+      <div class="mb-4">
+        <!-- ハイレゾ選択 -->
+        <label class="inline-flex items-center mr-6">
+          <input type="checkbox" id="hires" class="mr-2">
+          ハイレゾ（192kHz / 24bit）
+        </label>
+      </div>
+      <div class="mb-4 space-y-3">
+        <!-- モード切り替え -->
+        <div class="flex items-start gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="mode" value="music_release" class="mr-2" checked>
+            <span>音楽（配信用）</span>
+          </label>
+          <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-music-release">ℹ️</button>
+        </div>
+        <div id="mode-info-music-release" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">配信や販売を意識した仕上げ用。ストリーミング基準の音圧で、安心できるピーク管理と適度なダイナミクスを両立します。</div>
+
+        <div class="flex items-start gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="mode" value="music_practice" class="mr-2">
+            <span>音楽（練習用）</span>
+          </label>
+          <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-music-practice">ℹ️</button>
+        </div>
+        <div id="mode-info-music-practice" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">オーケストラや吹奏楽の練習録音向け。ダイナミクスを最大限に残しつつ、バランス確認しやすい音量に整えます。</div>
+
+        <div class="flex items-start gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="mode" value="strong" class="mr-2">
+            <span>音楽＋指揮者モード</span>
+          </label>
+          <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-strong">ℹ️</button>
+        </div>
+        <div id="mode-info-strong" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">指揮者のコメントを聞き取りやすくしつつ、演奏の強弱も適度に残したい場合に最適です。</div>
+
+        <div class="flex items-start gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="mode" value="cinema" class="mr-2">
+            <span>映画 / ドラマ</span>
+          </label>
+          <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-cinema">ℹ️</button>
+        </div>
+        <div id="mode-info-cinema" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">映画やドラマのミックスチェック向け。広いラウドネスレンジでセリフと効果音のメリハリを確保します。</div>
+
+        <div class="flex items-start gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="mode" value="variety" class="mr-2">
+            <span>バラエティ</span>
+          </label>
+          <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-variety">ℹ️</button>
+        </div>
+        <div id="mode-info-variety" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">トーク中心のテレビ番組を想定し、声を前に出しながらも BGM や効果音とのバランスを取りやすくします。</div>
+
+        <div class="flex items-start gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="mode" value="podcast" class="mr-2">
+            <span>ポッドキャスト / トーク</span>
+          </label>
+          <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-podcast">ℹ️</button>
+        </div>
+        <div id="mode-info-podcast" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">トーク番組やポッドキャスト向け。複数の話者でも聞きやすいよう中程度のラウドネスに揃えます。</div>
+
+        <div class="flex items-start gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="mode" value="livestream" class="mr-2">
+            <span>ライブ配信</span>
+          </label>
+          <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-livestream">ℹ️</button>
+        </div>
+        <div id="mode-info-livestream" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">ゲーム実況やライブ配信向け。声・BGM・効果音のピークを抑えつつ、配信基準に合わせます。</div>
+
+        <div class="flex items-start gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="mode" value="lecture" class="mr-2">
+            <span>講演 / セミナー</span>
+          </label>
+          <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-lecture">ℹ️</button>
+        </div>
+        <div id="mode-info-lecture" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">講演や質疑応答の収録向け。話者の声量差を吸収しながら聞き取りやすさを重視します。</div>
+
+        <div class="flex items-start gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="mode" value="bgm" class="mr-2">
+            <span>BGM / Lo-Fi</span>
+          </label>
+          <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-bgm">ℹ️</button>
+        </div>
+        <div id="mode-info-bgm" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">常時再生するバックグラウンドミュージック向け。耳障りになりにくいよう穏やかなダイナミクスにまとめます。</div>
+
+        <div class="flex items-start gap-2">
+          <label class="inline-flex items-center">
+            <input type="radio" name="mode" value="asmr" class="mr-2">
+            <span>ASMR / 朗読</span>
+          </label>
+          <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-asmr">ℹ️</button>
+        </div>
+        <div id="mode-info-asmr" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">近接収録の繊細な音向け。低ノイズで細かなニュアンスを保ちながら自然な音量感に整えます。</div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-tab="tab-gain" id="tab-gain" hidden>
+      <h2 class="text-xl font-semibold mb-2">1. 単純ゲイン</h2>
+      <p class="text-sm text-gray-600 mb-4">測定結果の input_i と選択モードの I の差分を dB で計算し、volume=+XdB を生成します。</p>
+    </div>
+
+    <!-- 2. 測定フェーズ -->
+    <h2 class="text-xl font-semibold mt-6 mb-2">2. 測定フェーズコマンド</h2>
     <button onclick="generateAnalyzeCmd()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-3">測定用コマンド生成</button>
     <div class="relative mb-4">
       <code id="analyzeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
       <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('analyzeCmd')">📋</button>
     </div>
 
-    <!-- 2. 音質設定 -->
-    <h2 class="text-xl font-semibold mt-6 mb-2">2. 音質設定</h2>
-    <div class="mb-4">
-      <!-- ハイレゾ選択 -->
-      <label class="inline-flex items-center mr-6">
-        <input type="checkbox" id="hires" class="mr-2">
-        ハイレゾ（192kHz / 24bit）
-      </label>
-    </div>
-    <div class="mb-4 space-y-3">
-      <!-- モード切り替え -->
-      <div class="flex items-start gap-2">
-        <label class="inline-flex items-center">
-          <input type="radio" name="mode" value="music_release" class="mr-2" checked>
-          <span>音楽（配信用）</span>
-        </label>
-        <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-music-release">ℹ️</button>
-      </div>
-      <div id="mode-info-music-release" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">配信や販売を意識した仕上げ用。ストリーミング基準の音圧で、安心できるピーク管理と適度なダイナミクスを両立します。</div>
-
-      <div class="flex items-start gap-2">
-        <label class="inline-flex items-center">
-          <input type="radio" name="mode" value="music_practice" class="mr-2">
-          <span>音楽（練習用）</span>
-        </label>
-        <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-music-practice">ℹ️</button>
-      </div>
-      <div id="mode-info-music-practice" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">オーケストラや吹奏楽の練習録音向け。ダイナミクスを最大限に残しつつ、バランス確認しやすい音量に整えます。</div>
-
-      <div class="flex items-start gap-2">
-        <label class="inline-flex items-center">
-          <input type="radio" name="mode" value="strong" class="mr-2">
-          <span>音楽＋指揮者モード</span>
-        </label>
-        <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-strong">ℹ️</button>
-      </div>
-      <div id="mode-info-strong" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">指揮者のコメントを聞き取りやすくしつつ、演奏の強弱も適度に残したい場合に最適です。</div>
-
-      <div class="flex items-start gap-2">
-        <label class="inline-flex items-center">
-          <input type="radio" name="mode" value="cinema" class="mr-2">
-          <span>映画 / ドラマ</span>
-        </label>
-        <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-cinema">ℹ️</button>
-      </div>
-      <div id="mode-info-cinema" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">映画やドラマのミックスチェック向け。広いラウドネスレンジでセリフと効果音のメリハリを確保します。</div>
-
-      <div class="flex items-start gap-2">
-        <label class="inline-flex items-center">
-          <input type="radio" name="mode" value="variety" class="mr-2">
-          <span>バラエティ</span>
-        </label>
-        <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-variety">ℹ️</button>
-      </div>
-      <div id="mode-info-variety" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">トーク中心のテレビ番組を想定し、声を前に出しながらも BGM や効果音とのバランスを取りやすくします。</div>
-
-      <div class="flex items-start gap-2">
-        <label class="inline-flex items-center">
-          <input type="radio" name="mode" value="podcast" class="mr-2">
-          <span>ポッドキャスト / トーク</span>
-        </label>
-        <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-podcast">ℹ️</button>
-      </div>
-      <div id="mode-info-podcast" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">トーク番組やポッドキャスト向け。複数の話者でも聞きやすいよう中程度のラウドネスに揃えます。</div>
-
-      <div class="flex items-start gap-2">
-        <label class="inline-flex items-center">
-          <input type="radio" name="mode" value="livestream" class="mr-2">
-          <span>ライブ配信</span>
-        </label>
-        <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-livestream">ℹ️</button>
-      </div>
-      <div id="mode-info-livestream" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">ゲーム実況やライブ配信向け。声・BGM・効果音のピークを抑えつつ、配信基準に合わせます。</div>
-
-      <div class="flex items-start gap-2">
-        <label class="inline-flex items-center">
-          <input type="radio" name="mode" value="lecture" class="mr-2">
-          <span>講演 / セミナー</span>
-        </label>
-        <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-lecture">ℹ️</button>
-      </div>
-      <div id="mode-info-lecture" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">講演や質疑応答の収録向け。話者の声量差を吸収しながら聞き取りやすさを重視します。</div>
-
-      <div class="flex items-start gap-2">
-        <label class="inline-flex items-center">
-          <input type="radio" name="mode" value="bgm" class="mr-2">
-          <span>BGM / Lo-Fi</span>
-        </label>
-        <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-bgm">ℹ️</button>
-      </div>
-      <div id="mode-info-bgm" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">常時再生するバックグラウンドミュージック向け。耳障りになりにくいよう穏やかなダイナミクスにまとめます。</div>
-
-      <div class="flex items-start gap-2">
-        <label class="inline-flex items-center">
-          <input type="radio" name="mode" value="asmr" class="mr-2">
-          <span>ASMR / 朗読</span>
-        </label>
-        <button type="button" class="text-blue-600 hover:text-blue-800" aria-expanded="false" data-target="mode-info-asmr">ℹ️</button>
-      </div>
-      <div id="mode-info-asmr" class="ml-7 text-sm text-gray-600 hidden bg-gray-100 rounded p-2">近接収録の繊細な音向け。低ノイズで細かなニュアンスを保ちながら自然な音量感に整えます。</div>
-    </div>
-
-    <!-- 3. 正規化フェーズ -->
-    <h2 class="text-xl font-semibold mt-6 mb-2">3. 実際の正規化コマンド</h2>
+    <!-- 3. 仕上げフェーズ -->
+    <h2 class="text-xl font-semibold mt-6 mb-2">3. 仕上げフェーズ</h2>
     <label for="jsonInput" class="block mb-1">ラウドネス測定結果（ffmpeg出力全文）:</label>
-    <textarea id="jsonInput" rows="10" placeholder='ffmpeg の出力全文を貼り付けてください' class="border border-gray-300 rounded w-full p-2 mb-3"></textarea>
-    <button onclick="generateNormalizeCmd()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded mb-3">正規化コマンド生成</button>
-    <div class="relative">
-      <code id="normalizeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
-      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('normalizeCmd')">📋</button>
+    <textarea id="jsonInput" rows="10" placeholder='ffmpeg の出力全文を貼り付けてください' class="border border-gray-300 rounded w-full p-2 mb-4"></textarea>
+
+    <div class="tab-panel" data-tab="tab-icu" id="finish-normalize">
+      <button onclick="generateNormalizeCmd()" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded mb-3">正規化コマンド生成</button>
+      <div class="relative">
+        <code id="normalizeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
+        <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('normalizeCmd')">📋</button>
+      </div>
     </div>
 
-    <!-- 4. 単純ゲインフェーズ -->
-    <h2 class="text-xl font-semibold mt-6 mb-2">4. 解析結果から単純ゲイン</h2>
-    <p class="text-sm text-gray-600 mb-2">測定結果の input_i と選択モードの I の差分を dB で計算し、volume=+XdB を生成します。</p>
-    <button onclick="generateGainCmd()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded mb-3">単純ゲインコマンド生成</button>
-    <div class="relative">
-      <code id="gainCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
-      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('gainCmd')">📋</button>
+    <div class="tab-panel" data-tab="tab-gain" id="finish-gain" hidden>
+      <button onclick="generateGainCmd()" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded mb-3">単純ゲインコマンド生成</button>
+      <div class="relative">
+        <code id="gainCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
+        <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('gainCmd')">📋</button>
+      </div>
     </div>
   </div>
 
@@ -305,6 +354,29 @@ ${outFile}`;
         button.setAttribute("aria-expanded", willShow ? "true" : "false");
       });
     });
+
+    function setActiveTab(targetId) {
+      document.querySelectorAll(".tab-button").forEach(btn => {
+        const isActive = btn.getAttribute("data-target") === targetId;
+        btn.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+
+      document.querySelectorAll(".tab-panel").forEach(panel => {
+        const panelTarget = panel.getAttribute("data-tab");
+        if (!panelTarget) return;
+        panel.hidden = panelTarget !== targetId;
+      });
+    }
+
+    document.querySelectorAll(".tab-button").forEach(button => {
+      button.addEventListener("click", () => {
+        const targetId = button.getAttribute("data-target");
+        if (!targetId) return;
+        setActiveTab(targetId);
+      });
+    });
+
+    setActiveTab("tab-icu");
   </script>
 </body>
 </html>
