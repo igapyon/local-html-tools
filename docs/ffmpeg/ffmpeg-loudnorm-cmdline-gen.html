@@ -71,6 +71,14 @@ Licensed under the Apache License, Version 2.0
     </label>
     <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.WAV" class="border border-gray-300 rounded w-full p-2 mb-4">
 
+    <div class="mb-4">
+      <!-- ハイレゾ選択 -->
+      <label class="inline-flex items-center mr-6 font-semibold">
+        <input type="checkbox" id="hires" class="mr-2">
+        ハイレゾ（192kHz / 24bit）
+      </label>
+    </div>
+
     <div class="tab-list flex flex-wrap mb-4" role="tablist" aria-label="処理方式の切り替え">
       <button type="button" class="tab-button" data-target="tab-icu" aria-selected="true" aria-controls="tab-icu">
         ICUラウドネス調整
@@ -82,13 +90,6 @@ Licensed under the Apache License, Version 2.0
 
     <div class="tab-panel" data-tab="tab-icu" id="tab-icu">
       <h2 class="text-xl font-semibold mb-2">1. 音質設定（ICUラウドネス調整）</h2>
-      <div class="mb-4">
-        <!-- ハイレゾ選択 -->
-        <label class="inline-flex items-center mr-6">
-          <input type="checkbox" id="hires" class="mr-2">
-          ハイレゾ（192kHz / 24bit）
-        </label>
-      </div>
       <div class="mb-4 space-y-3">
         <!-- モード切り替え -->
         <div class="flex items-start gap-2">
