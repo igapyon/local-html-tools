@@ -80,6 +80,20 @@ limitations under the License.
     <p id="probeSummary" class="text-sm text-gray-600 mb-4">解析結果: 未反映</p>
 
     <h2 class="text-xl font-semibold mt-4 mb-2">2. 出力音声設定</h2>
+    <div class="flex items-center gap-2 mb-4">
+      <button type="button" onclick="applyYoutubePreset()" class="group bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded relative">
+        YouTube用プリセット
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          MP4 / AAC / 48 kHz / 2ch / 320 kbps に一括設定します。
+        </span>
+      </button>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          MP4 / AAC / 48 kHz / 2ch / 320 kbps に一括設定します。最終アップロード向けの無難な設定です。編集/保存用途は別設定が向きます。
+        </span>
+      </span>
+    </div>
 
     <label class="block mb-2 font-semibold">出力コンテナ:</label>
     <select id="container" class="border border-gray-300 rounded w-full p-2 mb-4" onchange="handleContainerChange()">
@@ -97,7 +111,16 @@ limitations under the License.
       <option value="pcm_s24le">PCM 24-bit（無圧縮）</option>
     </select>
 
-    <label class="block mb-2 font-semibold">サンプルレート:</label>
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>サンプルレート</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          AAC を選ぶと 96 kHz までに制限されます。
+        </span>
+      </span>
+      <span>：</span>
+    </label>
     <select id="sampleRate" class="border border-gray-300 rounded w-full p-2 mb-4">
       <option value="auto" selected>WAVに合わせる（自動）</option>
       <option value="44100">44.1 kHz</option>
@@ -105,7 +128,7 @@ limitations under the License.
       <option value="96000">96 kHz</option>
       <option value="192000">192 kHz</option>
     </select>
-    <p id="sampleRateNote" class="text-sm text-gray-600 mb-4">AAC を選ぶと 96 kHz までに制限されます。</p>
+    <p id="sampleRateNote" class="text-sm text-gray-600 mb-4"></p>
 
     <label class="block mb-2 font-semibold">チャンネル数:</label>
     <select id="channels" class="border border-gray-300 rounded w-full p-2 mb-4">
@@ -114,20 +137,45 @@ limitations under the License.
       <option value="2">ステレオ（2ch）</option>
     </select>
 
-    <label class="block mb-2 font-semibold">音声ビットレート:</label>
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>音声ビットレート</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          PCM を選ぶとビットレート指定は無視されます。
+        </span>
+      </span>
+      <span>：</span>
+    </label>
     <select id="audioBitrate" class="border border-gray-300 rounded w-full p-2 mb-4">
       <option value="192k" selected>192 kbps（標準）</option>
       <option value="256k">256 kbps</option>
       <option value="320k">320 kbps</option>
     </select>
-    <p id="bitrateNote" class="text-sm text-gray-600 mb-4">PCM を選ぶとビットレート指定は無視されます。</p>
 
-    <label class="block mb-2 font-semibold">出力ファイル名（任意・空欄なら自動生成）:</label>
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>出力ファイル名</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          任意。空欄なら自動生成します。
+        </span>
+      </span>
+      <span>：</span>
+    </label>
     <input type="text" id="outputFile" placeholder="例: output.mp4" class="border border-gray-300 rounded w-full p-2 mb-4">
 
-    <label class="block mb-2 font-semibold">音声タイミング調整（ms）:</label>
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>音声タイミング調整（ms）</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          正の値は音声を遅らせます。負の値は音声を前に出します。
+        </span>
+      </span>
+      <span>：</span>
+    </label>
     <input type="number" id="audioOffsetMs" placeholder="例: 120（+で遅らせる / -で先行）" class="border border-gray-300 rounded w-full p-2 mb-2">
-    <p class="text-sm text-gray-600 mb-4">正の値は音声を遅らせます。負の値は音声を前に出します。</p>
 
     <button onclick="generateReplaceAudioCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
       ffmpeg コマンド生成
@@ -315,6 +363,16 @@ limitations under the License.
 
       document.getElementById("probeSummary").textContent =
         summaryParts.length ? `解析結果: ${summaryParts.join(" / ")}` : "解析結果: 解析できませんでした";
+    }
+
+    function applyYoutubePreset() {
+      document.getElementById("container").value = "mp4";
+      document.getElementById("audioCodec").value = "aac";
+      document.getElementById("sampleRate").value = "48000";
+      document.getElementById("channels").value = "2";
+      document.getElementById("audioBitrate").value = "320k";
+      handleCodecChange();
+      handleContainerChange();
     }
 
     function generateReplaceAudioCmd() {
