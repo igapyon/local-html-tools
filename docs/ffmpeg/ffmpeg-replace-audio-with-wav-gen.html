@@ -102,6 +102,17 @@ limitations under the License.
       <option value="mov">MOV</option>
     </select>
 
+    <label class="flex flex-wrap items-center gap-2 mb-4 font-semibold">
+      <input type="checkbox" id="regenPts" class="rounded border-gray-300" checked>
+      <span>PTS再生成</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          YouTubeでの音ズレ対策に有効な場合があります。
+        </span>
+      </span>
+    </label>
+
     <label class="block mb-2 font-semibold">音声エンコード:</label>
     <select id="audioCodec" class="border border-gray-300 rounded w-full p-2 mb-4" onchange="handleCodecChange()">
       <option value="aac" selected>AAC（一般的）</option>
@@ -367,6 +378,7 @@ limitations under the License.
 
     function applyYoutubePreset() {
       document.getElementById("container").value = "mp4";
+      document.getElementById("regenPts").checked = true;
       document.getElementById("audioCodec").value = "aac";
       document.getElementById("sampleRate").value = "48000";
       document.getElementById("channels").value = "2";
@@ -385,6 +397,7 @@ limitations under the License.
       const container = document.getElementById("container").value;
       const sampleRateSelect = document.getElementById("sampleRate");
       const channelsSelect = document.getElementById("channels");
+      const regenPts = document.getElementById("regenPts").checked;
 
       if (!videoFile) {
         alert("動画ファイル名を入力してください。");
@@ -442,7 +455,8 @@ limitations under the License.
       }
 
       const bitratePart = audioCodec.startsWith("pcm_") ? "" : ` -b:a ${audioBitrate}`;
-      const cmd = `ffmpeg -i ${videoFile}${offsetPart} -i ${audioFile} -map 0:v:0 -map 1:a:0 -c:v copy -c:a ${audioCodec}${sampleRatePart}${channelPart}${bitratePart} -shortest ${output}`;
+      const ptsPart = regenPts ? " -fflags +genpts" : "";
+      const cmd = `ffmpeg${ptsPart} -i ${videoFile}${offsetPart} -i ${audioFile} -map 0:v:0 -map 1:a:0 -c:v copy -c:a ${audioCodec}${sampleRatePart}${channelPart}${bitratePart} -shortest ${output}`;
       document.getElementById("replaceCmd").textContent = cmd;
     }
 
