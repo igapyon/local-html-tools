@@ -10,8 +10,10 @@
 - exiftool: 写真のEXIF確認
 - nmap: ネットワーク上の公開システムを探すコマンド生成
 - pom.xml （自分の作り方）を生成するツール。mkdir つき。
+- ps/lsof/netstat/ss でプロセス/ポート調査コマンド生成
+- find/rg の検索コマンド生成（条件UIから）
 - ssh: 安全な接続コマンド生成
-- rsync: 安全な同期コマンド生成
+- rsync: 安全な同期コマンド生成（除外ルールテンプレ生成・.gitignore連携も）
 - scp: 安全な転送コマンド生成
 - openssl: 鍵/証明書生成コマンドの雛形
 - [後まわし] docker/docker-compose: よくある起動・開発用コマンド生成
