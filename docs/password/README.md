@@ -11,3 +11,10 @@ This folder contains a local HTML password generator tool.
 ## Scope
 - ASCII-only characters.
 - No Japanese or non-ASCII characters.
+
+## UI Requirements
+- The user can select character groups via checkboxes:
+  - Uppercase letters
+  - Lowercase letters
+  - Digits
+  - Symbols
