@@ -1,23 +1,25 @@
-# Password Generator Specs
+# パスワードジェネレーター仕様
 
-This folder contains a local HTML password generator tool.
+このフォルダにはローカルで動作するHTMLのパスワードジェネレーターを配置します。
 
-## Character Set (Fixed)
-- Digits: 0 1 2 3 4 5 6 7 8 9
-- Uppercase: A D E F H M N R T Y
-- Lowercase: a d e f h m n r t y
-- Symbols: @ # $
+## 文字セット（固定）
+- 数字: 0 1 2 3 4 5 6 7 8 9
+- 英大文字: A D E F H M N R T Y
+- 英小文字: a d e f h m n r t y
+- 記号: @ # $
 
-## Scope
-- ASCII-only characters.
-- No Japanese or non-ASCII characters.
+## 対象範囲
+- ASCII文字のみ。
+- 日本語や非ASCII文字は使わない。
 
-## UI Requirements
-- The user can select character groups via checkboxes:
-  - Uppercase letters
-  - Lowercase letters
-  - Digits
-  - Symbols
-- The user can input the password length.
-  - Default length is 8.
-- The generated password should start with a letter (A-Z or a-z).
+## UI要件
+- チェックボックスで文字種を選択できること:
+  - 英大文字
+  - 英小文字
+  - 数字
+  - 記号
+  - いずれか1つ以上が選択されていること。
+- 文字数を入力できること。
+  - デフォルトは8文字。
+- 生成するパスワードは英字で始まること（A-Z または a-z）。
+  - 英大文字または英小文字のいずれかがチェックされていることが必須。
