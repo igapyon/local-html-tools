@@ -2,19 +2,20 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>local-html-tools</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 text-base sm:text-lg">
+<body class="bg-gray-100 text-gray-800">
   <div class="container mx-auto px-4 py-8">
     <header class="text-center mb-8">
-      <h1 class="text-4xl sm:text-5xl font-bold">local-html-tools</h1>
-      <p class="mt-2">ウェブブラウザで動く、ローカルHTMLツール集（Static Web App）</p>
-      <p class="mt-1 text-sm sm:text-base text-gray-500">更新日: 2026-01-11</p>
+      <h1 class="text-4xl font-bold">local-html-tools</h1>
+      <p class="mt-2 text-lg">ウェブブラウザで動く、ローカルHTMLツール集（Static Web App）</p>
+      <p class="mt-1 text-sm text-gray-500">更新日: 2026-01-11</p>
     </header>
 
     <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 class="text-2xl sm:text-3xl font-semibold mb-4">コンセプト</h2>
+        <h2 class="text-2xl font-semibold mb-4">コンセプト</h2>
         <p class="mb-2 flex flex-wrap items-center gap-2">
           <span>このツール群は、お使いのコンピュータ上で直接動作する、一連のシンプルなHTMLファイル（Static Web App）です。</span>
           <span class="relative inline-flex items-center group">
@@ -24,7 +25,7 @@
             </span>
           </span>
         </p>
-        <h3 class="text-xl sm:text-2xl font-semibold mt-4 mb-2">主な特徴</h3>
+        <h3 class="text-xl font-semibold mt-4 mb-2">主な特徴</h3>
         <ul class="list-disc list-inside">
             <li><strong>ローカル動作</strong>: インターネット接続は不要で、お使いのPC内だけで完結します。</li>
             <li><strong>簡単な操作</strong>: ウェブブラウザでファイルを開き、情報を入力するだけでコマンドが手に入ります。</li>
@@ -33,67 +34,67 @@
     </div>
 
     <div class="max-w-2xl mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-semibold mb-4 text-center">ツール一覧</h2>
-      <h3 class="text-lg sm:text-xl font-semibold text-gray-700 mt-2 mb-3">
+      <h2 class="text-2xl font-semibold mb-4 text-center">ツール一覧</h2>
+      <h3 class="text-lg font-semibold text-gray-700 mt-2 mb-3">
         <span aria-hidden="true" class="mr-2">🎬</span>メディア処理（FFmpeg）
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <a href="ffmpeg/ffmpeg-concat-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg sm:text-xl">
+          <h3 class="font-semibold text-lg">
             <span aria-hidden="true" class="mr-2">🧩</span>FFmpeg ファイル結合
           </h3>
           <p class="text-gray-600">複数の.wavファイルを1つに結合するコマンドを生成します。</p>
         </a>
         <a href="ffmpeg/ffmpeg-loudnorm-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg sm:text-xl">
+          <h3 class="font-semibold text-lg">
             <span aria-hidden="true" class="mr-2">🔊</span>FFmpeg 音量正規化 (Loudnorm)
           </h3>
           <p class="text-gray-600">.wavファイルの音量をラウドネス基準に合わせて正規化します。</p>
         </a>
         <a href="ffmpeg/ffmpeg-trim-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg sm:text-xl">
+          <h3 class="font-semibold text-lg">
             <span aria-hidden="true" class="mr-2">✂️</span>FFmpeg 切り出し (Trim)
           </h3>
           <p class="text-gray-600">音声/動画ファイルの一部を時間指定で切り出すコマンドを生成します。</p>
         </a>
         <a href="ffmpeg/ffmpeg-wav2m4a-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg sm:text-xl">
+          <h3 class="font-semibold text-lg">
             <span aria-hidden="true" class="mr-2">🎧</span>FFmpeg .wav から .m4a へ変換
           </h3>
           <p class="text-gray-600">高品質な.wavファイルを圧縮された.m4a形式に変換します。</p>
         </a>
         <a href="ffmpeg/ffmpeg-youtube-mkv-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg sm:text-xl">
+          <h3 class="font-semibold text-lg">
             <span aria-hidden="true" class="mr-2">📺</span>YouTube向け動画生成
           </h3>
           <p class="text-gray-600">一枚の画像と音声ファイルから、YouTube投稿用の動画ファイル(.mkv)を生成します。</p>
         </a>
         <a href="ffmpeg/ffmpeg-mp4-to-wav-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg sm:text-xl">
+          <h3 class="font-semibold text-lg">
             <span aria-hidden="true" class="mr-2">🎵</span>MP4からWAV抽出
           </h3>
           <p class="text-gray-600">mp4ファイルから音声をWAVとして取り出すコマンドを生成します。</p>
         </a>
         <a href="ffmpeg/ffmpeg-replace-audio-with-wav-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg sm:text-xl">
+          <h3 class="font-semibold text-lg">
             <span aria-hidden="true" class="mr-2">🔁</span>MP4音声差し替え（WAV）
           </h3>
           <p class="text-gray-600">動画の映像はそのままに、WAV音声へ差し替えるコマンドを生成します。</p>
         </a>
         <a href="ffmpeg/ffmpeg-silence-detect-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg sm:text-xl">
+          <h3 class="font-semibold text-lg">
             <span aria-hidden="true" class="mr-2">🔇</span>無音区間検出
           </h3>
           <p class="text-gray-600">silencedetect で無音区間を検出するコマンドを生成します。</p>
         </a>
       </div>
 
-      <h3 class="text-lg sm:text-xl font-semibold text-gray-700 mb-3">
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">
         <span aria-hidden="true" class="mr-2">🔐</span>パスワード
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <a href="password/password-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg sm:text-xl">
+          <h3 class="font-semibold text-lg">
             <span aria-hidden="true" class="mr-2">🛡️</span>パスワードジェネレーター
           </h3>
           <p class="text-gray-600">選択した文字種と文字数でパスワードを生成します。</p>
