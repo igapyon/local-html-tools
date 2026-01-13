@@ -1,0 +1,494 @@
+<!--
+Copyright 2025 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>FFmpeg 音声差し替え（WAV）コマンドジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </svg>
+    
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🔁</span>FFmpeg 音声差し替え（WAV）コマンドジェネレータ</h1>
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>元の動画ファイル</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          例: input.mp4
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <input type="text" id="videoFile" placeholder="例: input.mp4 / input.mkv / input.mov" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>差し替える音声ファイル</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          例: new_audio.wav
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <input type="text" id="audioFile" placeholder="例: new_audio.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <h2 class="text-xl font-semibold mt-4 mb-2">1. WAV 解析（ffprobe）</h2>
+    <button onclick="generateProbeCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-3">
+      ffprobe コマンド生成
+    </button>
+    <div class="relative mb-4">
+      <code id="probeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('probeCmd')">📋</button>
+    </div>
+
+    <label class="block mb-2 font-semibold">ffprobe 出力（JSON/テキスト）:</label>
+    <textarea id="probeOutput" rows="6" placeholder="ffprobe の出力を貼り付けてください" class="border border-gray-300 rounded w-full p-2 mb-3"></textarea>
+    <button onclick="applyProbeResult()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mb-4">
+      解析結果を反映
+    </button>
+    <p id="probeSummary" class="text-sm text-gray-600 mb-4">解析結果: 未反映</p>
+
+    <h2 class="text-xl font-semibold mt-4 mb-2">2. 出力音声設定</h2>
+    <div class="flex items-center gap-2 mb-4">
+      <button type="button" onclick="applyYoutubePreset()" class="group bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded relative">
+        YouTube用プリセット
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          MP4 / AAC / 48 kHz / 2ch / 320 kbps に一括設定します。
+        </span>
+      </button>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          MP4 / AAC / 48 kHz / 2ch / 320 kbps に一括設定します。最終アップロード向けの無難な設定です。編集/保存用途は別設定が向きます。プリセット後は解析結果の反映が不要なケースが多いです。
+        </span>
+      </span>
+    </div>
+
+    <label class="block mb-2 font-semibold">出力コンテナ:</label>
+    <select id="container" class="border border-gray-300 rounded w-full p-2 mb-4" onchange="handleContainerChange()">
+      <option value="mp4" selected>MP4</option>
+      <option value="mkv">MKV</option>
+      <option value="mov">MOV</option>
+    </select>
+
+    <label class="flex flex-wrap items-center gap-2 mb-4 font-semibold">
+      <input type="checkbox" id="regenPts" class="rounded border-gray-300" checked>
+      <span>PTS再生成</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          YouTubeでの音ズレ対策に有効な場合があります。
+        </span>
+      </span>
+    </label>
+
+    <label class="block mb-2 font-semibold">音声エンコード:</label>
+    <select id="audioCodec" class="border border-gray-300 rounded w-full p-2 mb-4" onchange="handleCodecChange()">
+      <option value="aac" selected>AAC（一般的）</option>
+      <option value="libopus">Opus</option>
+      <option value="ac3">AC-3</option>
+      <option value="pcm_s16le">PCM 16-bit（無圧縮）</option>
+      <option value="pcm_s24le">PCM 24-bit（無圧縮）</option>
+    </select>
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>サンプルレート</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          AAC を選ぶと 96 kHz までに制限されます。
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <select id="sampleRate" class="border border-gray-300 rounded w-full p-2 mb-4">
+      <option value="auto" selected>WAVに合わせる（自動）</option>
+      <option value="44100">44.1 kHz</option>
+      <option value="48000">48 kHz</option>
+      <option value="96000">96 kHz</option>
+      <option value="192000">192 kHz</option>
+    </select>
+    <p id="sampleRateNote" class="text-sm text-gray-600 mb-4"></p>
+
+    <label class="block mb-2 font-semibold">チャンネル数:</label>
+    <select id="channels" class="border border-gray-300 rounded w-full p-2 mb-4">
+      <option value="auto" selected>WAVに合わせる（自動）</option>
+      <option value="1">モノラル（1ch）</option>
+      <option value="2">ステレオ（2ch）</option>
+    </select>
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>音声ビットレート</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          PCM を選ぶとビットレート指定は無視されます。
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <select id="audioBitrate" class="border border-gray-300 rounded w-full p-2 mb-4">
+      <option value="192k" selected>192 kbps（標準）</option>
+      <option value="256k">256 kbps</option>
+      <option value="320k">320 kbps</option>
+    </select>
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>出力ファイル名</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-64 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          任意。空欄なら自動生成します。
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <input type="text" id="outputFile" placeholder="例: output.mp4" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>音声タイミング調整（ms）</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          正の値は音声を遅らせます。負の値は音声を前に出します。
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <input type="number" id="audioOffsetMs" placeholder="例: 120（+で遅らせる / -で先行）" class="border border-gray-300 rounded w-full p-2 mb-2">
+
+    <button onclick="generateReplaceAudioCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
+      ffmpeg コマンド生成
+    </button>
+
+    <div class="relative">
+      <code id="replaceCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('replaceCmd')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    function inferOutputName(input, audio, container, offsetMs) {
+      const base = input.replace(/\.[^/.]+$/i, "");
+      const audioBase = audio.replace(/\.[^/.]+$/i, "");
+      let offsetTag = "";
+      if (offsetMs) {
+        const normalized = String(offsetMs).trim();
+        const prefix = normalized.startsWith("-") ? "" : "+";
+        offsetTag = `-offset${prefix}${normalized}ms`;
+      }
+      return `${base}-replace-${audioBase}${offsetTag}.${container}`;
+    }
+
+    function generateProbeCommand() {
+      const audioFile = document.getElementById("audioFile").value.trim();
+      if (!audioFile) {
+        alert("音声ファイル名を入力してください。");
+        return;
+      }
+      const cmd = `ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate,channels,channel_layout -of json ${audioFile}`;
+      document.getElementById("probeCmd").textContent = cmd;
+    }
+
+    function extractJson(text) {
+      const start = text.indexOf("{");
+      const end = text.lastIndexOf("}");
+      if (start === -1 || end === -1 || end <= start) return null;
+      return text.substring(start, end + 1);
+    }
+
+    function parseProbeOutput(raw) {
+      let sampleRate = null;
+      let channels = null;
+      let channelLayout = null;
+
+      const jsonText = extractJson(raw);
+      if (jsonText) {
+        try {
+          const parsed = JSON.parse(jsonText);
+          const stream = parsed.streams && parsed.streams[0];
+          if (stream) {
+            if (stream.sample_rate) sampleRate = String(stream.sample_rate);
+            if (stream.channels) channels = Number(stream.channels);
+            if (stream.channel_layout) channelLayout = String(stream.channel_layout);
+          }
+        } catch (e) {
+          // fall through to regex parsing
+        }
+      }
+
+      if (!sampleRate) {
+        const match = raw.match(/sample_rate"?\s*[:=]\s*"?(\d+)/i);
+        if (match) sampleRate = match[1];
+      }
+      if (!channels) {
+        const match = raw.match(/channels"?\s*[:=]\s*"?(\d+)/i);
+        if (match) channels = Number(match[1]);
+      }
+      if (!channelLayout) {
+        const match = raw.match(/channel_layout"?\s*[:=]\s*"?([a-z_]+)"/i);
+        if (match) channelLayout = match[1];
+      }
+
+      if (!channels && channelLayout) {
+        if (channelLayout === "mono") channels = 1;
+        if (channelLayout === "stereo") channels = 2;
+      }
+
+      return { sampleRate, channels, channelLayout };
+    }
+
+    function clampSampleRateForCodec(sampleRate, codec) {
+      if (!sampleRate) return sampleRate;
+      if (codec === "aac" && Number(sampleRate) > 96000) {
+        return "96000";
+      }
+      return sampleRate;
+    }
+
+    function handleCodecChange() {
+      const codec = document.getElementById("audioCodec").value;
+      const containerSelect = document.getElementById("container");
+      const sampleSelect = document.getElementById("sampleRate");
+      const options = Array.from(sampleSelect.options);
+      options.forEach(option => {
+        if (option.value === "192000") {
+          option.disabled = (codec === "aac");
+        }
+      });
+
+      if (codec === "aac") {
+        if (sampleSelect.value === "192000") {
+          sampleSelect.value = "96000";
+        }
+        const detectedSampleRate = sampleSelect.dataset.detectedSampleRate;
+        if (detectedSampleRate && Number(detectedSampleRate) > 96000) {
+          sampleSelect.dataset.detectedSampleRate = "96000";
+        }
+      }
+
+      const pcmSelected = codec.startsWith("pcm_");
+      Array.from(containerSelect.options).forEach(option => {
+        if (option.value === "mp4") {
+          option.disabled = pcmSelected;
+        }
+      });
+      if (pcmSelected && containerSelect.value === "mp4") {
+        containerSelect.value = "mkv";
+      }
+
+      const bitrateSelect = document.getElementById("audioBitrate");
+      bitrateSelect.disabled = pcmSelected;
+    }
+
+    function handleContainerChange() {
+      const container = document.getElementById("container").value;
+      const outputInput = document.getElementById("outputFile");
+      if (!outputInput.value) {
+        outputInput.placeholder = `例: output.${container}`;
+      }
+    }
+
+    function applyProbeResult() {
+      const raw = document.getElementById("probeOutput").value.trim();
+      if (!raw) {
+        alert("ffprobe 出力を貼り付けてください。");
+        return;
+      }
+
+      const codec = document.getElementById("audioCodec").value;
+      const { sampleRate, channels, channelLayout } = parseProbeOutput(raw);
+      const normalizedSampleRate = clampSampleRateForCodec(sampleRate, codec);
+      const summaryParts = [];
+
+      if (normalizedSampleRate) {
+        const sampleSelect = document.getElementById("sampleRate");
+        let hasOption = false;
+        Array.from(sampleSelect.options).forEach(option => {
+          if (option.value === normalizedSampleRate) hasOption = true;
+        });
+        if (!hasOption) {
+          const option = document.createElement("option");
+          option.value = normalizedSampleRate;
+          option.textContent = `${normalizedSampleRate} Hz（ソース）`;
+          sampleSelect.appendChild(option);
+        }
+        sampleSelect.value = normalizedSampleRate;
+        if (normalizedSampleRate !== sampleRate) {
+          summaryParts.push(`サンプルレート: ${sampleRate} Hz → ${normalizedSampleRate} Hz`);
+        } else {
+          summaryParts.push(`サンプルレート: ${normalizedSampleRate} Hz`);
+        }
+      }
+
+      if (channels) {
+        const channelSelect = document.getElementById("channels");
+        if (channels === 1 || channels === 2) {
+          channelSelect.value = String(channels);
+        } else {
+          channelSelect.value = "auto";
+          channelSelect.dataset.detectedChannels = String(channels);
+        }
+        summaryParts.push(`チャンネル数: ${channels}ch`);
+      } else if (channelLayout) {
+        summaryParts.push(`チャンネル構成: ${channelLayout}`);
+      }
+
+      document.getElementById("channels").dataset.detectedChannels = channels ? String(channels) : "";
+      document.getElementById("sampleRate").dataset.detectedSampleRate = normalizedSampleRate ? String(normalizedSampleRate) : "";
+
+      document.getElementById("probeSummary").textContent =
+        summaryParts.length ? `解析結果: ${summaryParts.join(" / ")}` : "解析結果: 解析できませんでした";
+    }
+
+    function applyYoutubePreset() {
+      document.getElementById("container").value = "mp4";
+      document.getElementById("regenPts").checked = true;
+      document.getElementById("audioCodec").value = "aac";
+      document.getElementById("sampleRate").value = "48000";
+      document.getElementById("channels").value = "2";
+      document.getElementById("audioBitrate").value = "320k";
+      handleCodecChange();
+      handleContainerChange();
+    }
+
+    function generateReplaceAudioCmd() {
+      const videoFile = document.getElementById("videoFile").value.trim();
+      const audioFile = document.getElementById("audioFile").value.trim();
+      const audioOffsetMs = document.getElementById("audioOffsetMs").value.trim();
+      const audioCodec = document.getElementById("audioCodec").value;
+      const audioBitrate = document.getElementById("audioBitrate").value;
+      const outputInput = document.getElementById("outputFile").value.trim();
+      const container = document.getElementById("container").value;
+      const sampleRateSelect = document.getElementById("sampleRate");
+      const channelsSelect = document.getElementById("channels");
+      const regenPts = document.getElementById("regenPts").checked;
+
+      if (!videoFile) {
+        alert("動画ファイル名を入力してください。");
+        return;
+      }
+      if (!audioFile) {
+        alert("音声ファイル名を入力してください。");
+        return;
+      }
+      if (!/\.(mp4|mkv|mov)$/i.test(videoFile)) {
+        alert("動画ファイルは .mp4 / .mkv / .mov を指定してください。");
+        return;
+      }
+      if (!/\.wav$/i.test(audioFile)) {
+        alert("音声ファイルは .wav を指定してください。");
+        return;
+      }
+
+      const output = outputInput || inferOutputName(videoFile, audioFile, container, audioOffsetMs);
+
+      let offsetPart = "";
+      if (audioOffsetMs) {
+        const offsetValue = Number(audioOffsetMs);
+        if (isNaN(offsetValue)) {
+          alert("音声タイミング調整は数値で指定してください。");
+          return;
+        }
+        if (offsetValue !== 0) {
+          offsetPart = ` -itsoffset ${(offsetValue / 1000).toFixed(3)}`;
+        }
+      }
+
+      let sampleRatePart = "";
+      if (sampleRateSelect.value === "auto") {
+        const detectedSampleRate = sampleRateSelect.dataset.detectedSampleRate;
+        if (detectedSampleRate) {
+          sampleRatePart = ` -ar ${detectedSampleRate}`;
+        }
+      } else {
+        const selected = clampSampleRateForCodec(sampleRateSelect.value, audioCodec);
+        if (selected !== sampleRateSelect.value) {
+          sampleRateSelect.value = selected;
+        }
+        sampleRatePart = ` -ar ${selected}`;
+      }
+
+      let channelPart = "";
+      if (channelsSelect.value === "auto") {
+        const detectedChannels = channelsSelect.dataset.detectedChannels;
+        if (detectedChannels) {
+          channelPart = ` -ac ${detectedChannels}`;
+        }
+      } else {
+        channelPart = ` -ac ${channelsSelect.value}`;
+      }
+
+      const bitratePart = audioCodec.startsWith("pcm_") ? "" : ` -b:a ${audioBitrate}`;
+      const ptsPart = regenPts ? " -fflags +genpts" : "";
+      const cmd = `ffmpeg${ptsPart} -i ${videoFile}${offsetPart} -i ${audioFile} -map 0:v:0 -map 1:a:0 -c:v copy -c:a ${audioCodec}${sampleRatePart}${channelPart}${bitratePart} -shortest ${output}`;
+      document.getElementById("replaceCmd").textContent = cmd;
+    }
+
+    handleCodecChange();
+    handleContainerChange();
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+    function toggleMenu() {
+      const panel = document.getElementById("menuPanel");
+      if (!panel) return;
+      panel.classList.toggle("hidden");
+    }
+  </script>
+</body>
+</html>

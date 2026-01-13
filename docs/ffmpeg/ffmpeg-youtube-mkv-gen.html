@@ -21,13 +21,46 @@ limitations under the License.
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
-  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-6">YouTube向け FFmpeg コマンドジェネレータ (v20250624a)</h1>
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
 
-    <label class="block mb-2 font-semibold">音声ファイル（.wav）:</label>
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </svg>
+    
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">📺</span>YouTube向け FFmpeg コマンドジェネレータ</h1>
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>音声ファイル（.wav）</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          例: 250503_TrMic-part1.wav
+        </span>
+      </span>
+      <span>：</span>
+    </label>
     <input type="text" id="audioFile" placeholder="例: 250503_TrMic-part1.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
 
-    <label class="block mb-2 font-semibold">画像ファイル（.png, .jpg, .jpeg）:</label>
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>画像ファイル（.png, .jpg, .jpeg）</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          例: Borodin.png
+        </span>
+      </span>
+      <span>：</span>
+    </label>
     <input type="text" id="imageFile" placeholder="例: Borodin.png" class="border border-gray-300 rounded w-full p-2 mb-4">
 
     <button onclick="generateYoutubeCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
@@ -93,6 +126,11 @@ limitations under the License.
         toast.classList.remove("opacity-100");
         toast.classList.add("opacity-0", "pointer-events-none");
       }, 2000);
+    }
+    function toggleMenu() {
+      const panel = document.getElementById("menuPanel");
+      if (!panel) return;
+      panel.classList.toggle("hidden");
     }
   </script>
 </body>
