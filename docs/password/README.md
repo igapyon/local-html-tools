@@ -18,3 +18,6 @@ This folder contains a local HTML password generator tool.
   - Lowercase letters
   - Digits
   - Symbols
+- The user can input the password length.
+  - Default length is 8.
+- The generated password should start with a letter (A-Z or a-z).
