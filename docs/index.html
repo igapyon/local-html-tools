@@ -9,25 +9,26 @@
   <div class="container mx-auto px-4 py-8">
     <header class="text-center mb-8">
       <h1 class="text-4xl font-bold">local-html-tools</h1>
-      <p class="mt-2 text-lg">ウェブブラウザで動く、FFmpegコマンドの自動生成ツール</p>
+      <p class="mt-2 text-lg">ウェブブラウザで動く、ローカルHTMLツール集（Static Web App）</p>
       <p class="mt-1 text-sm text-gray-500">更新日: 2026-01-11</p>
     </header>
 
     <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md mb-8">
         <h2 class="text-2xl font-semibold mb-4">コンセプト</h2>
-        <p class="mb-2">このツール群は、お使いのコンピュータ上で直接動作する、一連のシンプルなHTMLファイルです。</p>
+        <p class="mb-2">このツール群は、お使いのコンピュータ上で直接動作する、一連のシンプルなHTMLファイル（Static Web App）です。</p>
         <p class="mb-2">各ツール（HTMLファイル）をウェブブラウザで開くと、専用の入力画面が表示されます。そこにファイル名などの必要な情報を入力するだけで、FFmpegで使えるコマンドラインのテキストが自動的に作成されます。</p>
         <h3 class="text-xl font-semibold mt-4 mb-2">主な特徴</h3>
         <ul class="list-disc list-inside">
             <li><strong>ローカル動作</strong>: インターネット接続は不要で、お使いのPC内だけで完結します。</li>
             <li><strong>簡単な操作</strong>: ウェブブラウザでファイルを開き、情報を入力するだけでコマンドが手に入ります。</li>
-            <li><strong>効率化</strong>: FFmpegの複雑なコマンドの構文を覚える必要がなく、手入力によるミスを防ぎます。</li>
+            <li><strong>効率化</strong>: （FFmpeg系の場合）複雑なコマンドの構文を覚える必要がなく、手入力によるミスを防ぎます。</li>
         </ul>
     </div>
 
     <div class="max-w-2xl mx-auto">
       <h2 class="text-2xl font-semibold mb-4 text-center">ツール一覧</h2>
-      <div class="grid gap-4">
+      <h3 class="text-lg font-semibold text-gray-700 mt-2 mb-3">メディア処理（FFmpeg）</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <a href="ffmpeg/ffmpeg-concat-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
           <h3 class="font-semibold text-lg">FFmpeg ファイル結合</h3>
           <p class="text-gray-600">複数の.wavファイルを1つに結合するコマンドを生成します。</p>
@@ -60,6 +61,10 @@
           <h3 class="font-semibold text-lg">無音区間検出</h3>
           <p class="text-gray-600">silencedetect で無音区間を検出するコマンドを生成します。</p>
         </a>
+      </div>
+
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">パスワード</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <a href="password/password-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
           <h3 class="font-semibold text-lg">パスワードジェネレーター</h3>
           <p class="text-gray-600">選択した文字種と文字数でパスワードを生成します。</p>
