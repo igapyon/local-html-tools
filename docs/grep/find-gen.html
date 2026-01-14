@@ -1,0 +1,264 @@
+<!--
+Copyright 2025 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>find 検索コマンドジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </svg>
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+
+    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🔎</span>find 検索コマンドジェネレータ</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="flex items-center gap-2 mb-2 font-semibold">
+          <span>検索開始パス</span>
+          <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+        </label>
+        <input type="text" id="basePath" placeholder="例: . / ~/projects" class="border border-gray-300 rounded w-full p-2" value=".">
+      </div>
+      <div>
+        <label class="block mb-2 font-semibold">対象の種類:</label>
+        <select id="targetType" class="border border-gray-300 rounded w-full p-2">
+          <option value="any">指定なし（ファイル/ディレクトリ）</option>
+          <option value="file" selected>ファイルのみ (-type f)</option>
+          <option value="dir">ディレクトリのみ (-type d)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="block mb-2 font-semibold">拡張子:</label>
+        <input type="text" id="extension" placeholder="例: txt / wav / jpg / java" class="border border-gray-300 rounded w-full p-2">
+      </div>
+      <div>
+        <label class="block mb-2 font-semibold">名前パターン（ワイルドカード可）:</label>
+        <input type="text" id="namePattern" placeholder="例: report / *.log / data??.csv" class="border border-gray-300 rounded w-full p-2 mb-2">
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+          <input type="checkbox" id="caseInsensitive" class="rounded border-gray-300">
+          大文字・小文字を区別しない (-iname)
+        </label>
+      </div>
+    </div>
+
+    <details class="mb-4 border border-gray-200 rounded-lg p-3 bg-gray-50">
+      <summary class="cursor-pointer font-semibold text-gray-700">詳細条件</summary>
+      <div class="mt-4">
+        <label class="block mb-2 font-semibold">サイズ条件:</label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+          <select id="sizeComparator" class="border border-gray-300 rounded w-full p-2">
+            <option value="min">以上 (>=)</option>
+            <option value="max">以下 (<=)</option>
+          </select>
+          <input type="number" id="sizeValue" placeholder="例: 10" class="border border-gray-300 rounded w-full p-2">
+          <select id="sizeUnit" class="border border-gray-300 rounded w-full p-2">
+            <option value="K">KB</option>
+            <option value="M" selected>MB</option>
+            <option value="G">GB</option>
+          </select>
+        </div>
+
+        <label class="block mb-2 font-semibold">更新日時条件:</label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+          <select id="mtimeComparator" class="border border-gray-300 rounded w-full p-2">
+            <option value="within" selected>直近N日以内</option>
+            <option value="older">N日より前</option>
+          </select>
+          <input type="number" id="mtimeValue" placeholder="例: 7" class="border border-gray-300 rounded w-full p-2">
+          <div class="flex items-center text-sm text-gray-600">日</div>
+        </div>
+
+        <label class="block mb-2 font-semibold">深さ条件:</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input type="number" id="minDepth" placeholder="最小深さ (mindepth)" class="border border-gray-300 rounded w-full p-2">
+          <input type="number" id="maxDepth" placeholder="最大深さ (maxdepth)" class="border border-gray-300 rounded w-full p-2">
+        </div>
+      </div>
+    </details>
+
+    <label class="block mb-2 font-semibold">内容検索:</label>
+    <input type="text" id="contentPattern" placeholder="例: ERROR / TODO / 404" class="border border-gray-300 rounded w-full p-2 mb-2">
+    <label class="flex items-center gap-2 mb-4 text-sm text-gray-600">
+      <input type="checkbox" id="useRipgrep" class="rounded border-gray-300" checked>
+      rg で検索（未チェックなら grep -E を使用）
+    </label>
+
+    <button onclick="generateFindCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
+      find コマンド生成
+    </button>
+
+    <div class="relative">
+      <code id="findCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('findCmd')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    function quoteIfNeeded(value) {
+      if (!value) return value;
+      if (/[\s"]/g.test(value)) {
+        const escaped = value.replace(/"/g, '\\"');
+        return `"${escaped}"`;
+      }
+      return value;
+    }
+
+    function quoteAlways(value) {
+      if (!value) return value;
+      const escaped = value.replace(/"/g, '\\"');
+      return `"${escaped}"`;
+    }
+
+    function normalizePattern(pattern) {
+      if (!pattern) return "";
+      if (/[*?\[]/.test(pattern)) return pattern;
+      return `*${pattern}*`;
+    }
+
+    function generateFindCommand() {
+      const basePath = document.getElementById("basePath").value.trim() || ".";
+      const targetType = document.getElementById("targetType").value;
+      const namePattern = document.getElementById("namePattern").value.trim();
+      const extension = document.getElementById("extension").value.trim();
+      const caseInsensitive = document.getElementById("caseInsensitive").checked;
+      const sizeComparator = document.getElementById("sizeComparator").value;
+      const sizeValue = document.getElementById("sizeValue").value.trim();
+      const sizeUnit = document.getElementById("sizeUnit").value;
+      const mtimeComparator = document.getElementById("mtimeComparator").value;
+      const mtimeValue = document.getElementById("mtimeValue").value.trim();
+      const minDepth = document.getElementById("minDepth").value.trim();
+      const maxDepth = document.getElementById("maxDepth").value.trim();
+      const contentPattern = document.getElementById("contentPattern").value.trim();
+      const useRipgrep = document.getElementById("useRipgrep").checked;
+
+      const parts = [];
+      const nameFlag = caseInsensitive ? "-iname" : "-name";
+
+      if (maxDepth) {
+        const num = Number(maxDepth);
+        if (!Number.isInteger(num) || num < 0) {
+          alert("最大深さは0以上の整数で入力してください。");
+          return;
+        }
+        parts.push(`-maxdepth ${num}`);
+      }
+      if (minDepth) {
+        const num = Number(minDepth);
+        if (!Number.isInteger(num) || num < 0) {
+          alert("最小深さは0以上の整数で入力してください。");
+          return;
+        }
+        parts.push(`-mindepth ${num}`);
+      }
+      if (minDepth && maxDepth && Number(minDepth) > Number(maxDepth)) {
+        alert("最小深さが最大深さを超えています。");
+        return;
+      }
+
+      if (targetType === "file") parts.push("-type f");
+      if (targetType === "dir") parts.push("-type d");
+
+      if (namePattern) {
+        const pattern = normalizePattern(namePattern);
+        parts.push(`${nameFlag} "${pattern}"`);
+      }
+
+      if (extension) {
+        const cleaned = extension.replace(/^\./, "").trim();
+        if (cleaned) {
+          parts.push(`${nameFlag} "*.${cleaned}"`);
+        }
+      }
+
+      if (sizeValue) {
+        const num = Number(sizeValue);
+        if (!Number.isFinite(num) || num <= 0) {
+          alert("サイズは正の数で入力してください。");
+          return;
+        }
+        const sign = sizeComparator === "min" ? "+" : "-";
+        parts.push(`-size ${sign}${num}${sizeUnit}`);
+      }
+
+      if (mtimeValue) {
+        const num = Number(mtimeValue);
+        if (!Number.isFinite(num) || num < 0) {
+          alert("更新日数は0以上の数で入力してください。");
+          return;
+        }
+        const sign = mtimeComparator === "within" ? "-" : "+";
+        parts.push(`-mtime ${sign}${Math.floor(num)}`);
+      }
+
+      let cmd = `find ${quoteIfNeeded(basePath)}${parts.length ? " " + parts.join(" ") : ""}`;
+      if (contentPattern) {
+        const tool = useRipgrep ? "rg" : "grep -nE";
+        const quoted = quoteAlways(contentPattern);
+        cmd += ` -print0 | xargs -0 ${tool} ${quoted}`;
+      }
+      document.getElementById("findCmd").textContent = cmd;
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      if (!text) return;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+
+    function toggleMenu() {
+      const panel = document.getElementById("menuPanel");
+      if (!panel) return;
+      panel.classList.toggle("hidden");
+    }
+  </script>
+</body>
+</html>
