@@ -5,8 +5,10 @@
 - find/rg の検索コマンド生成（条件UIから）
 - exiftool: 写真のEXIF確認
 - tar/zip/7z: 圧縮・解凍コマンド生成
+- pdfimages: PDFから画像抽出コマンド生成
 - nmap: ネットワーク上の公開システムを探すコマンド生成
 - pom.xml （自分の作り方）を生成するツール。mkdir つき。
+- python -m http.server など簡易サーバ起動コマンド生成
 - ps/lsof/netstat/ss でプロセス/ポート調査コマンド生成
 - ssh: 安全な接続コマンド生成
 - rsync: 安全な同期コマンド生成（除外ルールテンプレ生成・.gitignore連携も）
