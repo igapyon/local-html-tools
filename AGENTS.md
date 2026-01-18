@@ -15,6 +15,7 @@
 ## 構成
 - `docs/index.html` トップページ（ツール一覧へのリンクと簡易説明）。
 - `docs/ffmpeg/` FFmpegおよび周辺ツールのHTMLが配置。
+- `docs/link/` URL加工系ツールのHTMLが配置。
 - `docs/password/` パスワード生成ツールのHTMLが配置。
 
 ## ツール一覧（docs/ffmpeg）
@@ -28,3 +29,6 @@
 
 ## ツール一覧（docs/password）
 - `password-gen.html` 文字種と文字数を指定してパスワードを生成。
+
+## ツール一覧（docs/link）
+- `amazon-dp-extract.html` Amazon URL から dp/ASIN を抽出。
