@@ -61,7 +61,8 @@ limitations under the License.
           mp3: もっとも汎用的<br>
           opus: 低ビットレートに強い<br>
           flac: 可逆圧縮で高音質<br>
-          wav: 無圧縮のPCM
+          wav: 無圧縮のPCM<br>
+          互換性重視なら m4a / mp3 が安心（opus/flac はアプリ依存）
         </span>
       </span>
       <span>：</span>
@@ -98,11 +99,11 @@ limitations under the License.
       <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
         <span>VBR</span>
         <span class="relative inline-flex items-center group">
-          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            音の複雑さに合わせてビットレートを自動調整します
-          </span>
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            高め: 音質優先 / 標準: バランス / 低め: 容量優先
         </span>
+      </span>
         <span>：</span>
       </label>
       <div class="grid grid-cols-1 gap-2 mb-4 sm:grid-cols-2">
@@ -151,6 +152,54 @@ limitations under the License.
       <option value="44100">44.1kHz</option>
       <option value="48000">48kHz</option>
     </select>
+
+    <label class="block mb-2 font-semibold">用途別プリセット:</label>
+    <div class="flex flex-wrap gap-2 mb-4">
+      <div class="flex items-center gap-2">
+        <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="applyPreset('hq-lossy')">
+          なるべく高音質で圧縮
+        </button>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            m4a / VBR 高め / 元のまま
+          </span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="applyPreset('share')">
+          汎用・共有向け
+        </button>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            mp3 / VBR 標準 / 44.1kHz
+          </span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="applyPreset('mobile')">
+          スマホ向け軽量
+        </button>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            m4a / VBR 低め / 48kHz
+          </span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="applyPreset('archive')">
+          可逆保存（FLAC）
+        </button>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            flac / 圧縮レベル 5 / 元のまま
+          </span>
+        </span>
+      </div>
+    </div>
 
     <button onclick="generateCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
       ffmpeg コマンド生成
@@ -275,6 +324,40 @@ limitations under the License.
       const output = buildOutputName(input, format, tags);
       cmdParts.push(output);
       document.getElementById("audioCmd").textContent = cmdParts.join(" ");
+    }
+
+    function applyPreset(preset) {
+      const outputFormat = document.getElementById("outputFormat");
+      const vbrMode = document.getElementById("vbrMode");
+      const vbrQuality = document.getElementById("vbrQuality");
+      const bitrate = document.getElementById("bitrate");
+      const sampleRate = document.getElementById("sampleRate");
+      const flacLevel = document.getElementById("flacLevel");
+
+      if (preset === "hq-lossy") {
+        outputFormat.value = "m4a";
+        vbrMode.value = "on";
+        vbrQuality.value = "high";
+        sampleRate.value = "keep";
+      } else if (preset === "share") {
+        outputFormat.value = "mp3";
+        vbrMode.value = "on";
+        vbrQuality.value = "mid";
+        sampleRate.value = "44100";
+      } else if (preset === "mobile") {
+        outputFormat.value = "m4a";
+        vbrMode.value = "on";
+        vbrQuality.value = "low";
+        sampleRate.value = "48000";
+      } else if (preset === "archive") {
+        outputFormat.value = "flac";
+        flacLevel.value = "5";
+        vbrMode.value = "off";
+        bitrate.value = "auto";
+        sampleRate.value = "keep";
+      }
+
+      updateFormatOptions();
     }
 
     function copyToClipboard(id) {
