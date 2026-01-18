@@ -184,7 +184,7 @@ limitations under the License.
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            m4a / VBR 低め / 48kHz
+            m4a / VBR 低め / 44.1kHz
           </span>
         </span>
       </div>
@@ -273,7 +273,7 @@ limitations under the License.
       if (format === "m4a") {
         cmdParts.push("-c:a aac");
         if (vbrMode === "on") {
-          const qMap = { low: "3", mid: "2", high: "1" };
+          const qMap = { low: "1", mid: "3", high: "5" };
           cmdParts.push(`-q:a ${qMap[vbrQuality]}`);
           tags.push(`vbr-${vbrQuality}`);
         } else if (bitrate === "auto") {
@@ -348,7 +348,7 @@ limitations under the License.
         outputFormat.value = "m4a";
         vbrMode.value = "on";
         vbrQuality.value = "low";
-        sampleRate.value = "48000";
+        sampleRate.value = "44100";
       } else if (preset === "archive") {
         outputFormat.value = "flac";
         flacLevel.value = "5";
