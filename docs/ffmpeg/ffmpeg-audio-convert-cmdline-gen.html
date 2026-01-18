@@ -18,7 +18,7 @@ limitations under the License.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FFmpeg wav=>m4a コマンドジェネレータ</title>
+  <title>FFmpeg 音声変換 コマンドジェネレータ</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
@@ -36,35 +36,129 @@ limitations under the License.
     <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
       <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
     </div>
-    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🎧</span>FFmpeg wav=>m4a コマンドジェネレータ</h1>
+    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🎧</span>FFmpeg 音声変換 コマンドジェネレータ</h1>
 
     <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-      <span>WAVファイル名</span>
+      <span>音声ファイル名</span>
       <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
       <span class="relative inline-flex items-center group">
         <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
         <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-          例: sample.wav
+          例: sample.wav / sample.flac / sample.mp3
         </span>
       </span>
       <span>：</span>
     </label>
-    <input type="text" id="wavFile" placeholder="例: sample.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
+    <input type="text" id="audioFile" placeholder="例: sample.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
 
-    <label class="block mb-2 font-semibold">ビットレートを選択:</label>
-    <select id="bitrate" class="border border-gray-300 rounded w-full p-2 mb-4">
-      <option value="192k" selected>192 kbps（デフォルト）</option>
-      <option value="256k">256 kbps</option>
-      <option value="320k">320 kbps</option>
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>出力フォーマット</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          m4a: 高圧縮で互換性が高い<br>
+          mp3: もっとも汎用的<br>
+          opus: 低ビットレートに強い<br>
+          flac: 可逆圧縮で高音質<br>
+          wav: 無圧縮のPCM
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <select id="outputFormat" class="border border-gray-300 rounded w-full p-2 mb-4" onchange="updateFormatOptions()">
+      <option value="m4a" selected>m4a (AAC)</option>
+      <option value="mp3">mp3 (MP3)</option>
+      <option value="opus">opus (Opus)</option>
+      <option value="flac">flac (FLAC)</option>
+      <option value="wav">wav (PCM)</option>
     </select>
 
-    <button onclick="generateM4aCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
+    <div id="bitrateBlock">
+      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <span>ビットレート</span>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            VBR OFF 時に使用します（自動も選択可能）
+          </span>
+        </span>
+        <span>：</span>
+      </label>
+      <select id="bitrate" class="border border-gray-300 rounded w-full p-2 mb-4">
+        <option value="auto">元のまま（自動）</option>
+        <option value="128k">128 kbps</option>
+        <option value="192k" selected>192 kbps（デフォルト）</option>
+        <option value="256k">256 kbps</option>
+        <option value="320k">320 kbps</option>
+      </select>
+    </div>
+
+    <div id="vbrBlock">
+      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <span>VBR</span>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            音の複雑さに合わせてビットレートを自動調整します
+          </span>
+        </span>
+        <span>：</span>
+      </label>
+      <div class="grid grid-cols-1 gap-2 mb-4 sm:grid-cols-2">
+        <select id="vbrMode" class="border border-gray-300 rounded w-full p-2" onchange="updateVbrOptions()">
+          <option value="off" selected>OFF</option>
+          <option value="on">ON</option>
+        </select>
+        <select id="vbrQuality" class="border border-gray-300 rounded w-full p-2" disabled>
+          <option value="low">低め</option>
+          <option value="mid" selected>標準</option>
+          <option value="high">高め</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="flacBlock" class="hidden">
+      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <span>FLAC圧縮レベル</span>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            数字が大きいほど圧縮が強くなります
+          </span>
+        </span>
+        <span>：</span>
+      </label>
+      <select id="flacLevel" class="border border-gray-300 rounded w-full p-2 mb-4">
+        <option value="0">0 (高速)</option>
+        <option value="5" selected>5 (標準)</option>
+        <option value="8">8 (高圧縮)</option>
+      </select>
+    </div>
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>サンプルレート</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          元のまま / 44.1k / 48k から選択
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <select id="sampleRate" class="border border-gray-300 rounded w-full p-2 mb-4">
+      <option value="keep" selected>元のまま</option>
+      <option value="44100">44.1kHz</option>
+      <option value="48000">48kHz</option>
+    </select>
+
+    <button onclick="generateCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
       ffmpeg コマンド生成
     </button>
 
     <div class="relative">
-      <code id="m4aCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
-      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('m4aCmd')">📋</button>
+      <code id="audioCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('audioCmd')">📋</button>
     </div>
 
     <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
@@ -73,22 +167,114 @@ limitations under the License.
   </div>
 
   <script>
-    function generateM4aCommand() {
-      const input = document.getElementById("wavFile").value.trim();
+    const allowedInputPattern = /\.(wav|flac|aiff|aif|mp3|m4a|opus)$/i;
+
+    function updateVbrOptions() {
+      const vbrMode = document.getElementById("vbrMode").value;
+      const quality = document.getElementById("vbrQuality");
+      const bitrate = document.getElementById("bitrate");
+      quality.disabled = vbrMode !== "on";
+      bitrate.disabled = vbrMode === "on";
+      bitrate.classList.toggle("opacity-50", vbrMode === "on");
+    }
+
+    function updateFormatOptions() {
+      const format = document.getElementById("outputFormat").value;
+      const bitrateBlock = document.getElementById("bitrateBlock");
+      const vbrBlock = document.getElementById("vbrBlock");
+      const flacBlock = document.getElementById("flacBlock");
+
+      const isLossy = format === "m4a" || format === "mp3" || format === "opus";
+      bitrateBlock.classList.toggle("hidden", !isLossy);
+      vbrBlock.classList.toggle("hidden", !isLossy);
+      flacBlock.classList.toggle("hidden", format !== "flac");
+      updateVbrOptions();
+    }
+
+    function buildOutputName(input, format, tagParts) {
+      const base = input.replace(/\.[^/.]+$/, "");
+      const tag = tagParts.filter(Boolean).join("-");
+      return `${base}-${tag}.${format}`;
+    }
+
+    function generateCommand() {
+      const input = document.getElementById("audioFile").value.trim();
+      const format = document.getElementById("outputFormat").value;
       const bitrate = document.getElementById("bitrate").value;
+      const vbrMode = document.getElementById("vbrMode").value;
+      const vbrQuality = document.getElementById("vbrQuality").value;
+      const flacLevel = document.getElementById("flacLevel").value;
+      const sampleRate = document.getElementById("sampleRate").value;
 
       if (!input) {
-        alert("WAVファイル名を入力してください。");
+        alert("音声ファイル名を入力してください。");
         return;
       }
-      if (!input.toLowerCase().endsWith(".wav")) {
-        alert("ファイル名は .wav で終わる必要があります。");
+      if (!allowedInputPattern.test(input)) {
+        alert("入力ファイルは wav/flac/aiff/aif/mp3/m4a/opus のいずれかを指定してください。");
         return;
       }
 
-      const output = input.replace(/\.wav$/i, `-${bitrate}.m4a`);
-      const cmd = `ffmpeg -i ${input} -c:a aac -b:a ${bitrate} ${output}`;      
-      document.getElementById("m4aCmd").textContent = cmd;
+      const cmdParts = [`ffmpeg -i ${input}`];
+      if (sampleRate !== "keep") {
+        cmdParts.push(`-ar ${sampleRate}`);
+      }
+
+      const tags = [format];
+      if (format === "m4a") {
+        cmdParts.push("-c:a aac");
+        if (vbrMode === "on") {
+          const qMap = { low: "3", mid: "2", high: "1" };
+          cmdParts.push(`-q:a ${qMap[vbrQuality]}`);
+          tags.push(`vbr-${vbrQuality}`);
+        } else if (bitrate === "auto") {
+          tags.push("auto");
+        } else {
+          cmdParts.push(`-b:a ${bitrate}`);
+          tags.push(bitrate);
+        }
+      } else if (format === "mp3") {
+        cmdParts.push("-c:a libmp3lame");
+        if (vbrMode === "on") {
+          const qMap = { low: "6", mid: "4", high: "2" };
+          cmdParts.push(`-q:a ${qMap[vbrQuality]}`);
+          tags.push(`vbr-${vbrQuality}`);
+        } else if (bitrate === "auto") {
+          tags.push("auto");
+        } else {
+          cmdParts.push(`-b:a ${bitrate}`);
+          tags.push(bitrate);
+        }
+      } else if (format === "opus") {
+        cmdParts.push("-c:a libopus");
+        if (vbrMode === "on") {
+          const qMap = { low: "96k", mid: "128k", high: "192k" };
+          const opusBitrate = qMap[vbrQuality];
+          cmdParts.push(`-vbr on -b:a ${opusBitrate}`);
+          tags.push(`vbr-${vbrQuality}`);
+        } else if (bitrate === "auto") {
+          cmdParts.push("-vbr off");
+          tags.push("auto");
+        } else {
+          cmdParts.push(`-vbr off -b:a ${bitrate}`);
+          tags.push(bitrate);
+        }
+      } else if (format === "flac") {
+        cmdParts.push(`-c:a flac -compression_level ${flacLevel}`);
+        tags.push(`lv${flacLevel}`);
+      } else if (format === "wav") {
+        cmdParts.push("-c:a pcm_s16le");
+      }
+
+      if (sampleRate === "44100") {
+        tags.push("sr44k");
+      } else if (sampleRate === "48000") {
+        tags.push("sr48k");
+      }
+
+      const output = buildOutputName(input, format, tags);
+      cmdParts.push(output);
+      document.getElementById("audioCmd").textContent = cmdParts.join(" ");
     }
 
     function copyToClipboard(id) {
@@ -117,6 +303,8 @@ limitations under the License.
       if (!panel) return;
       panel.classList.toggle("hidden");
     }
+
+    updateFormatOptions();
   </script>
 </body>
 </html>
