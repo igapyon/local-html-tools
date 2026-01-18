@@ -34,6 +34,7 @@ URL加工系ツールです。
 
 - **amazon-dp-extract.html**: Amazon URL から dp/ASIN を抽出します。
 - **facebook-fbclid-remove.html**: URL から Facebook識別子（fbclid）を除去します。
+- **url-encode-decode.html**: URLのエンコードとデコードを行います。
 
 ## password
 
