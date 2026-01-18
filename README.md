@@ -36,6 +36,7 @@ URL加工系ツールです。
 - **facebook-fbclid-remove.html**: URL から Facebook識別子（fbclid）を除去します。
 - **url-encode-decode.html**: URLのエンコードとデコードを行います。
 - **mime-base64.html**: MIME Base64のエンコードとデコードを行います。
+- **utm-remove.html**: URL から utm_* パラメータを削除します。
 
 ## password
 

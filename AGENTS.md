@@ -38,3 +38,4 @@
 - `facebook-fbclid-remove.html` URL から Facebook識別子（fbclid）を除去。
 - `url-encode-decode.html` URLのエンコードとデコードを行う。
 - `mime-base64.html` MIME Base64のエンコードとデコードを行う。
+- `utm-remove.html` URL から utm_* パラメータを削除する。
