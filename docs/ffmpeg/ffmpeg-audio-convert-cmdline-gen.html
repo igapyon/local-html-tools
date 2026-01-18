@@ -264,7 +264,7 @@ limitations under the License.
         return;
       }
 
-      const cmdParts = [`ffmpeg -i ${input}`];
+      const cmdParts = [`ffmpeg -i "${input}"`];
       if (sampleRate !== "keep") {
         cmdParts.push(`-ar ${sampleRate}`);
       }
@@ -322,7 +322,7 @@ limitations under the License.
       }
 
       const output = buildOutputName(input, format, tags);
-      cmdParts.push(output);
+      cmdParts.push(`"${output}"`);
       document.getElementById("audioCmd").textContent = cmdParts.join(" ");
     }
 
