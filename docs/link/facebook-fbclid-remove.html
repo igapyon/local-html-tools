@@ -18,7 +18,7 @@ limitations under the License.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Amazon URL dp 抽出ツール</title>
+  <title>Facebook fbclid 除去ツール</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
@@ -35,29 +35,28 @@ limitations under the License.
       <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
     </div>
 
-    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🛒</span>Amazon URL dp 抽出ツール</h1>
+    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🔗</span>Facebook fbclid 除去ツール</h1>
 
     <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-      <span>AmazonのURL</span>
+      <span>URL</span>
       <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
       <span class="relative inline-flex items-center group">
         <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
         <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-          例: https://www.amazon.co.jp/.../dp/B0XXXXXXX<br>
-          ASIN（10文字）だけでもOK
+          fbclid パラメータだけを削除します
         </span>
       </span>
       <span>：</span>
     </label>
-    <input type="text" id="amazonUrl" placeholder="例: https://www.amazon.co.jp/dp/B0XXXXXXX" class="border border-gray-300 rounded w-full p-2 mb-4">
+    <input type="text" id="inputUrl" placeholder="例: https://example.com/?a=1&fbclid=..." class="border border-gray-300 rounded w-full p-2 mb-4">
 
-    <button onclick="generateDpPath()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
-      Amazonの短いURLにする
+    <button onclick="generateCleanUrl()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
+      Facebook識別子（fbclid）を除去
     </button>
 
     <div class="relative">
-      <code id="dpPath" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
-      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('dpPath')">📋</button>
+      <code id="cleanUrl" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('cleanUrl')">📋</button>
     </div>
 
     <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
@@ -66,35 +65,30 @@ limitations under the License.
   </div>
 
   <script>
-    function extractAsin(input) {
+    function removeFbclid(input) {
       const trimmed = input.trim();
       if (!trimmed) return "";
-      if (/^[A-Z0-9]{10}$/i.test(trimmed)) {
-        return trimmed.toUpperCase();
-      }
-
-      const dpMatch = trimmed.match(/\/dp\/([A-Z0-9]{10})/i);
-      if (dpMatch) return dpMatch[1].toUpperCase();
-
-      const gpMatch = trimmed.match(/\/gp\/product\/([A-Z0-9]{10})/i);
-      if (gpMatch) return gpMatch[1].toUpperCase();
-
-      const asinParam = trimmed.match(/[?&]asin=([A-Z0-9]{10})/i);
-      if (asinParam) return asinParam[1].toUpperCase();
-
-      return "";
+      if (!trimmed.includes("fbclid=")) return trimmed;
+      const urlWithoutHash = trimmed.split("#")[0];
+      const hash = trimmed.includes("#") ? trimmed.substring(trimmed.indexOf("#")) : "";
+      const parts = urlWithoutHash.split("?");
+      if (parts.length === 1) return trimmed;
+      const base = parts[0];
+      const params = parts.slice(1).join("?").split("&");
+      const filtered = params.filter((param) => {
+        return !/^fbclid=/i.test(param);
+      });
+      const query = filtered.length ? `?${filtered.join("&")}` : "";
+      return `${base}${query}${hash}`;
     }
 
-    function generateDpPath() {
-      const input = document.getElementById("amazonUrl").value;
-      const asin = extractAsin(input);
-
-      if (!asin) {
-        alert("URLまたはASIN（10文字）を入力してください。");
+    function generateCleanUrl() {
+      const input = document.getElementById("inputUrl").value;
+      if (!input.trim()) {
+        alert("URLを入力してください。");
         return;
       }
-
-      document.getElementById("dpPath").textContent = `https://www.amazon.co.jp/dp/${asin}`;
+      document.getElementById("cleanUrl").textContent = removeFbclid(input);
     }
 
     function copyToClipboard(id) {
