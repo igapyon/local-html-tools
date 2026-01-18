@@ -28,6 +28,13 @@ FFmpegのコマンドラインを生成するツールです。
 - **ffmpeg-mp4-to-wav-gen.html**: .mp4ファイルから音声をWAVとして取り出すコマンドを生成します。
 - **ffmpeg-replace-audio-with-wav-gen.html**: .mp4動画の音声をWAVに差し替えるコマンドを生成します。
 
+## link
+
+URL加工系ツールです。
+
+- **amazon-dp-extract.html**: Amazon URL から dp/ASIN を抽出します。
+- **facebook-fbclid-remove.html**: URL から Facebook識別子（fbclid）を除去します。
+
 ## password
 
 パスワード生成ツールです。

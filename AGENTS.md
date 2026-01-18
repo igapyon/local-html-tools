@@ -11,10 +11,14 @@
 - ツールによっては「入力 → コマンド生成」だけで完結するものもある。
 - ボタン色の方針: コマンド生成は緑、解析結果の反映は青（用途別に統一）。
 - UIルール: 必須項目は赤いアスタリスク（*）で示し、説明は「?」にまとめる。
+- PRテキスト作成時は `docs/index.html` の「更新日」も忘れずに更新する。
+- PRテキスト作成は「特定のコミット以降の全変更」を求められる前提でまとめる（例: 「<コミット> 以降の変更内容全てのための PRテキスト」）。
+- PRテキストの基本構成は「タイトル / 概要 / 変更点 / 影響」で統一する。
 
 ## 構成
 - `docs/index.html` トップページ（ツール一覧へのリンクと簡易説明）。
 - `docs/ffmpeg/` FFmpegおよび周辺ツールのHTMLが配置。
+- `docs/link/` URL加工系ツールのHTMLが配置。
 - `docs/password/` パスワード生成ツールのHTMLが配置。
 
 ## ツール一覧（docs/ffmpeg）
@@ -28,3 +32,7 @@
 
 ## ツール一覧（docs/password）
 - `password-gen.html` 文字種と文字数を指定してパスワードを生成。
+
+## ツール一覧（docs/link）
+- `amazon-dp-extract.html` Amazon URL から dp/ASIN を抽出。
+- `facebook-fbclid-remove.html` URL から Facebook識別子（fbclid）を除去。
