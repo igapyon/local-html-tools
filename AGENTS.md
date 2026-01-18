@@ -21,7 +21,7 @@
 - `ffmpeg-concat-cmdline-gen.html` 複数の `.wav` を結合するためのコマンドを生成。
 - `ffmpeg-loudnorm-cmdline-gen.html` loudnorm 測定結果に基づく正規化コマンドを生成（複数モード/ハイレゾ対応）。
 - `ffmpeg-trim-cmdline-gen.html` `.wav` の切り出しコマンドを生成（開始/終了時刻指定）。
-- `ffmpeg-wav2m4a-cmdline-gen.html` `.wav` を `.m4a` に変換するコマンドを生成（ビットレート選択）。
+- `ffmpeg-audio-convert-cmdline-gen.html` 音声ファイルを指定の形式に変換するコマンドを生成。
 - `ffmpeg-youtube-mkv-gen.html` 音声＋画像からYouTube向け `.mkv` を生成するコマンドを作成。
 - `ffmpeg-mp4-to-wav-gen.html` `.mp4` から音声をWAVとして抽出するコマンドを生成。
 - `ffmpeg-replace-audio-with-wav-gen.html` `.mp4` の音声をWAVへ差し替えるコマンドを生成。
