@@ -72,18 +72,19 @@
         }
         .particle {
             position: absolute;
-            width: 6px;
-            height: 6px;
-            border-radius: 999px;
-            background: var(--particle-color);
+            width: var(--w);
+            height: var(--h);
+            border-radius: var(--radius);
+            background: var(--fill);
             opacity: 0;
             transform: translate(-50%, -50%);
-            animation: pop 520ms ease-out forwards;
+            animation: pop 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            box-shadow: var(--glow);
         }
         @keyframes pop {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            20% { opacity: 1; }
-            100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.9); }
+            0% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--rot)) scale(0.35); }
+            18% { opacity: 1; }
+            100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(1); }
         }
     </style>
 </head>
@@ -221,35 +222,52 @@
             const x = rect.left + rect.width / 2;
             const y = rect.top + rect.height / 2;
             const color = type === 'check' ? 'rgba(160, 245, 255, 0.95)' : 'rgba(255, 194, 112, 0.95)';
-            const baseParticles = 18;
-            const upParticles = 14;
-            const maxDistance = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+            const baseParticles = 32;
+            const sparkleParticles = 22;
 
             burst.className = 'burst';
             burst.style.left = `${x}px`;
             burst.style.top = `${y}px`;
             burst.style.setProperty('--particle-color', color);
 
-            for (let i = 0; i < baseParticles + upParticles; i++) {
+            for (let i = 0; i < baseParticles + sparkleParticles; i++) {
                 const p = document.createElement('span');
-                const angle = i < baseParticles
-                    ? (Math.PI * 2 * i) / baseParticles
-                    : (Math.PI * (1.15 + Math.random() * 0.7));
-                const distance = 80 + Math.random() * maxDistance;
-                const dx = Math.cos(angle) * distance;
-                const dy = Math.sin(angle) * distance;
-                const size = 16 + Math.random() * 10;
-                p.className = 'particle';
-                p.style.boxShadow = '0 0 8px rgba(0, 0, 0, 0.35)';
-                p.style.width = `${size}px`;
-                p.style.height = `${size}px`;
+                const angle = Math.random() * Math.PI * 2;
+                const maxDx = window.innerWidth - x;
+                const minDx = -x;
+                const maxDy = window.innerHeight - y;
+                const minDy = -y;
+                const dx = (Math.random() * (maxDx - minDx)) + minDx;
+                const dy = (Math.random() * (maxDy - minDy)) + minDy;
+                const isSparkle = i >= baseParticles;
+
+                if (isSparkle) {
+                    const size = 6 + Math.random() * 6;
+                    p.className = 'particle';
+                    p.style.setProperty('--w', `${size}px`);
+                    p.style.setProperty('--h', `${size}px`);
+                    p.style.setProperty('--radius', '999px');
+                    p.style.setProperty('--fill', 'rgba(255, 255, 255, 0.9)');
+                    p.style.setProperty('--glow', '0 0 14px rgba(255, 255, 255, 0.55)');
+                } else {
+                    const length = 28 + Math.random() * 32;
+                    const thickness = 4 + Math.random() * 3;
+                    p.className = 'particle';
+                    p.style.setProperty('--w', `${length}px`);
+                    p.style.setProperty('--h', `${thickness}px`);
+                    p.style.setProperty('--radius', '999px');
+                    p.style.setProperty('--fill', `linear-gradient(90deg, rgba(255, 255, 255, 0.95), ${color})`);
+                    p.style.setProperty('--glow', `0 0 18px ${color}`);
+                }
+
+                p.style.setProperty('--rot', `${angle}rad`);
                 p.style.setProperty('--dx', `${dx}px`);
                 p.style.setProperty('--dy', `${dy}px`);
                 burst.appendChild(p);
             }
 
             document.body.appendChild(burst);
-            setTimeout(() => burst.remove(), 600);
+            setTimeout(() => burst.remove(), 1100);
         },
 
         reset: function() { this.switchScreen('start-screen'); this.showPreview(); }
