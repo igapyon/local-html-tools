@@ -69,6 +69,14 @@ URL加工系ツールです。
 GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/ffmpeg/`（FFmpegおよび周辺ツール）と `docs/password/`（パスワード生成ツール）配下にあります。
 公開URL: https://igapyon.github.io/local-html-tools/
 
+## Third-Party Notices
+
+本プロジェクトで利用しているサードパーティソフトウェアとライセンスは `THIRD_PARTY_NOTICES.md` に記載しています。
+
+## License
+
+本リポジトリのライセンスは `LICENSE` を参照してください。
+
 ## 将来の拡張
 
 このプロジェクトは将来的に FFmpeg 以外のツール群にも対応する予定です。現状の FFmpeg 系ツールはその一部です。
