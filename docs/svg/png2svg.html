@@ -1,24 +1,9 @@
-<!--
-Copyright 2026 Toshiki Iga
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
--->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PNG → SVG 変換</title>
+  <title>PNG → SVG 変換 Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     #preview svg {
@@ -32,104 +17,110 @@ limitations under the License.
   <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
     <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
       <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M4 6h16"/>
-        <path d="M4 12h16"/>
-        <path d="M4 18h16"/>
+        <path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>
       </svg>
     </button>
-    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden z-20">
       <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
     </div>
 
-    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🖼️</span>PNG → SVG 変換</h1>
+    <h1 class="text-2xl font-bold mb-6 flex items-center">
+      <span aria-hidden="true" class="mr-2">🖼️</span>PNG → SVG 変換 Pro
+    </h1>
 
-    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-      <span>PNGファイル</span>
-      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
-      <span class="relative inline-flex items-center group">
-        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-          PNG画像をSVGにトレース変換します。処理はブラウザ内で行われ、完了後にダウンロードできます。
-        </span>
-      </span>
-      <span>：</span>
-    </label>
-    <input id="file" type="file" accept="image/png" class="border border-gray-300 rounded w-full p-2 mb-4" />
+    <div class="mb-6">
+      <label class="flex items-center gap-2 mb-2 font-semibold">
+        <span>PNGファイル</span>
+        <span class="text-red-500 font-bold">*</span>
+      </label>
+      <input id="file" type="file" accept="image/png" class="border border-gray-300 rounded w-full p-2 bg-gray-50" />
+    </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
       <div>
-        <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <label class="flex items-center gap-2 mb-2 font-semibold">
           <span>プリセット</span>
           <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-              目的に合わせた設定を選ぶと、値が自動で入ります。
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
+            <span id="presetDescription" class="absolute left-1/2 bottom-full mb-2 w-64 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
+              用途に合わせた最適な数値をセットします。
             </span>
           </span>
         </label>
-        <select id="preset" class="border border-gray-300 rounded w-full p-2 bg-white">
-          <option value="standard">標準</option>
-          <option value="crisp">くっきり（線重視）</option>
-          <option value="smooth">なめらか（曲線重視）</option>
-          <option value="detail">細部重視（色数多め）</option>
+        <select id="preset" class="border border-gray-300 rounded w-full p-2 bg-white cursor-pointer">
+          <option value="icon">アイコン・ロゴ（軽量・鋭利）</option>
+          <option value="illustration" selected>イラスト（なめらか・曲線）</option>
+          <option value="photo">写真（芸術的・油絵風）</option>
+          <option value="pixelart">ドット絵（ピクセル完全再現）</option>
         </select>
       </div>
+
       <div>
-        <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <label class="flex items-center gap-2 mb-2 font-semibold">
           <span>色数</span>
           <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-              トレースで使う色数。少ないほど単純になり、増やすと細部が残ります。
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
+            <span class="absolute left-1/2 bottom-full mb-2 w-64 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
+              使用する色の数（2〜64）。多いほど詳細ですが重くなります。
             </span>
           </span>
         </label>
-        <input id="colors" type="number" min="2" max="64" value="8" class="border border-gray-300 rounded w-full p-2" />
+        <input id="colors" type="number" min="2" max="64" value="12" class="border border-gray-300 rounded w-full p-2" />
       </div>
+
       <div>
-        <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-          <span>輪郭の精度</span>
+        <label class="flex items-center gap-2 mb-2 font-semibold">
+          <span>輪郭の精度 (ltres)</span>
           <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-              小さいほど細かくトレースされます（ltres）。
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
+            <span class="absolute left-1/2 bottom-full mb-2 w-64 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
+              低いほど元の形に忠実、高いほどノイズを無視します。
             </span>
           </span>
         </label>
-        <input id="ltres" type="number" min="0.1" max="10" step="0.1" value="1" class="border border-gray-300 rounded w-full p-2" />
+        <input id="ltres" type="number" min="0" max="10" step="0.1" value="1.0" class="border border-gray-300 rounded w-full p-2" />
       </div>
+
       <div>
-        <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-          <span>曲線の精度</span>
+        <label class="flex items-center gap-2 mb-2 font-semibold">
+          <span>曲線の精度 (qtres)</span>
           <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-              小さいほど滑らかに近い曲線になります（qtres）。
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
+            <span class="absolute left-1/2 bottom-full mb-2 w-64 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
+              低いほど滑らかな曲線、高いほど直線的な描画になります。
             </span>
           </span>
         </label>
-        <input id="qtres" type="number" min="0.1" max="10" step="0.1" value="1" class="border border-gray-300 rounded w-full p-2" />
+        <input id="qtres" type="number" min="0.1" max="10" step="0.1" value="0.1" class="border border-gray-300 rounded w-full p-2" />
       </div>
     </div>
 
-    <div class="flex flex-wrap gap-2 mb-6">
-      <button id="convert" disabled class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed">
-        SVG化する
+    <div class="flex gap-3 mb-8">
+      <button id="convert" disabled class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded shadow-sm disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+        SVGに変換する
       </button>
     </div>
 
-    <div class="mb-2 font-semibold">プレビュー</div>
-    <div id="preview" class="border border-gray-200 rounded bg-gray-50 p-3 h-72 overflow-hidden"></div>
+    <div class="mb-2 font-semibold flex items-center justify-between">
+      <span>プレビュー</span>
+      <span id="fileInfo" class="text-xs text-gray-500 font-normal"></span>
+    </div>
+    <div id="preview" class="border-2 border-dashed border-gray-200 rounded bg-gray-50 h-80 flex items-center justify-center overflow-hidden transition-all">
+      <p class="text-gray-400 text-sm">ここに変換後の画像が表示されます</p>
+    </div>
 
-    <div class="flex flex-wrap gap-2 mt-4">
-      <button id="download" disabled class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed">
+    <div class="flex gap-3 mt-6">
+      <button id="download" disabled class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-sm disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
         SVGをダウンロード
       </button>
     </div>
   </div>
 
-  <div id="loading" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
-    <div class="bg-white px-6 py-4 rounded-lg shadow-lg text-gray-800">処理中…</div>
+  <div id="loading" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+    <div class="bg-white px-8 py-6 rounded-xl shadow-2xl flex flex-col items-center">
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
+      <p class="font-bold text-gray-700">ベクター変換中...</p>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.js"></script>
@@ -137,53 +128,72 @@ limitations under the License.
   <script>
     const fileInput = document.getElementById("file");
     const convertBtn = document.getElementById("convert");
-    const btn = document.getElementById("download");
+    const downloadBtn = document.getElementById("download");
     const preview = document.getElementById("preview");
     const loading = document.getElementById("loading");
     const colorsInput = document.getElementById("colors");
     const ltresInput = document.getElementById("ltres");
     const qtresInput = document.getElementById("qtres");
     const presetSelect = document.getElementById("preset");
+    const presetDesc = document.getElementById("presetDescription");
 
     let selectedFile = null;
     let lastSvgText = "";
 
+    // Gemini究極のプリセット定義
     const presetMap = {
-      standard: { numberofcolors: 8, ltres: 1, qtres: 1 },
-      crisp: { numberofcolors: 6, ltres: 0.5, qtres: 1.2 },
-      smooth: { numberofcolors: 6, ltres: 1.5, qtres: 0.5 },
-      detail: { numberofcolors: 16, ltres: 0.8, qtres: 0.8 },
+      icon: { 
+        numberofcolors: 4, ltres: 0.1, qtres: 5.0, 
+        desc: "ロゴやアイコン用。輪郭を極限まで鋭く保ち、パスの数を減らしてデータ量を最小限にします。" 
+      },
+      illustration: { 
+        numberofcolors: 12, ltres: 1.0, qtres: 0.1, 
+        desc: "手書きイラストや漫画用。線のガタつきを抑え、美しいベジェ曲線で滑らかに表現します。" 
+      },
+      photo: { 
+        numberofcolors: 32, ltres: 1.0, qtres: 1.0, 
+        desc: "写真や複雑な絵画用。多めの色数でトレースし、アーティスティックな階調を生み出します。" 
+      },
+      pixelart: { 
+        numberofcolors: 16, ltres: 0.0, qtres: 10.0, 
+        desc: "ドット絵専用。1ピクセルも崩さず、元のマス目を正確な四角形としてベクター化します。" 
+      }
     };
 
-    presetSelect.addEventListener("change", () => {
-      applyPreset(presetSelect.value);
-    });
+    // プリセット適用関数（説明文も動的に更新）
+    function applyPreset(key) {
+      const preset = presetMap[key] || presetMap.illustration;
+      colorsInput.value = preset.numberofcolors;
+      ltresInput.value = preset.ltres;
+      qtresInput.value = preset.qtres;
+      if (presetDesc) presetDesc.textContent = preset.desc;
+    }
 
+    // 初期化
     applyPreset(presetSelect.value);
+
+    presetSelect.addEventListener("change", () => applyPreset(presetSelect.value));
 
     fileInput.addEventListener("change", () => {
       selectedFile = fileInput.files && fileInput.files[0];
       convertBtn.disabled = !selectedFile;
-      btn.disabled = true;
+      downloadBtn.disabled = true;
       lastSvgText = "";
-      preview.innerHTML = "";
+      preview.innerHTML = '<p class="text-gray-400 text-sm">「変換する」ボタンを押してください</p>';
+      document.getElementById("fileInfo").textContent = selectedFile ? `${selectedFile.name}` : "";
     });
 
     convertBtn.addEventListener("click", async () => {
       if (!selectedFile) return;
 
       showLoading(true);
-      btn.disabled = true;
+      downloadBtn.disabled = true;
       convertBtn.disabled = true;
-      lastSvgText = "";
-      preview.innerHTML = "";
 
       try {
         await nextFrame();
 
-        if (!window.ImageTracer) {
-          throw new Error("ImageTracer not loaded.");
-        }
+        if (!window.ImageTracer) throw new Error("ImageTracer not loaded.");
 
         const img = await fileToImage(selectedFile);
         const canvas = document.createElement("canvas");
@@ -194,41 +204,39 @@ limitations under the License.
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const options = readOptions();
+        
+        // 変換実行
         lastSvgText = window.ImageTracer.imagedataToSVG(imageData, options);
 
         preview.innerHTML = preparePreviewSvg(lastSvgText);
-        btn.disabled = false;
+        downloadBtn.disabled = false;
       } catch (e) {
         console.error(e);
-        alert("変換に失敗しました（コンソールを確認してください）");
+        alert("変換に失敗しました。ファイル形式を確認してください。");
       } finally {
         showLoading(false);
         convertBtn.disabled = !selectedFile;
       }
     });
 
-    btn.addEventListener("click", () => {
+    downloadBtn.addEventListener("click", () => {
       if (!lastSvgText) return;
-      downloadText(lastSvgText, "output.svg", "image/svg+xml");
+      downloadText(lastSvgText, "converted_vector.svg", "image/svg+xml");
     });
 
+    // ユーティリティ
     function showLoading(on) {
       loading.classList.toggle("hidden", !on);
       loading.classList.toggle("flex", on);
     }
 
-    function nextFrame() {
-      return new Promise(requestAnimationFrame);
-    }
+    function nextFrame() { return new Promise(requestAnimationFrame); }
 
     function fileToImage(file) {
       return new Promise((resolve, reject) => {
         const url = URL.createObjectURL(file);
         const img = new Image();
-        img.onload = () => {
-          URL.revokeObjectURL(url);
-          resolve(img);
-        };
+        img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
         img.onerror = reject;
         img.src = url;
       });
@@ -246,25 +254,16 @@ limitations under the License.
 
     function readOptions() {
       return {
-        numberofcolors: readNumber(colorsInput, 8, 2, 64),
-        ltres: readNumber(ltresInput, 1, 0.1, 10),
+        numberofcolors: readNumber(colorsInput, 12, 2, 64),
+        ltres: readNumber(ltresInput, 1, 0, 10),
         qtres: readNumber(qtresInput, 1, 0.1, 10),
       };
     }
 
     function readNumber(input, fallback, min, max) {
-      const value = Number.parseFloat(input.value);
-      if (Number.isNaN(value)) return fallback;
-      if (value < min) return min;
-      if (value > max) return max;
-      return value;
-    }
-
-    function applyPreset(key) {
-      const preset = presetMap[key] || presetMap.standard;
-      colorsInput.value = preset.numberofcolors;
-      ltresInput.value = preset.ltres;
-      qtresInput.value = preset.qtres;
+      const value = parseFloat(input.value);
+      if (isNaN(value)) return fallback;
+      return Math.min(Math.max(value, min), max);
     }
 
     function preparePreviewSvg(svgText) {
@@ -273,28 +272,21 @@ limitations under the License.
       const svg = doc.querySelector("svg");
       if (!svg) return svgText;
 
-      const widthAttr = svg.getAttribute("width");
-      const heightAttr = svg.getAttribute("height");
-      const hasViewBox = svg.hasAttribute("viewBox");
-      const width = widthAttr ? Number.parseFloat(widthAttr) : null;
-      const height = heightAttr ? Number.parseFloat(heightAttr) : null;
-
-      if (!hasViewBox && width && height) {
-        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      const w = svg.getAttribute("width");
+      const h = svg.getAttribute("height");
+      if (!svg.hasAttribute("viewBox") && w && h) {
+        svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
       }
       svg.setAttribute("width", "100%");
       svg.setAttribute("height", "100%");
-      if (!svg.hasAttribute("preserveAspectRatio")) {
-        svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-      }
+      svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
       return new XMLSerializer().serializeToString(svg);
     }
 
     function toggleMenu() {
       const panel = document.getElementById("menuPanel");
-      if (!panel) return;
-      panel.classList.toggle("hidden");
+      if (panel) panel.classList.toggle("hidden");
     }
   </script>
 </body>
