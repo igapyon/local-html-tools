@@ -37,6 +37,7 @@
     <main>
       <div id="weather-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
 
+
       <div class="mt-12 p-6 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
         <h2 class="font-bold text-gray-700 mb-2 font-mono text-sm uppercase tracking-widest">Dev Note</h2>
         <p class="text-sm text-gray-700 leading-relaxed text-opacity-80">
@@ -183,6 +184,7 @@
         grid.innerHTML = "";
 
         // 埼玉県内の全エリア（南部・北部・秩父）をループ
+        console.log("[weather] raw json", data);
         const timeSeries = data[0].timeSeries;
         const weatherSeries = timeSeries.find((ts) => ts.areas?.[0]?.weathers) || timeSeries[0];
         const popSeries = timeSeries.find((ts) => ts.areas?.[0]?.pops);
@@ -307,6 +309,7 @@
           `;
           grid.insertAdjacentHTML("beforeend", card);
         });
+
       } catch (e) {
         console.error("データの読み込みに失敗:", e);
         document.getElementById("weather-grid").innerHTML = "<p class='col-span-3 text-center text-red-400'>気象データの取得に失敗しました。</p>";
