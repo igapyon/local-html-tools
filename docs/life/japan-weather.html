@@ -184,8 +184,6 @@
 
         // 埼玉県内の全エリア（南部・北部・秩父）をループ
         const timeSeries = data[0].timeSeries;
-        console.log("[weather] timeSeries", timeSeries);
-        console.log("[weather] timeSeries keys", timeSeries.map((ts) => Object.keys(ts.areas?.[0] || {})));
         const weatherSeries = timeSeries.find((ts) => ts.areas?.[0]?.weathers) || timeSeries[0];
         const popSeries = timeSeries.find((ts) => ts.areas?.[0]?.pops);
         const tempSeries = timeSeries.find((ts) => ts.areas?.[0]?.temps || ts.areas?.[0]?.tempsMin || ts.areas?.[0]?.tempsMax);
@@ -236,6 +234,45 @@
           return "";
         }
 
+        function formatTimeLabel(raw) {
+          if (!raw) return "";
+          const rawStr = String(raw);
+          const hasTimezone = /Z$|[+-]\d{2}:\d{2}$/.test(rawStr);
+          const iso = hasTimezone ? rawStr : `${rawStr}Z`;
+          const d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return rawStr;
+          const formatter = new Intl.DateTimeFormat("ja-JP", {
+            timeZone: "Asia/Tokyo",
+            month: "numeric",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+          });
+          return formatter.format(d).replace(/\s/, " ");
+        }
+
+        function buildTempTable(area, timeDefines) {
+          if (!area || !area.temps || !timeDefines || timeDefines.length === 0) return "";
+          const temps = area.temps;
+          const len = Math.min(temps.length, timeDefines.length);
+          if (len === 0) return "";
+          const rowsData = [];
+          for (let i = 0; i < len; i++) {
+            const t = temps[i];
+            const rawTime = timeDefines[i];
+            if (t === null || t === undefined || t === "" || t === "--") continue;
+            rowsData.push({ rawTime, temp: t });
+          }
+          rowsData.sort((a, b) => String(a.rawTime).localeCompare(String(b.rawTime)));
+          let rows = "";
+          rowsData.forEach((row) => {
+            rows += `<tr><td class="py-1 pr-3 text-slate-500">${formatTimeLabel(row.rawTime)}</td><td class="py-1 font-semibold text-slate-700">${row.temp}℃</td></tr>`;
+          });
+          if (!rows) return "";
+          return `<table class="w-full text-sm"><tbody>${rows}</tbody></table>`;
+        }
+
         areas.forEach((area, index) => {
           const name = area.area.name;
           const weatherRaw = area.weathers?.[0];
@@ -250,6 +287,7 @@
           const wind = firstValue(windArea?.winds);
           const wave = firstValue(waveArea?.waves);
           const temp = formatTemp(tempArea);
+          const tempTable = buildTempTable(tempArea, tempSeries?.timeDefines);
 
           const card = `
             <div class="bg-white rounded-3xl p-8 shadow-xl shadow-sky-900/5 border border-white hover:scale-105 transition-transform duration-300">
@@ -259,10 +297,11 @@
                 <p class="mt-6 text-lg font-medium text-center leading-relaxed text-slate-600">${weather}</p>
                 <div class="mt-4 w-full text-sm text-slate-600 space-y-1">
                   ${pop ? `<div><span class="font-semibold">降水確率</span>: ${pop}%</div>` : ""}
-                  ${temp ? `<div><span class="font-semibold">気温</span>: ${temp}</div>` : ""}
+                  ${temp ? `<div><span class="font-semibold">気温（要約）</span>: ${temp}</div>` : ""}
                   ${wind ? `<div><span class="font-semibold">風</span>: ${wind}</div>` : ""}
                   ${wave ? `<div><span class="font-semibold">波</span>: ${wave}</div>` : ""}
                 </div>
+                ${tempTable ? `<div class="mt-4 w-full"><div class="text-sm font-semibold text-slate-600 mb-1">気温（時系列）</div>${tempTable}</div>` : ""}
               </div>
             </div>
           `;
