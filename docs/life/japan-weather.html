@@ -49,9 +49,25 @@
         // 埼玉県内の全エリア（南部・北部・秩父）をループ
         const areas = data[0].timeSeries[0].areas;
 
+        const fallbackIcon =
+          "data:image/svg+xml;utf8," +
+          "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>" +
+          "<circle cx='32' cy='32' r='14' fill='%23fbbf24'/>" +
+          "<g stroke='%23f59e0b' stroke-width='4' stroke-linecap='round'>" +
+          "<line x1='32' y1='6' x2='32' y2='16'/>" +
+          "<line x1='32' y1='48' x2='32' y2='58'/>" +
+          "<line x1='6' y1='32' x2='16' y2='32'/>" +
+          "<line x1='48' y1='32' x2='58' y2='32'/>" +
+          "<line x1='14' y1='14' x2='21' y2='21'/>" +
+          "<line x1='43' y1='43' x2='50' y2='50'/>" +
+          "<line x1='14' y1='50' x2='21' y2='43'/>" +
+          "<line x1='43' y1='21' x2='50' y2='14'/>" +
+          "</g></svg>";
+
         areas.forEach((area) => {
           const name = area.area.name;
-          const weather = area.weathers[0];
+          const weatherRaw = area.weathers[0];
+          const weather = weatherRaw ? weatherRaw.replace(/\s+/g, " ").trim() : "";
           const code = area.weatherCodes[0];
           const icon = `https://www.jma.go.jp/bosai/forecast/img/${code}.png`;
 
@@ -59,7 +75,7 @@
             <div class="bg-white rounded-3xl p-8 shadow-xl shadow-sky-900/5 border border-white hover:scale-105 transition-transform duration-300">
               <h3 class="text-xl font-bold text-slate-700 border-b pb-4 mb-6">${name}</h3>
               <div class="flex flex-col items-center">
-                <img src="${icon}" alt="${weather}" class="w-24 h-24 drop-shadow-lg">
+                <img src="${icon}" alt="${weather}" class="w-24 h-24 object-contain drop-shadow-lg" loading="lazy" onerror="this.onerror=null; this.src='${fallbackIcon}'">
                 <p class="mt-6 text-lg font-medium text-center leading-relaxed text-slate-600">
                   ${weather}
                 </p>
