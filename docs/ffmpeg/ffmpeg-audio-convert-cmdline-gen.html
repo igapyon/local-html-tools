@@ -1,0 +1,410 @@
+<!--
+Copyright 2025 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FFmpeg 音声変換 コマンドジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </svg>
+    
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🎧</span>FFmpeg 音声変換 コマンドジェネレータ</h1>
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>音声ファイル名</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          例: sample.wav / sample.flac / sample.mp3
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <input type="text" id="audioFile" placeholder="例: sample.wav" class="border border-gray-300 rounded w-full p-2 mb-4">
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>出力フォーマット</span>
+      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          m4a: 高圧縮で互換性が高い<br>
+          mp3: もっとも汎用的<br>
+          opus: 低ビットレートに強い<br>
+          flac: 可逆圧縮で高音質<br>
+          wav: 無圧縮のPCM<br>
+          互換性重視なら m4a / mp3 が安心（opus/flac はアプリ依存）
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <select id="outputFormat" class="border border-gray-300 rounded w-full p-2 mb-4" onchange="updateFormatOptions()">
+      <option value="m4a" selected>m4a (AAC)</option>
+      <option value="mp3">mp3 (MP3)</option>
+      <option value="opus">opus (Opus)</option>
+      <option value="flac">flac (FLAC)</option>
+      <option value="wav">wav (PCM)</option>
+    </select>
+
+    <div id="bitrateBlock">
+      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <span>ビットレート</span>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            VBR OFF 時に使用します（自動も選択可能）
+          </span>
+        </span>
+        <span>：</span>
+      </label>
+      <select id="bitrate" class="border border-gray-300 rounded w-full p-2 mb-4">
+        <option value="auto">元のまま（自動）</option>
+        <option value="128k">128 kbps</option>
+        <option value="192k" selected>192 kbps（デフォルト）</option>
+        <option value="256k">256 kbps</option>
+        <option value="320k">320 kbps</option>
+      </select>
+    </div>
+
+    <div id="vbrBlock">
+      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <span>VBR</span>
+        <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            高め: 音質優先 / 標準: バランス / 低め: 容量優先
+        </span>
+      </span>
+        <span>：</span>
+      </label>
+      <div class="grid grid-cols-1 gap-2 mb-4 sm:grid-cols-2">
+        <select id="vbrMode" class="border border-gray-300 rounded w-full p-2" onchange="updateVbrOptions()">
+          <option value="off" selected>OFF</option>
+          <option value="on">ON</option>
+        </select>
+        <select id="vbrQuality" class="border border-gray-300 rounded w-full p-2" disabled>
+          <option value="low">低め</option>
+          <option value="mid" selected>標準</option>
+          <option value="high">高め</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="flacBlock" class="hidden">
+      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <span>FLAC圧縮レベル</span>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            数字が大きいほど圧縮が強くなります
+          </span>
+        </span>
+        <span>：</span>
+      </label>
+      <select id="flacLevel" class="border border-gray-300 rounded w-full p-2 mb-4">
+        <option value="0">0 (高速)</option>
+        <option value="5" selected>5 (標準)</option>
+        <option value="8">8 (高圧縮)</option>
+      </select>
+    </div>
+
+    <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+      <span>サンプルレート</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          元のまま / 44.1k / 48k から選択
+        </span>
+      </span>
+      <span>：</span>
+    </label>
+    <select id="sampleRate" class="border border-gray-300 rounded w-full p-2 mb-4">
+      <option value="keep" selected>元のまま</option>
+      <option value="44100">44.1kHz</option>
+      <option value="48000">48kHz</option>
+    </select>
+
+    <label class="block mb-2 font-semibold">用途別プリセット:</label>
+    <div class="flex flex-wrap gap-2 mb-4">
+      <div class="flex items-center gap-2">
+        <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="applyPreset('hq-lossy')">
+          なるべく高音質で圧縮
+        </button>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            m4a / VBR 高め / 256k (VBR OFF時) / 元のまま
+          </span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="applyPreset('share')">
+          汎用・共有向け
+        </button>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            mp3 / VBR 標準 / 44.1kHz
+          </span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="applyPreset('mobile')">
+          スマホ向け軽量
+        </button>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            m4a / VBR 低め / 44.1kHz
+          </span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="applyPreset('archive')">
+          可逆保存（FLAC）
+        </button>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            flac / 圧縮レベル 5 / 元のまま
+          </span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="applyPreset('original')">
+          オリジナル（旧ツール）
+        </button>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            m4a / CBR 192k / 元のまま
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <button onclick="generateCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
+      ffmpeg コマンド生成
+    </button>
+
+    <div class="relative">
+      <code id="audioCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('audioCmd')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    const allowedInputPattern = /\.(wav|flac|aiff|aif|mp3|m4a|opus)$/i;
+
+    function updateVbrOptions() {
+      const vbrMode = document.getElementById("vbrMode").value;
+      const quality = document.getElementById("vbrQuality");
+      const bitrate = document.getElementById("bitrate");
+      quality.disabled = vbrMode !== "on";
+      bitrate.disabled = vbrMode === "on";
+      bitrate.classList.toggle("opacity-50", vbrMode === "on");
+    }
+
+    function updateFormatOptions() {
+      const format = document.getElementById("outputFormat").value;
+      const bitrateBlock = document.getElementById("bitrateBlock");
+      const vbrBlock = document.getElementById("vbrBlock");
+      const flacBlock = document.getElementById("flacBlock");
+
+      const isLossy = format === "m4a" || format === "mp3" || format === "opus";
+      bitrateBlock.classList.toggle("hidden", !isLossy);
+      vbrBlock.classList.toggle("hidden", !isLossy);
+      flacBlock.classList.toggle("hidden", format !== "flac");
+      updateVbrOptions();
+    }
+
+    function buildOutputName(input, format, tagParts) {
+      const base = input.replace(/\.[^/.]+$/, "");
+      const tag = tagParts.filter(Boolean).join("-");
+      return `${base}-${tag}.${format}`;
+    }
+
+    function generateCommand() {
+      const input = document.getElementById("audioFile").value.trim();
+      const format = document.getElementById("outputFormat").value;
+      const bitrate = document.getElementById("bitrate").value;
+      const vbrMode = document.getElementById("vbrMode").value;
+      const vbrQuality = document.getElementById("vbrQuality").value;
+      const flacLevel = document.getElementById("flacLevel").value;
+      const sampleRate = document.getElementById("sampleRate").value;
+
+      if (!input) {
+        alert("音声ファイル名を入力してください。");
+        return;
+      }
+      if (!allowedInputPattern.test(input)) {
+        alert("入力ファイルは wav/flac/aiff/aif/mp3/m4a/opus のいずれかを指定してください。");
+        return;
+      }
+
+      const cmdParts = [`ffmpeg -i "${input}"`];
+      if (sampleRate !== "keep") {
+        cmdParts.push(`-ar ${sampleRate}`);
+      }
+
+      const tags = [format];
+      if (format === "m4a") {
+        cmdParts.push("-c:a aac");
+        if (vbrMode === "on") {
+          const qMap = { low: "1", mid: "3", high: "5" };
+          cmdParts.push(`-q:a ${qMap[vbrQuality]}`);
+          tags.push(`vbr-${vbrQuality}`);
+        } else if (bitrate === "auto") {
+          tags.push("auto");
+        } else {
+          cmdParts.push(`-b:a ${bitrate}`);
+          tags.push(bitrate);
+        }
+      } else if (format === "mp3") {
+        cmdParts.push("-c:a libmp3lame");
+        if (vbrMode === "on") {
+          const qMap = { low: "6", mid: "4", high: "2" };
+          cmdParts.push(`-q:a ${qMap[vbrQuality]}`);
+          tags.push(`vbr-${vbrQuality}`);
+        } else if (bitrate === "auto") {
+          tags.push("auto");
+        } else {
+          cmdParts.push(`-b:a ${bitrate}`);
+          tags.push(bitrate);
+        }
+      } else if (format === "opus") {
+        cmdParts.push("-c:a libopus");
+        if (vbrMode === "on") {
+          const qMap = { low: "96k", mid: "128k", high: "192k" };
+          const opusBitrate = qMap[vbrQuality];
+          cmdParts.push(`-vbr on -b:a ${opusBitrate}`);
+          tags.push(`vbr-${vbrQuality}`);
+        } else if (bitrate === "auto") {
+          cmdParts.push("-vbr off");
+          tags.push("auto");
+        } else {
+          cmdParts.push(`-vbr off -b:a ${bitrate}`);
+          tags.push(bitrate);
+        }
+      } else if (format === "flac") {
+        cmdParts.push(`-c:a flac -compression_level ${flacLevel}`);
+        tags.push(`lv${flacLevel}`);
+      } else if (format === "wav") {
+        cmdParts.push("-c:a pcm_s16le");
+      }
+
+      if (sampleRate === "44100") {
+        tags.push("sr44k");
+      } else if (sampleRate === "48000") {
+        tags.push("sr48k");
+      }
+
+      const output = buildOutputName(input, format, tags);
+      cmdParts.push(`"${output}"`);
+      document.getElementById("audioCmd").textContent = cmdParts.join(" ");
+    }
+
+    function applyPreset(preset) {
+      const outputFormat = document.getElementById("outputFormat");
+      const vbrMode = document.getElementById("vbrMode");
+      const vbrQuality = document.getElementById("vbrQuality");
+      const bitrate = document.getElementById("bitrate");
+      const sampleRate = document.getElementById("sampleRate");
+      const flacLevel = document.getElementById("flacLevel");
+
+      if (preset === "hq-lossy") {
+        outputFormat.value = "m4a";
+        vbrMode.value = "on";
+        vbrQuality.value = "high";
+        bitrate.value = "256k";
+        sampleRate.value = "keep";
+      } else if (preset === "share") {
+        outputFormat.value = "mp3";
+        vbrMode.value = "on";
+        vbrQuality.value = "mid";
+        sampleRate.value = "44100";
+      } else if (preset === "mobile") {
+        outputFormat.value = "m4a";
+        vbrMode.value = "on";
+        vbrQuality.value = "low";
+        sampleRate.value = "44100";
+      } else if (preset === "archive") {
+        outputFormat.value = "flac";
+        flacLevel.value = "5";
+        vbrMode.value = "off";
+        bitrate.value = "auto";
+        sampleRate.value = "keep";
+      } else if (preset === "original") {
+        outputFormat.value = "m4a";
+        vbrMode.value = "off";
+        bitrate.value = "192k";
+        sampleRate.value = "keep";
+      }
+
+      updateFormatOptions();
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+    function toggleMenu() {
+      const panel = document.getElementById("menuPanel");
+      if (!panel) return;
+      panel.classList.toggle("hidden");
+    }
+
+    updateFormatOptions();
+  </script>
+</body>
+</html>

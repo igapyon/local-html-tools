@@ -11,10 +11,10 @@
     <header class="text-center mb-8">
       <h1 class="text-4xl font-bold">local-html-tools</h1>
       <p class="mt-2 text-lg">ウェブブラウザで動く、ローカルHTMLツール集（Static Web App）</p>
-      <p class="mt-1 text-sm text-gray-500">更新日: 2026-01-11</p>
+      <p class="mt-1 text-sm text-gray-500">更新日: 2026-01-26</p>
     </header>
 
-    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md mb-8">
+    <div class="max-w-2xl mx-auto bg-yellow-50 p-6 rounded-lg shadow-md mb-8 border border-yellow-100">
         <h2 class="text-2xl font-semibold mb-4">コンセプト</h2>
         <p class="mb-2 flex flex-wrap items-center gap-2">
           <span>このツール群は、お使いのコンピュータ上で直接動作する、一連のシンプルなHTMLファイル（Static Web App）です。</span>
@@ -27,7 +27,7 @@
         </p>
         <h3 class="text-xl font-semibold mt-4 mb-2">主な特徴</h3>
         <ul class="list-disc list-inside">
-            <li><strong>ローカル動作</strong>: インターネット接続は不要で、お使いのPC内だけで完結します。</li>
+            <li><strong>ローカル動作</strong>: お使いのPC内で動作し、サーバは不要です。</li>
             <li><strong>簡単な操作</strong>: ウェブブラウザでファイルを開き、情報を入力するだけでコマンドが手に入ります。</li>
             <li><strong>効率化</strong>: （FFmpeg系の場合）複雑なコマンドの構文を覚える必要がなく、手入力によるミスを防ぎます。</li>
         </ul>
@@ -57,11 +57,11 @@
           </h3>
           <p class="text-gray-600">音声/動画ファイルの一部を時間指定で切り出すコマンドを生成します。</p>
         </a>
-        <a href="ffmpeg/ffmpeg-wav2m4a-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+        <a href="ffmpeg/ffmpeg-audio-convert-cmdline-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
           <h3 class="font-semibold text-lg">
-            <span aria-hidden="true" class="mr-2">🎧</span>FFmpeg .wav から .m4a へ変換
+            <span aria-hidden="true" class="mr-2">🎧</span>FFmpeg 音声変換
           </h3>
-          <p class="text-gray-600">高品質な.wavファイルを圧縮された.m4a形式に変換します。</p>
+          <p class="text-gray-600">音声ファイルを指定の形式に変換するコマンドを生成します。</p>
         </a>
         <a href="ffmpeg/ffmpeg-youtube-mkv-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
           <h3 class="font-semibold text-lg">
@@ -90,6 +90,66 @@
       </div>
 
       <h3 class="text-lg font-semibold text-gray-700 mb-3">
+        <span aria-hidden="true" class="mr-2">🔍</span>検索
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <a href="grep/find-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">🔎</span>find 検索
+          </h3>
+          <p class="text-gray-600">findでファイル/ディレクトリを検索するコマンドを生成します。</p>
+        </a>
+      </div>
+
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">
+        <span aria-hidden="true" class="mr-2">🌐</span>Web/URL
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <a href="link/amazon-dp-extract.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">🛒</span>Amazon dp 抽出
+          </h3>
+          <p class="text-gray-600">Amazon URL から dp/ASIN を取り出します。</p>
+        </a>
+        <a href="link/facebook-fbclid-remove.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">🔗</span>Facebook識別子（fbclid）除去
+          </h3>
+          <p class="text-gray-600">URL から Facebook識別子（fbclid）を除去します。</p>
+        </a>
+        <a href="link/url-encode-decode.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">🔤</span>URL エンコード/デコード
+          </h3>
+          <p class="text-gray-600">URLのエンコードとデコードを行います。</p>
+        </a>
+        <a href="link/mime-base64.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">📦</span>MIME Base64
+          </h3>
+          <p class="text-gray-600">MIME Base64のエンコード/デコードを行います。</p>
+        </a>
+        <a href="link/utm-remove.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">🧹</span>UTM除去
+          </h3>
+          <p class="text-gray-600">URL から utm_* パラメータを削除します。</p>
+        </a>
+      </div>
+
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">
+        <span aria-hidden="true" class="mr-2">🖼️</span>画像/SVG
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <a href="img/img2svg.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">🧩</span>画像 → SVG 変換
+          </h3>
+          <p class="text-gray-600">画像ファイルをSVGに変換してダウンロードします。</p>
+        </a>
+      </div>
+
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">
         <span aria-hidden="true" class="mr-2">🔐</span>パスワード
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -100,8 +160,45 @@
           <p class="text-gray-600">選択した文字種と文字数でパスワードを生成します。</p>
         </a>
       </div>
+
+      <h3 class="text-lg font-semibold text-gray-700 mt-8 mb-3">
+        <span aria-hidden="true" class="mr-2">🧳</span>日々の生活
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <a href="life/forgot-items-check.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">✅</span>忘れ物チェック
+          </h3>
+          <p class="text-gray-600">持ち物を順番に確認して、忘れ物を防ぎます。</p>
+        </a>
+      </div>
     </div>
 
+    <hr class="my-10 border-gray-200">
+    <footer class="text-center text-sm text-gray-600 pb-6">
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="https://github.com/igapyon/local-html-tools" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener noreferrer">
+          <svg aria-hidden="true" viewBox="0 0 16 16" class="w-4 h-4" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <span class="text-gray-300">|</span>
+        <a href="https://github.com/igapyon/local-html-tools/blob/main/THIRD_PARTY_NOTICES.md" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener noreferrer">
+          <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-gray-100 text-xs font-semibold border border-gray-200 hover:bg-gray-200">Third-Party Notices</span>
+        </a>
+        <span class="text-gray-300">|</span>
+        <a href="https://igapyon.github.io/local-html-tools/" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener noreferrer">
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M3 12h18"/>
+            <path d="M12 3a14 14 0 0 1 0 18"/>
+            <path d="M12 3a14 14 0 0 0 0 18"/>
+          </svg>
+          <span>GitHub Pages</span>
+        </a>
+      </div>
+    </footer>
   </div>
 </body>
 </html>

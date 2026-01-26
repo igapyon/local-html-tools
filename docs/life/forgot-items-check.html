@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Smart Check - Final Edition</title>
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-card: #1e1e1e;
+            --bg-card-lighter: #2c2c2c;
+            --accent-cyan: #00bcd4;
+            --accent-orange: #ff9800;
+            --accent-green: #4caf50;
+            --text-main: #e0e0e0;
+            --text-sub: #aaaaaa;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-main); color: var(--text-main); margin: 0; display: flex; justify-content: center; height: 100dvh; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        
+        .container { 
+            width: 100%; max-width: 500px; height: 100%; display: flex; flex-direction: column; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); box-sizing: border-box;
+        }
+
+        .matte-card { background: var(--bg-card); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid #333; }
+        .btn { border: none; border-radius: 12px; font-size: clamp(1rem, 2.8vw, 1.3rem); font-weight: bold; cursor: pointer; transition: opacity 0.2s; flex-shrink: 0; }
+        .btn:active { opacity: 0.7; }
+
+        .check-btn { background: var(--accent-cyan); color: #000; }
+        .skip-btn { background: var(--bg-card-lighter); color: var(--text-main); border: 1px solid #444; }
+        .retry-btn { background: var(--accent-orange); color: #000; margin-bottom: 10px; }
+
+        .scroll-list { text-align: left; margin: 15px 0; padding: 15px; overflow-y: auto; flex-grow: 1; background: var(--bg-card); border-radius: 16px; border: 1px solid #333; }
+        .category-label { font-size: 0.75rem; color: var(--accent-cyan); font-weight: bold; margin-top: 15px; margin-bottom: 5px; letter-spacing: 1px; }
+        .list-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #2a2a2a; }
+        .status-badge { font-size: 0.65rem; padding: 3px 8px; border-radius: 5px; margin-right: 12px; min-width: 48px; text-align: center; font-weight: bold; color: #000; }
+        .badge-todo { background: var(--accent-cyan); }
+        .badge-done { background: var(--accent-green); }
+        .badge-skip { background: var(--accent-orange); }
+        
+        #start-screen, #check-screen, #finish-screen { display: flex; flex-direction: column; height: 100%; }
+        .hidden { display: none !important; }
+
+        .logo-area { text-align: center; padding: 30px 0; }
+        .logo-text { font-size: 1.4rem; font-weight: 900; letter-spacing: 3px; color: var(--accent-cyan); }
+
+        .counter-display { font-size: 1rem; font-weight: bold; color: var(--accent-cyan); margin-bottom: 10px; font-family: 'Courier New', Courier, monospace; }
+
+        .dots-container { display: flex; justify-content: center; gap: 6px; padding: 5px 0; flex-wrap: wrap; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: #444; }
+        .dot.current { background: var(--accent-cyan); transform: scale(1.3); }
+        .dot.done { background: var(--accent-green); }
+        .dot.skipped { background: var(--accent-orange); }
+        
+        .item-display-card { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; margin-bottom: 20px; }
+        .item-text-main { font-size: 1.8rem; font-weight: 900; line-height: 1.3; }
+        .button-area { display: flex; gap: 15px; height: clamp(120px, 20vh, 220px); margin-bottom: 10px; }
+        .btn-primary { font-size: clamp(1.2rem, 4vw, 1.6rem); }
+        .summary-header { display: flex; justify-content: space-around; padding: 15px; margin-top: 10px; background: var(--bg-card); border-radius: 16px; border: 1px solid #333; }
+
+        .burst {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .particle {
+            position: absolute;
+            width: var(--w);
+            height: var(--h);
+            border-radius: var(--radius);
+            background: var(--fill);
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            animation: pop 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            box-shadow: var(--glow);
+        }
+        @keyframes pop {
+            0% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--rot)) scale(0.35); }
+            18% { opacity: 1; }
+            100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="start-screen">
+        <div class="logo-area"><span style="font-size:3rem;">💼</span><br><span class="logo-text">READY TO GO</span></div>
+        <div class="scroll-list" id="previewList"></div>
+        <button class="btn check-btn" style="height: 70px; width: 100%;" onclick="app.start('all')">CHECK START</button>
+    </div>
+
+    <div id="check-screen" class="hidden">
+        <div class="counter-display" id="counterDisplay" style="text-align: center;">0 / 0</div>
+        <div class="dots-container" id="dotsContainer"></div>
+        <div class="matte-card item-display-card">
+            <div id="itemCategory" style="color:var(--accent-cyan); font-size:0.8rem; font-weight:bold; margin-bottom:8px;"></div>
+            <div id="targetItem" class="item-text-main"></div>
+        </div>
+        <div class="button-area">
+            <button class="btn skip-btn" style="flex:2;" onclick="app.handleAction('skip', event)">あとで</button>
+            <button class="btn check-btn btn-primary" style="flex:3;" onclick="app.handleAction('check', event)">OK</button>
+        </div>
+    </div>
+
+    <div id="finish-screen" class="hidden">
+        <h2 style="text-align:center; color: var(--accent-cyan); margin: 15px 0 5px 0;">RESULT</h2>
+        <div class="summary-header">
+            <div style="text-align:center;"><span id="countDone" style="font-size:2.2rem; font-weight:900; color:var(--accent-green);">0</span><br><span style="font-size:0.7rem;">COMPLETE</span></div>
+            <div style="text-align:center;"><span id="countSkip" style="font-size:2.2rem; font-weight:900; color:var(--accent-orange);">0</span><br><span style="font-size:0.7rem;">SKIPPED</span></div>
+        </div>
+        <div class="scroll-list" id="resultList"></div>
+        <div id="actionArea">
+            <button id="retryBtn" class="btn retry-btn" style="height: 60px; width: 100%; display:none;" onclick="app.start('retry')">「あとで」を再チェック</button>
+            <button class="btn check-btn" style="height: 60px; width: 100%;" onclick="app.reset()">TOPに戻る</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CONFIG = {
+        categories: [
+            { name: "基本", items: ["ID", "スマホ", "モバイルバッテリー"] },
+            { name: "パソコン一式", items: ["パソコン本体", "電源アダプター", "トラックボール", "ヘッドホン"] },
+            { name: "ショルダーバッグ", items: ["SUICA", "クレカ", "現金", "家の鍵", "自転車の鍵", "駐輪場カード"] },
+            { name: "その他", items: ["マスク", "ハンカチ", "ティッシュ", "傘"] }
+        ]
+    };
+
+    let flatItems = [];
+    CONFIG.categories.forEach(cat => cat.items.forEach(name => flatItems.push({ category: cat.name, name: name })));
+
+    const app = {
+        currentIndex: 0,
+        activeIndices: [], 
+        states: new Array(flatItems.length).fill('none'),
+
+        init: function() { this.showPreview(); },
+
+        showPreview: function() {
+            let html = "";
+            CONFIG.categories.forEach(cat => {
+                html += `<div class="category-label">${cat.name}</div>`;
+                cat.items.forEach(name => html += `<div class="list-item"><span class="status-badge badge-todo">TODO</span><span>${name}</span></div>`);
+            });
+            document.getElementById('previewList').innerHTML = html;
+        },
+
+        start: function(mode) {
+            if (mode === 'all') {
+                this.states.fill('none');
+                this.activeIndices = flatItems.map((_, i) => i);
+            } else {
+                this.activeIndices = this.states.map((s, i) => s === 'skipped' ? i : -1).filter(i => i !== -1);
+            }
+            this.currentIndex = 0;
+            this.renderDots();
+            this.switchScreen('check-screen');
+            this.updateDisplay();
+        },
+
+        renderDots: function() {
+            document.getElementById('dotsContainer').innerHTML = this.activeIndices.map((_, i) => `<div class="dot" id="dot-${i}"></div>`).join('');
+        },
+
+        updateDisplay: function() {
+            if (this.currentIndex < this.activeIndices.length) {
+                const itemIndex = this.activeIndices[this.currentIndex];
+                const item = flatItems[itemIndex];
+                document.getElementById('counterDisplay').innerText = `${this.currentIndex + 1} / ${this.activeIndices.length}`;
+                document.getElementById('itemCategory').innerText = item.category;
+                document.getElementById('targetItem').innerText = item.name;
+                
+                this.activeIndices.forEach((_, i) => {
+                    const dot = document.getElementById(`dot-${i}`);
+                    const originalState = this.states[this.activeIndices[i]];
+                    dot.className = 'dot' + (i === this.currentIndex ? ' current' : '') + (originalState === 'done' ? ' done' : '') + (originalState === 'skipped' ? ' skipped' : '');
+                });
+            } else { this.showFinish(); }
+        },
+
+        handleAction: function(type, event) {
+            if (navigator.vibrate) navigator.vibrate(30);
+            this.playTapEffect(type, event);
+            const itemIndex = this.activeIndices[this.currentIndex];
+            this.states[itemIndex] = (type === 'check') ? 'done' : 'skipped';
+            this.currentIndex++;
+            this.updateDisplay();
+        },
+
+        showFinish: function() {
+            this.switchScreen('finish-screen');
+            const skipCount = this.states.filter(s => s === 'skipped').length;
+            document.getElementById('countDone').innerText = this.states.filter(s => s === 'done').length;
+            document.getElementById('countSkip').innerText = skipCount;
+            document.getElementById('retryBtn').style.display = skipCount > 0 ? 'block' : 'none';
+
+            let html = "";
+            let currentCat = "";
+            flatItems.forEach((item, i) => {
+                if (currentCat !== item.category) { currentCat = item.category; html += `<div class="category-label">${currentCat}</div>`; }
+                const isDone = this.states[i] === 'done';
+                html += `<div class="list-item"><span class="status-badge ${isDone ? 'badge-done' : 'badge-skip'}">${isDone ? 'OK' : '後で'}</span><span style="color:${isDone ? '' : 'var(--accent-orange)'}">${item.name}</span></div>`;
+            });
+            document.getElementById('resultList').innerHTML = html;
+        },
+
+        switchScreen: function(id) {
+            ['start-screen', 'check-screen', 'finish-screen'].forEach(s => document.getElementById(s).classList.toggle('hidden', s !== id));
+        },
+
+        playTapEffect: function(type, event) {
+            const burst = document.createElement('div');
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            const color = type === 'check' ? 'rgba(160, 245, 255, 0.95)' : 'rgba(255, 194, 112, 0.95)';
+            const baseParticles = 32;
+            const sparkleParticles = 22;
+
+            burst.className = 'burst';
+            burst.style.left = `${x}px`;
+            burst.style.top = `${y}px`;
+            burst.style.setProperty('--particle-color', color);
+
+            for (let i = 0; i < baseParticles + sparkleParticles; i++) {
+                const p = document.createElement('span');
+                const angle = Math.random() * Math.PI * 2;
+                const maxDx = window.innerWidth - x;
+                const minDx = -x;
+                const maxDy = window.innerHeight - y;
+                const minDy = -y;
+                const dx = (Math.random() * (maxDx - minDx)) + minDx;
+                const dy = (Math.random() * (maxDy - minDy)) + minDy;
+                const isSparkle = i >= baseParticles;
+
+                if (isSparkle) {
+                    const size = 6 + Math.random() * 6;
+                    p.className = 'particle';
+                    p.style.setProperty('--w', `${size}px`);
+                    p.style.setProperty('--h', `${size}px`);
+                    p.style.setProperty('--radius', '999px');
+                    p.style.setProperty('--fill', 'rgba(255, 255, 255, 0.9)');
+                    p.style.setProperty('--glow', '0 0 14px rgba(255, 255, 255, 0.55)');
+                } else {
+                    const length = 28 + Math.random() * 32;
+                    const thickness = 4 + Math.random() * 3;
+                    p.className = 'particle';
+                    p.style.setProperty('--w', `${length}px`);
+                    p.style.setProperty('--h', `${thickness}px`);
+                    p.style.setProperty('--radius', '999px');
+                    p.style.setProperty('--fill', `linear-gradient(90deg, rgba(255, 255, 255, 0.95), ${color})`);
+                    p.style.setProperty('--glow', `0 0 18px ${color}`);
+                }
+
+                p.style.setProperty('--rot', `${angle}rad`);
+                p.style.setProperty('--dx', `${dx}px`);
+                p.style.setProperty('--dy', `${dy}px`);
+                burst.appendChild(p);
+            }
+
+            document.body.appendChild(burst);
+            setTimeout(() => burst.remove(), 1100);
+        },
+
+        reset: function() { this.switchScreen('start-screen'); this.showPreview(); }
+    };
+
+    app.init();
+</script>
+</body>
+</html>
