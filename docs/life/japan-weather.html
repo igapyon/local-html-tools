@@ -54,6 +54,11 @@
   </div>
 
   <script>
+    // TODO: 現在の気温・湿度は予報APIではなく観測(AMeDAS)の取得が必要。
+    //   - 最新時刻: https://www.jma.go.jp/bosai/amedas/data/latest_time.txt
+    //   - 観測値: https://www.jma.go.jp/bosai/amedas/data/map/{YYYYMMDDHHmmss}.json
+    //   - 観測所一覧: https://www.jma.go.jp/bosai/amedas/const/amedastable.json
+    //   - 府県→観測所の対応 or 位置情報で最寄り観測所を選択する設計が必要
     const AREA_CSV = `地域,名称,コード
 北海道,宗谷地方,011000
 ,上川・留萌地方,012000
