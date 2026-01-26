@@ -20,6 +20,18 @@
     <header class="text-center mb-6">
       <h1 class="text-2xl font-bold tracking-tight">Japan Weather</h1>
       <p id="update-time" class="text-gray-500 mt-2 text-sm italic"></p>
+      <div class="mt-4 flex flex-col sm:flex-row gap-3 items-center justify-center">
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+          <span class="font-semibold">地域</span>
+          <select id="region-select" class="border border-gray-300 rounded px-3 py-1 bg-white">
+          </select>
+        </label>
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+          <span class="font-semibold">府県/地方</span>
+          <select id="area-select" class="border border-gray-300 rounded px-3 py-1 bg-white">
+          </select>
+        </label>
+      </div>
     </header>
 
     <main>
@@ -28,7 +40,7 @@
       <div class="mt-12 p-6 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
         <h2 class="font-bold text-gray-700 mb-2 font-mono text-sm uppercase tracking-widest">Dev Note</h2>
         <p class="text-sm text-gray-700 leading-relaxed text-opacity-80">
-          埼玉県のエリアコード `110000` を使用。`timeSeries[0].areas` 配列から南部・北部・秩父のデータを抽出しています。
+          気象庁の府県予報区コードで取得し、`timeSeries[0].areas` 配列から各エリアの天気を抽出しています。
         </p>
       </div>
     </main>
@@ -41,11 +53,126 @@
   </div>
 
   <script>
-    const API_URL = "https://www.jma.go.jp/bosai/forecast/data/forecast/110000.json";
+    const AREA_CSV = `地域,名称,コード
+北海道,宗谷地方,011000
+,上川・留萌地方,012000
+,網走・北見・紋別地方,013000
+,釧路・根室地方,014100
+,十勝地方,014030
+,胆振・日高地方,015000
+,石狩・空知・後志地方,016000
+,渡島・檜山地方,017000
+東北,青森県,020000
+,岩手県,030000
+,宮城県,040000
+,秋田県,050000
+,山形県,060000
+,福島県,070000
+関東,茨城県,080000
+,栃木県,090000
+,群馬県,100000
+,埼玉県,110000
+,千葉県,120000
+,東京都,130000
+,神奈川県,140000
+中部,新潟県,150000
+,富山県,160000
+,石川県,170000
+,福井県,180000
+,山梨県,190000
+,長野県,200000
+,岐阜県,210000
+,静岡県,220000
+,愛知県,230000
+,三重県,240000
+近畿,滋賀県,250000
+,京都府,260000
+,大阪府,270000
+,兵庫県,280000
+,奈良県,290000
+,和歌山県,300000
+中国,鳥取県,310000
+,島根県,320000
+,岡山県,330000
+,広島県,340000
+,山口県,350000
+四国,徳島県,360000
+,香川県,370000
+,愛媛県,380000
+,高知県,390000
+九州,福岡県,400000
+,佐賀県,410000
+,長崎県,420000
+,熊本県,430000
+,大分県,440000
+,宮崎県,450000
+,鹿児島県,460100
+沖縄,沖縄本島地方,471000
+,大東島地方,472000
+,宮古島地方,473000
+,八重山地方,474000`;
 
-    async function loadSaitamaWeather() {
+    const regionSelect = document.getElementById("region-select");
+    const areaSelect = document.getElementById("area-select");
+    const fallbackIcon =
+      "data:image/svg+xml;utf8," +
+      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>" +
+      "<circle cx='32' cy='32' r='14' fill='%23fbbf24'/>" +
+      "<g stroke='%23f59e0b' stroke-width='4' stroke-linecap='round'>" +
+      "<line x1='32' y1='6' x2='32' y2='16'/>" +
+      "<line x1='32' y1='48' x2='32' y2='58'/>" +
+      "<line x1='6' y1='32' x2='16' y2='32'/>" +
+      "<line x1='48' y1='32' x2='58' y2='32'/>" +
+      "<line x1='14' y1='14' x2='21' y2='21'/>" +
+      "<line x1='43' y1='43' x2='50' y2='50'/>" +
+      "<line x1='14' y1='50' x2='21' y2='43'/>" +
+      "<line x1='43' y1='21' x2='50' y2='14'/>" +
+      "</g></svg>";
+
+    function parseAreaCsv(csv) {
+      const lines = csv.trim().split("\n");
+      const items = [];
+      let currentRegion = "";
+      for (let i = 1; i < lines.length; i++) {
+        const [regionRaw, name, code] = lines[i].split(",");
+        if (regionRaw) currentRegion = regionRaw;
+        items.push({ region: currentRegion, name, code });
+      }
+      return items;
+    }
+
+    const areasMaster = parseAreaCsv(AREA_CSV);
+    const regions = [...new Set(areasMaster.map((a) => a.region))];
+
+    function buildRegionOptions() {
+      regionSelect.innerHTML = "";
+      regions.forEach((region) => {
+        const option = document.createElement("option");
+        option.value = region;
+        option.textContent = region;
+        regionSelect.appendChild(option);
+      });
+    }
+
+    function buildAreaOptions(region) {
+      areaSelect.innerHTML = "";
+      areasMaster
+        .filter((a) => a.region === region)
+        .forEach((area) => {
+          const option = document.createElement("option");
+          option.value = area.code;
+          option.textContent = area.name;
+          areaSelect.appendChild(option);
+        });
+    }
+
+    function getApiUrl(code) {
+      return `https://www.jma.go.jp/bosai/forecast/data/forecast/${code}.json`;
+    }
+
+    async function loadWeather(apiUrl) {
       try {
-        const response = await fetch(API_URL);
+        const response = await fetch(apiUrl);
         const data = await response.json();
 
         // 発表時刻
@@ -57,21 +184,6 @@
 
         // 埼玉県内の全エリア（南部・北部・秩父）をループ
         const areas = data[0].timeSeries[0].areas;
-
-        const fallbackIcon =
-          "data:image/svg+xml;utf8," +
-          "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>" +
-          "<circle cx='32' cy='32' r='14' fill='%23fbbf24'/>" +
-          "<g stroke='%23f59e0b' stroke-width='4' stroke-linecap='round'>" +
-          "<line x1='32' y1='6' x2='32' y2='16'/>" +
-          "<line x1='32' y1='48' x2='32' y2='58'/>" +
-          "<line x1='6' y1='32' x2='16' y2='32'/>" +
-          "<line x1='48' y1='32' x2='58' y2='32'/>" +
-          "<line x1='14' y1='14' x2='21' y2='21'/>" +
-          "<line x1='43' y1='43' x2='50' y2='50'/>" +
-          "<line x1='14' y1='50' x2='21' y2='43'/>" +
-          "<line x1='43' y1='21' x2='50' y2='14'/>" +
-          "</g></svg>";
 
         areas.forEach((area) => {
           const name = area.area.name;
@@ -99,7 +211,32 @@
       }
     }
 
-    loadSaitamaWeather();
+    function loadFromSelectedArea() {
+      const code = areaSelect.value;
+      if (!code) return;
+      const url = getApiUrl(code);
+      loadWeather(url);
+    }
+
+    function initSelectors() {
+      buildRegionOptions();
+      regionSelect.value = "関東";
+      buildAreaOptions(regionSelect.value);
+      areaSelect.value = "110000";
+    }
+
+    regionSelect.addEventListener("change", () => {
+      buildAreaOptions(regionSelect.value);
+      areaSelect.selectedIndex = 0;
+      loadFromSelectedArea();
+    });
+
+    areaSelect.addEventListener("change", () => {
+      loadFromSelectedArea();
+    });
+
+    initSelectors();
+    loadFromSelectedArea();
 
     function toggleMenu() {
       const panel = document.getElementById("menuPanel");
