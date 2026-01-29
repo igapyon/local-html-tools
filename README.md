@@ -63,10 +63,18 @@ URL加工系ツールです。
 生活系ツールです。
 
 - **forgot-items-check.html**: 忘れ物チェック用のリストを生成します。
+- **japan-weather.html**: 日本の天気情報（地域別）を確認できます。
+
+## git
+
+Git補助ツールです。
+
+- **git-pseudo-squash.html**: reset --soft で疑似的に1コミット化するコマンドを生成します。
+- **git-remote-branch-diff.html**: リモート/ローカルのブランチ差分コマンドを生成します。
 
 ## GitHub Pages
 
-GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/ffmpeg/`（FFmpegおよび周辺ツール）と `docs/password/`（パスワード生成ツール）配下にあります。
+GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/life/` 配下にあります。  
 公開URL: https://igapyon.github.io/local-html-tools/
 
 ## Third-Party Notices
