@@ -50,17 +50,36 @@ limitations under the License.
         <input type="checkbox" id="lockOrigin" class="rounded border-gray-300" checked onchange="toggleOriginLock()">
         リモート名は origin 固定
       </label>
-      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-        <span>基点ブランチ</span>
-        <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
-        <span class="relative inline-flex items-center group">
-          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            例: main / devel。現在のブランチのコミットを、この基点ブランチとの差分で1つにまとめる想定です。
-          </span>
-        </span>
-        <span>：</span>
-      </label>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="flex flex-wrap items-center gap-2 font-semibold">
+            <span>基点ブランチ</span>
+            <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+            <span class="relative inline-flex items-center group">
+              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+                例: main / devel。現在のブランチのコミットを、この基点ブランチとの差分で1つにまとめる想定です。
+              </span>
+            </span>
+            <span>：</span>
+          </label>
+          <input type="text" id="squashBaseBranch" placeholder="例: devel" class="border border-gray-300 rounded w-full p-2" value="devel">
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="flex flex-wrap items-center gap-2 font-semibold">
+            <span>作業ブランチ</span>
+            <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+            <span class="relative inline-flex items-center group">
+              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+                例: tiga0129a
+              </span>
+            </span>
+            <span>：</span>
+          </label>
+          <input type="text" id="workBranch" placeholder="例: tiga0129a" class="border border-gray-300 rounded w-full p-2">
+        </div>
+      </div>
       <div id="baseRemoteRow" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <select id="squashBaseScope" class="border border-gray-300 rounded w-full p-2" onchange="updateBaseScope()">
           <option value="remote" selected>リモート</option>
@@ -68,7 +87,6 @@ limitations under the License.
         </select>
         <input type="text" id="squashRemote" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
       </div>
-      <input type="text" id="squashBaseBranch" placeholder="例: devel" class="border border-gray-300 rounded w-full p-2" value="devel">
     </section>
     <div id="extraOptions" class="space-y-3 mb-4">
       <label id="remoteNameLabel" class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
@@ -87,33 +105,25 @@ limitations under the License.
     </div>
 
     <section id="commonFields" class="space-y-3 mb-4">
-      <div class="flex items-center justify-center py-2">
-        <svg aria-hidden="true" viewBox="0 0 420 64" class="w-full max-w-xl h-10" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-          <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
-          <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
-          <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
-          <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
-          <path d="M40 32h26" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
-          <path d="M116 32h70" stroke="#C4B5FD" stroke-width="4" stroke-linecap="round"/>
-          <path d="M236 32h26" stroke="#A7F3D0" stroke-width="4" stroke-linecap="round"/>
-          <path d="M312 32h70" stroke="#F9A8D4" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
+
+      <div class="flex items-center gap-3 py-2">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <circle cx="18" cy="32" r="5" fill="#93C5FD"/>
+          <path d="M24 32H34" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 32C40 32 42 26 46 24" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 32C40 32 42 38 46 40" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="48" cy="22" r="4" fill="#A78BFA"/>
+          <circle cx="48" cy="42" r="4" fill="#34D399"/>
         </svg>
-      </div>
-      <p class="text-sm text-gray-600">作業開始（基準ブランチから作成）</p>
-      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-        <span>作業ブランチ名</span>
-        <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+        <p class="text-base font-semibold text-gray-700">作業開始（基準ブランチから作成）</p>
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            例: tiga0129a
+            基点ブランチから作業ブランチを作るときの手順です。
           </span>
         </span>
-        <span>：</span>
-      </label>
-      <input type="text" id="workBranch" placeholder="例: tiga0129a" class="border border-gray-300 rounded w-full p-2">
+      </div>
       <button type="button" onclick="generateCreateBranchCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
         リモートからブランチ作成コマンド生成
       </button>
@@ -136,22 +146,42 @@ limitations under the License.
           <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
         </svg>
       </div>
-      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-        <span>まとめ後のコミットメッセージ</span>
-        <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+      <div class="flex items-center gap-3 py-2">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <circle cx="20" cy="22" r="4" fill="#93C5FD"/>
+          <circle cx="20" cy="42" r="4" fill="#FCA5A5"/>
+          <path d="M24 22H34" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
+          <path d="M24 42H34" stroke="#FCA5A5" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 22C40 22 42 28 46 32" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 42C40 42 42 36 46 32" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="50" cy="32" r="5" fill="#86EFAC"/>
+        </svg>
+        <p class="text-base font-semibold text-gray-700">作業をまとめる（squash）</p>
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            例: feat: update docs
+            この基点との差分を 1 コミットにまとめます（reset --soft）。
           </span>
         </span>
-        <span>：</span>
-      </label>
-      <input type="text" id="commitMessage" placeholder="例: feat: update docs" class="border border-gray-300 rounded w-full p-2">
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="flex flex-wrap items-center gap-2 font-semibold">
+          <span>コミットメッセージ</span>
+          <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              例: feat: update docs
+            </span>
+          </span>
+          <span>：</span>
+        </label>
+        <input type="text" id="commitMessage" placeholder="例: feat: update docs" class="border border-gray-300 rounded w-full sm:w-80 p-2">
+      </div>
     </section>
 
     <div class="space-y-2 mb-4">
-      <p class="text-sm text-gray-600">この基点との差分を 1 コミットにまとめます（reset --soft）。</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <label class="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" id="optPush" class="rounded border-gray-300">
