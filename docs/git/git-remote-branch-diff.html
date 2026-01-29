@@ -1,0 +1,214 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git リモートブランチ差分コマンドジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </svg>
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+
+    <h1 class="text-2xl font-bold mb-6 flex flex-wrap items-center gap-2">
+      <span aria-hidden="true" class="mr-2">🧰</span>
+      <span>Git リモートブランチ差分コマンドジェネレータ</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          リモートの2ブランチの内容差分をコンソールに表示するためのコマンドを生成します。
+        </span>
+      </span>
+    </h1>
+
+    <div class="space-y-3 mb-4">
+      <label class="flex items-center gap-2 text-sm text-gray-700">
+        <input type="checkbox" id="lockOrigin" class="rounded border-gray-300" checked onchange="updateRemoteState()">
+        リモート名は origin 固定
+      </label>
+      <div id="remoteNameBlock" class="space-y-2">
+        <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+          <span>リモート名</span>
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              fetch と差分比較に使うリモート名です。
+            </span>
+          </span>
+          <span>：</span>
+        </label>
+        <input type="text" id="remoteName" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
+      </div>
+    </div>
+
+    <div class="space-y-3 mb-4">
+      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <span>ブランチA</span>
+        <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            例: main
+          </span>
+        </span>
+        <span>：</span>
+      </label>
+      <label class="flex items-center gap-2 text-sm text-gray-700">
+        <input type="checkbox" id="scopeA" class="rounded border-gray-300" checked onchange="updateRemoteState()">
+        リモートとして扱う
+      </label>
+      <input type="text" id="branchA" placeholder="例: main" class="border border-gray-300 rounded w-full p-2">
+
+      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <span>ブランチB</span>
+        <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            例: feature/abc
+          </span>
+        </span>
+        <span>：</span>
+      </label>
+      <label class="flex items-center gap-2 text-sm text-gray-700">
+        <input type="checkbox" id="scopeB" class="rounded border-gray-300" checked onchange="updateRemoteState()">
+        リモートとして扱う
+      </label>
+      <input type="text" id="branchB" placeholder="例: feature/abc" class="border border-gray-300 rounded w-full p-2">
+    </div>
+
+    <div class="space-y-2 mb-4">
+      <p class="text-sm text-gray-600">出力形式</p>
+      <select id="diffMode" class="border border-gray-300 rounded w-full p-2">
+        <option value="" selected>内容差分 (git diff)</option>
+        <option value="--stat">差分統計 (git diff --stat)</option>
+        <option value="--name-only">変更ファイル一覧 (git diff --name-only)</option>
+      </select>
+    </div>
+
+    <button onclick="generateCommands()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+      差分コマンド生成
+    </button>
+
+    <div class="relative mt-4">
+      <code id="diffCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('diffCmd')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    function quoteIfNeeded(value) {
+      if (!value) return value;
+      if (/[\s"'\\]/.test(value)) {
+        const escaped = value.replace(/"/g, '\\"');
+        return `"${escaped}"`;
+      }
+      return value;
+    }
+
+    function updateRemoteState() {
+      const lockOrigin = document.getElementById("lockOrigin").checked;
+      const scopeA = document.getElementById("scopeA").checked;
+      const scopeB = document.getElementById("scopeB").checked;
+      const useRemote = scopeA || scopeB;
+      const remoteInput = document.getElementById("remoteName");
+      const remoteBlock = document.getElementById("remoteNameBlock");
+      remoteBlock.classList.toggle("hidden", lockOrigin);
+      remoteInput.disabled = lockOrigin || !useRemote;
+      remoteInput.classList.toggle("bg-gray-100", lockOrigin || !useRemote);
+      if (lockOrigin) {
+        remoteInput.value = "origin";
+      }
+    }
+
+    function generateCommands() {
+      const branchA = document.getElementById("branchA").value.trim();
+      const branchB = document.getElementById("branchB").value.trim();
+      const scopeA = document.getElementById("scopeA").checked;
+      const scopeB = document.getElementById("scopeB").checked;
+      const lockOrigin = document.getElementById("lockOrigin").checked;
+      const remoteName = lockOrigin ? "origin" : document.getElementById("remoteName").value.trim();
+      const diffMode = document.getElementById("diffMode").value;
+
+      if (!branchA || !branchB) {
+        alert("ブランチAとブランチBを入力してください。");
+        return;
+      }
+      const useRemote = scopeA || scopeB;
+      if (useRemote && !remoteName) {
+        alert("リモート名を入力してください。");
+        return;
+      }
+
+      const refA = scopeA ? `${remoteName}/${branchA}` : branchA;
+      const refB = scopeB ? `${remoteName}/${branchB}` : branchB;
+      const diffOption = diffMode ? ` ${diffMode}` : "";
+      const commands = [];
+      if (useRemote) {
+        commands.push(`git fetch ${quoteIfNeeded(remoteName)}`);
+      }
+      commands.push(`git diff${diffOption} ${quoteIfNeeded(refA)}..${quoteIfNeeded(refB)}`);
+      document.getElementById("diffCmd").textContent = commands.join("\n");
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      if (!text) return;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+
+    function toggleMenu() {
+      const panel = document.getElementById("menuPanel");
+      if (!panel) return;
+      panel.classList.toggle("hidden");
+    }
+
+    updateRemoteState();
+  </script>
+</body>
+</html>
