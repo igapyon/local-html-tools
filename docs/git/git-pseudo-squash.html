@@ -41,6 +41,7 @@ limitations under the License.
         <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
         <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
           reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。
+          運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。
         </span>
       </span>
     </h1>
@@ -59,6 +60,7 @@ limitations under the License.
               <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
               <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
                 この基点との差分が1コミットになります。間違えると差分がずれるため要確認です。
+                上から順に設定すると意図した差分になりやすいです。
               </span>
             </span>
             <span>：</span>
@@ -73,6 +75,7 @@ limitations under the License.
               <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
               <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
                 これから作業するブランチ名です。未作成なら作成先として使います。
+                生成コマンドにそのまま反映されます。
               </span>
             </span>
             <span>：</span>
@@ -95,6 +98,7 @@ limitations under the License.
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
             fetch / push に使うリモート名です。通常は origin です。
+            生成されるコマンドに反映されます。
           </span>
         </span>
         <span>：</span>
@@ -120,7 +124,7 @@ limitations under the License.
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            基点から作業ブランチを切る最初のステップです。
+            基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
           </span>
         </span>
       </div>
@@ -162,6 +166,7 @@ limitations under the License.
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
             reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
+            この下でまとめコマンドを生成します。
           </span>
         </span>
       </div>
@@ -173,6 +178,7 @@ limitations under the License.
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
             <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
               まとめ後の1コミットの説明文です。後で読んで分かる内容にします。
+              生成コマンドにそのまま入ります。
             </span>
           </span>
           <span>：</span>
