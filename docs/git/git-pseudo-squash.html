@@ -1,0 +1,413 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git pseudo-squash コマンドジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </svg>
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+
+    <h1 class="text-2xl font-bold mb-6 pr-10 flex flex-wrap items-center gap-2">
+      <span aria-hidden="true" class="mr-2">🧩</span>
+      <span>Git pseudo-squash コマンドジェネレータ</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。
+          運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。
+        </span>
+      </span>
+    </h1>
+
+    <section id="baseBlock" class="space-y-3 mb-4">
+      <label class="flex items-center gap-2 text-sm text-gray-700">
+        <input type="checkbox" id="lockOrigin" class="rounded border-gray-300" checked onchange="toggleOriginLock()">
+        リモート名は origin 固定
+      </label>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="flex flex-wrap items-center gap-2 font-semibold">
+            <span>基点ブランチ</span>
+            <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+            <span class="relative inline-flex items-center group">
+              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+                この基点との差分が1コミットになります。間違えると差分がずれるため要確認です。
+                上から順に設定すると意図した差分になりやすいです。
+              </span>
+            </span>
+            <span>：</span>
+          </label>
+          <input type="text" id="squashBaseBranch" placeholder="例: devel" class="border border-gray-300 rounded w-full p-2" value="devel">
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="flex flex-wrap items-center gap-2 font-semibold">
+            <span>作業ブランチ</span>
+            <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+            <span class="relative inline-flex items-center group">
+              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+                これから作業するブランチ名です。未作成なら作成先として使います。
+                生成コマンドにそのまま反映されます。
+              </span>
+            </span>
+            <span>：</span>
+          </label>
+          <input type="text" id="workBranch" placeholder="例: tiga0129a" class="border border-gray-300 rounded w-full p-2">
+        </div>
+      </div>
+      <div id="baseRemoteRow" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <select id="squashBaseScope" class="border border-gray-300 rounded w-full p-2" onchange="updateBaseScope()">
+          <option value="remote" selected>リモート</option>
+          <option value="local">ローカル</option>
+        </select>
+        <input type="text" id="squashRemote" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
+      </div>
+    </section>
+    <div id="extraOptions" class="space-y-3 mb-4">
+      <label id="remoteNameLabel" class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <span>リモート名</span>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            fetch / push に使うリモート名です。通常は origin です。
+            生成されるコマンドに反映されます。
+          </span>
+        </span>
+        <span>：</span>
+      </label>
+      <div id="remoteNameRow">
+        <input type="text" id="remoteName" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
+      </div>
+    </div>
+
+    <section id="commonFields" class="space-y-3 mb-4">
+
+      <div class="flex items-center gap-3 py-2">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <circle cx="18" cy="32" r="5" fill="#93C5FD"/>
+          <path d="M24 32H34" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 32C40 32 42 26 46 24" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 32C40 32 42 38 46 40" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="48" cy="22" r="4" fill="#A78BFA"/>
+          <circle cx="48" cy="42" r="4" fill="#34D399"/>
+        </svg>
+        <p class="text-base font-semibold text-gray-700">作業開始（基準ブランチから作成）</p>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
+          </span>
+        </span>
+      </div>
+      <button type="button" onclick="generateCreateBranchCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+        ブランチ作成コマンド生成
+      </button>
+      <div class="relative">
+        <code id="createBranchCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+        <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('createBranchCmd')">📋</button>
+      </div>
+
+      <div class="flex items-center justify-center py-2">
+        <svg aria-hidden="true" viewBox="0 0 420 64" class="w-full max-w-xl h-10" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
+          <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
+          <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
+          <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
+          <path d="M40 32h26" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
+          <path d="M116 32h70" stroke="#C4B5FD" stroke-width="4" stroke-linecap="round"/>
+          <path d="M236 32h26" stroke="#A7F3D0" stroke-width="4" stroke-linecap="round"/>
+          <path d="M312 32h70" stroke="#F9A8D4" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
+        </svg>
+      </div>
+      <div class="flex items-center gap-3 py-2">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <circle cx="20" cy="22" r="4" fill="#93C5FD"/>
+          <circle cx="20" cy="42" r="4" fill="#FCA5A5"/>
+          <path d="M24 22H34" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
+          <path d="M24 42H34" stroke="#FCA5A5" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 22C40 22 42 28 46 32" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 42C40 42 42 36 46 32" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="50" cy="32" r="5" fill="#86EFAC"/>
+        </svg>
+        <p class="text-base font-semibold text-gray-700">作業をまとめる（squash）</p>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
+            この下でまとめコマンドを生成します。
+          </span>
+        </span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="flex flex-wrap items-center gap-2 font-semibold">
+          <span>コミットメッセージ</span>
+          <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              まとめ後の1コミットの説明文です。後で読んで分かる内容にします。
+              生成コマンドにそのまま入ります。
+            </span>
+          </span>
+          <span>：</span>
+        </label>
+        <input type="text" id="commitMessage" placeholder="例: feat: update docs" class="border border-gray-300 rounded w-full sm:w-80 p-2">
+      </div>
+    </section>
+
+    <div class="space-y-2 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="optPush" class="rounded border-gray-300">
+          push --force-with-lease を追加
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              push 後にローカルで -done を付けて、このブランチは使わない合図にします。
+            </span>
+          </span>
+        </label>
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="useCurrentBranch" class="rounded border-gray-300" checked onchange="toggleCurrentBranch()">
+          現在のブランチを使う（switch を省略）
+        </label>
+      </div>
+    </div>
+
+    <button onclick="generateRebaseCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+      まとめコマンド生成
+    </button>
+
+    <div class="relative mt-4">
+      <code id="rebaseCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('rebaseCmd')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    function quoteIfNeeded(value) {
+      if (!value) return value;
+      if (/[^\w@%+=:,./-]/.test(value)) {
+        const escaped = value.replace(/"/g, '\\"');
+        return `"${escaped}"`;
+      }
+      return value;
+    }
+
+    function toggleCurrentBranch() {
+      const useCurrent = document.getElementById("useCurrentBranch").checked;
+      const workBranch = document.getElementById("workBranch");
+      if (workBranch) {
+        workBranch.disabled = useCurrent;
+        workBranch.classList.toggle("bg-gray-100", useCurrent);
+      }
+    }
+
+    function updateBaseScope() {
+      const scope = document.getElementById("squashBaseScope");
+      const remote = document.getElementById("squashRemote");
+      const lockOrigin = document.getElementById("lockOrigin");
+      const baseRemoteRow = document.getElementById("baseRemoteRow");
+      if (scope && remote) {
+        const disableRemote = scope.value !== "remote" || (lockOrigin && lockOrigin.checked);
+        remote.disabled = disableRemote;
+        remote.classList.toggle("bg-gray-100", disableRemote);
+      }
+      if (scope && lockOrigin && lockOrigin.checked) {
+        remote.value = "origin";
+      }
+      const remoteName = document.getElementById("remoteName");
+      const remoteNameRow = document.getElementById("remoteNameRow");
+      if (remoteName && lockOrigin) {
+        const disableRemoteName = lockOrigin.checked;
+        remoteName.disabled = disableRemoteName;
+        remoteName.classList.toggle("bg-gray-100", disableRemoteName);
+        if (disableRemoteName) {
+          remoteName.value = "origin";
+        }
+      }
+      if (baseRemoteRow && lockOrigin) {
+        baseRemoteRow.classList.toggle("hidden", lockOrigin.checked);
+      }
+      if (remoteNameRow && lockOrigin) {
+        remoteNameRow.classList.toggle("hidden", lockOrigin.checked);
+      }
+      const remoteNameLabel = document.getElementById("remoteNameLabel");
+      if (remoteNameLabel && lockOrigin) {
+        remoteNameLabel.classList.toggle("hidden", lockOrigin.checked);
+      }
+    }
+
+    function toggleOriginLock() {
+      updateBaseScope();
+    }
+
+    function setDefaultWorkBranch() {
+      const input = document.getElementById("workBranch");
+      if (!input || input.value.trim()) return;
+      const now = new Date();
+      const pad = (num) => String(num).padStart(2, "0");
+      const mm = pad(now.getMonth() + 1);
+      const dd = pad(now.getDate());
+      const hh = pad(now.getHours());
+      const min = pad(now.getMinutes());
+      input.value = `tiga${mm}${dd}${hh}${min}`;
+    }
+
+    function generateRebaseCommand() {
+      const squashScope = document.getElementById("squashBaseScope")?.value || "remote";
+      const squashRemote = document.getElementById("squashRemote")?.value.trim() || "origin";
+      const squashBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
+      let base = "";
+      const workBranch = document.getElementById("workBranch").value.trim();
+      const useCurrent = document.getElementById("useCurrentBranch").checked;
+      const commitMessage = document.getElementById("commitMessage").value.trim();
+      const remoteName = document.getElementById("remoteName").value.trim() || "origin";
+      const includePush = document.getElementById("optPush").checked;
+
+      if (!squashBranch) {
+        alert("基点ブランチを入力してください。");
+        return;
+      }
+      if (squashScope === "remote") {
+        base = `${squashRemote}/${squashBranch}`;
+      } else {
+        base = squashBranch;
+      }
+      if (!base) {
+        alert("基点（親）を入力してください。");
+        return;
+      }
+      if (!useCurrent && !workBranch) {
+        alert("作業ブランチ名を入力してください。");
+        return;
+      }
+      if (!commitMessage) {
+        alert("コミットメッセージを入力してください。");
+        return;
+      }
+      if (includePush && !useCurrent && !workBranch) {
+        alert("push する場合は作業ブランチ名を入力してください。");
+        return;
+      }
+
+      const lines = [];
+      lines.push(`git fetch ${quoteIfNeeded(remoteName)}`);
+      if (!useCurrent) {
+        lines.push(`git switch ${quoteIfNeeded(workBranch)}`);
+      }
+      lines.push(`git reset --soft ${quoteIfNeeded(base)}`);
+      lines.push(`git commit -m ${quoteIfNeeded(commitMessage)}`);
+      if (includePush) {
+        if (useCurrent) {
+          lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName)} HEAD`);
+        } else {
+          lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName)} ${quoteIfNeeded(workBranch)}`);
+        }
+        if (useCurrent) {
+          lines.push(`git branch -m "$(git branch --show-current)" "$(git branch --show-current)-done"`);
+        } else {
+          lines.push(`git branch -m ${quoteIfNeeded(workBranch)} ${quoteIfNeeded(`${workBranch}-done`)}`);
+        }
+      }
+
+      document.getElementById("rebaseCmd").textContent = lines.join("\n");
+    }
+
+    function generateCreateBranchCommand() {
+      const workBranch = document.getElementById("workBranch").value.trim();
+      const scope = document.getElementById("squashBaseScope").value;
+      const remote = document.getElementById("squashRemote").value.trim() || "origin";
+      const baseBranch = document.getElementById("squashBaseBranch").value.trim();
+
+      if (!workBranch) {
+        alert("作業ブランチ名を入力してください。");
+        return;
+      }
+      if (!baseBranch) {
+        alert("基点ブランチを入力してください。");
+        return;
+      }
+      if (scope !== "remote") {
+        alert("リモートから作成するには基点をリモートにしてください。");
+        return;
+      }
+
+      const lines = [
+        `git fetch ${quoteIfNeeded(remote)}`,
+        `git switch -c ${quoteIfNeeded(workBranch)} ${quoteIfNeeded(remote)}/${quoteIfNeeded(baseBranch)}`
+      ];
+      document.getElementById("createBranchCmd").textContent = lines.join("\n");
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      if (!text) return;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+
+    function toggleMenu() {
+      const panel = document.getElementById("menuPanel");
+      if (!panel) return;
+      panel.classList.toggle("hidden");
+    }
+
+    updateBaseScope();
+    toggleCurrentBranch();
+    setDefaultWorkBranch();
+  </script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>埼玉県お天気ボード</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-5xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>
+      </svg>
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden z-20">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+
+    <header class="text-center mb-6">
+      <h1 class="text-2xl font-bold tracking-tight">Japan Weather</h1>
+      <p id="update-time" class="text-gray-500 mt-2 text-sm italic"></p>
+      <div class="mt-4 flex flex-col sm:flex-row gap-3 items-center justify-center">
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+          <span class="font-semibold">地域</span>
+          <select id="region-select" class="border border-gray-300 rounded px-3 py-1 bg-white">
+          </select>
+        </label>
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+          <span class="font-semibold">府県/地方</span>
+          <select id="area-select" class="border border-gray-300 rounded px-3 py-1 bg-white">
+          </select>
+        </label>
+      </div>
+    </header>
+
+    <main>
+      <div id="weather-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+
+
+      <div class="mt-12 p-6 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+        <h2 class="font-bold text-gray-700 mb-2 font-mono text-sm uppercase tracking-widest">Dev Note</h2>
+        <p class="text-sm text-gray-700 leading-relaxed text-opacity-80">
+          気象庁の府県予報区コードで取得し、`timeSeries[0].areas` 配列から各エリアの天気を抽出しています。
+        </p>
+      </div>
+    </main>
+
+    <footer class="pt-8">
+      <div class="text-center text-xs text-gray-500">
+        このツールは気象庁のAPIと天気アイコン画像を取得するため、インターネット接続が必要です。
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // TODO: 現在の気温・湿度は予報APIではなく観測(AMeDAS)の取得が必要。
+    //   - 最新時刻: https://www.jma.go.jp/bosai/amedas/data/latest_time.txt
+    //   - 観測値: https://www.jma.go.jp/bosai/amedas/data/map/{YYYYMMDDHHmmss}.json
+    //   - 観測所一覧: https://www.jma.go.jp/bosai/amedas/const/amedastable.json
+    //   - 府県→観測所の対応 or 位置情報で最寄り観測所を選択する設計が必要
+    const AREA_CSV = `地域,名称,コード
+北海道,宗谷地方,011000
+,上川・留萌地方,012000
+,網走・北見・紋別地方,013000
+,釧路・根室地方,014100
+,十勝地方,014030
+,胆振・日高地方,015000
+,石狩・空知・後志地方,016000
+,渡島・檜山地方,017000
+東北,青森県,020000
+,岩手県,030000
+,宮城県,040000
+,秋田県,050000
+,山形県,060000
+,福島県,070000
+関東,茨城県,080000
+,栃木県,090000
+,群馬県,100000
+,埼玉県,110000
+,千葉県,120000
+,東京都,130000
+,神奈川県,140000
+中部,新潟県,150000
+,富山県,160000
+,石川県,170000
+,福井県,180000
+,山梨県,190000
+,長野県,200000
+,岐阜県,210000
+,静岡県,220000
+,愛知県,230000
+,三重県,240000
+近畿,滋賀県,250000
+,京都府,260000
+,大阪府,270000
+,兵庫県,280000
+,奈良県,290000
+,和歌山県,300000
+中国,鳥取県,310000
+,島根県,320000
+,岡山県,330000
+,広島県,340000
+,山口県,350000
+四国,徳島県,360000
+,香川県,370000
+,愛媛県,380000
+,高知県,390000
+九州,福岡県,400000
+,佐賀県,410000
+,長崎県,420000
+,熊本県,430000
+,大分県,440000
+,宮崎県,450000
+,鹿児島県,460100
+沖縄,沖縄本島地方,471000
+,大東島地方,472000
+,宮古島地方,473000
+,八重山地方,474000`;
+
+    const regionSelect = document.getElementById("region-select");
+    const areaSelect = document.getElementById("area-select");
+    const fallbackIcon =
+      "data:image/svg+xml;utf8," +
+      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>" +
+      "<circle cx='32' cy='32' r='14' fill='%23fbbf24'/>" +
+      "<g stroke='%23f59e0b' stroke-width='4' stroke-linecap='round'>" +
+      "<line x1='32' y1='6' x2='32' y2='16'/>" +
+      "<line x1='32' y1='48' x2='32' y2='58'/>" +
+      "<line x1='6' y1='32' x2='16' y2='32'/>" +
+      "<line x1='48' y1='32' x2='58' y2='32'/>" +
+      "<line x1='14' y1='14' x2='21' y2='21'/>" +
+      "<line x1='43' y1='43' x2='50' y2='50'/>" +
+      "<line x1='14' y1='50' x2='21' y2='43'/>" +
+      "<line x1='43' y1='21' x2='50' y2='14'/>" +
+      "</g></svg>";
+
+    function parseAreaCsv(csv) {
+      const lines = csv.trim().split("\n");
+      const items = [];
+      let currentRegion = "";
+      for (let i = 1; i < lines.length; i++) {
+        const [regionRaw, name, code] = lines[i].split(",");
+        if (regionRaw) currentRegion = regionRaw;
+        items.push({ region: currentRegion, name, code });
+      }
+      return items;
+    }
+
+    const areasMaster = parseAreaCsv(AREA_CSV);
+    const regions = [...new Set(areasMaster.map((a) => a.region))];
+
+    function buildRegionOptions() {
+      regionSelect.innerHTML = "";
+      regions.forEach((region) => {
+        const option = document.createElement("option");
+        option.value = region;
+        option.textContent = region;
+        regionSelect.appendChild(option);
+      });
+    }
+
+    function buildAreaOptions(region) {
+      areaSelect.innerHTML = "";
+      areasMaster
+        .filter((a) => a.region === region)
+        .forEach((area) => {
+          const option = document.createElement("option");
+          option.value = area.code;
+          option.textContent = area.name;
+          areaSelect.appendChild(option);
+        });
+    }
+
+    function getApiUrl(code) {
+      return `https://www.jma.go.jp/bosai/forecast/data/forecast/${code}.json`;
+    }
+
+    async function loadWeather(apiUrl) {
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // 発表時刻
+        const reportTime = new Date(data[0].reportDatetime).toLocaleString("ja-JP");
+        document.getElementById("update-time").innerText = `最終更新: ${reportTime}`;
+
+        const grid = document.getElementById("weather-grid");
+        grid.innerHTML = "";
+
+        // 埼玉県内の全エリア（南部・北部・秩父）をループ
+        console.log("[weather] raw json", data);
+        const timeSeries = data[0].timeSeries;
+        const weatherSeries = timeSeries.find((ts) => ts.areas?.[0]?.weathers) || timeSeries[0];
+        const popSeries = timeSeries.find((ts) => ts.areas?.[0]?.pops);
+        const tempSeries = timeSeries.find((ts) => ts.areas?.[0]?.temps || ts.areas?.[0]?.tempsMin || ts.areas?.[0]?.tempsMax);
+        const windSeries = timeSeries.find((ts) => ts.areas?.[0]?.winds);
+        const waveSeries = timeSeries.find((ts) => ts.areas?.[0]?.waves);
+
+        const areas = weatherSeries.areas;
+
+        function findArea(ts, name) {
+          if (!ts || !ts.areas) return null;
+          return ts.areas.find((a) => a.area?.name === name) || null;
+        }
+
+        function findAreaByNameOrIndex(ts, name, index) {
+          if (!ts || !ts.areas) return null;
+          return ts.areas.find((a) => a.area?.name === name) || ts.areas[index] || null;
+        }
+
+        function firstValue(arr) {
+          if (!arr || arr.length === 0) return "";
+          return arr[0] ?? "";
+        }
+
+        function formatTemp(area) {
+          if (!area) return "";
+          if (area.temps && area.temps.length > 0) {
+            const temps = area.temps
+              .map((t) => (t === null || t === undefined ? "" : String(t).trim()))
+              .filter((t) => t !== "" && t !== "--");
+            if (temps.length >= 2) {
+              const nums = temps.map((t) => Number(t)).filter((n) => !Number.isNaN(n));
+              if (nums.length >= 2) {
+                const min = Math.min(...nums);
+                const max = Math.max(...nums);
+                if (min !== max) return `${min} / ${max}℃`;
+              }
+              return `${temps[0]}℃`;
+            }
+            return `${temps[0]}℃`;
+          }
+          if (area.tempsMin || area.tempsMax) {
+            const min = area.tempsMin?.[0];
+            const max = area.tempsMax?.[0];
+            if (min && max) return `${min} / ${max}℃`;
+            if (min) return `${min}℃`;
+            if (max) return `${max}℃`;
+          }
+          return "";
+        }
+
+        function formatTimeLabel(raw) {
+          if (!raw) return "";
+          const rawStr = String(raw);
+          const hasTimezone = /Z$|[+-]\d{2}:\d{2}$/.test(rawStr);
+          const iso = hasTimezone ? rawStr : `${rawStr}Z`;
+          const d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return rawStr;
+          const formatter = new Intl.DateTimeFormat("ja-JP", {
+            timeZone: "Asia/Tokyo",
+            month: "numeric",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+          });
+          return formatter.format(d).replace(/\s/, " ");
+        }
+
+        function buildTempTable(area, timeDefines) {
+          if (!area || !area.temps || !timeDefines || timeDefines.length === 0) return "";
+          const temps = area.temps;
+          const len = Math.min(temps.length, timeDefines.length);
+          if (len === 0) return "";
+          const rowsData = [];
+          for (let i = 0; i < len; i++) {
+            const t = temps[i];
+            const rawTime = timeDefines[i];
+            if (t === null || t === undefined || t === "" || t === "--") continue;
+            rowsData.push({ rawTime, temp: t });
+          }
+          rowsData.sort((a, b) => String(a.rawTime).localeCompare(String(b.rawTime)));
+          let rows = "";
+          rowsData.forEach((row) => {
+            rows += `<tr><td class="py-1 pr-3 text-slate-500">${formatTimeLabel(row.rawTime)}</td><td class="py-1 font-semibold text-slate-700">${row.temp}℃</td></tr>`;
+          });
+          if (!rows) return "";
+          return `<table class="w-full text-sm"><tbody>${rows}</tbody></table>`;
+        }
+
+        areas.forEach((area, index) => {
+          const name = area.area.name;
+          const weatherRaw = area.weathers?.[0];
+          const weather = weatherRaw ? weatherRaw.replace(/\s+/g, " ").trim() : "";
+          const code = area.weatherCodes[0];
+          const icon = `https://raw.githubusercontent.com/ciscorn/jma-weather-images/master/output/${code}.png`;
+          const popArea = findAreaByNameOrIndex(popSeries, name, index);
+          const tempArea = findAreaByNameOrIndex(tempSeries, name, index);
+          const windArea = findAreaByNameOrIndex(windSeries, name, index);
+          const waveArea = findAreaByNameOrIndex(waveSeries, name, index);
+          const pop = firstValue(popArea?.pops);
+          const wind = firstValue(windArea?.winds);
+          const wave = firstValue(waveArea?.waves);
+          const temp = formatTemp(tempArea);
+          const tempTable = buildTempTable(tempArea, tempSeries?.timeDefines);
+
+          const card = `
+            <div class="bg-white rounded-3xl p-8 shadow-xl shadow-sky-900/5 border border-white hover:scale-105 transition-transform duration-300">
+              <h3 class="text-xl font-bold text-slate-700 border-b pb-4 mb-6">${name}</h3>
+              <div class="flex flex-col items-center">
+                <img src="${icon}" alt="${weather}" class="w-24 h-24 object-contain drop-shadow-lg" loading="lazy" onerror="this.onerror=null; this.src='${fallbackIcon}'">
+                <p class="mt-6 text-lg font-medium text-center leading-relaxed text-slate-600">${weather}</p>
+                <div class="mt-4 w-full text-sm text-slate-600 space-y-1">
+                  ${pop ? `<div><span class="font-semibold">降水確率</span>: ${pop}%</div>` : ""}
+                  ${temp ? `<div><span class="font-semibold">気温（要約）</span>: ${temp}</div>` : ""}
+                  ${wind ? `<div><span class="font-semibold">風</span>: ${wind}</div>` : ""}
+                  ${wave ? `<div><span class="font-semibold">波</span>: ${wave}</div>` : ""}
+                </div>
+                ${tempTable ? `<div class="mt-4 w-full"><div class="text-sm font-semibold text-slate-600 mb-1">気温（時系列）</div>${tempTable}</div>` : ""}
+              </div>
+            </div>
+          `;
+          grid.insertAdjacentHTML("beforeend", card);
+        });
+
+      } catch (e) {
+        console.error("データの読み込みに失敗:", e);
+        document.getElementById("weather-grid").innerHTML = "<p class='col-span-3 text-center text-red-400'>気象データの取得に失敗しました。</p>";
+      }
+    }
+
+    function loadFromSelectedArea() {
+      const code = areaSelect.value;
+      if (!code) return;
+      const url = getApiUrl(code);
+      loadWeather(url);
+    }
+
+    const storageKey = "japan-weather-selection";
+
+    function saveSelection() {
+      const payload = {
+        region: regionSelect.value,
+        area: areaSelect.value
+      };
+      localStorage.setItem(storageKey, JSON.stringify(payload));
+    }
+
+    function restoreSelection() {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return null;
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function initSelectors() {
+      buildRegionOptions();
+      const saved = restoreSelection();
+      const defaultRegion = "関東";
+      const defaultArea = "110000";
+      regionSelect.value = saved?.region && regions.includes(saved.region) ? saved.region : defaultRegion;
+      buildAreaOptions(regionSelect.value);
+      const areaCodes = areasMaster.filter((a) => a.region === regionSelect.value).map((a) => a.code);
+      areaSelect.value = saved?.area && areaCodes.includes(saved.area) ? saved.area : defaultArea;
+    }
+
+    regionSelect.addEventListener("change", () => {
+      buildAreaOptions(regionSelect.value);
+      areaSelect.selectedIndex = 0;
+      saveSelection();
+      loadFromSelectedArea();
+    });
+
+    areaSelect.addEventListener("change", () => {
+      saveSelection();
+      loadFromSelectedArea();
+    });
+
+    initSelectors();
+    loadFromSelectedArea();
+
+    function toggleMenu() {
+      const panel = document.getElementById("menuPanel");
+      if (panel) panel.classList.toggle("hidden");
+    }
+  </script>
+</body>
+</html>
