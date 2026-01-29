@@ -10,31 +10,56 @@
   <div class="container mx-auto px-4 py-8">
     <header class="text-center mb-8">
       <h1 class="text-4xl font-bold">local-html-tools</h1>
-      <p class="mt-2 text-lg">ウェブブラウザで動く、ローカルHTMLツール集（Static Web App）</p>
       <p class="mt-1 text-sm text-gray-500">更新日: 2026-01-29</p>
     </header>
 
     <div class="max-w-2xl mx-auto bg-yellow-50 p-6 rounded-lg shadow-md mb-8 border border-yellow-100">
-        <h2 class="text-2xl font-semibold mb-4">コンセプト</h2>
         <p class="mb-2 flex flex-wrap items-center gap-2">
-          <span>このツール群は、お使いのコンピュータ上で直接動作する、一連のシンプルなHTMLファイル（Static Web App）です。</span>
+          <span>ウェブブラウザで動くローカルHTMLツール集（Static Web App）です。</span>
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
             <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-              各ツール（HTMLファイル）をウェブブラウザで開くと、専用の入力画面が表示されます。そこにファイル名などの必要な情報を入力するだけで、FFmpegで使えるコマンドラインのテキストが自動的に作成されます。
+              各ツール（HTMLファイル）をウェブブラウザで開くと、専用の入力画面が表示されます。そこにファイル名などの必要な情報を入力するだけで、FFmpegで使えるコマンドラインのテキストが自動的に作成されます。<br>
+              主な特徴:<br>
+              ・ローカル動作: お使いのPC内で動作し、サーバは不要です。<br>
+              ・簡単な操作: ウェブブラウザでファイルを開き、情報を入力するだけでコマンドが手に入ります。<br>
+              ・効率化: （FFmpeg系の場合）複雑なコマンドの構文を覚える必要がなく、手入力によるミスを防ぎます。
             </span>
           </span>
         </p>
-        <h3 class="text-xl font-semibold mt-4 mb-2">主な特徴</h3>
-        <ul class="list-disc list-inside">
-            <li><strong>ローカル動作</strong>: お使いのPC内で動作し、サーバは不要です。</li>
-            <li><strong>簡単な操作</strong>: ウェブブラウザでファイルを開き、情報を入力するだけでコマンドが手に入ります。</li>
-            <li><strong>効率化</strong>: （FFmpeg系の場合）複雑なコマンドの構文を覚える必要がなく、手入力によるミスを防ぎます。</li>
-        </ul>
     </div>
 
     <div class="max-w-2xl mx-auto">
-      <h2 class="text-2xl font-semibold mb-4 text-center">ツール一覧</h2>
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">
+        <span aria-hidden="true" class="mr-2">🧰</span>Git
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <a href="git/git-pseudo-squash.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">🧩</span>Git pseudo-squash
+          </h3>
+          <p class="text-gray-600">reset --soft で疑似的に1コミット化するコマンドを生成します。</p>
+        </a>
+        <a href="git/git-remote-branch-diff.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">🧰</span>Git リモート差分
+          </h3>
+          <p class="text-gray-600">リモートの2ブランチ差分を表示するコマンドを生成します。</p>
+        </a>
+      </div>
+
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">
+        <span aria-hidden="true" class="mr-2">🔍</span>検索
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <a href="grep/find-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
+          <h3 class="font-semibold text-lg">
+            <span aria-hidden="true" class="mr-2">🔎</span>find 検索
+          </h3>
+          <p class="text-gray-600">findでファイル/ディレクトリを検索するコマンドを生成します。</p>
+        </a>
+      </div>
+
       <h3 class="text-lg font-semibold text-gray-700 mt-2 mb-3">
         <span aria-hidden="true" class="mr-2">🎬</span>メディア処理（FFmpeg）
       </h3>
@@ -86,36 +111,6 @@
             <span aria-hidden="true" class="mr-2">🔇</span>無音区間検出
           </h3>
           <p class="text-gray-600">silencedetect で無音区間を検出するコマンドを生成します。</p>
-        </a>
-      </div>
-
-      <h3 class="text-lg font-semibold text-gray-700 mb-3">
-        <span aria-hidden="true" class="mr-2">🔍</span>検索
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <a href="grep/find-gen.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg">
-            <span aria-hidden="true" class="mr-2">🔎</span>find 検索
-          </h3>
-          <p class="text-gray-600">findでファイル/ディレクトリを検索するコマンドを生成します。</p>
-        </a>
-      </div>
-
-      <h3 class="text-lg font-semibold text-gray-700 mb-3">
-        <span aria-hidden="true" class="mr-2">🧰</span>Git
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <a href="git/git-pseudo-squash.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg">
-            <span aria-hidden="true" class="mr-2">🧩</span>Git pseudo-squash
-          </h3>
-          <p class="text-gray-600">reset --soft で疑似的に1コミット化するコマンドを生成します。</p>
-        </a>
-        <a href="git/git-remote-branch-diff.html" class="block bg-white p-4 rounded-lg shadow hover:bg-blue-50 transition">
-          <h3 class="font-semibold text-lg">
-            <span aria-hidden="true" class="mr-2">🧰</span>Git リモート差分
-          </h3>
-          <p class="text-gray-600">リモートの2ブランチ差分を表示するコマンドを生成します。</p>
         </a>
       </div>
 
