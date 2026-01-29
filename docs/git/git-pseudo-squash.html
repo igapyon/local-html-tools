@@ -39,7 +39,7 @@ limitations under the License.
       <span>Git pseudo-squash コマンドジェネレータ</span>
       <span class="relative inline-flex items-center group">
         <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
           reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。
           運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。
         </span>
@@ -58,7 +58,7 @@ limitations under the License.
             <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
             <span class="relative inline-flex items-center group">
               <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
                 この基点との差分が1コミットになります。間違えると差分がずれるため要確認です。
                 上から順に設定すると意図した差分になりやすいです。
               </span>
@@ -73,7 +73,7 @@ limitations under the License.
             <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
             <span class="relative inline-flex items-center group">
               <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
                 これから作業するブランチ名です。未作成なら作成先として使います。
                 生成コマンドにそのまま反映されます。
               </span>
@@ -96,7 +96,7 @@ limitations under the License.
         <span>リモート名</span>
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
             fetch / push に使うリモート名です。通常は origin です。
             生成されるコマンドに反映されます。
           </span>
@@ -123,7 +123,7 @@ limitations under the License.
         <p class="text-base font-semibold text-gray-700">作業開始（基準ブランチから作成）</p>
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
             基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
           </span>
         </span>
@@ -164,7 +164,7 @@ limitations under the License.
         <p class="text-base font-semibold text-gray-700">作業をまとめる（squash）</p>
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
             reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
             この下でまとめコマンドを生成します。
           </span>
@@ -176,7 +176,7 @@ limitations under the License.
           <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
               まとめ後の1コミットの説明文です。後で読んで分かる内容にします。
               生成コマンドにそのまま入ります。
             </span>
@@ -194,8 +194,8 @@ limitations under the License.
           push --force-with-lease を追加
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-              push 後にローカルで -done を付けて、このブランチは使わない合図にします。
+            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              push --force-with-lease でコミット整理を反映した後、リモートと同期（pull）し、ブランチを -done サフィックスでリネームするコマンドが続きます。ローカルでコミットが1つにまとまっているため、GitHubのPRではsquashせず通常のmergeで完了です。
             </span>
           </span>
         </label>
