@@ -1,0 +1,302 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git 詳細設定コマンドジェネレータ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </svg>
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+
+    <h1 class="text-2xl font-bold mb-6 flex flex-wrap items-center gap-2">
+      <span aria-hidden="true" class="mr-2">🔧</span>
+      <span>Git 詳細設定コマンドジェネレータ</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          core.autocrlf や push.default などのGit詳細設定をグローバル設定するコマンドを生成します。
+        </span>
+      </span>
+    </h1>
+
+    <section id="checkSection" class="space-y-3 mb-6">
+      <div class="flex items-center gap-3 py-2">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="w-12 h-12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <circle cx="20" cy="32" r="4" fill="#93C5FD"/>
+          <path d="M24 32H34" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 32H44" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="48" cy="32" r="4" fill="#93C5FD"/>
+        </svg>
+        <p class="text-base font-semibold text-gray-700">現在の設定を確認</p>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            設定前に現在の値を確認できます。
+          </span>
+        </span>
+      </div>
+      <button type="button" onclick="generateCheckCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+        確認コマンド生成
+      </button>
+      <div class="relative">
+        <code id="checkCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+        <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('checkCmd')">📋</button>
+      </div>
+    </section>
+
+    <div class="flex items-center justify-center py-2">
+      <svg aria-hidden="true" viewBox="0 0 420 64" class="w-full max-w-xl h-10" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
+        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
+        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
+        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
+        <path d="M40 32h26" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
+        <path d="M116 32h70" stroke="#C4B5FD" stroke-width="4" stroke-linecap="round"/>
+        <path d="M236 32h26" stroke="#A7F3D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M312 32h70" stroke="#F9A8D4" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
+      </svg>
+    </div>
+
+    <section class="space-y-6 mb-6">
+      <div class="flex items-center gap-3 py-2">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="w-12 h-12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <circle cx="20" cy="20" r="4" fill="#A78BFA"/>
+          <path d="M24 20H34" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 20H44" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="48" cy="20" r="4" fill="#A78BFA"/>
+          <path d="M20 44L32 32L44 44" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="text-base font-semibold text-gray-700">詳細設定を行う</p>
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            必要な詳細設定を選択して、コマンドを生成します。
+          </span>
+        </span>
+      </div>
+
+      <!-- core.autocrlf セクション -->
+      <div class="border border-gray-200 rounded-lg p-4 space-y-3">
+        <div class="flex items-start gap-3">
+          <input type="checkbox" id="enableAutocrlf" class="rounded border-gray-300 mt-1" onchange="toggleAutocrlfOptions()">
+          <label for="enableAutocrlf" class="flex flex-wrap items-center gap-2 font-semibold">
+            <span>core.autocrlf を設定</span>
+            <span class="relative inline-flex items-center group">
+              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+                改行コード自動変換の設定です。Windows/Mac/Linux間での改行コード問題を対策します。
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <div id="autocrlfOptions" class="space-y-2 ml-8 p-3 bg-gray-50 rounded disabled-section">
+          <div class="flex items-center gap-2">
+            <input type="radio" id="autocrlf-true" name="autocrlf" value="true" disabled>
+            <label for="autocrlf-true" class="flex items-center gap-2 text-sm">
+              <span>true</span>
+              <span class="text-gray-500 text-xs">Windows用（LF ↔ CRLF 自動変換）</span>
+            </label>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" id="autocrlf-input" name="autocrlf" value="input" disabled>
+            <label for="autocrlf-input" class="flex items-center gap-2 text-sm">
+              <span>input</span>
+              <span class="text-gray-500 text-xs">Mac/Linux用（コミット時のみCRLF → LF）</span>
+              <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-blue-100 text-xs font-semibold text-blue-800">推奨</span>
+            </label>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" id="autocrlf-false" name="autocrlf" value="false" disabled>
+            <label for="autocrlf-false" class="flex items-center gap-2 text-sm">
+              <span>false</span>
+              <span class="text-gray-500 text-xs">変換なし（デフォルト）</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- push.default セクション -->
+      <div class="border border-gray-200 rounded-lg p-4 space-y-3">
+        <div class="flex items-start gap-3">
+          <input type="checkbox" id="enablePushDefault" class="rounded border-gray-300 mt-1" onchange="togglePushDefaultOptions()">
+          <label for="enablePushDefault" class="flex flex-wrap items-center gap-2 font-semibold">
+            <span>push.default を設定</span>
+            <span class="relative inline-flex items-center group">
+              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+                push時のデフォルト動作を指定します。指定しないと予期しない動作をすることがあります。
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <div id="pushDefaultOptions" class="space-y-2 ml-8 p-3 bg-gray-50 rounded disabled-section">
+          <div class="flex items-center gap-2">
+            <input type="radio" id="pushdefault-simple" name="pushdefault" value="simple" disabled>
+            <label for="pushdefault-simple" class="flex items-center gap-2 text-sm">
+              <span>simple</span>
+              <span class="text-gray-500 text-xs">同名ブランチにpush（Git 2.0以降のデフォルト）</span>
+              <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-blue-100 text-xs font-semibold text-blue-800">推奨</span>
+            </label>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" id="pushdefault-current" name="pushdefault" value="current" disabled>
+            <label for="pushdefault-current" class="flex items-center gap-2 text-sm">
+              <span>current</span>
+              <span class="text-gray-500 text-xs">現在のブランチ名でpush</span>
+            </label>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" id="pushdefault-upstream" name="pushdefault" value="upstream" disabled>
+            <label for="pushdefault-upstream" class="flex items-center gap-2 text-sm">
+              <span>upstream</span>
+              <span class="text-gray-500 text-xs">追跡ブランチにpush</span>
+            </label>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" id="pushdefault-matching" name="pushdefault" value="matching" disabled>
+            <label for="pushdefault-matching" class="flex items-center gap-2 text-sm">
+              <span>matching</span>
+              <span class="text-gray-500 text-xs">マッチングブランチすべてをpush</span>
+              <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-yellow-100 text-xs font-semibold text-yellow-800">非推奨</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <button onclick="generateConfigCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
+      設定コマンド生成
+    </button>
+
+    <div class="relative mt-4">
+      <code id="configCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('configCmd')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    function generateCheckCommand() {
+      const lines = [
+        "git config --global core.autocrlf",
+        "git config --global push.default"
+      ];
+      document.getElementById("checkCmd").textContent = lines.join("\n");
+    }
+
+    function toggleAutocrlfOptions() {
+      const enabled = document.getElementById("enableAutocrlf").checked;
+      const options = document.querySelectorAll("#autocrlfOptions input[type='radio']");
+      options.forEach(opt => {
+        opt.disabled = !enabled;
+      });
+      document.getElementById("autocrlfOptions").classList.toggle("opacity-50", !enabled);
+    }
+
+    function togglePushDefaultOptions() {
+      const enabled = document.getElementById("enablePushDefault").checked;
+      const options = document.querySelectorAll("#pushDefaultOptions input[type='radio']");
+      options.forEach(opt => {
+        opt.disabled = !enabled;
+      });
+      document.getElementById("pushDefaultOptions").classList.toggle("opacity-50", !enabled);
+    }
+
+    function generateConfigCommand() {
+      const enableAutocrlf = document.getElementById("enableAutocrlf").checked;
+      const enablePushDefault = document.getElementById("enablePushDefault").checked;
+
+      if (!enableAutocrlf && !enablePushDefault) {
+        alert("設定を1つ以上選択してください。");
+        return;
+      }
+
+      const lines = [];
+
+      if (enableAutocrlf) {
+        const autocrlfValue = document.querySelector("input[name='autocrlf']:checked");
+        if (autocrlfValue) {
+          lines.push(`git config --global core.autocrlf ${autocrlfValue.value}`);
+        }
+      }
+
+      if (enablePushDefault) {
+        const pushDefaultValue = document.querySelector("input[name='pushdefault']:checked");
+        if (pushDefaultValue) {
+          lines.push(`git config --global push.default ${pushDefaultValue.value}`);
+        }
+      }
+
+      document.getElementById("configCmd").textContent = lines.join("\n");
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      if (!text) return;
+      const temp = document.createElement("textarea");
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      showToast("コピーしました");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+
+    function toggleMenu() {
+      const panel = document.getElementById("menuPanel");
+      if (!panel) return;
+      panel.classList.toggle("hidden");
+    }
+
+    // Initialize
+    toggleAutocrlfOptions();
+    togglePushDefaultOptions();
+  </script>
+</body>
+</html>
