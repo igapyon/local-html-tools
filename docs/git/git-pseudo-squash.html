@@ -40,7 +40,7 @@ limitations under the License.
       <span class="relative inline-flex items-center group">
         <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
         <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-          reset --soft と再コミットで、作業ブランチの差分を 1 コミットにまとめるためのコマンドを生成します。
+          reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。
         </span>
       </span>
     </h1>
@@ -58,7 +58,7 @@ limitations under the License.
             <span class="relative inline-flex items-center group">
               <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
               <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-                例: main / devel。現在のブランチのコミットを、この基点ブランチとの差分で1つにまとめる想定です。
+                この基点との差分が1コミットになります。間違えると差分がずれるため要確認です。
               </span>
             </span>
             <span>：</span>
@@ -72,7 +72,7 @@ limitations under the License.
             <span class="relative inline-flex items-center group">
               <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
               <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-                これから作業するブランチ名を入力します。
+                これから作業するブランチ名です。未作成なら作成先として使います。
               </span>
             </span>
             <span>：</span>
@@ -94,7 +94,7 @@ limitations under the License.
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            fetch / push で使用するリモート名です。
+            fetch / push に使うリモート名です。通常は origin です。
           </span>
         </span>
         <span>：</span>
@@ -120,7 +120,7 @@ limitations under the License.
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            基点ブランチから作業ブランチを作るときの手順です。
+            基点から作業ブランチを切る最初のステップです。
           </span>
         </span>
       </div>
@@ -161,7 +161,7 @@ limitations under the License.
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            この基点との差分を 1 コミットにまとめます（reset --soft）。
+            reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
           </span>
         </span>
       </div>
@@ -172,7 +172,7 @@ limitations under the License.
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
             <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-              まとめ後の1コミットに付けるメッセージを入力します。
+              まとめ後の1コミットの説明文です。後で読んで分かる内容にします。
             </span>
           </span>
           <span>：</span>

@@ -18,6 +18,10 @@
 ## 構成
 - `docs/index.html` トップページ（ツール一覧へのリンクと簡易説明）。
 - `docs/ffmpeg/` FFmpegおよび周辺ツールのHTMLが配置。
+- `docs/git/` Git補助ツールのHTMLが配置。
+- `docs/grep/` find検索ツールのHTMLが配置。
+- `docs/img/` 画像系ツールのHTMLが配置。
+- `docs/life/` 生活系ツールのHTMLが配置。
 - `docs/link/` URL加工系ツールのHTMLが配置。
 - `docs/password/` パスワード生成ツールのHTMLが配置。
 
@@ -29,6 +33,21 @@
 - `ffmpeg-youtube-mkv-gen.html` 音声＋画像からYouTube向け `.mkv` を生成するコマンドを作成。
 - `ffmpeg-mp4-to-wav-gen.html` `.mp4` から音声をWAVとして抽出するコマンドを生成。
 - `ffmpeg-replace-audio-with-wav-gen.html` `.mp4` の音声をWAVへ差し替えるコマンドを生成。
+- `ffmpeg-silence-detect-gen.html` 無音区間検出のためのコマンドを生成。
+
+## ツール一覧（docs/git）
+- `git-pseudo-squash.html` reset --soft で疑似的に1コミット化するコマンドを生成。
+- `git-remote-branch-diff.html` リモート/ローカルのブランチ差分コマンドを生成。
+
+## ツール一覧（docs/grep）
+- `find-gen.html` findコマンドの検索条件を生成。
+
+## ツール一覧（docs/img）
+- `img2svg.html` 画像からSVG化のための手順/素材を生成。
+
+## ツール一覧（docs/life）
+- `forgot-items-check.html` 忘れ物チェック用のリストを生成。
+- `japan-weather.html` 日本の天気情報（地域別）を確認。
 
 ## ツール一覧（docs/password）
 - `password-gen.html` 文字種と文字数を指定してパスワードを生成。
