@@ -192,6 +192,12 @@ limitations under the License.
         <label class="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" id="optPush" class="rounded border-gray-300">
           push --force-with-lease を追加
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              push 後にローカルで -done を付けて、このブランチは使わない合図にします。
+            </span>
+          </span>
         </label>
         <label class="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" id="useCurrentBranch" class="rounded border-gray-300" checked onchange="toggleCurrentBranch()">
@@ -333,6 +339,11 @@ limitations under the License.
           lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName)} HEAD`);
         } else {
           lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName)} ${quoteIfNeeded(workBranch)}`);
+        }
+        if (useCurrent) {
+          lines.push(`git branch -m "$(git branch --show-current)" "$(git branch --show-current)-done"`);
+        } else {
+          lines.push(`git branch -m ${quoteIfNeeded(workBranch)} ${quoteIfNeeded(`${workBranch}-done`)}`);
         }
       }
 
