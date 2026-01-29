@@ -340,6 +340,7 @@ limitations under the License.
         } else {
           lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName)} ${quoteIfNeeded(workBranch)}`);
         }
+        lines.push(`git pull`);
         if (useCurrent) {
           lines.push(`git branch -m "$(git branch --show-current)" "$(git branch --show-current)-done"`);
         } else {
