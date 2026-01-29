@@ -66,44 +66,48 @@ limitations under the License.
     </div>
 
     <div class="space-y-3 mb-4">
-      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-        <span>ブランチA</span>
-        <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
-        <span class="relative inline-flex items-center group">
-          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            例: main
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="flex flex-wrap items-center gap-2 font-semibold">
+          <span>基準ブランチ</span>
+          <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              例: main
+            </span>
           </span>
-        </span>
-        <span>：</span>
-      </label>
-      <label class="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" id="scopeA" class="rounded border-gray-300" checked onchange="updateRemoteState()">
-        リモートとして扱う
-      </label>
-      <input type="text" id="branchA" placeholder="例: main" class="border border-gray-300 rounded w-full p-2">
+          <span>：</span>
+        </label>
+        <input type="text" id="branchA" placeholder="例: main" class="border border-gray-300 rounded w-full sm:w-64 p-2">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="scopeA" class="rounded border-gray-300" checked onchange="updateRemoteState()">
+          リモートとして扱う
+        </label>
+      </div>
 
-      <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-        <span>ブランチB</span>
-        <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
-        <span class="relative inline-flex items-center group">
-          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            例: feature/abc
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="flex flex-wrap items-center gap-2 font-semibold">
+          <span>比較ブランチ</span>
+          <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              例: feature123
+            </span>
           </span>
-        </span>
-        <span>：</span>
-      </label>
-      <label class="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" id="scopeB" class="rounded border-gray-300" checked onchange="updateRemoteState()">
-        リモートとして扱う
-      </label>
-      <input type="text" id="branchB" placeholder="例: feature/abc" class="border border-gray-300 rounded w-full p-2">
+          <span>：</span>
+        </label>
+        <input type="text" id="branchB" placeholder="例: feature123" class="border border-gray-300 rounded w-full sm:w-64 p-2">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="scopeB" class="rounded border-gray-300" checked onchange="updateRemoteState()">
+          リモートとして扱う
+        </label>
+      </div>
     </div>
 
-    <div class="space-y-2 mb-4">
-      <p class="text-sm text-gray-600">出力形式</p>
-      <select id="diffMode" class="border border-gray-300 rounded w-full p-2">
+    <div class="flex flex-wrap items-center gap-2 mb-4">
+      <p class="text-sm text-gray-600">出力形式：</p>
+      <select id="diffMode" class="border border-gray-300 rounded w-full sm:w-64 p-2">
         <option value="" selected>内容差分 (git diff)</option>
         <option value="--stat">差分統計 (git diff --stat)</option>
         <option value="--name-only">変更ファイル一覧 (git diff --name-only)</option>
