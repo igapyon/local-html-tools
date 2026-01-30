@@ -347,6 +347,7 @@ limitations under the License.
           lines.push(`git branch -m ${quoteIfNeeded(workBranch)} ${quoteIfNeeded(`${workBranch}-done`)}`);
         }
       }
+      lines.push(`git status`);
 
       document.getElementById("rebaseCmd").textContent = lines.join("\n");
     }
