@@ -230,6 +230,13 @@ limitations under the License.
       return value;
     }
 
+    function convertTimeToThreeChars(hours, minutes) {
+      const s1 = String.fromCharCode(97 + hours);
+      const s2 = String.fromCharCode(97 + Math.floor(minutes / 26));
+      const s3 = String.fromCharCode(97 + (minutes % 26));
+      return s1 + s2 + s3;
+    }
+
     function toggleCurrentBranch() {
       const useCurrent = document.getElementById("useCurrentBranch").checked;
       const workBranch = document.getElementById("workBranch");
@@ -285,9 +292,10 @@ limitations under the License.
       const pad = (num) => String(num).padStart(2, "0");
       const mm = pad(now.getMonth() + 1);
       const dd = pad(now.getDate());
-      const hh = pad(now.getHours());
-      const min = pad(now.getMinutes());
-      input.value = `tiga${mm}${dd}${hh}${min}`;
+      const hh = now.getHours();
+      const min = now.getMinutes();
+      const timeStr = convertTimeToThreeChars(hh, min);
+      input.value = `tiga${mm}${dd}${timeStr}`;
     }
 
     function generateRebaseCommand() {
