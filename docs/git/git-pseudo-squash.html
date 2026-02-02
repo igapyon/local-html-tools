@@ -183,7 +183,7 @@ limitations under the License.
           </span>
           <span>：</span>
         </label>
-        <input type="text" id="commitMessage" placeholder="例: feat: update docs" class="border border-gray-300 rounded w-full sm:w-80 p-2">
+        <textarea id="commitMessage" placeholder="例: feat: update docs&#10;&#10;詳しい説明..." class="border border-gray-300 rounded w-full p-2" rows="4"></textarea>
       </div>
     </section>
 
@@ -341,7 +341,12 @@ limitations under the License.
         lines.push(`git switch ${quoteIfNeeded(workBranch)}`);
       }
       lines.push(`git reset --soft ${quoteIfNeeded(base)}`);
-      lines.push(`git commit -m ${quoteIfNeeded(commitMessage)}`);
+      const messages = commitMessage.split('\n').map(msg => msg.trim()).filter(msg => msg);
+      let commitCmd = 'git commit';
+      for (const msg of messages) {
+        commitCmd += ` -m ${quoteIfNeeded(msg)}`;
+      }
+      lines.push(commitCmd);
       if (includePush) {
         if (useCurrent) {
           lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName)} HEAD`);
