@@ -78,6 +78,7 @@ limitations under the License.
                 生成コマンドにそのまま反映されます。
               </span>
             </span>
+            <button type="button" class="inline-flex items-center justify-center w-5 h-5 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded transition" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新">↻</button>
             <span>：</span>
           </label>
           <input type="text" id="workBranch" placeholder="例: tiga0129a" class="border border-gray-300 rounded w-full p-2">
@@ -299,6 +300,19 @@ limitations under the License.
       input.value = `tiga${mm}${dd}${timeStr}`;
     }
 
+    function updateWorkBranchWithCurrentTime() {
+      const input = document.getElementById("workBranch");
+      if (!input) return;
+      const now = new Date();
+      const pad = (num) => String(num).padStart(2, "0");
+      const mm = pad(now.getMonth() + 1);
+      const dd = pad(now.getDate());
+      const hh = now.getHours();
+      const min = now.getMinutes();
+      const timeStr = convertTimeToThreeChars(hh, min);
+      input.value = `tiga${mm}${dd}${timeStr}`;
+    }
+
     function generateRebaseCommand() {
       const squashScope = document.getElementById("squashBaseScope")?.value || "remote";
       const squashRemote = document.getElementById("squashRemote")?.value.trim() || "origin";
@@ -342,12 +356,12 @@ limitations under the License.
         lines.push(`git switch ${quoteIfNeeded(workBranch)}`);
       }
       lines.push(`git reset --soft ${quoteIfNeeded(base)}`);
-      const messages = commitMessage.split('\n').map(msg => msg.trim()).filter(msg => msg);
-      let commitCmd = 'git commit';
-      for (const msg of messages) {
-        commitCmd += ` -m ${quoteIfNeeded(msg)}`;
-      }
-      lines.push(commitCmd);
+      lines.push(`COMMIT_MSG_FILE=$(mktemp)`);
+      lines.push(`cat > "$COMMIT_MSG_FILE" <<'EOF'`);
+      lines.push(commitMessage);
+      lines.push("EOF");
+      lines.push(`git commit -F "$COMMIT_MSG_FILE"`);
+      lines.push(`rm "$COMMIT_MSG_FILE"`);
       if (includePush) {
         if (useCurrent) {
           lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName)} HEAD`);
