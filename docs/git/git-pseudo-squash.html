@@ -177,13 +177,14 @@ limitations under the License.
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
             <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-              まとめ後の1コミットの説明文です。後で読んで分かる内容にします。
-              生成コマンドにそのまま入ります。
+              まとめ後の1コミットの説明文です。複数行入力が可能で、各行が -m オプションで git commit に渡されます。
+              ダブルクォートをシングルクォートに置き換えて、シェル実行時のクォート解析問題を回避しています。
+              後で読んで分かる内容にします。
             </span>
           </span>
           <span>：</span>
         </label>
-        <textarea id="commitMessage" placeholder="例: feat: update docs&#10;&#10;詳しい説明..." class="border border-gray-300 rounded w-full p-2" rows="4"></textarea>
+        <textarea id='commitMessage' placeholder='例: feat: update docs&#10;&#10;詳しい説明...' class='border border-gray-300 rounded w-full p-2' rows='8'></textarea>
       </div>
     </section>
 
@@ -224,8 +225,8 @@ limitations under the License.
     function quoteIfNeeded(value) {
       if (!value) return value;
       if (/[^\w@%+=:,./-]/.test(value)) {
-        const escaped = value.replace(/"/g, '\\"');
-        return `"${escaped}"`;
+        const escaped = value.replace(/'/g, "'\\''");
+        return `'${escaped}'`;
       }
       return value;
     }
