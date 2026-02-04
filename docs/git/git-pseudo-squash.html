@@ -198,7 +198,9 @@ limitations under the License.
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-            普通は origin が使われるため、通常はこのままでOKです。必要なときだけ外して別名を指定します。
+            よくある利用方法として リモートと origin の組み合わせでの利用です。通常はこのままで OK です。
+            複数リモートを使い分ける場合だけ外して、対象のリモート名に切り替えます。
+            チェックを外すと、基点のリモート名と squash 用リモート名を個別に指定できます。
           </span>
         </span>
       </label>
@@ -210,8 +212,8 @@ limitations under the License.
             <span class="relative inline-flex items-center group">
               <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
               <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-                この基点との差分が1コミットになります。間違えると差分がずれるため要確認です。
-                上から順に設定すると意図した差分になりやすいです。
+                基点は git 作業の差分の起点として利用されます。git 作業をどこが基点なのか確認しましょう。
+                基点が違うと差分がずれるため要確認です。設定の順番を揃えると意図した差分になりやすいです。
               </span>
             </span>
             <span>：</span>
@@ -221,6 +223,7 @@ limitations under the License.
             <option value="main"></option>
             <option value="master"></option>
             <option value="devel"></option>
+            <option value="devel-tiga"></option>
             <option value="develop"></option>
             <option value="development"></option>
             <option value="release"></option>
@@ -255,22 +258,46 @@ limitations under the License.
           <input type="text" id="workBranch" placeholder="例: tiga0129a" class="border border-gray-300 rounded w-full p-2">
         </div>
       </div>
-      <div id="baseRemoteRow" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        <select id="squashBaseScope" class="border border-gray-300 rounded w-full p-2" onchange="updateBaseScope()">
-          <option value="remote" selected>リモート</option>
-          <option value="local">ローカル</option>
-        </select>
-        <input type="text" id="squashRemote" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
+      <div id="baseRemoteRow" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="flex flex-wrap items-center gap-2 font-semibold text-gray-700">
+            <span>基点の参照先</span>
+            <span class="relative inline-flex items-center group">
+              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+                基点ブランチをリモートから参照するか、ローカルで参照するかを指定します。
+                ふだんは最新のリモート状態で切りたいので、リモート基点を選ぶケースが多いです。
+              </span>
+            </span>
+            <span>：</span>
+          </label>
+          <select id="squashBaseScope" class="border border-gray-300 rounded w-full p-2" onchange="updateBaseScope()">
+            <option value="remote" selected>リモート</option>
+            <option value="local">ローカル</option>
+          </select>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="flex flex-wrap items-center gap-2 font-semibold text-gray-700">
+            <span>基点のリモート名</span>
+            <span class="relative inline-flex items-center group">
+              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+                基点をリモート参照する場合のリモート名です（例: origin）。
+              </span>
+            </span>
+            <span>：</span>
+          </label>
+          <input type="text" id="squashRemote" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
+        </div>
       </div>
     </section>
     <div id="extraOptions" class="space-y-3 mb-4">
       <label id="remoteNameLabel" class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-        <span>リモート名</span>
+        <span>squash で利用するリモート名</span>
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-            fetch / push に使うリモート名です。通常は origin です。
-            生成されるコマンドに反映されます。
+            squash で利用する fetch / push に使うリモート名です。通常は origin です。
           </span>
         </span>
         <span>：</span>
@@ -300,9 +327,6 @@ limitations under the License.
           </span>
         </span>
       </div>
-      <button type="button" onclick="generateCreateBranchCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
-        ブランチ作成コマンド生成
-      </button>
       <div class="relative">
         <code id="createBranchCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
         <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('createBranchCmd')">📋</button>
@@ -337,8 +361,8 @@ limitations under the License.
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            ローカルの複数のコミットを1つにまとめます。
             reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
-            この下でまとめコマンドを生成します。
           </span>
         </span>
       </div>
@@ -349,14 +373,14 @@ limitations under the License.
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
             <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-              まとめ後の1コミットの説明文です。複数行入力が可能で、各行が -m オプションで git commit に渡されます。
-              ダブルクォートをシングルクォートに置き換えて、シェル実行時のクォート解析問題を回避しています。
-              後で読んで分かる内容にします。
+              まとめ後の1コミットの説明文です。複数行入力が可能で、内容は一時ファイルに書き込んで git commit -F で渡されます。
+              ヒアドキュメント経由で渡すため、シェルのクォート解析の影響を受けにくくしています。
+              あとで読んで何をおこなったのかわかる内容にしましょう。
             </span>
           </span>
           <span>：</span>
         </label>
-        <textarea id='commitMessage' placeholder='例: feat: update docs&#10;&#10;詳しい説明...' class='border border-gray-300 rounded w-full p-2' rows='8'></textarea>
+        <textarea id='commitMessage' placeholder='コミットの内容を表す一文&#10;&#10;コミットの内容の説明' class='border border-gray-300 rounded w-full p-2' rows='8'></textarea>
       </div>
     </section>
 
@@ -384,10 +408,6 @@ limitations under the License.
         </label>
       </div>
     </div>
-
-    <button onclick="generateRebaseCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
-      まとめコマンド生成
-    </button>
 
     <div class="relative mt-4">
       <code id="rebaseCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
@@ -475,6 +495,7 @@ limitations under the License.
       const min = now.getMinutes();
       const timeStr = convertTimeToThreeChars(hh, min);
       input.value = `tiga${mm}${dd}${timeStr}`;
+      generateCreateBranchCommand({ silent: true });
     }
 
     function updateWorkBranchWithCurrentTime() {
@@ -488,9 +509,11 @@ limitations under the License.
       const min = now.getMinutes();
       const timeStr = convertTimeToThreeChars(hh, min);
       input.value = `tiga${mm}${dd}${timeStr}`;
+      generateCreateBranchCommand({ silent: true });
     }
 
-    function generateRebaseCommand() {
+    function generateRebaseCommand(options = {}) {
+      const silent = options && options.silent === true;
       const squashScope = document.getElementById("squashBaseScope")?.value || "remote";
       const squashRemote = document.getElementById("squashRemote")?.value.trim() || "origin";
       const squashBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
@@ -502,7 +525,8 @@ limitations under the License.
       const includePush = document.getElementById("optPush").checked;
 
       if (!squashBranch) {
-        alert("基点ブランチを入力してください。");
+        if (!silent) alert("基点ブランチを入力してください。");
+        document.getElementById("rebaseCmd").textContent = "";
         return;
       }
       if (squashScope === "remote") {
@@ -511,19 +535,23 @@ limitations under the License.
         base = squashBranch;
       }
       if (!base) {
-        alert("基点（親）を入力してください。");
+        if (!silent) alert("基点（親）を入力してください。");
+        document.getElementById("rebaseCmd").textContent = "";
         return;
       }
       if (!useCurrent && !workBranch) {
-        alert("作業ブランチ名を入力してください。");
+        if (!silent) alert("作業ブランチ名を入力してください。");
+        document.getElementById("rebaseCmd").textContent = "";
         return;
       }
       if (!commitMessage) {
-        alert("コミットメッセージを入力してください。");
+        if (!silent) alert("コミットメッセージを入力してください。");
+        document.getElementById("rebaseCmd").textContent = "";
         return;
       }
       if (includePush && !useCurrent && !workBranch) {
-        alert("push する場合は作業ブランチ名を入力してください。");
+        if (!silent) alert("push する場合は作業ブランチ名を入力してください。");
+        document.getElementById("rebaseCmd").textContent = "";
         return;
       }
 
@@ -557,30 +585,59 @@ limitations under the License.
       document.getElementById("rebaseCmd").textContent = lines.join("\n");
     }
 
-    function generateCreateBranchCommand() {
+    function generateCreateBranchCommand(options = {}) {
+      const silent = options && options.silent === true;
       const workBranch = document.getElementById("workBranch").value.trim();
       const scope = document.getElementById("squashBaseScope").value;
       const remote = document.getElementById("squashRemote").value.trim() || "origin";
       const baseBranch = document.getElementById("squashBaseBranch").value.trim();
 
       if (!workBranch) {
-        alert("作業ブランチ名を入力してください。");
+        if (!silent) alert("作業ブランチ名を入力してください。");
+        document.getElementById("createBranchCmd").textContent = "";
         return;
       }
       if (!baseBranch) {
-        alert("基点ブランチを入力してください。");
+        if (!silent) alert("基点ブランチを入力してください。");
+        document.getElementById("createBranchCmd").textContent = "";
         return;
       }
-      if (scope !== "remote") {
-        alert("リモートから作成するには基点をリモートにしてください。");
-        return;
+      const lines = [];
+      if (scope === "remote") {
+        lines.push(`git fetch ${quoteIfNeeded(remote)}`);
+        lines.push(`git switch -c ${quoteIfNeeded(workBranch)} ${quoteIfNeeded(remote)}/${quoteIfNeeded(baseBranch)}`);
+      } else {
+        lines.push(`git switch -c ${quoteIfNeeded(workBranch)} ${quoteIfNeeded(baseBranch)}`);
       }
-
-      const lines = [
-        `git fetch ${quoteIfNeeded(remote)}`,
-        `git switch -c ${quoteIfNeeded(workBranch)} ${quoteIfNeeded(remote)}/${quoteIfNeeded(baseBranch)}`
-      ];
       document.getElementById("createBranchCmd").textContent = lines.join("\n");
+    }
+
+    function setupCreateBranchAutoUpdate() {
+      const ids = ["squashBaseBranch", "workBranch", "squashBaseScope", "squashRemote", "remoteName"];
+      const handler = () => generateCreateBranchCommand({ silent: true });
+      ids.forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener("input", handler);
+        element.addEventListener("change", handler);
+      });
+    }
+
+    function setupRebaseAutoUpdate() {
+      const inputIds = ["squashBaseBranch", "workBranch", "squashBaseScope", "squashRemote", "remoteName", "commitMessage"];
+      const changeIds = ["useCurrentBranch", "optPush"];
+      const handler = () => generateRebaseCommand({ silent: true });
+      inputIds.forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener("input", handler);
+        element.addEventListener("change", handler);
+      });
+      changeIds.forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener("change", handler);
+      });
     }
 
     function copyToClipboard(id) {
@@ -615,6 +672,10 @@ limitations under the License.
     updateBaseScope();
     toggleCurrentBranch();
     setDefaultWorkBranch();
+    setupCreateBranchAutoUpdate();
+    generateCreateBranchCommand({ silent: true });
+    setupRebaseAutoUpdate();
+    generateRebaseCommand({ silent: true });
   </script>
 </body>
 </html>
