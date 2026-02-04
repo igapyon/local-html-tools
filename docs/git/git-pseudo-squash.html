@@ -19,7 +19,152 @@ limitations under the License.
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Git pseudo-squash コマンドジェネレータ</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /*
+      ベンダリング（Vendoring）: このHTMLファイルは、かつてTailwind CSSをCDNから動的に読み込んでいましたが、
+      完全なオフライン化のため、Tailwind CSS の CSS クラス定義を自前で実装しました。
+      Tailwind CSS のライセンス情報は THIRD_PARTY_NOTICES.md を参照してください。
+      外部CDNに依存せず、単一のHTMLファイルで完結して動作する設計が、このプロジェクトのコア機能です。
+    */
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1rem; line-height: 1.5; }
+    button { border: none; cursor: pointer; }
+
+    /* Colors */
+    body { background-color: #f9fafb; color: #1f2937; }
+    .bg-white { background-color: #ffffff; }
+    .bg-gray-50 { background-color: #f9fafb; }
+    .bg-gray-100 { background-color: #f3f4f6; }
+    .bg-gray-200 { background-color: #e5e7eb; }
+    .bg-gray-800 { background-color: #1f2937; }
+    .bg-gray-900 { background-color: #111827; }
+    .bg-green-600 { background-color: #16a34a; }
+    .text-white { color: #ffffff; }
+    .text-gray-600 { color: #4b5563; }
+    .text-gray-700 { color: #374151; }
+    .text-gray-800 { color: #1f2937; }
+    .text-red-500 { color: #ef4444; }
+    .border-gray-200 { border-color: #e5e7eb; }
+    .border-gray-300 { border-color: #d1d5db; }
+
+    /* Layout */
+    .flex { display: flex; }
+    .inline-flex { display: inline-flex; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .flex-wrap { flex-wrap: wrap; }
+    .gap-1 { gap: 0.25rem; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-3 { gap: 0.75rem; }
+    .gap-4 { gap: 1rem; }
+    .w-5 { width: 1.25rem; }
+    .w-14 { width: 3.5rem; }
+    .w-80 { width: 20rem; }
+    .w-full { width: 100%; }
+    .h-5 { height: 1.25rem; }
+    .h-10 { height: 2.5rem; }
+    .h-14 { height: 3.5rem; }
+    .max-w-3xl { max-width: 48rem; }
+    .max-w-xl { max-width: 36rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .p-2 { padding: 0.5rem; }
+    .p-3 { padding: 0.75rem; }
+    .p-6 { padding: 1.5rem; }
+    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .pr-10 { padding-right: 2.5rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .mt-4 { margin-top: 1rem; }
+    .mr-2 { margin-right: 0.5rem; }
+
+    /* Grid & Spacing */
+    .grid { display: grid; }
+    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    .space-y-2 > * + * { margin-top: 0.5rem; }
+    .space-y-3 > * + * { margin-top: 0.75rem; }
+    @media (min-width: 640px) {
+      .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 768px) {
+      .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    /* Typography */
+    .text-base { font-size: 1rem; line-height: 1.5rem; }
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .text-xs { font-size: 0.75rem; line-height: 1rem; }
+    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+    .leading-5 { line-height: 1.25rem; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .font-normal { font-weight: 400; }
+
+    /* Box model */
+    .block { display: block; }
+    .hidden { display: none; }
+    .rounded { border-radius: 0.375rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .rounded-full { border-radius: 9999px; }
+    .border { border-width: 1px; border-style: solid; }
+    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+    .overflow-x-auto { overflow-x: auto; }
+    .whitespace-pre { white-space: pre; }
+
+    /* Position */
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .fixed { position: fixed; }
+    .top-2 { top: 0.5rem; }
+    .top-4 { top: 1rem; }
+    .top-12 { top: 3rem; }
+    .top-full { top: 100%; }
+    .right-2 { right: 0.5rem; }
+    .right-4 { right: 1rem; }
+    .right-5 { right: 1.25rem; }
+    .bottom-5 { bottom: 1.25rem; }
+    .left-1\/2 { left: 50%; }
+    .-translate-x-1\/2 { transform: translateX(-50%); }
+
+    /* Visibility */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+    .opacity-0 { opacity: 0; }
+    .opacity-100 { opacity: 1; }
+    .pointer-events-none { pointer-events: none; }
+
+    /* Transitions */
+    .transition { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    .transition-opacity { transition-property: opacity; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+    .duration-300 { transition-duration: 300ms; }
+
+    /* Z-index */
+    .z-50 { z-index: 50; }
+
+    /* Hover effects */
+    .hover\:bg-gray-300:hover { background-color: #d1d5db; }
+    .hover\:bg-green-700:hover { background-color: #15803d; }
+    .hover\:text-gray-800:hover { color: #1f2937; }
+    button.hover\:bg-gray-300:hover { background-color: #d1d5db; }
+
+    /* Group hover */
+    .group {}
+    .group:hover .group-hover\:opacity-100 { opacity: 1; }
+
+    /* Disabled state */
+    input:disabled { background-color: #f3f4f6; }
+    select:disabled { background-color: #f3f4f6; }
+
+    /* Links */
+    a { text-decoration: none !important; }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
   <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
@@ -39,7 +184,7 @@ limitations under the License.
       <span>Git pseudo-squash コマンドジェネレータ</span>
       <span class="relative inline-flex items-center group">
         <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
           reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。
           運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。
         </span>
@@ -58,7 +203,7 @@ limitations under the License.
             <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
             <span class="relative inline-flex items-center group">
               <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
                 この基点との差分が1コミットになります。間違えると差分がずれるため要確認です。
                 上から順に設定すると意図した差分になりやすいです。
               </span>
@@ -73,7 +218,7 @@ limitations under the License.
             <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
             <span class="relative inline-flex items-center group">
               <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
                 これから作業するブランチ名です。未作成なら作成先として使います。
                 生成コマンドにそのまま反映されます。
               </span>
@@ -97,7 +242,7 @@ limitations under the License.
         <span>リモート名</span>
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
             fetch / push に使うリモート名です。通常は origin です。
             生成されるコマンドに反映されます。
           </span>
@@ -124,7 +269,7 @@ limitations under the License.
         <p class="text-base font-semibold text-gray-700">作業開始（基準ブランチから作成）</p>
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
             基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
           </span>
         </span>
@@ -165,7 +310,7 @@ limitations under the License.
         <p class="text-base font-semibold text-gray-700">作業をまとめる（squash）</p>
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
             reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
             この下でまとめコマンドを生成します。
           </span>
@@ -177,7 +322,7 @@ limitations under the License.
           <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
               まとめ後の1コミットの説明文です。複数行入力が可能で、各行が -m オプションで git commit に渡されます。
               ダブルクォートをシングルクォートに置き換えて、シェル実行時のクォート解析問題を回避しています。
               後で読んで分かる内容にします。
@@ -196,7 +341,7 @@ limitations under the License.
           push --force-with-lease を追加
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
               push --force-with-lease でコミット整理を反映した後、リモートと同期（pull）し、ブランチを -done サフィックスでリネームするコマンドが続きます。ローカルでコミットが1つにまとまっているため、GitHubのPRではsquashせず通常のmergeで完了です。
             </span>
           </span>
