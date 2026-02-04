@@ -194,7 +194,13 @@ limitations under the License.
     <section id="baseBlock" class="space-y-3 mb-4">
       <label class="flex items-center gap-2 text-sm text-gray-700">
         <input type="checkbox" id="lockOrigin" class="rounded border-gray-300" checked onchange="toggleOriginLock()">
-        リモート名は origin 固定
+        リモート: origin で作業
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            普通は origin が使われるため、通常はこのままでOKです。必要なときだけ外して別名を指定します。
+          </span>
+        </span>
       </label>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
         <div class="flex flex-wrap items-center gap-2">
@@ -210,7 +216,27 @@ limitations under the License.
             </span>
             <span>：</span>
           </label>
-          <input type="text" id="squashBaseBranch" placeholder="例: devel" class="border border-gray-300 rounded w-full p-2" value="devel">
+          <input type="text" id="squashBaseBranch" list="baseBranchSuggestions" placeholder="例: devel" class="border border-gray-300 rounded w-full p-2" value="devel">
+          <datalist id="baseBranchSuggestions">
+            <option value="main"></option>
+            <option value="master"></option>
+            <option value="devel"></option>
+            <option value="develop"></option>
+            <option value="development"></option>
+            <option value="release"></option>
+            <option value="staging"></option>
+            <option value="production"></option>
+            <option value="prod"></option>
+            <option value="canary"></option>
+            <option value="working"></option>
+            <option value="experimental"></option>
+            <option value="prototype"></option>
+            <option value="proto"></option>
+            <option value="archive"></option>
+            <option value="legacy"></option>
+            <option value="gh-pages"></option>
+            <option value="stable"></option>
+          </datalist>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <label class="flex flex-wrap items-center gap-2 font-semibold">
@@ -349,6 +375,12 @@ limitations under the License.
         <label class="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" id="useCurrentBranch" class="rounded border-gray-300" checked onchange="toggleCurrentBranch()">
           現在のブランチを使う（switch を省略）
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              現在チェックアウト中のブランチを作業ブランチとして扱います。チェックを外すと、作業ブランチ名で switch するコマンドが含まれます。
+            </span>
+          </span>
         </label>
       </div>
     </div>
@@ -388,8 +420,8 @@ limitations under the License.
       const useCurrent = document.getElementById("useCurrentBranch").checked;
       const workBranch = document.getElementById("workBranch");
       if (workBranch) {
-        workBranch.disabled = useCurrent;
-        workBranch.classList.toggle("bg-gray-100", useCurrent);
+        // 編集は常に可能にする（現在のブランチ使用時も入力は保持）
+        workBranch.classList.remove("bg-gray-100");
       }
     }
 
