@@ -1,0 +1,185 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>テキスト加工</title>
+  <style>
+    /*
+      ベンダリング（Vendoring）: このHTMLファイルは、かつてTailwind CSSをCDNから動的に読み込んでいましたが、
+      完全なオフライン化のため、Tailwind CSS の CSS クラス定義を自前で実装しました。
+      Tailwind CSS のライセンス情報は THIRD_PARTY_NOTICES.md を参照してください。
+      外部CDNに依存せず、単一のHTMLファイルで完結して動作する設計が、このプロジェクトのコア機能です。
+    */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1rem; line-height: 1.5; }
+    button { border: none; cursor: pointer; }
+    textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    body { background-color: #f9fafb; color: #1f2937; }
+    .bg-white { background-color: #ffffff; }
+    .bg-gray-50 { background-color: #f9fafb; }
+    .bg-gray-100 { background-color: #f3f4f6; }
+    .bg-gray-200 { background-color: #e5e7eb; }
+    .bg-gray-800 { background-color: #1f2937; }
+    .bg-green-600 { background-color: #16a34a; }
+    .text-white { color: #ffffff; }
+    .text-gray-600 { color: #4b5563; }
+    .text-gray-700 { color: #374151; }
+    .text-gray-800 { color: #1f2937; }
+    .border-gray-200 { border-color: #e5e7eb; }
+    .border-gray-300 { border-color: #d1d5db; }
+
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-3 { gap: 0.75rem; }
+    .w-5 { width: 1.25rem; }
+    .w-full { width: 100%; }
+    .h-5 { height: 1.25rem; }
+    .max-w-2xl { max-width: 42rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .p-2 { padding: 0.5rem; }
+    .p-3 { padding: 0.75rem; }
+    .p-6 { padding: 1.5rem; }
+    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+
+    .block { display: block; }
+    .hidden { display: none; }
+    .rounded { border-radius: 0.375rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .border { border-width: 1px; border-style: solid; }
+    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .top-2 { top: 0.5rem; }
+    .top-4 { top: 1rem; }
+    .top-12 { top: 3rem; }
+    .right-2 { right: 0.5rem; }
+    .right-4 { right: 1rem; }
+    .bottom-5 { bottom: 1.25rem; }
+
+    .opacity-0 { opacity: 0; }
+    .pointer-events-none { pointer-events: none; }
+
+    .transition-opacity { transition-property: opacity; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+    .duration-300 { transition-duration: 300ms; }
+
+    .hover\:bg-gray-300:hover { background-color: #d1d5db; }
+    .hover\:bg-green-700:hover { background-color: #15803d; }
+    .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
+    button.hover\:bg-gray-300:hover { background-color: #d1d5db; }
+
+    a { text-decoration: none !important; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </svg>
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+
+    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🧩</span>テキスト加工</h1>
+
+    <label class="block mb-2 font-semibold">入力テキスト:</label>
+    <textarea id="inputText" class="border border-gray-300 rounded w-full p-3 mb-4" rows="8" placeholder="加工したいテキストを入力してください"></textarea>
+
+    <div class="flex items-center gap-3 mb-6">
+      <button type="button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded" onclick="convertNewlines()">
+        改行を空白に変換
+      </button>
+      <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="clearAll()">
+        クリア
+      </button>
+    </div>
+
+    <label class="block mb-2 font-semibold">出力テキスト:</label>
+    <div class="relative">
+      <textarea id="outputText" class="bg-gray-100 border border-gray-300 rounded w-full p-3" rows="6" readonly placeholder="ここに結果が表示されます"></textarea>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('outputText')">📋</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-md opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    function convertNewlines() {
+      const input = document.getElementById('inputText').value;
+      const parts = input.split(/\r\n|\r|\n/).map(line => line.trim()).filter(Boolean);
+      document.getElementById('outputText').value = parts.join(' ');
+    }
+
+    function clearAll() {
+      document.getElementById('inputText').value = '';
+      document.getElementById('outputText').value = '';
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).value;
+      if (!text) return;
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showToast('コピーしました');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2000);
+    }
+
+    function toggleMenu() {
+      const panel = document.getElementById('menuPanel');
+      if (!panel) return;
+      panel.classList.toggle('hidden');
+    }
+  </script>
+</body>
+</html>
