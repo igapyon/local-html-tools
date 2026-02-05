@@ -252,6 +252,16 @@ limitations under the License.
       </div>
       <div class="flex flex-wrap items-center gap-3 text-sm text-gray-700">
         <label class="flex items-center gap-2">
+          <input type="checkbox" id="shellEnvPowerShell" class="rounded border-gray-300">
+          PowerShell
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 tooltip-wide -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              Windows PowerShell 用のコマンドを出力します。オフの場合は macOS / Linux の bash / zsh を想定します。
+            </span>
+          </span>
+        </label>
+        <label class="flex items-center gap-2">
           <input type="checkbox" id="lockOrigin" class="rounded border-gray-300" checked onchange="toggleOriginLock()">
           リモート + origin で作業
           <span class="relative inline-flex items-center group">
@@ -260,16 +270,6 @@ limitations under the License.
               よくある利用方法として リモートと origin の組み合わせでの利用です。通常はこのままで OK です。
               複数リモートを使い分ける場合だけ外して、対象のリモート名に切り替えます。
               チェックを外すと、基点のリモート名と squash 用リモート名を個別に指定できます。
-            </span>
-          </span>
-        </label>
-        <label class="flex items-center gap-2">
-          <input type="checkbox" id="shellEnvPowerShell" class="rounded border-gray-300">
-          PowerShell
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 tooltip-wide -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-              Windows PowerShell 用のコマンドを出力します。オフの場合は macOS / Linux の bash / zsh を想定します。
             </span>
           </span>
         </label>
