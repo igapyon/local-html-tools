@@ -4,13 +4,147 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>local-html-tools</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /*
+      ベンダリング（Vendoring）: このHTMLファイルは、かつてTailwind CSSをCDNから動的に読み込んでいましたが、
+      完全なオフライン化と軽量化のため、Tailwind CSS の CSS クラス定義を自前で実装しました（300-500KBから25KBへ削減）。
+      Tailwind CSS のライセンス情報は THIRD_PARTY_NOTICES.md を参照してください。
+      外部CDNに依存せず、単一のHTMLファイルで完結して動作する設計が、このプロジェクトのコア機能です。
+    */
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1rem; line-height: 1.5; }
+    button { border: none; cursor: pointer; }
+
+    /* Colors */
+    body { background-color: #f3f4f6; color: #1f2937; }
+    .bg-white { background-color: #ffffff; }
+    .bg-gray-50 { background-color: #f9fafb; }
+    .bg-gray-100 { background-color: #f3f4f6; }
+    .bg-gray-200 { background-color: #e5e7eb; }
+    .bg-yellow-50 { background-color: #fefce8; }
+    .bg-gray-900 { background-color: #111827; }
+    .text-gray-800 { color: #1f2937; }
+    .text-gray-700 { color: #374151; }
+    .text-gray-600 { color: #4b5563; }
+    .text-gray-500 { color: #6b7280; }
+    .text-gray-400 { color: #9ca3af; }
+    .text-gray-300 { color: #d1d5db; }
+    .text-gray-100 { color: #f3f4f6; }
+    .text-blue-600 { color: #2563eb; }
+    .text-blue-800 { color: #1e40af; }
+    .text-white { color: #ffffff; }
+    .border-gray-200 { border-color: #e5e7eb; }
+    .border-gray-300 { border-color: #d1d5db; }
+    .border-yellow-100 { border-color: #fef3c7; }
+
+    /* Layout */
+    .w-full { width: 100%; }
+    .w-4 { width: 1rem; }
+    .w-5 { width: 1.25rem; }
+    .h-4 { height: 1rem; }
+    .h-5 { height: 1.25rem; }
+    .max-w-4xl { max-width: 56rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+    .p-4 { padding: 1rem; }
+    .p-6 { padding: 1.5rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-3 { margin-bottom: 0.75rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .mt-1 { margin-top: 0.25rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .mt-8 { margin-top: 2rem; }
+    .my-10 { margin-top: 2.5rem; margin-bottom: 2.5rem; }
+    .mr-2 { margin-right: 0.5rem; }
+
+    /* Flexbox */
+    .flex { display: flex; }
+    .inline-flex { display: inline-flex; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .justify-between { justify-content: space-between; }
+    .flex-wrap { flex-wrap: wrap; }
+    .gap-1 { gap: 0.25rem; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-4 { gap: 1rem; }
+
+    /* Grid */
+    .grid { display: grid; }
+    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    .gap-4 { gap: 1rem; }
+    @media (min-width: 640px) {
+      .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1024px) {
+      .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    /* Typography */
+    .text-xs { font-size: 0.75rem; line-height: 1rem; }
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .text-base { font-size: 1rem; line-height: 1.5rem; }
+    .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+    .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .text-center { text-align: center; }
+
+    /* Box model */
+    .block { display: block; }
+    .inline { display: inline; }
+    .hidden { display: none; }
+    .rounded { border-radius: 0.375rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .rounded-full { border-radius: 9999px; }
+    .border { border-width: 1px; border-style: solid; }
+    .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    .underline { text-decoration: underline !important; }
+
+    /* Position */
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .left-1\/2 { left: 50%; }
+    .top-full { top: 100%; }
+    .mt-2 { margin-top: 0.5rem; }
+    .-translate-x-1\/2 { transform: translateX(-50%); }
+    .pointer-events-none { pointer-events: none; }
+    .opacity-0 { opacity: 0; }
+    .opacity-100 { opacity: 1; }
+
+    /* Group & Hover */
+    .group:hover .group-hover\:block { display: block; }
+    .group:hover .group-hover\:opacity-100 { opacity: 1; }
+    .transition { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    .hover\:shadow-md:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    .hover\:text-blue-800:hover { color: #1e40af; }
+    .hover\:bg-gray-200:hover { background-color: #e5e7eb; }
+    .hover\:translate-x-0\.5:hover { transform: translateX(0.125rem); }
+    a.hover\:text-blue-800:hover { color: #1e40af; }
+
+    /* Links */
+    a { color: inherit; text-decoration: none !important; }
+    a h3 { text-decoration: none !important; }
+    a p { text-decoration: none !important; }
+    a:hover { text-decoration: none; }
+    a:hover > span { text-decoration: none; }
+  </style>
 </head>
 <body class="bg-gray-100 text-gray-800 w-full">
   <div class="w-full px-4 py-8">
     <header class="text-center mb-8">
-      <h1 class="text-4xl font-bold">local-html-tools</h1>
-      <p class="mt-1 text-sm text-gray-500">更新日: 2026-02-03</p>
+      <h1 class="text-4xl font-bold">
+        <span aria-hidden="true" class="mr-2">🗂️</span>local-html-tools
+      </h1>
+      <p class="mt-1 text-sm text-gray-500">更新日: 2026-02-05</p>
     </header>
 
     <div class="max-w-4xl mx-auto bg-yellow-50 p-6 rounded-lg shadow-md mb-8 border border-yellow-100">
@@ -228,6 +362,30 @@
             <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
           </div>
           <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">画像ファイルをSVGに変換してダウンロードします。</p>
+        </a>
+      </div>
+
+      <h3 class="text-lg font-semibold text-gray-700 mb-3">
+        <span aria-hidden="true" class="mr-2">📄</span>テキスト
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <a href="text/text-viewer.html" class="group block bg-white p-4 rounded-lg shadow hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-lg">
+              <span aria-hidden="true" class="mr-2">📄</span>テキスト表示
+            </h3>
+            <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
+          </div>
+          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">テキストをペーストして、読みやすく表示します。マークダウン形式にも対応しています。</p>
+        </a>
+        <a href="text/text-processing.html" class="group block bg-white p-4 rounded-lg shadow hover:shadow-md transition">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-lg">
+              <span aria-hidden="true" class="mr-2">🧩</span>テキスト加工
+            </h3>
+            <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
+          </div>
+          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">改行付きテキストを半角空白区切りに変換します。</p>
         </a>
       </div>
 

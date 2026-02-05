@@ -1,0 +1,1035 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>テキスト加工</title>
+  <style>
+    /*
+      ベンダリング（Vendoring）: このHTMLファイルは、かつてTailwind CSSをCDNから動的に読み込んでいましたが、
+      完全なオフライン化のため、Tailwind CSS の CSS クラス定義を自前で実装しました。
+      Tailwind CSS のライセンス情報は THIRD_PARTY_NOTICES.md を参照してください。
+      外部CDNに依存せず、単一のHTMLファイルで完結して動作する設計が、このプロジェクトのコア機能です。
+    */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1rem; line-height: 1.5; }
+    button { border: none; cursor: pointer; }
+    textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    body { background-color: #f9fafb; color: #1f2937; }
+    .bg-white { background-color: #ffffff; }
+    .bg-gray-50 { background-color: #f9fafb; }
+    .bg-gray-100 { background-color: #f3f4f6; }
+    .bg-gray-200 { background-color: #e5e7eb; }
+    .bg-gray-800 { background-color: #1f2937; }
+    .bg-gray-900 { background-color: #111827; }
+    .bg-green-600 { background-color: #16a34a; }
+    .text-white { color: #ffffff; }
+    .text-gray-600 { color: #4b5563; }
+    .text-gray-700 { color: #374151; }
+    .text-gray-800 { color: #1f2937; }
+    .border-gray-200 { border-color: #e5e7eb; }
+    .border-gray-300 { border-color: #d1d5db; }
+
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-3 { gap: 0.75rem; }
+    .w-5 { width: 1.25rem; }
+    .w-80 { width: 20rem; }
+    .w-full { width: 100%; }
+    .h-5 { height: 1.25rem; }
+    .max-w-2xl { max-width: 42rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .p-2 { padding: 0.5rem; }
+    .p-3 { padding: 0.75rem; }
+    .p-6 { padding: 1.5rem; }
+    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .pl-4 { padding-left: 1rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+
+    .block { display: block; }
+    .hidden { display: none; }
+    .rounded { border-radius: 0.375rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .rounded-full { border-radius: 9999px; }
+    .border { border-width: 1px; border-style: solid; }
+    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .top-2 { top: 0.5rem; }
+    .top-4 { top: 1rem; }
+    .top-12 { top: 3rem; }
+    .top-full { top: 100%; }
+    .right-2 { right: 0.5rem; }
+    .right-4 { right: 1rem; }
+    .bottom-5 { bottom: 1.25rem; }
+    .left-1\/2 { left: 50%; }
+    .-translate-x-1\/2 { transform: translateX(-50%); }
+
+    .opacity-0 { opacity: 0; }
+    .opacity-100 { opacity: 1; }
+    .pointer-events-none { pointer-events: none; }
+
+    .transition { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    .transition-opacity { transition-property: opacity; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+    .duration-300 { transition-duration: 300ms; }
+
+    .hover\:bg-gray-300:hover { background-color: #d1d5db; }
+    .hover\:bg-green-700:hover { background-color: #15803d; }
+    .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
+    button.hover\:bg-gray-300:hover { background-color: #d1d5db; }
+
+    a { text-decoration: none !important; }
+
+    .inline-flex { display: inline-flex; }
+    .justify-center { justify-content: center; }
+    .text-xs { font-size: 0.75rem; line-height: 1rem; }
+    .leading-5 { line-height: 1.25rem; }
+    .font-normal { font-weight: 400; }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+    .z-50 { z-index: 50; }
+    .group {}
+    .group:hover .group-hover\:opacity-100 { opacity: 1; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </svg>
+    </button>
+    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
+      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    </div>
+
+    <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
+      <span aria-hidden="true">🧩</span>
+      <span>テキスト加工</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          テキストを即時に変換・整形するためのツールです。入力内容に対して選択した変換オプションが順番に適用され、結果が出力欄に反映されます。文字の変換・行の変換・空白の変換を組み合わせて使えます。
+        </span>
+      </span>
+    </h1>
+
+    <label class="block mb-2 font-semibold">
+      入力テキスト:
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          ここに入力したテキストが変換対象になります。
+        </span>
+      </span>
+    </label>
+    <textarea id="inputText" class="border border-gray-300 rounded w-full p-3 mb-4" rows="8" placeholder="加工したいテキストを入力してください"></textarea>
+
+    <div class="mb-6">
+      <div class="mb-2 font-semibold">
+        変換オプション:
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            変換オプション: チェックや選択した内容が出力に反映されます。複数の変換を同時に適用できます。
+            変換の順序: 行末 → 全角/半角 → 記号 → ひら/カタ → 大文字/小文字 → 行の並び → 空行除去 → 改行→空白 → トリム → 空白正規化
+          </span>
+        </span>
+      </div>
+      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="toggleCharConvert" class="rounded border-gray-300">
+          文字の変換
+        </label>
+        <div id="charConvertPanel" class="mt-2 pl-4">
+        <div class="mb-2">
+          <label class="block mb-2 text-sm">
+            大文字/小文字（英字）:
+            <select id="optCase" class="border border-gray-300 rounded px-2 py-1">
+              <option value="none">変換しない</option>
+              <option value="upper">大文字に変換</option>
+              <option value="lower">小文字に変換</option>
+            </select>
+          </label>
+        </div>
+        <div class="mb-2">
+          <label class="block mb-2 text-sm">
+            全角/半角:
+            <select id="optWidth" class="border border-gray-300 rounded px-2 py-1">
+              <option value="none">変換しない</option>
+              <option value="toHalf">半角に変換</option>
+              <option value="toFull">全角に変換</option>
+            </select>
+          </label>
+        </div>
+        <div class="mb-2">
+          <label class="block mb-2 text-sm">
+            ひらがな/カタカナ:
+            <select id="optKana" class="border border-gray-300 rounded px-2 py-1">
+              <option value="none">変換しない</option>
+              <option value="toKata">ひらがな → カタカナ</option>
+              <option value="toHira">カタカナ → ひらがな</option>
+            </select>
+          </label>
+        </div>
+        <div class="mb-2">
+          <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" id="optIncludeKana" class="rounded border-gray-300">
+            仮名を含める
+          </label>
+        </div>
+        </div>
+      </div>
+      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="toggleSymbolConvert" class="rounded border-gray-300">
+          記号を変換
+        </label>
+        <div id="symbolConvertPanel" class="mt-2 pl-4">
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolAll" class="rounded border-gray-300">
+              すべて切り替え
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolSemicolon" class="rounded border-gray-300">
+              セミコロン（； → ;）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolColon" class="rounded border-gray-300">
+              コロン（： → :）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolSingleQuote" class="rounded border-gray-300">
+              クオート（＇ → '）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolDoubleQuote" class="rounded border-gray-300">
+              ダブルクオート（＂ → "）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolBackQuote" class="rounded border-gray-300">
+              バッククオート（｀ → `）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolParentheses" class="rounded border-gray-300">
+              丸括弧（（ ） → ( )）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolExclamation" class="rounded border-gray-300">
+              感嘆符（！ → !）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolDollar" class="rounded border-gray-300">
+              ドル（＄ → $）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolQuestion" class="rounded border-gray-300">
+              クエスチョン（？ → ?）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolAmpersand" class="rounded border-gray-300">
+              アンパサンド（＆ → &）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolAt" class="rounded border-gray-300">
+              アットマーク（＠ → @）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolHash" class="rounded border-gray-300">
+              シャープ（＃ → #）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolPercent" class="rounded border-gray-300">
+              パーセント（％ → %）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolPlus" class="rounded border-gray-300">
+              プラス（＋ → +）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolEquals" class="rounded border-gray-300">
+              イコール（＝ → =）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolSlash" class="rounded border-gray-300">
+              スラッシュ（／ → /）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolBackslash" class="rounded border-gray-300">
+              バックスラッシュ（＼ → \）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolHyphen" class="rounded border-gray-300">
+              ハイフン（－ → -）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolUnderscore" class="rounded border-gray-300">
+              アンダースコア（＿ → _）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolComma" class="rounded border-gray-300">
+              カンマ（， → ,）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolPeriod" class="rounded border-gray-300">
+              ピリオド（． → .）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolCaret" class="rounded border-gray-300">
+              キャレット（＾ → ^）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolPipe" class="rounded border-gray-300">
+              パイプ（｜ → |）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolAngle" class="rounded border-gray-300">
+              不等号（＜ ＞ → < >）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolBrace" class="rounded border-gray-300">
+              波括弧（｛ ｝ → { }）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolBracket" class="rounded border-gray-300">
+              角括弧（［ ］ → [ ]）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolTilde" class="rounded border-gray-300">
+              チルダ（～ → ~）
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="toggleLineConvert" class="rounded border-gray-300">
+          行の変換
+        </label>
+        <div id="lineConvertPanel" class="mt-2 pl-4">
+          <div class="mb-2">
+            <label class="block mb-2 text-sm">
+              行末:
+              <select id="optLineEnding" class="border border-gray-300 rounded px-2 py-1">
+                <option value="keep">維持</option>
+                <option value="lf">LF に統一</option>
+                <option value="crlf">CRLF に統一</option>
+              </select>
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="block mb-2 text-sm">
+              行の並び:
+              <select id="optSortLines" class="border border-gray-300 rounded px-2 py-1">
+                <option value="none">並び替えしない</option>
+                <option value="asc">昇順</option>
+                <option value="desc">降順</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="toggleSpaceConvert" class="rounded border-gray-300">
+          空白の変換
+        </label>
+        <div id="spaceConvertPanel" class="mt-2 pl-4">
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optNewlineToSpace" class="rounded border-gray-300">
+              改行を空白に変換
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optNormalizeUnicodeSpaces" class="rounded border-gray-300">
+              全角/特殊空白を半角空白に変換
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optRemoveZeroWidthSpaces" class="rounded border-gray-300">
+              サイズのない空白を除去
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optRemoveSpaceBeforePunct" class="rounded border-gray-300">
+              句読点/記号（。、？！）の直前の半角空白を除去
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optTrim" class="rounded border-gray-300">
+              前後の空白をトリム
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optNormalizeSpaces" class="rounded border-gray-300">
+              連続する空白・タブを1つにする
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optRemoveEmptyLines" class="rounded border-gray-300">
+              空行を除去
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="text-sm text-gray-600"></div>
+    </div>
+
+    <label class="block mb-2 font-semibold">
+      出力テキスト:
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          入力テキストに変換オプションを適用した結果が表示されます。コピーアイコンで内容をクリップボードへコピーできます。
+        </span>
+      </span>
+    </label>
+    <div class="relative">
+      <textarea id="outputText" class="bg-gray-100 border border-gray-300 rounded w-full p-3" rows="6" readonly placeholder="ここに結果が表示されます"></textarea>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('outputText')">📋</button>
+    </div>
+    <div class="mt-2 text-sm text-gray-600" id="outputStats">文字数: 0 / 行数: 0</div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-md opacity-0 transition-opacity duration-300 pointer-events-none">
+      コピーしました
+    </div>
+  </div>
+
+  <script>
+    const halfToFullKanaMap = {
+      '｡': '。', '｢': '「', '｣': '」', '､': '、', '･': '・',
+      'ｧ': 'ァ', 'ｨ': 'ィ', 'ｩ': 'ゥ', 'ｪ': 'ェ', 'ｫ': 'ォ',
+      'ｬ': 'ャ', 'ｭ': 'ュ', 'ｮ': 'ョ', 'ｯ': 'ッ', 'ｰ': 'ー',
+      'ｱ': 'ア', 'ｲ': 'イ', 'ｳ': 'ウ', 'ｴ': 'エ', 'ｵ': 'オ',
+      'ｶ': 'カ', 'ｷ': 'キ', 'ｸ': 'ク', 'ｹ': 'ケ', 'ｺ': 'コ',
+      'ｻ': 'サ', 'ｼ': 'シ', 'ｽ': 'ス', 'ｾ': 'セ', 'ｿ': 'ソ',
+      'ﾀ': 'タ', 'ﾁ': 'チ', 'ﾂ': 'ツ', 'ﾃ': 'テ', 'ﾄ': 'ト',
+      'ﾅ': 'ナ', 'ﾆ': 'ニ', 'ﾇ': 'ヌ', 'ﾈ': 'ネ', 'ﾉ': 'ノ',
+      'ﾊ': 'ハ', 'ﾋ': 'ヒ', 'ﾌ': 'フ', 'ﾍ': 'ヘ', 'ﾎ': 'ホ',
+      'ﾏ': 'マ', 'ﾐ': 'ミ', 'ﾑ': 'ム', 'ﾒ': 'メ', 'ﾓ': 'モ',
+      'ﾔ': 'ヤ', 'ﾕ': 'ユ', 'ﾖ': 'ヨ',
+      'ﾗ': 'ラ', 'ﾘ': 'リ', 'ﾙ': 'ル', 'ﾚ': 'レ', 'ﾛ': 'ロ',
+      'ﾜ': 'ワ', 'ｦ': 'ヲ', 'ﾝ': 'ン',
+      'ﾞ': '゛', 'ﾟ': '゜'
+    };
+    const halfVoicedMap = {
+      'ｶﾞ': 'ガ', 'ｷﾞ': 'ギ', 'ｸﾞ': 'グ', 'ｹﾞ': 'ゲ', 'ｺﾞ': 'ゴ',
+      'ｻﾞ': 'ザ', 'ｼﾞ': 'ジ', 'ｽﾞ': 'ズ', 'ｾﾞ': 'ゼ', 'ｿﾞ': 'ゾ',
+      'ﾀﾞ': 'ダ', 'ﾁﾞ': 'ヂ', 'ﾂﾞ': 'ヅ', 'ﾃﾞ': 'デ', 'ﾄﾞ': 'ド',
+      'ﾊﾞ': 'バ', 'ﾋﾞ': 'ビ', 'ﾌﾞ': 'ブ', 'ﾍﾞ': 'ベ', 'ﾎﾞ': 'ボ',
+      'ｳﾞ': 'ヴ'
+    };
+    const halfSemiVoicedMap = {
+      'ﾊﾟ': 'パ', 'ﾋﾟ': 'ピ', 'ﾌﾟ': 'プ', 'ﾍﾟ': 'ペ', 'ﾎﾟ': 'ポ'
+    };
+    const fullToHalfKanaMap = {
+      '。': '｡', '「': '｢', '」': '｣', '、': '､', '・': '･',
+      'ァ': 'ｧ', 'ィ': 'ｨ', 'ゥ': 'ｩ', 'ェ': 'ｪ', 'ォ': 'ｫ',
+      'ャ': 'ｬ', 'ュ': 'ｭ', 'ョ': 'ｮ', 'ッ': 'ｯ', 'ー': 'ｰ',
+      'ア': 'ｱ', 'イ': 'ｲ', 'ウ': 'ｳ', 'エ': 'ｴ', 'オ': 'ｵ',
+      'カ': 'ｶ', 'キ': 'ｷ', 'ク': 'ｸ', 'ケ': 'ｹ', 'コ': 'ｺ',
+      'サ': 'ｻ', 'シ': 'ｼ', 'ス': 'ｽ', 'セ': 'ｾ', 'ソ': 'ｿ',
+      'タ': 'ﾀ', 'チ': 'ﾁ', 'ツ': 'ﾂ', 'テ': 'ﾃ', 'ト': 'ﾄ',
+      'ナ': 'ﾅ', 'ニ': 'ﾆ', 'ヌ': 'ﾇ', 'ネ': 'ﾈ', 'ノ': 'ﾉ',
+      'ハ': 'ﾊ', 'ヒ': 'ﾋ', 'フ': 'ﾌ', 'ヘ': 'ﾍ', 'ホ': 'ﾎ',
+      'マ': 'ﾏ', 'ミ': 'ﾐ', 'ム': 'ﾑ', 'メ': 'ﾒ', 'モ': 'ﾓ',
+      'ヤ': 'ﾔ', 'ユ': 'ﾕ', 'ヨ': 'ﾖ',
+      'ラ': 'ﾗ', 'リ': 'ﾘ', 'ル': 'ﾙ', 'レ': 'ﾚ', 'ロ': 'ﾛ',
+      'ワ': 'ﾜ', 'ヲ': 'ｦ', 'ン': 'ﾝ',
+      '゛': 'ﾞ', '゜': 'ﾟ'
+    };
+    const fullToHalfVoicedMap = {
+      'ガ': 'ｶﾞ', 'ギ': 'ｷﾞ', 'グ': 'ｸﾞ', 'ゲ': 'ｹﾞ', 'ゴ': 'ｺﾞ',
+      'ザ': 'ｻﾞ', 'ジ': 'ｼﾞ', 'ズ': 'ｽﾞ', 'ゼ': 'ｾﾞ', 'ゾ': 'ｿﾞ',
+      'ダ': 'ﾀﾞ', 'ヂ': 'ﾁﾞ', 'ヅ': 'ﾂﾞ', 'デ': 'ﾃﾞ', 'ド': 'ﾄﾞ',
+      'バ': 'ﾊﾞ', 'ビ': 'ﾋﾞ', 'ブ': 'ﾌﾞ', 'ベ': 'ﾍﾞ', 'ボ': 'ﾎﾞ',
+      'ヴ': 'ｳﾞ'
+    };
+    const fullToHalfSemiVoicedMap = {
+      'パ': 'ﾊﾟ', 'ピ': 'ﾋﾟ', 'プ': 'ﾌﾟ', 'ペ': 'ﾍﾟ', 'ポ': 'ﾎﾟ'
+    };
+
+    function detectPreferredNewline(text) {
+      if (/\r\n/.test(text)) return "\r\n";
+      if (/\r/.test(text)) return "\r";
+      return "\n";
+    }
+
+    function normalizeLineEnding(text, mode) {
+      if (mode === "keep") return text;
+      const normalized = text.replace(/\r\n|\r/g, "\n");
+      if (mode === "lf") return normalized;
+      if (mode === "crlf") return normalized.replace(/\n/g, "\r\n");
+      return text;
+    }
+
+    function convertHalfToFull(text, includeKana) {
+      let result = "";
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+        if (includeKana && next && (next === 'ﾞ' || next === 'ﾟ')) {
+          const combined = char + next;
+          if (halfVoicedMap[combined]) {
+            result += halfVoicedMap[combined];
+            i++;
+            continue;
+          }
+          if (halfSemiVoicedMap[combined]) {
+            result += halfSemiVoicedMap[combined];
+            i++;
+            continue;
+          }
+        }
+        const code = char.charCodeAt(0);
+        if (char === " ") {
+          result += "　";
+        } else if (code >= 0x21 && code <= 0x7e) {
+          result += String.fromCharCode(code + 0xfee0);
+        } else if (includeKana && halfToFullKanaMap[char]) {
+          result += halfToFullKanaMap[char];
+        } else {
+          result += char;
+        }
+      }
+      return result;
+    }
+
+    function convertFullToHalf(text, includeKana) {
+      let result = "";
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const code = char.charCodeAt(0);
+        if (char === "　") {
+          result += " ";
+        } else if (code >= 0xff01 && code <= 0xff5e) {
+          result += String.fromCharCode(code - 0xfee0);
+        } else if (includeKana && fullToHalfVoicedMap[char]) {
+          result += fullToHalfVoicedMap[char];
+        } else if (includeKana && fullToHalfSemiVoicedMap[char]) {
+          result += fullToHalfSemiVoicedMap[char];
+        } else if (includeKana && fullToHalfKanaMap[char]) {
+          result += fullToHalfKanaMap[char];
+        } else {
+          result += char;
+        }
+      }
+      return result;
+    }
+
+    function convertHiraganaToKatakana(text) {
+      return text.replace(/[\u3041-\u3096]/g, (char) =>
+        String.fromCharCode(char.charCodeAt(0) + 0x60)
+      );
+    }
+
+    function convertKatakanaToHiragana(text) {
+      return text.replace(/[\u30a1-\u30f6]/g, (char) =>
+        String.fromCharCode(char.charCodeAt(0) - 0x60)
+      );
+    }
+
+    function convertFullWidthSymbolsToHalf(text, options) {
+      let result = text;
+      if (options.semicolon) {
+        result = result.replace(/；/g, ";");
+      }
+      if (options.colon) {
+        result = result.replace(/：/g, ":");
+      }
+      if (options.singleQuote) {
+        result = result.replace(/＇/g, "'");
+      }
+      if (options.doubleQuote) {
+        result = result.replace(/＂/g, "\"");
+      }
+      if (options.backQuote) {
+        result = result.replace(/｀/g, "`");
+      }
+      if (options.parentheses) {
+        result = result.replace(/（/g, "(").replace(/）/g, ")");
+      }
+      if (options.exclamation) {
+        result = result.replace(/！/g, "!");
+      }
+      if (options.dollar) {
+        result = result.replace(/＄/g, "$");
+      }
+      if (options.question) {
+        result = result.replace(/？/g, "?");
+      }
+      if (options.ampersand) {
+        result = result.replace(/＆/g, "&");
+      }
+      if (options.at) {
+        result = result.replace(/＠/g, "@");
+      }
+      if (options.hash) {
+        result = result.replace(/＃/g, "#");
+      }
+      if (options.percent) {
+        result = result.replace(/％/g, "%");
+      }
+      if (options.plus) {
+        result = result.replace(/＋/g, "+");
+      }
+      if (options.equals) {
+        result = result.replace(/＝/g, "=");
+      }
+      if (options.slash) {
+        result = result.replace(/／/g, "/");
+      }
+      if (options.backslash) {
+        result = result.replace(/＼/g, "\\");
+      }
+      if (options.hyphen) {
+        result = result.replace(/－/g, "-");
+      }
+      if (options.underscore) {
+        result = result.replace(/＿/g, "_");
+      }
+      if (options.comma) {
+        result = result.replace(/，/g, ",");
+      }
+      if (options.period) {
+        result = result.replace(/．/g, ".");
+      }
+      if (options.caret) {
+        result = result.replace(/＾/g, "^");
+      }
+      if (options.pipe) {
+        result = result.replace(/｜/g, "|");
+      }
+      if (options.angle) {
+        result = result.replace(/＜/g, "<").replace(/＞/g, ">");
+      }
+      if (options.brace) {
+        result = result.replace(/｛/g, "{").replace(/｝/g, "}");
+      }
+      if (options.bracket) {
+        result = result.replace(/［/g, "[").replace(/］/g, "]");
+      }
+      if (options.tilde) {
+        result = result.replace(/～/g, "~");
+      }
+      return result;
+    }
+
+    function normalizeUnicodeSpacesToHalf(text) {
+      return text.replace(/[\u3000\u00A0\u1680\u180E\u2000-\u200A\u202F\u205F]/g, " ");
+    }
+
+    function removeZeroWidthSpaces(text) {
+      return text.replace(/[\u200B\u200C\u200D\u2060\uFEFF]/g, "");
+    }
+
+    function removeHalfSpaceBeforeJapanesePunctuation(text) {
+      return text.replace(/ ([\u3002\u3001！？\?！])/g, "$1");
+    }
+
+    function sortLines(text, direction, preferredNewline) {
+      if (direction === "none") return text;
+      const lines = text.split(/\r\n|\r|\n/);
+      const sorted = lines.sort((a, b) => a.localeCompare(b, "ja"));
+      if (direction === "desc") sorted.reverse();
+      return sorted.join(preferredNewline);
+    }
+
+    function autoResizeOutput() {
+      const textarea = document.getElementById('outputText');
+      if (!textarea) return;
+      const maxLines = 100;
+      const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 18;
+      const maxHeight = lineHeight * maxLines + 24;
+      textarea.style.height = 'auto';
+      const nextHeight = Math.min(textarea.scrollHeight, maxHeight);
+      textarea.style.height = `${nextHeight}px`;
+    }
+
+    function updateOutput() {
+      const input = document.getElementById('inputText').value;
+      const optWidth = document.getElementById('optWidth').value;
+      const optIncludeKana = document.getElementById('optIncludeKana').checked;
+      const optKana = document.getElementById('optKana').value;
+      const optCase = document.getElementById('optCase').value;
+      const optSymbolConvert = document.getElementById('toggleSymbolConvert').checked;
+      const optSymbolSemicolon = document.getElementById('optSymbolSemicolon').checked;
+      const optSymbolColon = document.getElementById('optSymbolColon').checked;
+      const optSymbolSingleQuote = document.getElementById('optSymbolSingleQuote').checked;
+      const optSymbolDoubleQuote = document.getElementById('optSymbolDoubleQuote').checked;
+      const optSymbolBackQuote = document.getElementById('optSymbolBackQuote').checked;
+      const optSymbolParentheses = document.getElementById('optSymbolParentheses').checked;
+      const optSymbolExclamation = document.getElementById('optSymbolExclamation').checked;
+      const optSymbolDollar = document.getElementById('optSymbolDollar').checked;
+      const optSymbolQuestion = document.getElementById('optSymbolQuestion').checked;
+      const optSymbolAmpersand = document.getElementById('optSymbolAmpersand').checked;
+      const optSymbolAt = document.getElementById('optSymbolAt').checked;
+      const optSymbolHash = document.getElementById('optSymbolHash').checked;
+      const optSymbolPercent = document.getElementById('optSymbolPercent').checked;
+      const optSymbolPlus = document.getElementById('optSymbolPlus').checked;
+      const optSymbolEquals = document.getElementById('optSymbolEquals').checked;
+      const optSymbolSlash = document.getElementById('optSymbolSlash').checked;
+      const optSymbolBackslash = document.getElementById('optSymbolBackslash').checked;
+      const optSymbolHyphen = document.getElementById('optSymbolHyphen').checked;
+      const optSymbolUnderscore = document.getElementById('optSymbolUnderscore').checked;
+      const optSymbolComma = document.getElementById('optSymbolComma').checked;
+      const optSymbolPeriod = document.getElementById('optSymbolPeriod').checked;
+      const optSymbolCaret = document.getElementById('optSymbolCaret').checked;
+      const optSymbolPipe = document.getElementById('optSymbolPipe').checked;
+      const optSymbolAngle = document.getElementById('optSymbolAngle').checked;
+      const optSymbolBrace = document.getElementById('optSymbolBrace').checked;
+      const optSymbolBracket = document.getElementById('optSymbolBracket').checked;
+      const optSymbolTilde = document.getElementById('optSymbolTilde').checked;
+      const optLineEnding = document.getElementById('optLineEnding').value;
+      const optSortLines = document.getElementById('optSortLines').value;
+      const optNewlineToSpace = document.getElementById('optNewlineToSpace').checked;
+      const optNormalizeUnicodeSpaces = document.getElementById('optNormalizeUnicodeSpaces').checked;
+      const optRemoveZeroWidthSpaces = document.getElementById('optRemoveZeroWidthSpaces').checked;
+      const optRemoveSpaceBeforePunct = document.getElementById('optRemoveSpaceBeforePunct').checked;
+      const optTrim = document.getElementById('optTrim').checked;
+      const optNormalizeSpaces = document.getElementById('optNormalizeSpaces').checked;
+      const optRemoveEmptyLines = document.getElementById('optRemoveEmptyLines').checked;
+
+      let text = input;
+      const preferredNewline = optLineEnding === "keep" ? detectPreferredNewline(text) : (optLineEnding === "crlf" ? "\r\n" : "\n");
+      text = normalizeLineEnding(text, optLineEnding);
+
+      if (optWidth === "toHalf") {
+        text = convertFullToHalf(text, optIncludeKana);
+      } else if (optWidth === "toFull") {
+        text = convertHalfToFull(text, optIncludeKana);
+      }
+
+      if (optSymbolConvert) {
+        text = convertFullWidthSymbolsToHalf(text, {
+          semicolon: optSymbolSemicolon,
+          colon: optSymbolColon,
+          singleQuote: optSymbolSingleQuote,
+          doubleQuote: optSymbolDoubleQuote,
+          backQuote: optSymbolBackQuote,
+          parentheses: optSymbolParentheses,
+          exclamation: optSymbolExclamation,
+          dollar: optSymbolDollar,
+          question: optSymbolQuestion,
+          ampersand: optSymbolAmpersand,
+          at: optSymbolAt,
+          hash: optSymbolHash,
+          percent: optSymbolPercent,
+          plus: optSymbolPlus,
+          equals: optSymbolEquals,
+          slash: optSymbolSlash,
+          backslash: optSymbolBackslash,
+          hyphen: optSymbolHyphen,
+          underscore: optSymbolUnderscore,
+          comma: optSymbolComma,
+          period: optSymbolPeriod,
+          caret: optSymbolCaret,
+          pipe: optSymbolPipe,
+          angle: optSymbolAngle,
+          brace: optSymbolBrace,
+          bracket: optSymbolBracket,
+          tilde: optSymbolTilde
+        });
+      }
+
+      if (optKana === "toKata") {
+        text = convertHiraganaToKatakana(text);
+      } else if (optKana === "toHira") {
+        text = convertKatakanaToHiragana(text);
+      }
+
+      if (optCase === "upper") {
+        text = text.toUpperCase();
+      } else if (optCase === "lower") {
+        text = text.toLowerCase();
+      }
+
+      text = sortLines(text, optSortLines, preferredNewline);
+
+      if (optRemoveEmptyLines) {
+        const lineSep = optNewlineToSpace ? "\n" : preferredNewline;
+        const lines = text.split(/\r\n|\r|\n/).filter((line) => line.trim() !== "");
+        text = lines.join(lineSep);
+      }
+
+      if (optNewlineToSpace) {
+        text = text.replace(/\r\n|\r|\n/g, " ");
+      }
+
+      if (optNormalizeUnicodeSpaces) {
+        text = normalizeUnicodeSpacesToHalf(text);
+      }
+
+      if (optRemoveZeroWidthSpaces) {
+        text = removeZeroWidthSpaces(text);
+      }
+
+      if (optRemoveSpaceBeforePunct) {
+        text = removeHalfSpaceBeforeJapanesePunctuation(text);
+      }
+
+      if (optTrim) {
+        text = text.trim();
+      }
+
+      if (optNormalizeSpaces) {
+        text = text.replace(/[ \t]+/g, " ");
+      }
+
+      document.getElementById('outputText').value = text;
+      autoResizeOutput();
+      const lineCount = text ? text.split(/\r\n|\r|\n/).length : 0;
+      document.getElementById('outputStats').textContent = `文字数: ${text.length} / 行数: ${lineCount}`;
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).value;
+      if (!text) return;
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showToast('コピーしました');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2000);
+    }
+
+    function toggleMenu() {
+      const panel = document.getElementById('menuPanel');
+      if (!panel) return;
+      panel.classList.toggle('hidden');
+    }
+
+    function toggleCharConvertPanel() {
+      const toggle = document.getElementById('toggleCharConvert');
+      const panel = document.getElementById('charConvertPanel');
+      if (!toggle || !panel) return;
+      panel.classList.toggle('hidden', !toggle.checked);
+    }
+
+    function toggleLineConvertPanel() {
+      const toggle = document.getElementById('toggleLineConvert');
+      const panel = document.getElementById('lineConvertPanel');
+      if (!toggle || !panel) return;
+      panel.classList.toggle('hidden', !toggle.checked);
+    }
+
+    function toggleSymbolConvertPanel() {
+      const toggle = document.getElementById('toggleSymbolConvert');
+      const panel = document.getElementById('symbolConvertPanel');
+      if (!toggle || !panel) return;
+      panel.classList.toggle('hidden', !toggle.checked);
+    }
+
+    function getSymbolOptionIds() {
+      return [
+        'optSymbolSemicolon', 'optSymbolColon', 'optSymbolSingleQuote',
+        'optSymbolDoubleQuote', 'optSymbolBackQuote', 'optSymbolParentheses',
+        'optSymbolExclamation', 'optSymbolDollar', 'optSymbolQuestion',
+        'optSymbolAmpersand', 'optSymbolAt', 'optSymbolHash',
+        'optSymbolPercent', 'optSymbolPlus', 'optSymbolEquals',
+        'optSymbolSlash', 'optSymbolBackslash', 'optSymbolHyphen',
+        'optSymbolUnderscore', 'optSymbolComma', 'optSymbolPeriod',
+        'optSymbolCaret', 'optSymbolPipe', 'optSymbolAngle',
+        'optSymbolBrace', 'optSymbolBracket', 'optSymbolTilde'
+      ];
+    }
+
+    function updateSymbolAllState() {
+      const allToggle = document.getElementById('optSymbolAll');
+      if (!allToggle) return;
+      const ids = getSymbolOptionIds();
+      const elements = ids.map((id) => document.getElementById(id)).filter(Boolean);
+      if (elements.length === 0) return;
+      const allChecked = elements.every((el) => el.checked);
+      allToggle.checked = allChecked;
+      allToggle.indeterminate = !allChecked && elements.some((el) => el.checked);
+    }
+
+    function toggleAllSymbols(checked) {
+      getSymbolOptionIds().forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = checked;
+      });
+    }
+
+    function toggleSpaceConvertPanel() {
+      const toggle = document.getElementById('toggleSpaceConvert');
+      const panel = document.getElementById('spaceConvertPanel');
+      if (!toggle || !panel) return;
+      panel.classList.toggle('hidden', !toggle.checked);
+    }
+
+    function setupAutoUpdate() {
+      const ids = [
+        'inputText', 'optWidth', 'optIncludeKana', 'optKana', 'optCase',
+        'toggleSymbolConvert', 'optSymbolAll', 'optSymbolSemicolon', 'optSymbolColon', 'optSymbolSingleQuote',
+        'optSymbolDoubleQuote', 'optSymbolBackQuote', 'optSymbolParentheses',
+        'optSymbolExclamation', 'optSymbolDollar', 'optSymbolQuestion', 'optSymbolAmpersand',
+        'optSymbolAt', 'optSymbolHash', 'optSymbolPercent', 'optSymbolPlus',
+        'optSymbolEquals', 'optSymbolSlash', 'optSymbolBackslash', 'optSymbolHyphen',
+        'optSymbolUnderscore', 'optSymbolComma', 'optSymbolPeriod', 'optSymbolCaret',
+        'optSymbolPipe', 'optSymbolAngle', 'optSymbolBrace', 'optSymbolBracket',
+        'optSymbolTilde', 'optLineEnding', 'optSortLines', 'optNewlineToSpace',
+        'optNormalizeUnicodeSpaces', 'optRemoveZeroWidthSpaces', 'optRemoveSpaceBeforePunct',
+        'optNewlineToSpace', 'optTrim', 'optNormalizeSpaces', 'optRemoveEmptyLines'
+      ];
+      ids.forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        const eventName = element.tagName === 'SELECT' || element.type === 'checkbox' ? 'change' : 'input';
+        element.addEventListener(eventName, updateOutput);
+        if (element.tagName === 'SELECT' || element.type === 'checkbox') {
+          element.addEventListener('input', updateOutput);
+        }
+      });
+      updateOutput();
+    }
+
+    setupAutoUpdate();
+    toggleCharConvertPanel();
+    toggleSymbolConvertPanel();
+    toggleLineConvertPanel();
+    toggleSpaceConvertPanel();
+    const toggleCharConvert = document.getElementById('toggleCharConvert');
+    if (toggleCharConvert) {
+      toggleCharConvert.addEventListener('change', toggleCharConvertPanel);
+    }
+    const toggleSymbolConvert = document.getElementById('toggleSymbolConvert');
+    if (toggleSymbolConvert) {
+      toggleSymbolConvert.addEventListener('change', toggleSymbolConvertPanel);
+    }
+    const optSymbolAll = document.getElementById('optSymbolAll');
+    if (optSymbolAll) {
+      optSymbolAll.addEventListener('change', () => {
+        toggleAllSymbols(optSymbolAll.checked);
+        updateSymbolAllState();
+        updateOutput();
+      });
+    }
+    getSymbolOptionIds().forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('change', () => {
+        updateSymbolAllState();
+        updateOutput();
+      });
+    });
+    updateSymbolAllState();
+    const toggleLineConvert = document.getElementById('toggleLineConvert');
+    if (toggleLineConvert) {
+      toggleLineConvert.addEventListener('change', toggleLineConvertPanel);
+    }
+    const toggleSpaceConvert = document.getElementById('toggleSpaceConvert');
+    if (toggleSpaceConvert) {
+      toggleSpaceConvert.addEventListener('change', toggleSpaceConvertPanel);
+    }
+  </script>
+</body>
+</html>
