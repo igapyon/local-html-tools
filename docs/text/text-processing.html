@@ -38,6 +38,7 @@ limitations under the License.
     .bg-gray-100 { background-color: #f3f4f6; }
     .bg-gray-200 { background-color: #e5e7eb; }
     .bg-gray-800 { background-color: #1f2937; }
+    .bg-gray-900 { background-color: #111827; }
     .bg-green-600 { background-color: #16a34a; }
     .text-white { color: #ffffff; }
     .text-gray-600 { color: #4b5563; }
@@ -52,6 +53,7 @@ limitations under the License.
     .gap-2 { gap: 0.5rem; }
     .gap-3 { gap: 0.75rem; }
     .w-5 { width: 1.25rem; }
+    .w-80 { width: 20rem; }
     .w-full { width: 100%; }
     .h-5 { height: 1.25rem; }
     .max-w-2xl { max-width: 42rem; }
@@ -60,9 +62,12 @@ limitations under the License.
     .p-3 { padding: 0.75rem; }
     .p-6 { padding: 1.5rem; }
     .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
     .px-4 { padding-left: 1rem; padding-right: 1rem; }
     .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
     .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .pl-4 { padding-left: 1rem; }
+    .mt-2 { margin-top: 0.5rem; }
     .mb-2 { margin-bottom: 0.5rem; }
     .mb-4 { margin-bottom: 1rem; }
     .mb-6 { margin-bottom: 1.5rem; }
@@ -76,6 +81,7 @@ limitations under the License.
     .hidden { display: none; }
     .rounded { border-radius: 0.375rem; }
     .rounded-lg { border-radius: 0.5rem; }
+    .rounded-full { border-radius: 9999px; }
     .border { border-width: 1px; border-style: solid; }
     .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
 
@@ -84,13 +90,18 @@ limitations under the License.
     .top-2 { top: 0.5rem; }
     .top-4 { top: 1rem; }
     .top-12 { top: 3rem; }
+    .top-full { top: 100%; }
     .right-2 { right: 0.5rem; }
     .right-4 { right: 1rem; }
     .bottom-5 { bottom: 1.25rem; }
+    .left-1\/2 { left: 50%; }
+    .-translate-x-1\/2 { transform: translateX(-50%); }
 
     .opacity-0 { opacity: 0; }
+    .opacity-100 { opacity: 1; }
     .pointer-events-none { pointer-events: none; }
 
+    .transition { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
     .transition-opacity { transition-property: opacity; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
     .duration-300 { transition-duration: 300ms; }
 
@@ -100,6 +111,16 @@ limitations under the License.
     button.hover\:bg-gray-300:hover { background-color: #d1d5db; }
 
     a { text-decoration: none !important; }
+
+    .inline-flex { display: inline-flex; }
+    .justify-center { justify-content: center; }
+    .text-xs { font-size: 0.75rem; line-height: 1rem; }
+    .leading-5 { line-height: 1.25rem; }
+    .font-normal { font-weight: 400; }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+    .z-50 { z-index: 50; }
+    .group {}
+    .group:hover .group-hover\:opacity-100 { opacity: 1; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
@@ -115,25 +136,160 @@ limitations under the License.
       <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
     </div>
 
-    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🧩</span>テキスト加工</h1>
+    <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
+      <span aria-hidden="true">🧩</span>
+      <span>テキスト加工</span>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          テキストを即時に変換・整形するためのツールです。入力内容に対して選択した変換オプションが順番に適用され、結果が出力欄に反映されます。文字の変換・行の変換・空白の変換を組み合わせて使えます。
+        </span>
+      </span>
+    </h1>
 
-    <label class="block mb-2 font-semibold">入力テキスト:</label>
+    <label class="block mb-2 font-semibold">
+      入力テキスト:
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          ここに入力したテキストが変換対象になります。
+        </span>
+      </span>
+    </label>
     <textarea id="inputText" class="border border-gray-300 rounded w-full p-3 mb-4" rows="8" placeholder="加工したいテキストを入力してください"></textarea>
 
-    <div class="flex items-center gap-3 mb-6">
-      <button type="button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded" onclick="convertNewlines()">
-        改行を空白に変換
-      </button>
-      <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded" onclick="clearAll()">
-        クリア
-      </button>
+    <div class="mb-6">
+      <div class="mb-2 font-semibold">
+        変換オプション:
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            変換オプション: チェックや選択した内容が出力に反映されます。複数の変換を同時に適用できます。
+            変換の順序: 行末 → 全角/半角 → ひら/カタ → 大文字/小文字 → 行の並び → 空行除去 → 改行→空白 → トリム → 空白正規化
+          </span>
+        </span>
+      </div>
+      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="toggleCharConvert" class="rounded border-gray-300">
+          文字の変換
+        </label>
+        <div id="charConvertPanel" class="mt-2 pl-4">
+        <div class="mb-2">
+          <label class="block mb-2 text-sm">
+            大文字/小文字（英字）:
+            <select id="optCase" class="border border-gray-300 rounded px-2 py-1">
+              <option value="none">変換しない</option>
+              <option value="upper">大文字に変換</option>
+              <option value="lower">小文字に変換</option>
+            </select>
+          </label>
+        </div>
+        <div class="mb-2">
+          <label class="block mb-2 text-sm">
+            全角/半角:
+            <select id="optWidth" class="border border-gray-300 rounded px-2 py-1">
+              <option value="none">変換しない</option>
+              <option value="toHalf">半角に変換</option>
+              <option value="toFull">全角に変換</option>
+            </select>
+          </label>
+        </div>
+        <div class="mb-2">
+          <label class="block mb-2 text-sm">
+            ひらがな/カタカナ:
+            <select id="optKana" class="border border-gray-300 rounded px-2 py-1">
+              <option value="none">変換しない</option>
+              <option value="toKata">ひらがな → カタカナ</option>
+              <option value="toHira">カタカナ → ひらがな</option>
+            </select>
+          </label>
+        </div>
+        <div class="mb-2">
+          <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" id="optIncludeKana" class="rounded border-gray-300">
+            仮名を含める
+          </label>
+        </div>
+      </div>
+      </div>
+      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="toggleLineConvert" class="rounded border-gray-300">
+          行の変換
+        </label>
+        <div id="lineConvertPanel" class="mt-2 pl-4">
+          <div class="mb-2">
+            <label class="block mb-2 text-sm">
+              行末:
+              <select id="optLineEnding" class="border border-gray-300 rounded px-2 py-1">
+                <option value="keep">維持</option>
+                <option value="lf">LF に統一</option>
+                <option value="crlf">CRLF に統一</option>
+              </select>
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="block mb-2 text-sm">
+              行の並び:
+              <select id="optSortLines" class="border border-gray-300 rounded px-2 py-1">
+                <option value="none">並び替えしない</option>
+                <option value="asc">昇順</option>
+                <option value="desc">降順</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="toggleSpaceConvert" class="rounded border-gray-300">
+          空白の変換
+        </label>
+        <div id="spaceConvertPanel" class="mt-2 pl-4">
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optNewlineToSpace" class="rounded border-gray-300">
+              改行を空白に変換
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optTrim" class="rounded border-gray-300">
+              前後の空白をトリム
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optNormalizeSpaces" class="rounded border-gray-300">
+              連続する空白・タブを1つにする
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optRemoveEmptyLines" class="rounded border-gray-300">
+              空行を除去
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="text-sm text-gray-600"></div>
     </div>
 
-    <label class="block mb-2 font-semibold">出力テキスト:</label>
+    <label class="block mb-2 font-semibold">
+      出力テキスト:
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          入力テキストに変換オプションを適用した結果が表示されます。コピーアイコンで内容をクリップボードへコピーできます。
+        </span>
+      </span>
+    </label>
     <div class="relative">
       <textarea id="outputText" class="bg-gray-100 border border-gray-300 rounded w-full p-3" rows="6" readonly placeholder="ここに結果が表示されます"></textarea>
       <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('outputText')">📋</button>
     </div>
+    <div class="mt-2 text-sm text-gray-600" id="outputStats">文字数: 0 / 行数: 0</div>
 
     <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-md opacity-0 transition-opacity duration-300 pointer-events-none">
       コピーしました
@@ -141,15 +297,217 @@ limitations under the License.
   </div>
 
   <script>
-    function convertNewlines() {
-      const input = document.getElementById('inputText').value;
-      const parts = input.split(/\r\n|\r|\n/).map(line => line.trim()).filter(Boolean);
-      document.getElementById('outputText').value = parts.join(' ');
+    const halfToFullKanaMap = {
+      '｡': '。', '｢': '「', '｣': '」', '､': '、', '･': '・',
+      'ｧ': 'ァ', 'ｨ': 'ィ', 'ｩ': 'ゥ', 'ｪ': 'ェ', 'ｫ': 'ォ',
+      'ｬ': 'ャ', 'ｭ': 'ュ', 'ｮ': 'ョ', 'ｯ': 'ッ', 'ｰ': 'ー',
+      'ｱ': 'ア', 'ｲ': 'イ', 'ｳ': 'ウ', 'ｴ': 'エ', 'ｵ': 'オ',
+      'ｶ': 'カ', 'ｷ': 'キ', 'ｸ': 'ク', 'ｹ': 'ケ', 'ｺ': 'コ',
+      'ｻ': 'サ', 'ｼ': 'シ', 'ｽ': 'ス', 'ｾ': 'セ', 'ｿ': 'ソ',
+      'ﾀ': 'タ', 'ﾁ': 'チ', 'ﾂ': 'ツ', 'ﾃ': 'テ', 'ﾄ': 'ト',
+      'ﾅ': 'ナ', 'ﾆ': 'ニ', 'ﾇ': 'ヌ', 'ﾈ': 'ネ', 'ﾉ': 'ノ',
+      'ﾊ': 'ハ', 'ﾋ': 'ヒ', 'ﾌ': 'フ', 'ﾍ': 'ヘ', 'ﾎ': 'ホ',
+      'ﾏ': 'マ', 'ﾐ': 'ミ', 'ﾑ': 'ム', 'ﾒ': 'メ', 'ﾓ': 'モ',
+      'ﾔ': 'ヤ', 'ﾕ': 'ユ', 'ﾖ': 'ヨ',
+      'ﾗ': 'ラ', 'ﾘ': 'リ', 'ﾙ': 'ル', 'ﾚ': 'レ', 'ﾛ': 'ロ',
+      'ﾜ': 'ワ', 'ｦ': 'ヲ', 'ﾝ': 'ン',
+      'ﾞ': '゛', 'ﾟ': '゜'
+    };
+    const halfVoicedMap = {
+      'ｶﾞ': 'ガ', 'ｷﾞ': 'ギ', 'ｸﾞ': 'グ', 'ｹﾞ': 'ゲ', 'ｺﾞ': 'ゴ',
+      'ｻﾞ': 'ザ', 'ｼﾞ': 'ジ', 'ｽﾞ': 'ズ', 'ｾﾞ': 'ゼ', 'ｿﾞ': 'ゾ',
+      'ﾀﾞ': 'ダ', 'ﾁﾞ': 'ヂ', 'ﾂﾞ': 'ヅ', 'ﾃﾞ': 'デ', 'ﾄﾞ': 'ド',
+      'ﾊﾞ': 'バ', 'ﾋﾞ': 'ビ', 'ﾌﾞ': 'ブ', 'ﾍﾞ': 'ベ', 'ﾎﾞ': 'ボ',
+      'ｳﾞ': 'ヴ'
+    };
+    const halfSemiVoicedMap = {
+      'ﾊﾟ': 'パ', 'ﾋﾟ': 'ピ', 'ﾌﾟ': 'プ', 'ﾍﾟ': 'ペ', 'ﾎﾟ': 'ポ'
+    };
+    const fullToHalfKanaMap = {
+      '。': '｡', '「': '｢', '」': '｣', '、': '､', '・': '･',
+      'ァ': 'ｧ', 'ィ': 'ｨ', 'ゥ': 'ｩ', 'ェ': 'ｪ', 'ォ': 'ｫ',
+      'ャ': 'ｬ', 'ュ': 'ｭ', 'ョ': 'ｮ', 'ッ': 'ｯ', 'ー': 'ｰ',
+      'ア': 'ｱ', 'イ': 'ｲ', 'ウ': 'ｳ', 'エ': 'ｴ', 'オ': 'ｵ',
+      'カ': 'ｶ', 'キ': 'ｷ', 'ク': 'ｸ', 'ケ': 'ｹ', 'コ': 'ｺ',
+      'サ': 'ｻ', 'シ': 'ｼ', 'ス': 'ｽ', 'セ': 'ｾ', 'ソ': 'ｿ',
+      'タ': 'ﾀ', 'チ': 'ﾁ', 'ツ': 'ﾂ', 'テ': 'ﾃ', 'ト': 'ﾄ',
+      'ナ': 'ﾅ', 'ニ': 'ﾆ', 'ヌ': 'ﾇ', 'ネ': 'ﾈ', 'ノ': 'ﾉ',
+      'ハ': 'ﾊ', 'ヒ': 'ﾋ', 'フ': 'ﾌ', 'ヘ': 'ﾍ', 'ホ': 'ﾎ',
+      'マ': 'ﾏ', 'ミ': 'ﾐ', 'ム': 'ﾑ', 'メ': 'ﾒ', 'モ': 'ﾓ',
+      'ヤ': 'ﾔ', 'ユ': 'ﾕ', 'ヨ': 'ﾖ',
+      'ラ': 'ﾗ', 'リ': 'ﾘ', 'ル': 'ﾙ', 'レ': 'ﾚ', 'ロ': 'ﾛ',
+      'ワ': 'ﾜ', 'ヲ': 'ｦ', 'ン': 'ﾝ',
+      '゛': 'ﾞ', '゜': 'ﾟ'
+    };
+    const fullToHalfVoicedMap = {
+      'ガ': 'ｶﾞ', 'ギ': 'ｷﾞ', 'グ': 'ｸﾞ', 'ゲ': 'ｹﾞ', 'ゴ': 'ｺﾞ',
+      'ザ': 'ｻﾞ', 'ジ': 'ｼﾞ', 'ズ': 'ｽﾞ', 'ゼ': 'ｾﾞ', 'ゾ': 'ｿﾞ',
+      'ダ': 'ﾀﾞ', 'ヂ': 'ﾁﾞ', 'ヅ': 'ﾂﾞ', 'デ': 'ﾃﾞ', 'ド': 'ﾄﾞ',
+      'バ': 'ﾊﾞ', 'ビ': 'ﾋﾞ', 'ブ': 'ﾌﾞ', 'ベ': 'ﾍﾞ', 'ボ': 'ﾎﾞ',
+      'ヴ': 'ｳﾞ'
+    };
+    const fullToHalfSemiVoicedMap = {
+      'パ': 'ﾊﾟ', 'ピ': 'ﾋﾟ', 'プ': 'ﾌﾟ', 'ペ': 'ﾍﾟ', 'ポ': 'ﾎﾟ'
+    };
+
+    function detectPreferredNewline(text) {
+      if (/\r\n/.test(text)) return "\r\n";
+      if (/\r/.test(text)) return "\r";
+      return "\n";
     }
 
-    function clearAll() {
-      document.getElementById('inputText').value = '';
-      document.getElementById('outputText').value = '';
+    function normalizeLineEnding(text, mode) {
+      if (mode === "keep") return text;
+      const normalized = text.replace(/\r\n|\r/g, "\n");
+      if (mode === "lf") return normalized;
+      if (mode === "crlf") return normalized.replace(/\n/g, "\r\n");
+      return text;
+    }
+
+    function convertHalfToFull(text, includeKana) {
+      let result = "";
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+        if (includeKana && next && (next === 'ﾞ' || next === 'ﾟ')) {
+          const combined = char + next;
+          if (halfVoicedMap[combined]) {
+            result += halfVoicedMap[combined];
+            i++;
+            continue;
+          }
+          if (halfSemiVoicedMap[combined]) {
+            result += halfSemiVoicedMap[combined];
+            i++;
+            continue;
+          }
+        }
+        const code = char.charCodeAt(0);
+        if (char === " ") {
+          result += "　";
+        } else if (code >= 0x21 && code <= 0x7e) {
+          result += String.fromCharCode(code + 0xfee0);
+        } else if (includeKana && halfToFullKanaMap[char]) {
+          result += halfToFullKanaMap[char];
+        } else {
+          result += char;
+        }
+      }
+      return result;
+    }
+
+    function convertFullToHalf(text, includeKana) {
+      let result = "";
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const code = char.charCodeAt(0);
+        if (char === "　") {
+          result += " ";
+        } else if (code >= 0xff01 && code <= 0xff5e) {
+          result += String.fromCharCode(code - 0xfee0);
+        } else if (includeKana && fullToHalfVoicedMap[char]) {
+          result += fullToHalfVoicedMap[char];
+        } else if (includeKana && fullToHalfSemiVoicedMap[char]) {
+          result += fullToHalfSemiVoicedMap[char];
+        } else if (includeKana && fullToHalfKanaMap[char]) {
+          result += fullToHalfKanaMap[char];
+        } else {
+          result += char;
+        }
+      }
+      return result;
+    }
+
+    function convertHiraganaToKatakana(text) {
+      return text.replace(/[\u3041-\u3096]/g, (char) =>
+        String.fromCharCode(char.charCodeAt(0) + 0x60)
+      );
+    }
+
+    function convertKatakanaToHiragana(text) {
+      return text.replace(/[\u30a1-\u30f6]/g, (char) =>
+        String.fromCharCode(char.charCodeAt(0) - 0x60)
+      );
+    }
+
+    function sortLines(text, direction, preferredNewline) {
+      if (direction === "none") return text;
+      const lines = text.split(/\r\n|\r|\n/);
+      const sorted = lines.sort((a, b) => a.localeCompare(b, "ja"));
+      if (direction === "desc") sorted.reverse();
+      return sorted.join(preferredNewline);
+    }
+
+    function autoResizeOutput() {
+      const textarea = document.getElementById('outputText');
+      if (!textarea) return;
+      const maxLines = 100;
+      const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 18;
+      const maxHeight = lineHeight * maxLines + 24;
+      textarea.style.height = 'auto';
+      const nextHeight = Math.min(textarea.scrollHeight, maxHeight);
+      textarea.style.height = `${nextHeight}px`;
+    }
+
+    function updateOutput() {
+      const input = document.getElementById('inputText').value;
+      const optWidth = document.getElementById('optWidth').value;
+      const optIncludeKana = document.getElementById('optIncludeKana').checked;
+      const optKana = document.getElementById('optKana').value;
+      const optCase = document.getElementById('optCase').value;
+      const optLineEnding = document.getElementById('optLineEnding').value;
+      const optSortLines = document.getElementById('optSortLines').value;
+      const optNewlineToSpace = document.getElementById('optNewlineToSpace').checked;
+      const optTrim = document.getElementById('optTrim').checked;
+      const optNormalizeSpaces = document.getElementById('optNormalizeSpaces').checked;
+      const optRemoveEmptyLines = document.getElementById('optRemoveEmptyLines').checked;
+
+      let text = input;
+      const preferredNewline = optLineEnding === "keep" ? detectPreferredNewline(text) : (optLineEnding === "crlf" ? "\r\n" : "\n");
+      text = normalizeLineEnding(text, optLineEnding);
+
+      if (optWidth === "toHalf") {
+        text = convertFullToHalf(text, optIncludeKana);
+      } else if (optWidth === "toFull") {
+        text = convertHalfToFull(text, optIncludeKana);
+      }
+
+      if (optKana === "toKata") {
+        text = convertHiraganaToKatakana(text);
+      } else if (optKana === "toHira") {
+        text = convertKatakanaToHiragana(text);
+      }
+
+      if (optCase === "upper") {
+        text = text.toUpperCase();
+      } else if (optCase === "lower") {
+        text = text.toLowerCase();
+      }
+
+      text = sortLines(text, optSortLines, preferredNewline);
+
+      if (optRemoveEmptyLines) {
+        const lineSep = optNewlineToSpace ? "\n" : preferredNewline;
+        const lines = text.split(/\r\n|\r|\n/).filter((line) => line.trim() !== "");
+        text = lines.join(lineSep);
+      }
+
+      if (optNewlineToSpace) {
+        text = text.replace(/\r\n|\r|\n/g, " ");
+      }
+
+      if (optTrim) {
+        text = text.trim();
+      }
+
+      if (optNormalizeSpaces) {
+        text = text.replace(/[ \t]+/g, " ");
+      }
+
+      document.getElementById('outputText').value = text;
+      autoResizeOutput();
+      const lineCount = text ? text.split(/\r\n|\r|\n/).length : 0;
+      document.getElementById('outputStats').textContent = `文字数: ${text.length} / 行数: ${lineCount}`;
     }
 
     function copyToClipboard(id) {
@@ -179,6 +537,62 @@ limitations under the License.
       const panel = document.getElementById('menuPanel');
       if (!panel) return;
       panel.classList.toggle('hidden');
+    }
+
+    function toggleCharConvertPanel() {
+      const toggle = document.getElementById('toggleCharConvert');
+      const panel = document.getElementById('charConvertPanel');
+      if (!toggle || !panel) return;
+      panel.classList.toggle('hidden', !toggle.checked);
+    }
+
+    function toggleLineConvertPanel() {
+      const toggle = document.getElementById('toggleLineConvert');
+      const panel = document.getElementById('lineConvertPanel');
+      if (!toggle || !panel) return;
+      panel.classList.toggle('hidden', !toggle.checked);
+    }
+
+    function toggleSpaceConvertPanel() {
+      const toggle = document.getElementById('toggleSpaceConvert');
+      const panel = document.getElementById('spaceConvertPanel');
+      if (!toggle || !panel) return;
+      panel.classList.toggle('hidden', !toggle.checked);
+    }
+
+    function setupAutoUpdate() {
+      const ids = [
+        'inputText', 'optWidth', 'optIncludeKana', 'optKana', 'optCase',
+        'optLineEnding', 'optSortLines', 'optNewlineToSpace', 'optTrim',
+        'optNormalizeSpaces', 'optRemoveEmptyLines'
+      ];
+      ids.forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        const eventName = element.tagName === 'SELECT' || element.type === 'checkbox' ? 'change' : 'input';
+        element.addEventListener(eventName, updateOutput);
+        if (element.tagName === 'SELECT' || element.type === 'checkbox') {
+          element.addEventListener('input', updateOutput);
+        }
+      });
+      updateOutput();
+    }
+
+    setupAutoUpdate();
+    toggleCharConvertPanel();
+    toggleLineConvertPanel();
+    toggleSpaceConvertPanel();
+    const toggleCharConvert = document.getElementById('toggleCharConvert');
+    if (toggleCharConvert) {
+      toggleCharConvert.addEventListener('change', toggleCharConvertPanel);
+    }
+    const toggleLineConvert = document.getElementById('toggleLineConvert');
+    if (toggleLineConvert) {
+      toggleLineConvert.addEventListener('change', toggleLineConvertPanel);
+    }
+    const toggleSpaceConvert = document.getElementById('toggleSpaceConvert');
+    if (toggleSpaceConvert) {
+      toggleSpaceConvert.addEventListener('change', toggleSpaceConvertPanel);
     }
   </script>
 </body>
