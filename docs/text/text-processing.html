@@ -165,7 +165,7 @@ limitations under the License.
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
             変換オプション: チェックや選択した内容が出力に反映されます。複数の変換を同時に適用できます。
-            変換の順序: 行末 → 全角/半角 → ひら/カタ → 大文字/小文字 → 行の並び → 空行除去 → 改行→空白 → トリム → 空白正規化
+            変換の順序: 行末 → 全角/半角 → 記号 → ひら/カタ → 大文字/小文字 → 行の並び → 空行除去 → 改行→空白 → トリム → 空白正規化
           </span>
         </span>
       </div>
@@ -211,7 +211,183 @@ limitations under the License.
             仮名を含める
           </label>
         </div>
+        </div>
       </div>
+      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="toggleSymbolConvert" class="rounded border-gray-300">
+          記号を変換
+        </label>
+        <div id="symbolConvertPanel" class="mt-2 pl-4">
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolAll" class="rounded border-gray-300">
+              すべて切り替え
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolSemicolon" class="rounded border-gray-300">
+              セミコロン（； → ;）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolColon" class="rounded border-gray-300">
+              コロン（： → :）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolSingleQuote" class="rounded border-gray-300">
+              クオート（＇ → '）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolDoubleQuote" class="rounded border-gray-300">
+              ダブルクオート（＂ → "）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolBackQuote" class="rounded border-gray-300">
+              バッククオート（｀ → `）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolParentheses" class="rounded border-gray-300">
+              丸括弧（（ ） → ( )）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolExclamation" class="rounded border-gray-300">
+              感嘆符（！ → !）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolDollar" class="rounded border-gray-300">
+              ドル（＄ → $）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolQuestion" class="rounded border-gray-300">
+              クエスチョン（？ → ?）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolAmpersand" class="rounded border-gray-300">
+              アンパサンド（＆ → &）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolAt" class="rounded border-gray-300">
+              アットマーク（＠ → @）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolHash" class="rounded border-gray-300">
+              シャープ（＃ → #）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolPercent" class="rounded border-gray-300">
+              パーセント（％ → %）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolPlus" class="rounded border-gray-300">
+              プラス（＋ → +）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolEquals" class="rounded border-gray-300">
+              イコール（＝ → =）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolSlash" class="rounded border-gray-300">
+              スラッシュ（／ → /）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolBackslash" class="rounded border-gray-300">
+              バックスラッシュ（＼ → \）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolHyphen" class="rounded border-gray-300">
+              ハイフン（－ → -）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolUnderscore" class="rounded border-gray-300">
+              アンダースコア（＿ → _）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolComma" class="rounded border-gray-300">
+              カンマ（， → ,）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolPeriod" class="rounded border-gray-300">
+              ピリオド（． → .）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolCaret" class="rounded border-gray-300">
+              キャレット（＾ → ^）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolPipe" class="rounded border-gray-300">
+              パイプ（｜ → |）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolAngle" class="rounded border-gray-300">
+              不等号（＜ ＞ → < >）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolBrace" class="rounded border-gray-300">
+              波括弧（｛ ｝ → { }）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolBracket" class="rounded border-gray-300">
+              角括弧（［ ］ → [ ]）
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optSymbolTilde" class="rounded border-gray-300">
+              チルダ（～ → ~）
+            </label>
+          </div>
+        </div>
       </div>
       <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
         <label class="flex items-center gap-2 text-sm text-gray-700">
@@ -251,6 +427,24 @@ limitations under the License.
             <label class="flex items-center gap-2 text-sm">
               <input type="checkbox" id="optNewlineToSpace" class="rounded border-gray-300">
               改行を空白に変換
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optNormalizeUnicodeSpaces" class="rounded border-gray-300">
+              全角/特殊空白を半角空白に変換
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optRemoveZeroWidthSpaces" class="rounded border-gray-300">
+              サイズのない空白を除去
+            </label>
+          </div>
+          <div class="mb-2">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" id="optRemoveSpaceBeforePunct" class="rounded border-gray-300">
+              句読点/記号（。、？！）の直前の半角空白を除去
             </label>
           </div>
           <div class="mb-2">
@@ -430,6 +624,104 @@ limitations under the License.
       );
     }
 
+    function convertFullWidthSymbolsToHalf(text, options) {
+      let result = text;
+      if (options.semicolon) {
+        result = result.replace(/；/g, ";");
+      }
+      if (options.colon) {
+        result = result.replace(/：/g, ":");
+      }
+      if (options.singleQuote) {
+        result = result.replace(/＇/g, "'");
+      }
+      if (options.doubleQuote) {
+        result = result.replace(/＂/g, "\"");
+      }
+      if (options.backQuote) {
+        result = result.replace(/｀/g, "`");
+      }
+      if (options.parentheses) {
+        result = result.replace(/（/g, "(").replace(/）/g, ")");
+      }
+      if (options.exclamation) {
+        result = result.replace(/！/g, "!");
+      }
+      if (options.dollar) {
+        result = result.replace(/＄/g, "$");
+      }
+      if (options.question) {
+        result = result.replace(/？/g, "?");
+      }
+      if (options.ampersand) {
+        result = result.replace(/＆/g, "&");
+      }
+      if (options.at) {
+        result = result.replace(/＠/g, "@");
+      }
+      if (options.hash) {
+        result = result.replace(/＃/g, "#");
+      }
+      if (options.percent) {
+        result = result.replace(/％/g, "%");
+      }
+      if (options.plus) {
+        result = result.replace(/＋/g, "+");
+      }
+      if (options.equals) {
+        result = result.replace(/＝/g, "=");
+      }
+      if (options.slash) {
+        result = result.replace(/／/g, "/");
+      }
+      if (options.backslash) {
+        result = result.replace(/＼/g, "\\");
+      }
+      if (options.hyphen) {
+        result = result.replace(/－/g, "-");
+      }
+      if (options.underscore) {
+        result = result.replace(/＿/g, "_");
+      }
+      if (options.comma) {
+        result = result.replace(/，/g, ",");
+      }
+      if (options.period) {
+        result = result.replace(/．/g, ".");
+      }
+      if (options.caret) {
+        result = result.replace(/＾/g, "^");
+      }
+      if (options.pipe) {
+        result = result.replace(/｜/g, "|");
+      }
+      if (options.angle) {
+        result = result.replace(/＜/g, "<").replace(/＞/g, ">");
+      }
+      if (options.brace) {
+        result = result.replace(/｛/g, "{").replace(/｝/g, "}");
+      }
+      if (options.bracket) {
+        result = result.replace(/［/g, "[").replace(/］/g, "]");
+      }
+      if (options.tilde) {
+        result = result.replace(/～/g, "~");
+      }
+      return result;
+    }
+
+    function normalizeUnicodeSpacesToHalf(text) {
+      return text.replace(/[\u3000\u00A0\u1680\u180E\u2000-\u200A\u202F\u205F]/g, " ");
+    }
+
+    function removeZeroWidthSpaces(text) {
+      return text.replace(/[\u200B\u200C\u200D\u2060\uFEFF]/g, "");
+    }
+
+    function removeHalfSpaceBeforeJapanesePunctuation(text) {
+      return text.replace(/ ([\u3002\u3001！？\?！])/g, "$1");
+    }
+
     function sortLines(text, direction, preferredNewline) {
       if (direction === "none") return text;
       const lines = text.split(/\r\n|\r|\n/);
@@ -455,9 +747,40 @@ limitations under the License.
       const optIncludeKana = document.getElementById('optIncludeKana').checked;
       const optKana = document.getElementById('optKana').value;
       const optCase = document.getElementById('optCase').value;
+      const optSymbolConvert = document.getElementById('toggleSymbolConvert').checked;
+      const optSymbolSemicolon = document.getElementById('optSymbolSemicolon').checked;
+      const optSymbolColon = document.getElementById('optSymbolColon').checked;
+      const optSymbolSingleQuote = document.getElementById('optSymbolSingleQuote').checked;
+      const optSymbolDoubleQuote = document.getElementById('optSymbolDoubleQuote').checked;
+      const optSymbolBackQuote = document.getElementById('optSymbolBackQuote').checked;
+      const optSymbolParentheses = document.getElementById('optSymbolParentheses').checked;
+      const optSymbolExclamation = document.getElementById('optSymbolExclamation').checked;
+      const optSymbolDollar = document.getElementById('optSymbolDollar').checked;
+      const optSymbolQuestion = document.getElementById('optSymbolQuestion').checked;
+      const optSymbolAmpersand = document.getElementById('optSymbolAmpersand').checked;
+      const optSymbolAt = document.getElementById('optSymbolAt').checked;
+      const optSymbolHash = document.getElementById('optSymbolHash').checked;
+      const optSymbolPercent = document.getElementById('optSymbolPercent').checked;
+      const optSymbolPlus = document.getElementById('optSymbolPlus').checked;
+      const optSymbolEquals = document.getElementById('optSymbolEquals').checked;
+      const optSymbolSlash = document.getElementById('optSymbolSlash').checked;
+      const optSymbolBackslash = document.getElementById('optSymbolBackslash').checked;
+      const optSymbolHyphen = document.getElementById('optSymbolHyphen').checked;
+      const optSymbolUnderscore = document.getElementById('optSymbolUnderscore').checked;
+      const optSymbolComma = document.getElementById('optSymbolComma').checked;
+      const optSymbolPeriod = document.getElementById('optSymbolPeriod').checked;
+      const optSymbolCaret = document.getElementById('optSymbolCaret').checked;
+      const optSymbolPipe = document.getElementById('optSymbolPipe').checked;
+      const optSymbolAngle = document.getElementById('optSymbolAngle').checked;
+      const optSymbolBrace = document.getElementById('optSymbolBrace').checked;
+      const optSymbolBracket = document.getElementById('optSymbolBracket').checked;
+      const optSymbolTilde = document.getElementById('optSymbolTilde').checked;
       const optLineEnding = document.getElementById('optLineEnding').value;
       const optSortLines = document.getElementById('optSortLines').value;
       const optNewlineToSpace = document.getElementById('optNewlineToSpace').checked;
+      const optNormalizeUnicodeSpaces = document.getElementById('optNormalizeUnicodeSpaces').checked;
+      const optRemoveZeroWidthSpaces = document.getElementById('optRemoveZeroWidthSpaces').checked;
+      const optRemoveSpaceBeforePunct = document.getElementById('optRemoveSpaceBeforePunct').checked;
       const optTrim = document.getElementById('optTrim').checked;
       const optNormalizeSpaces = document.getElementById('optNormalizeSpaces').checked;
       const optRemoveEmptyLines = document.getElementById('optRemoveEmptyLines').checked;
@@ -470,6 +793,38 @@ limitations under the License.
         text = convertFullToHalf(text, optIncludeKana);
       } else if (optWidth === "toFull") {
         text = convertHalfToFull(text, optIncludeKana);
+      }
+
+      if (optSymbolConvert) {
+        text = convertFullWidthSymbolsToHalf(text, {
+          semicolon: optSymbolSemicolon,
+          colon: optSymbolColon,
+          singleQuote: optSymbolSingleQuote,
+          doubleQuote: optSymbolDoubleQuote,
+          backQuote: optSymbolBackQuote,
+          parentheses: optSymbolParentheses,
+          exclamation: optSymbolExclamation,
+          dollar: optSymbolDollar,
+          question: optSymbolQuestion,
+          ampersand: optSymbolAmpersand,
+          at: optSymbolAt,
+          hash: optSymbolHash,
+          percent: optSymbolPercent,
+          plus: optSymbolPlus,
+          equals: optSymbolEquals,
+          slash: optSymbolSlash,
+          backslash: optSymbolBackslash,
+          hyphen: optSymbolHyphen,
+          underscore: optSymbolUnderscore,
+          comma: optSymbolComma,
+          period: optSymbolPeriod,
+          caret: optSymbolCaret,
+          pipe: optSymbolPipe,
+          angle: optSymbolAngle,
+          brace: optSymbolBrace,
+          bracket: optSymbolBracket,
+          tilde: optSymbolTilde
+        });
       }
 
       if (optKana === "toKata") {
@@ -494,6 +849,18 @@ limitations under the License.
 
       if (optNewlineToSpace) {
         text = text.replace(/\r\n|\r|\n/g, " ");
+      }
+
+      if (optNormalizeUnicodeSpaces) {
+        text = normalizeUnicodeSpacesToHalf(text);
+      }
+
+      if (optRemoveZeroWidthSpaces) {
+        text = removeZeroWidthSpaces(text);
+      }
+
+      if (optRemoveSpaceBeforePunct) {
+        text = removeHalfSpaceBeforeJapanesePunctuation(text);
       }
 
       if (optTrim) {
@@ -553,6 +920,45 @@ limitations under the License.
       panel.classList.toggle('hidden', !toggle.checked);
     }
 
+    function toggleSymbolConvertPanel() {
+      const toggle = document.getElementById('toggleSymbolConvert');
+      const panel = document.getElementById('symbolConvertPanel');
+      if (!toggle || !panel) return;
+      panel.classList.toggle('hidden', !toggle.checked);
+    }
+
+    function getSymbolOptionIds() {
+      return [
+        'optSymbolSemicolon', 'optSymbolColon', 'optSymbolSingleQuote',
+        'optSymbolDoubleQuote', 'optSymbolBackQuote', 'optSymbolParentheses',
+        'optSymbolExclamation', 'optSymbolDollar', 'optSymbolQuestion',
+        'optSymbolAmpersand', 'optSymbolAt', 'optSymbolHash',
+        'optSymbolPercent', 'optSymbolPlus', 'optSymbolEquals',
+        'optSymbolSlash', 'optSymbolBackslash', 'optSymbolHyphen',
+        'optSymbolUnderscore', 'optSymbolComma', 'optSymbolPeriod',
+        'optSymbolCaret', 'optSymbolPipe', 'optSymbolAngle',
+        'optSymbolBrace', 'optSymbolBracket', 'optSymbolTilde'
+      ];
+    }
+
+    function updateSymbolAllState() {
+      const allToggle = document.getElementById('optSymbolAll');
+      if (!allToggle) return;
+      const ids = getSymbolOptionIds();
+      const elements = ids.map((id) => document.getElementById(id)).filter(Boolean);
+      if (elements.length === 0) return;
+      const allChecked = elements.every((el) => el.checked);
+      allToggle.checked = allChecked;
+      allToggle.indeterminate = !allChecked && elements.some((el) => el.checked);
+    }
+
+    function toggleAllSymbols(checked) {
+      getSymbolOptionIds().forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = checked;
+      });
+    }
+
     function toggleSpaceConvertPanel() {
       const toggle = document.getElementById('toggleSpaceConvert');
       const panel = document.getElementById('spaceConvertPanel');
@@ -563,8 +969,16 @@ limitations under the License.
     function setupAutoUpdate() {
       const ids = [
         'inputText', 'optWidth', 'optIncludeKana', 'optKana', 'optCase',
-        'optLineEnding', 'optSortLines', 'optNewlineToSpace', 'optTrim',
-        'optNormalizeSpaces', 'optRemoveEmptyLines'
+        'toggleSymbolConvert', 'optSymbolAll', 'optSymbolSemicolon', 'optSymbolColon', 'optSymbolSingleQuote',
+        'optSymbolDoubleQuote', 'optSymbolBackQuote', 'optSymbolParentheses',
+        'optSymbolExclamation', 'optSymbolDollar', 'optSymbolQuestion', 'optSymbolAmpersand',
+        'optSymbolAt', 'optSymbolHash', 'optSymbolPercent', 'optSymbolPlus',
+        'optSymbolEquals', 'optSymbolSlash', 'optSymbolBackslash', 'optSymbolHyphen',
+        'optSymbolUnderscore', 'optSymbolComma', 'optSymbolPeriod', 'optSymbolCaret',
+        'optSymbolPipe', 'optSymbolAngle', 'optSymbolBrace', 'optSymbolBracket',
+        'optSymbolTilde', 'optLineEnding', 'optSortLines', 'optNewlineToSpace',
+        'optNormalizeUnicodeSpaces', 'optRemoveZeroWidthSpaces', 'optRemoveSpaceBeforePunct',
+        'optNewlineToSpace', 'optTrim', 'optNormalizeSpaces', 'optRemoveEmptyLines'
       ];
       ids.forEach((id) => {
         const element = document.getElementById(id);
@@ -580,12 +994,34 @@ limitations under the License.
 
     setupAutoUpdate();
     toggleCharConvertPanel();
+    toggleSymbolConvertPanel();
     toggleLineConvertPanel();
     toggleSpaceConvertPanel();
     const toggleCharConvert = document.getElementById('toggleCharConvert');
     if (toggleCharConvert) {
       toggleCharConvert.addEventListener('change', toggleCharConvertPanel);
     }
+    const toggleSymbolConvert = document.getElementById('toggleSymbolConvert');
+    if (toggleSymbolConvert) {
+      toggleSymbolConvert.addEventListener('change', toggleSymbolConvertPanel);
+    }
+    const optSymbolAll = document.getElementById('optSymbolAll');
+    if (optSymbolAll) {
+      optSymbolAll.addEventListener('change', () => {
+        toggleAllSymbols(optSymbolAll.checked);
+        updateSymbolAllState();
+        updateOutput();
+      });
+    }
+    getSymbolOptionIds().forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('change', () => {
+        updateSymbolAllState();
+        updateOutput();
+      });
+    });
+    updateSymbolAllState();
     const toggleLineConvert = document.getElementById('toggleLineConvert');
     if (toggleLineConvert) {
       toggleLineConvert.addEventListener('change', toggleLineConvertPanel);
