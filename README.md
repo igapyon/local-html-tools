@@ -27,8 +27,8 @@
 - 基本はローカル動作で、インターネット接続は不要（※一部ツールはオンライン取得あり）
 - Static Web App（静的HTML/CSS/JSのみ）として構成され、サーバは不要
 - 各ツールは単一HTMLで完結して動作
-- 基本の流れ：「入力 → コマンド生成 → （必要に応じて）実行結果貼り付け → 次のステップのコマンド生成」で、画面要素は上から下へ流れに沿って並ぶ
-- ツールによっては「入力 → コマンド生成」だけで完結するものもある
+- 基本の流れ：「入力 → 生成 → （必要に応じて）実行結果貼り付け → 次のステップの生成」で、画面要素は上から下へ流れに沿って並ぶ
+- ツールによっては「入力 → 生成」だけで完結するものもある
 - **ベンダリング**: CSSフレームワークなどの外部CDN依存をできる限り排除し、必要な機能は自前で実装して完全オフライン化を実現しています
 
 ### UI設計ルール
@@ -131,7 +131,7 @@ Git補助ツールです。
 
 ## GitHub Pages
 
-GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/life/` 配下にあります。  
+GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/` 配下にあります。  
 公開URL: https://igapyon.github.io/local-html-tools/
 
 ## Third-Party Notices
@@ -142,6 +142,6 @@ GitHub Pages で公開する場合は `docs/index.html` が入口になります
 
 本リポジトリのライセンスは `LICENSE` を参照してください。
 
-## 将来の拡張
+## ツール群の構成
 
-このプロジェクトは将来的に FFmpeg 以外のツール群にも対応する予定です。現状の FFmpeg 系ツールはその一部です。
+本プロジェクトは複数カテゴリのツールで構成されており、FFmpeg、Git、リンク管理、パスワード、grep、画像、生活系などが並列に含まれます。FFmpeg 系ツールはその一部です。
