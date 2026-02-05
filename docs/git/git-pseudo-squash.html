@@ -107,6 +107,7 @@ limitations under the License.
     .font-bold { font-weight: 700; }
     .font-semibold { font-weight: 600; }
     .font-normal { font-weight: 400; }
+    .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
 
     /* Box model */
     .block { display: block; }
@@ -162,6 +163,8 @@ limitations under the License.
     /* Disabled state */
     input:disabled { background-color: #f3f4f6; }
     select:disabled { background-color: #f3f4f6; }
+    textarea:focus { outline: none; }
+    .selectable-code { cursor: text; }
 
     /* Links */
     a { text-decoration: none !important; }
@@ -193,18 +196,6 @@ limitations under the License.
     </h1>
 
     <section id="baseBlock" class="space-y-3 mb-4">
-      <label class="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" id="lockOrigin" class="rounded border-gray-300" checked onchange="toggleOriginLock()">
-        リモート: origin で作業
-        <span class="relative inline-flex items-center group">
-          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-            よくある利用方法として リモートと origin の組み合わせでの利用です。通常はこのままで OK です。
-            複数リモートを使い分ける場合だけ外して、対象のリモート名に切り替えます。
-            チェックを外すと、基点のリモート名と squash 用リモート名を個別に指定できます。
-          </span>
-        </span>
-      </label>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
         <div class="flex flex-wrap items-center gap-2">
           <label class="flex flex-wrap items-center gap-2 font-semibold">
@@ -259,6 +250,18 @@ limitations under the License.
           <input type="text" id="workBranch" placeholder="例: tiga0129a" class="border border-gray-300 rounded w-full p-2">
         </div>
       </div>
+      <label class="flex items-center gap-2 text-sm text-gray-700">
+        <input type="checkbox" id="lockOrigin" class="rounded border-gray-300" checked onchange="toggleOriginLock()">
+        リモート + origin で作業
+        <span class="relative inline-flex items-center group">
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            よくある利用方法として リモートと origin の組み合わせでの利用です。通常はこのままで OK です。
+            複数リモートを使い分ける場合だけ外して、対象のリモート名に切り替えます。
+            チェックを外すと、基点のリモート名と squash 用リモート名を個別に指定できます。
+          </span>
+        </span>
+      </label>
       <div id="baseRemoteRow" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
         <div class="flex flex-wrap items-center gap-2">
           <label class="flex flex-wrap items-center gap-2 font-semibold text-gray-700">
@@ -279,32 +282,36 @@ limitations under the License.
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <label class="flex flex-wrap items-center gap-2 font-semibold text-gray-700">
-            <span>基点のリモート名</span>
+            <span>基点リモート</span>
             <span class="relative inline-flex items-center group">
               <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
               <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-                基点をリモート参照する場合のリモート名です（例: origin）。
+                基点ブランチを参照するリモート名です（例: origin）。
+                「作業開始」と「まとめる予定の作業 (diff)」の基準になります。
+                リモート基点を選ぶ場合は、最新の origin/devel などを参照する想定です。
               </span>
             </span>
             <span>：</span>
           </label>
-          <input type="text" id="squashRemote" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
+          <input type="text" id="baseRemote" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
         </div>
       </div>
     </section>
     <div id="extraOptions" class="space-y-3 mb-4">
-      <label id="remoteNameLabel" class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-        <span>squash で利用するリモート名</span>
+      <label id="squashRemoteLabel" class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+        <span>squashリモート</span>
         <span class="relative inline-flex items-center group">
           <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
           <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-            squash で利用する fetch / push に使うリモート名です。通常は origin です。
+            squash 作業で使う fetch / push のリモート名です。通常は origin です。
+            「作業をまとめる（squash）」のコマンドに反映されます。
+            基点のリモートと同じにしておくと混乱しにくいです。
           </span>
         </span>
         <span>：</span>
       </label>
-      <div id="remoteNameRow">
-        <input type="text" id="remoteName" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
+      <div id="squashRemoteRow">
+        <input type="text" id="squashRemote" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
       </div>
     </div>
 
@@ -426,6 +433,43 @@ limitations under the License.
       <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('rebaseCmd')">📋</button>
     </div>
 
+    <div class="flex items-center justify-center py-2">
+      <svg aria-hidden="true" viewBox="0 0 420 64" class="w-full max-w-xl h-10" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
+        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
+        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
+        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
+        <path d="M40 32h26" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
+        <path d="M116 32h70" stroke="#C4B5FD" stroke-width="4" stroke-linecap="round"/>
+        <path d="M236 32h26" stroke="#A7F3D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M312 32h70" stroke="#F9A8D4" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
+      </svg>
+    </div>
+    <div class="flex items-center gap-3 py-2">
+      <svg aria-hidden="true" viewBox="0 0 64 64" class="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+        <path d="M16 22h32" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
+        <path d="M16 32h26" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+        <path d="M16 42h20" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="48" cy="22" r="4" fill="#93C5FD"/>
+        <circle cx="42" cy="32" r="4" fill="#A78BFA"/>
+        <circle cx="36" cy="42" r="4" fill="#34D399"/>
+      </svg>
+      <p class="text-base font-semibold text-gray-700">まとめる予定の作業 (diff)</p>
+      <span class="relative inline-flex items-center group">
+        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          基点ブランチと作業ブランチの差分を表示するコマンドです。squash 後に1コミットへまとめる内容の目安になります。
+        </span>
+      </span>
+    </div>
+    <div class="relative">
+      <code id="plannedDiffCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
+      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('plannedDiffCmd')">📋</button>
+    </div>
+
     <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
       コピーしました
     </div>
@@ -463,36 +507,36 @@ limitations under the License.
 
     function updateBaseScope() {
       const scope = document.getElementById("squashBaseScope");
-      const remote = document.getElementById("squashRemote");
+      const baseRemote = document.getElementById("baseRemote");
       const lockOrigin = document.getElementById("lockOrigin");
       const baseRemoteRow = document.getElementById("baseRemoteRow");
-      if (scope && remote) {
+      if (scope && baseRemote) {
         const disableRemote = scope.value !== "remote" || (lockOrigin && lockOrigin.checked);
-        remote.disabled = disableRemote;
-        remote.classList.toggle("bg-gray-100", disableRemote);
+        baseRemote.disabled = disableRemote;
+        baseRemote.classList.toggle("bg-gray-100", disableRemote);
       }
       if (scope && lockOrigin && lockOrigin.checked) {
-        remote.value = "origin";
+        baseRemote.value = "origin";
       }
-      const remoteName = document.getElementById("remoteName");
-      const remoteNameRow = document.getElementById("remoteNameRow");
-      if (remoteName && lockOrigin) {
+      const squashRemote = document.getElementById("squashRemote");
+      const squashRemoteRow = document.getElementById("squashRemoteRow");
+      if (squashRemote && lockOrigin) {
         const disableRemoteName = lockOrigin.checked;
-        remoteName.disabled = disableRemoteName;
-        remoteName.classList.toggle("bg-gray-100", disableRemoteName);
+        squashRemote.disabled = disableRemoteName;
+        squashRemote.classList.toggle("bg-gray-100", disableRemoteName);
         if (disableRemoteName) {
-          remoteName.value = "origin";
+          squashRemote.value = "origin";
         }
       }
       if (baseRemoteRow && lockOrigin) {
         baseRemoteRow.classList.toggle("hidden", lockOrigin.checked);
       }
-      if (remoteNameRow && lockOrigin) {
-        remoteNameRow.classList.toggle("hidden", lockOrigin.checked);
+      if (squashRemoteRow && lockOrigin) {
+        squashRemoteRow.classList.toggle("hidden", lockOrigin.checked);
       }
-      const remoteNameLabel = document.getElementById("remoteNameLabel");
-      if (remoteNameLabel && lockOrigin) {
-        remoteNameLabel.classList.toggle("hidden", lockOrigin.checked);
+      const squashRemoteLabel = document.getElementById("squashRemoteLabel");
+      if (squashRemoteLabel && lockOrigin) {
+        squashRemoteLabel.classList.toggle("hidden", lockOrigin.checked);
       }
     }
 
@@ -531,13 +575,13 @@ limitations under the License.
     function generateRebaseCommand(options = {}) {
       const silent = options && options.silent === true;
       const squashScope = document.getElementById("squashBaseScope")?.value || "remote";
-      const squashRemote = document.getElementById("squashRemote")?.value.trim() || "origin";
+      const baseRemote = document.getElementById("baseRemote")?.value.trim() || "origin";
       const squashBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
       let base = "";
       const workBranch = document.getElementById("workBranch").value.trim();
       const useCurrent = document.getElementById("useCurrentBranch").checked;
       const commitMessage = document.getElementById("commitMessage").value.trim();
-      const remoteName = document.getElementById("remoteName").value.trim() || "origin";
+      const squashRemote = document.getElementById("squashRemote").value.trim() || "origin";
       const includePush = document.getElementById("optPush").checked;
       const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
 
@@ -547,7 +591,7 @@ limitations under the License.
         return;
       }
       if (squashScope === "remote") {
-        base = `${squashRemote}/${squashBranch}`;
+        base = `${baseRemote}/${squashBranch}`;
       } else {
         base = squashBranch;
       }
@@ -573,7 +617,7 @@ limitations under the License.
       }
 
       const lines = [];
-      lines.push(`git fetch ${quoteIfNeeded(remoteName, shellEnv)}`);
+      lines.push(`git fetch ${quoteIfNeeded(squashRemote, shellEnv)}`);
       if (!useCurrent) {
         lines.push(`git switch ${quoteIfNeeded(workBranch, shellEnv)}`);
       }
@@ -595,9 +639,9 @@ limitations under the License.
       }
       if (includePush) {
         if (useCurrent) {
-          lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName, shellEnv)} HEAD`);
+          lines.push(`git push --force-with-lease ${quoteIfNeeded(squashRemote, shellEnv)} HEAD`);
         } else {
-          lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName, shellEnv)} ${quoteIfNeeded(workBranch, shellEnv)}`);
+          lines.push(`git push --force-with-lease ${quoteIfNeeded(squashRemote, shellEnv)} ${quoteIfNeeded(workBranch, shellEnv)}`);
         }
         lines.push(`git pull`);
         if (useCurrent) {
@@ -606,16 +650,51 @@ limitations under the License.
           lines.push(`git branch -m ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(`${workBranch}-done`, shellEnv)}`);
         }
       }
-      lines.push(`git status`);
+      lines.push(`git status -sb`);
 
       document.getElementById("rebaseCmd").textContent = lines.join("\n");
+    }
+
+    function generatePlannedDiffCommand(options = {}) {
+      const silent = options && options.silent === true;
+      const squashScope = document.getElementById("squashBaseScope")?.value || "remote";
+      const baseRemote = document.getElementById("baseRemote")?.value.trim() || "origin";
+      const squashBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
+      const workBranch = document.getElementById("workBranch").value.trim();
+      const useCurrent = document.getElementById("useCurrentBranch").checked;
+      const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
+
+      const output = document.getElementById("plannedDiffCmd");
+      if (!output) return;
+
+      if (!squashBranch) {
+        if (!silent) alert("基点ブランチを入力してください。");
+        output.textContent = "";
+        return;
+      }
+      const base = squashScope === "remote" ? `${baseRemote}/${squashBranch}` : squashBranch;
+      if (!useCurrent && !workBranch) {
+        if (!silent) alert("作業ブランチ名を入力してください。");
+        output.textContent = "";
+        return;
+      }
+      const target = useCurrent ? "HEAD" : workBranch;
+      const lines = [];
+      if (squashScope === "remote") {
+        lines.push(`git fetch ${quoteIfNeeded(baseRemote, shellEnv)}`);
+      }
+      lines.push(`git diff ${quoteIfNeeded(base, shellEnv)}..${quoteIfNeeded(target, shellEnv)}`);
+      lines.push(`echo ##基点ブランチのコミットID`);
+      lines.push(`git rev-parse ${quoteIfNeeded(base, shellEnv)}`);
+      lines.push(`git status -sb`);
+      output.textContent = lines.join("\n");
     }
 
     function generateCreateBranchCommand(options = {}) {
       const silent = options && options.silent === true;
       const workBranch = document.getElementById("workBranch").value.trim();
       const scope = document.getElementById("squashBaseScope").value;
-      const remote = document.getElementById("squashRemote").value.trim() || "origin";
+      const remote = document.getElementById("baseRemote").value.trim() || "origin";
       const baseBranch = document.getElementById("squashBaseBranch").value.trim();
       const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
 
@@ -633,14 +712,16 @@ limitations under the License.
       if (scope === "remote") {
         lines.push(`git fetch ${quoteIfNeeded(remote, shellEnv)}`);
         lines.push(`git switch -c ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(remote, shellEnv)}/${quoteIfNeeded(baseBranch, shellEnv)}`);
+        lines.push(`git status -sb`);
       } else {
         lines.push(`git switch -c ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(baseBranch, shellEnv)}`);
+        lines.push(`git status -sb`);
       }
       document.getElementById("createBranchCmd").textContent = lines.join("\n");
     }
 
     function setupCreateBranchAutoUpdate() {
-      const ids = ["squashBaseBranch", "workBranch", "squashBaseScope", "squashRemote", "remoteName", "shellEnvPowerShell"];
+      const ids = ["squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "shellEnvPowerShell"];
       const handler = () => generateCreateBranchCommand({ silent: true });
       ids.forEach((id) => {
         const element = document.getElementById(id);
@@ -651,9 +732,12 @@ limitations under the License.
     }
 
     function setupRebaseAutoUpdate() {
-      const inputIds = ["squashBaseBranch", "workBranch", "squashBaseScope", "squashRemote", "remoteName", "commitMessage"];
+      const inputIds = ["squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "commitMessage"];
       const changeIds = ["useCurrentBranch", "optPush", "shellEnvPowerShell"];
-      const handler = () => generateRebaseCommand({ silent: true });
+      const handler = () => {
+        generateRebaseCommand({ silent: true });
+        generatePlannedDiffCommand({ silent: true });
+      };
       inputIds.forEach((id) => {
         const element = document.getElementById(id);
         if (!element) return;
@@ -668,7 +752,11 @@ limitations under the License.
     }
 
     function copyToClipboard(id) {
-      const text = document.getElementById(id).textContent;
+      const element = document.getElementById(id);
+      if (!element) return;
+      const text = element.tagName === "TEXTAREA" || element.tagName === "INPUT"
+        ? element.value
+        : element.textContent;
       if (!text) return;
       const temp = document.createElement("textarea");
       temp.value = text;
@@ -696,6 +784,18 @@ limitations under the License.
       panel.classList.toggle("hidden");
     }
 
+    function setupCodeSelectAll() {
+      document.querySelectorAll("code.selectable-code").forEach((el) => {
+        el.addEventListener("click", () => {
+          const range = document.createRange();
+          range.selectNodeContents(el);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+        });
+      });
+    }
+
     updateBaseScope();
     toggleCurrentBranch();
     setDefaultWorkBranch();
@@ -703,6 +803,8 @@ limitations under the License.
     generateCreateBranchCommand({ silent: true });
     setupRebaseAutoUpdate();
     generateRebaseCommand({ silent: true });
+    generatePlannedDiffCommand({ silent: true });
+    setupCodeSelectAll();
   </script>
 </body>
 </html>
