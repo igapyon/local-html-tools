@@ -62,6 +62,7 @@ limitations under the License.
     .w-5 { width: 1.25rem; }
     .w-14 { width: 3.5rem; }
     .w-80 { width: 20rem; }
+    .tooltip-wide { width: 24rem; max-width: 90vw; }
     .w-full { width: 100%; }
     .h-5 { height: 1.25rem; }
     .h-10 { height: 2.5rem; }
@@ -374,6 +375,7 @@ limitations under the License.
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
             <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
               まとめ後の1コミットの説明文です。複数行入力が可能で、内容は一時ファイルに書き込んで git commit -F で渡されます。
+              macOS / Linux は mktemp + ヒアドキュメント、Windows は PowerShell の New-TemporaryFile で対応します。
               ヒアドキュメント経由で渡すため、シェルのクォート解析の影響を受けにくくしています。
               あとで読んで何をおこなったのかわかる内容にしましょう。
             </span>
@@ -385,10 +387,10 @@ limitations under the License.
     </section>
 
     <div class="space-y-2 mb-4">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <label class="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" id="optPush" class="rounded border-gray-300">
-          push --force-with-lease を追加
+          push を追加
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
             <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
@@ -397,8 +399,18 @@ limitations under the License.
           </span>
         </label>
         <label class="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" id="shellEnvPowerShell" class="rounded border-gray-300">
+          PowerShell
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 tooltip-wide -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              Windows PowerShell 用のコマンドを出力します。オフの場合は macOS / Linux の bash / zsh を想定します。
+            </span>
+          </span>
+        </label>
+        <label class="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" id="useCurrentBranch" class="rounded border-gray-300" checked onchange="toggleCurrentBranch()">
-          現在のブランチを使う（switch を省略）
+          現在ブランチで作業
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
             <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
@@ -420,13 +432,17 @@ limitations under the License.
   </div>
 
   <script>
-    function quoteIfNeeded(value) {
+    function quoteIfNeeded(value, shell = "posix") {
       if (!value) return value;
-      if (/[^\w@%+=:,./-]/.test(value)) {
-        const escaped = value.replace(/'/g, "'\\''");
+      if (!/[^\w@%+=:,./-]/.test(value)) {
+        return value;
+      }
+      if (shell === "powershell") {
+        const escaped = value.replace(/'/g, "''");
         return `'${escaped}'`;
       }
-      return value;
+      const escaped = value.replace(/'/g, "'\\''");
+      return `'${escaped}'`;
     }
 
     function convertTimeToThreeChars(hours, minutes) {
@@ -523,6 +539,7 @@ limitations under the License.
       const commitMessage = document.getElementById("commitMessage").value.trim();
       const remoteName = document.getElementById("remoteName").value.trim() || "origin";
       const includePush = document.getElementById("optPush").checked;
+      const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
 
       if (!squashBranch) {
         if (!silent) alert("基点ブランチを入力してください。");
@@ -556,28 +573,37 @@ limitations under the License.
       }
 
       const lines = [];
-      lines.push(`git fetch ${quoteIfNeeded(remoteName)}`);
+      lines.push(`git fetch ${quoteIfNeeded(remoteName, shellEnv)}`);
       if (!useCurrent) {
-        lines.push(`git switch ${quoteIfNeeded(workBranch)}`);
+        lines.push(`git switch ${quoteIfNeeded(workBranch, shellEnv)}`);
       }
-      lines.push(`git reset --soft ${quoteIfNeeded(base)}`);
-      lines.push(`COMMIT_MSG_FILE=$(mktemp)`);
-      lines.push(`cat > "$COMMIT_MSG_FILE" <<'EOF'`);
-      lines.push(commitMessage);
-      lines.push("EOF");
-      lines.push(`git commit -F "$COMMIT_MSG_FILE"`);
-      lines.push(`rm "$COMMIT_MSG_FILE"`);
+      lines.push(`git reset --soft ${quoteIfNeeded(base, shellEnv)}`);
+      if (shellEnv === "powershell") {
+        lines.push(`$CommitMsgFile = New-TemporaryFile`);
+        lines.push(`@'`);
+        lines.push(commitMessage);
+        lines.push(`'@ | Set-Content -Path $CommitMsgFile -Encoding UTF8`);
+        lines.push(`git commit -F $CommitMsgFile`);
+        lines.push(`Remove-Item $CommitMsgFile`);
+      } else {
+        lines.push(`COMMIT_MSG_FILE=$(mktemp)`);
+        lines.push(`cat > "$COMMIT_MSG_FILE" <<'EOF'`);
+        lines.push(commitMessage);
+        lines.push("EOF");
+        lines.push(`git commit -F "$COMMIT_MSG_FILE"`);
+        lines.push(`rm "$COMMIT_MSG_FILE"`);
+      }
       if (includePush) {
         if (useCurrent) {
-          lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName)} HEAD`);
+          lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName, shellEnv)} HEAD`);
         } else {
-          lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName)} ${quoteIfNeeded(workBranch)}`);
+          lines.push(`git push --force-with-lease ${quoteIfNeeded(remoteName, shellEnv)} ${quoteIfNeeded(workBranch, shellEnv)}`);
         }
         lines.push(`git pull`);
         if (useCurrent) {
           lines.push(`git branch -m "$(git branch --show-current)" "$(git branch --show-current)-done"`);
         } else {
-          lines.push(`git branch -m ${quoteIfNeeded(workBranch)} ${quoteIfNeeded(`${workBranch}-done`)}`);
+          lines.push(`git branch -m ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(`${workBranch}-done`, shellEnv)}`);
         }
       }
       lines.push(`git status`);
@@ -591,6 +617,7 @@ limitations under the License.
       const scope = document.getElementById("squashBaseScope").value;
       const remote = document.getElementById("squashRemote").value.trim() || "origin";
       const baseBranch = document.getElementById("squashBaseBranch").value.trim();
+      const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
 
       if (!workBranch) {
         if (!silent) alert("作業ブランチ名を入力してください。");
@@ -604,16 +631,16 @@ limitations under the License.
       }
       const lines = [];
       if (scope === "remote") {
-        lines.push(`git fetch ${quoteIfNeeded(remote)}`);
-        lines.push(`git switch -c ${quoteIfNeeded(workBranch)} ${quoteIfNeeded(remote)}/${quoteIfNeeded(baseBranch)}`);
+        lines.push(`git fetch ${quoteIfNeeded(remote, shellEnv)}`);
+        lines.push(`git switch -c ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(remote, shellEnv)}/${quoteIfNeeded(baseBranch, shellEnv)}`);
       } else {
-        lines.push(`git switch -c ${quoteIfNeeded(workBranch)} ${quoteIfNeeded(baseBranch)}`);
+        lines.push(`git switch -c ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(baseBranch, shellEnv)}`);
       }
       document.getElementById("createBranchCmd").textContent = lines.join("\n");
     }
 
     function setupCreateBranchAutoUpdate() {
-      const ids = ["squashBaseBranch", "workBranch", "squashBaseScope", "squashRemote", "remoteName"];
+      const ids = ["squashBaseBranch", "workBranch", "squashBaseScope", "squashRemote", "remoteName", "shellEnvPowerShell"];
       const handler = () => generateCreateBranchCommand({ silent: true });
       ids.forEach((id) => {
         const element = document.getElementById(id);
@@ -625,7 +652,7 @@ limitations under the License.
 
     function setupRebaseAutoUpdate() {
       const inputIds = ["squashBaseBranch", "workBranch", "squashBaseScope", "squashRemote", "remoteName", "commitMessage"];
-      const changeIds = ["useCurrentBranch", "optPush"];
+      const changeIds = ["useCurrentBranch", "optPush", "shellEnvPowerShell"];
       const handler = () => generateRebaseCommand({ silent: true });
       inputIds.forEach((id) => {
         const element = document.getElementById(id);
