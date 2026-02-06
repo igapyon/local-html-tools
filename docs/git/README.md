@@ -47,3 +47,4 @@
 - モバイル幅では `@media (max-width: 640px)` で wrap させて詰まりを防ぐ
 - `md-field-stack`（縦並び）の場合は `.md-field-stack .md-input` を `flex: 0 0 auto` にして縦に伸びるのを防ぐ
 - 入力右端にアクションボタンを半分埋める配置は `md-input-wrap` + `md-input-action` を使う
+- ラベルと入力を同じ行に固定したいときは `md-form-row md-form-row--nowrap` を使う
