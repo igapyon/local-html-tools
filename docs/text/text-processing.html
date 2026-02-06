@@ -14,483 +14,611 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>テキスト加工</title>
-  <style>
-    /*
-      ベンダリング（Vendoring）: このHTMLファイルは、かつてTailwind CSSをCDNから動的に読み込んでいましたが、
-      完全なオフライン化のため、Tailwind CSS の CSS クラス定義を自前で実装しました。
-      Tailwind CSS のライセンス情報は THIRD_PARTY_NOTICES.md を参照してください。
-      外部CDNに依存せず、単一のHTMLファイルで完結して動作する設計が、このプロジェクトのコア機能です。
-    */
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>テキスト加工</title>
+<style>
+    :root {
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-outline: #c8c5d0;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1rem; line-height: 1.5; }
-    button { border: none; cursor: pointer; }
+    body { font-family: "Roboto", "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif; font-size: 1rem; line-height: 1.5; }
+    button { border: none; background: transparent; cursor: pointer; font: inherit; }
     textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    a { text-decoration: none; color: inherit; }
 
-    body { background-color: #f9fafb; color: #1f2937; }
-    .bg-white { background-color: #ffffff; }
-    .bg-gray-50 { background-color: #f9fafb; }
-    .bg-gray-100 { background-color: #f3f4f6; }
-    .bg-gray-200 { background-color: #e5e7eb; }
-    .bg-gray-800 { background-color: #1f2937; }
-    .bg-gray-900 { background-color: #111827; }
-    .bg-green-600 { background-color: #16a34a; }
-    .text-white { color: #ffffff; }
-    .text-gray-600 { color: #4b5563; }
-    .text-gray-700 { color: #374151; }
-    .text-gray-800 { color: #1f2937; }
-    .border-gray-200 { border-color: #e5e7eb; }
-    .border-gray-300 { border-color: #d1d5db; }
+    .md-page { background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; }
+    .md-shell { max-width: 48rem; margin: 0 auto; }
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      border: 1px solid #ece7f3;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      padding: 24px;
+      position: relative;
+    }
 
-    .flex { display: flex; }
-    .items-center { align-items: center; }
-    .justify-between { justify-content: space-between; }
-    .gap-2 { gap: 0.5rem; }
-    .gap-3 { gap: 0.75rem; }
-    .w-5 { width: 1.25rem; }
-    .w-80 { width: 20rem; }
-    .w-full { width: 100%; }
-    .h-5 { height: 1.25rem; }
-    .max-w-2xl { max-width: 42rem; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
-    .p-2 { padding: 0.5rem; }
-    .p-3 { padding: 0.75rem; }
-    .p-6 { padding: 1.5rem; }
-    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-    .px-4 { padding-left: 1rem; padding-right: 1rem; }
-    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .pl-4 { padding-left: 1rem; }
-    .mt-2 { margin-top: 0.5rem; }
+    .md-menu-button { position: absolute; top: 16px; right: 16px; }
+    .md-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .md-icon-btn:hover { background: #e6e1ee; }
+    .md-icon-20 { width: 20px; height: 20px; }
+
+    .md-menu-panel {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 10;
+    }
+    .md-menu-link { display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface); }
+    .md-menu-link:hover { background: #f2edf8; }
+
+    .md-headline {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .md-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: #3f3b46;
+      margin-bottom: 0.5rem;
+    }
+
+    .md-textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    .md-input-block { margin-bottom: 1rem; }
+
+    .md-section { margin-bottom: 1.5rem; }
+    .md-section-title { font-weight: 600; color: #3f3b46; margin-bottom: 0.5rem; }
+    .md-section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .md-text-button {
+      background: rgba(98, 0, 238, 0.12);
+      color: var(--md-sys-color-primary);
+      border-radius: 999px;
+      padding: 0.25rem 0.85rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: background 150ms ease, color 150ms ease;
+    }
+    .md-text-button:hover {
+      background: rgba(98, 0, 238, 0.2);
+    }
+    .md-text-button:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.3);
+    }
+
+    .md-option-card {
+      border: 1px solid #e5e0ec;
+      border-radius: 14px;
+      background: var(--md-sys-color-surface-variant);
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .md-check-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: #3f3b46;
+    }
+    .md-checkbox { accent-color: var(--md-sys-color-primary); }
+    .md-toggle {
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .md-toggle-text { flex: 1; }
+    .md-toggle-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .md-toggle-track {
+      width: 44px;
+      height: 24px;
+      background: #f0ebf7;
+      border-radius: 9999px;
+      position: relative;
+      box-shadow: inset 0 0 0 1px #cfc7dc;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      flex-shrink: 0;
+    }
+    .md-toggle-track::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: #ffffff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 150ms ease, background 150ms ease;
+    }
+    .md-toggle-input:checked + .md-toggle-track {
+      background: rgba(98, 0, 238, 0.32);
+      box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.6);
+    }
+    .md-toggle-input:checked + .md-toggle-track::after {
+      transform: translateX(20px);
+      background: var(--md-sys-color-primary);
+    }
+
+    .md-subpanel {
+      margin-top: 0.5rem;
+      padding-left: 1rem;
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .md-accordion {
+      border: 1px solid #e5e0ec;
+      border-radius: 14px;
+      background: var(--md-sys-color-surface);
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .md-accordion summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: #3f3b46;
+      padding: 0.35rem 0;
+    }
+    .md-accordion summary::-webkit-details-marker { display: none; }
+    .md-accordion summary::after {
+      content: "▾";
+      font-size: 0.9rem;
+      color: #6a6675;
+      transition: transform 150ms ease;
+    }
+    .md-accordion[open] summary::after { transform: rotate(180deg); }
+    .md-sub-label { font-size: 0.85rem; color: #3f3b46; }
+    .md-select {
+      border-radius: 10px;
+      border: 1px solid var(--md-sys-color-outline);
+      padding: 0.35rem 0.5rem;
+      background: var(--md-sys-color-surface);
+      font-size: 0.85rem;
+    }
+
+    .md-output-wrap { position: relative; }
+    .md-output { background: var(--md-sys-color-surface-variant); }
+    .md-copy-button { position: absolute; top: 0.5rem; right: 0.5rem; }
+
+    .md-muted { color: #6a6675; font-size: 0.85rem; margin-top: 0.5rem; }
+
+    .md-snackbar {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2b2831;
+      color: #f7f4fb;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+    .md-snackbar--visible { opacity: 1; pointer-events: auto; }
+
+    .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
+    .md-help-chip {
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: #f0edf5;
+      color: #4a4458;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+    }
+    .md-tooltip-group:hover .md-tooltip-content { opacity: 1; }
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      min-width: 12rem;
+      width: min(24rem, 90vw);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .hidden { display: none; }
+
     .mb-2 { margin-bottom: 0.5rem; }
     .mb-4 { margin-bottom: 1rem; }
     .mb-6 { margin-bottom: 1.5rem; }
-
-    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-    .font-bold { font-weight: 700; }
+    .mt-2 { margin-top: 0.5rem; }
+    .pl-4 { padding-left: 1rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-xs { font-size: 0.75rem; }
     .font-semibold { font-weight: 600; }
-
-    .block { display: block; }
-    .hidden { display: none; }
-    .rounded { border-radius: 0.375rem; }
-    .rounded-lg { border-radius: 0.5rem; }
-    .rounded-full { border-radius: 9999px; }
-    .border { border-width: 1px; border-style: solid; }
-    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-
-    .relative { position: relative; }
-    .absolute { position: absolute; }
-    .top-2 { top: 0.5rem; }
-    .top-4 { top: 1rem; }
-    .top-12 { top: 3rem; }
-    .top-full { top: 100%; }
-    .right-2 { right: 0.5rem; }
-    .right-4 { right: 1rem; }
-    .bottom-5 { bottom: 1.25rem; }
-    .left-1\/2 { left: 50%; }
-    .-translate-x-1\/2 { transform: translateX(-50%); }
-
-    .opacity-0 { opacity: 0; }
-    .opacity-100 { opacity: 1; }
-    .pointer-events-none { pointer-events: none; }
-
-    .transition { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-    .transition-opacity { transition-property: opacity; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-    .duration-300 { transition-duration: 300ms; }
-
-    .hover\:bg-gray-300:hover { background-color: #d1d5db; }
-    .hover\:bg-green-700:hover { background-color: #15803d; }
-    .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
-    button.hover\:bg-gray-300:hover { background-color: #d1d5db; }
-
-    a { text-decoration: none !important; }
-
-    .inline-flex { display: inline-flex; }
-    .justify-center { justify-content: center; }
-    .text-xs { font-size: 0.75rem; line-height: 1rem; }
-    .leading-5 { line-height: 1.25rem; }
-    .font-normal { font-weight: 400; }
-    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-    .z-50 { z-index: 50; }
-    .group {}
-    .group:hover .group-hover\:opacity-100 { opacity: 1; }
+    .font-bold { font-weight: 700; }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 p-6">
-  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
-    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
-      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M4 6h16"/>
-        <path d="M4 12h16"/>
-        <path d="M4 18h16"/>
-      </svg>
-    </button>
-    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
-      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
-    </div>
-
-    <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
-      <span aria-hidden="true">🧩</span>
-      <span>テキスト加工</span>
-      <span class="relative inline-flex items-center group">
-        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+<body class="md-page">
+<div class="md-shell md-card">
+<button aria-label="メニュー" class="md-icon-btn md-menu-button" onclick="toggleMenu()" type="button">
+<svg aria-hidden="true" class="md-icon-20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M4 6h16"></path>
+<path d="M4 12h16"></path>
+<path d="M4 18h16"></path>
+</svg>
+</button>
+<div class="md-menu-panel hidden" id="menuPanel">
+<a class="md-menu-link" href="../index.html">トップへ戻る</a>
+</div>
+<h1 class="md-headline">
+<span aria-hidden="true">🧩</span>
+<span>テキスト加工</span>
+<span class="md-tooltip-group">
+<span class="md-help-chip">?</span>
+<span class="md-tooltip-content md-tooltip">
           テキストを即時に変換・整形するためのツールです。入力内容に対して選択した変換オプションが順番に適用され、結果が出力欄に反映されます。文字の変換・行の変換・空白の変換を組み合わせて使えます。
         </span>
-      </span>
-    </h1>
-
-    <label class="block mb-2 font-semibold">
+</span>
+</h1>
+<label class="md-label">
       入力テキスト:
-      <span class="relative inline-flex items-center group">
-        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+      <span class="md-tooltip-group">
+<span class="md-help-chip">?</span>
+<span class="md-tooltip-content md-tooltip">
           ここに入力したテキストが変換対象になります。
         </span>
-      </span>
-    </label>
-    <textarea id="inputText" class="border border-gray-300 rounded w-full p-3 mb-4" rows="8" placeholder="加工したいテキストを入力してください"></textarea>
-
-    <div class="mb-6">
-      <div class="mb-2 font-semibold">
-        変換オプション:
-        <span class="relative inline-flex items-center group">
-          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+</span>
+</label>
+<textarea class="md-textarea md-input-block" id="inputText" placeholder="加工したいテキストを入力してください" rows="8"></textarea>
+<div class="md-section">
+<div class="md-section-title md-section-title-row">
+<div>
+          変換オプション:
+          <span class="md-tooltip-group">
+<span class="md-help-chip">?</span>
+<span class="md-tooltip-content md-tooltip">
             変換オプション: チェックや選択した内容が出力に反映されます。複数の変換を同時に適用できます。
             変換の順序: 行末 → 全角/半角 → 記号 → ひら/カタ → 大文字/小文字 → 行の並び → 空行除去 → 改行→空白 → トリム → 空白正規化
           </span>
-        </span>
-      </div>
-      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" id="toggleCharConvert" class="rounded border-gray-300">
-          文字の変換
-        </label>
-        <div id="charConvertPanel" class="mt-2 pl-4">
-        <div class="mb-2">
-          <label class="block mb-2 text-sm">
-            大文字/小文字（英字）:
-            <select id="optCase" class="border border-gray-300 rounded px-2 py-1">
-              <option value="none">変換しない</option>
-              <option value="upper">大文字に変換</option>
-              <option value="lower">小文字に変換</option>
-            </select>
-          </label>
-        </div>
-        <div class="mb-2">
-          <label class="block mb-2 text-sm">
-            全角/半角:
-            <select id="optWidth" class="border border-gray-300 rounded px-2 py-1">
-              <option value="none">変換しない</option>
-              <option value="toHalf">半角に変換</option>
-              <option value="toFull">全角に変換</option>
-            </select>
-          </label>
-        </div>
-        <div class="mb-2">
-          <label class="block mb-2 text-sm">
-            ひらがな/カタカナ:
-            <select id="optKana" class="border border-gray-300 rounded px-2 py-1">
-              <option value="none">変換しない</option>
-              <option value="toKata">ひらがな → カタカナ</option>
-              <option value="toHira">カタカナ → ひらがな</option>
-            </select>
-          </label>
-        </div>
-        <div class="mb-2">
-          <label class="flex items-center gap-2 text-sm">
-            <input type="checkbox" id="optIncludeKana" class="rounded border-gray-300">
-            仮名を含める
-          </label>
-        </div>
-        </div>
-      </div>
-      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" id="toggleSymbolConvert" class="rounded border-gray-300">
-          記号を変換
-        </label>
-        <div id="symbolConvertPanel" class="mt-2 pl-4">
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolAll" class="rounded border-gray-300">
-              すべて切り替え
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolSemicolon" class="rounded border-gray-300">
-              セミコロン（； → ;）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolColon" class="rounded border-gray-300">
-              コロン（： → :）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolSingleQuote" class="rounded border-gray-300">
-              クオート（＇ → '）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolDoubleQuote" class="rounded border-gray-300">
-              ダブルクオート（＂ → "）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolBackQuote" class="rounded border-gray-300">
-              バッククオート（｀ → `）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolParentheses" class="rounded border-gray-300">
-              丸括弧（（ ） → ( )）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolExclamation" class="rounded border-gray-300">
-              感嘆符（！ → !）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolDollar" class="rounded border-gray-300">
-              ドル（＄ → $）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolQuestion" class="rounded border-gray-300">
-              クエスチョン（？ → ?）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolAmpersand" class="rounded border-gray-300">
-              アンパサンド（＆ → &）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolAt" class="rounded border-gray-300">
-              アットマーク（＠ → @）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolHash" class="rounded border-gray-300">
-              シャープ（＃ → #）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolPercent" class="rounded border-gray-300">
-              パーセント（％ → %）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolPlus" class="rounded border-gray-300">
-              プラス（＋ → +）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolEquals" class="rounded border-gray-300">
-              イコール（＝ → =）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolSlash" class="rounded border-gray-300">
-              スラッシュ（／ → /）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolBackslash" class="rounded border-gray-300">
-              バックスラッシュ（＼ → \）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolHyphen" class="rounded border-gray-300">
-              ハイフン（－ → -）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolUnderscore" class="rounded border-gray-300">
-              アンダースコア（＿ → _）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolComma" class="rounded border-gray-300">
-              カンマ（， → ,）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolPeriod" class="rounded border-gray-300">
-              ピリオド（． → .）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolCaret" class="rounded border-gray-300">
-              キャレット（＾ → ^）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolPipe" class="rounded border-gray-300">
-              パイプ（｜ → |）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolAngle" class="rounded border-gray-300">
-              不等号（＜ ＞ → < >）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolBrace" class="rounded border-gray-300">
-              波括弧（｛ ｝ → { }）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolBracket" class="rounded border-gray-300">
-              角括弧（［ ］ → [ ]）
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optSymbolTilde" class="rounded border-gray-300">
-              チルダ（～ → ~）
-            </label>
-          </div>
-        </div>
-      </div>
-      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" id="toggleLineConvert" class="rounded border-gray-300">
-          行の変換
-        </label>
-        <div id="lineConvertPanel" class="mt-2 pl-4">
-          <div class="mb-2">
-            <label class="block mb-2 text-sm">
-              行末:
-              <select id="optLineEnding" class="border border-gray-300 rounded px-2 py-1">
-                <option value="keep">維持</option>
-                <option value="lf">LF に統一</option>
-                <option value="crlf">CRLF に統一</option>
-              </select>
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="block mb-2 text-sm">
-              行の並び:
-              <select id="optSortLines" class="border border-gray-300 rounded px-2 py-1">
-                <option value="none">並び替えしない</option>
-                <option value="asc">昇順</option>
-                <option value="desc">降順</option>
-              </select>
-            </label>
-          </div>
-        </div>
-      </div>
-      <div class="mb-2 border border-gray-200 rounded p-3 bg-gray-50">
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" id="toggleSpaceConvert" class="rounded border-gray-300">
-          空白の変換
-        </label>
-        <div id="spaceConvertPanel" class="mt-2 pl-4">
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optNewlineToSpace" class="rounded border-gray-300">
-              改行を空白に変換
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optNormalizeUnicodeSpaces" class="rounded border-gray-300">
-              全角/特殊空白を半角空白に変換
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optRemoveZeroWidthSpaces" class="rounded border-gray-300">
-              サイズのない空白を除去
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optRemoveSpaceBeforePunct" class="rounded border-gray-300">
-              句読点/記号（。、？！）の直前の半角空白を除去
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optTrim" class="rounded border-gray-300">
-              前後の空白をトリム
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optNormalizeSpaces" class="rounded border-gray-300">
-              連続する空白・タブを1つにする
-            </label>
-          </div>
-          <div class="mb-2">
-            <label class="flex items-center gap-2 text-sm">
-              <input type="checkbox" id="optRemoveEmptyLines" class="rounded border-gray-300">
-              空行を除去
-            </label>
-          </div>
-        </div>
-      </div>
-      <div class="text-sm text-gray-600"></div>
-    </div>
-
-    <label class="block mb-2 font-semibold">
+</span>
+</div>
+<button class="md-text-button" onclick="applyCommonPreset()" type="button">よくある</button>
+</div>
+<details class="md-accordion">
+<summary>文字の変換</summary>
+<div class="md-subpanel" id="charConvertPanel">
+<label class="md-sub-label">全角/半角:
+          <select class="md-select" id="optWidth">
+<option value="none">変換しない</option>
+<option value="toHalf">半角に変換</option>
+<option value="toFull">全角に変換</option>
+</select>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">仮名を含める</span>
+<input class="md-toggle-input" id="optIncludeKana" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-sub-label">ひらがな/カタカナ:
+          <select class="md-select" id="optKana">
+<option value="none">変換しない</option>
+<option value="toKata">ひらがな → カタカナ</option>
+<option value="toHira">カタカナ → ひらがな</option>
+</select>
+</label>
+<label class="md-sub-label">大文字/小文字（英字）:
+          <select class="md-select" id="optCase">
+<option value="none">変換しない</option>
+<option value="upper">大文字に変換</option>
+<option value="lower">小文字に変換</option>
+</select>
+</label>
+</div>
+</details>
+<details class="md-accordion">
+<summary>記号を変換</summary>
+<div class="md-subpanel" id="symbolConvertPanel">
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">すべて切り替え</span>
+<input class="md-toggle-input" id="optSymbolAll" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">セミコロン（； → ;）</span>
+<input class="md-toggle-input" id="optSymbolSemicolon" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">コロン（： → :）</span>
+<input class="md-toggle-input" id="optSymbolColon" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">クオート（＇ → '）</span>
+<input class="md-toggle-input" id="optSymbolSingleQuote" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">ダブルクオート（＂ → "）</span>
+<input class="md-toggle-input" id="optSymbolDoubleQuote" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">バッククオート（｀ → `）</span>
+<input class="md-toggle-input" id="optSymbolBackQuote" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">丸括弧（（ ） → ( )）</span>
+<input class="md-toggle-input" id="optSymbolParentheses" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">感嘆符（！ → !）</span>
+<input class="md-toggle-input" id="optSymbolExclamation" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">ドル（＄ → $）</span>
+<input class="md-toggle-input" id="optSymbolDollar" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">クエスチョン（？ → ?）</span>
+<input class="md-toggle-input" id="optSymbolQuestion" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">アンパサンド（＆ → &amp;）</span>
+<input class="md-toggle-input" id="optSymbolAmpersand" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">アットマーク（＠ → @）</span>
+<input class="md-toggle-input" id="optSymbolAt" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">シャープ（＃ → #）</span>
+<input class="md-toggle-input" id="optSymbolHash" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">パーセント（％ → %）</span>
+<input class="md-toggle-input" id="optSymbolPercent" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">プラス（＋ → +）</span>
+<input class="md-toggle-input" id="optSymbolPlus" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">イコール（＝ → =）</span>
+<input class="md-toggle-input" id="optSymbolEquals" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">スラッシュ（／ → /）</span>
+<input class="md-toggle-input" id="optSymbolSlash" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">バックスラッシュ（＼ → \\）</span>
+<input class="md-toggle-input" id="optSymbolBackslash" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">ハイフン（－ → -）</span>
+<input class="md-toggle-input" id="optSymbolHyphen" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">アンダースコア（＿ → _）</span>
+<input class="md-toggle-input" id="optSymbolUnderscore" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">カンマ（， → ,）</span>
+<input class="md-toggle-input" id="optSymbolComma" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">ピリオド（． → .）</span>
+<input class="md-toggle-input" id="optSymbolPeriod" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">キャレット（＾ → ^）</span>
+<input class="md-toggle-input" id="optSymbolCaret" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">パイプ（｜ → |）</span>
+<input class="md-toggle-input" id="optSymbolPipe" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">不等号（＜ ＞ → &lt; &gt;）</span>
+<input class="md-toggle-input" id="optSymbolAngle" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">波括弧（｛ ｝ → { }）</span>
+<input class="md-toggle-input" id="optSymbolBrace" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">角括弧（［ ］ → [ ]）</span>
+<input class="md-toggle-input" id="optSymbolBracket" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">チルダ（～ → ~）</span>
+<input class="md-toggle-input" id="optSymbolTilde" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+</div>
+</details>
+<details class="md-accordion">
+<summary>行の変換</summary>
+<div class="md-subpanel" id="lineConvertPanel">
+<label class="md-sub-label">行末:
+          <select class="md-select" id="optLineEnding">
+<option value="keep">維持</option>
+<option value="lf">LF に統一</option>
+<option value="crlf">CRLF に統一</option>
+</select>
+</label>
+<label class="md-sub-label">行の並び:
+          <select class="md-select" id="optSortLines">
+<option value="none">並び替えしない</option>
+<option value="asc">昇順</option>
+<option value="desc">降順</option>
+</select>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">空行を除去</span>
+<input class="md-toggle-input" id="optRemoveEmptyLines" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">連続する空行を1行に</span>
+<input class="md-toggle-input" id="optCollapseEmptyLines" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+</div>
+</details>
+<details class="md-accordion">
+<summary>空白の変換</summary>
+<div class="md-subpanel" id="spaceConvertPanel">
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">全角/特殊空白を半角空白に変換</span>
+<input class="md-toggle-input" id="optNormalizeUnicodeSpaces" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">サイズのない空白を除去</span>
+<input class="md-toggle-input" id="optRemoveZeroWidthSpaces" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">句読点/記号（。、？！）の直前の半角空白を除去</span>
+<input class="md-toggle-input" id="optRemoveSpaceBeforePunct" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">前後の空白をトリム</span>
+<input class="md-toggle-input" id="optTrim" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">連続する空白・タブを1つにする</span>
+<input class="md-toggle-input" id="optNormalizeSpaces" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+<label class="md-check-row md-toggle">
+<span class="md-toggle-text">改行を空白に変換</span>
+<input class="md-toggle-input" id="optNewlineToSpace" type="checkbox">
+<span class="md-toggle-track"></span>
+</label>
+</div>
+</details>
+<div class="md-muted"></div>
+</div>
+<label class="md-label">
       出力テキスト:
-      <span class="relative inline-flex items-center group">
-        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+      <span class="md-tooltip-group">
+<span class="md-help-chip">?</span>
+<span class="md-tooltip-content md-tooltip">
           入力テキストに変換オプションを適用した結果が表示されます。コピーアイコンで内容をクリップボードへコピーできます。
         </span>
-      </span>
-    </label>
-    <div class="relative">
-      <textarea id="outputText" class="bg-gray-100 border border-gray-300 rounded w-full p-3" rows="6" readonly placeholder="ここに結果が表示されます"></textarea>
-      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('outputText')">📋</button>
-    </div>
-    <div class="mt-2 text-sm text-gray-600" id="outputStats">文字数: 0 / 行数: 0</div>
-
-    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-md opacity-0 transition-opacity duration-300 pointer-events-none">
+</span>
+</label>
+<div class="md-output-wrap">
+<textarea class="md-textarea md-output" id="outputText" placeholder="ここに結果が表示されます" readonly="" rows="6"></textarea>
+<button class="md-icon-btn md-copy-button" onclick="copyToClipboard('outputText')">📋</button>
+</div>
+<div class="md-muted" id="outputStats">文字数: 0 / 行数: 0</div>
+<div class="md-snackbar" id="toast">
       コピーしました
     </div>
-  </div>
-
-  <script>
+</div>
+<script>
     const halfToFullKanaMap = {
       '｡': '。', '｢': '「', '｣': '」', '､': '、', '･': '・',
       'ｧ': 'ァ', 'ｨ': 'ィ', 'ｩ': 'ゥ', 'ｪ': 'ェ', 'ｫ': 'ォ',
@@ -747,7 +875,6 @@ limitations under the License.
       const optIncludeKana = document.getElementById('optIncludeKana').checked;
       const optKana = document.getElementById('optKana').value;
       const optCase = document.getElementById('optCase').value;
-      const optSymbolConvert = document.getElementById('toggleSymbolConvert').checked;
       const optSymbolSemicolon = document.getElementById('optSymbolSemicolon').checked;
       const optSymbolColon = document.getElementById('optSymbolColon').checked;
       const optSymbolSingleQuote = document.getElementById('optSymbolSingleQuote').checked;
@@ -775,15 +902,25 @@ limitations under the License.
       const optSymbolBrace = document.getElementById('optSymbolBrace').checked;
       const optSymbolBracket = document.getElementById('optSymbolBracket').checked;
       const optSymbolTilde = document.getElementById('optSymbolTilde').checked;
+      const optSymbolConvert = [
+        optSymbolSemicolon, optSymbolColon, optSymbolSingleQuote, optSymbolDoubleQuote,
+        optSymbolBackQuote, optSymbolParentheses, optSymbolExclamation, optSymbolDollar,
+        optSymbolQuestion, optSymbolAmpersand, optSymbolAt, optSymbolHash,
+        optSymbolPercent, optSymbolPlus, optSymbolEquals, optSymbolSlash,
+        optSymbolBackslash, optSymbolHyphen, optSymbolUnderscore, optSymbolComma,
+        optSymbolPeriod, optSymbolCaret, optSymbolPipe, optSymbolAngle,
+        optSymbolBrace, optSymbolBracket, optSymbolTilde
+      ].some(Boolean);
       const optLineEnding = document.getElementById('optLineEnding').value;
       const optSortLines = document.getElementById('optSortLines').value;
+      const optRemoveEmptyLines = document.getElementById('optRemoveEmptyLines').checked;
+      const optCollapseEmptyLines = document.getElementById('optCollapseEmptyLines').checked;
       const optNewlineToSpace = document.getElementById('optNewlineToSpace').checked;
       const optNormalizeUnicodeSpaces = document.getElementById('optNormalizeUnicodeSpaces').checked;
       const optRemoveZeroWidthSpaces = document.getElementById('optRemoveZeroWidthSpaces').checked;
       const optRemoveSpaceBeforePunct = document.getElementById('optRemoveSpaceBeforePunct').checked;
       const optTrim = document.getElementById('optTrim').checked;
       const optNormalizeSpaces = document.getElementById('optNormalizeSpaces').checked;
-      const optRemoveEmptyLines = document.getElementById('optRemoveEmptyLines').checked;
 
       let text = input;
       const preferredNewline = optLineEnding === "keep" ? detectPreferredNewline(text) : (optLineEnding === "crlf" ? "\r\n" : "\n");
@@ -841,6 +978,23 @@ limitations under the License.
 
       text = sortLines(text, optSortLines, preferredNewline);
 
+      if (optCollapseEmptyLines) {
+        const lines = text.split(/\r\n|\r|\n/);
+        const collapsed = [];
+        let prevEmpty = false;
+        lines.forEach((line) => {
+          const isEmpty = line.trim() === "";
+          if (isEmpty) {
+            if (!prevEmpty) collapsed.push("");
+            prevEmpty = true;
+          } else {
+            collapsed.push(line);
+            prevEmpty = false;
+          }
+        });
+        text = collapsed.join(preferredNewline);
+      }
+
       if (optRemoveEmptyLines) {
         const lineSep = optNewlineToSpace ? "\n" : preferredNewline;
         const lines = text.split(/\r\n|\r|\n/).filter((line) => line.trim() !== "");
@@ -892,11 +1046,9 @@ limitations under the License.
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
-      toast.classList.remove('opacity-0', 'pointer-events-none');
-      toast.classList.add('opacity-100');
+      toast.classList.add('md-snackbar--visible');
       setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0', 'pointer-events-none');
+        toast.classList.remove('md-snackbar--visible');
       }, 2000);
     }
 
@@ -906,25 +1058,44 @@ limitations under the License.
       panel.classList.toggle('hidden');
     }
 
-    function toggleCharConvertPanel() {
-      const toggle = document.getElementById('toggleCharConvert');
-      const panel = document.getElementById('charConvertPanel');
-      if (!toggle || !panel) return;
-      panel.classList.toggle('hidden', !toggle.checked);
-    }
+    function applyCommonPreset() {
+      const setChecked = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = value;
+      };
+      const setSelect = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+      };
 
-    function toggleLineConvertPanel() {
-      const toggle = document.getElementById('toggleLineConvert');
-      const panel = document.getElementById('lineConvertPanel');
-      if (!toggle || !panel) return;
-      panel.classList.toggle('hidden', !toggle.checked);
-    }
+      setSelect('optWidth', 'toHalf');
 
-    function toggleSymbolConvertPanel() {
-      const toggle = document.getElementById('toggleSymbolConvert');
-      const panel = document.getElementById('symbolConvertPanel');
-      if (!toggle || !panel) return;
-      panel.classList.toggle('hidden', !toggle.checked);
+      const symbolIds = [
+        'optSymbolSemicolon', 'optSymbolColon', 'optSymbolSingleQuote',
+        'optSymbolDoubleQuote', 'optSymbolBackQuote', 'optSymbolParentheses',
+        'optSymbolExclamation', 'optSymbolDollar', 'optSymbolQuestion',
+        'optSymbolAmpersand', 'optSymbolAt', 'optSymbolHash',
+        'optSymbolPercent', 'optSymbolPlus', 'optSymbolEquals',
+        'optSymbolSlash', 'optSymbolBackslash', 'optSymbolUnderscore',
+        'optSymbolComma', 'optSymbolPeriod', 'optSymbolCaret',
+        'optSymbolPipe', 'optSymbolAngle', 'optSymbolBrace',
+        'optSymbolBracket', 'optSymbolTilde'
+      ];
+      symbolIds.forEach((id) => setChecked(id, true));
+      setChecked('optSymbolHyphen', false);
+      setChecked('optSymbolTilde', false);
+
+      setChecked('optNormalizeUnicodeSpaces', true);
+      setChecked('optRemoveZeroWidthSpaces', true);
+      setChecked('optNewlineToSpace', false);
+      setChecked('optRemoveSpaceBeforePunct', false);
+      setChecked('optRemoveEmptyLines', false);
+      setChecked('optCollapseEmptyLines', false);
+      setChecked('optTrim', false);
+      setChecked('optNormalizeSpaces', false);
+
+      updateSymbolAllState();
+      updateOutput();
     }
 
     function getSymbolOptionIds() {
@@ -959,17 +1130,10 @@ limitations under the License.
       });
     }
 
-    function toggleSpaceConvertPanel() {
-      const toggle = document.getElementById('toggleSpaceConvert');
-      const panel = document.getElementById('spaceConvertPanel');
-      if (!toggle || !panel) return;
-      panel.classList.toggle('hidden', !toggle.checked);
-    }
-
     function setupAutoUpdate() {
       const ids = [
         'inputText', 'optWidth', 'optIncludeKana', 'optKana', 'optCase',
-        'toggleSymbolConvert', 'optSymbolAll', 'optSymbolSemicolon', 'optSymbolColon', 'optSymbolSingleQuote',
+        'optSymbolAll', 'optSymbolSemicolon', 'optSymbolColon', 'optSymbolSingleQuote',
         'optSymbolDoubleQuote', 'optSymbolBackQuote', 'optSymbolParentheses',
         'optSymbolExclamation', 'optSymbolDollar', 'optSymbolQuestion', 'optSymbolAmpersand',
         'optSymbolAt', 'optSymbolHash', 'optSymbolPercent', 'optSymbolPlus',
@@ -977,8 +1141,8 @@ limitations under the License.
         'optSymbolUnderscore', 'optSymbolComma', 'optSymbolPeriod', 'optSymbolCaret',
         'optSymbolPipe', 'optSymbolAngle', 'optSymbolBrace', 'optSymbolBracket',
         'optSymbolTilde', 'optLineEnding', 'optSortLines', 'optNewlineToSpace',
-        'optNormalizeUnicodeSpaces', 'optRemoveZeroWidthSpaces', 'optRemoveSpaceBeforePunct',
-        'optNewlineToSpace', 'optTrim', 'optNormalizeSpaces', 'optRemoveEmptyLines'
+        'optRemoveEmptyLines', 'optCollapseEmptyLines', 'optNormalizeUnicodeSpaces',
+        'optRemoveZeroWidthSpaces', 'optRemoveSpaceBeforePunct', 'optTrim', 'optNormalizeSpaces'
       ];
       ids.forEach((id) => {
         const element = document.getElementById(id);
@@ -993,18 +1157,6 @@ limitations under the License.
     }
 
     setupAutoUpdate();
-    toggleCharConvertPanel();
-    toggleSymbolConvertPanel();
-    toggleLineConvertPanel();
-    toggleSpaceConvertPanel();
-    const toggleCharConvert = document.getElementById('toggleCharConvert');
-    if (toggleCharConvert) {
-      toggleCharConvert.addEventListener('change', toggleCharConvertPanel);
-    }
-    const toggleSymbolConvert = document.getElementById('toggleSymbolConvert');
-    if (toggleSymbolConvert) {
-      toggleSymbolConvert.addEventListener('change', toggleSymbolConvertPanel);
-    }
     const optSymbolAll = document.getElementById('optSymbolAll');
     if (optSymbolAll) {
       optSymbolAll.addEventListener('change', () => {
@@ -1022,14 +1174,6 @@ limitations under the License.
       });
     });
     updateSymbolAllState();
-    const toggleLineConvert = document.getElementById('toggleLineConvert');
-    if (toggleLineConvert) {
-      toggleLineConvert.addEventListener('change', toggleLineConvertPanel);
-    }
-    const toggleSpaceConvert = document.getElementById('toggleSpaceConvert');
-    if (toggleSpaceConvert) {
-      toggleSpaceConvert.addEventListener('change', toggleSpaceConvertPanel);
-    }
   </script>
 </body>
 </html>

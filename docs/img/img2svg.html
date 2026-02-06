@@ -5,163 +5,229 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>画像 → SVG 変換</title>
   <style>
-    /*
-      ベンダリング（Vendoring）: このHTMLファイルは、かつてTailwind CSSをCDNから動的に読み込んでいましたが、
-      完全なオフライン化のため、Tailwind CSS の CSS クラス定義を自前で実装しました。
-      Tailwind CSS のライセンス情報は THIRD_PARTY_NOTICES.md を参照してください。
-      外部CDNに依存せず、単一のHTMLファイルで完結して動作する設計が、このプロジェクトのコア機能です。
-    */
-    /* Reset */
+    :root {
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
+      --md-state-layer: rgba(98, 0, 238, 0.12);
+      --md-danger: #b3261e;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1rem; line-height: 1.5; }
-    button { border: none; cursor: pointer; }
+    body { font-family: "Roboto", "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif; font-size: 1rem; line-height: 1.5; }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; background: transparent; cursor: pointer; font: inherit; }
 
-    /* Colors */
-    body { background-color: #f9fafb; color: #1f2937; }
-    .bg-white { background-color: #ffffff; }
-    .bg-gray-50 { background-color: #f9fafb; }
-    .bg-gray-200 { background-color: #e5e7eb; }
-    .bg-gray-900 { background-color: #111827; }
-    .bg-green-600 { background-color: #16a34a; }
-    .bg-blue-600 { background-color: #2563eb; }
-    .bg-black\/50 { background-color: rgba(0, 0, 0, 0.5); }
-    .text-white { color: #ffffff; }
-    .text-gray-400 { color: #9ca3af; }
-    .text-gray-500 { color: #6b7280; }
-    .text-gray-600 { color: #4b5563; }
-    .text-gray-700 { color: #374151; }
-    .text-gray-800 { color: #1f2937; }
-    .text-red-500 { color: #ef4444; }
-    .border-gray-200 { border-color: #e5e7eb; }
-    .border-gray-300 { border-color: #d1d5db; }
-    .border-blue-600 { border-color: #2563eb; }
-
-    /* Layout */
-    .flex { display: flex; }
-    .inline-flex { display: inline-flex; }
-    .flex-col { flex-direction: column; }
-    .flex-1 { flex: 1 1 0%; }
-    .items-center { align-items: center; }
-    .justify-center { justify-content: center; }
-    .justify-between { justify-content: space-between; }
-    .flex-wrap { flex-wrap: wrap; }
-    .grid { display: grid; }
-    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .gap-2 { gap: 0.5rem; }
-    .gap-3 { gap: 0.75rem; }
-    .gap-6 { gap: 1.5rem; }
-    .w-5 { width: 1.25rem; }
-    .w-10 { width: 2.5rem; }
-    .w-64 { width: 16rem; }
-    .w-full { width: 100%; }
-    .h-5 { height: 1.25rem; }
-    .h-10 { height: 2.5rem; }
-    .h-80 { height: 20rem; }
-    .max-w-2xl { max-width: 42rem; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
-    .p-2 { padding: 0.5rem; }
-    .p-6 { padding: 1.5rem; }
-    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-    .px-4 { padding-left: 1rem; padding-right: 1rem; }
-    .px-8 { padding-left: 2rem; padding-right: 2rem; }
-    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-    .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .mb-6 { margin-bottom: 1.5rem; }
-    .mb-8 { margin-bottom: 2rem; }
-    .mt-3 { margin-top: 0.75rem; }
-    .mt-6 { margin-top: 1.5rem; }
-    .mr-2 { margin-right: 0.5rem; }
-
-    /* Typography */
-    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-    .text-xs { font-size: 0.75rem; line-height: 1rem; }
-    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-    .leading-5 { line-height: 1.25rem; }
-    .font-bold { font-weight: 700; }
-    .font-semibold { font-weight: 600; }
-    .font-normal { font-weight: 400; }
-
-    /* Box model */
-    .block { display: block; }
-    .hidden { display: none; }
-    .rounded { border-radius: 0.375rem; }
-    .rounded-lg { border-radius: 0.5rem; }
-    .rounded-full { border-radius: 9999px; }
-    .rounded-xl { border-radius: 0.75rem; }
-    .border { border-width: 1px; border-style: solid; }
-    .border-2 { border-width: 2px; border-style: solid; }
-    .border-b-2 { border-bottom-width: 2px; }
-    .border-dashed { border-style: dashed; }
-    .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-    .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-    .overflow-hidden { overflow: hidden; }
-
-    /* Position */
-    .relative { position: relative; }
-    .absolute { position: absolute; }
-    .fixed { position: fixed; }
-    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
-    .top-4 { top: 1rem; }
-    .top-12 { top: 3rem; }
-    .top-full { top: 100%; }
-    .right-4 { right: 1rem; }
-    .left-1\/2 { left: 50%; }
-    .bottom-full { bottom: 100%; }
-    .-translate-x-1\/2 { transform: translateX(-50%); }
-
-    /* Visibility */
-    .opacity-0 { opacity: 0; }
-    .pointer-events-none { pointer-events: none; }
-    .z-10 { z-index: 10; }
-    .z-20 { z-index: 20; }
-    .z-50 { z-index: 50; }
-
-    /* Transitions */
-    .transition { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-    .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-    .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-
-    /* Hover effects */
-    .hover\:bg-gray-300:hover { background-color: #d1d5db; }
-    .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
-    .hover\:bg-green-700:hover { background-color: #15803d; }
-    .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
-    button.hover\:bg-gray-300:hover { background-color: #d1d5db; }
-
-    /* Disabled state */
-    .disabled\:bg-gray-300:disabled { background-color: #d1d5db; }
-    .disabled\:cursor-not-allowed:disabled { cursor: not-allowed; }
-
-    /* Group hover */
-    .group:hover .group-hover\:opacity-100 { opacity: 1; }
-    .group {}
-
-    /* Interactions */
-    .cursor-pointer { cursor: pointer; }
-    .cursor-help { cursor: help; }
-
-    /* Effects */
-    .backdrop-blur-sm { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-
-    /* Animation */
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .animate-spin { animation: spin 1s linear infinite; }
-
-    /* Links */
-    a { text-decoration: none !important; }
-
-    /* Responsive */
-    @media (min-width: 640px) {
-      .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .md-page { background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; }
+    .md-surface-card { max-width: 48rem; margin: 0 auto; padding: 24px; position: relative; }
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid #ece7f3;
     }
+
+    .md-menu-button { position: absolute; top: 16px; right: 16px; }
+    .md-menu-panel {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 20;
+    }
+    .md-menu-link { display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface); }
+    .md-menu-link:hover { background: #f2edf8; }
+
+    .md-headline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      padding-right: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .md-headline__icon { margin-right: 0.5rem; }
+
+    .md-section { margin-bottom: 1.25rem; }
+    .md-grid { display: grid; gap: 1rem; }
+    @media (min-width: 768px) {
+      .md-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    .md-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+      margin-bottom: 0.5rem;
+    }
+    .md-required { color: var(--md-danger); font-weight: 700; }
+
+    .md-input,
+    .md-select {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      font-size: 1rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .md-input:focus,
+    .md-select:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-actions { display: flex; gap: 0.75rem; }
+    .md-button {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      transition: box-shadow 150ms ease, transform 150ms ease, background 150ms ease;
+    }
+    .md-button-primary {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 2px 6px rgba(98, 0, 238, 0.3);
+    }
+    .md-button-primary:hover { box-shadow: 0 4px 10px rgba(98, 0, 238, 0.35); }
+    .md-button-secondary {
+      background: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-primary);
+      border: 1px solid #ded7e6;
+    }
+    .md-button:disabled {
+      background: #e6e1ee;
+      color: #9a94a7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .md-row-between { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .md-muted { color: #6a6675; font-size: 0.75rem; }
+
+    .md-preview {
+      border: 2px dashed #ddd6e8;
+      border-radius: 16px;
+      background: var(--md-sys-color-surface-variant);
+      height: 20rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .md-preview__empty { color: #8f8a98; font-size: 0.875rem; }
+
+    .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: min(24rem, 90vw);
+    }
+    .md-tooltip-group:hover .md-tooltip-content { opacity: 1; }
+    .md-tooltip {
+      display: block;
+      min-width: 12rem;
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.5;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: normal;
+      word-break: break-word;
+    }
+    .md-help-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: #f0edf5;
+      color: #4a4458;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .md-icon-btn:hover { background: #e6e1ee; }
+    .md-icon-20 { width: 20px; height: 20px; }
+
+    .md-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      backdrop-filter: blur(4px);
+    }
+    .md-dialog {
+      background: var(--md-sys-color-surface);
+      padding: 1.5rem 2rem;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    .md-spinner {
+      width: 40px;
+      height: 40px;
+      border-radius: 9999px;
+      border: 3px solid #d7cfee;
+      border-top-color: var(--md-sys-color-primary);
+      animation: spin 1s linear infinite;
+    }
+
+    .hidden { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
   <style>
     #preview svg {
@@ -171,48 +237,50 @@
     }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 p-6">
-  <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
-    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
-      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+<body class="md-page">
+  <div class="md-surface-card md-card">
+    <button type="button" class="md-icon-btn md-menu-button" aria-label="メニュー" onclick="toggleMenu()">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>
       </svg>
     </button>
-    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden z-20">
-      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    <div id="menuPanel" class="md-menu-panel hidden">
+      <a href="../index.html" class="md-menu-link">トップへ戻る</a>
     </div>
 
-    <h1 class="text-2xl font-bold mb-6 flex flex-wrap items-center gap-2">
-      <span aria-hidden="true" class="mr-2">🖼️</span>
+    <h1 class="md-headline">
+      <span aria-hidden="true" class="md-headline__icon">🖼️</span>
       <span>画像 → SVG 変換</span>
-      <span class="relative inline-flex items-center group">
-        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
-        <span class="absolute left-1/2 top-full mt-3 w-64 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
-          画像ファイルをSVGに変換します。これは困難なことを実現するツールです。アイコン・ロゴのようなものはよく再現できますが、イラスト・写真などは技術的な理由から再現度が高くないことをあらかじめご承知ください。
+      <span class="md-tooltip-group">
+        <span class="md-help-chip">?</span>
+        <span class="md-tooltip-content">
+          <span class="md-tooltip">
+            画像ファイルをSVGに変換します。これは困難なことを実現するツールです。アイコン・ロゴのようなものはよく再現できますが、イラスト・写真などは技術的な理由から再現度が高くないことをあらかじめご承知ください。
+          </span>
         </span>
       </span>
     </h1>
 
-    <div class="mb-6">
-      <label class="flex items-center gap-2 mb-2 font-semibold">
+    <div class="md-section">
+      <label class="md-label">
         <span>画像ファイル（PNG/JPEG/WebP/GIF）</span>
-        <span class="text-red-500 font-bold">*</span>
+        <span class="md-required">*</span>
       </label>
-      <input id="file" type="file" accept="image/*" class="border border-gray-300 rounded w-full p-2 bg-gray-50" />
+      <input id="file" type="file" accept="image/*" class="md-input" />
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+    <div class="md-grid md-grid-2 md-section">
       <div>
-        <label class="flex items-center gap-2 mb-2 font-semibold">
+        <label class="md-label">
           <span>プリセット</span>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
-            <span id="presetDescription" class="absolute left-1/2 bottom-full mb-2 w-64 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
-              用途に合わせた最適な数値をセットします。
+          <span class="md-tooltip-group">
+            <span class="md-help-chip">?</span>
+            <span class="md-tooltip-content">
+              <span id="presetDescription" class="md-tooltip">用途に合わせた最適な数値をセットします。</span>
             </span>
           </span>
         </label>
-        <select id="preset" class="border border-gray-300 rounded w-full p-2 bg-white cursor-pointer">
+        <select id="preset" class="md-select">
           <option value="icon">アイコン・ロゴ（軽量・鋭利）</option>
           <option value="illustration" selected>イラスト（なめらか・曲線）</option>
           <option value="photo">写真（芸術的・油絵風）</option>
@@ -221,97 +289,97 @@
       </div>
 
       <div>
-        <label class="flex items-center gap-2 mb-2 font-semibold">
+        <label class="md-label">
           <span>色数</span>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
-            <span class="absolute left-1/2 bottom-full mb-2 w-64 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
-              使用する色の数（2〜64）。多いほど詳細ですが重くなります。
+          <span class="md-tooltip-group">
+            <span class="md-help-chip">?</span>
+            <span class="md-tooltip-content">
+              <span class="md-tooltip">使用する色の数（2〜64）。多いほど詳細ですが重くなります。</span>
             </span>
           </span>
         </label>
-        <input id="colors" type="number" min="2" max="64" value="12" class="border border-gray-300 rounded w-full p-2" />
+        <input id="colors" type="number" min="2" max="64" value="12" class="md-input" />
       </div>
 
       <div>
-        <label class="flex items-center gap-2 mb-2 font-semibold">
+        <label class="md-label">
           <span>輪郭の精度 (ltres)</span>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
-            <span class="absolute left-1/2 bottom-full mb-2 w-64 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
-              低いほど元の形に忠実、高いほどノイズを無視します。
+          <span class="md-tooltip-group">
+            <span class="md-help-chip">?</span>
+            <span class="md-tooltip-content">
+              <span class="md-tooltip">低いほど元の形に忠実、高いほどノイズを無視します。</span>
             </span>
           </span>
         </label>
-        <input id="ltres" type="number" min="0" max="10" step="0.1" value="1.0" class="border border-gray-300 rounded w-full p-2" />
+        <input id="ltres" type="number" min="0" max="10" step="0.1" value="1.0" class="md-input" />
       </div>
 
       <div>
-        <label class="flex items-center gap-2 mb-2 font-semibold">
+        <label class="md-label">
           <span>曲線の精度 (qtres)</span>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
-            <span class="absolute left-1/2 bottom-full mb-2 w-64 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
-              低いほど滑らかな曲線、高いほど直線的な描画になります。
+          <span class="md-tooltip-group">
+            <span class="md-help-chip">?</span>
+            <span class="md-tooltip-content">
+              <span class="md-tooltip">低いほど滑らかな曲線、高いほど直線的な描画になります。</span>
             </span>
           </span>
         </label>
-        <input id="qtres" type="number" min="0.1" max="10" step="0.1" value="0.1" class="border border-gray-300 rounded w-full p-2" />
+        <input id="qtres" type="number" min="0.1" max="10" step="0.1" value="0.1" class="md-input" />
       </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+    <div class="md-grid md-grid-2 md-section">
       <div>
-        <label class="flex items-center gap-2 mb-2 font-semibold">
+        <label class="md-label">
           <span>縮小率（前処理）</span>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
-            <span class="absolute left-1/2 bottom-full mb-2 w-64 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
-              小さくしてからトレースすることで、パスの数を減らします（10〜100%）。
+          <span class="md-tooltip-group">
+            <span class="md-help-chip">?</span>
+            <span class="md-tooltip-content">
+              <span class="md-tooltip">小さくしてからトレースすることで、パスの数を減らします（10〜100%）。</span>
             </span>
           </span>
         </label>
-        <input id="scalePercent" type="number" min="10" max="100" value="100" class="border border-gray-300 rounded w-full p-2" />
+        <input id="scalePercent" type="number" min="10" max="100" value="100" class="md-input" />
       </div>
       <div>
-        <label class="flex items-center gap-2 mb-2 font-semibold">
+        <label class="md-label">
           <span>ぼかし（前処理）</span>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full cursor-help">?</span>
-            <span class="absolute left-1/2 bottom-full mb-2 w-64 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-10 shadow-xl">
-              0以上の値で細かいノイズをならします（0〜5px）。
+          <span class="md-tooltip-group">
+            <span class="md-help-chip">?</span>
+            <span class="md-tooltip-content">
+              <span class="md-tooltip">0以上の値で細かいノイズをならします（0〜5px）。</span>
             </span>
           </span>
         </label>
-        <input id="blurPx" type="number" min="0" max="5" step="0.5" value="0" class="border border-gray-300 rounded w-full p-2" />
+        <input id="blurPx" type="number" min="0" max="5" step="0.5" value="0" class="md-input" />
       </div>
     </div>
 
-    <div class="flex gap-3 mb-8">
-      <button id="convert" disabled class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded shadow-sm disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+    <div class="md-actions md-section">
+      <button id="convert" disabled class="md-button md-button-primary">
         SVGに変換する
       </button>
     </div>
 
-    <div class="mb-2 font-semibold flex items-center justify-between">
+    <div class="md-row-between md-section">
       <span>プレビュー</span>
-      <span id="fileInfo" class="text-xs text-gray-500 font-normal"></span>
+      <span id="fileInfo" class="md-muted"></span>
     </div>
-    <div id="preview" class="border-2 border-dashed border-gray-200 rounded bg-gray-50 h-80 flex items-center justify-center overflow-hidden transition-all">
-      <p class="text-gray-400 text-sm">ここに変換後の画像が表示されます</p>
+    <div id="preview" class="md-preview">
+      <p class="md-preview__empty">ここに変換後の画像が表示されます</p>
     </div>
 
-    <div class="flex gap-3 mt-6">
-      <button id="download" disabled class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-sm disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+    <div class="md-actions md-section" style="margin-top: 1.5rem;">
+      <button id="download" disabled class="md-button md-button-secondary">
         SVGをダウンロード
       </button>
     </div>
   </div>
 
-  <div id="loading" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
-    <div class="bg-white px-8 py-6 rounded-xl shadow-2xl flex flex-col items-center">
-      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
-      <p class="font-bold text-gray-700">ベクター変換中...</p>
+  <div id="loading" class="md-overlay hidden">
+    <div class="md-dialog md-card">
+      <div class="md-spinner"></div>
+      <p>ベクター変換中...</p>
     </div>
   </div>
 
@@ -1591,7 +1659,7 @@ if(typeof define === 'function' && define.amd){
       convertBtn.disabled = !selectedFile;
       downloadBtn.disabled = true;
       lastSvgText = "";
-      preview.innerHTML = '<p class="text-gray-400 text-sm">「変換する」ボタンを押してください</p>';
+      preview.innerHTML = '<p class="md-preview__empty">「変換する」ボタンを押してください</p>';
       document.getElementById("fileInfo").textContent = selectedFile ? `${selectedFile.name}` : "";
     });
 
@@ -1657,7 +1725,6 @@ if(typeof define === 'function' && define.amd){
     // ユーティリティ
     function showLoading(on) {
       loading.classList.toggle("hidden", !on);
-      loading.classList.toggle("flex", on);
     }
 
     function nextFrame() { return new Promise(requestAnimationFrame); }
