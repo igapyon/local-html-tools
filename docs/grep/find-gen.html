@@ -20,176 +20,311 @@ limitations under the License.
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>find 検索コマンドジェネレータ</title>
   <style>
-    /*
-      ベンダリング（Vendoring）: このHTMLファイルは、かつてTailwind CSSをCDNから動的に読み込んでいましたが、
-      完全なオフライン化のため、Tailwind CSS の CSS クラス定義を自前で実装しました。
-      Tailwind CSS のライセンス情報は THIRD_PARTY_NOTICES.md を参照してください。
-      外部CDNに依存せず、単一のHTMLファイルで完結して動作する設計が、このプロジェクトのコア機能です。
-    */
-    /* Reset */
+    :root {
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-secondary: #03dac6;
+      --md-sys-color-on-secondary: #00332c;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1rem; line-height: 1.5; }
-    button { border: none; cursor: pointer; }
+    body { font-family: "Roboto", "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif; font-size: 1rem; line-height: 1.5; }
+    button { border: none; cursor: pointer; background: transparent; }
+    a { text-decoration: none; color: inherit; }
 
-    /* Colors */
-    body { background-color: #f9fafb; color: #1f2937; }
-    .bg-white { background-color: #ffffff; }
-    .bg-gray-50 { background-color: #f9fafb; }
-    .bg-gray-100 { background-color: #f3f4f6; }
-    .bg-gray-200 { background-color: #e5e7eb; }
-    .bg-gray-800 { background-color: #1f2937; }
-    .bg-gray-900 { background-color: #111827; }
-    .bg-green-600 { background-color: #16a34a; }
-    .text-white { color: #ffffff; }
-    .text-gray-600 { color: #4b5563; }
-    .text-gray-700 { color: #374151; }
-    .text-gray-800 { color: #1f2937; }
-    .text-red-500 { color: #ef4444; }
-    .border-gray-200 { border-color: #e5e7eb; }
-    .border-gray-300 { border-color: #d1d5db; }
+    .md-page { background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; }
+    .md-surface-card { max-width: 48rem; margin: 0 auto; padding: 24px; position: relative; }
 
-    /* Layout */
-    .flex { display: flex; }
-    .inline-flex { display: inline-flex; }
-    .items-center { align-items: center; }
-    .justify-center { justify-content: center; }
-    .flex-wrap { flex-wrap: wrap; }
-    .grid { display: grid; }
-    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .gap-2 { gap: 0.5rem; }
-    .gap-3 { gap: 0.75rem; }
-    .gap-4 { gap: 1rem; }
-    .w-5 { width: 1.25rem; }
-    .w-72 { width: 18rem; }
-    .w-80 { width: 20rem; }
-    .w-full { width: 100%; }
-    .h-5 { height: 1.25rem; }
-    .max-w-3xl { max-width: 48rem; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
-    .p-2 { padding: 0.5rem; }
-    .p-3 { padding: 0.75rem; }
-    .p-6 { padding: 1.5rem; }
-    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-    .px-4 { padding-left: 1rem; padding-right: 1rem; }
-    .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
-    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
-    .pr-10 { padding-right: 2.5rem; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .mb-6 { margin-bottom: 1.5rem; }
-    .mt-2 { margin-top: 0.5rem; }
-    .mt-4 { margin-top: 1rem; }
-    .mr-2 { margin-right: 0.5rem; }
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid #ece7f3;
+    }
 
-    /* Typography */
-    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-    .text-xs { font-size: 0.75rem; line-height: 1rem; }
-    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-    .leading-5 { line-height: 1.25rem; }
-    .leading-6 { line-height: 1.5rem; }
-    .font-bold { font-weight: 700; }
-    .font-semibold { font-weight: 600; }
-    .font-normal { font-weight: 400; }
+    .md-menu-button { position: absolute; top: 16px; right: 16px; }
+    .md-menu-panel {
+      position: absolute;
+      top: 48px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+    }
+    .md-menu-link { display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface); }
+    .md-menu-link:hover { background: #f2edf8; }
 
-    /* Box model */
-    .block { display: block; }
-    .hidden { display: none; }
-    .rounded { border-radius: 0.375rem; }
-    .rounded-lg { border-radius: 0.5rem; }
-    .rounded-full { border-radius: 9999px; }
-    .border { border-width: 1px; border-style: solid; }
-    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-    .overflow-x-auto { overflow-x: auto; }
-    .whitespace-pre { white-space: pre; }
+    .md-headline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      padding-right: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .md-headline__icon { margin-right: 0.5rem; }
 
-    /* Position */
-    .relative { position: relative; }
-    .absolute { position: absolute; }
-    .fixed { position: fixed; }
-    .top-2 { top: 0.5rem; }
-    .top-4 { top: 1rem; }
-    .top-12 { top: 3rem; }
-    .top-full { top: 100%; }
-    .right-2 { right: 0.5rem; }
-    .right-4 { right: 1rem; }
-    .right-5 { right: 1.25rem; }
-    .bottom-5 { bottom: 1.25rem; }
-    .left-1\/2 { left: 50%; }
-    .-translate-x-1\/2 { transform: translateX(-50%); }
+    .md-section { margin-bottom: 1rem; }
+    .md-stack-md > * + * { margin-top: 0.75rem; }
+    .md-stack-sm > * + * { margin-top: 0.5rem; }
 
-    /* Visibility */
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
-    .opacity-0 { opacity: 0; }
-    .pointer-events-none { pointer-events: none; }
-    .z-50 { z-index: 50; }
-
-    /* Transitions */
-    .transition { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-    .transition-opacity { transition-property: opacity; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-    .duration-300 { transition-duration: 300ms; }
-
-    /* Hover effects */
-    .hover\:bg-gray-300:hover { background-color: #d1d5db; }
-    .hover\:bg-green-700:hover { background-color: #15803d; }
-    .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
-    button.hover\:bg-gray-300:hover { background-color: #d1d5db; }
-
-    /* Group hover */
-    .group:hover .group-hover\:opacity-100 { opacity: 1; }
-    .group {}
-
-    /* Links */
-    a { text-decoration: none !important; }
-
-    /* Interactions */
-    .cursor-pointer { cursor: pointer; }
-
-    /* Responsive */
+    .md-grid { display: grid; gap: 1rem; }
+    .md-grid-2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    .md-grid-3 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
     @media (min-width: 640px) {
-      .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .md-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .md-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    .md-field { display: flex; flex-direction: column; gap: 0.5rem; }
+    .md-form-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .md-form-row--nowrap { flex-wrap: nowrap; }
+    .md-label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--md-sys-color-on-surface); }
+    .md-label--muted { color: #3f3b46; }
+    .md-label--block { margin-bottom: 0.5rem; }
+
+    .md-input,
+    .md-select,
+    .md-textarea {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: 12px;
+      padding: 0.625rem 0.75rem;
+      font: inherit;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .md-input,
+    .md-select { flex: 1 1 16rem; min-width: 12rem; }
+    .md-input:focus,
+    .md-select:focus,
+    .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.18);
+    }
+
+    .md-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1.4rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+      transition: transform 120ms ease, box-shadow 150ms ease, background 150ms ease;
+    }
+    .md-button--primary {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 4px 10px rgba(98, 0, 238, 0.22);
+    }
+    .md-button--primary:hover { background: #5a00d6; }
+
+    .md-code-block { position: relative; margin-top: 1rem; }
+    .md-code {
+      display: block;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: var(--md-sys-color-surface-variant);
+      border: 1px solid #e5e0ec;
+      color: #1f1b2d;
+    }
+    .md-copy-button { position: absolute; top: 0.5rem; right: 0.5rem; }
+
+    .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: 20rem;
+    }
+    .md-tooltip-group:hover .md-tooltip-content { opacity: 1; }
+    .md-tooltip--wide { width: 24rem; max-width: 90vw; }
+
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .md-icon-btn:hover { background: #e6e1ee; }
+    .md-icon-btn--small { width: 32px; height: 32px; border-radius: 16px; }
+    .md-icon-btn--surface { background: #f7f2fa; }
+    .md-icon-small { width: 16px; height: 16px; }
+    .md-icon-20 { width: 20px; height: 20px; }
+
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.01em;
+    }
+    .md-tooltip--rich { border: 1px solid rgba(255, 255, 255, 0.08); }
+
+    .md-help-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: transparent;
+      color: #4a4458;
+      margin-left: 0.2rem;
+    }
+    .md-help-icon { width: 18px; height: 18px; }
+
+    .md-required {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.1rem 0.45rem;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: #f7e9e7;
+      color: #8c1d18;
+      border: 1px solid #f0c9c5;
+    }
+
+    .md-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #f0ebf7;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: inset 0 0 0 1px #cfc7dc;
+    }
+    .md-switch::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transform: translateX(0);
+      transition: transform 150ms ease;
+    }
+    .md-switch-input { position: absolute; opacity: 0; pointer-events: none; }
+    .md-switch-input:checked + .md-switch {
+      background: #8b5cf6;
+      box-shadow: inset 0 0 0 1px #7c3aed;
+    }
+    .md-switch-input:checked + .md-switch::after { transform: translateX(20px); }
+    .md-switch-label { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.95rem; color: var(--md-sys-color-on-surface); }
+
+    .md-details {
+      border: 1px solid #e2dcec;
+      border-radius: 16px;
+      padding: 0.75rem 1rem;
+      background: #f7f3fb;
+    }
+    .md-summary { cursor: pointer; font-weight: 600; color: #3f3b46; }
+    .md-details-body { margin-top: 1rem; }
+
+    .md-snackbar {
+      background: #2b2831;
+      color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      letter-spacing: 0.01em;
+    }
+
+    .md-snackbar-host {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      padding: 0.5rem 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+    .md-snackbar-host.md-visible { opacity: 1; pointer-events: auto; }
+
+    .md-hidden { display: none; }
+    .md-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+    @media (max-width: 640px) {
+      .md-form-row--nowrap { flex-wrap: wrap; }
     }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 p-6">
-  <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
-    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
-      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+<body class="md-page">
+  <div class="md-surface-card md-card">
+    <button type="button" class="md-menu-button md-icon-btn" aria-label="メニュー" onclick="toggleMenu()">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M4 6h16"/>
         <path d="M4 12h16"/>
         <path d="M4 18h16"/>
       </svg>
     </button>
-    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
-      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    <div id="menuPanel" class="md-menu-panel md-hidden">
+      <a href="../index.html" class="md-menu-link">トップへ戻る</a>
     </div>
 
-    <h1 class="text-2xl font-bold mb-6 pr-10 flex flex-wrap items-center gap-2">
-      <span aria-hidden="true" class="mr-2">🔎</span>
+    <h1 class="md-headline">
+      <span aria-hidden="true" class="md-headline__icon">🔎</span>
       <span>find 検索コマンドジェネレータ</span>
-      <span class="relative inline-flex items-center group">
-        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-6 font-normal px-4 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+      <span class="md-tooltip-group">
+        <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+        <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide">
           findでファイル/ディレクトリを検索するコマンドを生成します。条件（名前/拡張子/サイズ/更新日時/内容検索）を組み合わせて作れます。
         </span>
       </span>
     </h1>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-      <div>
-        <label class="flex items-center gap-2 mb-2 font-semibold">
+    <div class="md-section md-stack-md">
+      <div class="md-form-row md-form-row--nowrap">
+        <label class="md-label">
           <span>検索開始パス</span>
-          <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+          <span class="md-required" aria-hidden="true">Required</span><span class="md-sr-only">必須</span>
         </label>
-        <input type="text" id="basePath" placeholder="例: . / ~/projects" class="border border-gray-300 rounded w-full p-2" value=".">
+        <input type="text" id="basePath" placeholder="例: . / ~/projects" class="md-input" value=".">
       </div>
-      <div>
-        <label class="block mb-2 font-semibold">対象の種類:</label>
-        <select id="targetType" class="border border-gray-300 rounded w-full p-2">
+      <div class="md-form-row md-form-row--nowrap">
+        <label class="md-label">対象の種類:</label>
+        <select id="targetType" class="md-select">
           <option value="any">指定なし（ファイル/ディレクトリ）</option>
           <option value="file" selected>ファイルのみ (-type f)</option>
           <option value="dir">ディレクトリのみ (-type d)</option>
@@ -197,73 +332,86 @@ limitations under the License.
       </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-      <div>
-        <label class="block mb-2 font-semibold">拡張子:</label>
-        <input type="text" id="extension" placeholder="例: txt / wav / jpg / java" class="border border-gray-300 rounded w-full p-2">
+    <div class="md-section md-stack-md">
+      <div class="md-form-row md-form-row--nowrap">
+        <label class="md-label">拡張子:</label>
+        <input type="text" id="extension" placeholder="例: txt / wav / jpg / java" class="md-input">
       </div>
-      <div>
-        <label class="block mb-2 font-semibold">名前パターン（ワイルドカード可）:</label>
-        <input type="text" id="namePattern" placeholder="例: report / *.log / data??.csv" class="border border-gray-300 rounded w-full p-2 mb-2">
-        <label class="flex items-center gap-2 text-sm text-gray-600">
-          <input type="checkbox" id="caseInsensitive" class="rounded border-gray-300">
+      <div class="md-field">
+        <div class="md-form-row md-form-row--nowrap">
+          <label class="md-label">名前パターン（ワイルドカード可）:</label>
+          <input type="text" id="namePattern" placeholder="例: report / *.log / data??.csv" class="md-input">
+        </div>
+        <label class="md-switch-label">
+          <input type="checkbox" id="caseInsensitive" class="md-switch-input">
+          <span class="md-switch" aria-hidden="true"></span>
           大文字・小文字を区別しない (-iname)
         </label>
       </div>
     </div>
 
-    <details class="mb-4 border border-gray-200 rounded-lg p-3 bg-gray-50">
-      <summary class="cursor-pointer font-semibold text-gray-700">詳細条件</summary>
-      <div class="mt-4">
-        <label class="block mb-2 font-semibold">サイズ条件:</label>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-          <select id="sizeComparator" class="border border-gray-300 rounded w-full p-2">
+    <details class="md-details md-section">
+      <summary class="md-summary">詳細条件</summary>
+      <div class="md-details-body md-stack-md">
+        <label class="md-label">サイズ条件:</label>
+        <div class="md-grid md-grid-3">
+          <select id="sizeComparator" class="md-select">
             <option value="min">以上 (>=)</option>
             <option value="max">以下 (<=)</option>
           </select>
-          <input type="number" id="sizeValue" placeholder="例: 10" class="border border-gray-300 rounded w-full p-2">
-          <select id="sizeUnit" class="border border-gray-300 rounded w-full p-2">
+          <input type="number" id="sizeValue" placeholder="例: 10" class="md-input">
+          <select id="sizeUnit" class="md-select">
             <option value="K">KB</option>
             <option value="M" selected>MB</option>
             <option value="G">GB</option>
           </select>
         </div>
 
-        <label class="block mb-2 font-semibold">更新日時条件:</label>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-          <select id="mtimeComparator" class="border border-gray-300 rounded w-full p-2">
+        <label class="md-label">更新日時条件:</label>
+        <div class="md-grid md-grid-3">
+          <select id="mtimeComparator" class="md-select">
             <option value="within" selected>直近N日以内</option>
             <option value="older">N日より前</option>
           </select>
-          <input type="number" id="mtimeValue" placeholder="例: 7" class="border border-gray-300 rounded w-full p-2">
-          <div class="flex items-center text-sm text-gray-600">日</div>
+          <input type="number" id="mtimeValue" placeholder="例: 7" class="md-input">
+          <div class="md-label md-label--muted">日</div>
         </div>
 
-        <label class="block mb-2 font-semibold">深さ条件:</label>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <input type="number" id="minDepth" placeholder="最小深さ (mindepth)" class="border border-gray-300 rounded w-full p-2">
-          <input type="number" id="maxDepth" placeholder="最大深さ (maxdepth)" class="border border-gray-300 rounded w-full p-2">
+        <label class="md-label">深さ条件:</label>
+        <div class="md-grid md-grid-2">
+          <input type="number" id="minDepth" placeholder="最小深さ (mindepth)" class="md-input">
+          <input type="number" id="maxDepth" placeholder="最大深さ (maxdepth)" class="md-input">
         </div>
       </div>
     </details>
 
-    <label class="block mb-2 font-semibold">内容検索:</label>
-    <input type="text" id="contentPattern" placeholder="例: ERROR / TODO / 404" class="border border-gray-300 rounded w-full p-2 mb-2">
-    <label class="flex items-center gap-2 mb-4 text-sm text-gray-600">
-      <input type="checkbox" id="useRipgrep" class="rounded border-gray-300" checked>
-      rg で検索（未チェックなら grep -E を使用）
-    </label>
+    <div class="md-section md-stack-sm">
+      <div class="md-form-row md-form-row--nowrap">
+        <label class="md-label">内容検索:</label>
+        <input type="text" id="contentPattern" placeholder="例: ERROR / TODO / 404" class="md-input">
+      </div>
+      <label class="md-switch-label">
+        <input type="checkbox" id="useRipgrep" class="md-switch-input" checked>
+        <span class="md-switch" aria-hidden="true"></span>
+        rg で検索（未チェックなら grep -E を使用）
+      </label>
+    </div>
 
-    <button onclick="generateFindCommand()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-4">
+    <button onclick="generateFindCommand()" class="md-button md-button--primary">
       find コマンド生成
     </button>
 
-    <div class="relative">
-      <code id="findCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
-      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('findCmd')">📋</button>
+    <div class="md-code-block">
+      <code id="findCmd" class="md-code"></code>
+      <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('findCmd')" aria-label="コピー">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="11" height="11" rx="2"/>
+          <rect x="4" y="4" width="11" height="11" rx="2"/>
+        </svg>
+      </button>
     </div>
 
-    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+    <div id="toast" class="md-snackbar-host md-snackbar">
       コピーしました
     </div>
   </div>
@@ -389,18 +537,16 @@ limitations under the License.
     function showToast(message) {
       const toast = document.getElementById("toast");
       toast.textContent = message;
-      toast.classList.remove("opacity-0", "pointer-events-none");
-      toast.classList.add("opacity-100");
+      toast.classList.add("md-visible");
       setTimeout(() => {
-        toast.classList.remove("opacity-100");
-        toast.classList.add("opacity-0", "pointer-events-none");
+        toast.classList.remove("md-visible");
       }, 2000);
     }
 
     function toggleMenu() {
       const panel = document.getElementById("menuPanel");
       if (!panel) return;
-      panel.classList.toggle("hidden");
+      panel.classList.toggle("md-hidden");
     }
   </script>
 </body>
