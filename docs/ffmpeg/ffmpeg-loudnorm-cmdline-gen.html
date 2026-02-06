@@ -10,351 +10,486 @@ Licensed under the Apache License, Version 2.0
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FFmpeg Loudnorm スクリプトジェネレータ</title>
   <style>
-    /*
-      ベンダリング（Vendoring）: このHTMLファイルは、かつてTailwind CSSをCDNから動的に読み込んでいましたが、
-      完全なオフライン化のため、Tailwind CSS の CSS クラス定義を自前で実装しました。
-      Tailwind CSS のライセンス情報は THIRD_PARTY_NOTICES.md を参照してください。
-      外部CDNに依存せず、単一のHTMLファイルで完結して動作する設計が、このプロジェクトのコア機能です。
-    */
-    /* Reset */
+    :root {
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-secondary: #03dac6;
+      --md-sys-color-on-secondary: #00332c;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
+      --md-state-layer: rgba(98, 0, 238, 0.12);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1rem; line-height: 1.5; }
-    button { border: none; cursor: pointer; }
+    body { font-family: "Roboto", "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif; font-size: 1rem; line-height: 1.5; }
+    button { border: none; cursor: pointer; background: transparent; font: inherit; }
+    a { text-decoration: none; color: inherit; }
 
-    /* Colors */
-    body { background-color: #f9fafb; color: #1f2937; }
-    .bg-white { background-color: #ffffff; }
-    .bg-gray-50 { background-color: #f9fafb; }
-    .bg-gray-100 { background-color: #f3f4f6; }
-    .bg-gray-200 { background-color: #e5e7eb; }
-    .bg-gray-800 { background-color: #1f2937; }
-    .bg-gray-900 { background-color: #111827; }
-    .bg-green-600 { background-color: #16a34a; }
-    .bg-blue-600 { background-color: #2563eb; }
-    .text-white { color: #ffffff; }
-    .text-gray-600 { color: #4b5563; }
-    .text-gray-700 { color: #374151; }
-    .text-gray-800 { color: #1f2937; }
-    .text-red-500 { color: #ef4444; }
-    .border-gray-200 { border-color: #e5e7eb; }
-    .border-gray-300 { border-color: #d1d5db; }
-
-    /* Layout */
-    .flex { display: flex; }
-    .inline-flex { display: inline-flex; }
-    .items-center { align-items: center; }
-    .items-start { align-items: flex-start; }
-    .justify-center { justify-content: center; }
-    .flex-wrap { flex-wrap: wrap; }
-    .grid { display: grid; }
-    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .gap-2 { gap: 0.5rem; }
-    .w-5 { width: 1.25rem; }
-    .w-64 { width: 16rem; }
-    .w-72 { width: 18rem; }
-    .w-full { width: 100%; }
-    .h-5 { height: 1.25rem; }
-    .max-w-2xl { max-width: 42rem; }
-    .max-w-3xl { max-width: 48rem; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
-    .p-2 { padding: 0.5rem; }
-    .p-3 { padding: 0.75rem; }
-    .p-6 { padding: 1.5rem; }
-    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-    .px-4 { padding-left: 1rem; padding-right: 1rem; }
-    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .pr-10 { padding-right: 2.5rem; }
-    .mb-1 { margin-bottom: 0.25rem; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .mb-3 { margin-bottom: 0.75rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .mb-6 { margin-bottom: 1.5rem; }
-    .mt-2 { margin-top: 0.5rem; }
-    .mt-4 { margin-top: 1rem; }
-    .mt-6 { margin-top: 1.5rem; }
-    .mr-2 { margin-right: 0.5rem; }
-    .mr-6 { margin-right: 1.5rem; }
-    .ml-7 { margin-left: 1.75rem; }
-    .space-y-3 > * + * { margin-top: 0.75rem; }
-
-    /* Typography */
-    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-    .text-xs { font-size: 0.75rem; line-height: 1rem; }
-    .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-    .leading-5 { line-height: 1.25rem; }
-    .font-bold { font-weight: 700; }
-    .font-semibold { font-weight: 600; }
-    .font-normal { font-weight: 400; }
-
-    /* Box model */
-    .block { display: block; }
-    .hidden { display: none; }
-    .rounded { border-radius: 0.375rem; }
-    .rounded-lg { border-radius: 0.5rem; }
-    .rounded-full { border-radius: 9999px; }
-    .border { border-width: 1px; border-style: solid; }
-    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-    .overflow-x-auto { overflow-x: auto; }
-    .whitespace-pre { white-space: pre; }
-
-    /* Position */
-    .relative { position: relative; }
-    .absolute { position: absolute; }
-    .fixed { position: fixed; }
-    .top-2 { top: 0.5rem; }
-    .top-4 { top: 1rem; }
-    .top-12 { top: 3rem; }
-    .top-full { top: 100%; }
-    .right-2 { right: 0.5rem; }
-    .right-4 { right: 1rem; }
-    .right-5 { right: 1.25rem; }
-    .bottom-5 { bottom: 1.25rem; }
-    .left-1\/2 { left: 50%; }
-    .-translate-x-1\/2 { transform: translateX(-50%); }
-
-    /* Visibility */
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
-    .opacity-0 { opacity: 0; }
-    .pointer-events-none { pointer-events: none; }
-    .z-50 { z-index: 50; }
-
-    /* Transitions */
-    .transition { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-    .transition-opacity { transition-property: opacity; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
-    .duration-300 { transition-duration: 300ms; }
-
-    /* Hover effects */
-    .hover\:bg-gray-300:hover { background-color: #d1d5db; }
-    .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
-    .hover\:bg-green-700:hover { background-color: #15803d; }
-    .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
-    button.hover\:bg-gray-300:hover { background-color: #d1d5db; }
-
-    /* Group hover */
-    .group:hover .group-hover\:opacity-100 { opacity: 1; }
-    .group {}
-
-    /* Links */
-    a { text-decoration: none !important; }
-
-    /* Responsive */
-    @media (min-width: 640px) {
-      .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .md-page { background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; }
+    .md-shell { max-width: 48rem; margin: 0 auto; }
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid #ece7f3;
+      padding: 24px;
+      position: relative;
     }
-  </style>
-  <style>
-    .tab-list {
-      border-bottom: 1px solid #e5e7eb;
+
+    .md-menu-button { position: absolute; top: 16px; right: 16px; }
+    .md-menu-panel {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 20;
+    }
+    .md-menu-link { display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface); }
+    .md-menu-link:hover { background: #f2edf8; }
+
+    .md-headline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
       gap: 0.5rem;
+      padding-right: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
     }
-    .tab-button {
-      border: 1px solid #e5e7eb;
+    .md-headline__icon { margin-right: 0.5rem; }
+
+    .md-section { margin-bottom: 1rem; }
+    .md-section-title { font-size: 1rem; font-weight: 600; color: #3f3b46; margin-bottom: 0.5rem; }
+    .md-section-title--lg { font-size: 1.1rem; }
+
+    .md-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+      margin-bottom: 0.5rem;
+    }
+
+    .md-required {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.15rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(98, 0, 238, 0.12);
+      color: var(--md-sys-color-primary);
+    }
+
+    .md-input,
+    .md-select,
+    .md-textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .md-textarea { min-height: 10rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .md-input:focus,
+    .md-select:focus,
+    .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    .md-field-block { margin-bottom: 1rem; }
+
+    .md-button {
+      border-radius: 999px;
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+    .md-button--primary {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
+    }
+    .md-button--primary:hover { background: #4f00c9; }
+
+    .md-code-block { position: relative; margin-top: 0.5rem; }
+    .md-code {
+      display: block;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: var(--md-sys-color-surface-variant);
+      border: 1px solid #e5e0ec;
+      color: #1f1b2d;
+    }
+    .md-copy-button { position: absolute; top: 0.5rem; right: 0.5rem; }
+
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .md-icon-btn:hover { background: #e6e1ee; }
+    .md-icon-btn--small { width: 32px; height: 32px; border-radius: 16px; }
+    .md-icon-btn--surface { background: #f7f2fa; }
+    .md-icon-20 { width: 20px; height: 20px; }
+
+    .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: 20rem;
+      max-width: 90vw;
+    }
+    .md-tooltip-group:hover .md-tooltip-content { opacity: 1; }
+    .md-tooltip--wide { width: 24rem; }
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.01em;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .md-help-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: transparent;
+      color: #4a4458;
+      margin-left: 0.2rem;
+    }
+    .md-help-icon { width: 18px; height: 18px; }
+
+    .md-snackbar {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2b2831;
+      color: #f7f4fb;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+    .md-snackbar.md-visible { opacity: 1; pointer-events: auto; }
+
+    .md-hidden { display: none; }
+    .md-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+
+    .md-stack-sm > * + * { margin-top: 0.75rem; }
+    .md-muted { color: #6a6675; font-size: 0.875rem; }
+
+    .md-radio-row { display: flex; align-items: flex-start; gap: 0.5rem; }
+    .md-radio {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: #3f3b46;
+    }
+    .md-radio input { accent-color: var(--md-sys-color-primary); }
+
+    .md-switch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      font-weight: 600;
+    }
+    .md-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #f0ebf7;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: inset 0 0 0 1px #cfc7dc;
+    }
+    .md-switch::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: #ffffff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 150ms ease, background 150ms ease;
+    }
+    .md-switch-input { position: absolute; opacity: 0; pointer-events: none; }
+    .md-switch-input:checked + .md-switch {
+      background: rgba(98, 0, 238, 0.32);
+      box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.6);
+    }
+    .md-switch-input:checked + .md-switch::after {
+      transform: translateX(20px);
+      background: var(--md-sys-color-primary);
+    }
+
+    .md-tab-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border-bottom: 1px solid #e6e1ee;
+      margin-bottom: 1rem;
+    }
+    .md-tab-button {
+      border: 1px solid #e6e1ee;
       border-bottom: none;
-      background: #f3f4f6;
+      background: #f3f1f7;
       padding: 0.4rem 0.9rem;
       margin-bottom: -1px;
-      border-top-left-radius: 0.5rem;
-      border-top-right-radius: 0.5rem;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
       font-size: 0.875rem;
       font-weight: 600;
-      color: #374151;
+      color: #3f3b46;
     }
-    .tab-button[aria-selected="true"] {
+    .md-tab-button[aria-selected="true"] {
       background: #ffffff;
-      border-color: #94a3b8;
-      color: #0f172a;
+      border-color: #c8c5d0;
+      color: #1c1b1f;
     }
-    .tab-panel {
-      border: 1px solid #e5e7eb;
+    .md-tab-panel {
+      border: 1px solid #e6e1ee;
       border-top: none;
       padding: 1rem;
       background: #ffffff;
-      border-bottom-left-radius: 0.5rem;
-      border-bottom-right-radius: 0.5rem;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 p-6">
-  <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
+<body class="md-page">
+  <div class="md-shell md-card">
 
-    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+    <button type="button" class="md-icon-btn md-menu-button" aria-label="メニュー" onclick="toggleMenu()">
       
-      <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M4 6h16"/>
         <path d="M4 12h16"/>
         <path d="M4 18h16"/>
       </svg>
     
     </button>
-    <div id="menuPanel" class="absolute top-12 right-4 bg-white border border-gray-200 rounded shadow-md hidden">
-      <a href="../index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">トップへ戻る</a>
+    <div id="menuPanel" class="md-menu-panel md-hidden">
+      <a href="../index.html" class="md-menu-link">トップへ戻る</a>
     </div>
-    <h1 class="text-2xl font-bold mb-6"><span aria-hidden="true" class="mr-2">🔊</span>FFmpeg Loudnorm スクリプトジェネレータ</h1>
+    <h1 class="md-headline"><span aria-hidden="true">🔊</span>FFmpeg Loudnorm スクリプトジェネレータ</h1>
 
-    <label for="filename" class="flex flex-wrap items-center gap-2 mb-1 font-semibold">
+    <label for="filename" class="md-label">
       <span>音声ファイル名</span>
-      <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
-      <span class="relative inline-flex items-center group">
-        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-        <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+      <span class="md-required" aria-hidden="true">Required</span><span class="md-sr-only">必須</span>
+      <span class="md-tooltip-group">
+        <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+        <span class="md-tooltip-content md-tooltip md-tooltip--wide">
           例: 250503_130527_TrMic.WAV
         </span>
       </span>
       <span>：</span>
     </label>
-    <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.WAV" class="border border-gray-300 rounded w-full p-2 mb-4">
+    <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.WAV" class="md-input md-field-block">
 
-    <div class="mb-4">
-      <!-- ハイレゾ選択 -->
-      <label class="inline-flex items-center mr-6 font-semibold">
-        <input type="checkbox" id="hires" class="mr-2">
+    <div class="md-section">
+      <label class="md-switch-label">
+        <input type="checkbox" id="hires" class="md-switch-input">
+        <span class="md-switch" aria-hidden="true"></span>
         ハイレゾ（192kHz / 24bit）
       </label>
     </div>
 
-    <div class="tab-list flex flex-wrap mb-4" role="tablist" aria-label="処理方式の切り替え">
-      <button type="button" class="tab-button" data-target="tab-icu" aria-selected="true" aria-controls="tab-icu">
+    <div class="md-tab-list" role="tablist" aria-label="処理方式の切り替え">
+      <button type="button" class="md-tab-button" data-target="tab-icu" aria-selected="true" aria-controls="tab-icu">
         ICUラウドネス調整
       </button>
-      <button type="button" class="tab-button" data-target="tab-gain" aria-selected="false" aria-controls="tab-gain">
+      <button type="button" class="md-tab-button" data-target="tab-gain" aria-selected="false" aria-controls="tab-gain">
         単純ゲイン
       </button>
     </div>
 
-    <div class="tab-panel" data-tab="tab-icu" id="tab-icu">
-      <h2 class="text-xl font-semibold mb-2">1. 音質設定（ICUラウドネス調整）</h2>
-      <div class="mb-4 space-y-3">
+    <div class="md-tab-panel" data-tab="tab-icu" id="tab-icu">
+      <h2 class="md-section-title md-section-title--lg">1. 音質設定（ICUラウドネス調整）</h2>
+      <div class="md-stack-sm">
         <!-- モード切り替え -->
-        <div class="flex items-start gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="mode" value="music_release" class="mr-2" checked>
+        <div class="md-radio-row">
+          <label class="md-radio">
+            <input type="radio" name="mode" value="music_release" checked>
             <span>音楽（配信用）</span>
           </label>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--wide">
               配信や販売を意識した仕上げ用。ストリーミング基準の音圧で、安心できるピーク管理と適度なダイナミクスを両立します。
             </span>
           </span>
         </div>
 
-        <div class="flex items-start gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="mode" value="music_practice" class="mr-2">
+        <div class="md-radio-row">
+          <label class="md-radio">
+            <input type="radio" name="mode" value="music_practice">
             <span>音楽（練習用）</span>
           </label>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--wide">
               オーケストラや吹奏楽の練習録音向け。ダイナミクスを最大限に残しつつ、バランス確認しやすい音量に整えます。
             </span>
           </span>
         </div>
 
-        <div class="flex items-start gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="mode" value="strong" class="mr-2">
+        <div class="md-radio-row">
+          <label class="md-radio">
+            <input type="radio" name="mode" value="strong">
             <span>音楽＋指揮者モード</span>
           </label>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--wide">
               指揮者のコメントを聞き取りやすくしつつ、演奏の強弱も適度に残したい場合に最適です。
             </span>
           </span>
         </div>
 
-        <div class="flex items-start gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="mode" value="cinema" class="mr-2">
+        <div class="md-radio-row">
+          <label class="md-radio">
+            <input type="radio" name="mode" value="cinema">
             <span>映画 / ドラマ</span>
           </label>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--wide">
               映画やドラマのミックスチェック向け。広いラウドネスレンジでセリフと効果音のメリハリを確保します。
             </span>
           </span>
         </div>
 
-        <div class="flex items-start gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="mode" value="variety" class="mr-2">
+        <div class="md-radio-row">
+          <label class="md-radio">
+            <input type="radio" name="mode" value="variety">
             <span>バラエティ</span>
           </label>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--wide">
               トーク中心のテレビ番組を想定し、声を前に出しながらも BGM や効果音とのバランスを取りやすくします。
             </span>
           </span>
         </div>
 
-        <div class="flex items-start gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="mode" value="podcast" class="mr-2">
+        <div class="md-radio-row">
+          <label class="md-radio">
+            <input type="radio" name="mode" value="podcast">
             <span>ポッドキャスト / トーク</span>
           </label>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--wide">
               トーク番組やポッドキャスト向け。複数の話者でも聞きやすいよう中程度のラウドネスに揃えます。
             </span>
           </span>
         </div>
 
-        <div class="flex items-start gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="mode" value="livestream" class="mr-2">
+        <div class="md-radio-row">
+          <label class="md-radio">
+            <input type="radio" name="mode" value="livestream">
             <span>ライブ配信</span>
           </label>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--wide">
               ゲーム実況やライブ配信向け。声・BGM・効果音のピークを抑えつつ、配信基準に合わせます。
             </span>
           </span>
         </div>
 
-        <div class="flex items-start gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="mode" value="lecture" class="mr-2">
+        <div class="md-radio-row">
+          <label class="md-radio">
+            <input type="radio" name="mode" value="lecture">
             <span>講演 / セミナー</span>
           </label>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--wide">
               講演や質疑応答の収録向け。話者の声量差を吸収しながら聞き取りやすさを重視します。
             </span>
           </span>
         </div>
 
-        <div class="flex items-start gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="mode" value="bgm" class="mr-2">
+        <div class="md-radio-row">
+          <label class="md-radio">
+            <input type="radio" name="mode" value="bgm">
             <span>BGM / Lo-Fi</span>
           </label>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--wide">
               常時再生するバックグラウンドミュージック向け。耳障りになりにくいよう穏やかなダイナミクスにまとめます。
             </span>
           </span>
         </div>
 
-        <div class="flex items-start gap-2">
-          <label class="inline-flex items-center">
-            <input type="radio" name="mode" value="asmr" class="mr-2">
+        <div class="md-radio-row">
+          <label class="md-radio">
+            <input type="radio" name="mode" value="asmr">
             <span>ASMR / 朗読</span>
           </label>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--wide">
               近接収録の繊細な音向け。低ノイズで細かなニュアンスを保ちながら自然な音量感に整えます。
             </span>
           </span>
@@ -362,49 +497,50 @@ Licensed under the Apache License, Version 2.0
       </div>
     </div>
 
-    <div class="tab-panel" data-tab="tab-gain" id="tab-gain" hidden>
-      <h2 class="text-xl font-semibold mb-2">1. 単純ゲイン</h2>
-      <p class="text-sm text-gray-600 mb-4">測定結果の input_tp を基準に、ピークが目標TPに到達する分だけゲインします。</p>
-      <label class="block mb-2 font-semibold">目標TP (dBTP):</label>
-      <input type="number" id="gainTargetTp" step="0.1" value="-1.0" class="border border-gray-300 rounded w-full p-2 mb-4">
-      <label class="inline-flex items-center gap-2 mb-4 font-semibold">
-        <input type="checkbox" id="gainUseCompressor" class="mr-2">
+    <div class="md-tab-panel" data-tab="tab-gain" id="tab-gain" hidden>
+      <h2 class="md-section-title md-section-title--lg">1. 単純ゲイン</h2>
+      <p class="md-muted">測定結果の input_tp を基準に、ピークが目標TPに到達する分だけゲインします。</p>
+      <label class="md-label">目標TP (dBTP):</label>
+      <input type="number" id="gainTargetTp" step="0.1" value="-1.0" class="md-input md-field-block">
+      <label class="md-switch-label">
+        <input type="checkbox" id="gainUseCompressor" class="md-switch-input">
+        <span class="md-switch" aria-hidden="true"></span>
         軽いコンプを追加（自然にピークを抑える）
       </label>
     </div>
 
     <!-- 2. 測定フェーズ -->
-    <h2 class="text-xl font-semibold mt-6 mb-2">2. 測定フェーズコマンド</h2>
-    <button onclick="generateAnalyzeCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-3">測定用コマンド生成</button>
-    <div class="relative mb-4">
-      <code id="analyzeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
-      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('analyzeCmd')">📋</button>
+    <h2 class="md-section-title md-section-title--lg">2. 測定フェーズコマンド</h2>
+    <button onclick="generateAnalyzeCmd()" class="md-button md-button--primary md-field-block">測定用コマンド生成</button>
+    <div class="md-code-block md-field-block">
+      <code id="analyzeCmd" class="md-code"></code>
+      <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('analyzeCmd')">📋</button>
     </div>
 
     <!-- 3. 仕上げフェーズ -->
-    <h2 class="text-xl font-semibold mt-6 mb-2">3. 仕上げフェーズ</h2>
-    <label for="jsonInput" class="block mb-1">ラウドネス測定結果（ffmpeg出力全文）:</label>
-    <textarea id="jsonInput" rows="10" placeholder='ffmpeg の出力全文を貼り付けてください' class="border border-gray-300 rounded w-full p-2 mb-4"></textarea>
+    <h2 class="md-section-title md-section-title--lg">3. 仕上げフェーズ</h2>
+    <label for="jsonInput" class="md-label">ラウドネス測定結果（ffmpeg出力全文）:</label>
+    <textarea id="jsonInput" rows="10" placeholder='ffmpeg の出力全文を貼り付けてください' class="md-textarea md-field-block"></textarea>
 
-    <div class="tab-panel" data-tab="tab-icu" id="finish-normalize">
-      <button onclick="generateNormalizeCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-3">正規化コマンド生成</button>
-      <div class="relative">
-        <code id="normalizeCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
-        <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('normalizeCmd')">📋</button>
+    <div class="md-tab-panel" data-tab="tab-icu" id="finish-normalize">
+      <button onclick="generateNormalizeCmd()" class="md-button md-button--primary md-field-block">正規化コマンド生成</button>
+      <div class="md-code-block">
+        <code id="normalizeCmd" class="md-code"></code>
+        <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('normalizeCmd')">📋</button>
       </div>
     </div>
 
-    <div class="tab-panel" data-tab="tab-gain" id="finish-gain" hidden>
-      <button onclick="generateGainCmd()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded mb-3">単純ゲインコマンド生成</button>
-      <div class="relative">
-        <code id="gainCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto pr-10"></code>
-        <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('gainCmd')">📋</button>
+    <div class="md-tab-panel" data-tab="tab-gain" id="finish-gain" hidden>
+      <button onclick="generateGainCmd()" class="md-button md-button--primary md-field-block">単純ゲインコマンド生成</button>
+      <div class="md-code-block">
+        <code id="gainCmd" class="md-code"></code>
+        <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('gainCmd')">📋</button>
       </div>
     </div>
   </div>
 
   <!-- Toast -->
-  <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">コピーしました</div>
+  <div id="toast" class="md-snackbar md-hidden">コピーしました</div>
 
   <script>
     function generateAnalyzeCmd() {
@@ -554,28 +690,28 @@ ${outFile}`;
     function showToast(message) {
       const toast = document.getElementById("toast");
       toast.textContent = message;
-      toast.classList.remove("opacity-0", "pointer-events-none");
-      toast.classList.add("opacity-100");
+      toast.classList.remove("md-hidden");
+      toast.classList.add("md-visible");
       setTimeout(() => {
-        toast.classList.remove("opacity-100");
-        toast.classList.add("opacity-0", "pointer-events-none");
+        toast.classList.remove("md-visible");
+        toast.classList.add("md-hidden");
       }, 2000);
     }
 
     function setActiveTab(targetId) {
-      document.querySelectorAll(".tab-button").forEach(btn => {
+      document.querySelectorAll(".md-tab-button").forEach(btn => {
         const isActive = btn.getAttribute("data-target") === targetId;
         btn.setAttribute("aria-selected", isActive ? "true" : "false");
       });
 
-      document.querySelectorAll(".tab-panel").forEach(panel => {
+      document.querySelectorAll(".md-tab-panel").forEach(panel => {
         const panelTarget = panel.getAttribute("data-tab");
         if (!panelTarget) return;
         panel.hidden = panelTarget !== targetId;
       });
     }
 
-    document.querySelectorAll(".tab-button").forEach(button => {
+    document.querySelectorAll(".md-tab-button").forEach(button => {
       button.addEventListener("click", () => {
         const targetId = button.getAttribute("data-target");
         if (!targetId) return;
@@ -587,7 +723,7 @@ ${outFile}`;
     function toggleMenu() {
       const panel = document.getElementById("menuPanel");
       if (!panel) return;
-      panel.classList.toggle("hidden");
+      panel.classList.toggle("md-hidden");
     }
   </script>
 </body>
