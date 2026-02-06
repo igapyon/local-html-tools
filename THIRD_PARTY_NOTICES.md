@@ -2,6 +2,12 @@
 
 This project includes the following third-party software:
 
+## Material Design
+- Project: https://m3.material.io/
+- License: N/A (Design specification)
+
+Material Design is a design specification by Google and is referenced in this project.
+
 ## Tailwind CSS
 - Project: https://tailwindcss.com/
 - License: MIT

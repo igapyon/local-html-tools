@@ -32,6 +32,8 @@
 
 このプロジェクトでは、Tailwind 的ユーティリティをすべて撤去し、Material Design のコンポーネント指向に置き換えています。
 
+- チェックボックスとトグルの使い分けは行わず、選択肢はすべてトグルに統一する
+- トグルはラベルの左側に配置する（左右の違いで迷わないように固定）
 - ユーティリティ連打の構造はやめ、意味単位の `md-*` コンポーネントに再構成する
 - 色/角丸/影/タイポは `--md-sys-*` に集約し、要素側はトークン参照のみにする
 - `input/select/textarea` は `md-input` `md-select` `md-textarea` に統一する
@@ -39,7 +41,6 @@
 - ツールチップは `md-tooltip-group` + `md-tooltip-content` で構成し、`i` はインライン SVG を使う
 - ツールチップ本文は `md-tooltip` に `font-weight: 400` を指定し、細めの表現に統一する
 - 表示状態は `md-hidden` `md-visible` `md-disabled` に統一し、JS はクラス切替のみで制御する
-- コード出力は `md-code-block` と `md-code` を使い、コピーは `md-copy-button` に統一する
 
 ## フォーム配置の実装メモ
 
@@ -48,3 +49,10 @@
 - `md-field-stack`（縦並び）の場合は `.md-field-stack .md-input` を `flex: 0 0 auto` にして縦に伸びるのを防ぐ
 - 入力右端にアクションボタンを半分埋める配置は `md-input-wrap` + `md-input-action` を使う
 - ラベルと入力を同じ行に固定したいときは `md-form-row md-form-row--nowrap` を使う
+
+## Material Design 適用時の実装メモ（他フォルダの知見）
+
+- アコーディオンは `<details>/<summary>` を使うのが軽量で管理しやすい。初期状態は `open` 属性で制御する
+- ラジオはピル型ではなく、シンプルなラジオ＋ラベルを基準にする
+- ツールチップは横幅を制御して縦長化を避ける（例: `max-width` と `min-width` を併用）
+- ラベルと入力の並びは基本「ラベル直下に入力」。横並びにする場合は行高とベースラインを揃える
