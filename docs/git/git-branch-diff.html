@@ -18,7 +18,7 @@ limitations under the License.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Git リモートブランチ差分コマンドジェネレータ</title>
+  <title>Git ブランチ比較コマンドジェネレータ</title>
   <style>
     /*
       ベンダリング（Vendoring）: このHTMLファイルは、かつてTailwind CSSをCDNから動的に読み込んでいましたが、
@@ -56,6 +56,8 @@ limitations under the License.
     .justify-center { justify-content: center; }
     .flex-wrap { flex-wrap: wrap; }
     .gap-2 { gap: 0.5rem; }
+    .gap-4 { gap: 1rem; }
+    .gap-6 { gap: 1.5rem; }
     .w-5 { width: 1.25rem; }
     .w-full { width: 100%; }
     .w-80 { width: 20rem; }
@@ -72,12 +74,15 @@ limitations under the License.
     .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
     .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
     .pr-10 { padding-right: 2.5rem; }
+    .pr-6 { padding-right: 1.5rem; }
     .mb-2 { margin-bottom: 0.5rem; }
     .mb-4 { margin-bottom: 1rem; }
     .mb-6 { margin-bottom: 1.5rem; }
     .mt-2 { margin-top: 0.5rem; }
     .mt-4 { margin-top: 1rem; }
     .mr-2 { margin-right: 0.5rem; }
+    .mr-5 { margin-right: 1.25rem; }
+    .ml-8 { margin-left: 2rem; }
 
     /* Typography */
     .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
@@ -165,34 +170,14 @@ limitations under the License.
 
     <h1 class="text-2xl font-bold mb-6 flex flex-wrap items-center gap-2">
       <span aria-hidden="true" class="mr-2">🧰</span>
-      <span>Git リモートブランチ差分コマンドジェネレータ</span>
+      <span>Git ブランチ比較コマンドジェネレータ</span>
       <span class="relative inline-flex items-center group">
         <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
         <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-          リモートの2ブランチの内容差分をコンソールに表示するためのコマンドを生成します。
+          2つのブランチ差分を表示する `git diff` コマンドを生成します。ローカル/リモートを選べ、表示形式（内容/統計/ファイル一覧）や `..` / `...` を切り替えできます。
         </span>
       </span>
     </h1>
-
-    <div class="space-y-3 mb-4">
-      <label class="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" id="lockOrigin" class="rounded border-gray-300" checked onchange="updateRemoteState()">
-        リモート名は origin 固定
-      </label>
-      <div id="remoteNameBlock" class="space-y-2">
-        <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
-          <span>リモート名</span>
-          <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-              fetch と差分比較に使うリモート名です。
-            </span>
-          </span>
-          <span>：</span>
-        </label>
-        <input type="text" id="remoteName" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
-      </div>
-    </div>
 
     <div class="space-y-3 mb-4">
       <div class="flex flex-wrap items-center gap-2">
@@ -202,7 +187,8 @@ limitations under the License.
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
             <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-              例: main
+              比較の基準にするブランチです。差分の「片側」として使われます。
+              例: main / devel
             </span>
           </span>
           <span>：</span>
@@ -221,16 +207,57 @@ limitations under the License.
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
             <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
-              例: feature123
+              比較対象のブランチです。2つのブランチ差分を表示します。
+              例: feature123 / release
             </span>
           </span>
           <span>：</span>
         </label>
-        <input type="text" id="branchB" placeholder="例: feature123" class="border border-gray-300 rounded w-full sm:w-64 p-2">
+        <input type="text" id="branchB" placeholder="例: devel" class="border border-gray-300 rounded w-full sm:w-64 p-2">
         <label class="flex items-center gap-2 text-sm text-gray-700">
           <input type="checkbox" id="scopeB" class="rounded border-gray-300" checked onchange="updateRemoteState()">
           リモートとして扱う
         </label>
+      </div>
+    </div>
+
+    <div class="space-y-3 mb-4">
+      <div class="flex flex-wrap items-center text-sm text-gray-700" style="column-gap: 2ch; row-gap: 0.5rem;">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" id="lockOrigin" class="rounded border-gray-300" checked onchange="updateRemoteState()">
+          リモート名は origin 固定
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              origin 固定で使う場合にオンにします。オフにすると任意のリモート名を入力できます。
+              ふだんは origin を使うケースが多いです。
+            </span>
+          </span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" id="useTripleDot" class="rounded border-gray-300">
+          共通祖先からの差分比較
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              オフ時は A と B のスナップショット差分で、A/B の両方の変更が見えます。
+              オン時は共通祖先から B までの差分になり、B 側で増えた変更だけが見え、A だけの変更は見えません。
+            </span>
+          </span>
+        </label>
+      </div>
+      <div id="remoteNameBlock" class="space-y-2">
+        <label class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
+          <span>リモート名</span>
+          <span class="relative inline-flex items-center group">
+            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
+            <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              fetch と差分比較に使うリモート名です。
+            </span>
+          </span>
+          <span>：</span>
+        </label>
+        <input type="text" id="remoteName" placeholder="例: origin" class="border border-gray-300 rounded w-full p-2" value="origin">
       </div>
     </div>
 
@@ -243,9 +270,6 @@ limitations under the License.
       </select>
     </div>
 
-    <button onclick="generateCommands()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded">
-      差分コマンド生成
-    </button>
 
     <div class="relative mt-4">
       <code id="diffCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
@@ -282,7 +306,7 @@ limitations under the License.
       }
     }
 
-    function generateCommands() {
+    function generateCommands({ silent = false } = {}) {
       const branchA = document.getElementById("branchA").value.trim();
       const branchB = document.getElementById("branchB").value.trim();
       const scopeA = document.getElementById("scopeA").checked;
@@ -290,26 +314,48 @@ limitations under the License.
       const lockOrigin = document.getElementById("lockOrigin").checked;
       const remoteName = lockOrigin ? "origin" : document.getElementById("remoteName").value.trim();
       const diffMode = document.getElementById("diffMode").value;
+      const useTripleDot = document.getElementById("useTripleDot")?.checked;
+      const output = document.getElementById("diffCmd");
 
       if (!branchA || !branchB) {
-        alert("ブランチAとブランチBを入力してください。");
+        if (!silent) alert("ブランチAとブランチBを入力してください。");
+        if (output) output.textContent = "";
         return;
       }
       const useRemote = scopeA || scopeB;
       if (useRemote && !remoteName) {
-        alert("リモート名を入力してください。");
+        if (!silent) alert("リモート名を入力してください。");
+        if (output) output.textContent = "";
         return;
       }
 
       const refA = scopeA ? `${remoteName}/${branchA}` : branchA;
       const refB = scopeB ? `${remoteName}/${branchB}` : branchB;
       const diffOption = diffMode ? ` ${diffMode}` : "";
+      const rangeSeparator = useTripleDot ? "..." : "..";
       const commands = [];
       if (useRemote) {
         commands.push(`git fetch ${quoteIfNeeded(remoteName)}`);
       }
-      commands.push(`git diff${diffOption} ${quoteIfNeeded(refA)}..${quoteIfNeeded(refB)}`);
-      document.getElementById("diffCmd").textContent = commands.join("\n");
+      commands.push(`git diff${diffOption} ${quoteIfNeeded(refA)}${rangeSeparator}${quoteIfNeeded(refB)}`);
+      if (output) output.textContent = commands.join("\n");
+    }
+
+    function setupAutoUpdate() {
+      const handler = () => generateCommands({ silent: true });
+      const inputIds = ["branchA", "branchB", "remoteName"];
+      const changeIds = ["scopeA", "scopeB", "lockOrigin", "diffMode", "useTripleDot"];
+      inputIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("input", handler);
+        el.addEventListener("change", handler);
+      });
+      changeIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("change", handler);
+      });
     }
 
     function copyToClipboard(id) {
@@ -342,6 +388,8 @@ limitations under the License.
     }
 
     updateRemoteState();
+    setupAutoUpdate();
+    generateCommands({ silent: true });
   </script>
 </body>
 </html>

@@ -18,3 +18,29 @@
 - ImageMagick/sox: 画像/音声変換のパラメータ生成（バッチリサイズ/ウォーターマーク）
 - regex/sed/awk: 文字列変換テンプレの生成
 - [後まわし] docker/docker-compose: よくある起動・開発用コマンド生成
+- 各HTMLのタイトル右に「?」説明を置く方針に統一し、その文言を docs/index.html のホバー説明へ転記する対応を実施
+- [優先度高] タイトルに「?」が未設置のHTML一覧
+- 対象: docs/ffmpeg/ffmpeg-audio-convert-cmdline-gen.html
+- 対象: docs/ffmpeg/ffmpeg-concat-cmdline-gen.html
+- 対象: docs/ffmpeg/ffmpeg-loudnorm-cmdline-gen.html
+- 対象: docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html
+- 対象: docs/ffmpeg/ffmpeg-replace-audio-with-wav-gen.html
+- 対象: docs/ffmpeg/ffmpeg-silence-detect-gen.html
+- 対象: docs/ffmpeg/ffmpeg-trim-cmdline-gen.html
+- 対象: docs/ffmpeg/ffmpeg-youtube-mkv-gen.html
+- 対象: docs/index.html
+- 対象: docs/life/forgot-items-check.html
+- 対象: docs/life/japan-weather.html
+- 対象: docs/link/amazon-dp-extract.html
+- 対象: docs/link/facebook-fbclid-remove.html
+- 対象: docs/link/mime-base64.html
+- 対象: docs/link/url-encode-decode.html
+- 対象: docs/link/utm-remove.html
+- 対象: docs/text/text-viewer.html
+
+# DONE
+
+- [優先度高] タイトルに「?」が未設置のHTML一覧（対応済み分）
+- 対象: docs/grep/find-gen.html
+- 対象: docs/img/img2svg.html
+- 対象: docs/password/password-gen.html
