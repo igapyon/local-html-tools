@@ -89,9 +89,12 @@ limitations under the License.
     }
 
     .md-form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .md-form-row--nowrap { flex-wrap: nowrap; }
+    .md-field-stack { display: flex; flex-direction: column; align-items: stretch; gap: 0.5rem; }
     .md-label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--md-sys-color-on-surface); }
     .md-label--muted { color: #3f3b46; }
     .md-label--block { margin-bottom: 0.5rem; }
+    .md-label--full { width: 100%; }
 
     .md-switch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; color: var(--md-sys-color-on-surface); font-size: 0.95rem; }
 
@@ -158,6 +161,7 @@ limitations under the License.
       border-radius: 12px;
       padding: 0.75rem 1rem;
       font-size: 0.8125rem;
+      font-weight: 400;
       line-height: 1.35;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
       letter-spacing: 0.01em;
@@ -223,6 +227,20 @@ limitations under the License.
       border: 1px solid #f0c9c5;
     }
 
+    .md-input-wrap {
+      position: relative;
+      flex: 1 1 16rem;
+      min-width: 12rem;
+    }
+    .md-input-wrap .md-input { padding-right: 3rem; }
+    .md-input-action {
+      position: absolute;
+      top: 50%;
+      right: -0.5rem;
+      transform: translateY(-50%);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    }
+
     .md-snackbar {
       background: #2b2831;
       color: #ffffff;
@@ -242,6 +260,19 @@ limitations under the License.
       font: inherit;
       color: var(--md-sys-color-on-surface);
       transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .md-input {
+      flex: 1 1 16rem;
+      min-width: 12rem;
+      height: 2.75rem;
+      min-height: 2.75rem;
+      line-height: 1.2;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .md-field-stack .md-input,
+    .md-field-stack .md-select {
+      flex: 0 0 auto;
     }
     .md-field--dropdown {
       background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23635b75' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
@@ -273,6 +304,10 @@ limitations under the License.
     .md-snackbar-host.md-visible { opacity: 1; pointer-events: auto; }
 
     .md-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+
+    @media (max-width: 640px) {
+      .md-form-row--nowrap { flex-wrap: wrap; }
+    }
   </style>
 </head>
 <body class="md-page">
@@ -301,8 +336,8 @@ limitations under the License.
     </h1>
 
     <section id="baseBlock" class="md-section md-stack-md">
-      <div class="md-form-grid md-form-grid-2">
-        <div class="md-form-row">
+      <div class="md-stack-md">
+        <div class="md-form-row md-form-row--nowrap">
           <label class="md-label">
             <span>基点ブランチ</span>
             <span class="md-required" aria-hidden="true">Required</span><span class="md-sr-only">必須</span>
@@ -338,7 +373,7 @@ limitations under the License.
             <option value="stable"></option>
           </datalist>
         </div>
-        <div class="md-form-row">
+        <div class="md-form-row md-form-row--nowrap">
           <label class="md-label">
             <span>作業ブランチ</span>
             <span class="md-required" aria-hidden="true">Required</span><span class="md-sr-only">必須</span>
@@ -349,15 +384,17 @@ limitations under the License.
                 生成コマンドにそのまま反映されます。
               </span>
             </span>
-            <button type="button" class="md-icon-btn md-icon-btn--small" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新">
+            <span>：</span>
+          </label>
+          <div class="md-input-wrap">
+            <input type="text" id="workBranch" placeholder="例: tiga0129a" class="md-input">
+            <button type="button" class="md-icon-btn md-icon-btn--small md-input-action" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
                 <path d="M20 4v6h-6"/>
               </svg>
             </button>
-            <span>：</span>
-          </label>
-          <input type="text" id="workBranch" placeholder="例: tiga0129a" class="md-input">
+          </div>
         </div>
       </div>
       <div class="md-switch-row">

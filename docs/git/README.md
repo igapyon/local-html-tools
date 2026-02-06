@@ -16,3 +16,34 @@
 ## 使い方
 
 対象の HTML をブラウザで開き、必要事項を入力して生成されたコマンドをそのままターミナルで実行します。
+
+## git-pseudo-squash.html の Material Design 実装方針
+
+`docs/git/git-pseudo-squash.html` は外部ライブラリに依存せず、単一 HTML 内で Material Design 仕様を再現しています。
+
+- 命名は `md-*` で統一し、レイアウト/フォーム/ボタン/ツールチップ/スナックバー/コード表示をコンポーネント単位で定義する
+- 色/角丸/影/タイポグラフィは CSS 変数 `--md-sys-*` に集約し、要素側はトークン参照のみで組み立てる
+- 主要コンポーネントは以下のクラスで構成する
+- `md-card` `md-input` `md-select` `md-textarea` `md-button` `md-icon-btn` `md-switch` `md-tooltip` `md-snackbar` `md-code`
+- 表示切替は `md-hidden` `md-visible` `md-disabled` を使い、JS 側はクラスの付け替えだけで制御する
+- 「i」アイコンはインライン SVG で実装し、色/サイズ/余白は `md-tooltip-trigger` 側で統一する
+
+## Tailwind CSS から Material Design への書き換えルール
+
+このプロジェクトでは、Tailwind 的ユーティリティをすべて撤去し、Material Design のコンポーネント指向に置き換えています。
+
+- ユーティリティ連打の構造はやめ、意味単位の `md-*` コンポーネントに再構成する
+- 色/角丸/影/タイポは `--md-sys-*` に集約し、要素側はトークン参照のみにする
+- `input/select/textarea` は `md-input` `md-select` `md-textarea` に統一する
+- 必須表示はラベル横の `md-required-chip` に統一する
+- ツールチップは `md-tooltip-group` + `md-tooltip-content` で構成し、`i` はインライン SVG を使う
+- ツールチップ本文は `md-tooltip` に `font-weight: 400` を指定し、細めの表現に統一する
+- 表示状態は `md-hidden` `md-visible` `md-disabled` に統一し、JS はクラス切替のみで制御する
+- コード出力は `md-code-block` と `md-code` を使い、コピーは `md-copy-button` に統一する
+
+## フォーム配置の実装メモ
+
+- ラベル右に入力を並べるときは `md-form-row md-form-row--nowrap` を使う
+- モバイル幅では `@media (max-width: 640px)` で wrap させて詰まりを防ぐ
+- `md-field-stack`（縦並び）の場合は `.md-field-stack .md-input` を `flex: 0 0 auto` にして縦に伸びるのを防ぐ
+- 入力右端にアクションボタンを半分埋める配置は `md-input-wrap` + `md-input-action` を使う
