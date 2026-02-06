@@ -129,6 +129,7 @@
     .hover\:bg-gray-200:hover { background-color: #e5e7eb; }
     .hover\:translate-x-0\.5:hover { transform: translateX(0.125rem); }
     a.hover\:text-blue-800:hover { color: #1e40af; }
+    .tooltip { width: min(32rem, 90vw); white-space: normal; line-height: 1.5; }
 
     /* Links */
     a { color: inherit; text-decoration: none !important; }
@@ -152,11 +153,11 @@
           <span>ウェブブラウザで動くローカルHTMLツール集（Static Web App）です。</span>
           <span class="relative inline-flex items-center group">
             <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
-              各ツール（HTMLファイル）をウェブブラウザで開くと、専用の入力画面が表示されます。そこにファイル名などの必要な情報を入力するだけで、FFmpegで使えるコマンドラインのテキストが自動的に作成されます。<br>
-              主な特徴:<br>
-              ・ローカル動作: お使いのPC内で動作し、サーバは不要です。<br>
-              ・簡単な操作: ウェブブラウザでファイルを開き、情報を入力するだけでコマンドが手に入ります。<br>
+            <span class="tooltip absolute left-1/2 top-full mt-2 -translate-x-1/2 rounded bg-gray-900 text-white text-xs px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              各ツール（HTMLファイル）をウェブブラウザで開くと、専用の入力画面が表示されます。そこにファイル名などの必要な情報を入力するだけで、FFmpegで使えるコマンドラインのテキストが自動的に作成されます。
+              主な特徴:
+              ・ローカル動作: お使いのPC内で動作し、サーバは不要です。
+              ・簡単な操作: ウェブブラウザでファイルを開き、情報を入力するだけでコマンドが手に入ります。
               ・効率化: （FFmpeg系の場合）複雑なコマンドの構文を覚える必要がなく、手入力によるミスを防ぎます。
             </span>
           </span>
@@ -175,16 +176,16 @@
             </h3>
             <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
           </div>
-          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">reset --soft で疑似的に1コミット化するコマンドを生成します。</p>
+          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。</p>
         </a>
-        <a href="git/git-remote-branch-diff.html" class="group block bg-white p-4 rounded-lg shadow hover:shadow-md transition">
+        <a href="git/git-branch-diff.html" class="group block bg-white p-4 rounded-lg shadow hover:shadow-md transition">
           <div class="flex items-center justify-between">
             <h3 class="font-semibold text-lg">
-              <span aria-hidden="true" class="mr-2">🧰</span>Git リモート差分
+              <span aria-hidden="true" class="mr-2">🧰</span>Git ブランチ比較
             </h3>
             <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
           </div>
-          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">リモートの2ブランチ差分を表示するコマンドを生成します。</p>
+          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">2つのブランチ差分を表示する `git diff` コマンドを生成します。ローカル/リモートを選べ、表示形式（内容/統計/ファイル一覧）や `..` / `...` を切り替えできます。</p>
         </a>
         <a href="git/git-config-setup.html" class="group block bg-white p-4 rounded-lg shadow hover:shadow-md transition">
           <div class="flex items-center justify-between">
@@ -193,7 +194,7 @@
             </h3>
             <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
           </div>
-          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">Gitのユーザー名とメールアドレスを設定するコマンドを生成します。</p>
+          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">グローバル設定でGitユーザー名とメールアドレスを設定するためのコマンドを生成します。</p>
         </a>
         <a href="git/git-config-advanced-setup.html" class="group block bg-white p-4 rounded-lg shadow hover:shadow-md transition">
           <div class="flex items-center justify-between">
@@ -202,7 +203,7 @@
             </h3>
             <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
           </div>
-          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">core.autocrlfやpush.defaultなどの詳細設定をコマンドで生成します。</p>
+          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">core.autocrlf や push.default などのGit詳細設定をグローバル設定するコマンドを生成します。</p>
         </a>
       </div>
 
@@ -217,7 +218,7 @@
             </h3>
             <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
           </div>
-          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">findでファイル/ディレクトリを検索するコマンドを生成します。</p>
+          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">findでファイル/ディレクトリを検索するコマンドを生成します。条件（名前/拡張子/サイズ/更新日時/内容検索）を組み合わせて作れます。</p>
         </a>
       </div>
 
@@ -361,7 +362,7 @@
             </h3>
             <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
           </div>
-          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">画像ファイルをSVGに変換してダウンロードします。</p>
+          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">画像ファイルをSVGに変換します。これは困難なことを実現するツールです。アイコン・ロゴのようなものはよく再現できますが、イラスト・写真などは技術的な理由から再現度が高くないことをあらかじめご承知ください。</p>
         </a>
       </div>
 
@@ -385,7 +386,7 @@
             </h3>
             <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
           </div>
-          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">改行付きテキストを半角空白区切りに変換します。</p>
+          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">テキストを即時に変換・整形するためのツールです。入力内容に対して選択した変換オプションが順番に適用され、結果が出力欄に反映されます。文字の変換・行の変換・空白の変換を組み合わせて使えます。</p>
         </a>
       </div>
 
@@ -400,7 +401,7 @@
             </h3>
             <span class="text-gray-400 transition group-hover:translate-x-0.5">→</span>
           </div>
-          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">選択した文字種と文字数でパスワードを生成します。</p>
+          <p class="mt-2 hidden text-sm text-gray-600 group-hover:block">選択した文字種と文字数でパスワードを生成します。英大文字または英小文字は必須で、生成結果は英字から始まります。目視で認識しづらい文字は除外した設計になっています。</p>
         </a>
       </div>
 
