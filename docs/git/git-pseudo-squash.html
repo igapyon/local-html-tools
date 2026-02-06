@@ -26,28 +26,43 @@ limitations under the License.
       Tailwind CSS のライセンス情報は THIRD_PARTY_NOTICES.md を参照してください。
       外部CDNに依存せず、単一のHTMLファイルで完結して動作する設計が、このプロジェクトのコア機能です。
     */
+    :root {
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-secondary: #03dac6;
+      --md-sys-color-on-secondary: #00332c;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
+      --md-state-layer: rgba(98, 0, 238, 0.12);
+    }
+
     /* Reset */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 1rem; line-height: 1.5; }
+    body { font-family: "Roboto", "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif; font-size: 1rem; line-height: 1.5; }
     button { border: none; cursor: pointer; }
 
     /* Colors */
-    body { background-color: #f9fafb; color: #1f2937; }
-    .bg-white { background-color: #ffffff; }
-    .bg-gray-50 { background-color: #f9fafb; }
-    .bg-gray-100 { background-color: #f3f4f6; }
-    .bg-gray-200 { background-color: #e5e7eb; }
-    .bg-gray-800 { background-color: #1f2937; }
-    .bg-gray-900 { background-color: #111827; }
-    .bg-green-600 { background-color: #16a34a; }
+    body { background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); }
+    .bg-white { background-color: var(--md-sys-color-surface); }
+    .bg-gray-50 { background-color: var(--md-sys-color-background); }
+    .bg-gray-100 { background-color: var(--md-sys-color-surface-variant); }
+    .bg-gray-200 { background-color: #ede9f5; }
+    .bg-gray-800 { background-color: #2a2730; }
+    .bg-gray-900 { background-color: #1b1820; }
+    .bg-green-600 { background-color: var(--md-sys-color-primary); }
     .text-white { color: #ffffff; }
-    .text-gray-600 { color: #4b5563; }
-    .text-gray-700 { color: #374151; }
-    .text-gray-800 { color: #1f2937; }
-    .text-red-500 { color: #ef4444; }
-    .border-gray-200 { border-color: #e5e7eb; }
-    .border-gray-300 { border-color: #d1d5db; }
+    .text-gray-600 { color: var(--md-sys-color-on-surface-variant); }
+    .text-gray-700 { color: #3f3b46; }
+    .text-gray-800 { color: var(--md-sys-color-on-surface); }
+    .text-red-500 { color: #b3261e; }
+    .border-gray-200 { border-color: #e6e1ee; }
+    .border-gray-300 { border-color: var(--md-sys-color-outline); }
 
     /* Layout */
     .flex { display: flex; }
@@ -116,8 +131,8 @@ limitations under the License.
     .rounded-lg { border-radius: 0.5rem; }
     .rounded-full { border-radius: 9999px; }
     .border { border-width: 1px; border-style: solid; }
-    .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+    .shadow-md { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 6px 14px rgba(0, 0, 0, 0.08); }
+    .shadow-lg { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14); }
     .overflow-x-auto { overflow-x: auto; }
     .whitespace-pre { white-space: pre; }
 
@@ -160,9 +175,151 @@ limitations under the License.
     .group {}
     .group:hover .group-hover\:opacity-100 { opacity: 1; }
 
+    /* Material components */
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid #ece7f3;
+    }
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .md-icon-btn:hover { background: #e6e1ee; }
+    .md-icon-btn--small { width: 32px; height: 32px; border-radius: 16px; font-size: 0.875rem; }
+    .md-icon-btn--surface { background: #f7f2fa; }
+    .md-code {
+      background: var(--md-sys-color-surface-variant);
+      border: 1px solid #e5e0ec;
+      border-radius: 12px;
+      color: #1f1b2d;
+    }
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.01em;
+    }
+    .md-help-chip { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 9999px; background: transparent; color: #4a4458; box-shadow: none; margin-left: 0.2rem; }
+    .md-help-icon { width: 18px; height: 18px; }
+    .md-inline-icon { width: 20px; height: 20px; display: inline-block; }
+    .md-icon-small { width: 16px; height: 16px; }
+
+    .md-tooltip--rich {
+      max-width: 22rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .md-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #f0ebf7;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: inset 0 0 0 1px #cfc7dc;
+    }
+    .md-switch::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transform: translateX(0);
+      transition: transform 150ms ease;
+    }
+    input[type="checkbox"].md-switch-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    input[type="checkbox"].md-switch-input:checked + .md-switch {
+      background: #8b5cf6;
+      box-shadow: inset 0 0 0 1px #7c3aed;
+    }
+    input[type="checkbox"].md-switch-input:checked + .md-switch::after {
+      transform: translateX(20px);
+      background: #ffffff;
+    }
+    .md-switch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+    }
+    .md-required {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.1rem 0.45rem;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: #f7e9e7;
+      color: #8c1d18;
+      border: 1px solid #f0c9c5;
+    }
+    .md-snackbar {
+      background: #2b2831;
+      color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      letter-spacing: 0.01em;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      background: #ffffff;
+      border: 1px solid var(--md-sys-color-outline);
+      border-radius: 12px;
+      padding: 0.625rem 0.75rem;
+      font: inherit;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .md-field--dropdown {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23635b75' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem 1rem;
+      padding-right: 2.25rem;
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.18);
+    }
+    input[type="checkbox"],
+    input[type="radio"] {
+      accent-color: var(--md-sys-color-primary);
+    }
+
     /* Disabled state */
-    input:disabled { background-color: #f3f4f6; }
-    select:disabled { background-color: #f3f4f6; }
+    input:disabled { background-color: #f3f0f7; }
+    select:disabled { background-color: #f3f0f7; }
     textarea:focus { outline: none; }
     .selectable-code { cursor: text; }
 
@@ -171,8 +328,8 @@ limitations under the License.
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
-  <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 relative">
-    <button type="button" class="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-1 px-2 rounded" aria-label="メニュー" onclick="toggleMenu()">
+  <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 relative md-card">
+    <button type="button" class="absolute top-4 right-4 md-icon-btn" aria-label="メニュー" onclick="toggleMenu()">
       <svg aria-hidden="true" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M4 6h16"/>
         <path d="M4 12h16"/>
@@ -187,8 +344,8 @@ limitations under the License.
       <span aria-hidden="true" class="mr-2">🧩</span>
       <span>Git pseudo-squash コマンドジェネレータ</span>
       <span class="relative inline-flex items-center group">
-        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+        <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+        <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
           reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。
           運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。
         </span>
@@ -200,17 +357,17 @@ limitations under the License.
         <div class="flex flex-wrap items-center gap-2">
           <label class="flex flex-wrap items-center gap-2 font-semibold">
             <span>基点ブランチ</span>
-            <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+            <span class="md-required" aria-hidden="true">Required</span><span class="sr-only">必須</span>
             <span class="relative inline-flex items-center group">
-              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+              <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
                 基点は git 作業の差分の起点として利用されます。git 作業をどこが基点なのか確認しましょう。
                 基点が違うと差分がずれるため要確認です。設定の順番を揃えると意図した差分になりやすいです。
               </span>
             </span>
             <span>：</span>
           </label>
-          <input type="text" id="squashBaseBranch" list="baseBranchSuggestions" placeholder="例: devel" class="border border-gray-300 rounded w-full p-2" value="devel">
+          <input type="text" id="squashBaseBranch" list="baseBranchSuggestions" placeholder="例: devel" class="border border-gray-300 rounded w-full p-2 md-field--dropdown" value="devel">
           <datalist id="baseBranchSuggestions">
             <option value="main"></option>
             <option value="master"></option>
@@ -236,37 +393,44 @@ limitations under the License.
         <div class="flex flex-wrap items-center gap-2">
           <label class="flex flex-wrap items-center gap-2 font-semibold">
             <span>作業ブランチ</span>
-            <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+            <span class="md-required" aria-hidden="true">Required</span><span class="sr-only">必須</span>
             <span class="relative inline-flex items-center group">
-              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+              <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
                 これから作業するブランチ名です。未作成なら作成先として使います。
                 生成コマンドにそのまま反映されます。
               </span>
             </span>
-            <button type="button" class="inline-flex items-center justify-center w-5 h-5 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded transition" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新">↻</button>
+            <button type="button" class="md-icon-btn md-icon-btn--small" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新">
+              <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+                <path d="M20 4v6h-6"/>
+              </svg>
+            </button>
             <span>：</span>
           </label>
           <input type="text" id="workBranch" placeholder="例: tiga0129a" class="border border-gray-300 rounded w-full p-2">
         </div>
       </div>
       <div class="flex flex-wrap items-center gap-3 text-sm text-gray-700">
-        <label class="flex items-center gap-2">
-          <input type="checkbox" id="shellEnvPowerShell" class="rounded border-gray-300">
+        <label class="md-switch-label">
+          <input type="checkbox" id="shellEnvPowerShell" class="md-switch-input">
+          <span class="md-switch" aria-hidden="true"></span>
           PowerShell
           <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 tooltip-wide -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 tooltip-wide -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
               Windows PowerShell 用のコマンドを出力します。オフの場合は macOS / Linux の bash / zsh を想定します。
             </span>
           </span>
         </label>
-        <label class="flex items-center gap-2">
-          <input type="checkbox" id="lockOrigin" class="rounded border-gray-300" checked onchange="toggleOriginLock()">
+        <label class="md-switch-label">
+          <input type="checkbox" id="lockOrigin" class="md-switch-input" checked onchange="toggleOriginLock()">
+          <span class="md-switch" aria-hidden="true"></span>
           リモート + origin で作業
           <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
               よくある利用方法として リモートと origin の組み合わせでの利用です。通常はこのままで OK です。
               複数リモートを使い分ける場合だけ外して、対象のリモート名に切り替えます。
               チェックを外すと、基点のリモート名と squash 用リモート名を個別に指定できます。
@@ -279,8 +443,8 @@ limitations under the License.
           <label class="flex flex-wrap items-center gap-2 font-semibold text-gray-700">
             <span>基点の参照先</span>
             <span class="relative inline-flex items-center group">
-              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+              <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
                 基点ブランチをリモートから参照するか、ローカルで参照するかを指定します。
                 ふだんは最新のリモート状態で切りたいので、リモート基点を選ぶケースが多いです。
               </span>
@@ -296,8 +460,8 @@ limitations under the License.
           <label class="flex flex-wrap items-center gap-2 font-semibold text-gray-700">
             <span>基点リモート</span>
             <span class="relative inline-flex items-center group">
-              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-              <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+              <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+              <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
                 基点ブランチを参照するリモート名です（例: origin）。
                 「作業開始」と「まとめる予定の作業 (diff)」の基準になります。
                 リモート基点を選ぶ場合は、最新の origin/devel などを参照する想定です。
@@ -313,8 +477,8 @@ limitations under the License.
       <label id="squashRemoteLabel" class="flex flex-wrap items-center gap-2 mb-2 font-semibold">
         <span>squashリモート</span>
         <span class="relative inline-flex items-center group">
-          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+          <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
             squash 作業で使う fetch / push のリモート名です。通常は origin です。
             「作業をまとめる（squash）」のコマンドに反映されます。
             基点のリモートと同じにしておくと混乱しにくいです。
@@ -341,15 +505,20 @@ limitations under the License.
         </svg>
         <p class="text-base font-semibold text-gray-700">作業開始（基準ブランチから作成）</p>
         <span class="relative inline-flex items-center group">
-          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+          <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
             基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
           </span>
         </span>
       </div>
       <div class="relative">
-        <code id="createBranchCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
-        <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('createBranchCmd')">📋</button>
+      <code id="createBranchCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10 md-code"></code>
+      <button class="absolute top-2 right-2 md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('createBranchCmd')">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="11" height="11" rx="2"/>
+          <rect x="4" y="4" width="11" height="11" rx="2"/>
+        </svg>
+      </button>
       </div>
 
       <div class="flex items-center justify-center py-2">
@@ -379,8 +548,8 @@ limitations under the License.
         </svg>
         <p class="text-base font-semibold text-gray-700">作業をまとめる（squash）</p>
         <span class="relative inline-flex items-center group">
-          <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-          <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+          <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+          <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
             ローカルの複数のコミットを1つにまとめます。
             reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
           </span>
@@ -389,10 +558,10 @@ limitations under the License.
       <div class="flex flex-wrap items-center gap-2">
         <label class="flex flex-wrap items-center gap-2 font-semibold">
           <span>コミットメッセージ</span>
-          <span class="text-red-500 font-bold" aria-hidden="true">*</span><span class="sr-only">必須</span>
+          <span class="md-required" aria-hidden="true">Required</span><span class="sr-only">必須</span>
           <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
               まとめ後の1コミットの説明文です。複数行入力が可能で、内容は一時ファイルに書き込んで git commit -F で渡されます。
               macOS / Linux は mktemp + ヒアドキュメント、Windows は PowerShell の New-TemporaryFile で対応します。
               ヒアドキュメント経由で渡すため、シェルのクォート解析の影響を受けにくくしています。
@@ -401,28 +570,30 @@ limitations under the License.
           </span>
           <span>：</span>
         </label>
-        <textarea id='commitMessage' placeholder='コミットの内容を表す一文&#10;&#10;コミットの内容の説明' class='border border-gray-300 rounded w-full p-2' rows='8'></textarea>
+        <textarea id='commitMessage' placeholder='コミットの内容を表す一文&#10;&#10;コミットの内容の説明' class='border border-gray-300 rounded w-full p-2' rows='12'></textarea>
       </div>
     </section>
 
     <div class="space-y-2 mb-4">
       <div class="flex flex-wrap items-center gap-2">
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" id="optPush" class="rounded border-gray-300">
+        <label class="md-switch-label">
+          <input type="checkbox" id="optPush" class="md-switch-input">
+          <span class="md-switch" aria-hidden="true"></span>
           push を追加
           <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
               push --force-with-lease でコミット整理を反映した後、リモートと同期（pull）し、ブランチを -done サフィックスでリネームするコマンドが続きます。ローカルでコミットが1つにまとまっているため、GitHubのPRではsquashせず通常のmergeで完了です。
             </span>
           </span>
         </label>
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" id="useCurrentBranch" class="rounded border-gray-300" checked onchange="toggleCurrentBranch()">
+        <label class="md-switch-label">
+          <input type="checkbox" id="useCurrentBranch" class="md-switch-input" checked onchange="toggleCurrentBranch()">
+          <span class="md-switch" aria-hidden="true"></span>
           現在ブランチで作業
           <span class="relative inline-flex items-center group">
-            <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-            <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
               現在チェックアウト中のブランチを作業ブランチとして扱います。チェックを外すと、作業ブランチ名で switch するコマンドが含まれます。
             </span>
           </span>
@@ -431,8 +602,13 @@ limitations under the License.
     </div>
 
     <div class="relative mt-4">
-      <code id="rebaseCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
-      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('rebaseCmd')">📋</button>
+      <code id="rebaseCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10 md-code"></code>
+      <button class="absolute top-2 right-2 md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('rebaseCmd')">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="11" height="11" rx="2"/>
+          <rect x="4" y="4" width="11" height="11" rx="2"/>
+        </svg>
+      </button>
     </div>
 
     <div class="flex items-center justify-center py-2">
@@ -461,18 +637,23 @@ limitations under the License.
       </svg>
       <p class="text-base font-semibold text-gray-700">まとめる予定の作業 (diff)</p>
       <span class="relative inline-flex items-center group">
-        <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-        <span class="absolute left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+        <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+        <span class="absolute md-tooltip md-tooltip--rich left-1/2 top-full mt-2 w-80 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
           基点ブランチと作業ブランチの差分を表示するコマンドです。squash 後に1コミットへまとめる内容の目安になります。
         </span>
       </span>
     </div>
     <div class="relative">
-      <code id="plannedDiffCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10"></code>
-      <button class="absolute top-2 right-2 bg-gray-200 px-2 py-1 rounded text-sm hover:bg-gray-300" onclick="copyToClipboard('plannedDiffCmd')">📋</button>
+      <code id="plannedDiffCmd" class="bg-gray-100 p-3 block rounded overflow-x-auto whitespace-pre pr-10 md-code"></code>
+      <button class="absolute top-2 right-2 md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('plannedDiffCmd')">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="11" height="11" rx="2"/>
+          <rect x="4" y="4" width="11" height="11" rx="2"/>
+        </svg>
+      </button>
     </div>
 
-    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none md-snackbar">
       コピーしました
     </div>
   </div>
