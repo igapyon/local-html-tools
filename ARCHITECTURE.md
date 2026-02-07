@@ -1,39 +1,60 @@
 # ARCHITECTURE
 
-## 「?」ツールチップのビジュアル標準
+## Material Design 実装ガイド
 
-本プロジェクトでは、説明文はタイトル右の「?」に集約し、ホバーで表示する統一UIとする。
+本プロジェクトでは、外部CSSに依存せず `md-*` クラスを用いて Material Design の見た目と操作感を再現する。
 
-### 見た目の基準
+### 基本トークン
 
-- **形状**: 小さな丸型バッジ
-- **サイズ**: `w-5 h-5`（1.25rem）
-- **文字**: `?` を中央配置、`text-xs`、`font-bold`
-- **配色**: `bg-gray-200`、文字色 `text-gray-600`
-- **角丸**: `rounded-full`
-- **配置**: タイトルの右に並べ、`inline-flex items-center` で整列
+- 色や影は CSS 変数 `--md-sys-*` に集約する
+- コンポーネント側はトークン参照のみで組み立てる
 
-### ホバーテキストの基準
+### 「i」ツールチップの標準
 
-- **表示方式**: ホバー時にフェードイン（`opacity-0` → `group-hover:opacity-100`）
-- **位置**: `top-full` + `mt-2`、中央寄せ（`left-1/2` + `-translate-x-1/2`）
-- **幅**: `w-72` または `w-80` を基準（内容に応じて調整）
-- **背景/文字**: `bg-gray-900`、`text-white`
-- **文字サイズ**: `text-xs`、`leading-5`
-- **装飾**: `rounded-lg`、`shadow-lg`、`px-3 py-2`
-- **干渉防止**: `pointer-events-none`、`z-50`
-- **余白の実運用**: 読みやすさ優先で `leading-6`、左右は `px-4`、上下は `py-2` を基準にして微調整する
+説明文はタイトル右の「i」アイコンに集約し、ホバーで表示する。
 
-### 実装の基本形（参考）
+- **構成**: `md-tooltip-group` + `md-help-chip` + `md-tooltip-content` + `md-tooltip`
+- **表示**: `md-tooltip-group:hover` で `md-tooltip-content` をフェードイン
+- **幅**: 標準 `20rem`、必要なら `md-tooltip--wide`
+
+#### 実装の基本形（参考）
 
 ```html
-<span class="relative inline-flex items-center group">
-  <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-gray-600 bg-gray-200 rounded-full">?</span>
-  <span class="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg shadow-lg bg-gray-900 text-white text-xs leading-5 font-normal px-3 py-2 opacity-0 group-hover:opacity-100 transition pointer-events-none z-50">
+<span class="md-tooltip-group">
+  <span class="md-help-chip">
+    <svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none">
+      <circle cx="12" cy="12" r="9" fill="#cbbcf0"/>
+      <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/>
+      <circle cx="12" cy="7.5" r="1" fill="#ffffff"/>
+    </svg>
+  </span>
+  <span class="md-tooltip-content md-tooltip">
     説明文…
   </span>
 </span>
 ```
+
+### 主要コンポーネント
+
+- **レイアウト**: `md-page` `md-shell` `md-card` `md-section`
+- **フォーム**: `md-label` `md-input` `md-select` `md-textarea` `md-field-block`
+- **ボタン**: `md-button` `md-button--primary` `md-icon-btn`
+- **コード表示**: `md-code-block` `md-code` `md-copy-button`
+- **トースト**: `md-snackbar` `md-hidden` `md-visible`
+
+### 追加クラス（用途別）
+
+`git-pseudo-squash.html` を基準にしつつ、以下はツール固有で追加されたクラス群。
+
+- **find-gen.html**
+  - グリッド系: `md-grid` `md-grid-2` `md-grid-3`
+  - フォーム行: `md-form-row` `md-form-row--nowrap`
+- **text-processing.html**
+  - テキストボタン: `md-text-button`
+  - オプションカード: `md-option-card`
+  - トグル: `md-toggle` `md-toggle-input` `md-toggle-track`
+  - アコーディオン: `md-accordion`
+  - 出力枠: `md-output` `md-output-wrap`
 
 ## ボタンなし（自動生成）パターン
 
