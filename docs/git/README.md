@@ -28,13 +28,13 @@
 - 表示切替は `md-hidden` `md-visible` `md-disabled` を使い、JS 側はクラスの付け替えだけで制御する
 - 「i」アイコンはインライン SVG で実装し、色/サイズ/余白は `md-tooltip-trigger` 側で統一する
 
-## Tailwind CSS から Material Design への書き換えルール
+## Material Design 実装ルール
 
-このプロジェクトでは、Tailwind 的ユーティリティをすべて撤去し、Material Design のコンポーネント指向に置き換えています。
+このプロジェクトでは、外部CSS依存を避け、Material Design のコンポーネント指向に統一しています。
 
 - チェックボックスとトグルの使い分けは行わず、選択肢はすべてトグルに統一する
 - トグルはラベルの左側に配置する（左右の違いで迷わないように固定）
-- ユーティリティ連打の構造はやめ、意味単位の `md-*` コンポーネントに再構成する
+- 意味単位の `md-*` コンポーネントに再構成する
 - 色/角丸/影/タイポは `--md-sys-*` に集約し、要素側はトークン参照のみにする
 - `input/select/textarea` は `md-input` `md-select` `md-textarea` に統一する
 - 必須表示はラベル横の `md-required-chip` に統一する
