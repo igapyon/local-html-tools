@@ -153,6 +153,21 @@
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
     }
 
+    .md-switch-label { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--md-sys-color-on-surface); }
+    .md-switch { width: 44px; height: 24px; border-radius: 999px; background: #d7d2de; position: relative; transition: background 150ms ease; }
+    .md-switch::after { content: ""; width: 18px; height: 18px; border-radius: 50%; background: white; position: absolute; top: 3px; left: 3px; transition: transform 150ms ease; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .md-switch-input { position: absolute; opacity: 0; pointer-events: none; }
+    .md-switch-input:checked + .md-switch { background: var(--md-sys-color-primary); }
+    .md-switch-input:checked + .md-switch::after { transform: translateX(20px); }
+
+    .md-toggle { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.95rem; color: var(--md-sys-color-on-surface); }
+    .md-toggle-input { position: absolute; opacity: 0; pointer-events: none; }
+    .md-toggle-track { width: 44px; height: 24px; border-radius: 999px; background: #d7d2de; position: relative; transition: background 150ms ease; }
+    .md-toggle-track::after { content: ""; width: 18px; height: 18px; border-radius: 50%; background: white; position: absolute; top: 3px; left: 3px; transition: transform 150ms ease; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .md-toggle-input:checked + .md-toggle-track { background: var(--md-sys-color-primary); }
+    .md-toggle-input:checked + .md-toggle-track::after { transform: translateX(20px); }
+    .md-toggle-text { font-weight: 600; }
+
     .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
     .md-tooltip-content {
       position: absolute;
@@ -1731,85 +1746,316 @@
 <div class="md-section" style="margin-top: 16px;">
   <h3 class="md-section-title">Core Selector Catalog</h3>
   <div class="md-grid md-grid-2">
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: button + modifiers + states</div><div class="md-preview-row md-button-row"><button class="md-button">Base</button><button class="md-button md-button--primary">Primary</button><button class="md-button md-button--tonal">Tonal</button><button class="md-button md-button--surface">Surface</button><button class="md-button md-button--secondary">Secondary</button><button class="md-button md-button--primary md-button--hero">Hero</button><button class="md-button" disabled>Disabled</button></div></div><div><strong>Classes</strong><span class="md-chip">.md-button</span><span class="md-chip">.md-button--hero</span><span class="md-chip">.md-button--primary</span><span class="md-chip">.md-button--primary:hover</span><span class="md-chip">.md-button--secondary</span><span class="md-chip">.md-button--surface</span><span class="md-chip">.md-button--tonal</span><span class="md-chip">.md-button--tonal:hover</span><span class="md-chip">.md-button-primary</span><span class="md-chip">.md-button-primary:hover</span><span class="md-chip">.md-button-row</span><span class="md-chip">.md-button-secondary</span><span class="md-chip">.md-button:active</span><span class="md-chip">.md-button:disabled</span><span class="md-chip">.md-button:hover</span></div><pre class="md-code"><code>&lt;div class="md-button-row"&gt;
-  &lt;button class="md-button"&gt;Base&lt;/button&gt;
-  &lt;button class="md-button md-button--primary"&gt;Primary&lt;/button&gt;
-  &lt;button class="md-button md-button--tonal"&gt;Tonal&lt;/button&gt;
-  &lt;button class="md-button md-button--surface"&gt;Surface&lt;/button&gt;
-  &lt;button class="md-button md-button--secondary"&gt;Secondary&lt;/button&gt;
-  &lt;button class="md-button md-button--primary md-button--hero"&gt;Hero&lt;/button&gt;
-  &lt;button class="md-button" disabled&gt;Disabled&lt;/button&gt;
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: section layout + titles</div>
+        <div class="md-section-wrap">
+          <section class="md-section-card md-section">
+            <div class="md-section-title md-section-title-row">
+              <span>Section Title</span>
+              <span class="md-subtitle">Meta</span>
+            </div>
+            <div class="md-section-title md-section-title--lg md-section-title--spaced">Section Title (Large)</div>
+            <div class="md-section-subtitle">Section Subtitle</div>
+          </section>
+        </div>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-section</span><span class="md-chip">.md-section-card</span><span class="md-chip">.md-section-subtitle</span><span class="md-chip">.md-section-title</span><span class="md-chip">.md-section-title--lg</span><span class="md-chip">.md-section-title--spaced</span><span class="md-chip">.md-section-title-row</span><span class="md-chip">.md-section-wrap</span><span class="md-chip">.md-subtitle</span></div>
+      <div><strong>Examples</strong><a class="md-chip" href="../docs/index.html">1</a><a class="md-chip" href="../docs/text/text-processing.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">3</a></div>
+      <pre class="md-code"><code>&lt;div class="md-section-wrap"&gt;
+  &lt;section class="md-section-card md-section"&gt;
+    &lt;div class="md-section-title md-section-title-row"&gt;
+      &lt;span&gt;Section Title&lt;/span&gt;
+      &lt;span class="md-subtitle"&gt;Meta&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="md-section-title md-section-title--lg md-section-title--spaced"&gt;Section Title (Large)&lt;/div&gt;
+    &lt;div class="md-section-subtitle"&gt;Section Subtitle&lt;/div&gt;
+  &lt;/section&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: button + modifiers + states</div><div class="md-preview-row md-button-row"><button class="md-button">Base</button><button class="md-button md-button--primary">Primary</button><button class="md-button md-button--tonal">Tonal</button><button class="md-button md-button--surface">Surface</button><button class="md-button md-button--secondary">Secondary</button><button class="md-button md-button--primary md-button--hero">Hero</button><button class="md-button" disabled>Disabled</button></div></div><div><strong>Classes</strong><span class="md-chip">.md-button</span><span class="md-chip">.md-button--hero</span><span class="md-chip">.md-button--primary</span><span class="md-chip">.md-button--primary:hover</span><span class="md-chip">.md-button--secondary</span><span class="md-chip">.md-button--surface</span><span class="md-chip">.md-button--tonal</span><span class="md-chip">.md-button--tonal:hover</span><span class="md-chip">.md-button-primary</span><span class="md-chip">.md-button-primary:hover</span><span class="md-chip">.md-button-row</span><span class="md-chip">.md-button-secondary</span><span class="md-chip">.md-button:active</span><span class="md-chip">.md-button:disabled</span><span class="md-chip">.md-button:hover</span></div><div><strong>Examples</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-replace-audio-with-wav-gen.html">1</a><a class="md-chip" href="../docs/life/forgot-items-check.html">2</a><a class="md-chip" href="../docs/link/url-encode-decode.html">3</a></div><pre class="md-code"><code>&lt;div class="md-button-row"&gt;
+  &lt;button class="md-button md-button--primary"&gt;...&lt;/button&gt;
 &lt;/div&gt;</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: card layout</div><div class="md-card" style="padding: 16px; border-radius: 12px;"><div class="md-card-head" style="display:flex; align-items:center; justify-content:space-between;"><div class="md-card-title">Card Title</div><div class="md-card-arrow">→</div></div><div class="md-card-desc" style="margin-top: 8px;">Description text...</div></div></div><div><strong>Classes</strong><span class="md-chip">.md-card</span><span class="md-chip">.md-card-arrow</span><span class="md-chip">.md-card-desc</span><span class="md-chip">.md-card-head</span><span class="md-chip">.md-card-title</span></div><pre class="md-code"><code>&lt;div class="md-card"&gt;
-  &lt;div class="md-card-head"&gt;...&lt;/div&gt;
-  &lt;div class="md-card-desc"&gt;...&lt;/div&gt;
+    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: card layout</div><div class="md-card" style="padding: 16px; border-radius: 12px;"><div class="md-card-head" style="display:flex; align-items:center; justify-content:space-between;"><div class="md-card-title">Card Title</div><div class="md-card-arrow">→</div></div><div class="md-card-desc" style="margin-top: 8px;">Description text...</div></div></div><div><strong>Classes</strong><span class="md-chip">.md-card</span><span class="md-chip">.md-card-arrow</span><span class="md-chip">.md-card-desc</span><span class="md-chip">.md-card-head</span><span class="md-chip">.md-card-title</span></div><div><strong>Examples</strong><a class="md-chip" href="../docs/git/git-pseudo-squash.html">1</a><a class="md-chip" href="../docs/link/amazon-dp-extract.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">3</a></div><pre class="md-code"><code>&lt;div class="md-card"&gt;
+  &lt;div class="md-card-head"&gt;
+    &lt;div class="md-card-title"&gt;Card Title&lt;/div&gt;
+    &lt;div class="md-card-arrow"&gt;→&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="md-card-desc"&gt;Description text...&lt;/div&gt;
 &lt;/div&gt;</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: md-switch</div><label class="md-switch-label"><input type="checkbox" class="md-switch-input" checked /><span class="md-switch" aria-hidden="true"></span><span>Switch</span></label></div><div><strong>Classes</strong><span class="md-chip">.md-switch</span><span class="md-chip">.md-switch-input</span><span class="md-chip">.md-switch-input:checked + .md-switch</span><span class="md-chip">.md-switch-input:checked + .md-switch::after</span><span class="md-chip">.md-switch-label</span><span class="md-chip">.md-switch-row</span><span class="md-chip">.md-switch::after</span></div><pre class="md-code"><code>&lt;label class="md-switch-label"&gt;...&lt;/label&gt;</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: md-toggle</div><label class="md-toggle"><input type="checkbox" class="md-toggle-input" checked /><span class="md-toggle-track"></span><span class="md-toggle-text">Toggle</span></label></div><div><strong>Classes</strong><span class="md-chip">.md-toggle</span><span class="md-chip">.md-toggle-input</span><span class="md-chip">.md-toggle-input:checked + .md-toggle-track</span><span class="md-chip">.md-toggle-input:checked + .md-toggle-track::after</span><span class="md-chip">.md-toggle-row</span><span class="md-chip">.md-toggle-text</span><span class="md-chip">.md-toggle-track</span><span class="md-chip">.md-toggle-track::after</span></div><pre class="md-code"><code>&lt;label class="md-toggle"&gt;...&lt;/label&gt;</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: field container</div><div class="md-field"><label class="md-label">Label</label><input class="md-input" placeholder="text" /></div></div><div><strong>Classes</strong><span class="md-chip">.md-field</span><span class="md-chip">.md-field--dropdown</span><span class="md-chip">.md-field-block</span><span class="md-chip">.md-field-stack</span><span class="md-chip">.md-field__label</span></div><pre class="md-code"><code>&lt;div class="md-field"&gt;...&lt;/div&gt;</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: input variants</div><input class="md-input" placeholder="例: sample" /></div><div><strong>Classes</strong><span class="md-chip">.md-input</span><span class="md-chip">.md-input-action</span><span class="md-chip">.md-input-block</span><span class="md-chip">.md-input-wrap</span><span class="md-chip">.md-input.md-disabled</span></div><pre class="md-code"><code>&lt;input class="md-input" /&gt;</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: select variants</div><select class="md-select"><option>Option</option></select></div><div><strong>Classes</strong><span class="md-chip">.md-select</span><span class="md-chip">.md-select--inline</span><span class="md-chip">.md-select.md-disabled</span></div><pre class="md-code"><code>&lt;select class="md-select"&gt;...&lt;/select&gt;</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: textarea variants</div><textarea class="md-textarea" placeholder="..." ></textarea></div><div><strong>Classes</strong><span class="md-chip">.md-textarea</span></div><pre class="md-code"><code>&lt;textarea class="md-textarea"&gt;&lt;/textarea&gt;</code></pre></div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: md-switch</div>
+        <label class="md-switch-label">
+          <input type="checkbox" class="md-switch-input" checked />
+          <span class="md-switch" aria-hidden="true"></span>
+          <span>Switch</span>
+        </label>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-switch</span><span class="md-chip">.md-switch-input</span><span class="md-chip">.md-switch-input:checked + .md-switch</span><span class="md-chip">.md-switch-input:checked + .md-switch::after</span><span class="md-chip">.md-switch-label</span><span class="md-chip">.md-switch-row</span><span class="md-chip">.md-switch::after</span></div>
+      <div><strong>Examples</strong><a class="md-chip" href="../docs/git/git-branch-diff.html">1</a><a class="md-chip" href="../docs/git/git-pseudo-squash.html">2</a><a class="md-chip" href="../docs/grep/find-gen.html">3</a></div>
+      <pre class="md-code"><code>&lt;label class="md-switch-label"&gt;
+  &lt;input type="checkbox" class="md-switch-input" checked /&gt;
+  &lt;span class="md-switch" aria-hidden="true"&gt;&lt;/span&gt;
+  &lt;span&gt;Switch&lt;/span&gt;
+&lt;/label&gt;</code></pre>
+    </div>
+    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: md-toggle</div><label class="md-toggle"><input type="checkbox" class="md-toggle-input" checked /><span class="md-toggle-track"></span><span class="md-toggle-text">Toggle</span></label><div class="md-preview-note" style="margin-top: 6px; color: #b3261e; font-weight: 700;">Deprecated: md-toggle は廃止予定。md-switch を使用してください。</div></div><div><strong>Classes</strong><span class="md-chip">.md-toggle</span><span class="md-chip">.md-toggle-input</span><span class="md-chip">.md-toggle-input:checked + .md-toggle-track</span><span class="md-chip">.md-toggle-input:checked + .md-toggle-track::after</span><span class="md-chip">.md-toggle-row</span><span class="md-chip">.md-toggle-text</span><span class="md-chip">.md-toggle-track</span><span class="md-chip">.md-toggle-track::after</span></div><pre class="md-code"><code>&lt;label class="md-toggle"&gt;
+  &lt;input type="checkbox" class="md-toggle-input" checked /&gt;
+  &lt;span class="md-toggle-track"&gt;&lt;/span&gt;
+  &lt;span class="md-toggle-text"&gt;Toggle&lt;/span&gt;
+&lt;/label&gt;</code></pre></div>
+    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: md-radio</div><div class="md-radio-row"><label class="md-radio"><input type="radio" name="demo" checked /> Option A</label><label class="md-radio"><input type="radio" name="demo" /> Option B</label></div></div><div><strong>Classes</strong><span class="md-chip">.md-radio</span><span class="md-chip">.md-radio input</span><span class="md-chip">.md-radio-row</span></div><div><strong>Examples</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-loudnorm-cmdline-gen.html">1</a><a class="md-chip" href="../docs/text/text-viewer.html">2</a></div><pre class="md-code"><code>&lt;div class="md-radio-row"&gt;
+  &lt;label class="md-radio"&gt;&lt;input type="radio" name="demo" checked /&gt; Option A&lt;/label&gt;
+  &lt;label class="md-radio"&gt;&lt;input type="radio" name="demo" /&gt; Option B&lt;/label&gt;
+&lt;/div&gt;</code></pre></div>
+    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: md-choice</div><div class="md-choice-row"><label class="md-choice"><input type="checkbox" /> Option A</label><label class="md-choice"><input type="checkbox" checked /> Option B</label></div></div><div><strong>Classes</strong><span class="md-chip">.md-choice</span><span class="md-chip">.md-choice-card</span><span class="md-chip">.md-choice-card--muted</span><span class="md-chip">.md-choice-inline</span><span class="md-chip">.md-choice-row</span><span class="md-chip">.md-choice-row input</span><span class="md-chip">.md-choice-sub</span><span class="md-chip">.md-choice-sub small</span><span class="md-chip">.md-choice-text</span></div><div><strong>Examples</strong><a class="md-chip" href="../docs/git/git-config-advanced-setup.html">1</a><a class="md-chip" href="../docs/git/git-branch-diff.html">2</a><a class="md-chip" href="../docs/password/password-gen.html">3</a></div><pre class="md-code"><code>&lt;div class="md-choice-row"&gt;
+  &lt;label class="md-choice"&gt;&lt;input type="checkbox" /&gt; Option A&lt;/label&gt;
+  &lt;label class="md-choice"&gt;&lt;input type="checkbox" checked /&gt; Option B&lt;/label&gt;
+&lt;/div&gt;</code></pre></div>
+    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: field container</div><div class="md-field"><label class="md-label">Label</label><input class="md-input" placeholder="text" /></div></div><div><strong>Classes</strong><span class="md-chip">.md-field</span><span class="md-chip">.md-field--dropdown</span><span class="md-chip">.md-field-block</span><span class="md-chip">.md-field-stack</span><span class="md-chip">.md-field__label</span></div><div><strong>Examples</strong><a class="md-chip" href="../docs/grep/find-gen.html">1</a><a class="md-chip" href="../docs/life/japan-weather.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-replace-audio-with-wav-gen.html">3</a></div><pre class="md-code"><code>&lt;div class="md-field"&gt;...&lt;/div&gt;</code></pre></div>
+    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: input variants</div><input class="md-input" placeholder="例: sample" /></div><div><strong>Classes</strong><span class="md-chip">.md-input</span><span class="md-chip">.md-input-action</span><span class="md-chip">.md-input-block</span><span class="md-chip">.md-input-wrap</span><span class="md-chip">.md-input.md-disabled</span></div><div><strong>Examples</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">1</a><a class="md-chip" href="../docs/link/amazon-dp-extract.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-trim-cmdline-gen.html">3</a></div><pre class="md-code"><code>&lt;input class="md-input" /&gt;</code></pre></div>
+    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: select variants</div><select class="md-select"><option>Option</option></select></div><div><strong>Classes</strong><span class="md-chip">.md-select</span><span class="md-chip">.md-select--inline</span><span class="md-chip">.md-select.md-disabled</span></div><div><strong>Examples</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">1</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-replace-audio-with-wav-gen.html">2</a><a class="md-chip" href="../docs/life/japan-weather.html">3</a></div><pre class="md-code"><code>&lt;select class="md-select"&gt;...&lt;/select&gt;</code></pre></div>
+    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: textarea variants</div><textarea class="md-textarea" placeholder="..." ></textarea></div><div><strong>Classes</strong><span class="md-chip">.md-textarea</span></div><div><strong>Examples</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">1</a><a class="md-chip" href="../docs/link/mime-base64.html">2</a><a class="md-chip" href="../docs/link/url-encode-decode.html">3</a></div><pre class="md-code"><code>&lt;textarea class="md-textarea"&gt;&lt;/textarea&gt;</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: tooltip</div><span class="md-tooltip-group"><span class="md-help-chip">i</span><span class="md-tooltip-content md-tooltip">説明文…</span></span></div><div><strong>Classes</strong><span class="md-chip">.md-tooltip</span><span class="md-chip">.md-tooltip--narrow</span><span class="md-chip">.md-tooltip--rich</span><span class="md-chip">.md-tooltip--wide</span><span class="md-chip">.md-tooltip-content</span><span class="md-chip">.md-tooltip-group</span></div><pre class="md-code"><code>&lt;span class="md-tooltip-group"&gt;...&lt;/span&gt;</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector set: code output</div><div class="md-code-block"><code class="md-code">echo "Hello"</code><button class="md-copy-button">📋</button></div></div><div><strong>Classes</strong><span class="md-chip">.md-code</span><span class="md-chip">.md-code-block</span></div><pre class="md-code"><code>&lt;div class="md-code-block"&gt;...&lt;/div&gt;</code></pre></div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: code output</div>
+        <div class="md-code-block">
+          <code class="md-code">echo "Hello"</code>
+          <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" aria-label="コピー">📋</button>
+        </div>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-code-block</span><span class="md-chip">.md-code</span><span class="md-chip">.md-copy-button</span><span class="md-chip">.md-icon-btn</span><span class="md-chip">.md-icon-btn--small</span><span class="md-chip">.md-icon-btn--surface</span></div>
+      <div><strong>Examples</strong><a class="md-chip" href="../docs/link/url-encode-decode.html">1</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">2</a><a class="md-chip" href="../docs/git/git-pseudo-squash.html">3</a></div>
+      <pre class="md-code"><code>&lt;div class="md-code-block"&gt;
+  &lt;code class="md-code"&gt;echo "Hello"&lt;/code&gt;
+  &lt;button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" aria-label="コピー"&gt;📋&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+    </div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-snackbar</div><div class="md-snackbar">コピーしました</div></div><div><strong>Classes</strong><span class="md-chip">.md-snackbar</span><span class="md-chip">.md-hidden</span><span class="md-chip">.md-visible</span></div><pre class="md-code"><code>&lt;div class="md-snackbar"&gt;...&lt;/div&gt;</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-choice-row input</div></div><div><strong>Classes</strong><span class="md-chip">.md-choice-row input</span></div><pre class="md-code"><code>.md-choice-row input { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-choice-sub small</div></div><div><strong>Classes</strong><span class="md-chip">.md-choice-sub small</span></div><pre class="md-code"><code>.md-choice-sub small { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-copy-button</div></div><div><strong>Classes</strong><span class="md-chip">.md-copy-button</span></div><pre class="md-code"><code>.md-copy-button { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-field-stack .md-input</div></div><div><strong>Classes</strong><span class="md-chip">.md-field-stack .md-input</span></div><pre class="md-code"><code>.md-field-stack .md-input { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-field-stack .md-select</div></div><div><strong>Classes</strong><span class="md-chip">.md-field-stack .md-select</span></div><pre class="md-code"><code>.md-field-stack .md-select { ... }</code></pre></div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: field stack</div>
+        <div class="md-field-stack">
+          <input class="md-input" placeholder="text" />
+          <select class="md-select">
+            <option>Option</option>
+          </select>
+          <textarea class="md-textarea" rows="2" placeholder="multiline"></textarea>
+        </div>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-field-stack</span><span class="md-chip">.md-field-stack .md-input</span><span class="md-chip">.md-field-stack .md-select</span><span class="md-chip">.md-textarea</span></div>
+      <div><strong>Examples</strong><span class="md-chip">使用箇所なし</span></div>
+      <pre class="md-code"><code>&lt;div class="md-field-stack"&gt;
+  &lt;input class="md-input" placeholder="text" /&gt;
+  &lt;select class="md-select"&gt;
+    &lt;option&gt;Option&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;textarea class="md-textarea" rows="2" placeholder="multiline"&gt;&lt;/textarea&gt;
+&lt;/div&gt;</code></pre>
+    </div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-form-grid</div></div><div><strong>Classes</strong><span class="md-chip">.md-form-grid</span></div><pre class="md-code"><code>.md-form-grid { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-form-row</div></div><div><strong>Classes</strong><span class="md-chip">.md-form-row</span></div><pre class="md-code"><code>.md-form-row { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-form-row--nowrap</div></div><div><strong>Classes</strong><span class="md-chip">.md-form-row--nowrap</span></div><pre class="md-code"><code>.md-form-row--nowrap { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-form-row--start</div></div><div><strong>Classes</strong><span class="md-chip">.md-form-row--start</span></div><pre class="md-code"><code>.md-form-row--start { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-headline</div></div><div><strong>Classes</strong><span class="md-chip">.md-headline</span></div><pre class="md-code"><code>.md-headline { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-headline__icon</div></div><div><strong>Classes</strong><span class="md-chip">.md-headline__icon</span></div><pre class="md-code"><code>.md-headline__icon { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-help-chip</div></div><div><strong>Classes</strong><span class="md-chip">.md-help-chip</span></div><pre class="md-code"><code>.md-help-chip { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-help-chip:focus-visible</div></div><div><strong>Classes</strong><span class="md-chip">.md-help-chip:focus-visible</span></div><pre class="md-code"><code>.md-help-chip:focus-visible { ... }</code></pre></div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: form row + modifiers</div>
+        <div class="md-form-row md-form-row--nowrap">
+          <label class="md-label">Label</label>
+          <input class="md-input" placeholder="text" />
+          <span class="md-sub-label">hint</span>
+        </div>
+        <div class="md-form-row md-form-row--start" style="margin-top: 8px;">
+          <label class="md-label">Label</label>
+          <div>
+            <textarea class="md-textarea" rows="2" placeholder="multiline"></textarea>
+            <div class="md-sub-label">note</div>
+          </div>
+        </div>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-form-row</span><span class="md-chip">.md-form-row--nowrap</span><span class="md-chip">.md-form-row--start</span></div>
+      <pre class="md-code"><code>&lt;div class="md-form-row md-form-row--nowrap"&gt;
+  &lt;label class="md-label"&gt;Label&lt;/label&gt;
+  &lt;input class="md-input" placeholder="text" /&gt;
+  &lt;span class="md-sub-label"&gt;hint&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="md-form-row md-form-row--start"&gt;
+  &lt;label class="md-label"&gt;Label&lt;/label&gt;
+  &lt;div&gt;
+    &lt;textarea class="md-textarea" rows="2" placeholder="multiline"&gt;&lt;/textarea&gt;
+    &lt;div class="md-sub-label"&gt;note&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: headline + icon</div>
+        <h1 class="md-headline">
+          <span aria-hidden="true" class="md-headline__icon">🧩</span>
+          Headline Title
+        </h1>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-headline</span><span class="md-chip">.md-headline__icon</span></div>
+      <div><strong>Examples</strong><a class="md-chip" href="../docs/git/git-branch-diff.html">1</a><a class="md-chip" href="../docs/git/git-pseudo-squash.html">2</a><a class="md-chip" href="../docs/link/utm-remove.html">3</a></div>
+      <pre class="md-code"><code>&lt;h1 class="md-headline"&gt;
+  &lt;span aria-hidden="true" class="md-headline__icon"&gt;🧩&lt;/span&gt;
+  Headline Title
+&lt;/h1&gt;</code></pre>
+    </div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: tooltip + help chip</div>
+        <span class="md-tooltip-group">
+          <span class="md-help-chip" aria-hidden="true">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none">
+              <circle cx="12" cy="12" r="9" fill="#cbbcf0"/>
+              <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/>
+              <circle cx="12" cy="7.5" r="1" fill="#ffffff"/>
+            </svg>
+          </span>
+          <span class="md-tooltip-content md-tooltip">説明文…</span>
+        </span>
+        <span class="md-tooltip-group" style="margin-left: 12px;">
+          <button type="button" class="md-help-chip" aria-label="詳細">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none">
+              <circle cx="12" cy="12" r="9" fill="#cbbcf0"/>
+              <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/>
+              <circle cx="12" cy="7.5" r="1" fill="#ffffff"/>
+            </svg>
+          </button>
+          <span class="md-tooltip-content md-tooltip md-tooltip--wide">説明文（長め）…</span>
+        </span>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-tooltip-group</span><span class="md-chip">.md-help-chip</span><span class="md-chip">.md-help-chip:focus-visible</span><span class="md-chip">.md-tooltip</span><span class="md-chip">.md-tooltip--narrow</span><span class="md-chip">.md-tooltip--rich</span><span class="md-chip">.md-tooltip--wide</span><span class="md-chip">.md-tooltip-content</span></div>
+      <div><strong>Examples</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-audio-convert-cmdline-gen.html">1</a><a class="md-chip" href="../docs/grep/find-gen.html">2</a><a class="md-chip" href="../docs/link/utm-remove.html">3</a></div>
+      <pre class="md-code"><code>&lt;span class="md-tooltip-group"&gt;
+  &lt;span class="md-help-chip" aria-hidden="true"&gt;
+    &lt;svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"&gt;
+      &lt;circle cx="12" cy="12" r="9" fill="#cbbcf0"/&gt;
+      &lt;rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/&gt;
+      &lt;circle cx="12" cy="7.5" r="1" fill="#ffffff"/&gt;
+    &lt;/svg&gt;
+  &lt;/span&gt;
+  &lt;span class="md-tooltip-content md-tooltip"&gt;説明文…&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class="md-tooltip-group"&gt;
+  &lt;button type="button" class="md-help-chip" aria-label="詳細"&gt;
+    &lt;svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"&gt;
+      &lt;circle cx="12" cy="12" r="9" fill="#cbbcf0"/&gt;
+      &lt;rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/&gt;
+      &lt;circle cx="12" cy="7.5" r="1" fill="#ffffff"/&gt;
+    &lt;/svg&gt;
+  &lt;/button&gt;
+  &lt;span class="md-tooltip-content md-tooltip md-tooltip--wide"&gt;説明文（長め）…&lt;/span&gt;
+&lt;/span&gt;</code></pre>
+    </div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-help-icon</div></div><div><strong>Classes</strong><span class="md-chip">.md-help-icon</span></div><pre class="md-code"><code>.md-help-icon { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-hidden</div></div><div><strong>Classes</strong><span class="md-chip">.md-hidden</span></div><pre class="md-code"><code>.md-hidden { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-icon-btn</div></div><div><strong>Classes</strong><span class="md-chip">.md-icon-btn</span></div><pre class="md-code"><code>.md-icon-btn { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-icon-btn--small</div></div><div><strong>Classes</strong><span class="md-chip">.md-icon-btn--small</span></div><pre class="md-code"><code>.md-icon-btn--small { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-icon-btn--surface</div></div><div><strong>Classes</strong><span class="md-chip">.md-icon-btn--surface</span></div><pre class="md-code"><code>.md-icon-btn--surface { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-icon-btn:hover</div></div><div><strong>Classes</strong><span class="md-chip">.md-icon-btn:hover</span></div><pre class="md-code"><code>.md-icon-btn:hover { ... }</code></pre></div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: icon button + modifiers</div>
+        <div class="md-button-row">
+          <button class="md-icon-btn" aria-label="メニュー">☰</button>
+          <button class="md-icon-btn md-icon-btn--small" aria-label="コピー">📋</button>
+          <button class="md-icon-btn md-icon-btn--small md-icon-btn--surface" aria-label="設定">⚙️</button>
+        </div>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-icon-btn</span><span class="md-chip">.md-icon-btn--small</span><span class="md-chip">.md-icon-btn--surface</span><span class="md-chip">.md-icon-btn:hover</span></div>
+      <pre class="md-code"><code>&lt;button class="md-icon-btn" aria-label="メニュー"&gt;☰&lt;/button&gt;
+&lt;button class="md-icon-btn md-icon-btn--small" aria-label="コピー"&gt;📋&lt;/button&gt;
+&lt;button class="md-icon-btn md-icon-btn--small md-icon-btn--surface" aria-label="設定"&gt;⚙️&lt;/button&gt;</code></pre>
+    </div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-input-wrap .md-input</div></div><div><strong>Classes</strong><span class="md-chip">.md-input-wrap .md-input</span></div><pre class="md-code"><code>.md-input-wrap .md-input { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-input:disabled</div></div><div><strong>Classes</strong><span class="md-chip">.md-input:disabled</span></div><pre class="md-code"><code>.md-input:disabled { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-input:focus</div></div><div><strong>Classes</strong><span class="md-chip">.md-input:focus</span></div><pre class="md-code"><code>.md-input:focus { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-label</div></div><div><strong>Classes</strong><span class="md-chip">.md-label</span></div><pre class="md-code"><code>.md-label { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-label--block</div></div><div><strong>Classes</strong><span class="md-chip">.md-label--block</span></div><pre class="md-code"><code>.md-label--block { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-label--full</div></div><div><strong>Classes</strong><span class="md-chip">.md-label--full</span></div><pre class="md-code"><code>.md-label--full { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-label--muted</div></div><div><strong>Classes</strong><span class="md-chip">.md-label--muted</span></div><pre class="md-code"><code>.md-label--muted { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-label--row</div></div><div><strong>Classes</strong><span class="md-chip">.md-label--row</span></div><pre class="md-code"><code>.md-label--row { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-menu-button</div></div><div><strong>Classes</strong><span class="md-chip">.md-menu-button</span></div><pre class="md-code"><code>.md-menu-button { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-menu-link</div></div><div><strong>Classes</strong><span class="md-chip">.md-menu-link</span></div><pre class="md-code"><code>.md-menu-link { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-menu-link:hover</div></div><div><strong>Classes</strong><span class="md-chip">.md-menu-link:hover</span></div><pre class="md-code"><code>.md-menu-link:hover { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-menu-panel</div></div><div><strong>Classes</strong><span class="md-chip">.md-menu-panel</span></div><pre class="md-code"><code>.md-menu-panel { ... }</code></pre></div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: label + modifiers</div>
+        <div class="md-field-stack">
+          <label class="md-label md-label--block">Label Block</label>
+          <input class="md-input" placeholder="text" />
+          <label class="md-label md-label--row">
+            <span>Label Row</span>
+            <span class="md-label md-label--muted">Muted</span>
+          </label>
+          <input class="md-input" placeholder="text" />
+          <label class="md-label md-label--full">Label Full</label>
+          <textarea class="md-textarea" rows="2" placeholder="multiline"></textarea>
+        </div>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-label</span><span class="md-chip">.md-label--block</span><span class="md-chip">.md-label--full</span><span class="md-chip">.md-label--muted</span><span class="md-chip">.md-label--row</span><span class="md-chip">.md-field-stack</span><span class="md-chip">.md-input</span><span class="md-chip">.md-textarea</span></div>
+      <pre class="md-code"><code>&lt;div class="md-field-stack"&gt;
+  &lt;label class="md-label md-label--block"&gt;Label Block&lt;/label&gt;
+  &lt;input class="md-input" placeholder="text" /&gt;
+  &lt;label class="md-label md-label--row"&gt;
+    &lt;span&gt;Label Row&lt;/span&gt;
+    &lt;span class="md-label md-label--muted"&gt;Muted&lt;/span&gt;
+  &lt;/label&gt;
+  &lt;input class="md-input" placeholder="text" /&gt;
+  &lt;label class="md-label md-label--full"&gt;Label Full&lt;/label&gt;
+  &lt;textarea class="md-textarea" rows="2" placeholder="multiline"&gt;&lt;/textarea&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: menu button + panel</div>
+        <div style="position: relative; min-height: 120px;">
+          <button type="button" class="md-menu-button md-icon-btn" aria-label="メニュー">☰</button>
+          <div class="md-menu-panel" style="position: absolute; top: 44px; right: 12px;">
+            <a class="md-menu-link" href="#">メニュー 1</a>
+            <a class="md-menu-link" href="#">メニュー 2</a>
+          </div>
+        </div>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-menu-button</span><span class="md-chip">.md-icon-btn</span><span class="md-chip">.md-menu-panel</span><span class="md-chip">.md-menu-link</span><span class="md-chip">.md-menu-link:hover</span></div>
+      <pre class="md-code"><code>&lt;button type="button" class="md-menu-button md-icon-btn" aria-label="メニュー"&gt;☰&lt;/button&gt;
+&lt;div class="md-menu-panel"&gt;
+  &lt;a class="md-menu-link" href="#"&gt;メニュー 1&lt;/a&gt;
+  &lt;a class="md-menu-link" href="#"&gt;メニュー 2&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+    </div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-page</div></div><div><strong>Classes</strong><span class="md-chip">.md-page</span></div><pre class="md-code"><code>.md-page { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-radio</div></div><div><strong>Classes</strong><span class="md-chip">.md-radio</span></div><pre class="md-code"><code>.md-radio { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-radio input</div></div><div><strong>Classes</strong><span class="md-chip">.md-radio input</span></div><pre class="md-code"><code>.md-radio input { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-radio-row</div></div><div><strong>Classes</strong><span class="md-chip">.md-radio-row</span></div><pre class="md-code"><code>.md-radio-row { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-required</div></div><div><strong>Classes</strong><span class="md-chip">.md-required</span></div><pre class="md-code"><code>.md-required { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-section</div></div><div><strong>Classes</strong><span class="md-chip">.md-section</span></div><pre class="md-code"><code>.md-section { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-section-card</div></div><div><strong>Classes</strong><span class="md-chip">.md-section-card</span></div><pre class="md-code"><code>.md-section-card { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-section-subtitle</div></div><div><strong>Classes</strong><span class="md-chip">.md-section-subtitle</span></div><pre class="md-code"><code>.md-section-subtitle { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-section-title</div></div><div><strong>Classes</strong><span class="md-chip">.md-section-title</span></div><pre class="md-code"><code>.md-section-title { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-section-title--lg</div></div><div><strong>Classes</strong><span class="md-chip">.md-section-title--lg</span></div><pre class="md-code"><code>.md-section-title--lg { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-section-title--spaced</div></div><div><strong>Classes</strong><span class="md-chip">.md-section-title--spaced</span></div><pre class="md-code"><code>.md-section-title--spaced { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-section-title-row</div></div><div><strong>Classes</strong><span class="md-chip">.md-section-title-row</span></div><pre class="md-code"><code>.md-section-title-row { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-section-wrap</div></div><div><strong>Classes</strong><span class="md-chip">.md-section-wrap</span></div><pre class="md-code"><code>.md-section-wrap { ... }</code></pre></div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: label + required</div>
+        <label class="md-label">
+          <span>タイトル</span>
+          <span class="md-required">Required</span>
+        </label>
+        <input class="md-input" placeholder="例: sample.txt" />
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-label</span><span class="md-chip">.md-required</span><span class="md-chip">.md-input</span></div>
+      <pre class="md-code"><code>&lt;label class="md-label"&gt;
+  &lt;span&gt;タイトル&lt;/span&gt;
+  &lt;span class="md-required"&gt;Required&lt;/span&gt;
+&lt;/label&gt;
+&lt;input class="md-input" placeholder="例: sample.txt" /&gt;</code></pre>
+    </div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-select:disabled</div></div><div><strong>Classes</strong><span class="md-chip">.md-select:disabled</span></div><pre class="md-code"><code>.md-select:disabled { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-select:focus</div></div><div><strong>Classes</strong><span class="md-chip">.md-select:focus</span></div><pre class="md-code"><code>.md-select:focus { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-shell</div></div><div><strong>Classes</strong><span class="md-chip">.md-shell</span></div><pre class="md-code"><code>.md-shell { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-snackbar</div></div><div><strong>Classes</strong><span class="md-chip">.md-snackbar</span></div><pre class="md-code"><code>.md-snackbar { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-snackbar--visible</div></div><div><strong>Classes</strong><span class="md-chip">.md-snackbar--visible</span></div><pre class="md-code"><code>.md-snackbar--visible { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-snackbar-host</div></div><div><strong>Classes</strong><span class="md-chip">.md-snackbar-host</span></div><pre class="md-code"><code>.md-snackbar-host { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-snackbar-host.md-visible</div></div><div><strong>Classes</strong><span class="md-chip">.md-snackbar-host.md-visible</span></div><pre class="md-code"><code>.md-snackbar-host.md-visible { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-snackbar.md-visible</div></div><div><strong>Classes</strong><span class="md-chip">.md-snackbar.md-visible</span></div><pre class="md-code"><code>.md-snackbar.md-visible { ... }</code></pre></div>
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: snackbar + host</div>
+        <div class="md-snackbar-host md-visible" style="position: relative; min-height: 72px;">
+          <div class="md-snackbar md-snackbar--visible md-visible">
+            <span>保存しました</span>
+            <button class="md-icon-btn md-icon-btn--small" aria-label="閉じる">✕</button>
+          </div>
+        </div>
+      </div>
+      <div><strong>Classes</strong><span class="md-chip">.md-snackbar-host</span><span class="md-chip">.md-snackbar-host.md-visible</span><span class="md-chip">.md-snackbar</span><span class="md-chip">.md-snackbar--visible</span><span class="md-chip">.md-snackbar.md-visible</span></div>
+      <div><strong>Examples</strong><a class="md-chip" href="../docs/git/git-pseudo-squash.html">1</a><a class="md-chip" href="../docs/link/url-encode-decode.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">3</a></div>
+      <pre class="md-code"><code>&lt;div class="md-snackbar-host md-visible"&gt;
+  &lt;div class="md-snackbar md-snackbar--visible md-visible"&gt;
+    &lt;span&gt;保存しました&lt;/span&gt;
+    &lt;button class="md-icon-btn md-icon-btn--small" aria-label="閉じる"&gt;✕&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-sr-only</div></div><div><strong>Classes</strong><span class="md-chip">.md-sr-only</span></div><pre class="md-code"><code>.md-sr-only { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-stack-lg > * + *</div></div><div><strong>Classes</strong><span class="md-chip">.md-stack-lg > * + *</span></div><pre class="md-code"><code>.md-stack-lg > * + * { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-stack-md > * + *</div></div><div><strong>Classes</strong><span class="md-chip">.md-stack-md > * + *</span></div><pre class="md-code"><code>.md-stack-md > * + * { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-stack-sm > * + *</div></div><div><strong>Classes</strong><span class="md-chip">.md-stack-sm > * + *</span></div><pre class="md-code"><code>.md-stack-sm > * + * { ... }</code></pre></div>
-    <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-subtitle</div></div><div><strong>Classes</strong><span class="md-chip">.md-subtitle</span></div><pre class="md-code"><code>.md-subtitle { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-surface-card</div></div><div><strong>Classes</strong><span class="md-chip">.md-surface-card</span></div><pre class="md-code"><code>.md-surface-card { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-tab-button[aria-selected="true"]</div></div><div><strong>Classes</strong><span class="md-chip">.md-tab-button[aria-selected="true"]</span></div><pre class="md-code"><code>.md-tab-button[aria-selected="true"] { ... }</code></pre></div>
     <div class="md-example-card"><div class="md-preview"><div class="md-preview-note">Selector: .md-textarea:focus</div></div><div><strong>Classes</strong><span class="md-chip">.md-textarea:focus</span></div><pre class="md-code"><code>.md-textarea:focus { ... }</code></pre></div>
@@ -1925,13 +2171,13 @@
             <div class="md-preview-note">Source: docs/link/url-encode-decode.html</div>
             <div class="md-code-block">
               <code class="md-code">echo "Hello"</code>
-              <button class="md-copy-button" aria-label="コピー">📋</button>
+              <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" aria-label="コピー">📋</button>
             </div>
           </div>
-          <div><strong>Classes</strong><span class="md-chip">md-code-block</span><span class="md-chip">md-code</span><span class="md-chip">md-copy-button</span></div>
+          <div><strong>Classes</strong><span class="md-chip">md-code-block</span><span class="md-chip">md-code</span><span class="md-chip">md-copy-button</span><span class="md-chip">md-icon-btn</span><span class="md-chip">md-icon-btn--small</span><span class="md-chip">md-icon-btn--surface</span></div>
           <pre class="md-code"><code>&lt;div class="md-code-block"&gt;
   &lt;code class="md-code"&gt;...&lt;/code&gt;
-  &lt;button class="md-copy-button"&gt;📋&lt;/button&gt;
+  &lt;button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface"&gt;📋&lt;/button&gt;
 &lt;/div&gt;</code></pre>
         </div>
       </div>
