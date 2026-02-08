@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MD3 Reference</title>
+  <title>MD3 Component Catalog</title>
   <style>
     :root {
       --md-sys-color-primary: #6200ee;
@@ -350,10 +350,11 @@
         <div class="md-preview-stack">
           <div class="md-note-title">トークン方針（:root / --md-sys-*）</div>
           <div class="md-preview-note">
-            このプロジェクトの Material Design 対応は、各HTMLファイル冒頭の `:root` にある CSS 変数（`--md-sys-*`）を前提にしています。
-            ここには、`docs` 配下を含む全HTMLから抽出したトークンの総和（重複は除外）をまとめています。
+            ここに掲載する `Token Spec` を正本とし、各 `docs/*.html` にコピーして利用します。
+            `docs/*.html` 側で改善を見つけた場合は、適用後にこの `md3` 側へフィードバックして更新します。
           </div>
-          <textarea class="md-textarea" rows="10" readonly>:root {
+          <textarea class="md-textarea" rows="10" readonly>/* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
+:root {
   --md-danger: #b3261e;
   --md-state-layer: rgba(98, 0, 238, 0.12);
   --md-sys-color-background: #f6f4f8;
@@ -383,10 +384,14 @@
   --status-todo: #00bcd4;
 }</textarea>
           <div class="md-preview-note" style="margin-top: 12px;">
-            参考: 全HTMLから抽出したMD系CSSセレクタの総和（重複除外）
+            参考: `Token Spec` / `Core Spec` は `md3/spec/*.css` でも管理する。
           </div>
           <div class="md-note-title" style="margin-top: 8px;">Core（共通）</div>
-<textarea class="md-textarea" rows="16" readonly>.md-page {
+          <div class="md-preview-note" style="margin-top: 8px;">
+            `Core Spec` も正本はここ（および `md3/spec/core-spec.css`）。各 `docs/*.html` はコピーして利用し、改善は `md3` へ還元します。
+          </div>
+<textarea class="md-textarea" rows="16" readonly>/* local-html-tools MD3 Core Spec v1.0.0 (2026-02-08) */
+.md-page {
   background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; min-height: 100vh;
 }
 
