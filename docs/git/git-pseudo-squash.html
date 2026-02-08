@@ -1202,20 +1202,22 @@ limitations under the License.
           <span class="md-tooltip-group">
             <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
             <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide">
-              Windows PowerShell 用のコマンドを出力します。オフの場合は macOS / Linux の bash / zsh を想定します。
+              Windows PowerShell 用のコマンドを出力するかどうかを切り替えます。
+              スイッチがオフの場合は macOS / Linux の bash / zsh 向けのコマンドを出力します。
+              ご利用の環境に従って切り替えてください。
+              なお Windows コマンドプロンプトには対応していません。
             </span>
           </span>
         </label>
         <label class="md-switch-label">
           <input type="checkbox" id="lockOrigin" class="md-switch-input" checked onchange="toggleOriginLock()">
           <span class="md-switch" aria-hidden="true"></span>
-          リモート + origin で作業
+          リモート + origin と作業
           <span class="md-tooltip-group">
             <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
             <span class="md-tooltip-content md-tooltip md-tooltip--rich">
-              よくある利用方法として リモートと origin の組み合わせでの利用です。通常はこのままで OK です。
-              複数リモートを使い分ける場合だけ外して、対象のリモート名に切り替えます。
-              チェックを外すと、基点のリモート名と squash 用リモート名を個別に指定できます。
+              一連の作業を リモート + origin と連携して作業するかどうかを切り替えます。よくある利用方法が リモート + origin の組み合わせだと考えています。
+              ローカルの中で完結して作業する場合や、リモートの名称を変更したい場合は、このスイッチを OFF にして個別に値を設定してください。
             </span>
           </span>
         </label>
@@ -1364,11 +1366,13 @@ limitations under the License.
         <label class="md-switch-label">
           <input type="checkbox" id="optPush" class="md-switch-input">
           <span class="md-switch" aria-hidden="true"></span>
-          push を追加
+          リモートに push
           <span class="md-tooltip-group">
             <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
             <span class="md-tooltip-content md-tooltip md-tooltip--rich">
-              push --force-with-lease でコミット整理を反映した後、リモートと同期（pull）し、ブランチを -done サフィックスでリネームするコマンドが続きます。ローカルでコミットが1つにまとまっているため、GitHubのPRではsquashせず通常のmergeで完了です。
+              コミットをまとめた後、リモートに push するかどうかを切り替えます。
+              push --force-with-lease オプションで push の実施後に、リモートと同期（pull）し、ブランチを -done サフィックスでリネームします。
+              ローカルでコミットが1つにまとまっているため、GitHubのPRではsquashせず通常のmergeで完了できるのが嬉しいです。
             </span>
           </span>
         </label>
