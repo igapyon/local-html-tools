@@ -204,7 +204,7 @@ limitations under the License.
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .md-help-chip {
+    .md-info-chip {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -216,7 +216,7 @@ limitations under the License.
       margin-left: 0.2rem;
     }
 
-    .md-help-icon {
+    .md-info-icon {
       width: 18px; height: 18px;
     }
 
@@ -322,7 +322,7 @@ limitations under the License.
       overflow: hidden;
     }
 
-    .md-help-chip:focus-visible {
+    .md-info-chip:focus-visible {
       box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring);
     }
 
@@ -986,7 +986,7 @@ limitations under the License.
     }
     .md-tooltip--rich { border: 1px solid rgba(255, 255, 255, 0.08); }
 
-    .md-help-chip {
+    .md-info-chip {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -997,7 +997,7 @@ limitations under the License.
       color: #4a4458;
       margin-left: 0.2rem;
     }
-    .md-help-icon { width: 18px; height: 18px; }
+    .md-info-icon { width: 18px; height: 18px; }
 
     .md-choice-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
     .md-choice-inline { display: flex; flex-wrap: wrap; gap: 1.25rem; row-gap: 0.5rem; }
@@ -1078,7 +1078,7 @@ limitations under the License.
       <span aria-hidden="true" class="md-headline__icon">🧰</span>
       <span>Git ブランチ比較コマンドジェネレータ</span>
       <span class="md-tooltip-group">
-        <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+        <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
         <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide">
           2つのブランチ差分を表示する `git diff` コマンドを生成します。ローカル/リモートを選べ、表示形式（内容/統計/ファイル一覧）や `..` / `...` を切り替えできます。
         </span>
@@ -1091,7 +1091,7 @@ limitations under the License.
           <span>基準ブランチ</span>
           <span class="md-required" aria-hidden="true">Required</span><span class="md-sr-only">必須</span>
           <span class="md-tooltip-group">
-            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
             <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--narrow">
               比較の基準にするブランチです。差分の「片側」として使われます。
               例: main / devel
@@ -1112,7 +1112,7 @@ limitations under the License.
           <span>比較ブランチ</span>
           <span class="md-required" aria-hidden="true">Required</span><span class="md-sr-only">必須</span>
           <span class="md-tooltip-group">
-            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
             <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--narrow">
               比較対象のブランチです。2つのブランチ差分を表示します。
               例: feature123 / release
@@ -1136,7 +1136,7 @@ limitations under the License.
           <span class="md-switch" aria-hidden="true"></span>
           リモート名は origin 固定
           <span class="md-tooltip-group">
-            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
             <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--narrow">
               origin 固定で使う場合にオンにします。オフにすると任意のリモート名を入力できます。
               ふだんは origin を使うケースが多いです。
@@ -1148,7 +1148,7 @@ limitations under the License.
           <span class="md-switch" aria-hidden="true"></span>
           共通祖先からの差分比較
           <span class="md-tooltip-group">
-            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
             <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide">
               オフ時は A と B のスナップショット差分で、A/B の両方の変更が見えます。
               オン時は共通祖先から B までの差分になり、B 側で増えた変更だけが見え、A だけの変更は見えません。
@@ -1160,7 +1160,7 @@ limitations under the License.
         <label class="md-label">
           <span>リモート名</span>
           <span class="md-tooltip-group">
-            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
             <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--narrow">
               fetch と差分比較に使うリモート名です。
             </span>

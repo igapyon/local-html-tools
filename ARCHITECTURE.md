@@ -13,7 +13,7 @@
 
 説明文はタイトル右の「i」アイコンに集約し、ホバーで表示する。
 
-- **構成**: `md-tooltip-group` + `md-help-chip` + `md-tooltip-content` + `md-tooltip`
+- **構成**: `md-tooltip-group` + `md-info-chip` + `md-tooltip-content` + `md-tooltip`
 - **表示**: `md-tooltip-group:hover` で `md-tooltip-content` をフェードイン
 - **幅**: 標準 `20rem`、必要なら `md-tooltip--wide`
 
@@ -21,8 +21,8 @@
 
 ```html
 <span class="md-tooltip-group">
-  <span class="md-help-chip">
-    <svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none">
+  <span class="md-info-chip">
+    <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
       <circle cx="12" cy="12" r="9" fill="#cbbcf0"/>
       <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/>
       <circle cx="12" cy="7.5" r="1" fill="#ffffff"/>
