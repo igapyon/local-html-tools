@@ -33,7 +33,7 @@
 
 `md3/index.html` は単なるサンプル集ではなく、実運用で使ったクラス設計のカタログです。
 
-- ページタイトル: `MD3 Reference`
+- ページタイトル: `MD3 Component Catalog`
 - 主なセクション:
   - `Core Components`
 - 掲載要素（例）:
@@ -43,6 +43,21 @@
   - 操作系: `md-button` `md-icon-btn` `md-menu-*`
   - 補助表示: `md-tooltip-*` `md-chip` `md-sr-only`
   - 出力/通知: `md-code-block` `md-copy-button` `md-snackbar`
+
+## 標準セットファイル
+
+- `md3/spec/token-spec.css`（Token Spec）
+- `md3/spec/core-spec.css`（Core Spec）
+- `md3/spec/VERSION.md`（バージョンと変更履歴）
+
+## 標準セット運用（正本と還元）
+
+- `md3/index.html` は参照正本（カタログ）として扱う
+  - 設計意図・構成・Preview Code の確認元
+  - ページ全体をそのままコピペする対象ではない
+- `md3/spec/token-spec.css` と `md3/spec/core-spec.css` は貼り付け正本（配布元）として扱う
+  - 各 `docs/*.html` にはこの2ファイルを基準にコピーして利用する（未使用定義を含んでよい）
+- `docs/*.html` 側で改善を行った場合は、適用後に `md3` 側へ必ずフィードバックして正本を更新する
 
 ## 現状スナップショット（実態）
 
@@ -98,6 +113,8 @@
   - アクセシビリティに関する未整理事項は `md3/TODO.md` で管理する
 - カタログ運用:
   - 各項目は「実物プレビュー + Selectors + Origin + Rationale + Preview Code + Usageリンク」を1セットで揃える
+  - `Token（:root / --md-sys-*）` と `Core（共通）` は標準仕様としてバージョン管理する（例: `Token Spec v1.x`, `Core Spec v1.x`）
+  - 標準仕様の適用対象HTMLには、未使用定義を含む標準セットを貼り付けてよい（仕様準拠を優先）
   - `Selectors` は実体クラスを表示し、必要に応じて同カード内に `State Selectors` / `Composite Selectors` を分離表示する
   - 実体クラスは `unused` 表示で、プレビュー内で直接使っていないものを区別する
   - 疑似クラス/複合セレクタ（例: `:focus`, `.a .b`）は参照用として扱い、未使用判定の対象外にする
