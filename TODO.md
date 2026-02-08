@@ -37,6 +37,8 @@
 - 対象: docs/link/url-encode-decode.html
 - 対象: docs/link/utm-remove.html
 - 対象: docs/text/text-viewer.html
+- [既存バグ] `docs/text/text-processing.html` の入力欄で、文字入力後にスペースを連打すると `.`（ピリオド）が自動挿入される
+  - 不要な自動挿入のため、発生条件を切り分けて無効化する（ブラウザ/OSの自動補正影響も確認）
 
 # DONE
 

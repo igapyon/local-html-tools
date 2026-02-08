@@ -1,7 +1,7 @@
 # MD3 Spec Versions
 
 - local-html-tools MD3 Token Spec: `v1.0.0`
-- local-html-tools MD3 Core Spec: `v1.0.0`
+- local-html-tools MD3 Core Spec: `v1.0.2`
 
 ## Policy
 
@@ -13,3 +13,7 @@
 
 - `v1.0.0` (2026-02-08)
   - `md3/index.html` 掲載の Token/Core を初回切り出し。
+- `v1.0.1` (2026-02-08)
+  - `md-switch` の checked ノブ色を白に変更（`md-switch-input:checked + .md-switch::after`）。
+- `v1.0.2` (2026-02-08)
+  - `md-switch-label` の `font-weight` を削除し、ページ側タイポグラフィを優先する。
