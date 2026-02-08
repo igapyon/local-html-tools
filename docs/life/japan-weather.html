@@ -944,13 +944,30 @@
   </style>
 </head>
 <body>
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
   <div class="md-page">
     <div class="md-shell">
       <div class="md-card">
         <button type="button" class="md-icon-btn md-menu-button" aria-label="メニュー" onclick="toggleMenu()">
           <svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/>
-          </svg>
+        <use href="#md-icon-menu" xlink:href="#md-icon-menu"></use>
+      </svg>
         </button>
         <div id="menuPanel" class="md-menu-panel md-hidden">
           <a href="../index.html" class="md-menu-link">トップへ戻る</a>

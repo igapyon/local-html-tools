@@ -1179,6 +1179,24 @@
 .md-choice-text {
   font-size: 0.9rem; color: #4a4458;
 }</textarea>
+<div class="md-note-title" style="margin-top: 12px;">Icon Spec（menu / copy / refresh）</div>
+<div class="md-preview-note" style="margin-top: 8px;">
+  `Icon Spec` は `md3/spec/icon-spec.svg` を正本とし、各 `docs/*.html` の `<body>` 直下へ埋め込みコピーします（外部参照はしない）。
+  `<use>` は Safari 互換のため `href` と `xlink:href` を併記します。
+</div>
+<textarea class="md-textarea" rows="16" readonly>&lt;svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden"&gt;
+  &lt;defs&gt;
+    &lt;symbol id="md-icon-menu" viewBox="0 0 24 24"&gt;
+      &lt;path d="M4 6h16"/&gt;&lt;path d="M4 12h16"/&gt;&lt;path d="M4 18h16"/&gt;
+    &lt;/symbol&gt;
+    &lt;symbol id="md-icon-copy" viewBox="0 0 24 24"&gt;
+      &lt;rect x="9" y="9" width="11" height="11" rx="2"/&gt;&lt;rect x="4" y="4" width="11" height="11" rx="2"/&gt;
+    &lt;/symbol&gt;
+    &lt;symbol id="md-icon-refresh" viewBox="0 0 24 24"&gt;
+      &lt;path d="M20 12a8 8 0 1 1-2.34-5.66"/&gt;&lt;path d="M20 4v6h-6"/&gt;
+    &lt;/symbol&gt;
+  &lt;/defs&gt;
+&lt;/svg&gt;</textarea>
 <div class="md-note-title" style="margin-top: 12px;">Screen-specific（画面依存）</div>
 <textarea class="md-textarea" rows="16" readonly>.md-example-card {
   background: var(--md-sys-color-surface-variant);
