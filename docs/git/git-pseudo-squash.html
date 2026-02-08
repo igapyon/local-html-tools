@@ -893,9 +893,9 @@ limitations under the License.
     .md-section-title { font-size: 1rem; font-weight: 600; color: #3f3b46; }
 
     .md-flow-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; }
-    .md-flow-title-row { display: inline-flex; align-items: center; gap: 0.08rem; }
-    .md-flow-title-row .md-section-title { margin: 0; }
-    .md-flow-title-row .md-info-chip { margin-left: 0; }
+    .md-title-info-row { display: inline-flex; align-items: center; gap: 0.08rem; }
+    .md-title-info-row .md-section-title { margin: 0; }
+    .md-title-info-row .md-info-chip { margin-left: 0; }
     .md-flow-divider { display: flex; justify-content: center; padding: 0.5rem 0; }
 
     .md-step-icon { width: 3.5rem; height: 3.5rem; }
@@ -1094,12 +1094,27 @@ limitations under the License.
   </style>
 </head>
 <body class="md-page">
-  <div class="md-surface-card md-card">
-    <button type="button" class="md-menu-button md-icon-btn" aria-label="メニュー" onclick="toggleMenu()">
-      <svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
         <path d="M4 6h16"/>
         <path d="M4 12h16"/>
         <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
+  <div class="md-surface-card md-card">
+    <button type="button" class="md-menu-button md-icon-btn" aria-label="メニュー" onclick="toggleMenu()">
+      <svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <use href="#md-icon-menu" xlink:href="#md-icon-menu"></use>
       </svg>
     </button>
     <div id="menuPanel" class="md-menu-panel md-hidden">
@@ -1173,8 +1188,7 @@ limitations under the License.
             <input type="text" id="workBranch" placeholder="例: tiga0129a" class="md-input">
             <button type="button" class="md-icon-btn md-icon-btn--small md-input-action" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
-                <path d="M20 4v6h-6"/>
+                <use href="#md-icon-refresh" xlink:href="#md-icon-refresh"></use>
               </svg>
             </button>
           </div>
@@ -1271,7 +1285,7 @@ limitations under the License.
           <circle cx="48" cy="22" r="4" fill="#A78BFA"/>
           <circle cx="48" cy="42" r="4" fill="#34D399"/>
         </svg>
-        <span class="md-flow-title-row">
+        <span class="md-title-info-row">
           <p class="md-section-title">作業開始 (基準ブランチから作成)</p>
           <span class="md-tooltip-group">
             <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
@@ -1285,9 +1299,8 @@ limitations under the License.
       <code id="createBranchCmd" class="md-code"></code>
       <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('createBranchCmd')">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="9" width="11" height="11" rx="2"/>
-          <rect x="4" y="4" width="11" height="11" rx="2"/>
-        </svg>
+            <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
+          </svg>
       </button>
       </div>
 
@@ -1316,7 +1329,7 @@ limitations under the License.
           <path d="M34 42C40 42 42 36 46 32" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
           <circle cx="50" cy="32" r="5" fill="#86EFAC"/>
         </svg>
-        <span class="md-flow-title-row">
+        <span class="md-title-info-row">
           <p class="md-section-title">作業をまとめる (squash)</p>
           <span class="md-tooltip-group">
             <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
@@ -1377,9 +1390,8 @@ limitations under the License.
       <code id="rebaseCmd" class="md-code"></code>
       <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('rebaseCmd')">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="9" width="11" height="11" rx="2"/>
-          <rect x="4" y="4" width="11" height="11" rx="2"/>
-        </svg>
+            <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
+          </svg>
       </button>
     </div>
 
@@ -1407,7 +1419,7 @@ limitations under the License.
         <circle cx="42" cy="32" r="4" fill="#A78BFA"/>
         <circle cx="36" cy="42" r="4" fill="#34D399"/>
       </svg>
-      <span class="md-flow-title-row">
+      <span class="md-title-info-row">
         <p class="md-section-title">まとめる予定の作業 (diff)</p>
         <span class="md-tooltip-group">
           <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
@@ -1421,9 +1433,8 @@ limitations under the License.
       <code id="plannedDiffCmd" class="md-code"></code>
       <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('plannedDiffCmd')">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="9" width="11" height="11" rx="2"/>
-          <rect x="4" y="4" width="11" height="11" rx="2"/>
-        </svg>
+            <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
+          </svg>
       </button>
     </div>
 

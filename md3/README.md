@@ -48,6 +48,7 @@
 
 - `md3/spec/token-spec.css`（Token Spec）
 - `md3/spec/core-spec.css`（Core Spec）
+- `md3/spec/icon-spec.svg`（Icon Spec: menu/copy/refresh）
 - `md3/spec/VERSION.md`（バージョンと変更履歴）
 
 ## 標準セット運用（正本と還元）
@@ -57,15 +58,19 @@
   - ページ全体をそのままコピペする対象ではない
 - `md3/spec/token-spec.css` と `md3/spec/core-spec.css` は貼り付け正本（配布元）として扱う
   - 各 `docs/*.html` にはこの2ファイルを基準にコピーして利用する（未使用定義を含んでよい）
+- `md3/spec/icon-spec.svg` はSVGアイコンの貼り付け正本（配布元）として扱う
+  - 単一HTML配布を優先し、`docs/*.html` では外部参照ではなく各HTML内へ埋め込みコピーする
+  - `<use href="...">` と `<use xlink:href="...">` を併記して互換性を確保する
 - `docs/*.html` 側で改善を行った場合は、適用後に `md3` 側へ必ずフィードバックして正本を更新する
 
 ## docs への反映手順（標準）
 
 1. 対象 `docs/*.html` の `<style>` 内で、`:root { ... }` を `md3/spec/token-spec.css` の内容に置き換える。
 2. 同じ `<style>` 内で、共通部品（`md-page`, `md-shell`, `md-card`, `md-input`, `md-button`, `md-tooltip`, `md-code`, `md-snackbar` など）を `md3/spec/core-spec.css` で置き換える。
-3. 画面固有スタイル（`Screen-specific`）は残す。共通化済み定義と重複する箇所だけ削除する。
-4. ブラウザで表示確認する（レイアウト崩れ、ボタン/入力/ツールチップ/コピーUI/通知の見た目と操作）。
-5. 反映時に修正した内容は `md3/index.html` と `md3/spec/*.css` に還元し、`md3/spec/VERSION.md` を更新する。
+3. `<body>` 直下に `md3/spec/icon-spec.svg` 相当の `<svg><defs><symbol>...</symbol></defs></svg>` を埋め込み、menu/copy/refresh を `<use href xlink:href>` へ統一する。
+4. 画面固有スタイル（`Screen-specific`）は残す。共通化済み定義と重複する箇所だけ削除する。
+5. ブラウザで表示確認する（レイアウト崩れ、ボタン/入力/ツールチップ/コピーUI/通知の見た目と操作）。
+6. 反映時に修正した内容は `md3/index.html` と `md3/spec/*` に還元し、`md3/spec/VERSION.md` を更新する。
 
 ## 現状スナップショット（実態）
 
