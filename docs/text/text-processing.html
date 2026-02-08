@@ -158,17 +158,17 @@ limitations under the License.
       color: #3f3b46;
     }
     .md-checkbox { accent-color: var(--md-sys-color-primary); }
-    .md-toggle {
+    .md-switch-label {
       justify-content: space-between;
       gap: 0.75rem;
     }
-    .md-toggle-text { flex: 1; }
-    .md-toggle-input {
+    .md-switch-text { flex: 1; }
+    .md-switch-input {
       position: absolute;
       opacity: 0;
       pointer-events: none;
     }
-    .md-toggle-track {
+    .md-switch {
       width: 44px;
       height: 24px;
       background: #f0ebf7;
@@ -178,7 +178,7 @@ limitations under the License.
       transition: background 150ms ease, box-shadow 150ms ease;
       flex-shrink: 0;
     }
-    .md-toggle-track::after {
+    .md-switch::after {
       content: "";
       width: 20px;
       height: 20px;
@@ -190,11 +190,11 @@ limitations under the License.
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
       transition: transform 150ms ease, background 150ms ease;
     }
-    .md-toggle-input:checked + .md-toggle-track {
+    .md-switch-input:checked + .md-switch {
       background: rgba(98, 0, 238, 0.32);
       box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.6);
     }
-    .md-toggle-input:checked + .md-toggle-track::after {
+    .md-switch-input:checked + .md-switch::after {
       transform: translateX(20px);
       background: var(--md-sys-color-primary);
     }
@@ -259,7 +259,7 @@ limitations under the License.
       pointer-events: none;
       transition: opacity 200ms ease;
     }
-    .md-snackbar--visible { opacity: 1; pointer-events: auto; }
+    .md-snackbar.md-visible { opacity: 1; pointer-events: auto; }
 
     .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
     .md-help-chip {
@@ -368,10 +368,10 @@ limitations under the License.
 <option value="toFull">全角に変換</option>
 </select>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">仮名を含める</span>
-<input class="md-toggle-input" id="optIncludeKana" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">仮名を含める</span>
+<input class="md-switch-input" id="optIncludeKana" type="checkbox">
+<span class="md-switch"></span>
 </label>
 <label class="md-sub-label">ひらがな/カタカナ:
           <select class="md-select" id="optKana">
@@ -392,145 +392,145 @@ limitations under the License.
 <details class="md-accordion">
 <summary>記号を変換</summary>
 <div class="md-subpanel" id="symbolConvertPanel">
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">すべて切り替え</span>
-<input class="md-toggle-input" id="optSymbolAll" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">すべて切り替え</span>
+<input class="md-switch-input" id="optSymbolAll" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">セミコロン（； → ;）</span>
-<input class="md-toggle-input" id="optSymbolSemicolon" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">セミコロン（； → ;）</span>
+<input class="md-switch-input" id="optSymbolSemicolon" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">コロン（： → :）</span>
-<input class="md-toggle-input" id="optSymbolColon" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">コロン（： → :）</span>
+<input class="md-switch-input" id="optSymbolColon" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">クオート（＇ → '）</span>
-<input class="md-toggle-input" id="optSymbolSingleQuote" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">クオート（＇ → '）</span>
+<input class="md-switch-input" id="optSymbolSingleQuote" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">ダブルクオート（＂ → "）</span>
-<input class="md-toggle-input" id="optSymbolDoubleQuote" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">ダブルクオート（＂ → "）</span>
+<input class="md-switch-input" id="optSymbolDoubleQuote" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">バッククオート（｀ → `）</span>
-<input class="md-toggle-input" id="optSymbolBackQuote" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">バッククオート（｀ → `）</span>
+<input class="md-switch-input" id="optSymbolBackQuote" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">丸括弧（（ ） → ( )）</span>
-<input class="md-toggle-input" id="optSymbolParentheses" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">丸括弧（（ ） → ( )）</span>
+<input class="md-switch-input" id="optSymbolParentheses" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">感嘆符（！ → !）</span>
-<input class="md-toggle-input" id="optSymbolExclamation" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">感嘆符（！ → !）</span>
+<input class="md-switch-input" id="optSymbolExclamation" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">ドル（＄ → $）</span>
-<input class="md-toggle-input" id="optSymbolDollar" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">ドル（＄ → $）</span>
+<input class="md-switch-input" id="optSymbolDollar" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">クエスチョン（？ → ?）</span>
-<input class="md-toggle-input" id="optSymbolQuestion" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">クエスチョン（？ → ?）</span>
+<input class="md-switch-input" id="optSymbolQuestion" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">アンパサンド（＆ → &amp;）</span>
-<input class="md-toggle-input" id="optSymbolAmpersand" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">アンパサンド（＆ → &amp;）</span>
+<input class="md-switch-input" id="optSymbolAmpersand" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">アットマーク（＠ → @）</span>
-<input class="md-toggle-input" id="optSymbolAt" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">アットマーク（＠ → @）</span>
+<input class="md-switch-input" id="optSymbolAt" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">シャープ（＃ → #）</span>
-<input class="md-toggle-input" id="optSymbolHash" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">シャープ（＃ → #）</span>
+<input class="md-switch-input" id="optSymbolHash" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">パーセント（％ → %）</span>
-<input class="md-toggle-input" id="optSymbolPercent" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">パーセント（％ → %）</span>
+<input class="md-switch-input" id="optSymbolPercent" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">プラス（＋ → +）</span>
-<input class="md-toggle-input" id="optSymbolPlus" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">プラス（＋ → +）</span>
+<input class="md-switch-input" id="optSymbolPlus" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">イコール（＝ → =）</span>
-<input class="md-toggle-input" id="optSymbolEquals" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">イコール（＝ → =）</span>
+<input class="md-switch-input" id="optSymbolEquals" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">スラッシュ（／ → /）</span>
-<input class="md-toggle-input" id="optSymbolSlash" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">スラッシュ（／ → /）</span>
+<input class="md-switch-input" id="optSymbolSlash" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">バックスラッシュ（＼ → \\）</span>
-<input class="md-toggle-input" id="optSymbolBackslash" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">バックスラッシュ（＼ → \\）</span>
+<input class="md-switch-input" id="optSymbolBackslash" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">ハイフン（－ → -）</span>
-<input class="md-toggle-input" id="optSymbolHyphen" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">ハイフン（－ → -）</span>
+<input class="md-switch-input" id="optSymbolHyphen" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">アンダースコア（＿ → _）</span>
-<input class="md-toggle-input" id="optSymbolUnderscore" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">アンダースコア（＿ → _）</span>
+<input class="md-switch-input" id="optSymbolUnderscore" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">カンマ（， → ,）</span>
-<input class="md-toggle-input" id="optSymbolComma" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">カンマ（， → ,）</span>
+<input class="md-switch-input" id="optSymbolComma" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">ピリオド（． → .）</span>
-<input class="md-toggle-input" id="optSymbolPeriod" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">ピリオド（． → .）</span>
+<input class="md-switch-input" id="optSymbolPeriod" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">キャレット（＾ → ^）</span>
-<input class="md-toggle-input" id="optSymbolCaret" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">キャレット（＾ → ^）</span>
+<input class="md-switch-input" id="optSymbolCaret" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">パイプ（｜ → |）</span>
-<input class="md-toggle-input" id="optSymbolPipe" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">パイプ（｜ → |）</span>
+<input class="md-switch-input" id="optSymbolPipe" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">不等号（＜ ＞ → &lt; &gt;）</span>
-<input class="md-toggle-input" id="optSymbolAngle" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">不等号（＜ ＞ → &lt; &gt;）</span>
+<input class="md-switch-input" id="optSymbolAngle" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">波括弧（｛ ｝ → { }）</span>
-<input class="md-toggle-input" id="optSymbolBrace" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">波括弧（｛ ｝ → { }）</span>
+<input class="md-switch-input" id="optSymbolBrace" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">角括弧（［ ］ → [ ]）</span>
-<input class="md-toggle-input" id="optSymbolBracket" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">角括弧（［ ］ → [ ]）</span>
+<input class="md-switch-input" id="optSymbolBracket" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">チルダ（～ → ~）</span>
-<input class="md-toggle-input" id="optSymbolTilde" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">チルダ（～ → ~）</span>
+<input class="md-switch-input" id="optSymbolTilde" type="checkbox">
+<span class="md-switch"></span>
 </label>
 </div>
 </details>
@@ -551,50 +551,50 @@ limitations under the License.
 <option value="desc">降順</option>
 </select>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">空行を除去</span>
-<input class="md-toggle-input" id="optRemoveEmptyLines" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">空行を除去</span>
+<input class="md-switch-input" id="optRemoveEmptyLines" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">連続する空行を1行に</span>
-<input class="md-toggle-input" id="optCollapseEmptyLines" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">連続する空行を1行に</span>
+<input class="md-switch-input" id="optCollapseEmptyLines" type="checkbox">
+<span class="md-switch"></span>
 </label>
 </div>
 </details>
 <details class="md-accordion">
 <summary>空白の変換</summary>
 <div class="md-subpanel" id="spaceConvertPanel">
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">全角/特殊空白を半角空白に変換</span>
-<input class="md-toggle-input" id="optNormalizeUnicodeSpaces" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">全角/特殊空白を半角空白に変換</span>
+<input class="md-switch-input" id="optNormalizeUnicodeSpaces" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">サイズのない空白を除去</span>
-<input class="md-toggle-input" id="optRemoveZeroWidthSpaces" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">サイズのない空白を除去</span>
+<input class="md-switch-input" id="optRemoveZeroWidthSpaces" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">句読点/記号（。、？！）の直前の半角空白を除去</span>
-<input class="md-toggle-input" id="optRemoveSpaceBeforePunct" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">句読点/記号（。、？！）の直前の半角空白を除去</span>
+<input class="md-switch-input" id="optRemoveSpaceBeforePunct" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">前後の空白をトリム</span>
-<input class="md-toggle-input" id="optTrim" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">前後の空白をトリム</span>
+<input class="md-switch-input" id="optTrim" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">連続する空白・タブを1つにする</span>
-<input class="md-toggle-input" id="optNormalizeSpaces" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">連続する空白・タブを1つにする</span>
+<input class="md-switch-input" id="optNormalizeSpaces" type="checkbox">
+<span class="md-switch"></span>
 </label>
-<label class="md-check-row md-toggle">
-<span class="md-toggle-text">改行を空白に変換</span>
-<input class="md-toggle-input" id="optNewlineToSpace" type="checkbox">
-<span class="md-toggle-track"></span>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">改行を空白に変換</span>
+<input class="md-switch-input" id="optNewlineToSpace" type="checkbox">
+<span class="md-switch"></span>
 </label>
 </div>
 </details>
@@ -1046,9 +1046,9 @@ limitations under the License.
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
-      toast.classList.add('md-snackbar--visible');
+      toast.classList.add('md-visible');
       setTimeout(() => {
-        toast.classList.remove('md-snackbar--visible');
+        toast.classList.remove('md-visible');
       }, 2000);
     }
 

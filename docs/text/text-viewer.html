@@ -108,7 +108,7 @@ limitations under the License.
       box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
     }
 
-    .md-toggle-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .md-radio-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
     .md-radio {
       display: inline-flex;
       align-items: center;
@@ -160,7 +160,7 @@ limitations under the License.
       pointer-events: none;
       transition: opacity 200ms ease;
     }
-    .md-snackbar--visible { opacity: 1; pointer-events: auto; }
+    .md-snackbar.md-visible { opacity: 1; pointer-events: auto; }
 
     .hidden { display: none; }
     .leading-relaxed { line-height: 1.6; }
@@ -229,7 +229,7 @@ limitations under the License.
     <div class="md-section">
       <div class="md-toolbar" style="margin-bottom: 0.75rem;">
         <label class="md-label" style="margin-bottom: 0;">プレビュー</label>
-        <div class="md-toggle-row">
+        <div class="md-radio-row">
           <label class="md-radio">
             <input type="radio" name="format" value="plain" checked>
             <span>プレーンテキスト</span>
@@ -372,9 +372,9 @@ limitations under the License.
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
-      toast.classList.add('md-snackbar--visible');
+      toast.classList.add('md-visible');
       setTimeout(() => {
-        toast.classList.remove('md-snackbar--visible');
+        toast.classList.remove('md-visible');
       }, 2000);
     }
 

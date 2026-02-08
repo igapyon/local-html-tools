@@ -11,7 +11,7 @@
 ## 何をまとめたものか
 
 - 対象: `docs/` の各 HTML ツール（Git / FFmpeg / Link / Text / Grep / Password / Life など）
-- 形式: 「実物プレビュー + 使用クラス + HTML 記述例 + 実際の利用箇所リンク」
+- 形式: 「実物プレビュー + Selectors + Origin + Rationale + Preview Code + Usage（実利用リンク）」
 - 目的:
   - 画面ごとに散らばった UI パターンの再利用性を上げる
   - Material Design 風の見た目と操作感を、外部依存なしで統一する
@@ -36,16 +36,16 @@
 - ページタイトル: `MD3 Reference`
 - 主なセクション:
   - `Core Components`
-  - `Layout Examples`
-  - `Form Examples`
-  - `Button Examples`
-  - `Tooltip (i) Examples`
-  - `Code Output Examples`
-  - `Snackbar Examples`
+  - `Layout Usage`
+  - `Form Usage`
+  - `Button Usage`
+  - `Tooltip (i) Usage`
+  - `Code Output Usage`
+  - `Snackbar Usage`
 - 掲載要素（例）:
   - レイアウト: `md-page` `md-shell` `md-card`
   - 入力系: `md-label` `md-input` `md-select` `md-textarea` `md-required`
-  - 選択系: `md-radio` `md-choice` `md-switch`（`md-toggle` は廃止予定）
+  - 選択系: `md-radio` `md-choice` `md-switch`
   - 操作系: `md-button` `md-icon-btn` `md-menu-*`
   - 補助表示: `md-tooltip-*` `md-chip` `md-sr-only`
   - 出力/通知: `md-code-block` `md-copy-button` `md-snackbar`
@@ -56,11 +56,11 @@
   - トークン/セレクタ集約（`Core（共通）` と `Screen-specific（画面依存）` の提示）
   - `Core Selector Catalog`（コンポーネント単位の実物+コード）
   - 用途別サンプル（Layout / Form / Button / Tooltip / Code / Snackbar）
-- カタログカードは `Note (MD-inspired)` と `Note (Project-specific)` の2系統で意図を明示している
-- `Examples` の `../docs/*.html` 参照リンクは現状 25 件あり、リンク先は存在している
-- スイッチ系は `md-switch` を推奨しつつ、`md-toggle` は Deprecated 表示で併存している
-- ボタン系は `md-button--*` 修飾子スタイルと、旧来の `md-button-primary` / `md-button-secondary` が併存している
-- Snackbar 可視化クラスは `md-snackbar.md-visible` と `md-snackbar--visible` の2表現が残っている
+- カタログカードは `Origin`（`MD-inspired` / `Project-specific`）と `Rationale`（意図メモ）を分離している
+- `Usage` の `../docs/*.html` 参照リンクは現状 25 件あり、リンク先は存在している
+- スイッチ系は `md-switch` に統一済み
+- ボタン系は `md-button--*` 修飾子スタイルへ統一済み（旧来 `md-button-primary` / `md-button-secondary` は削除）
+- Snackbar 可視化は `md-visible` 系へ統一済み（`md-snackbar--visible` は削除）
 - このため、`md3/index.html` は「統一済み仕様書」ではなく「実運用知見の収集・移行中カタログ」として扱う
 
 ## 位置づけ（docs との関係）
@@ -104,7 +104,15 @@
   - 現時点では完全対応を目標にしない（必要時に段階的に対応する）
   - アクセシビリティに関する未整理事項は `md3/TODO.md` で管理する
 - カタログ運用:
-  - 各項目は「実物プレビュー + Classes + HTML例 + Examplesリンク」を1セットで揃える
+  - 各項目は「実物プレビュー + Selectors + Origin + Rationale + Preview Code + Usageリンク」を1セットで揃える
+  - `Selectors` は実体クラスを表示し、必要に応じて同カード内に `State Selectors` / `Composite Selectors` を分離表示する
+  - 実体クラスは `unused` 表示で、プレビュー内で直接使っていないものを区別する
+  - 疑似クラス/複合セレクタ（例: `:focus`, `.a .b`）は参照用として扱い、未使用判定の対象外にする
+  - `MD-inspired` で `unused` が出ることは許容する（状態・派生の説明として有効）
+  - `Project-specific` は `docs/*.html` に実利用があるものだけ採用する（未使用の独自実装は追加しない）
+  - `Project-specific` で実利用のない要素はカタログに載せない方針とする
+  - `Project-specific` で実利用のない要素は `docs/*.html` 側にも残さない（未使用定義は削除する）
+  - 表示整形の一部は `md3/index.html` のJSで実施する（`Source:` の `Usage` への吸収、`Usage` 重複リンク除去、`使用箇所なし` チップ整理 など）
   - 仕様として許容する例外（未定義関数参照・重複IDなど）はREADME/TODOで明示する
 
 ## 補足
@@ -116,4 +124,4 @@
 
 - `md3/index.html` の一部プレビューは、実運用HTMLから断片をそのまま引用している。
 - そのため、`onclick` / `onchange` がこのページ内で未定義の関数を参照する箇所がある（仕様として許容）。
-- 同じ理由で、プレビュー断片間で `id` が重複する場合がある（例: `toast`）。
+- 以前は同じ理由で、プレビュー断片間で `id` が重複する箇所（`toast`）があったが、現在は `toastHost` / `toastInline` へ分離済み。
