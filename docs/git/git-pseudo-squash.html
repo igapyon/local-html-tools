@@ -1364,19 +1364,6 @@ limitations under the License.
     <div class="md-section md-stack-sm">
       <div class="md-form-row">
         <label class="md-switch-label">
-          <input type="checkbox" id="optPush" class="md-switch-input">
-          <span class="md-switch" aria-hidden="true"></span>
-          リモートに push
-          <span class="md-tooltip-group">
-            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-            <span class="md-tooltip-content md-tooltip md-tooltip--rich">
-              コミットをまとめた後、リモートに push するかどうかを切り替えます。
-              push --force-with-lease オプションで push の実施後に、リモートと同期（pull）し、ブランチを -done サフィックスでリネームします。
-              ローカルでコミットが1つにまとまっているため、GitHubのPRではsquashせず通常のmergeで完了できるのが嬉しいです。
-            </span>
-          </span>
-        </label>
-        <label class="md-switch-label">
           <input type="checkbox" id="useCurrentBranch" class="md-switch-input" checked onchange="toggleCurrentBranch()">
           <span class="md-switch" aria-hidden="true"></span>
           現在ブランチで作業
@@ -1393,6 +1380,50 @@ limitations under the License.
     <div class="md-code-block">
       <code id="rebaseCmd" class="md-code"></code>
       <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('rebaseCmd')">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
+          </svg>
+      </button>
+    </div>
+
+    <div class="md-flow-divider">
+      <svg aria-hidden="true" viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
+        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
+        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
+        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
+        <path d="M40 32h26" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
+        <path d="M116 32h70" stroke="#C4B5FD" stroke-width="4" stroke-linecap="round"/>
+        <path d="M236 32h26" stroke="#A7F3D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M312 32h70" stroke="#F9A8D4" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
+      </svg>
+    </div>
+    <div class="md-flow-row">
+      <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+        <path d="M22 40h20" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
+        <path d="M32 18v18" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+        <path d="M26 24l6-6 6 6" stroke="#A78BFA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="18" y="42" width="28" height="8" rx="4" fill="#D9F5F0"/>
+        <circle cx="46" cy="24" r="5" fill="#86EFAC"/>
+      </svg>
+      <span class="md-title-info-row">
+        <p class="md-section-title">リモートに反映 (push)</p>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+          <span class="md-tooltip-content md-tooltip md-tooltip--rich">
+            コミットをまとめた後、リモートに push するときに利用するコマンドです。
+            push --force-with-lease オプションで push の実施後に、リモートと同期（pull）し、ブランチを -done サフィックスでリネームします。
+            ローカルでコミットが1つにまとまっているため、GitHubのPRではsquashせず通常のmergeで完了できるのが嬉しいです。
+          </span>
+        </span>
+      </span>
+    </div>
+    <div class="md-code-block">
+      <code id="pushCmd" class="md-code"></code>
+      <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('pushCmd')">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
           </svg>
@@ -1521,6 +1552,7 @@ limitations under the License.
     function regenerateAllCommands() {
       generateCreateBranchCommand({ silent: true });
       generateRebaseCommand({ silent: true });
+      generatePushCommand({ silent: true });
       generatePlannedDiffCommand({ silent: true });
     }
 
@@ -1562,7 +1594,6 @@ limitations under the License.
       const useCurrent = document.getElementById("useCurrentBranch").checked;
       const commitMessage = document.getElementById("commitMessage").value.trim();
       const squashRemote = document.getElementById("squashRemote").value.trim() || "origin";
-      const includePush = document.getElementById("optPush").checked;
       const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
 
       if (!squashBranch) {
@@ -1590,12 +1621,6 @@ limitations under the License.
         document.getElementById("rebaseCmd").textContent = "";
         return;
       }
-      if (includePush && !useCurrent && !workBranch) {
-        if (!silent) alert("push する場合は作業ブランチ名を入力してください。");
-        document.getElementById("rebaseCmd").textContent = "";
-        return;
-      }
-
       const lines = [];
       lines.push(`git fetch ${quoteIfNeeded(squashRemote, shellEnv)}`);
       if (!useCurrent) {
@@ -1617,22 +1642,41 @@ limitations under the License.
         lines.push(`git commit -F "$COMMIT_MSG_FILE"`);
         lines.push(`rm "$COMMIT_MSG_FILE"`);
       }
-      if (includePush) {
-        if (useCurrent) {
-          lines.push(`git push --force-with-lease ${quoteIfNeeded(squashRemote, shellEnv)} HEAD`);
-        } else {
-          lines.push(`git push --force-with-lease ${quoteIfNeeded(squashRemote, shellEnv)} ${quoteIfNeeded(workBranch, shellEnv)}`);
-        }
-        lines.push(`git pull`);
-        if (useCurrent) {
-          lines.push(`git branch -m "$(git branch --show-current)" "$(git branch --show-current)-done"`);
-        } else {
-          lines.push(`git branch -m ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(`${workBranch}-done`, shellEnv)}`);
-        }
-      }
       lines.push(`git status -sb`);
 
       document.getElementById("rebaseCmd").textContent = lines.join("\n");
+    }
+
+    function generatePushCommand(options = {}) {
+      const silent = options && options.silent === true;
+      const output = document.getElementById("pushCmd");
+      if (!output) return;
+
+      const workBranch = document.getElementById("workBranch").value.trim();
+      const useCurrent = document.getElementById("useCurrentBranch").checked;
+      const squashRemote = document.getElementById("squashRemote").value.trim() || "origin";
+      const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
+
+      if (!useCurrent && !workBranch) {
+        if (!silent) alert("push する場合は作業ブランチ名を入力してください。");
+        output.textContent = "";
+        return;
+      }
+
+      const lines = [];
+      if (useCurrent) {
+        lines.push(`git push --force-with-lease ${quoteIfNeeded(squashRemote, shellEnv)} HEAD`);
+      } else {
+        lines.push(`git push --force-with-lease ${quoteIfNeeded(squashRemote, shellEnv)} ${quoteIfNeeded(workBranch, shellEnv)}`);
+      }
+      lines.push(`git pull`);
+      if (useCurrent) {
+        lines.push(`git branch -m "$(git branch --show-current)" "$(git branch --show-current)-done"`);
+      } else {
+        lines.push(`git branch -m ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(`${workBranch}-done`, shellEnv)}`);
+      }
+      lines.push(`git status -sb`);
+      output.textContent = lines.join("\n");
     }
 
     function generatePlannedDiffCommand(options = {}) {
@@ -1705,7 +1749,7 @@ limitations under the License.
 
     function setupCreateBranchAutoUpdate() {
       const ids = ["squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "shellEnvPowerShell", "lockOrigin"];
-      const handler = () => generateCreateBranchCommand({ silent: true });
+      const handler = () => regenerateAllCommands();
       ids.forEach((id) => {
         const element = document.getElementById(id);
         if (!element) return;
@@ -1716,11 +1760,8 @@ limitations under the License.
 
     function setupRebaseAutoUpdate() {
       const inputIds = ["squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "commitMessage"];
-      const changeIds = ["useCurrentBranch", "optPush", "shellEnvPowerShell", "lockOrigin"];
-      const handler = () => {
-        generateRebaseCommand({ silent: true });
-        generatePlannedDiffCommand({ silent: true });
-      };
+      const changeIds = ["useCurrentBranch", "shellEnvPowerShell", "lockOrigin"];
+      const handler = () => regenerateAllCommands();
       inputIds.forEach((id) => {
         const element = document.getElementById(id);
         if (!element) return;
@@ -1786,6 +1827,7 @@ limitations under the License.
     generateCreateBranchCommand({ silent: true });
     setupRebaseAutoUpdate();
     generateRebaseCommand({ silent: true });
+    generatePushCommand({ silent: true });
     generatePlannedDiffCommand({ silent: true });
     setupCodeSelectAll();
   </script>
