@@ -306,7 +306,6 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-
     .md-help-chip:focus-visible {
       box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring);
     }
@@ -960,6 +959,21 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+    @media (hover: hover) and (pointer: fine) {
+      .md-link-card:hover,
+      .md-link-card:focus-visible {
+        overflow: visible;
+        z-index: 2;
+      }
+      .md-link-card:hover .md-card-desc,
+      .md-link-card:focus-visible .md-card-desc {
+        display: block;
+        -webkit-line-clamp: unset;
+        line-clamp: unset;
+        -webkit-box-orient: initial;
+        overflow: visible;
+      }
+    }
 
     .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
     .md-help-chip {
@@ -1016,7 +1030,7 @@
           <span aria-hidden="true" class="md-icon-inline">🗂️</span>
           <span>local-html-tools</span>
         </div>
-        <div class="md-app-meta">更新日: 2026-02-05</div>
+        <div class="md-app-meta">更新日: 2026-02-08</div>
       </div>
     </header>
 
