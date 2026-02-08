@@ -1790,6 +1790,9 @@
         ここにある各コンポーネントは、すぐに `class` をコピーして利用できるよう実物 + HTML例を配置している。
       </div>
       <div class="md-preview-note" style="margin-top: 6px;">
+        注: プレビューは実運用ページから断片的にコピーしているため、`onclick` / `onchange` が未定義関数を参照する場合があります（仕様として許容）。同じ理由で、`id` が重複する断片が含まれる場合があります。
+      </div>
+      <div class="md-preview-note" style="margin-top: 6px;">
         TODO: トグル系が `md-switch` と `md-toggle` の2系統に分かれており重複。標準を統一すること。
       </div>
       <!-- core-catalog:start -->
@@ -2201,7 +2204,7 @@
     </div>
             
                 
-            <div class="md-section-title" style="grid-column: 1 / -1; margin-top: 10px;">Tooltip & Help</div>
+            <div class="md-section-title" style="grid-column: 1 / -1; margin-top: 10px;">Tooltip &amp; Help</div>
             
         
     <div class="md-example-card">
@@ -2310,7 +2313,7 @@
     </div>
                     
                 
-            <div class="md-section-title" style="grid-column: 1 / -1; margin-top: 10px;">Output & Feedback</div>
+            <div class="md-section-title" style="grid-column: 1 / -1; margin-top: 10px;">Output &amp; Feedback</div>
             
         
     <div class="md-example-card">

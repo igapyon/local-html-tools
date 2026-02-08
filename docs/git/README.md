@@ -2,6 +2,12 @@
 
 `docs/git/` 配下の HTML は、ブラウザだけで使える Git コマンドジェネレータです。すべて単一 HTML で完結し、オフラインで動作します。
 
+## 関連README
+
+- [ルートREADME](../../README.md)
+- [MD3リファレンス](../../md3/README.md)
+- [PasswordツールREADME](../password/README.md)
+
 ## 一覧
 
 - `docs/git/git-config-setup.html`
