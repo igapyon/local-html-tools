@@ -38,6 +38,9 @@
     .md-subtitle { color: var(--md-sys-color-on-surface-variant); font-size: 0.95rem; }
     .md-section { margin-top: 28px; }
     .md-section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .md-title-info-row { display: inline-flex; align-items: center; gap: 0.1rem; }
+    .md-title-info-row .md-section-title { margin: 0; }
+    .md-title-info-row .md-info-chip { margin-left: 0; }
 
     .md-grid { display: grid; gap: 16px; }
     @media (min-width: 840px) {
@@ -421,6 +424,20 @@
 
 .md-section-title {
   font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
+}
+
+.md-title-info-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.md-title-info-row .md-section-title {
+  margin: 0;
+}
+
+.md-title-info-row .md-info-chip {
+  margin-left: 0;
 }
 
 .md-grid {
@@ -2137,12 +2154,42 @@
     </div>
             
                 
-            <div class="md-section-title" style="grid-column: 1 / -1; margin-top: 10px;">Tooltip &amp; Help</div>
+            <div class="md-section-title" style="grid-column: 1 / -1; margin-top: 10px;">Info Chip &amp; Tooltip</div>
+            
+        
+    <div class="md-example-card">
+      <div class="md-preview">
+        <div class="md-preview-note">Selector set: title + info chip + tooltip (from docs/git/git-pseudo-squash.html)</div>
+        <div class="md-title-info-row">
+          <p class="md-section-title">作業開始 (基準ブランチから作成)</p>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide">
+              基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
+            </span>
+          </span>
+        </div>
+      </div>
+      <div><strong>Selectors</strong><span class="md-chip">.md-title-info-row</span><span class="md-chip">.md-tooltip-group</span><span class="md-chip">.md-tooltip-content</span><span class="md-chip">.md-tooltip--rich</span><span class="md-chip">.md-tooltip--wide</span><span class="md-chip">.md-info-chip</span><span class="md-chip">.md-info-icon</span></div>
+      <div><strong>Origin</strong><span class="md-chip">MD-inspired</span></div>
+      <div><strong>Rationale</strong>基本的に、補足説明を付けられる箇所には `i` を配置し、ホバーで意図を確認できるようにする。</div>
+      <div><strong>Usage</strong><a class="md-chip" href="../docs/git/git-pseudo-squash.html">1</a><a class="md-chip" href="../docs/git/git-config-setup.html">2</a><a class="md-chip" href="../docs/index.html">3</a></div>
+      <div><strong>Preview Code</strong></div>
+      <pre class="md-code"><code>&lt;div class="md-title-info-row"&gt;
+  &lt;p class="md-section-title"&gt;作業開始 (基準ブランチから作成)&lt;/p&gt;
+  &lt;span class="md-tooltip-group"&gt;
+    &lt;span class="md-info-chip"&gt;&lt;svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"&gt;&lt;circle cx="12" cy="12" r="9" fill="#cbbcf0"/&gt;&lt;rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/&gt;&lt;circle cx="12" cy="7.5" r="1" fill="#ffffff"/&gt;&lt;/svg&gt;&lt;/span&gt;
+    &lt;span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide"&gt;
+      基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
+    &lt;/span&gt;
+  &lt;/span&gt;
+&lt;/div&gt;</code></pre>
+    </div>
             
         
     <div class="md-example-card">
                       <div class="md-preview">
-                        <div class="md-preview-note">Selector set: tooltip + help chip</div>
+                        <div class="md-preview-note">Selector set: tooltip + info chip</div>
                         <h1 class="md-headline">
                           <span aria-hidden="true" class="md-headline__icon">⚙️</span>
                           <span>Git ユーザー設定コマンドジェネレータ</span>
@@ -2154,18 +2201,20 @@
                           </span>
                         </h1>
                         <div class="md-flow-row">
-                          <p class="md-section-title">現在の設定を確認</p>
-                          <span class="md-tooltip-group">
-                            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-                            <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide">
-                              設定前に現在のユーザー名とメールアドレスを確認できます。
+                          <span class="md-title-info-row">
+                            <p class="md-section-title">現在の設定を確認</p>
+                            <span class="md-tooltip-group">
+                              <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+                              <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide">
+                                設定前に現在のユーザー名とメールアドレスを確認できます。
+                              </span>
                             </span>
                           </span>
                         </div>
                       </div>
-                      <div><strong>Selectors</strong><span class="md-chip">.md-tooltip-group</span><span class="md-chip">.md-tooltip-group:hover .md-tooltip-content</span><span class="md-chip">.md-info-chip</span><span class="md-chip">.md-info-chip:focus-visible</span><span class="md-chip">.md-info-icon</span><span class="md-chip">.md-tooltip</span><span class="md-chip">.md-tooltip--narrow</span><span class="md-chip">.md-tooltip--rich</span><span class="md-chip">.md-tooltip--wide</span><span class="md-chip">.md-tooltip-content</span></div>
+                      <div><strong>Selectors</strong><span class="md-chip">.md-title-info-row</span><span class="md-chip">.md-tooltip-group</span><span class="md-chip">.md-tooltip-group:hover .md-tooltip-content</span><span class="md-chip">.md-info-chip</span><span class="md-chip">.md-info-chip:focus-visible</span><span class="md-chip">.md-info-icon</span><span class="md-chip">.md-tooltip</span><span class="md-chip">.md-tooltip--narrow</span><span class="md-chip">.md-tooltip--rich</span><span class="md-chip">.md-tooltip--wide</span><span class="md-chip">.md-tooltip-content</span></div>
               <div><strong>Origin</strong><span class="md-chip">MD-inspired</span></div>
-      <div><strong>Rationale</strong> Material Designのツールチップ相当。ヘルプチップ併用は独自。</div>
+      <div><strong>Rationale</strong> Material Designのツールチップ相当。情報チップ併用は独自。</div>
                       <div><strong>Usage</strong><a class="md-chip" href="../docs/git/git-config-setup.html">1</a><a class="md-chip" href="../docs/grep/find-gen.html">2</a><a class="md-chip" href="../docs/link/utm-remove.html">3</a></div>
                       <div><strong>Preview Code</strong></div>
       <pre class="md-code"><code>&lt;h1 class="md-headline"&gt;
@@ -2179,11 +2228,13 @@
   &lt;/span&gt;
 &lt;/h1&gt;
 &lt;div class="md-flow-row"&gt;
-  &lt;p class="md-section-title"&gt;現在の設定を確認&lt;/p&gt;
-  &lt;span class="md-tooltip-group"&gt;
-    &lt;span class="md-info-chip"&gt;&lt;svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"&gt;&lt;circle cx="12" cy="12" r="9" fill="#cbbcf0"/&gt;&lt;rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/&gt;&lt;circle cx="12" cy="7.5" r="1" fill="#ffffff"/&gt;&lt;/svg&gt;&lt;/span&gt;
-    &lt;span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide"&gt;
-      設定前に現在のユーザー名とメールアドレスを確認できます。
+  &lt;span class="md-title-info-row"&gt;
+    &lt;p class="md-section-title"&gt;現在の設定を確認&lt;/p&gt;
+    &lt;span class="md-tooltip-group"&gt;
+      &lt;span class="md-info-chip"&gt;&lt;svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"&gt;&lt;circle cx="12" cy="12" r="9" fill="#cbbcf0"/&gt;&lt;rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/&gt;&lt;circle cx="12" cy="7.5" r="1" fill="#ffffff"/&gt;&lt;/svg&gt;&lt;/span&gt;
+      &lt;span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide"&gt;
+        設定前に現在のユーザー名とメールアドレスを確認できます。
+      &lt;/span&gt;
     &lt;/span&gt;
   &lt;/span&gt;
 &lt;/div&gt;</code></pre>

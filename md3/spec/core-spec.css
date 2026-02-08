@@ -31,6 +31,20 @@
   font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
 }
 
+.md-title-info-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.md-title-info-row .md-section-title {
+  margin: 0;
+}
+
+.md-title-info-row .md-info-chip {
+  margin-left: 0;
+}
+
 .md-grid {
   display: grid; gap: 16px;
 }
