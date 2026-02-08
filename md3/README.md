@@ -59,6 +59,14 @@
   - 各 `docs/*.html` にはこの2ファイルを基準にコピーして利用する（未使用定義を含んでよい）
 - `docs/*.html` 側で改善を行った場合は、適用後に `md3` 側へ必ずフィードバックして正本を更新する
 
+## docs への反映手順（標準）
+
+1. 対象 `docs/*.html` の `<style>` 内で、`:root { ... }` を `md3/spec/token-spec.css` の内容に置き換える。
+2. 同じ `<style>` 内で、共通部品（`md-page`, `md-shell`, `md-card`, `md-input`, `md-button`, `md-tooltip`, `md-code`, `md-snackbar` など）を `md3/spec/core-spec.css` で置き換える。
+3. 画面固有スタイル（`Screen-specific`）は残す。共通化済み定義と重複する箇所だけ削除する。
+4. ブラウザで表示確認する（レイアウト崩れ、ボタン/入力/ツールチップ/コピーUI/通知の見た目と操作）。
+5. 反映時に修正した内容は `md3/index.html` と `md3/spec/*.css` に還元し、`md3/spec/VERSION.md` を更新する。
+
 ## 現状スナップショット（実態）
 
 - 構成は2層（完全統合）:
