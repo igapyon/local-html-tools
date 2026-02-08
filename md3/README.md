@@ -36,12 +36,6 @@
 - ページタイトル: `MD3 Reference`
 - 主なセクション:
   - `Core Components`
-  - `Layout Usage`
-  - `Form Usage`
-  - `Button Usage`
-  - `Tooltip (i) Usage`
-  - `Code Output Usage`
-  - `Snackbar Usage`
 - 掲載要素（例）:
   - レイアウト: `md-page` `md-shell` `md-card`
   - 入力系: `md-label` `md-input` `md-select` `md-textarea` `md-required`
@@ -52,10 +46,9 @@
 
 ## 現状スナップショット（実態）
 
-- 構成は3層:
+- 構成は2層（完全統合）:
   - トークン/セレクタ集約（`Core（共通）` と `Screen-specific（画面依存）` の提示）
-  - `Core Selector Catalog`（コンポーネント単位の実物+コード）
-  - 用途別サンプル（Layout / Form / Button / Tooltip / Code / Snackbar）
+  - `Core Selector Catalog`（実物 + Selectors + Origin + Rationale + Preview Code + Usageリンク）
 - カタログカードは `Origin`（`MD-inspired` / `Project-specific`）と `Rationale`（意図メモ）を分離している
 - `Usage` の `../docs/*.html` 参照リンクは現状 25 件あり、リンク先は存在している
 - スイッチ系は `md-switch` に統一済み

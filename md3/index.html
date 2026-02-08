@@ -343,11 +343,12 @@
 </head>
 <body class="md-page">
   <div class="md-shell md-card">
-    <h1 class="md-headline">local-html-tools MD3 Component Reference</h1>
-    <p class="md-subtitle">コンポーネント実物 + CSSクラス + HTML記述例のリファレンス</p>
+    <h1 class="md-headline">local-html-tools MD3 Component Catalog</h1>
+    <p class="md-subtitle">実運用ベースの、コンポーネント実物 + Selectors + Origin/Rationale + Preview Code + Usage（実利用リンク）の統合リファレンス</p>
     <div class="md-section" style="margin-top: 16px;">
       <div class="md-example-card">
         <div class="md-preview-stack">
+          <div class="md-note-title">トークン方針（:root / --md-sys-*）</div>
           <div class="md-preview-note">
             このプロジェクトの Material Design 対応は、各HTMLファイル冒頭の `:root` にある CSS 変数（`--md-sys-*`）を前提にしています。
             ここには、`docs` 配下を含む全HTMLから抽出したトークンの総和（重複は除外）をまとめています。
@@ -383,7 +384,8 @@
 }</textarea>
           <div class="md-preview-note" style="margin-top: 12px;">
             参考: 全HTMLから抽出したMD系CSSセレクタの総和（重複除外）
-<div class="md-preview-note" style="margin-top: 8px;">Core（共通）</div>
+          </div>
+          <div class="md-note-title" style="margin-top: 8px;">Core（共通）</div>
 <textarea class="md-textarea" rows="16" readonly>.md-page {
   background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; min-height: 100vh;
 }
@@ -1156,7 +1158,7 @@
 .md-choice-text {
   font-size: 0.9rem; color: #4a4458;
 }</textarea>
-<div class="md-preview-note" style="margin-top: 12px;">Screen-specific（画面依存）</div>
+<div class="md-note-title" style="margin-top: 12px;">Screen-specific（画面依存）</div>
 <textarea class="md-textarea" rows="16" readonly>.md-example-card {
   background: var(--md-sys-color-surface-variant);
   border: 1px solid #e5e0ec;
@@ -1779,28 +1781,13 @@
     <div class="md-example-card">
       <div class="md-preview">
         <div class="md-preview-note">Selector set: textarea variants</div>
-        <textarea id="inputText" rows="5" placeholder="例: こんにちは / %E3%81%93%E3%82%93%E3%81%AB%E3%81%A1%E3%81%AF" class="md-textarea md-field-block"></textarea>
-      </div>
-      <div><strong>Selectors</strong><span class="md-chip">.md-textarea</span><span class="md-chip">.md-field-block</span></div>
-      <div><strong>Origin</strong><span class="md-chip">MD-inspired</span></div>
-      <div><strong>Rationale</strong> Material Designのテキスト入力に近い見た目を意識。</div>
-      <div><strong>Usage</strong><a class="md-chip" href="../docs/link/url-encode-decode.html">1</a><a class="md-chip" href="../docs/link/mime-base64.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">3</a></div>
-      <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;textarea id="inputText" rows="5" placeholder="例: こんにちは / %E3%81%93%E3%82%93%E3%81%AB%E3%81%A1%E3%81%AF" class="md-textarea md-field-block"&gt;&lt;/textarea&gt;</code></pre>
-    </div>
-                
-            
-        
-    <div class="md-example-card">
-      <div class="md-preview">
-        <div class="md-preview-note">Selector: .md-textarea:focus</div>
         <label class="md-label">ffprobe 出力（JSON/テキスト）:</label>
         <textarea id="probeOutput" rows="6" placeholder="ffprobe の出力を貼り付けてください" class="md-textarea md-field-block"></textarea>
       </div>
-      <div><strong>Selectors</strong><span class="md-chip">.md-textarea:focus</span></div>
+      <div><strong>Selectors</strong><span class="md-chip">.md-textarea</span><span class="md-chip">.md-field-block</span><span class="md-chip">.md-textarea:focus</span></div>
       <div><strong>Origin</strong><span class="md-chip">MD-inspired</span></div>
-      <div><strong>Rationale</strong> 説明ラベル + 大きめテキストエリアの組み合わせで、複数行入力を想定。</div>
-      <div><strong>Usage</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">1</a><a class="md-chip" href="../docs/link/mime-base64.html">2</a><a class="md-chip" href="../docs/text/text-processing.html">3</a></div>
+      <div><strong>Rationale</strong> Material Designのテキスト入力に近い見た目を意識。説明ラベル + 大きめテキストエリア構成で、フォーカス時の状態変化も含めて示す。</div>
+      <div><strong>Usage</strong><a class="md-chip" href="../docs/link/url-encode-decode.html">1</a><a class="md-chip" href="../docs/link/mime-base64.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">3</a><a class="md-chip" href="../docs/text/text-processing.html">4</a></div>
       <div><strong>Preview Code</strong></div>
       <pre class="md-code"><code>&lt;label class="md-label"&gt;ffprobe 出力（JSON/テキスト）:&lt;/label&gt;
 &lt;textarea id="probeOutput" rows="6" placeholder="ffprobe の出力を貼り付けてください" class="md-textarea md-field-block"&gt;&lt;/textarea&gt;</code></pre>
@@ -2036,66 +2023,55 @@
                 
             
         
+            <div class="md-section-title" style="grid-column: 1 / -1; margin-top: 10px;">Navigation</div>
+
     <div class="md-example-card">
       <div class="md-preview">
         <div class="md-preview-note">Selector set: icon button + modifiers</div>
         <div class="md-button-row">
-          <button type="button" class="md-menu-button md-icon-btn" aria-label="メニュー" onclick="toggleMenu(this)">
+          <button type="button" class="md-icon-btn" aria-label="メニュー">
             <svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <path d="M4 6h16"/>
               <path d="M4 12h16"/>
               <path d="M4 18h16"/>
             </svg>
           </button>
-          <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('createBranchCmd')">
+          <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" aria-label="補助アクション">
             <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <rect x="9" y="9" width="11" height="11" rx="2"/>
               <rect x="4" y="4" width="11" height="11" rx="2"/>
-            </svg>
-          </button>
-          <button type="button" class="md-icon-btn md-icon-btn--small md-input-action" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
-            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
-              <path d="M20 4v6h-6"/>
             </svg>
           </button>
         </div>
       </div>
       <div><strong>Selectors</strong><span class="md-chip">.md-icon-btn</span><span class="md-chip">.md-icon-btn--small</span><span class="md-chip">.md-icon-btn--surface</span><span class="md-chip">.md-icon-btn:hover</span></div>
       <div><strong>Origin</strong><span class="md-chip">MD-inspired</span></div>
-      <div><strong>Rationale</strong> Material Designのアイコンボタン相当。</div>
+      <div><strong>Rationale</strong> Material Designのアイコンボタン相当。単体/小サイズ/サーフェス系の派生を同カードで確認できる。</div>
       <div><strong>Usage</strong><a class="md-chip" href="../docs/git/git-pseudo-squash.html">1</a><a class="md-chip" href="../docs/link/utm-remove.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">3</a></div>
       <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;button type="button" class="md-menu-button md-icon-btn" aria-label="メニュー" onclick="toggleMenu(this)"&gt;
-  &lt;svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"&gt;
-    &lt;path d="M4 6h16"/&gt;
-    &lt;path d="M4 12h16"/&gt;
-    &lt;path d="M4 18h16"/&gt;
-  &lt;/svg&gt;
-&lt;/button&gt;
-&lt;button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('createBranchCmd')"&gt;
-  &lt;svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"&gt;
-    &lt;rect x="9" y="9" width="11" height="11" rx="2"/&gt;
-    &lt;rect x="4" y="4" width="11" height="11" rx="2"/&gt;
-  &lt;/svg&gt;
-&lt;/button&gt;
-&lt;button type="button" class="md-icon-btn md-icon-btn--small md-input-action" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新"&gt;
-  &lt;svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"&gt;
-    &lt;path d="M20 12a8 8 0 1 1-2.34-5.66"/&gt;
-    &lt;path d="M20 4v6h-6"/&gt;
-  &lt;/svg&gt;
-&lt;/button&gt;</code></pre>
+      <pre class="md-code"><code>&lt;div class="md-button-row"&gt;
+  &lt;button type="button" class="md-icon-btn" aria-label="メニュー"&gt;
+    &lt;svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"&gt;
+      &lt;path d="M4 6h16"/&gt;
+      &lt;path d="M4 12h16"/&gt;
+      &lt;path d="M4 18h16"/&gt;
+    &lt;/svg&gt;
+  &lt;/button&gt;
+  &lt;button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" aria-label="補助アクション"&gt;
+    &lt;svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"&gt;
+      &lt;rect x="9" y="9" width="11" height="11" rx="2"/&gt;
+      &lt;rect x="4" y="4" width="11" height="11" rx="2"/&gt;
+    &lt;/svg&gt;
+  &lt;/button&gt;
+&lt;/div&gt;</code></pre>
     </div>
-                    
-                
-            <div class="md-section-title" style="grid-column: 1 / -1; margin-top: 10px;">Navigation</div>
             
         
     <div class="md-example-card">
       <div class="md-preview">
         <div class="md-preview-note">Selector set: menu button + panel</div>
         <div class="md-menu-demo" style="min-height: 120px;">
-          <button type="button" class="md-menu-button md-icon-btn" aria-label="メニュー" aria-expanded="false" onclick="toggleMenu(this)">
+          <button type="button" class="md-menu-button" aria-label="メニュー" aria-expanded="false" onclick="toggleMenu(this)" style="width: 40px; height: 40px; border-radius: 20px; border: 0; background: #e6e1ee; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: #4b4557;">
             <svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <path d="M4 6h16"/>
               <path d="M4 12h16"/>
@@ -2107,13 +2083,13 @@
           </div>
         </div>
       </div>
-      <div><strong>Selectors</strong><span class="md-chip">.md-menu-button</span><span class="md-chip">.md-icon-btn</span><span class="md-chip">.md-menu-panel</span><span class="md-chip">.md-menu-link</span><span class="md-chip">.md-menu-link:hover</span></div>
+      <div><strong>Selectors</strong><span class="md-chip">.md-menu-button</span><span class="md-chip">.md-menu-panel</span><span class="md-chip">.md-menu-link</span><span class="md-chip">.md-menu-link:hover</span></div>
       <div><strong>Origin</strong><span class="md-chip">Project-specific</span></div>
-      <div><strong>Rationale</strong> メニューUIの独自セット。</div>
+      <div><strong>Rationale</strong> ドロップダウンメニュー構造の独自セット。メニュー表示/非表示とリンク面の定義を扱う。</div>
       <div><strong>Usage</strong><a class="md-chip" href="../docs/git/git-pseudo-squash.html">1</a><a class="md-chip" href="../docs/link/amazon-dp-extract.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">3</a></div>
       <div><strong>Preview Code</strong></div>
       <pre class="md-code"><code>&lt;div class="md-menu-demo"&gt;
-  &lt;button type="button" class="md-menu-button md-icon-btn" aria-label="メニュー" aria-expanded="false" onclick="toggleMenu(this)"&gt;
+  &lt;button type="button" class="md-menu-button" aria-label="メニュー" aria-expanded="false" onclick="toggleMenu(this)" style="width: 40px; height: 40px; border-radius: 20px; border: 0; background: #e6e1ee; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: #4b4557;"&gt;
     &lt;svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"&gt;
       &lt;path d="M4 6h16"/&gt;
       &lt;path d="M4 12h16"/&gt;
@@ -2308,219 +2284,26 @@
         
     <div class="md-example-card">
       <div class="md-preview">
-        <div class="md-preview-note">Selector set: snackbar + host</div>
+        <div class="md-preview-note">Selector set: snackbar (host + inline)</div>
         <div id="toastHost" class="md-snackbar-host md-snackbar">
           コピーしました
         </div>
+        <div style="margin-top: 0.75rem;" class="md-snackbar" id="toastInline">コピーしました</div>
       </div>
       <div><strong>Selectors</strong><span class="md-chip">.md-snackbar-host</span><span class="md-chip">.md-snackbar</span></div>
       <div><strong>Origin</strong><span class="md-chip">MD-inspired</span></div>
-      <div><strong>Rationale</strong> Material Designのスナックバー相当。</div>
-      <div><strong>Usage</strong><a class="md-chip" href="../docs/git/git-branch-diff.html">1</a><a class="md-chip" href="../docs/git/git-config-setup.html">2</a><a class="md-chip" href="../docs/grep/find-gen.html">3</a></div>
+      <div><strong>Rationale</strong> Material Designのスナックバー相当。host配置とinline配置の両方を示す。</div>
+      <div><strong>Usage</strong><a class="md-chip" href="../docs/git/git-branch-diff.html">1</a><a class="md-chip" href="../docs/git/git-config-setup.html">2</a><a class="md-chip" href="../docs/grep/find-gen.html">3</a><a class="md-chip" href="../docs/text/text-processing.html">4</a><a class="md-chip" href="../docs/text/text-viewer.html">5</a><a class="md-chip" href="../docs/password/password-gen.html">6</a></div>
       <div><strong>Preview Code</strong></div>
       <pre class="md-code"><code>&lt;div id="toastHost" class="md-snackbar-host md-snackbar"&gt;
   コピーしました
-&lt;/div&gt;</code></pre>
-    </div>
-                    
-                
-            
-        
-    <div class="md-example-card">
-      <div class="md-preview">
-        <div class="md-preview-note">Selector: .md-snackbar</div>
-        <div class="md-snackbar" id="toastInline">コピーしました</div>
-      </div>
-      <div><strong>Selectors</strong><span class="md-chip">.md-snackbar</span></div>
-      <div><strong>Origin</strong><span class="md-chip">MD-inspired</span></div>
-      <div><strong>Rationale</strong> Material Designのスナックバー相当。短いフィードバック表示に使う。</div>
-      <div><strong>Usage</strong><a class="md-chip" href="../docs/text/text-processing.html">1</a><a class="md-chip" href="../docs/text/text-viewer.html">2</a><a class="md-chip" href="../docs/password/password-gen.html">3</a></div>
-      <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;div class="md-snackbar" id="toastInline"&gt;コピーしました&lt;/div&gt;</code></pre>
+&lt;/div&gt;
+&lt;div class="md-snackbar" id="toastInline"&gt;コピーしました&lt;/div&gt;</code></pre>
     </div>
                     
   </div>
 </div>
 <!-- core-catalog:end -->
-    </section>
-
-    <section class="md-section">
-      <h2 class="md-section-title">Layout Usage</h2>
-      <div class="md-grid md-grid-2">
-        <div class="md-example-card">
-          <div class="md-preview">
-            <div class="md-preview-stack">
-              <div class="md-preview-note">Source: docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html</div>
-              <div class="md-card" style="padding: 16px; border-radius: 12px; box-shadow: none;">
-                コンテンツ領域
-              </div>
-            </div>
-          </div>
-          <div><strong>Selectors</strong><span class="md-chip">md-page</span><span class="md-chip">md-shell</span><span class="md-chip">md-card</span></div>
-          <div><strong>Usage</strong><a class="md-chip" href="../docs/text/text-processing.html">1</a><a class="md-chip" href="../docs/link/utm-remove.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">3</a></div>
-          <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;div class="md-preview-stack"&gt;
-  &lt;div class="md-preview-note"&gt;Source: docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html&lt;/div&gt;
-  &lt;div class="md-card" style="padding: 16px; border-radius: 12px; box-shadow: none;"&gt;
-    コンテンツ領域
-  &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-        </div>
-      </div>
-    </section>
-
-    <section class="md-section">
-      <h2 class="md-section-title">Form Usage</h2>
-      <div class="md-grid md-grid-2">
-        <div class="md-example-card">
-          <div class="md-preview">
-            <div class="md-preview-note">Source: docs/ffmpeg/ffmpeg-trim-cmdline-gen.html</div>
-            <label class="md-label">
-              <span>入力ファイル名</span>
-          <span class="md-required" aria-hidden="true">Required</span><span class="md-sr-only" style="display:none">必須</span>
-              <span class="md-tooltip-group">
-                <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-                <span class="md-tooltip-content md-tooltip md-tooltip--wide">
-                  例: 250503_130527_TrMic.wav / sample.mp4
-                </span>
-              </span>
-              <span>：</span>
-            </label>
-            <input type="text" id="filename" placeholder="例: 250503_130527_TrMic.wav / sample.mp4" class="md-input md-field-block">
-          </div>
-          <div><strong>Selectors</strong><span class="md-chip">md-label</span><span class="md-chip">md-input</span><span class="md-chip">md-field-block</span></div>
-          <div><strong>Origin</strong><span class="md-chip">MD-inspired</span></div>
-      <div><strong>Rationale</strong> ラベル + 必須表示 + 入力欄の基本セット。補足はツールチップで補う。</div>
-          <div><strong>Usage</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">1</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-trim-cmdline-gen.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-replace-audio-with-wav-gen.html">3</a></div>
-          <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;label class="md-label"&gt;
-  &lt;span&gt;入力ファイル名&lt;/span&gt;
-  &lt;span class="md-required" aria-hidden="true"&gt;Required&lt;/span&gt;&lt;span class="md-sr-only"&gt;必須&lt;/span&gt;
-  &lt;span class="md-tooltip-group"&gt;
-    &lt;span class="md-help-chip"&gt;&lt;svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"&gt;&lt;circle cx="12" cy="12" r="9" fill="#cbbcf0"/&gt;&lt;rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/&gt;&lt;circle cx="12" cy="7.5" r="1" fill="#ffffff"/&gt;&lt;/svg&gt;&lt;/span&gt;
-    &lt;span class="md-tooltip-content md-tooltip md-tooltip--wide"&gt;
-      例: 250503_130527_TrMic.wav / sample.mp4
-    &lt;/span&gt;
-  &lt;/span&gt;
-  &lt;span&gt;：&lt;/span&gt;
-&lt;/label&gt;
-&lt;input type="text" id="filename" placeholder="例: 250503_130527_TrMic.wav / sample.mp4" class="md-input md-field-block"&gt;</code></pre>
-        </div>
-        <div class="md-example-card">
-          <div class="md-preview">
-            <div class="md-preview-note">Source: docs/ffmpeg/ffmpeg-loudnorm-cmdline-gen.html</div>
-            <label class="md-label">詳細</label>
-            <textarea class="md-textarea md-field-block" placeholder="例: メモを入力"></textarea>
-          </div>
-          <div><strong>Selectors</strong><span class="md-chip">md-textarea</span><span class="md-chip">md-field-block</span></div>
-          <div><strong>Usage</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">1</a><a class="md-chip" href="../docs/link/url-encode-decode.html">2</a><a class="md-chip" href="../docs/link/mime-base64.html">3</a></div>
-          <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;label class="md-label"&gt;詳細&lt;/label&gt;
-&lt;textarea class="md-textarea md-field-block" placeholder="例: メモを入力"&gt;&lt;/textarea&gt;</code></pre>
-        </div>
-      </div>
-    </section>
-
-    <section class="md-section">
-      <h2 class="md-section-title">Button Usage</h2>
-      <div class="md-grid md-grid-2">
-        <div class="md-example-card">
-          <div class="md-preview md-preview-row">
-            <div class="md-preview-note">Source: docs/link/url-encode-decode.html</div>
-            <button class="md-button md-button--primary">実行</button>
-            <button class="md-icon-btn" aria-label="メニュー">☰</button>
-          </div>
-          <div><strong>Selectors</strong><span class="md-chip">md-button</span><span class="md-chip">md-button--primary</span></div>
-          <div><strong>Usage</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">1</a><a class="md-chip" href="../docs/link/url-encode-decode.html">2</a><a class="md-chip" href="../docs/git/git-config-setup.html">3</a></div>
-          <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;button class="md-button md-button--primary"&gt;実行&lt;/button&gt;
-&lt;button class="md-icon-btn" aria-label="メニュー"&gt;☰&lt;/button&gt;</code></pre>
-        </div>
-        <div class="md-example-card">
-          <div class="md-preview md-preview-row">
-            <div class="md-preview-note">Source: docs/link/amazon-dp-extract.html</div>
-            <button class="md-icon-btn" aria-label="メニュー">☰</button>
-          </div>
-          <div><strong>Selectors</strong><span class="md-chip">md-icon-btn</span></div>
-          <div><strong>Usage</strong><a class="md-chip" href="../docs/link/amazon-dp-extract.html">1</a><a class="md-chip" href="../docs/git/git-pseudo-squash.html">2</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">3</a></div>
-          <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;button class="md-icon-btn" aria-label="メニュー"&gt;☰&lt;/button&gt;</code></pre>
-        </div>
-      </div>
-    </section>
-
-    <section class="md-section">
-      <h2 class="md-section-title">Tooltip (i) Usage</h2>
-      <div class="md-grid md-grid-2">
-        <div class="md-example-card">
-          <div class="md-preview">
-            <div class="md-preview-note">Source: docs/grep/find-gen.html</div>
-            <span class="md-tooltip-group">
-              <span class="md-help-chip">
-                <svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none">
-                  <circle cx="12" cy="12" r="9" fill="#cbbcf0"/>
-                  <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/>
-                  <circle cx="12" cy="7.5" r="1" fill="#ffffff"/>
-                </svg>
-              </span>
-              <span class="md-tooltip-content md-tooltip">説明文…</span>
-            </span>
-            <span class="md-preview-note">ホバーで表示</span>
-          </div>
-          <div><strong>Selectors</strong><span class="md-chip">md-tooltip-group</span><span class="md-chip">md-help-chip</span><span class="md-chip">md-tooltip</span></div>
-          <div><strong>Usage</strong><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">1</a><a class="md-chip" href="../docs/grep/find-gen.html">2</a><a class="md-chip" href="../docs/link/utm-remove.html">3</a></div>
-          <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;span class="md-tooltip-group"&gt;
-  &lt;span class="md-help-chip"&gt;
-    &lt;svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"&gt;
-      &lt;circle cx="12" cy="12" r="9" fill="#cbbcf0"/&gt;
-      &lt;rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/&gt;
-      &lt;circle cx="12" cy="7.5" r="1" fill="#ffffff"/&gt;
-    &lt;/svg&gt;
-  &lt;/span&gt;
-  &lt;span class="md-tooltip-content md-tooltip"&gt;説明文…&lt;/span&gt;
-&lt;/span&gt;
-&lt;span class="md-preview-note"&gt;ホバーで表示&lt;/span&gt;</code></pre>
-        </div>
-      </div>
-    </section>
-
-    <section class="md-section">
-      <h2 class="md-section-title">Code Output Usage</h2>
-      <div class="md-grid md-grid-2">
-        <div class="md-example-card">
-          <div class="md-preview">
-            <div class="md-preview-note">Source: docs/link/url-encode-decode.html</div>
-            <div class="md-code-block">
-              <code class="md-code">echo "Hello"</code>
-              <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" aria-label="コピー">📋</button>
-            </div>
-          </div>
-          <div><strong>Selectors</strong><span class="md-chip">md-code-block</span><span class="md-chip">md-code</span><span class="md-chip">md-copy-button</span><span class="md-chip">md-icon-btn</span><span class="md-chip">md-icon-btn--small</span><span class="md-chip">md-icon-btn--surface</span></div>
-          <div><strong>Usage</strong><a class="md-chip" href="../docs/link/url-encode-decode.html">1</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">2</a><a class="md-chip" href="../docs/git/git-pseudo-squash.html">3</a></div>
-          <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;div class="md-code-block"&gt;
-  &lt;code class="md-code"&gt;echo "Hello"&lt;/code&gt;
-  &lt;button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface"&gt;📋&lt;/button&gt;
-&lt;/div&gt;</code></pre>
-        </div>
-      </div>
-    </section>
-
-    <section class="md-section">
-      <h2 class="md-section-title">Snackbar Usage</h2>
-      <div class="md-grid md-grid-2">
-        <div class="md-example-card">
-          <div class="md-preview md-preview-row">
-            <div class="md-preview-note">Source: docs/link/utm-remove.html</div>
-            <div class="md-snackbar">コピーしました</div>
-          </div>
-          <div><strong>Selectors</strong><span class="md-chip">md-snackbar</span><span class="md-chip">md-hidden</span><span class="md-chip">md-visible</span></div>
-          <div><strong>Usage</strong><a class="md-chip" href="../docs/link/utm-remove.html">1</a><a class="md-chip" href="../docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html">2</a><a class="md-chip" href="../docs/git/git-pseudo-squash.html">3</a></div>
-          <div><strong>Preview Code</strong></div>
-      <pre class="md-code"><code>&lt;div class="md-snackbar"&gt;コピーしました&lt;/div&gt;</code></pre>
-        </div>
-      </div>
     </section>
   </div>
   <script>
