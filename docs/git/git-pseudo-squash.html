@@ -883,7 +883,7 @@ limitations under the License.
     .md-form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
     .md-form-row--nowrap { flex-wrap: nowrap; }
     .md-field-stack { display: flex; flex-direction: column; align-items: stretch; gap: 0.5rem; }
-    .md-label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; font-weight: 600; color: var(--md-sys-color-on-surface); }
+    .md-label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.18rem; font-weight: 600; color: var(--md-sys-color-on-surface); }
     .md-label--muted { color: #3f3b46; }
     .md-label--block { margin-bottom: 0.5rem; }
     .md-label--full { width: 100%; }
@@ -893,6 +893,9 @@ limitations under the License.
     .md-section-title { font-size: 1rem; font-weight: 600; color: #3f3b46; }
 
     .md-flow-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; }
+    .md-flow-title-row { display: inline-flex; align-items: center; gap: 0.08rem; }
+    .md-flow-title-row .md-section-title { margin: 0; }
+    .md-flow-title-row .md-help-chip { margin-left: 0; }
     .md-flow-divider { display: flex; justify-content: center; padding: 0.5rem 0; }
 
     .md-step-icon { width: 3.5rem; height: 3.5rem; }
@@ -1003,7 +1006,9 @@ limitations under the License.
       box-shadow: inset 0 0 0 1px #7c3aed;
     }
     .md-switch-input:checked + .md-switch::after { transform: translateX(20px); background: #ffffff; }
-    .md-switch-label { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.95rem; color: var(--md-sys-color-on-surface); }
+    .md-switch-label { display: inline-flex; align-items: center; gap: 0.24rem; font-size: 0.95rem; color: var(--md-sys-color-on-surface); }
+    .md-label .md-help-chip,
+    .md-switch-label .md-help-chip { margin-left: 0; }
 
     .md-input-wrap {
       position: relative;
@@ -1266,11 +1271,13 @@ limitations under the License.
           <circle cx="48" cy="22" r="4" fill="#A78BFA"/>
           <circle cx="48" cy="42" r="4" fill="#34D399"/>
         </svg>
-        <p class="md-section-title">作業開始（基準ブランチから作成）</p>
-        <span class="md-tooltip-group">
-          <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-          <span class="md-tooltip-content md-tooltip md-tooltip--rich">
-            基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
+        <span class="md-flow-title-row">
+          <p class="md-section-title">作業開始 (基準ブランチから作成)</p>
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--rich">
+              基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
+            </span>
           </span>
         </span>
       </div>
@@ -1309,12 +1316,14 @@ limitations under the License.
           <path d="M34 42C40 42 42 36 46 32" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
           <circle cx="50" cy="32" r="5" fill="#86EFAC"/>
         </svg>
-        <p class="md-section-title">作業をまとめる（squash）</p>
-        <span class="md-tooltip-group">
-          <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-          <span class="md-tooltip-content md-tooltip md-tooltip--rich">
-            ローカルの複数のコミットを1つにまとめます。
-            reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
+        <span class="md-flow-title-row">
+          <p class="md-section-title">作業をまとめる (squash)</p>
+          <span class="md-tooltip-group">
+            <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--rich">
+              ローカルの複数のコミットを1つにまとめます。
+              reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
+            </span>
           </span>
         </span>
       </div>
@@ -1398,11 +1407,13 @@ limitations under the License.
         <circle cx="42" cy="32" r="4" fill="#A78BFA"/>
         <circle cx="36" cy="42" r="4" fill="#34D399"/>
       </svg>
-      <p class="md-section-title">まとめる予定の作業 (diff)</p>
-      <span class="md-tooltip-group">
-        <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-        <span class="md-tooltip-content md-tooltip md-tooltip--rich">
-          基点ブランチと作業ブランチの差分を表示するコマンドです。squash 後に1コミットへまとめる内容の目安になります。
+      <span class="md-flow-title-row">
+        <p class="md-section-title">まとめる予定の作業 (diff)</p>
+        <span class="md-tooltip-group">
+          <span class="md-help-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-help-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+          <span class="md-tooltip-content md-tooltip md-tooltip--rich">
+            基点ブランチと作業ブランチの差分を表示するコマンドです。squash 後に1コミットへまとめる内容の目安になります。
+          </span>
         </span>
       </span>
     </div>
