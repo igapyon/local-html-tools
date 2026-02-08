@@ -1475,6 +1475,7 @@ limitations under the License.
         // 編集は常に可能にする（現在のブランチ使用時も入力は保持）
         workBranch.classList.remove("md-disabled");
       }
+      regenerateAllCommands();
     }
 
     function updateBaseScope() {
@@ -1510,10 +1511,17 @@ limitations under the License.
       if (squashRemoteLabel && lockOrigin) {
         squashRemoteLabel.classList.toggle("md-hidden", lockOrigin.checked);
       }
+      regenerateAllCommands();
     }
 
     function toggleOriginLock() {
       updateBaseScope();
+    }
+
+    function regenerateAllCommands() {
+      generateCreateBranchCommand({ silent: true });
+      generateRebaseCommand({ silent: true });
+      generatePlannedDiffCommand({ silent: true });
     }
 
     function setDefaultWorkBranch() {
@@ -1527,7 +1535,7 @@ limitations under the License.
       const min = now.getMinutes();
       const timeStr = convertTimeToThreeChars(hh, min);
       input.value = `tiga${mm}${dd}${timeStr}`;
-      generateCreateBranchCommand({ silent: true });
+      regenerateAllCommands();
     }
 
     function updateWorkBranchWithCurrentTime() {
@@ -1541,7 +1549,7 @@ limitations under the License.
       const min = now.getMinutes();
       const timeStr = convertTimeToThreeChars(hh, min);
       input.value = `tiga${mm}${dd}${timeStr}`;
-      generateCreateBranchCommand({ silent: true });
+      regenerateAllCommands();
     }
 
     function generateRebaseCommand(options = {}) {
@@ -1696,7 +1704,7 @@ limitations under the License.
     }
 
     function setupCreateBranchAutoUpdate() {
-      const ids = ["squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "shellEnvPowerShell"];
+      const ids = ["squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "shellEnvPowerShell", "lockOrigin"];
       const handler = () => generateCreateBranchCommand({ silent: true });
       ids.forEach((id) => {
         const element = document.getElementById(id);
@@ -1708,7 +1716,7 @@ limitations under the License.
 
     function setupRebaseAutoUpdate() {
       const inputIds = ["squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "commitMessage"];
-      const changeIds = ["useCurrentBranch", "optPush", "shellEnvPowerShell"];
+      const changeIds = ["useCurrentBranch", "optPush", "shellEnvPowerShell", "lockOrigin"];
       const handler = () => {
         generateRebaseCommand({ silent: true });
         generatePlannedDiffCommand({ silent: true });
