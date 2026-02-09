@@ -1057,6 +1057,8 @@ limitations under the License.
         <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
         <span class="md-tooltip-content md-tooltip">
           例: https://www.amazon.co.jp/.../dp/B0XXXXXXX<br>
+          例: https://www.amazon.co.jp/gp/product/B0XXXXXXX/<br>
+          例: https://www.amazon.co.jp/gp/offer-listing/B0XXXXXXX/<br>
           ASIN（10文字）だけでもOK
         </span>
       </span>
@@ -1090,28 +1092,82 @@ limitations under the License.
         return trimmed.toUpperCase();
       }
 
-      const dpMatch = trimmed.match(/\/dp\/([A-Z0-9]{10})/i);
-      if (dpMatch) return dpMatch[1].toUpperCase();
+      const directPatterns = [
+        /\/dp\/([A-Z0-9]{10})(?=[/?&#]|$)/i,
+        /\/gp\/product\/([A-Z0-9]{10})(?=[/?&#]|$)/i,
+        /\/gp\/aw\/d\/([A-Z0-9]{10})(?=[/?&#]|$)/i,
+        /\/gp\/offer-listing\/([A-Z0-9]{10})(?=[/?&#]|$)/i
+      ];
+      for (const pattern of directPatterns) {
+        const match = trimmed.match(pattern);
+        if (match) return match[1].toUpperCase();
+      }
 
-      const gpMatch = trimmed.match(/\/gp\/product\/([A-Z0-9]{10})/i);
-      if (gpMatch) return gpMatch[1].toUpperCase();
+      const queryPatterns = [
+        /[?&]asin=([A-Z0-9]{10})(?=[&#]|$)/i,
+        /[?&]ASIN=([A-Z0-9]{10})(?=[&#]|$)/i,
+        /[?&]pd_rd_i=([A-Z0-9]{10})(?=[&#]|$)/i
+      ];
+      for (const pattern of queryPatterns) {
+        const match = trimmed.match(pattern);
+        if (match) return match[1].toUpperCase();
+      }
 
-      const asinParam = trimmed.match(/[?&]asin=([A-Z0-9]{10})/i);
-      if (asinParam) return asinParam[1].toUpperCase();
+      // URL構文として読める場合は pathname / query を優先して抽出する
+      try {
+        const url = new URL(trimmed);
+        const path = decodeURIComponent(url.pathname || "");
+        for (const pattern of directPatterns) {
+          const match = path.match(pattern);
+          if (match) return match[1].toUpperCase();
+        }
+        const params = url.searchParams;
+        const keys = ["asin", "ASIN", "pd_rd_i"];
+        for (const key of keys) {
+          const value = params.get(key);
+          if (value && /^[A-Z0-9]{10}$/i.test(value)) {
+            return value.toUpperCase();
+          }
+        }
+      } catch (_) {
+        // URLとして解釈できない入力は下のフォールバックへ進む
+      }
+
+      // 最後のフォールバック: Amazon系URL内に露出したASINを拾う
+      const genericAmazonAsin = trimmed.match(/amazon\.[^/\s]+\/[^?\s#]*?([A-Z0-9]{10})(?=[/?&#]|$)/i);
+      if (genericAmazonAsin) return genericAmazonAsin[1].toUpperCase();
 
       return "";
+    }
+
+    function detectAmazonPathStyle(input) {
+      const trimmed = (input || "").trim();
+      if (!trimmed) return "dp";
+      if (/\/dp\/[A-Z0-9]{10}(?=[/?&#]|$)/i.test(trimmed)) {
+        return "dp";
+      }
+      if (/\/gp\/(product|aw\/d|offer-listing)\/[A-Z0-9]{10}(?=[/?&#]|$)/i.test(trimmed) || /\/gp\//i.test(trimmed)) {
+        return "gp";
+      }
+      return "dp";
     }
 
     function generateDpPath() {
       const input = document.getElementById("amazonUrl").value;
       const asin = extractAsin(input);
+      const pathStyle = detectAmazonPathStyle(input);
 
       if (!asin) {
+        document.getElementById("dpPath").textContent = "";
         alert("URLまたはASIN（10文字）を入力してください。");
         return;
       }
 
-      document.getElementById("dpPath").textContent = `https://www.amazon.co.jp/dp/${asin}`;
+      if (pathStyle === "gp") {
+        document.getElementById("dpPath").textContent = `https://www.amazon.co.jp/gp/product/${asin}/`;
+      } else {
+        document.getElementById("dpPath").textContent = `https://www.amazon.co.jp/dp/${asin}`;
+      }
     }
 
     function copyToClipboard(id) {
