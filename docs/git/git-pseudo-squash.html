@@ -780,20 +780,22 @@ limitations under the License.
     }
 
     .md-input-wrap {
-      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       flex: 1 1 16rem;
       min-width: 12rem;
     }
 
     .md-input-wrap .md-input {
-      padding-right: 3rem;
+      flex: 1 1 auto;
+      min-width: 0;
+      padding-right: 0.75rem;
     }
 
     .md-input-action {
-      position: absolute;
-      top: 50%;
-      right: -0.5rem;
-      transform: translateY(-50%);
+      position: static;
+      flex: 0 0 auto;
       box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
     }
 
@@ -1011,16 +1013,20 @@ limitations under the License.
     .md-switch-label .md-info-chip { margin-left: 0; }
 
     .md-input-wrap {
-      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       flex: 1 1 16rem;
       min-width: 12rem;
     }
-    .md-input-wrap .md-input { padding-right: 3rem; }
+    .md-input-wrap .md-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      padding-right: 0.75rem;
+    }
     .md-input-action {
-      position: absolute;
-      top: 50%;
-      right: -0.5rem;
-      transform: translateY(-50%);
+      position: static;
+      flex: 0 0 auto;
       box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
     }
 
@@ -1109,6 +1115,13 @@ limitations under the License.
         <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
         <path d="M20 4v6h-6"/>
       </symbol>
+      <symbol id="md-icon-trash" viewBox="0 0 24 24">
+        <path d="M4 7h16"/>
+        <path d="M10 11v6"/>
+        <path d="M14 11v6"/>
+        <path d="M6 7l1 12h10l1-12"/>
+        <path d="M9 7V5h6v2"/>
+      </symbol>
     </defs>
   </svg>
   <div class="md-surface-card md-card">
@@ -1149,6 +1162,11 @@ limitations under the License.
             <span>：</span>
           </label>
           <input type="text" id="squashBaseBranch" list="baseBranchSuggestions" placeholder="例: devel" class="md-input md-field--dropdown" value="devel">
+          <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="clearBaseBranchHistory()" title="基点ブランチ履歴をクリア" aria-label="基点ブランチ履歴をクリア">
+            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <use href="#md-icon-trash" xlink:href="#md-icon-trash"></use>
+            </svg>
+          </button>
           <datalist id="baseBranchSuggestions">
             <option value="main"></option>
             <option value="master"></option>
@@ -1820,9 +1838,128 @@ limitations under the License.
       });
     }
 
+    const BASE_BRANCH_STORAGE_KEY = "gitPseudoSquash.squashBaseBranch";
+    const BASE_BRANCH_HISTORY_STORAGE_KEY = "gitPseudoSquash.squashBaseBranchHistory";
+    const BASE_BRANCH_HISTORY_MAX = 12;
+    let baseBranchDefaultSuggestions = [];
+
+    function uniqueBranchNames(values) {
+      const seen = new Set();
+      const uniqueValues = [];
+      values.forEach((value) => {
+        if (!value || seen.has(value)) return;
+        seen.add(value);
+        uniqueValues.push(value);
+      });
+      return uniqueValues;
+    }
+
+    function getStoredBaseBranchHistory() {
+      try {
+        const raw = localStorage.getItem(BASE_BRANCH_HISTORY_STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        const normalized = parsed
+          .map((value) => (typeof value === "string" ? value.trim() : ""))
+          .filter((value) => value.length > 0);
+        return uniqueBranchNames(normalized).slice(0, BASE_BRANCH_HISTORY_MAX);
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function saveBaseBranchHistory(values) {
+      try {
+        localStorage.setItem(BASE_BRANCH_HISTORY_STORAGE_KEY, JSON.stringify(values));
+      } catch (_) {
+        // localStorage が使えない環境では保存機能を無効化
+      }
+    }
+
+    function renderBaseBranchSuggestions() {
+      const datalist = document.getElementById("baseBranchSuggestions");
+      if (!datalist) return;
+      const history = getStoredBaseBranchHistory();
+      const merged = uniqueBranchNames([...history, ...baseBranchDefaultSuggestions]);
+      datalist.textContent = "";
+      merged.forEach((branch) => {
+        const option = document.createElement("option");
+        option.value = branch;
+        datalist.appendChild(option);
+      });
+    }
+
+    function setupBaseBranchSuggestions() {
+      const datalist = document.getElementById("baseBranchSuggestions");
+      if (!datalist) return;
+      baseBranchDefaultSuggestions = uniqueBranchNames(
+        Array.from(datalist.querySelectorAll("option"))
+          .map((option) => option.value.trim())
+          .filter((value) => value.length > 0)
+      );
+      renderBaseBranchSuggestions();
+    }
+
+    function rememberBaseBranch(value) {
+      const branch = value.trim();
+      if (!branch) return;
+      try {
+        localStorage.setItem(BASE_BRANCH_STORAGE_KEY, branch);
+      } catch (_) {
+        // localStorage が使えない環境では保存機能を無効化
+      }
+      const history = getStoredBaseBranchHistory();
+      const next = [branch, ...history.filter((entry) => entry !== branch)].slice(0, BASE_BRANCH_HISTORY_MAX);
+      saveBaseBranchHistory(next);
+      renderBaseBranchSuggestions();
+    }
+
+    function loadPersistedBaseBranch() {
+      const input = document.getElementById("squashBaseBranch");
+      if (!input) return;
+      try {
+        const stored = localStorage.getItem(BASE_BRANCH_STORAGE_KEY);
+        const history = getStoredBaseBranchHistory();
+        const restored = stored && stored.trim() ? stored.trim() : (history[0] || "");
+        if (restored) {
+          input.value = restored;
+          if (!history.includes(restored)) {
+            saveBaseBranchHistory([restored, ...history].slice(0, BASE_BRANCH_HISTORY_MAX));
+          }
+        }
+      } catch (_) {
+        // localStorage が使えない環境では保存機能を無効化
+      }
+      renderBaseBranchSuggestions();
+    }
+
+    function setupBaseBranchPersistence() {
+      const input = document.getElementById("squashBaseBranch");
+      if (!input) return;
+      const persist = () => {
+        rememberBaseBranch(input.value);
+      };
+      input.addEventListener("change", persist);
+    }
+
+    function clearBaseBranchHistory() {
+      try {
+        localStorage.removeItem(BASE_BRANCH_HISTORY_STORAGE_KEY);
+        localStorage.removeItem(BASE_BRANCH_STORAGE_KEY);
+        renderBaseBranchSuggestions();
+        showToast("基点ブランチ履歴をクリアしました");
+      } catch (_) {
+        showToast("履歴のクリアに失敗しました");
+      }
+    }
+
+    setupBaseBranchSuggestions();
+    loadPersistedBaseBranch();
     updateBaseScope();
     toggleCurrentBranch();
     setDefaultWorkBranch();
+    setupBaseBranchPersistence();
     setupCreateBranchAutoUpdate();
     generateCreateBranchCommand({ silent: true });
     setupRebaseAutoUpdate();
