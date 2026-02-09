@@ -302,6 +302,8 @@ limitations under the License.
       font-size: 0.8125rem;
       font-weight: 400;
       line-height: 1.35;
+      white-space: normal;
+      overflow-wrap: anywhere;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
@@ -543,7 +545,7 @@ limitations under the License.
       <span>ファイル名連番リネームコマンドジェネレータ</span>
       <span class="md-tooltip-group">
         <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-        <span class="md-tooltip-content md-tooltip">ファイル名リストから連番リネームコマンドを生成します。PowerShellまたはbashで実行できるコマンドを出力します。</span>
+        <span class="md-tooltip-content md-tooltip">ファイル名リストから連番にリネームするコマンドを生成します。bashまたはPowerShellで実行できるコマンドを出力します。</span>
       </span>
     </h1>
 
@@ -736,6 +738,37 @@ limitations under the License.
   </div>
 
   <script>
+    const UI_SHELL_ENV_POWERSHELL_STORAGE_KEY = "fileRenameCmdlineGen.ui.shellEnvPowerShell";
+    const UI_EXTENSION_FILTER_STORAGE_KEY = "fileRenameCmdlineGen.ui.extensionFilter";
+    const UI_FILENAME_PATTERN_STORAGE_KEY = "fileRenameCmdlineGen.ui.filenamePattern";
+    const UI_PREFIX_STORAGE_KEY = "fileRenameCmdlineGen.ui.prefix";
+    const UI_START_NO_STORAGE_KEY = "fileRenameCmdlineGen.ui.startNo";
+    const UI_DIGITS_STORAGE_KEY = "fileRenameCmdlineGen.ui.digits";
+
+    function getStoredString(key) {
+      try {
+        const value = localStorage.getItem(key);
+        return value == null ? null : value;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function getStoredBoolean(key) {
+      const raw = getStoredString(key);
+      if (raw === "true") return true;
+      if (raw === "false") return false;
+      return null;
+    }
+
+    function setStoredValue(key, value) {
+      try {
+        localStorage.setItem(key, String(value));
+      } catch (error) {
+        // localStorage が使えない環境でも動作継続
+      }
+    }
+
     function toggleMenu() {
       const panel = document.getElementById("menuPanel");
       if (!panel) return;
@@ -944,7 +977,92 @@ limitations under the License.
       });
     }
 
+    function loadPersistedInputs() {
+      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
+      const extensionFilter = document.getElementById("extensionFilter");
+      const filenamePattern = document.getElementById("filenamePattern");
+      const prefixInput = document.getElementById("prefixInput");
+      const startNoInput = document.getElementById("startNoInput");
+      const digitsInput = document.getElementById("digitsInput");
+
+      const shellEnvValue = getStoredBoolean(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY);
+      const extensionValue = getStoredString(UI_EXTENSION_FILTER_STORAGE_KEY);
+      const filenamePatternValue = getStoredString(UI_FILENAME_PATTERN_STORAGE_KEY);
+      const prefixValue = getStoredString(UI_PREFIX_STORAGE_KEY);
+      const startNoValue = getStoredString(UI_START_NO_STORAGE_KEY);
+      const digitsValue = getStoredString(UI_DIGITS_STORAGE_KEY);
+
+      if (shellEnvPowerShell && shellEnvValue !== null) {
+        shellEnvPowerShell.checked = shellEnvValue;
+      }
+      if (extensionFilter && extensionValue !== null) {
+        extensionFilter.value = extensionValue;
+      }
+      if (filenamePattern && filenamePatternValue !== null) {
+        filenamePattern.value = filenamePatternValue;
+      }
+      if (prefixInput && prefixValue !== null) {
+        prefixInput.value = prefixValue;
+      }
+      if (startNoInput && startNoValue !== null) {
+        const parsed = Number(startNoValue);
+        if (Number.isInteger(parsed) && parsed >= 1) {
+          startNoInput.value = String(parsed);
+        }
+      }
+      if (digitsInput && digitsValue && digitsInput.querySelector(`option[value="${digitsValue}"]`)) {
+        digitsInput.value = digitsValue;
+      }
+    }
+
+    function savePersistedInputs() {
+      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
+      const extensionFilter = document.getElementById("extensionFilter");
+      const filenamePattern = document.getElementById("filenamePattern");
+      const prefixInput = document.getElementById("prefixInput");
+      const startNoInput = document.getElementById("startNoInput");
+      const digitsInput = document.getElementById("digitsInput");
+
+      if (shellEnvPowerShell) {
+        setStoredValue(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY, shellEnvPowerShell.checked);
+      }
+      if (extensionFilter) {
+        setStoredValue(UI_EXTENSION_FILTER_STORAGE_KEY, extensionFilter.value);
+      }
+      if (filenamePattern) {
+        setStoredValue(UI_FILENAME_PATTERN_STORAGE_KEY, filenamePattern.value);
+      }
+      if (prefixInput) {
+        setStoredValue(UI_PREFIX_STORAGE_KEY, prefixInput.value);
+      }
+      if (startNoInput) {
+        setStoredValue(UI_START_NO_STORAGE_KEY, startNoInput.value);
+      }
+      if (digitsInput) {
+        setStoredValue(UI_DIGITS_STORAGE_KEY, digitsInput.value);
+      }
+    }
+
+    function setupInputPersistence() {
+      const ids = [
+        "shellEnvPowerShell",
+        "extensionFilter",
+        "filenamePattern",
+        "prefixInput",
+        "startNoInput",
+        "digitsInput"
+      ];
+      ids.forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener("input", savePersistedInputs);
+        element.addEventListener("change", savePersistedInputs);
+      });
+    }
+
+    loadPersistedInputs();
     setupAutoUpdate();
+    setupInputPersistence();
     regenerateAll();
   </script>
 </body>

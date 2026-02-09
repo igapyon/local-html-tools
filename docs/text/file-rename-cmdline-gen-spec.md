@@ -158,6 +158,36 @@ mv 'スクリーンショット-2024-01-15-123457.png' 'MyTest_002.png'
 - 説明は `?` ツールチップに集約。
 - コード表示は `md-code-block` + `md-copy-button`。
 
+## localStorage 永続化仕様
+
+以下の入力値を `localStorage` に保存し、次回アクセス時に復元する。
+
+- `shellEnvPowerShell`（PowerShell スイッチ）
+- `extensionFilter`（拡張子）
+- `filenamePattern`（名前パターン）
+- `prefixInput`（プレフィックス）
+- `startNoInput`（開始番号）
+- `digitsInput`（桁数）
+
+キー:
+
+- `fileRenameCmdlineGen.ui.shellEnvPowerShell`
+- `fileRenameCmdlineGen.ui.extensionFilter`
+- `fileRenameCmdlineGen.ui.filenamePattern`
+- `fileRenameCmdlineGen.ui.prefix`
+- `fileRenameCmdlineGen.ui.startNo`
+- `fileRenameCmdlineGen.ui.digits`
+
+保存タイミング:
+
+- 対象項目の `input/change` イベントで保存。
+- `localStorage` 例外は握りつぶして継続。
+
+復元タイミング:
+
+- 初期化時に読み込み、復元後にコマンド再生成を実行。
+- `startNoInput` は `1` 以上の整数のみ復元。
+
 ## 想定 JavaScript 関数
 
 - `regenerateAll()` - すべての出力再生成
@@ -168,4 +198,3 @@ mv 'スクリーンショット-2024-01-15-123457.png' 'MyTest_002.png'
 - `quoteShell(value, shellEnv)` - シェル別クォート処理
 - `copyToClipboard(elementId)` - コピー
 - `showToast(message)` - トースト
-
