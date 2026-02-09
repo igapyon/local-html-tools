@@ -242,4 +242,9 @@ PowerShellモードでも `useCurrentBranch = true` 時のリネーム行は POS
 
 ### 3.8 クリア仕様
 1. 既存「基点ブランチ履歴クリア」は現状どおり基点履歴のみ対象
-2. UI設定クリアは別機能として分離（必要なら「表示設定リセット」を追加）
+2. UI設定クリアは別機能として分離し、「設定をクリア」ボタンで実行する
+3. 確認ダイアログ文言は次を使用する  
+`ローカルに保存されているこのツールの設定をクリアします。よろしいですか？`
+4. 「設定をクリア」は `gitPseudoSquash.ui.*` キーを削除し、`gitPseudoSquash.squashBaseBranch` は既定値 `devel` に戻す
+5. 基点ブランチ履歴キー（`gitPseudoSquash.squashBaseBranchHistory`）も削除し、autocomplete履歴を初期化する
+6. 実行後はUIを既定値へ戻し、候補を再描画して全コマンドを再生成する

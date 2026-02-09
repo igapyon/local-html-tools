@@ -254,6 +254,42 @@ limitations under the License.
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
     }
 
+    .md-button {
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .md-button--surface {
+      background: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface);
+      border: 1px solid var(--md-sys-color-outline);
+    }
+
+    .md-button--compact {
+      padding: 0.38rem 0.75rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .md-button--with-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .md-inline-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
     .md-icon-btn:hover {
       background: #e6e1ee;
     }
@@ -527,6 +563,13 @@ limitations under the License.
         <rect x="9" y="9" width="11" height="11" rx="2"/>
         <rect x="4" y="4" width="11" height="11" rx="2"/>
       </symbol>
+      <symbol id="md-icon-trash" viewBox="0 0 24 24">
+        <path d="M4 7h16"/>
+        <path d="M10 11v6"/>
+        <path d="M14 11v6"/>
+        <path d="M6 7l1 12h10l1-12"/>
+        <path d="M9 7V5h6v2"/>
+      </symbol>
     </defs>
   </svg>
 
@@ -559,6 +602,20 @@ limitations under the License.
           <span class="md-tooltip-content md-tooltip">Windows PowerShell用のコマンドを出力するかどうかを切り替えます。スイッチがオフの場合はmacOS/Linuxのbash/zsh向けのコマンドを出力します。ご利用の環境に従って切り替えてください。</span>
         </span>
       </label>
+      <span class="md-inline-action">
+        <button type="button" class="md-button md-button--surface md-button--compact md-button--with-icon" onclick="clearUiPreferences()" title="設定をクリア" aria-label="設定をクリア">
+          <svg viewBox="0 0 24 24" class="md-info-icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <use href="#md-icon-trash" xlink:href="#md-icon-trash"></use>
+          </svg>
+          <span>設定をクリア</span>
+        </button>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg>
+          </span>
+          <span class="md-tooltip-content md-tooltip">ローカルに保存されているこのツールの設定をクリアします。</span>
+        </span>
+      </span>
     </div>
 
     <section class="md-section">
@@ -1058,6 +1115,40 @@ limitations under the License.
         element.addEventListener("input", savePersistedInputs);
         element.addEventListener("change", savePersistedInputs);
       });
+    }
+
+    function clearUiPreferences() {
+      const confirmed = confirm("ローカルに保存されているこのツールの設定をクリアします。よろしいですか？");
+      if (!confirmed) return;
+
+      try {
+        localStorage.removeItem(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY);
+        localStorage.removeItem(UI_EXTENSION_FILTER_STORAGE_KEY);
+        localStorage.removeItem(UI_FILENAME_PATTERN_STORAGE_KEY);
+        localStorage.removeItem(UI_PREFIX_STORAGE_KEY);
+        localStorage.removeItem(UI_START_NO_STORAGE_KEY);
+        localStorage.removeItem(UI_DIGITS_STORAGE_KEY);
+      } catch (error) {
+        showToast("設定のクリアに失敗しました");
+        return;
+      }
+
+      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
+      const extensionFilter = document.getElementById("extensionFilter");
+      const filenamePattern = document.getElementById("filenamePattern");
+      const prefixInput = document.getElementById("prefixInput");
+      const startNoInput = document.getElementById("startNoInput");
+      const digitsInput = document.getElementById("digitsInput");
+
+      if (shellEnvPowerShell) shellEnvPowerShell.checked = false;
+      if (extensionFilter) extensionFilter.value = "png";
+      if (filenamePattern) filenamePattern.value = "スクリーンショット*";
+      if (prefixInput) prefixInput.value = "MyImage_";
+      if (startNoInput) startNoInput.value = "1";
+      if (digitsInput) digitsInput.value = "3";
+
+      regenerateAll();
+      showToast("設定をクリアしました");
     }
 
     loadPersistedInputs();
