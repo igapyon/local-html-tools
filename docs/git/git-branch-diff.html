@@ -955,6 +955,14 @@ limitations under the License.
     .md-tooltip--wide { width: 24rem; max-width: 90vw; }
     .md-tooltip--narrow { width: 18rem; max-width: 90vw; }
 
+    /* Switch rows are often near the right edge; anchor tooltip to the right to avoid clipping. */
+    .md-switch-label .md-tooltip-content {
+      left: auto;
+      right: 0;
+      transform: none;
+      max-width: calc(100vw - 2rem);
+    }
+
     .md-icon-btn {
       width: 40px;
       height: 40px;
@@ -981,6 +989,8 @@ limitations under the License.
       font-size: 0.8125rem;
       font-weight: 400;
       line-height: 1.35;
+      white-space: normal;
+      overflow-wrap: anywhere;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
       letter-spacing: 0.01em;
     }
@@ -1109,14 +1119,15 @@ limitations under the License.
             <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
             <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--narrow">
               比較の基準にするブランチです。差分の「片側」として使われます。
-              例: main / devel
+              例: main / devel。
+              ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。
             </span>
           </span>
           <span>：</span>
         </label>
         <input type="text" id="branchA" placeholder="例: main" class="md-input">
         <label class="md-switch-label">
-          <input type="checkbox" id="scopeA" class="md-switch-input" checked onchange="updateRemoteState()">
+          <input type="checkbox" id="scopeA" class="md-switch-input" onchange="updateRemoteState()">
           <span class="md-switch" aria-hidden="true"></span>
           リモートとして扱う
         </label>
@@ -1130,14 +1141,15 @@ limitations under the License.
             <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
             <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--narrow">
               比較対象のブランチです。2つのブランチ差分を表示します。
-              例: feature123 / release
+              例: devel / feature123
+              ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。
             </span>
           </span>
           <span>：</span>
         </label>
         <input type="text" id="branchB" placeholder="例: devel" class="md-input">
         <label class="md-switch-label">
-          <input type="checkbox" id="scopeB" class="md-switch-input" checked onchange="updateRemoteState()">
+          <input type="checkbox" id="scopeB" class="md-switch-input" onchange="updateRemoteState()">
           <span class="md-switch" aria-hidden="true"></span>
           リモートとして扱う
         </label>
