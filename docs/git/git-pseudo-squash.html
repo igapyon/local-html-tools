@@ -1524,6 +1524,7 @@ limitations under the License.
         // 編集は常に可能にする（現在のブランチ使用時も入力は保持）
         workBranch.classList.remove("md-disabled");
       }
+      saveUiPreferences();
       regenerateAllCommands();
     }
 
@@ -1564,7 +1565,22 @@ limitations under the License.
     }
 
     function toggleOriginLock() {
+      const lockOrigin = document.getElementById("lockOrigin");
+      const isLocked = !!(lockOrigin && lockOrigin.checked);
+      if (!isLocked) {
+        const baseRemote = document.getElementById("baseRemote");
+        const squashRemote = document.getElementById("squashRemote");
+        const storedBaseRemote = getStoredString(UI_BASE_REMOTE_STORAGE_KEY);
+        const storedSquashRemote = getStoredString(UI_SQUASH_REMOTE_STORAGE_KEY);
+        if (baseRemote && storedBaseRemote) {
+          baseRemote.value = storedBaseRemote;
+        }
+        if (squashRemote && storedSquashRemote) {
+          squashRemote.value = storedSquashRemote;
+        }
+      }
       updateBaseScope();
+      saveUiPreferences();
     }
 
     function regenerateAllCommands() {
@@ -1841,7 +1857,116 @@ limitations under the License.
     const BASE_BRANCH_STORAGE_KEY = "gitPseudoSquash.squashBaseBranch";
     const BASE_BRANCH_HISTORY_STORAGE_KEY = "gitPseudoSquash.squashBaseBranchHistory";
     const BASE_BRANCH_HISTORY_MAX = 12;
+    const UI_SHELL_ENV_POWERSHELL_STORAGE_KEY = "gitPseudoSquash.ui.shellEnvPowerShell";
+    const UI_LOCK_ORIGIN_STORAGE_KEY = "gitPseudoSquash.ui.lockOrigin";
+    const UI_SQUASH_BASE_SCOPE_STORAGE_KEY = "gitPseudoSquash.ui.squashBaseScope";
+    const UI_BASE_REMOTE_STORAGE_KEY = "gitPseudoSquash.ui.baseRemote";
+    const UI_SQUASH_REMOTE_STORAGE_KEY = "gitPseudoSquash.ui.squashRemote";
+    const UI_USE_CURRENT_BRANCH_STORAGE_KEY = "gitPseudoSquash.ui.useCurrentBranch";
     let baseBranchDefaultSuggestions = [];
+
+    function getStoredString(key) {
+      try {
+        const value = localStorage.getItem(key);
+        if (value == null) return "";
+        return String(value);
+      } catch (_) {
+        return "";
+      }
+    }
+
+    function getStoredBoolean(key) {
+      const raw = getStoredString(key);
+      if (!raw) return null;
+      if (raw === "true") return true;
+      if (raw === "false") return false;
+      return null;
+    }
+
+    function setStoredValue(key, value) {
+      try {
+        localStorage.setItem(key, String(value));
+      } catch (_) {
+        // localStorage が使えない環境では保存機能を無効化
+      }
+    }
+
+    function loadPersistedUiPreferences() {
+      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
+      const lockOrigin = document.getElementById("lockOrigin");
+      const squashBaseScope = document.getElementById("squashBaseScope");
+      const baseRemote = document.getElementById("baseRemote");
+      const squashRemote = document.getElementById("squashRemote");
+      const useCurrentBranch = document.getElementById("useCurrentBranch");
+
+      const shellEnvValue = getStoredBoolean(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY);
+      const lockOriginValue = getStoredBoolean(UI_LOCK_ORIGIN_STORAGE_KEY);
+      const useCurrentBranchValue = getStoredBoolean(UI_USE_CURRENT_BRANCH_STORAGE_KEY);
+      const scopeValue = getStoredString(UI_SQUASH_BASE_SCOPE_STORAGE_KEY);
+      const baseRemoteValue = getStoredString(UI_BASE_REMOTE_STORAGE_KEY);
+      const squashRemoteValue = getStoredString(UI_SQUASH_REMOTE_STORAGE_KEY);
+
+      if (shellEnvPowerShell && shellEnvValue !== null) {
+        shellEnvPowerShell.checked = shellEnvValue;
+      }
+      if (lockOrigin && lockOriginValue !== null) {
+        lockOrigin.checked = lockOriginValue;
+      }
+      if (useCurrentBranch && useCurrentBranchValue !== null) {
+        useCurrentBranch.checked = useCurrentBranchValue;
+      }
+      if (squashBaseScope && (scopeValue === "remote" || scopeValue === "local")) {
+        squashBaseScope.value = scopeValue;
+      }
+      if (baseRemote && baseRemoteValue) {
+        baseRemote.value = baseRemoteValue;
+      }
+      if (squashRemote && squashRemoteValue) {
+        squashRemote.value = squashRemoteValue;
+      }
+    }
+
+    function saveUiPreferences() {
+      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
+      const lockOrigin = document.getElementById("lockOrigin");
+      const squashBaseScope = document.getElementById("squashBaseScope");
+      const baseRemote = document.getElementById("baseRemote");
+      const squashRemote = document.getElementById("squashRemote");
+      const useCurrentBranch = document.getElementById("useCurrentBranch");
+
+      if (shellEnvPowerShell) {
+        setStoredValue(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY, shellEnvPowerShell.checked);
+      }
+      if (lockOrigin) {
+        setStoredValue(UI_LOCK_ORIGIN_STORAGE_KEY, lockOrigin.checked);
+      }
+      if (squashBaseScope) {
+        setStoredValue(UI_SQUASH_BASE_SCOPE_STORAGE_KEY, squashBaseScope.value);
+      }
+      if (useCurrentBranch) {
+        setStoredValue(UI_USE_CURRENT_BRANCH_STORAGE_KEY, useCurrentBranch.checked);
+      }
+
+      // lockOrigin ON 時は origin を強制表示するため、ユーザーのリモート入力値は保持する。
+      const isLockOrigin = !!(lockOrigin && lockOrigin.checked);
+      if (!isLockOrigin && baseRemote) {
+        setStoredValue(UI_BASE_REMOTE_STORAGE_KEY, baseRemote.value.trim());
+      }
+      if (!isLockOrigin && squashRemote) {
+        setStoredValue(UI_SQUASH_REMOTE_STORAGE_KEY, squashRemote.value.trim());
+      }
+    }
+
+    function setupUiPreferencePersistence() {
+      const ids = ["shellEnvPowerShell", "lockOrigin", "squashBaseScope", "baseRemote", "squashRemote", "useCurrentBranch"];
+      const persist = () => saveUiPreferences();
+      ids.forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener("input", persist);
+        element.addEventListener("change", persist);
+      });
+    }
 
     function uniqueBranchNames(values) {
       const seen = new Set();
@@ -1956,10 +2081,12 @@ limitations under the License.
 
     setupBaseBranchSuggestions();
     loadPersistedBaseBranch();
+    loadPersistedUiPreferences();
     updateBaseScope();
     toggleCurrentBranch();
     setDefaultWorkBranch();
     setupBaseBranchPersistence();
+    setupUiPreferencePersistence();
     setupCreateBranchAutoUpdate();
     generateCreateBranchCommand({ silent: true });
     setupRebaseAutoUpdate();
