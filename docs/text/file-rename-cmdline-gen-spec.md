@@ -188,6 +188,25 @@ mv 'スクリーンショット-2024-01-15-123457.png' 'MyTest_002.png'
 - 初期化時に読み込み、復元後にコマンド再生成を実行。
 - `startNoInput` は `1` 以上の整数のみ復元。
 
+### 設定クリア仕様
+
+- 「設定をクリア」ボタンで以下キーを削除する
+  - `fileRenameCmdlineGen.ui.shellEnvPowerShell`
+  - `fileRenameCmdlineGen.ui.extensionFilter`
+  - `fileRenameCmdlineGen.ui.filenamePattern`
+  - `fileRenameCmdlineGen.ui.prefix`
+  - `fileRenameCmdlineGen.ui.startNo`
+  - `fileRenameCmdlineGen.ui.digits`
+- 確認ダイアログ文言:
+  - `ローカルに保存されているこのツールの設定をクリアします。よろしいですか？`
+- クリア後は以下既定値で UI を更新し、再生成する
+  - `shellEnvPowerShell = false`
+  - `extensionFilter = "png"`
+  - `filenamePattern = "スクリーンショット*"`
+  - `prefixInput = "MyImage_"`
+  - `startNoInput = 1`
+  - `digitsInput = 3`
+
 ## 想定 JavaScript 関数
 
 - `regenerateAll()` - すべての出力再生成

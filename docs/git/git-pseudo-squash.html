@@ -599,6 +599,25 @@ limitations under the License.
       background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); border: 1px solid var(--md-sys-color-outline);
     }
 
+    .md-button--compact {
+      padding: 0.38rem 0.75rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .md-button--with-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .md-inline-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
     .md-button--secondary {
       background: var(--md-sys-color-secondary); color: var(--md-sys-color-on-secondary); margin-bottom: 10px;
     }
@@ -1239,6 +1258,20 @@ limitations under the License.
             </span>
           </span>
         </label>
+        <span class="md-inline-action">
+          <button type="button" class="md-button md-button--surface md-button--compact md-button--with-icon" onclick="clearUiPreferences()" title="設定をクリア" aria-label="設定をクリア">
+            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <use href="#md-icon-trash" xlink:href="#md-icon-trash"></use>
+            </svg>
+            <span>設定をクリア</span>
+          </button>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg>
+            </span>
+            <span class="md-tooltip-content md-tooltip md-tooltip--rich">ローカルに保存されているこのツールの設定をクリアします。</span>
+          </span>
+        </span>
       </div>
       <div id="baseRemoteRow" class="md-form-grid md-form-grid-2">
         <div class="md-form-row">
@@ -1966,6 +1999,52 @@ limitations under the License.
         element.addEventListener("input", persist);
         element.addEventListener("change", persist);
       });
+    }
+
+    function clearUiPreferences() {
+      const confirmed = confirm("ローカルに保存されているこのツールの設定をクリアします。よろしいですか？");
+      if (!confirmed) return;
+
+      try {
+        localStorage.removeItem(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY);
+        localStorage.removeItem(UI_LOCK_ORIGIN_STORAGE_KEY);
+        localStorage.removeItem(UI_SQUASH_BASE_SCOPE_STORAGE_KEY);
+        localStorage.removeItem(UI_BASE_REMOTE_STORAGE_KEY);
+        localStorage.removeItem(UI_SQUASH_REMOTE_STORAGE_KEY);
+        localStorage.removeItem(UI_USE_CURRENT_BRANCH_STORAGE_KEY);
+        localStorage.removeItem(BASE_BRANCH_HISTORY_STORAGE_KEY);
+        localStorage.setItem(BASE_BRANCH_STORAGE_KEY, "devel");
+      } catch (_) {
+        showToast("設定のクリアに失敗しました");
+        return;
+      }
+
+      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
+      const lockOrigin = document.getElementById("lockOrigin");
+      const squashBaseScope = document.getElementById("squashBaseScope");
+      const baseRemote = document.getElementById("baseRemote");
+      const squashRemote = document.getElementById("squashRemote");
+      const useCurrentBranch = document.getElementById("useCurrentBranch");
+      const squashBaseBranch = document.getElementById("squashBaseBranch");
+      const workBranch = document.getElementById("workBranch");
+      const commitMessage = document.getElementById("commitMessage");
+
+      if (shellEnvPowerShell) shellEnvPowerShell.checked = false;
+      if (lockOrigin) lockOrigin.checked = true;
+      if (squashBaseScope) squashBaseScope.value = "remote";
+      if (baseRemote) baseRemote.value = "origin";
+      if (squashRemote) squashRemote.value = "origin";
+      if (useCurrentBranch) useCurrentBranch.checked = true;
+      if (squashBaseBranch) squashBaseBranch.value = "devel";
+      if (workBranch) workBranch.value = "";
+      if (commitMessage) commitMessage.value = "";
+      setDefaultWorkBranch();
+      renderBaseBranchSuggestions();
+
+      updateBaseScope();
+      toggleCurrentBranch();
+      regenerateAllCommands();
+      showToast("設定をクリアしました");
     }
 
     function uniqueBranchNames(values) {
