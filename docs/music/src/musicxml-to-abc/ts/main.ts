@@ -1,5 +1,25 @@
+const musicXmlCommon = window["MusicXmlCommon"] || (typeof MusicXmlCommon !== "undefined" ? MusicXmlCommon : null);
+const musicXmlSynthScheduleCommon = window["MusicXmlSynthScheduleCommon"] || (typeof MusicXmlSynthScheduleCommon !== "undefined" ? MusicXmlSynthScheduleCommon : null);
+const musicSynthCommon = window["MusicSynthCommon"] || (typeof MusicSynthCommon !== "undefined" ? MusicSynthCommon : null);
+const abcCommon = window["AbcCommon"] || (typeof AbcCommon !== "undefined" ? AbcCommon : null);
+if (!musicXmlCommon) {
+  throw new Error("MusicXmlCommon is not loaded.");
+}
+if (!musicXmlSynthScheduleCommon) {
+  throw new Error("MusicXmlSynthScheduleCommon is not loaded.");
+}
+if (!musicSynthCommon) {
+  throw new Error("MusicSynthCommon is not loaded.");
+}
+if (!abcCommon) {
+  throw new Error("AbcCommon is not loaded.");
+}
 const xmlInput = document.getElementById("xmlInput");
     const fileInput = document.getElementById("fileInput");
+    const inputModeSourceRadio = document.getElementById("inputModeSource");
+    const inputModeFileRadio = document.getElementById("inputModeFile");
+    const sourceInputBlock = document.getElementById("sourceInputBlock");
+    const fileInputBlock = document.getElementById("fileInputBlock");
     const fileSelectBtn = document.getElementById("fileSelectBtn");
     const fileNameText = document.getElementById("fileNameText");
     const defaultTitleInput = document.getElementById("defaultTitleInput");
@@ -7,6 +27,7 @@ const xmlInput = document.getElementById("xmlInput");
     const defaultLengthSelect = document.getElementById("defaultLengthSelect");
     const convertBtn = document.getElementById("convertBtn");
     const downloadBtn = document.getElementById("downloadBtn");
+    const playSineBtn = document.getElementById("playSineBtn");
     const copyBtn = document.getElementById("copyBtn");
     const previewText = document.getElementById("previewText");
     const abcOutput = document.getElementById("abcOutput");
@@ -16,21 +37,30 @@ const xmlInput = document.getElementById("xmlInput");
     const menuPanel = document.getElementById("menuPanel");
 
     const SETTINGS_KEY = "musicxml-to-abc-settings";
+    const MIDI_TICKS_PER_QUARTER = 128;
 
     let lastAbc = "";
+    let lastSynthSchedule = null;
+    const synthEngine = musicSynthCommon.createBasicWaveSynthEngine({
+      ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+    });
 
     restoreSettings();
 
     convertBtn.addEventListener("click", convertMusicXml);
     downloadBtn.addEventListener("click", downloadAbc);
+    playSineBtn.addEventListener("click", playSine);
     copyBtn.addEventListener("click", copyAbc);
     fileInput.addEventListener("change", loadXmlFile);
     fileSelectBtn.addEventListener("click", () => fileInput.click());
+    inputModeSourceRadio.addEventListener("change", applyInputMode);
+    inputModeFileRadio.addEventListener("change", applyInputMode);
     defaultTitleInput.addEventListener("change", persistSettings);
     defaultComposerInput.addEventListener("change", persistSettings);
     defaultLengthSelect.addEventListener("change", persistSettings);
     document.addEventListener("click", handleDocumentClick);
 
+    applyInputMode();
     convertMusicXml();
 
     function loadXmlFile(event) {
@@ -39,16 +69,15 @@ const xmlInput = document.getElementById("xmlInput");
         updateFileName("");
         return;
       }
+      inputModeFileRadio.checked = true;
+      applyInputMode();
       updateFileName(file.name);
-      const reader = new FileReader();
-      reader.onload = () => {
-        xmlInput.value = String(reader.result || "");
+      musicXmlCommon.readTextFileUtf8(file, (text) => {
+        xmlInput.value = text;
         showToast("MusicXMLを読み込みました。");
-      };
-      reader.onerror = () => {
+      }, () => {
         setError("ファイルの読み込みに失敗しました。");
-      };
-      reader.readAsText(file, "utf-8");
+      });
     }
 
     function updateFileName(name) {
@@ -74,6 +103,9 @@ const xmlInput = document.getElementById("xmlInput");
         });
 
         lastAbc = result.abc;
+        lastSynthSchedule = musicXmlSynthScheduleCommon.buildSynthScheduleFromMusicXml(source, {
+          ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+        });
         abcOutput.textContent = result.abc;
         previewText.textContent = [
           "title: " + result.meta.title,
@@ -81,11 +113,13 @@ const xmlInput = document.getElementById("xmlInput");
           "meter: " + result.meta.meter,
           "unit length: " + result.meta.defaultLengthText,
           "key: " + result.meta.key,
+          "voices: " + result.meta.voiceCount,
           "measures: " + result.meta.measureCount,
           "notes/rests: " + result.meta.noteCount
         ].join("\n");
 
         downloadBtn.disabled = false;
+        playSineBtn.disabled = !lastSynthSchedule || lastSynthSchedule.events.length === 0;
 
         if (result.warnings.length > 0) {
           warningText.textContent = "警告:\n" + result.warnings.join("\n");
@@ -101,23 +135,15 @@ const xmlInput = document.getElementById("xmlInput");
     }
 
     function parseMusicXml(source, settings) {
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(source, "application/xml");
-      const parseErr = xmlDoc.querySelector("parsererror");
-      if (parseErr) {
-        throw new Error("XMLの構文解釈に失敗しました。");
-      }
-
+      const xmlDoc = musicXmlCommon.parseScorePartwiseXml(source);
       const root = xmlDoc.documentElement;
-      if (!root || root.nodeName !== "score-partwise") {
-        throw new Error("score-partwise 形式のMusicXMLに対応しています。");
-      }
 
       const warnings = [];
-      const part = root.querySelector("part");
-      if (!part) {
+      const partNodes = Array.from(root.children).filter((node) => node.nodeType === 1 && node.nodeName === "part");
+      if (partNodes.length === 0) {
         throw new Error("part が見つかりません。");
       }
+      const partNameById = buildPartNameMap(root);
 
       const title = textOrFallback(
         root.querySelector("work > work-title") || root.querySelector("movement-title"),
@@ -132,88 +158,103 @@ const xmlInput = document.getElementById("xmlInput");
       let meter = { beats: 4, beatType: 4 };
       let key = "C";
       let noteCount = 0;
-      const measures = [];
-
-      const measureNodes = Array.from(part.children).filter((node) => node.nodeType === 1 && node.nodeName === "measure");
-      if (measureNodes.length === 0) {
-        throw new Error("measure が見つかりません。");
-      }
+      const voices = [];
 
       let warnedBackup = false;
       let warnedForward = false;
       let warnedChord = false;
       let warnedTie = false;
 
-      for (const measureNode of measureNodes) {
-        const measureNo = measureNode.getAttribute("number") || String(measures.length + 1);
-        const attrNode = measureNode.querySelector(":scope > attributes");
-        if (attrNode) {
-          const divText = getChildText(attrNode, "divisions");
-          if (divText) {
-            const divVal = Number.parseInt(divText, 10);
-            if (Number.isFinite(divVal) && divVal > 0) {
-              divisions = divVal;
-            }
-          }
+      for (let partIndex = 0; partIndex < partNodes.length; partIndex += 1) {
+        const part = partNodes[partIndex];
+        const partId = part.getAttribute("id") || ("P" + String(partIndex + 1));
+        const voiceId = "V" + String(partIndex + 1);
+        const partName = partNameById[partId] || partId;
+        const measures = [];
 
-          const beatsText = getChildText(attrNode.querySelector("time"), "beats");
-          const beatTypeText = getChildText(attrNode.querySelector("time"), "beat-type");
-          if (beatsText && beatTypeText) {
-            const beatsVal = Number.parseInt(beatsText, 10);
-            const beatTypeVal = Number.parseInt(beatTypeText, 10);
-            if (beatsVal > 0 && beatTypeVal > 0) {
-              meter = { beats: beatsVal, beatType: beatTypeVal };
-            }
-          }
-
-          const fifthsText = getChildText(attrNode.querySelector("key"), "fifths");
-          const modeText = getChildText(attrNode.querySelector("key"), "mode") || "major";
-          if (fifthsText !== "") {
-            const fifthsVal = Number.parseInt(fifthsText, 10);
-            if (Number.isFinite(fifthsVal)) {
-              key = keyFromFifths(fifthsVal, modeText);
-            }
-          }
+        const measureNodes = Array.from(part.children).filter((node) => node.nodeType === 1 && node.nodeName === "measure");
+        if (measureNodes.length === 0) {
+          warnings.push("part " + partName + ": measure が見つかりません。");
+          continue;
         }
 
-        const tokens = [];
-
-        for (const child of Array.from(measureNode.children)) {
-          const name = child.nodeName;
-          if (name === "note") {
-            const noteToken = noteToAbc(child, divisions, settings.defaultLength, warnings, measureNo);
-            if (noteToken.skipped) {
-              if (noteToken.reason === "chord" && !warnedChord) {
-                warnings.push("和音（<chord/>）は先頭音のみ扱います。");
-                warnedChord = true;
+        for (const measureNode of measureNodes) {
+          const measureNo = measureNode.getAttribute("number") || String(measures.length + 1);
+          const attrNode = measureNode.querySelector(":scope > attributes");
+          if (attrNode) {
+            const divText = getChildText(attrNode, "divisions");
+            if (divText) {
+              const divVal = Number.parseInt(divText, 10);
+              if (Number.isFinite(divVal) && divVal > 0) {
+                divisions = divVal;
               }
-              continue;
             }
-            tokens.push(noteToken.token);
-            if (noteToken.reason === "tie" && !warnedTie) {
-              warnings.push("タイ/スラーは出力していません。");
-              warnedTie = true;
+
+            const beatsText = getChildText(attrNode.querySelector("time"), "beats");
+            const beatTypeText = getChildText(attrNode.querySelector("time"), "beat-type");
+            if (beatsText && beatTypeText) {
+              const beatsVal = Number.parseInt(beatsText, 10);
+              const beatTypeVal = Number.parseInt(beatTypeText, 10);
+              if (beatsVal > 0 && beatTypeVal > 0) {
+                meter = { beats: beatsVal, beatType: beatTypeVal };
+              }
             }
-            noteCount += 1;
-          } else if (name === "backup") {
-            if (!warnedBackup) {
-              warnings.push("backup 要素（複数声部）はMVPでは非対応です。");
-              warnedBackup = true;
-            }
-          } else if (name === "forward") {
-            if (!warnedForward) {
-              warnings.push("forward 要素（複数声部）はMVPでは非対応です。");
-              warnedForward = true;
+
+            const fifthsText = getChildText(attrNode.querySelector("key"), "fifths");
+            const modeText = getChildText(attrNode.querySelector("key"), "mode") || "major";
+            if (fifthsText !== "") {
+              const fifthsVal = Number.parseInt(fifthsText, 10);
+              if (Number.isFinite(fifthsVal)) {
+                key = keyFromFifths(fifthsVal, modeText);
+              }
             }
           }
+
+          const tokens = [];
+
+          for (const child of Array.from(measureNode.children)) {
+            const name = child.nodeName;
+            if (name === "note") {
+              const noteToken = noteToAbc(child, divisions, settings.defaultLength, warnings, measureNo);
+              if (noteToken.skipped) {
+                if (noteToken.reason === "chord" && !warnedChord) {
+                  warnings.push("和音（<chord/>）は先頭音のみ扱います。");
+                  warnedChord = true;
+                }
+                continue;
+              }
+              tokens.push(noteToken.token);
+              if (noteToken.reason === "tie" && !warnedTie) {
+                warnings.push("タイ/スラーは出力していません。");
+                warnedTie = true;
+              }
+              noteCount += 1;
+            } else if (name === "backup") {
+              if (!warnedBackup) {
+                warnings.push("backup 要素（複数声部）はMVPでは非対応です。");
+                warnedBackup = true;
+              }
+            } else if (name === "forward") {
+              if (!warnedForward) {
+                warnings.push("forward 要素（複数声部）はMVPでは非対応です。");
+                warnedForward = true;
+              }
+            }
+          }
+
+          if (tokens.length === 0) {
+            tokens.push("z");
+            warnings.push("part " + partName + " measure " + measureNo + ": 要素が空のため休符 z を補完しました。");
+          }
+
+          measures.push(tokens.join(" "));
         }
 
-        if (tokens.length === 0) {
-          tokens.push("z");
-          warnings.push("measure " + measureNo + ": 要素が空のため休符 z を補完しました。");
-        }
-
-        measures.push(tokens.join(" "));
+        voices.push({
+          id: voiceId,
+          name: partName,
+          measures
+        });
       }
 
       if (noteCount === 0) {
@@ -222,16 +263,26 @@ const xmlInput = document.getElementById("xmlInput");
 
       const meterText = meter.beats + "/" + meter.beatType;
       const defaultLengthText = settings.defaultLength.num + "/" + settings.defaultLength.den;
-      const body = measures.join(" | ") + " |";
       const abcLines = [
         "X:1",
         "T:" + title,
         "C:" + composer,
         "M:" + meterText,
         "L:" + defaultLengthText,
-        "K:" + key,
-        body
+        "K:" + key
       ];
+      if (voices.length > 1) {
+        abcLines.push("%%score " + voices.map((voice) => "(" + voice.id + ")").join(" "));
+      }
+
+      for (const voice of voices) {
+        if (voices.length > 1) {
+          abcLines.push("V:" + voice.id + ' name="' + escapeAbcText(voice.name || voice.id) + '"');
+        }
+        abcLines.push(voice.measures.join(" | ") + " |");
+      }
+
+      const measureCount = voices.reduce((acc, voice) => Math.max(acc, voice.measures.length), 0);
 
       return {
         abc: abcLines.join("\n"),
@@ -241,7 +292,8 @@ const xmlInput = document.getElementById("xmlInput");
           meter: meterText,
           defaultLengthText,
           key,
-          measureCount: measures.length,
+          voiceCount: voices.length,
+          measureCount,
           noteCount
         },
         warnings
@@ -268,8 +320,12 @@ const xmlInput = document.getElementById("xmlInput");
         return { skipped: true, reason: "duration" };
       }
 
-      const ratio = divideFractions(reduceFraction(durationVal, divisions * 4), defaultLength);
-      const lengthToken = abcLengthToken(ratio);
+      const ratio = abcCommon.divideFractions(
+        abcCommon.reduceFraction(durationVal, divisions * 4, { num: 1, den: 1 }),
+        defaultLength,
+        { num: 1, den: 1 }
+      );
+      const lengthToken = abcCommon.abcLengthTokenFromFraction(ratio);
 
       if (noteNode.querySelector(":scope > rest")) {
         return { skipped: false, token: "z" + lengthToken };
@@ -290,73 +346,24 @@ const xmlInput = document.getElementById("xmlInput");
 
       const alterText = getChildText(noteNode.querySelector(":scope > pitch"), "alter");
       const alter = alterText === "" ? 0 : Number.parseInt(alterText, 10);
-      const accidental = accidentalFromAlter(Number.isFinite(alter) ? alter : 0);
+      const accidental = abcCommon.accidentalFromAlter(Number.isFinite(alter) ? alter : 0);
 
       if (noteNode.querySelector(":scope > tie") || noteNode.querySelector(":scope > notations > tied")) {
         return {
           skipped: false,
           reason: "tie",
-          token: accidental + abcPitch(step, octave) + lengthToken
+          token: accidental + abcCommon.abcPitchFromStepOctave(step, octave) + lengthToken
         };
       }
 
       return {
         skipped: false,
-        token: accidental + abcPitch(step, octave) + lengthToken
+        token: accidental + abcCommon.abcPitchFromStepOctave(step, octave) + lengthToken
       };
     }
 
-    function abcPitch(step, octave) {
-      const upperStep = step.toUpperCase();
-      if (!/^[A-G]$/.test(upperStep)) {
-        return "C";
-      }
-
-      if (octave >= 5) {
-        return upperStep.toLowerCase() + "'".repeat(octave - 5);
-      }
-      return upperStep + ",".repeat(Math.max(0, 4 - octave));
-    }
-
-    function accidentalFromAlter(alter) {
-      if (alter === 0) {
-        return "";
-      }
-      if (alter > 0) {
-        return "^".repeat(Math.min(2, alter));
-      }
-      return "_".repeat(Math.min(2, Math.abs(alter)));
-    }
-
-    function abcLengthToken(ratio) {
-      const reduced = reduceFraction(ratio.num, ratio.den);
-      if (reduced.num === reduced.den) {
-        return "";
-      }
-      if (reduced.den === 1) {
-        return String(reduced.num);
-      }
-      if (reduced.num === 1 && reduced.den === 2) {
-        return "/";
-      }
-      if (reduced.num === 1) {
-        return "/" + reduced.den;
-      }
-      return reduced.num + "/" + reduced.den;
-    }
-
     function keyFromFifths(fifths, mode) {
-      const major = ["Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#"];
-      const minor = ["Abm", "Ebm", "Bbm", "Fm", "Cm", "Gm", "Dm", "Am", "Em", "Bm", "F#m", "C#m", "G#m", "D#m", "A#m"];
-      const idx = fifths + 7;
-      if (idx < 0 || idx >= major.length) {
-        return "C";
-      }
-      const lowerMode = String(mode || "").toLowerCase();
-      if (lowerMode === "minor") {
-        return minor[idx];
-      }
-      return major[idx];
+      return abcCommon.keyFromFifthsMode(fifths, mode);
     }
 
     function getChildText(parent, tagName) {
@@ -375,79 +382,63 @@ const xmlInput = document.getElementById("xmlInput");
       return text || fallback;
     }
 
+    function escapeAbcText(text) {
+      return String(text || "").replace(/"/g, "'");
+    }
+
+    function buildPartNameMap(root) {
+      const map = {};
+      const partList = root.querySelector("part-list");
+      if (!partList) {
+        return map;
+      }
+      const scoreParts = Array.from(partList.children).filter((node) => node.nodeType === 1 && node.nodeName === "score-part");
+      for (const scorePart of scoreParts) {
+        const id = scorePart.getAttribute("id");
+        if (!id) {
+          continue;
+        }
+        const partNameNode = scorePart.querySelector(":scope > part-name");
+        const partName = partNameNode && partNameNode.textContent ? partNameNode.textContent.trim() : "";
+        map[id] = partName || id;
+      }
+      return map;
+    }
+
     function parseFraction(text) {
-      const m = String(text || "").match(/^\s*(\d+)\/(\d+)\s*$/);
-      if (!m) {
-        return { num: 1, den: 8 };
-      }
-      const num = Number.parseInt(m[1], 10);
-      const den = Number.parseInt(m[2], 10);
-      if (!num || !den) {
-        return { num: 1, den: 8 };
-      }
-      return reduceFraction(num, den);
+      return abcCommon.parseFractionText(text, { num: 1, den: 8 });
     }
 
     function divideFractions(a, b) {
-      return reduceFraction(a.num * b.den, a.den * b.num);
+      return abcCommon.divideFractions(a, b, { num: 1, den: 1 });
     }
 
     function reduceFraction(num, den) {
-      if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) {
-        return { num: 1, den: 1 };
-      }
-      const sign = den < 0 ? -1 : 1;
-      const n = num * sign;
-      const d = den * sign;
-      const g = gcd(Math.abs(n), Math.abs(d));
-      return { num: n / g, den: d / g };
-    }
-
-    function gcd(a, b) {
-      let x = a || 1;
-      let y = b || 1;
-      while (y !== 0) {
-        const t = x % y;
-        x = y;
-        y = t;
-      }
-      return x || 1;
+      return abcCommon.reduceFraction(num, den, { num: 1, den: 1 });
     }
 
     function normalizeSource(rawText) {
-      if (!rawText) {
-        return "";
-      }
-
-      const lines = rawText.split("\n");
-      let first = 0;
-      let last = lines.length - 1;
-
-      while (first <= last && lines[first].trim() === "") {
-        first += 1;
-      }
-      while (last >= first && lines[last].trim() === "") {
-        last -= 1;
-      }
-      if (first > last) {
-        return "";
-      }
-
-      const firstLine = lines[first].trim();
-      const lastLine = lines[last].trim();
-      const hasCodeFencePair = /^```.*$/.test(firstLine) && /^```\s*$/.test(lastLine);
-      if (hasCodeFencePair) {
-        return lines.slice(first + 1, last).join("\n").trim();
-      }
-
-      return lines.slice(first, last + 1).join("\n").trim();
+      return musicXmlCommon.normalizeMusicXmlSource(rawText);
     }
 
     function resetOutput() {
       lastAbc = "";
+      lastSynthSchedule = null;
+      synthEngine.stop();
       abcOutput.textContent = "";
       previewText.textContent = "未変換";
       downloadBtn.disabled = true;
+      playSineBtn.disabled = true;
+    }
+
+    function applyInputMode() {
+      const sourceMode = inputModeSourceRadio.checked;
+      sourceInputBlock.classList.toggle("md-hidden", !sourceMode);
+      fileInputBlock.classList.toggle("md-hidden", sourceMode);
+      if (sourceMode) {
+        fileInput.value = "";
+        updateFileName("");
+      }
     }
 
     function downloadAbc() {
@@ -470,6 +461,19 @@ const xmlInput = document.getElementById("xmlInput");
         showToast("ABCをコピーしました。");
       }).catch((error) => {
         setError("コピーに失敗しました: " + (error && error.message ? error.message : String(error)));
+      });
+    }
+
+    function playSine() {
+      if (!lastSynthSchedule || lastSynthSchedule.events.length === 0) {
+        setError("先に変換してください。");
+        return;
+      }
+      synthEngine.playSchedule(lastSynthSchedule, "sine").then(() => {
+        clearError();
+        showToast("sine再生を開始しました。");
+      }).catch((error) => {
+        setError("sine再生に失敗しました: " + (error && error.message ? error.message : String(error)));
       });
     }
 

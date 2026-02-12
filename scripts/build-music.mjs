@@ -10,25 +10,57 @@ const TARGETS = [
     cssOrder: ["src/musicxml-to-midi/css/app.css"],
     jsOrder: [
       "src/musicxml-to-midi/js/midi-writer.js",
+      "src/common/js/musicxml-common.js",
+      "src/common/js/music-synth-common.js",
       "src/musicxml-to-midi/js/main.js"
     ],
-    tsOrder: ["src/musicxml-to-midi/ts/main.ts"]
+    tsOrder: [
+      "src/common/ts/musicxml-common.ts",
+      "src/common/ts/music-synth-common.ts",
+      "src/musicxml-to-midi/ts/main.ts"
+    ]
   },
   {
     id: "musicxml-to-abc",
     srcHtml: "docs/music/musicxml-to-abc-src.html",
     outHtml: "docs/music/musicxml-to-abc.html",
     cssOrder: ["src/musicxml-to-abc/css/app.css"],
-    jsOrder: ["src/musicxml-to-abc/js/main.js"],
-    tsOrder: ["src/musicxml-to-abc/ts/main.ts"]
+    jsOrder: [
+      "src/common/js/musicxml-common.js",
+      "src/common/js/musicxml-synth-schedule-common.js",
+      "src/common/js/music-synth-common.js",
+      "src/common/js/abc-common.js",
+      "src/musicxml-to-abc/js/main.js"
+    ],
+    tsOrder: [
+      "src/common/ts/musicxml-common.ts",
+      "src/common/ts/musicxml-synth-schedule-common.ts",
+      "src/common/ts/music-synth-common.ts",
+      "src/common/ts/abc-common.ts",
+      "src/musicxml-to-abc/ts/main.ts"
+    ]
   },
   {
     id: "abc-to-musicxml",
     srcHtml: "docs/music/abc-to-musicxml-src.html",
     outHtml: "docs/music/abc-to-musicxml.html",
     cssOrder: ["src/abc-to-musicxml/css/app.css"],
-    jsOrder: ["src/abc-to-musicxml/js/main.js"],
-    tsOrder: ["src/abc-to-musicxml/ts/main.ts"]
+    jsOrder: [
+      "src/common/js/abc-common.js",
+      "src/common/js/musicxml-common.js",
+      "src/common/js/musicxml-synth-schedule-common.js",
+      "src/common/js/music-synth-common.js",
+      "src/common/js/musicxml-writer-common.js",
+      "src/abc-to-musicxml/js/main.js"
+    ],
+    tsOrder: [
+      "src/common/ts/abc-common.ts",
+      "src/common/ts/musicxml-common.ts",
+      "src/common/ts/musicxml-synth-schedule-common.ts",
+      "src/common/ts/music-synth-common.ts",
+      "src/common/ts/musicxml-writer-common.ts",
+      "src/abc-to-musicxml/ts/main.ts"
+    ]
   },
   {
     id: "musicxml-to-svg",
@@ -38,9 +70,17 @@ const TARGETS = [
     jsOrder: [
       "src/musicxml-to-svg/js/verovio.js",
       "src/musicxml-to-svg/js/jszip.js",
+      "src/common/js/musicxml-common.js",
+      "src/common/js/musicxml-synth-schedule-common.js",
+      "src/common/js/music-synth-common.js",
       "src/musicxml-to-svg/js/main.js"
     ],
-    tsOrder: ["src/musicxml-to-svg/ts/main.ts"]
+    tsOrder: [
+      "src/common/ts/musicxml-common.ts",
+      "src/common/ts/musicxml-synth-schedule-common.ts",
+      "src/common/ts/music-synth-common.ts",
+      "src/musicxml-to-svg/ts/main.ts"
+    ]
   }
 ];
 

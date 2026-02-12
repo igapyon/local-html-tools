@@ -1,11 +1,37 @@
+const abcCommon = window["AbcCommon"] || (typeof AbcCommon !== "undefined" ? AbcCommon : null);
+const musicXmlCommon = window["MusicXmlCommon"] || (typeof MusicXmlCommon !== "undefined" ? MusicXmlCommon : null);
+const musicXmlSynthScheduleCommon = window["MusicXmlSynthScheduleCommon"] || (typeof MusicXmlSynthScheduleCommon !== "undefined" ? MusicXmlSynthScheduleCommon : null);
+const musicSynthCommon = window["MusicSynthCommon"] || (typeof MusicSynthCommon !== "undefined" ? MusicSynthCommon : null);
+const musicXmlWriterCommon = window["MusicXmlWriterCommon"] || (typeof MusicXmlWriterCommon !== "undefined" ? MusicXmlWriterCommon : null);
+if (!abcCommon) {
+  throw new Error("AbcCommon is not loaded.");
+}
+if (!musicXmlCommon) {
+  throw new Error("MusicXmlCommon is not loaded.");
+}
+if (!musicXmlSynthScheduleCommon) {
+  throw new Error("MusicXmlSynthScheduleCommon is not loaded.");
+}
+if (!musicSynthCommon) {
+  throw new Error("MusicSynthCommon is not loaded.");
+}
+if (!musicXmlWriterCommon) {
+  throw new Error("MusicXmlWriterCommon is not loaded.");
+}
+
 const abcInput = document.getElementById("abcInput");
     const fileInput = document.getElementById("fileInput");
+    const inputModeSourceRadio = document.getElementById("inputModeSource");
+    const inputModeFileRadio = document.getElementById("inputModeFile");
+    const sourceInputBlock = document.getElementById("sourceInputBlock");
+    const fileInputBlock = document.getElementById("fileInputBlock");
     const fileSelectBtn = document.getElementById("fileSelectBtn");
     const fileNameText = document.getElementById("fileNameText");
     const defaultTitleInput = document.getElementById("defaultTitleInput");
     const defaultComposerInput = document.getElementById("defaultComposerInput");
     const convertBtn = document.getElementById("convertBtn");
     const downloadBtn = document.getElementById("downloadBtn");
+    const playSineBtn = document.getElementById("playSineBtn");
     const copyBtn = document.getElementById("copyBtn");
     const previewText = document.getElementById("previewText");
     const xmlOutput = document.getElementById("xmlOutput");
@@ -15,20 +41,29 @@ const abcInput = document.getElementById("abcInput");
     const menuPanel = document.getElementById("menuPanel");
 
     const SETTINGS_KEY = "diagram-abc-to-musicxml-settings";
+    const MIDI_TICKS_PER_QUARTER = 128;
 
     let lastXml = "";
+    let lastSynthSchedule = null;
+    const synthEngine = musicSynthCommon.createBasicWaveSynthEngine({
+      ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+    });
 
     restoreSettings();
 
     convertBtn.addEventListener("click", convertAbc);
     downloadBtn.addEventListener("click", downloadMusicXml);
+    playSineBtn.addEventListener("click", playSine);
     copyBtn.addEventListener("click", copyMusicXml);
     fileInput.addEventListener("change", loadAbcFile);
     fileSelectBtn.addEventListener("click", () => fileInput.click());
+    inputModeSourceRadio.addEventListener("change", applyInputMode);
+    inputModeFileRadio.addEventListener("change", applyInputMode);
     defaultTitleInput.addEventListener("change", persistSettings);
     defaultComposerInput.addEventListener("change", persistSettings);
     document.addEventListener("click", handleDocumentClick);
 
+    applyInputMode();
     convertAbc();
 
     function loadAbcFile(event) {
@@ -37,6 +72,8 @@ const abcInput = document.getElementById("abcInput");
         updateFileName("");
         return;
       }
+      inputModeFileRadio.checked = true;
+      applyInputMode();
       updateFileName(file.name);
       const reader = new FileReader();
       reader.onload = () => {
@@ -51,6 +88,16 @@ const abcInput = document.getElementById("abcInput");
 
     function updateFileName(name) {
       fileNameText.textContent = name || "未選択";
+    }
+
+    function applyInputMode() {
+      const sourceMode = inputModeSourceRadio.checked;
+      sourceInputBlock.classList.toggle("md-hidden", !sourceMode);
+      fileInputBlock.classList.toggle("md-hidden", sourceMode);
+      if (sourceMode) {
+        fileInput.value = "";
+        updateFileName("");
+      }
     }
 
     function convertAbc() {
@@ -70,8 +117,11 @@ const abcInput = document.getElementById("abcInput");
           defaultComposer: defaultComposerInput.value.trim() || "Unknown"
         });
 
-        const xml = buildMusicXml(result);
+        const xml = musicXmlWriterCommon.buildScorePartwiseXml(result);
         lastXml = xml;
+        lastSynthSchedule = musicXmlSynthScheduleCommon.buildSynthScheduleFromMusicXml(xml, {
+          ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+        });
         xmlOutput.textContent = xml;
         previewText.textContent = [
           "title: " + result.meta.title,
@@ -79,11 +129,13 @@ const abcInput = document.getElementById("abcInput");
           "meter: " + result.meta.meterText,
           "unit length: " + result.meta.unitLengthText,
           "key: " + result.meta.keyText,
-          "measures: " + result.measures.length,
+          "voices: " + result.voiceCount,
+          "measures: " + result.measureCount,
           "notes/rests: " + result.noteCount
         ].join("\n");
 
         downloadBtn.disabled = false;
+        playSineBtn.disabled = !lastSynthSchedule || lastSynthSchedule.events.length === 0;
 
         if (result.warnings.length > 0) {
           warningText.textContent = "警告:\n" + result.warnings.join("\n");
@@ -101,9 +153,12 @@ const abcInput = document.getElementById("abcInput");
 
     function resetOutput() {
       lastXml = "";
+      lastSynthSchedule = null;
+      synthEngine.stop();
       xmlOutput.textContent = "";
       previewText.textContent = "未変換";
       downloadBtn.disabled = true;
+      playSineBtn.disabled = true;
     }
 
     function parseAbc(source, settings) {
@@ -111,6 +166,10 @@ const abcInput = document.getElementById("abcInput");
       const lines = source.split("\n");
       const headers = {};
       const bodyEntries = [];
+      const declaredVoiceIds = [];
+      const voiceNameById = {};
+      let currentVoiceId = "1";
+      let scoreDirective = "";
 
       for (let i = 0; i < lines.length; i += 1) {
         const lineNo = i + 1;
@@ -122,15 +181,43 @@ const abcInput = document.getElementById("abcInput");
           continue;
         }
 
+        const scoreMatch = trimmed.match(/^%%\s*score\s+(.+)$/i);
+        if (scoreMatch) {
+          scoreDirective = scoreMatch[1].trim();
+          continue;
+        }
+
         const headerMatch = trimmed.match(/^([A-Za-z]):\s*(.*)$/);
         if (headerMatch && /^[A-Za-z]$/.test(headerMatch[1])) {
           const key = headerMatch[1];
           const value = headerMatch[2].trim();
+          if (key === "V") {
+            const m = value.match(/^(\S+)\s*(.*)$/);
+            if (!m) {
+              continue;
+            }
+            currentVoiceId = m[1];
+            if (!declaredVoiceIds.includes(currentVoiceId)) {
+              declaredVoiceIds.push(currentVoiceId);
+            }
+            const rest = m[2].trim();
+            const parsedVoice = parseVoiceDirectiveTail(rest);
+            if (parsedVoice.name) {
+              voiceNameById[currentVoiceId] = parsedVoice.name;
+            }
+            if (parsedVoice.bodyText) {
+              bodyEntries.push({ text: parsedVoice.bodyText, lineNo, voiceId: currentVoiceId });
+            }
+            continue;
+          }
           headers[key] = value;
           continue;
         }
 
-        bodyEntries.push({ text: noComment, lineNo });
+        if (!declaredVoiceIds.includes(currentVoiceId)) {
+          declaredVoiceIds.push(currentVoiceId);
+        }
+        bodyEntries.push({ text: noComment, lineNo, voiceId: currentVoiceId });
       }
 
       if (bodyEntries.length === 0) {
@@ -140,12 +227,19 @@ const abcInput = document.getElementById("abcInput");
       const meter = parseMeter(headers.M || "4/4", warnings);
       const unitLength = parseFraction(headers.L || "1/8", "L", warnings);
       const keyInfo = parseKey(headers.K || "C", warnings);
-
-      const measures = [[]];
-      let currentMeasure = measures[0];
+      const measuresByVoice = {};
       let noteCount = 0;
 
+      function ensureVoice(voiceId) {
+        if (!Object.prototype.hasOwnProperty.call(measuresByVoice, voiceId)) {
+          measuresByVoice[voiceId] = [[]];
+        }
+        return measuresByVoice[voiceId];
+      }
+
       for (const entry of bodyEntries) {
+        const measures = ensureVoice(entry.voiceId);
+        let currentMeasure = measures[measures.length - 1];
         let idx = 0;
         const text = entry.text;
 
@@ -205,18 +299,35 @@ const abcInput = document.getElementById("abcInput");
           }
 
           const note = buildNoteData(pitchChar, accidental, octaveShift, absoluteLength, dur, entry.lineNo);
+          note.voice = entry.voiceId;
           currentMeasure.push(note);
           noteCount += 1;
         }
       }
 
-      while (measures.length > 1 && measures[measures.length - 1].length === 0) {
-        measures.pop();
+      for (const voiceId of Object.keys(measuresByVoice)) {
+        const measures = measuresByVoice[voiceId];
+        while (measures.length > 1 && measures[measures.length - 1].length === 0) {
+          measures.pop();
+        }
       }
 
       if (noteCount === 0) {
         throw new Error("ノートまたは休符が見つかりませんでした。 (line 1)");
       }
+
+      const orderedVoiceIds = parseScoreVoiceOrder(scoreDirective, declaredVoiceIds);
+      const parts = orderedVoiceIds.map((voiceId, index) => {
+        const partName = voiceNameById[voiceId] || ("Voice " + voiceId);
+        return {
+          partId: "P" + String(index + 1),
+          partName,
+          transpose: inferTransposeFromPartName(partName),
+          voiceId,
+          measures: measuresByVoice[voiceId] || [[]]
+        };
+      });
+      const measureCount = parts.reduce((acc, part) => Math.max(acc, part.measures.length), 0);
 
       return {
         meta: {
@@ -229,10 +340,107 @@ const abcInput = document.getElementById("abcInput");
           keyInfo,
           keyText: headers.K || "C"
         },
-        measures,
+        parts,
+        measures: parts[0] ? parts[0].measures : [[]],
+        voiceCount: parts.length,
+        measureCount,
         noteCount,
         warnings
       };
+    }
+
+    function parseScoreVoiceOrder(raw, declaredVoiceIds) {
+      const baseOrder = Array.from(declaredVoiceIds || []);
+      if (!raw) {
+        return baseOrder.length > 0 ? baseOrder : ["1"];
+      }
+
+      const ordered = [];
+      const seen = new Set();
+      const groupRegex = /\(([^)]*)\)|([^\s()]+)/g;
+      let m;
+      while ((m = groupRegex.exec(raw)) !== null) {
+        const chunk = m[1] || m[2] || "";
+        const ids = chunk
+          .split(/\s+/)
+          .map((v) => v.trim())
+          .filter((v) => /^[A-Za-z0-9_.-]+$/.test(v));
+        for (const id of ids) {
+          if (!seen.has(id)) {
+            seen.add(id);
+            ordered.push(id);
+          }
+        }
+      }
+      for (const id of baseOrder) {
+        if (!seen.has(id)) {
+          seen.add(id);
+          ordered.push(id);
+        }
+      }
+      return ordered.length > 0 ? ordered : ["1"];
+    }
+
+    function parseVoiceDirectiveTail(raw) {
+      if (!raw) {
+        return { name: "", bodyText: "" };
+      }
+      let bodyText = String(raw);
+      let name = "";
+      const attrRegex = /([A-Za-z][A-Za-z0-9_-]*)\s*=\s*("([^"]*)"|(\S+))/g;
+      bodyText = bodyText.replace(attrRegex, (_full, key, _quotedValue, quotedInner, bareValue) => {
+        if (String(key).toLowerCase() === "name") {
+          name = quotedInner || bareValue || "";
+        }
+        return " ";
+      });
+      return {
+        name: name.trim(),
+        bodyText: bodyText.trim()
+      };
+    }
+
+    function inferTransposeFromPartName(partName) {
+      if (!partName) {
+        return null;
+      }
+      const normalized = String(partName).replace(/[♭]/g, "b").replace(/[♯]/g, "#");
+      const m = normalized.match(/\bin\s+([A-Ga-g])([#b]?)/);
+      if (!m) {
+        return null;
+      }
+
+      const tonic = String(m[1]).toUpperCase() + (m[2] || "");
+      const semitoneByTonic = {
+        C: 0,
+        "C#": 1,
+        Db: 1,
+        D: 2,
+        "D#": 3,
+        Eb: 3,
+        E: 4,
+        F: 5,
+        "F#": 6,
+        Gb: 6,
+        G: 7,
+        "G#": 8,
+        Ab: 8,
+        A: 9,
+        "A#": 10,
+        Bb: 10,
+        B: 11
+      };
+      if (!Object.prototype.hasOwnProperty.call(semitoneByTonic, tonic)) {
+        return null;
+      }
+      let chromatic = semitoneByTonic[tonic];
+      if (chromatic > 6) {
+        chromatic -= 12;
+      }
+      if (chromatic === 0) {
+        return null;
+      }
+      return { chromatic };
     }
 
     function parseMeter(raw, warnings) {
@@ -245,58 +453,24 @@ const abcInput = document.getElementById("abcInput");
     }
 
     function parseFraction(raw, fieldName, warnings) {
-      const m = raw.match(/^(\d+)\/(\d+)$/);
-      if (!m) {
+      const parsed = abcCommon.parseFractionText(raw, { num: 1, den: 8 });
+      if (parsed.num === 1 && parsed.den === 8 && !/^\s*\d+\/\d+\s*$/.test(String(raw || ""))) {
         warnings.push(fieldName + " の形式が不正なため 1/8 を使用しました: " + raw);
-        return { num: 1, den: 8 };
+        return parsed;
       }
-      const num = Number(m[1]);
-      const den = Number(m[2]);
-      if (!num || !den) {
+      const m = String(raw || "").match(/^\s*(\d+)\/(\d+)\s*$/);
+      if (!m || !Number(m[1]) || !Number(m[2])) {
         warnings.push(fieldName + " の値が不正なため 1/8 を使用しました: " + raw);
         return { num: 1, den: 8 };
       }
-      return reduceFraction(num, den);
+      return parsed;
     }
 
     function parseKey(raw, warnings) {
       const key = raw.trim();
-      const table = {
-        "C": 0,
-        "G": 1,
-        "D": 2,
-        "A": 3,
-        "E": 4,
-        "B": 5,
-        "F#": 6,
-        "C#": 7,
-        "F": -1,
-        "Bb": -2,
-        "Eb": -3,
-        "Ab": -4,
-        "Db": -5,
-        "Gb": -6,
-        "Cb": -7,
-        "Am": 0,
-        "Em": 1,
-        "Bm": 2,
-        "F#m": 3,
-        "C#m": 4,
-        "G#m": 5,
-        "D#m": 6,
-        "A#m": 7,
-        "Dm": -1,
-        "Gm": -2,
-        "Cm": -3,
-        "Fm": -4,
-        "Bbm": -5,
-        "Ebm": -6,
-        "Abm": -7
-      };
-
-      const normalized = key.replace(/\s+/g, "");
-      if (Object.prototype.hasOwnProperty.call(table, normalized)) {
-        return { fifths: table[normalized] };
+      const fifths = abcCommon.fifthsFromAbcKey(key);
+      if (fifths !== null) {
+        return { fifths };
       }
 
       warnings.push("K: 非対応キーのため C を使用しました: " + key);
@@ -304,23 +478,7 @@ const abcInput = document.getElementById("abcInput");
     }
 
     function parseLengthToken(token, lineNo) {
-      if (!token) {
-        return { num: 1, den: 1 };
-      }
-      if (token === "/") {
-        return { num: 1, den: 2 };
-      }
-      if (/^\d+$/.test(token)) {
-        return { num: Number(token), den: 1 };
-      }
-      if (/^\/\d+$/.test(token)) {
-        return { num: 1, den: Number(token.slice(1)) };
-      }
-      if (/^\d+\/\d+$/.test(token)) {
-        const p = token.split("/");
-        return reduceFraction(Number(p[0]), Number(p[1]));
-      }
-      throw new Error("line " + lineNo + ": 長さ指定を解釈できません: " + token);
+      return abcCommon.parseAbcLengthToken(token, lineNo);
     }
 
     function buildNoteData(pitchChar, accidental, octaveShift, absoluteLength, duration, lineNo) {
@@ -373,64 +531,6 @@ const abcInput = document.getElementById("abcInput");
       };
     }
 
-    function buildMusicXml(parsed) {
-      const lines = [];
-      const meta = parsed.meta;
-
-      lines.push('<?xml version="1.0" encoding="UTF-8"?>');
-      lines.push('<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN"');
-      lines.push('  "http://www.musicxml.org/dtds/partwise.dtd">');
-      lines.push('<score-partwise version="3.1">');
-      lines.push('  <work><work-title>' + escapeXml(meta.title) + '</work-title></work>');
-      lines.push('  <identification><creator type="composer">' + escapeXml(meta.composer) + '</creator></identification>');
-      lines.push('  <part-list>');
-      lines.push('    <score-part id="P1"><part-name>Music</part-name></score-part>');
-      lines.push('  </part-list>');
-      lines.push('  <part id="P1">');
-
-      for (let measureIndex = 0; measureIndex < parsed.measures.length; measureIndex += 1) {
-        const measureNo = measureIndex + 1;
-        const notes = parsed.measures[measureIndex];
-
-        lines.push('    <measure number="' + measureNo + '">');
-        if (measureIndex === 0) {
-          lines.push('      <attributes>');
-          lines.push('        <divisions>960</divisions>');
-          lines.push('        <key><fifths>' + meta.keyInfo.fifths + '</fifths></key>');
-          lines.push('        <time><beats>' + meta.meter.beats + '</beats><beat-type>' + meta.meter.beatType + '</beat-type></time>');
-          lines.push('        <clef><sign>G</sign><line>2</line></clef>');
-          lines.push('      </attributes>');
-        }
-
-        for (const note of notes) {
-          lines.push('      <note>');
-          if (note.isRest) {
-            lines.push('        <rest/>');
-          } else {
-            lines.push('        <pitch>');
-            lines.push('          <step>' + note.step + '</step>');
-            if (note.alter !== null) {
-              lines.push('          <alter>' + note.alter + '</alter>');
-            }
-            lines.push('          <octave>' + note.octave + '</octave>');
-            lines.push('        </pitch>');
-          }
-
-          lines.push('        <duration>' + note.duration + '</duration>');
-          lines.push('        <type>' + note.type + '</type>');
-          if (!note.isRest && note.accidentalText) {
-            lines.push('        <accidental>' + note.accidentalText + '</accidental>');
-          }
-          lines.push('      </note>');
-        }
-
-        lines.push('    </measure>');
-      }
-
-      lines.push('  </part>');
-      lines.push('</score-partwise>');
-      return lines.join("\n");
-    }
 
     function typeFromFraction(frac) {
       const value = frac.num / frac.den;
@@ -457,35 +557,11 @@ const abcInput = document.getElementById("abcInput");
     }
 
     function multiplyFractions(a, b) {
-      return reduceFraction(a.num * b.num, a.den * b.den);
+      return abcCommon.multiplyFractions(a, b, { num: 1, den: 1 });
     }
 
     function reduceFraction(num, den) {
-      if (!den) {
-        return { num: 1, den: 8 };
-      }
-      const g = gcd(Math.abs(num), Math.abs(den));
-      return { num: num / g, den: den / g };
-    }
-
-    function gcd(a, b) {
-      let x = a;
-      let y = b;
-      while (y !== 0) {
-        const t = x % y;
-        x = y;
-        y = t;
-      }
-      return x || 1;
-    }
-
-    function escapeXml(value) {
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&apos;");
+      return abcCommon.reduceFraction(num, den, { num: 1, den: 8 });
     }
 
     function normalizeSource(rawText) {
@@ -537,6 +613,19 @@ const abcInput = document.getElementById("abcInput");
         showToast("MusicXMLをコピーしました。");
       }).catch((error) => {
         setError("コピーに失敗しました: " + (error && error.message ? error.message : String(error)));
+      });
+    }
+
+    function playSine() {
+      if (!lastSynthSchedule || lastSynthSchedule.events.length === 0) {
+        setError("先に変換してください。");
+        return;
+      }
+      synthEngine.playSchedule(lastSynthSchedule, "sine").then(() => {
+        clearError();
+        showToast("sine再生を開始しました。");
+      }).catch((error) => {
+        setError("sine再生に失敗しました: " + (error && error.message ? error.message : String(error)));
       });
     }
 

@@ -1,5 +1,21 @@
+const musicXmlCommon = window["MusicXmlCommon"] || (typeof MusicXmlCommon !== "undefined" ? MusicXmlCommon : null);
+const musicXmlSynthScheduleCommon = window["MusicXmlSynthScheduleCommon"] || (typeof MusicXmlSynthScheduleCommon !== "undefined" ? MusicXmlSynthScheduleCommon : null);
+const musicSynthCommon = window["MusicSynthCommon"] || (typeof MusicSynthCommon !== "undefined" ? MusicSynthCommon : null);
+if (!musicXmlCommon) {
+  throw new Error("MusicXmlCommon is not loaded.");
+}
+if (!musicXmlSynthScheduleCommon) {
+  throw new Error("MusicXmlSynthScheduleCommon is not loaded.");
+}
+if (!musicSynthCommon) {
+  throw new Error("MusicSynthCommon is not loaded.");
+}
 const musicxmlInput = document.getElementById("musicxmlInput");
     const fileInput = document.getElementById("fileInput");
+    const inputModeSourceRadio = document.getElementById("inputModeSource");
+    const inputModeFileRadio = document.getElementById("inputModeFile");
+    const sourceInputBlock = document.getElementById("sourceInputBlock");
+    const fileInputBlock = document.getElementById("fileInputBlock");
     const fileSelectBtn = document.getElementById("fileSelectBtn");
     const fileNameText = document.getElementById("fileNameText");
     const scaleInput = document.getElementById("scaleInput");
@@ -11,6 +27,7 @@ const musicxmlInput = document.getElementById("musicxmlInput");
     const renderBtn = document.getElementById("renderBtn");
     const downloadSvgBtn = document.getElementById("downloadSvgBtn");
     const downloadZipBtn = document.getElementById("downloadZipBtn");
+    const playSineBtn = document.getElementById("playSineBtn");
     const prevPageBtn = document.getElementById("prevPageBtn");
     const nextPageBtn = document.getElementById("nextPageBtn");
     const pageIndicator = document.getElementById("pageIndicator");
@@ -23,23 +40,31 @@ const musicxmlInput = document.getElementById("musicxmlInput");
     const statusText = document.getElementById("statusText");
 
     const STORAGE_KEY = "diagram-musicxml-render-options";
+    const MIDI_TICKS_PER_QUARTER = 128;
 
     let lastSvg = "";
+    let lastSynthSchedule = null;
     let toolkit = null;
     let pageCount = 0;
     let currentPage = 0;
     let pageSvgCache = [];
+    const synthEngine = musicSynthCommon.createBasicWaveSynthEngine({
+      ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+    });
 
     restoreOptions();
 
     renderBtn.addEventListener("click", renderMusicXML);
     downloadSvgBtn.addEventListener("click", downloadCurrentSvg);
     downloadZipBtn.addEventListener("click", downloadZipAllPages);
+    playSineBtn.addEventListener("click", playSine);
     prevPageBtn.addEventListener("click", showPreviousPage);
     nextPageBtn.addEventListener("click", showNextPage);
     copySvgBtn.addEventListener("click", copySvg);
     fileInput.addEventListener("change", loadMusicXMLFile);
     fileSelectBtn.addEventListener("click", () => fileInput.click());
+    inputModeSourceRadio.addEventListener("change", applyInputMode);
+    inputModeFileRadio.addEventListener("change", applyInputMode);
     document.addEventListener("click", handleDocumentClick);
 
     [
@@ -53,6 +78,7 @@ const musicxmlInput = document.getElementById("musicxmlInput");
       input.addEventListener("change", persistOptions);
     });
 
+    applyInputMode();
     initVerovioToolkit();
 
     function initVerovioToolkit() {
@@ -91,16 +117,15 @@ const musicxmlInput = document.getElementById("musicxmlInput");
         updateFileName("");
         return;
       }
+      inputModeFileRadio.checked = true;
+      applyInputMode();
       updateFileName(file.name);
-      const reader = new FileReader();
-      reader.onload = () => {
-        musicxmlInput.value = String(reader.result || "");
+      musicXmlCommon.readTextFileUtf8(file, (text) => {
+        musicxmlInput.value = text;
         showToast("MusicXMLを読み込みました。");
-      };
-      reader.onerror = () => {
+      }, () => {
         setError("ファイルの読み込みに失敗しました。");
-      };
-      reader.readAsText(file, "utf-8");
+      });
     }
 
     function updateFileName(name) {
@@ -138,6 +163,14 @@ const musicxmlInput = document.getElementById("musicxmlInput");
 
         downloadSvgBtn.disabled = false;
         downloadZipBtn.disabled = false;
+        try {
+        lastSynthSchedule = musicXmlSynthScheduleCommon.buildSynthScheduleFromMusicXml(source, {
+          ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+        });
+        } catch (_error) {
+          lastSynthSchedule = null;
+        }
+        playSineBtn.disabled = !lastSynthSchedule || lastSynthSchedule.events.length === 0;
 
         if (pageCount > 1) {
           showToast("SVGを生成しました（ページ切替できます）。");
@@ -203,9 +236,35 @@ const musicxmlInput = document.getElementById("musicxmlInput");
       pageSvgCache = [];
       svgPreview.innerHTML = "";
       svgText.textContent = "";
+      lastSynthSchedule = null;
+      synthEngine.stop();
       downloadSvgBtn.disabled = true;
       downloadZipBtn.disabled = true;
+      playSineBtn.disabled = true;
       updatePager();
+    }
+
+    function playSine() {
+      if (!lastSynthSchedule || lastSynthSchedule.events.length === 0) {
+        setError("先にレンダリングしてください。");
+        return;
+      }
+      synthEngine.playSchedule(lastSynthSchedule, "sine").then(() => {
+        clearError();
+        showToast("sine再生を開始しました。");
+      }).catch((error) => {
+        setError("sine再生に失敗しました: " + (error && error.message ? error.message : String(error)));
+      });
+    }
+
+    function applyInputMode() {
+      const sourceMode = inputModeSourceRadio.checked;
+      sourceInputBlock.classList.toggle("md-hidden", !sourceMode);
+      fileInputBlock.classList.toggle("md-hidden", sourceMode);
+      if (sourceMode) {
+        fileInput.value = "";
+        updateFileName("");
+      }
     }
 
     function getRenderOptions() {
@@ -354,32 +413,7 @@ const musicxmlInput = document.getElementById("musicxmlInput");
     }
 
     function normalizeMusicXMLSource(rawText) {
-      if (!rawText) {
-        return "";
-      }
-
-      const lines = rawText.split("\n");
-      let first = 0;
-      let last = lines.length - 1;
-
-      while (first <= last && lines[first].trim() === "") {
-        first++;
-      }
-      while (last >= first && lines[last].trim() === "") {
-        last--;
-      }
-      if (first > last) {
-        return "";
-      }
-
-      const firstLine = lines[first].trim();
-      const lastLine = lines[last].trim();
-      const hasCodeFencePair = /^```.*$/.test(firstLine) && /^```\s*$/.test(lastLine);
-      if (hasCodeFencePair) {
-        return lines.slice(first + 1, last).join("\n").trim();
-      }
-
-      return lines.slice(first, last + 1).join("\n").trim();
+      return musicXmlCommon.normalizeMusicXmlSource(rawText);
     }
 
     function extractXmlErrorLine(message) {
