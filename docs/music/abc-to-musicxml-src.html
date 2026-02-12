@@ -1,0 +1,176 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABC → MusicXML 変換</title>
+    <link rel="stylesheet" href="src/abc-to-musicxml/css/app.css" />
+</head>
+<body>
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 7h16" />
+        <path d="M4 12h16" />
+        <path d="M4 17h16" />
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2" />
+        <rect x="4" y="4" width="11" height="11" rx="2" />
+      </symbol>
+    </defs>
+  </svg>
+
+  <main class="md-shell">
+    <section class="md-card">
+      <button type="button" class="md-menu-button" aria-label="メニュー" onclick="toggleMenu()">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <use href="#md-icon-menu" xlink:href="#md-icon-menu"></use>
+        </svg>
+      </button>
+      <div id="menuPanel" class="md-menu-panel md-hidden">
+        <a href="../index.html" class="md-menu-link">トップへ戻る</a>
+      </div>
+
+      <h1 class="md-headline">
+        <span aria-hidden="true" class="md-headline__icon">🎵</span>
+        <span>ABC → MusicXML 変換</span>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip" tabindex="0" aria-label="このツールの説明">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+              <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+              <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+              <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+            </svg>
+          </span>
+          <span class="md-tooltip-content md-tooltip">ABC記法をMusicXMLへ変換します。MVPとして単旋律と基本ヘッダ（T/M/L/K/C）を対象にしています。</span>
+        </span>
+      </h1>
+
+      <section class="md-section">
+        <div class="md-title-info-row">
+          <h2 class="md-section-title">ABC入力</h2>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip" tabindex="0" aria-label="入力説明">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+                <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+                <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+                <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+              </svg>
+            </span>
+            <span class="md-tooltip-content md-tooltip">ABCソースを入力するか `.abc` / `.txt` を読み込んでください。</span>
+          </span>
+        </div>
+
+        <label class="md-label" for="abcInput">
+          ソース<span class="md-required">Required</span>
+        </label>
+        <textarea id="abcInput" class="md-textarea" spellcheck="false">X:1
+T:Simple Scale
+C:Unknown
+M:4/4
+L:1/4
+K:C
+C D E F | G A B c |</textarea>
+
+        <label class="md-label" for="fileInput">ファイル読込</label>
+        <input id="fileInput" class="md-file" type="file" accept=".abc,.txt,text/plain" />
+      </section>
+
+      <section class="md-section">
+        <div class="md-title-info-row">
+          <h2 class="md-section-title">変換設定</h2>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip" tabindex="0" aria-label="設定説明">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+                <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+                <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+                <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+              </svg>
+            </span>
+            <span class="md-tooltip-content md-tooltip">ABC内に `T:` / `C:` が無い場合の既定値を指定します。</span>
+          </span>
+        </div>
+
+        <div class="md-grid">
+          <div>
+            <label class="md-label" for="defaultTitleInput">既定タイトル</label>
+            <input id="defaultTitleInput" class="md-input" type="text" value="Untitled" />
+          </div>
+          <div>
+            <label class="md-label" for="defaultComposerInput">既定作曲者</label>
+            <input id="defaultComposerInput" class="md-input" type="text" value="Unknown" />
+          </div>
+        </div>
+
+        <div class="md-actions">
+          <button id="convertBtn" class="md-button md-button--primary" type="button">変換</button>
+          <button id="downloadBtn" class="md-button md-button--secondary" type="button" disabled>MusicXML保存</button>
+        </div>
+        <p id="errorText" class="md-error md-hidden" role="alert"></p>
+        <p id="warningText" class="md-warning md-hidden"></p>
+      </section>
+
+      <section class="md-section">
+        <div class="md-title-info-row">
+          <h2 class="md-section-title">簡易プレビュー</h2>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip" tabindex="0" aria-label="プレビュー説明">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+                <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+                <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+                <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+              </svg>
+            </span>
+            <span class="md-tooltip-content md-tooltip">生成したMusicXMLの要約情報です。詳細は下のXMLテキストで確認してください。</span>
+          </span>
+        </div>
+        <div id="previewText" class="md-preview">未変換</div>
+      </section>
+
+      <section class="md-section">
+        <div class="md-title-info-row">
+          <h2 class="md-section-title">MusicXMLテキスト</h2>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip" tabindex="0" aria-label="MusicXML説明">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+                <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+                <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+                <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+              </svg>
+            </span>
+            <span class="md-tooltip-content md-tooltip">生成されたMusicXMLです。コピー・保存して他ツールへ連携できます。</span>
+          </span>
+        </div>
+        <div class="md-code-block">
+          <code id="xmlOutput" class="md-code"></code>
+          <button class="md-copy-button md-icon-btn" aria-label="MusicXMLをコピー" type="button" id="copyBtn">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
+            </svg>
+          </button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="md-snackbar md-hidden" role="status" aria-live="polite"></div>
+
+    <script src="src/abc-to-musicxml/js/main.js"></script>
+</body>
+</html>
