@@ -39,6 +39,8 @@
 - 対象: docs/text/text-viewer.html
 - [既存バグ] `docs/text/text-processing.html` の入力欄で、文字入力後にスペースを連打すると `.`（ピリオド）が自動挿入される
   - 不要な自動挿入のため、発生条件を切り分けて無効化する（ブラウザ/OSの自動補正影響も確認）
+- [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
+- [music] `docs/music/*` の「ファイルを選択」操作を、Material Design のよくあるパターン（Filled ボタン + 選択ファイル名表示）で目立たせる
 
 # DONE
 

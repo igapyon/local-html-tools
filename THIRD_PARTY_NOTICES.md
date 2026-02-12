@@ -56,3 +56,32 @@ For more information, please refer to https://creativecommons.org/publicdomain/z
 - License: MIT
 
 Mermaid is used for diagram rendering in `docs/diagram/mermaid-to-svg.html`.
+
+## Viz.js (Graphviz renderer)
+- Project: https://github.com/mdaines/viz-js
+- License: MIT
+
+Viz.js is used for DOT diagram rendering in `docs/diagram/graphviz-dot-to-svg.html`.
+
+This distribution contains bundled third-party object code:
+- Graphviz (EPL-1.0)
+- Expat (MIT)
+- zlib (zlib license)
+
+## Verovio
+- Project: https://github.com/rism-digital/verovio
+- License: LGPL-3.0-or-later
+
+Verovio is used for MusicXML score rendering in `docs/music/musicxml-to-svg.html`.
+
+## JSZip
+- Project: https://github.com/Stuk/jszip
+- License: MIT or GPL-3.0
+
+JSZip is used for ZIP archive generation in `docs/music/musicxml-to-svg.html`.
+
+## midi-writer-js
+- Project: https://github.com/grimmdude/MidiWriterJS
+- License: MIT
+
+midi-writer-js is used for MIDI file generation in `docs/music/musicxml-to-midi.html`.

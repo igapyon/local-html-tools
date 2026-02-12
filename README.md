@@ -9,6 +9,7 @@
 - [MD3リファレンス](md3/README.md)
 - [GitツールREADME](docs/git/README.md)
 - [PasswordツールREADME](docs/password/README.md)
+- [Musicビルドプロセス](docs/music/BUILD_PROCESS.md)
 
 ## 前提条件
 
@@ -33,6 +34,7 @@
 - 基本はローカル動作で、インターネット接続は不要（※一部ツールはオンライン取得あり）
 - Static Web App（静的HTML/CSS/JSのみ）として構成され、サーバは不要
 - 各ツールは単一HTMLで完結して動作
+- ただし `docs/music/` は保守性確保のため「分割ソースをビルドして単一HTMLを生成」する例外運用を採用
 - 基本の流れ：「入力 → 生成 → （必要に応じて）実行結果貼り付け → 次のステップの生成」で、画面要素は上から下へ流れに沿って並ぶ
 - ツールによっては「入力 → 生成」だけで完結するものもある
 - **ベンダリング**: CSSフレームワークなどの外部CDN依存をできる限り排除し、必要な機能は自前で実装して完全オフライン化を実現しています
@@ -51,6 +53,10 @@
 docs/
 ├── index.html           # トップページ（ツール一覧へのリンク）
 ├── diagram/             # 図表系ツール
+├── music/               # 楽譜変換系ツール
+│   ├── *-src.html       # music向け開発テンプレート（手編集対象）
+│   ├── *.html           # music向け配布用生成物（手編集しない）
+│   └── src/             # music向け分割ソース（css/ts/js）
 ├── ffmpeg/              # FFmpegおよび周辺ツール
 ├── git/                 # Git補助ツール
 ├── grep/                # 検索補助ツール
@@ -60,6 +66,18 @@ docs/
 ├── link/                # URL加工系ツール
 └── password/            # パスワード生成ツール
 ```
+
+### music 例外運用（分割開発）
+
+- 対象: `docs/music/` 配下
+- 配布: `*.html`（単一HTML、生成物）
+- 開発: `*-src.html` + `src/css/*.css` + `src/ts/*.ts` + `src/js/*.js`
+- ビルド: `npm run build:music`（`scripts/build-music.mjs`）
+- 型チェック: `npm run typecheck:music`（`typescript` 導入後）
+- ルール:
+  - `*.html` は直接編集しない
+  - 変更は `*-src.html` と `src/` を編集する
+  - PRには生成済み `*.html` を含める
 
 ### PR作成時のルール
 
@@ -129,6 +147,16 @@ URL加工系ツールです。
 図表系ツールです。
 
 - **mermaid-to-svg.html**: Mermaid記法からSVGを生成し、SVGを保存します。
+- **graphviz-dot-to-svg.html**: Graphviz DOT記法からSVGを生成し、SVGを保存します。
+
+## music
+
+楽譜変換系ツールです。
+
+- **musicxml-to-svg.html**: MusicXMLから楽譜SVGを生成し、SVGを保存します。
+- **abc-to-musicxml.html**: ABC記法をMusicXMLへ変換し、MusicXMLを保存します。
+- **musicxml-to-abc.html**: MusicXMLをABC記法へ変換し、ABCを保存します。
+- **musicxml-to-midi.html**: MusicXMLをMIDIへ変換し、.midを保存します。
 
 ## text
 
@@ -156,7 +184,7 @@ Git補助ツールです。
 
 ## GitHub Pages
 
-GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/diagram/`、`docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/` 配下にあります。  
+GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/diagram/`、`docs/music/`、`docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/` 配下にあります。  
 公開URL: https://igapyon.github.io/local-html-tools/
 
 ## Third-Party Notices

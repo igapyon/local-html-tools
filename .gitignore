@@ -7,6 +7,8 @@
 *.mkv
 *.json
 filelist.txt
+!package.json
+!tsconfig.music.json
 
 # AGENTS
 .claude

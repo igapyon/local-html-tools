@@ -1,0 +1,12 @@
+{
+  "name": "local-html-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:music": "node scripts/build-music.mjs",
+    "typecheck:music": "tsc -p tsconfig.music.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
