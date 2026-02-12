@@ -1,5 +1,9 @@
 const xmlInput = document.getElementById("xmlInput");
     const fileInput = document.getElementById("fileInput");
+    const inputModeSourceRadio = document.getElementById("inputModeSource");
+    const inputModeFileRadio = document.getElementById("inputModeFile");
+    const sourceInputBlock = document.getElementById("sourceInputBlock");
+    const fileInputBlock = document.getElementById("fileInputBlock");
     const fileSelectBtn = document.getElementById("fileSelectBtn");
     const fileNameText = document.getElementById("fileNameText");
     const defaultTitleInput = document.getElementById("defaultTitleInput");
@@ -12,7 +16,6 @@ const xmlInput = document.getElementById("xmlInput");
     const playBtn = document.getElementById("playBtn");
     const stopBtn = document.getElementById("stopBtn");
     const previewText = document.getElementById("previewText");
-    const logOutput = document.getElementById("logOutput");
     const errorText = document.getElementById("errorText");
     const warningText = document.getElementById("warningText");
     const toast = document.getElementById("toast");
@@ -35,6 +38,8 @@ const xmlInput = document.getElementById("xmlInput");
     stopBtn.addEventListener("click", stopMidi);
     fileInput.addEventListener("change", loadXmlFile);
     fileSelectBtn.addEventListener("click", () => fileInput.click());
+    inputModeSourceRadio.addEventListener("change", applyInputMode);
+    inputModeFileRadio.addEventListener("change", applyInputMode);
     defaultTitleInput.addEventListener("change", persistSettings);
     defaultComposerInput.addEventListener("change", persistSettings);
     defaultTempoInput.addEventListener("change", persistSettings);
@@ -42,6 +47,7 @@ const xmlInput = document.getElementById("xmlInput");
     synthWaveformSelect.addEventListener("change", persistSettings);
     document.addEventListener("click", handleDocumentClick);
 
+    applyInputMode();
     convertMusicXml();
 
     function loadXmlFile(event) {
@@ -50,6 +56,8 @@ const xmlInput = document.getElementById("xmlInput");
         updateFileName("");
         return;
       }
+      inputModeFileRadio.checked = true;
+      applyInputMode();
       updateFileName(file.name);
       const reader = new FileReader();
       reader.onload = () => {
@@ -150,8 +158,6 @@ const xmlInput = document.getElementById("xmlInput");
           "tracks: " + tracks.length,
           "midi bytes: " + lastMidiBytes.length
         ].join("\n");
-
-        logOutput.textContent = result.logLines.join("\n");
 
         if (result.warnings.length > 0) {
           warningText.textContent = "警告:\n" + result.warnings.join("\n");
@@ -731,10 +737,19 @@ const xmlInput = document.getElementById("xmlInput");
       lastMidiBytes = null;
       lastSynthSchedule = null;
       previewText.textContent = "未変換";
-      logOutput.textContent = "未変換";
       downloadBtn.disabled = true;
       playBtn.disabled = true;
       stopBtn.disabled = true;
+    }
+
+    function applyInputMode() {
+      const sourceMode = inputModeSourceRadio.checked;
+      sourceInputBlock.classList.toggle("md-hidden", !sourceMode);
+      fileInputBlock.classList.toggle("md-hidden", sourceMode);
+      if (sourceMode) {
+        fileInput.value = "";
+        updateFileName("");
+      }
     }
 
     function downloadMidi() {
@@ -789,36 +804,7 @@ const xmlInput = document.getElementById("xmlInput");
       for (const event of lastSynthSchedule.events) {
         const startAt = baseTime + (event.start * secPerTick);
         const bodyDuration = Math.max(0.04, event.ticks * secPerTick);
-        const attack = 0.005;
-        const release = 0.03;
-        const endAt = startAt + bodyDuration;
-
-        const oscillator = audioContext.createOscillator();
-        oscillator.type = waveform;
-        oscillator.frequency.setValueAtTime(midiNumberToFrequency(event.midiNumber), startAt);
-
-        const gainNode = audioContext.createGain();
-        const gainLevel = event.channel === 10 ? 0.06 : 0.1;
-        gainNode.gain.setValueAtTime(0.0001, startAt);
-        gainNode.gain.linearRampToValueAtTime(gainLevel, startAt + attack);
-        gainNode.gain.setValueAtTime(gainLevel, endAt);
-        gainNode.gain.linearRampToValueAtTime(0.0001, endAt + release);
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.start(startAt);
-        oscillator.stop(endAt + release + 0.01);
-
-        oscillator.onended = () => {
-          try {
-            oscillator.disconnect();
-            gainNode.disconnect();
-          } catch (_error) {
-            // ignore cleanup failure
-          }
-        };
-        activeSynthNodes.push({ oscillator, gainNode });
-        latestEndTime = Math.max(latestEndTime, endAt + release + 0.02);
+        latestEndTime = Math.max(latestEndTime, scheduleBasicWaveNote(event, startAt, bodyDuration, waveform));
       }
 
       if (synthStopTimer) {
@@ -829,6 +815,41 @@ const xmlInput = document.getElementById("xmlInput");
         activeSynthNodes = [];
         stopBtn.disabled = true;
       }, waitMs);
+    }
+
+    function scheduleBasicWaveNote(event, startAt, bodyDuration, waveform) {
+      const attack = 0.005;
+      const release = 0.03;
+      const endAt = startAt + bodyDuration;
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = waveform;
+      oscillator.frequency.setValueAtTime(midiNumberToFrequency(event.midiNumber), startAt);
+
+      const gainNode = audioContext.createGain();
+      const gainLevel = event.channel === 10 ? 0.06 : 0.1;
+      gainNode.gain.setValueAtTime(0.0001, startAt);
+      gainNode.gain.linearRampToValueAtTime(gainLevel, startAt + attack);
+      gainNode.gain.setValueAtTime(gainLevel, endAt);
+      gainNode.gain.linearRampToValueAtTime(0.0001, endAt + release);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.start(startAt);
+      oscillator.stop(endAt + release + 0.01);
+      registerSynthNode(oscillator, gainNode);
+      return endAt + release + 0.02;
+    }
+
+    function registerSynthNode(oscillator, gainNode) {
+      oscillator.onended = () => {
+        try {
+          oscillator.disconnect();
+          gainNode.disconnect();
+        } catch (_error) {
+          // ignore cleanup failure
+        }
+      };
+      activeSynthNodes.push({ oscillator, gainNode });
     }
 
     function stopMidi(showMessage = true) {

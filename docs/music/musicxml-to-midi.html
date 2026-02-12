@@ -129,6 +129,10 @@ limitations under the License.
       line-height: 1.5;
     }
 
+    .md-textarea--compact {
+      min-height: 8rem;
+    }
+
     .md-textarea:focus,
     .md-input:focus,
     .md-file:focus {
@@ -141,6 +145,55 @@ limitations under the License.
       display: grid;
       grid-template-columns: 1fr;
       gap: 0.8rem;
+    }
+
+    .md-radio-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+    }
+
+    .md-radio-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .md-grid--defaults {
+      margin-top: 0.8rem;
+    }
+
+    .md-disclosure {
+      margin-bottom: 0.8rem;
+      border: 1px solid #e5e0ec;
+      border-radius: 12px;
+      background: #faf8fc;
+      padding: 0.7rem 0.85rem;
+    }
+
+    .md-disclosure-summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #3d2e5a;
+      list-style: none;
+    }
+
+    .md-disclosure-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .md-disclosure-summary::before {
+      content: "▸";
+      display: inline-block;
+      margin-right: 0.35rem;
+      transition: transform 120ms ease;
+    }
+
+    .md-disclosure[open] .md-disclosure-summary::before {
+      transform: rotate(90deg);
     }
 
     @media (min-width: 720px) {
@@ -396,10 +449,19 @@ limitations under the License.
           </span>
         </div>
 
-        <label class="md-label" for="xmlInput">
-          ソース<span class="md-required">Required</span>
-        </label>
-        <textarea id="xmlInput" class="md-textarea" spellcheck="false"><?xml version="1.0" encoding="UTF-8"?>
+        <div class="md-radio-group" role="radiogroup" aria-label="入力方式">
+          <label class="md-radio-option">
+            <input id="inputModeFile" type="radio" name="inputMode" value="file" checked />
+            <span>ファイル読込</span>
+          </label>
+          <label class="md-radio-option">
+            <input id="inputModeSource" type="radio" name="inputMode" value="source" />
+            <span>ソースコード入力</span>
+          </label>
+        </div>
+
+        <div id="sourceInputBlock">
+          <textarea id="xmlInput" class="md-textarea md-textarea--compact" rows="10" spellcheck="false"><?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1">
   <work><work-title>Simple Scale</work-title></work>
   <identification><creator type="composer">Unknown</creator></identification>
@@ -421,20 +483,22 @@ limitations under the License.
     </measure>
   </part>
 </score-partwise></textarea>
-
-        <label class="md-label" for="fileInput">ファイル読込</label>
-        <div class="md-actions">
-          <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
-            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.35rem">
-              <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <path d="M12 10v6" />
-              <path d="M9.5 13.5 12 16l2.5-2.5" />
-            </svg>
-            <span>ファイルを選択</span>
-          </button>
-          <span id="fileNameText">未選択</span>
         </div>
-        <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" hidden />
+
+        <div id="fileInputBlock" class="md-hidden">
+          <div class="md-actions">
+            <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.35rem">
+                <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <path d="M12 10v6" />
+                <path d="M9.5 13.5 12 16l2.5-2.5" />
+              </svg>
+              <span>ファイルを選択</span>
+            </button>
+            <span id="fileNameText">未選択</span>
+          </div>
+          <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" hidden />
+        </div>
       </section>
 
       <section class="md-section">
@@ -452,19 +516,24 @@ limitations under the License.
           </span>
         </div>
 
+        <details class="md-disclosure">
+          <summary class="md-disclosure-summary">詳細設定（既定タイトル / 既定作曲者 / 既定テンポ）</summary>
+          <div class="md-grid md-grid--defaults">
+            <div>
+              <label class="md-label" for="defaultTitleInput">既定タイトル</label>
+              <input id="defaultTitleInput" class="md-input" type="text" value="Untitled" />
+            </div>
+            <div>
+              <label class="md-label" for="defaultComposerInput">既定作曲者</label>
+              <input id="defaultComposerInput" class="md-input" type="text" value="Unknown" />
+            </div>
+            <div>
+              <label class="md-label" for="defaultTempoInput">既定テンポ (BPM)</label>
+              <input id="defaultTempoInput" class="md-input" type="number" min="20" max="300" step="1" value="120" />
+            </div>
+          </div>
+        </details>
         <div class="md-grid">
-          <div>
-            <label class="md-label" for="defaultTitleInput">既定タイトル</label>
-            <input id="defaultTitleInput" class="md-input" type="text" value="Untitled" />
-          </div>
-          <div>
-            <label class="md-label" for="defaultComposerInput">既定作曲者</label>
-            <input id="defaultComposerInput" class="md-input" type="text" value="Unknown" />
-          </div>
-          <div>
-            <label class="md-label" for="defaultTempoInput">既定テンポ (BPM)</label>
-            <input id="defaultTempoInput" class="md-input" type="number" min="20" max="300" step="1" value="120" />
-          </div>
           <div>
             <label class="md-label" for="instrumentOverrideSelect">音色上書き</label>
             <select id="instrumentOverrideSelect" class="md-input">
@@ -533,11 +602,6 @@ limitations under the License.
           </span>
         </div>
         <div id="previewText" class="md-preview">未変換</div>
-      </section>
-
-      <section class="md-section">
-        <h2 class="md-section-title">生成ログ</h2>
-        <code id="logOutput" class="md-code">未変換</code>
       </section>
     </section>
   </main>
@@ -2431,6 +2495,10 @@ window.MidiWriter = main;
   <script>
 const xmlInput = document.getElementById("xmlInput");
     const fileInput = document.getElementById("fileInput");
+    const inputModeSourceRadio = document.getElementById("inputModeSource");
+    const inputModeFileRadio = document.getElementById("inputModeFile");
+    const sourceInputBlock = document.getElementById("sourceInputBlock");
+    const fileInputBlock = document.getElementById("fileInputBlock");
     const fileSelectBtn = document.getElementById("fileSelectBtn");
     const fileNameText = document.getElementById("fileNameText");
     const defaultTitleInput = document.getElementById("defaultTitleInput");
@@ -2443,7 +2511,6 @@ const xmlInput = document.getElementById("xmlInput");
     const playBtn = document.getElementById("playBtn");
     const stopBtn = document.getElementById("stopBtn");
     const previewText = document.getElementById("previewText");
-    const logOutput = document.getElementById("logOutput");
     const errorText = document.getElementById("errorText");
     const warningText = document.getElementById("warningText");
     const toast = document.getElementById("toast");
@@ -2466,6 +2533,8 @@ const xmlInput = document.getElementById("xmlInput");
     stopBtn.addEventListener("click", stopMidi);
     fileInput.addEventListener("change", loadXmlFile);
     fileSelectBtn.addEventListener("click", () => fileInput.click());
+    inputModeSourceRadio.addEventListener("change", applyInputMode);
+    inputModeFileRadio.addEventListener("change", applyInputMode);
     defaultTitleInput.addEventListener("change", persistSettings);
     defaultComposerInput.addEventListener("change", persistSettings);
     defaultTempoInput.addEventListener("change", persistSettings);
@@ -2473,6 +2542,7 @@ const xmlInput = document.getElementById("xmlInput");
     synthWaveformSelect.addEventListener("change", persistSettings);
     document.addEventListener("click", handleDocumentClick);
 
+    applyInputMode();
     convertMusicXml();
 
     function loadXmlFile(event) {
@@ -2481,6 +2551,8 @@ const xmlInput = document.getElementById("xmlInput");
         updateFileName("");
         return;
       }
+      inputModeFileRadio.checked = true;
+      applyInputMode();
       updateFileName(file.name);
       const reader = new FileReader();
       reader.onload = () => {
@@ -2581,8 +2653,6 @@ const xmlInput = document.getElementById("xmlInput");
           "tracks: " + tracks.length,
           "midi bytes: " + lastMidiBytes.length
         ].join("\n");
-
-        logOutput.textContent = result.logLines.join("\n");
 
         if (result.warnings.length > 0) {
           warningText.textContent = "警告:\n" + result.warnings.join("\n");
@@ -3162,10 +3232,19 @@ const xmlInput = document.getElementById("xmlInput");
       lastMidiBytes = null;
       lastSynthSchedule = null;
       previewText.textContent = "未変換";
-      logOutput.textContent = "未変換";
       downloadBtn.disabled = true;
       playBtn.disabled = true;
       stopBtn.disabled = true;
+    }
+
+    function applyInputMode() {
+      const sourceMode = inputModeSourceRadio.checked;
+      sourceInputBlock.classList.toggle("md-hidden", !sourceMode);
+      fileInputBlock.classList.toggle("md-hidden", sourceMode);
+      if (sourceMode) {
+        fileInput.value = "";
+        updateFileName("");
+      }
     }
 
     function downloadMidi() {
@@ -3220,36 +3299,7 @@ const xmlInput = document.getElementById("xmlInput");
       for (const event of lastSynthSchedule.events) {
         const startAt = baseTime + (event.start * secPerTick);
         const bodyDuration = Math.max(0.04, event.ticks * secPerTick);
-        const attack = 0.005;
-        const release = 0.03;
-        const endAt = startAt + bodyDuration;
-
-        const oscillator = audioContext.createOscillator();
-        oscillator.type = waveform;
-        oscillator.frequency.setValueAtTime(midiNumberToFrequency(event.midiNumber), startAt);
-
-        const gainNode = audioContext.createGain();
-        const gainLevel = event.channel === 10 ? 0.06 : 0.1;
-        gainNode.gain.setValueAtTime(0.0001, startAt);
-        gainNode.gain.linearRampToValueAtTime(gainLevel, startAt + attack);
-        gainNode.gain.setValueAtTime(gainLevel, endAt);
-        gainNode.gain.linearRampToValueAtTime(0.0001, endAt + release);
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.start(startAt);
-        oscillator.stop(endAt + release + 0.01);
-
-        oscillator.onended = () => {
-          try {
-            oscillator.disconnect();
-            gainNode.disconnect();
-          } catch (_error) {
-            // ignore cleanup failure
-          }
-        };
-        activeSynthNodes.push({ oscillator, gainNode });
-        latestEndTime = Math.max(latestEndTime, endAt + release + 0.02);
+        latestEndTime = Math.max(latestEndTime, scheduleBasicWaveNote(event, startAt, bodyDuration, waveform));
       }
 
       if (synthStopTimer) {
@@ -3260,6 +3310,41 @@ const xmlInput = document.getElementById("xmlInput");
         activeSynthNodes = [];
         stopBtn.disabled = true;
       }, waitMs);
+    }
+
+    function scheduleBasicWaveNote(event, startAt, bodyDuration, waveform) {
+      const attack = 0.005;
+      const release = 0.03;
+      const endAt = startAt + bodyDuration;
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = waveform;
+      oscillator.frequency.setValueAtTime(midiNumberToFrequency(event.midiNumber), startAt);
+
+      const gainNode = audioContext.createGain();
+      const gainLevel = event.channel === 10 ? 0.06 : 0.1;
+      gainNode.gain.setValueAtTime(0.0001, startAt);
+      gainNode.gain.linearRampToValueAtTime(gainLevel, startAt + attack);
+      gainNode.gain.setValueAtTime(gainLevel, endAt);
+      gainNode.gain.linearRampToValueAtTime(0.0001, endAt + release);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.start(startAt);
+      oscillator.stop(endAt + release + 0.01);
+      registerSynthNode(oscillator, gainNode);
+      return endAt + release + 0.02;
+    }
+
+    function registerSynthNode(oscillator, gainNode) {
+      oscillator.onended = () => {
+        try {
+          oscillator.disconnect();
+          gainNode.disconnect();
+        } catch (_error) {
+          // ignore cleanup failure
+        }
+      };
+      activeSynthNodes.push({ oscillator, gainNode });
     }
 
     function stopMidi(showMessage = true) {
