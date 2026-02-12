@@ -107,7 +107,18 @@ limitations under the License.
 </score-partwise></textarea>
 
         <label class="md-label" for="fileInput">ファイル読込</label>
-        <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" />
+        <div class="md-actions">
+          <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.35rem">
+              <path d="M12 16V4" />
+              <path d="M8 8l4-4 4 4" />
+              <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+            </svg>
+            <span>ファイルを選択</span>
+          </button>
+          <span id="fileNameText">未選択</span>
+        </div>
+        <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" hidden />
       </section>
 
       <section class="md-section">

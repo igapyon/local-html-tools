@@ -1,11 +1,16 @@
 const xmlInput = document.getElementById("xmlInput");
     const fileInput = document.getElementById("fileInput");
+    const fileSelectBtn = document.getElementById("fileSelectBtn");
+    const fileNameText = document.getElementById("fileNameText");
     const defaultTitleInput = document.getElementById("defaultTitleInput");
     const defaultComposerInput = document.getElementById("defaultComposerInput");
     const defaultTempoInput = document.getElementById("defaultTempoInput");
     const instrumentOverrideSelect = document.getElementById("instrumentOverrideSelect");
+    const synthWaveformSelect = document.getElementById("synthWaveformSelect");
     const convertBtn = document.getElementById("convertBtn");
     const downloadBtn = document.getElementById("downloadBtn");
+    const playBtn = document.getElementById("playBtn");
+    const stopBtn = document.getElementById("stopBtn");
     const previewText = document.getElementById("previewText");
     const logOutput = document.getElementById("logOutput");
     const errorText = document.getElementById("errorText");
@@ -17,16 +22,24 @@ const xmlInput = document.getElementById("xmlInput");
     const MIDI_TICKS_PER_QUARTER = 128;
 
     let lastMidiBytes = null;
+    let lastSynthSchedule = null;
+    let audioContext = null;
+    let activeSynthNodes = [];
+    let synthStopTimer = null;
 
     restoreSettings();
 
     convertBtn.addEventListener("click", convertMusicXml);
     downloadBtn.addEventListener("click", downloadMidi);
+    playBtn.addEventListener("click", playMidi);
+    stopBtn.addEventListener("click", stopMidi);
     fileInput.addEventListener("change", loadXmlFile);
+    fileSelectBtn.addEventListener("click", () => fileInput.click());
     defaultTitleInput.addEventListener("change", persistSettings);
     defaultComposerInput.addEventListener("change", persistSettings);
     defaultTempoInput.addEventListener("change", persistSettings);
     instrumentOverrideSelect.addEventListener("change", persistSettings);
+    synthWaveformSelect.addEventListener("change", persistSettings);
     document.addEventListener("click", handleDocumentClick);
 
     convertMusicXml();
@@ -34,8 +47,10 @@ const xmlInput = document.getElementById("xmlInput");
     function loadXmlFile(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) {
+        updateFileName("");
         return;
       }
+      updateFileName(file.name);
       const reader = new FileReader();
       reader.onload = () => {
         xmlInput.value = String(reader.result || "");
@@ -45,6 +60,10 @@ const xmlInput = document.getElementById("xmlInput");
         setError("ファイルの読み込みに失敗しました。");
       };
       reader.readAsText(file, "utf-8");
+    }
+
+    function updateFileName(name) {
+      fileNameText.textContent = name || "未選択";
     }
 
     function convertMusicXml() {
@@ -111,13 +130,17 @@ const xmlInput = document.getElementById("xmlInput");
         const writer = new MidiWriter.Writer(tracks);
         const built = writer.buildFile();
         lastMidiBytes = built instanceof Uint8Array ? built : Uint8Array.from(built || []);
+        lastSynthSchedule = buildSynthSchedule(result.meta.tempo, voiceIds, result.voiceTracksById, instrumentOverride);
 
         downloadBtn.disabled = lastMidiBytes.length === 0;
+        playBtn.disabled = !lastSynthSchedule || lastSynthSchedule.events.length === 0;
+        stopBtn.disabled = true;
         previewText.textContent = [
           "title: " + result.meta.title,
           "composer: " + result.meta.composer,
           "tempo: " + result.meta.tempo,
           "instrument override: " + instrumentOverrideLabel(instrumentOverride),
+          "synth waveform: " + normalizeWaveform(synthWaveformSelect.value),
           "meter: " + result.meta.meter.beats + "/" + result.meta.meter.beatType,
           "parts: " + result.meta.partCount,
           "voices: " + result.meta.voiceCount,
@@ -320,6 +343,7 @@ const xmlInput = document.getElementById("xmlInput");
                 const soundingPitch = midiNumberToMidiWriterPitch(soundingMidi);
                 voiceTracksById[trackId].events.push({
                   pitch: soundingPitch,
+                  midiNumber: soundingMidi,
                   ticks: event.ticks,
                   start: timelineTick + cursorTick
                 });
@@ -669,11 +693,48 @@ const xmlInput = document.getElementById("xmlInput");
       return Math.max(0, Math.min(127, Math.round(program)));
     }
 
+    function buildSynthSchedule(tempo, voiceIds, voiceTracksById, instrumentOverride) {
+      const events = [];
+      for (let trackIndex = 0; trackIndex < voiceIds.length; trackIndex += 1) {
+        const voiceId = voiceIds[trackIndex];
+        const voiceTrack = voiceTracksById[voiceId];
+        if (!voiceTrack || !Array.isArray(voiceTrack.events)) {
+          continue;
+        }
+        const channel = resolveChannel(voiceTrack.channel, instrumentOverride, trackIndex);
+        for (const event of voiceTrack.events) {
+          if (!event || !Number.isFinite(event.midiNumber) || !Number.isFinite(event.start) || !Number.isFinite(event.ticks)) {
+            continue;
+          }
+          events.push({
+            midiNumber: Math.max(0, Math.min(127, Math.round(event.midiNumber))),
+            start: Math.max(0, Math.round(event.start)),
+            ticks: Math.max(1, Math.round(event.ticks)),
+            channel
+          });
+        }
+      }
+      events.sort((a, b) => {
+        if (a.start !== b.start) {
+          return a.start - b.start;
+        }
+        return a.midiNumber - b.midiNumber;
+      });
+      return {
+        tempo: clampTempo(tempo),
+        events
+      };
+    }
+
     function resetOutput() {
+      stopMidi(false);
       lastMidiBytes = null;
+      lastSynthSchedule = null;
       previewText.textContent = "未変換";
       logOutput.textContent = "未変換";
       downloadBtn.disabled = true;
+      playBtn.disabled = true;
+      stopBtn.disabled = true;
     }
 
     function downloadMidi() {
@@ -684,6 +745,126 @@ const xmlInput = document.getElementById("xmlInput");
       const blob = new Blob([lastMidiBytes], { type: "audio/midi" });
       downloadBlob(blob, "score.mid");
       showToast("MIDIを保存しました。");
+    }
+
+    function playMidi() {
+      if (!lastSynthSchedule || lastSynthSchedule.events.length === 0) {
+        setError("先に変換してください。");
+        return;
+      }
+      const AudioContextCtor =
+        window.AudioContext ||
+        (window).webkitAudioContext;
+      if (!AudioContextCtor) {
+        setError("このブラウザはWebAudioに対応していません。");
+        return;
+      }
+
+      if (!audioContext) {
+        audioContext = new AudioContextCtor();
+      }
+
+      stopMidi(false);
+
+      audioContext.resume().then(() => {
+        startSynthPlayback();
+        clearError();
+        stopBtn.disabled = false;
+        showToast("内蔵シンセ再生を開始しました。");
+      }).catch((error) => {
+        stopBtn.disabled = true;
+        setError("内蔵シンセ再生に失敗しました: " + (error && error.message ? error.message : String(error)));
+      });
+    }
+
+    function startSynthPlayback() {
+      if (!audioContext || !lastSynthSchedule || lastSynthSchedule.events.length === 0) {
+        return;
+      }
+      const waveform = normalizeWaveform(synthWaveformSelect.value);
+      const secPerTick = 60 / (lastSynthSchedule.tempo * MIDI_TICKS_PER_QUARTER);
+      const baseTime = audioContext.currentTime + 0.04;
+      let latestEndTime = baseTime;
+
+      for (const event of lastSynthSchedule.events) {
+        const startAt = baseTime + (event.start * secPerTick);
+        const bodyDuration = Math.max(0.04, event.ticks * secPerTick);
+        const attack = 0.005;
+        const release = 0.03;
+        const endAt = startAt + bodyDuration;
+
+        const oscillator = audioContext.createOscillator();
+        oscillator.type = waveform;
+        oscillator.frequency.setValueAtTime(midiNumberToFrequency(event.midiNumber), startAt);
+
+        const gainNode = audioContext.createGain();
+        const gainLevel = event.channel === 10 ? 0.06 : 0.1;
+        gainNode.gain.setValueAtTime(0.0001, startAt);
+        gainNode.gain.linearRampToValueAtTime(gainLevel, startAt + attack);
+        gainNode.gain.setValueAtTime(gainLevel, endAt);
+        gainNode.gain.linearRampToValueAtTime(0.0001, endAt + release);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.start(startAt);
+        oscillator.stop(endAt + release + 0.01);
+
+        oscillator.onended = () => {
+          try {
+            oscillator.disconnect();
+            gainNode.disconnect();
+          } catch (_error) {
+            // ignore cleanup failure
+          }
+        };
+        activeSynthNodes.push({ oscillator, gainNode });
+        latestEndTime = Math.max(latestEndTime, endAt + release + 0.02);
+      }
+
+      if (synthStopTimer) {
+        clearTimeout(synthStopTimer);
+      }
+      const waitMs = Math.max(0, Math.ceil((latestEndTime - audioContext.currentTime) * 1000));
+      synthStopTimer = setTimeout(() => {
+        activeSynthNodes = [];
+        stopBtn.disabled = true;
+      }, waitMs);
+    }
+
+    function stopMidi(showMessage = true) {
+      if (synthStopTimer) {
+        clearTimeout(synthStopTimer);
+        synthStopTimer = null;
+      }
+      for (const node of activeSynthNodes) {
+        try {
+          node.oscillator.stop();
+        } catch (_error) {
+          // ignore already-stopped nodes
+        }
+        try {
+          node.oscillator.disconnect();
+          node.gainNode.disconnect();
+        } catch (_error) {
+          // ignore disconnect error
+        }
+      }
+      activeSynthNodes = [];
+      stopBtn.disabled = true;
+      if (showMessage) {
+        showToast("内蔵シンセ再生を停止しました。");
+      }
+    }
+
+    function normalizeWaveform(value) {
+      if (value === "square" || value === "triangle") {
+        return value;
+      }
+      return "sine";
+    }
+
+    function midiNumberToFrequency(midiNumber) {
+      return 440 * Math.pow(2, (midiNumber - 69) / 12);
     }
 
     function setError(message) {
@@ -742,7 +923,8 @@ const xmlInput = document.getElementById("xmlInput");
         defaultTitle: defaultTitleInput.value,
         defaultComposer: defaultComposerInput.value,
         defaultTempo: defaultTempoInput.value,
-        instrumentOverride: instrumentOverrideSelect.value
+        instrumentOverride: instrumentOverrideSelect.value,
+        synthWaveform: synthWaveformSelect.value
       };
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(payload));
     }
@@ -766,6 +948,9 @@ const xmlInput = document.getElementById("xmlInput");
           }
           if (typeof data.instrumentOverride === "string") {
             instrumentOverrideSelect.value = data.instrumentOverride;
+          }
+          if (typeof data.synthWaveform === "string") {
+            synthWaveformSelect.value = normalizeWaveform(data.synthWaveform);
           }
         }
       } catch (_error) {

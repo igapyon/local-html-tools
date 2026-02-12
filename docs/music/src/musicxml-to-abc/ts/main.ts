@@ -1,5 +1,7 @@
 const xmlInput = document.getElementById("xmlInput");
     const fileInput = document.getElementById("fileInput");
+    const fileSelectBtn = document.getElementById("fileSelectBtn");
+    const fileNameText = document.getElementById("fileNameText");
     const defaultTitleInput = document.getElementById("defaultTitleInput");
     const defaultComposerInput = document.getElementById("defaultComposerInput");
     const defaultLengthSelect = document.getElementById("defaultLengthSelect");
@@ -23,6 +25,7 @@ const xmlInput = document.getElementById("xmlInput");
     downloadBtn.addEventListener("click", downloadAbc);
     copyBtn.addEventListener("click", copyAbc);
     fileInput.addEventListener("change", loadXmlFile);
+    fileSelectBtn.addEventListener("click", () => fileInput.click());
     defaultTitleInput.addEventListener("change", persistSettings);
     defaultComposerInput.addEventListener("change", persistSettings);
     defaultLengthSelect.addEventListener("change", persistSettings);
@@ -33,8 +36,10 @@ const xmlInput = document.getElementById("xmlInput");
     function loadXmlFile(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) {
+        updateFileName("");
         return;
       }
+      updateFileName(file.name);
       const reader = new FileReader();
       reader.onload = () => {
         xmlInput.value = String(reader.result || "");
@@ -44,6 +49,10 @@ const xmlInput = document.getElementById("xmlInput");
         setError("ファイルの読み込みに失敗しました。");
       };
       reader.readAsText(file, "utf-8");
+    }
+
+    function updateFileName(name) {
+      fileNameText.textContent = name || "未選択";
     }
 
     function convertMusicXml() {
