@@ -467,7 +467,18 @@ limitations under the License.
 </score-partwise></textarea>
 
         <label class="md-label" for="fileInput">ファイル読込</label>
-        <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" />
+        <div class="md-actions">
+          <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.35rem">
+              <path d="M12 16V4" />
+              <path d="M8 8l4-4 4 4" />
+              <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+            </svg>
+            <span>ファイルを選択</span>
+          </button>
+          <span id="fileNameText">未選択</span>
+        </div>
+        <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" hidden />
       </section>
 
       <section class="md-section">
@@ -1031,6 +1042,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
   <script>
 const musicxmlInput = document.getElementById("musicxmlInput");
     const fileInput = document.getElementById("fileInput");
+    const fileSelectBtn = document.getElementById("fileSelectBtn");
+    const fileNameText = document.getElementById("fileNameText");
     const scaleInput = document.getElementById("scaleInput");
     const pageWidthInput = document.getElementById("pageWidthInput");
     const marginTopInput = document.getElementById("marginTopInput");
@@ -1068,6 +1081,7 @@ const musicxmlInput = document.getElementById("musicxmlInput");
     nextPageBtn.addEventListener("click", showNextPage);
     copySvgBtn.addEventListener("click", copySvg);
     fileInput.addEventListener("change", loadMusicXMLFile);
+    fileSelectBtn.addEventListener("click", () => fileInput.click());
     document.addEventListener("click", handleDocumentClick);
 
     [
@@ -1116,8 +1130,10 @@ const musicxmlInput = document.getElementById("musicxmlInput");
     function loadMusicXMLFile(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) {
+        updateFileName("");
         return;
       }
+      updateFileName(file.name);
       const reader = new FileReader();
       reader.onload = () => {
         musicxmlInput.value = String(reader.result || "");
@@ -1127,6 +1143,10 @@ const musicxmlInput = document.getElementById("musicxmlInput");
         setError("ファイルの読み込みに失敗しました。");
       };
       reader.readAsText(file, "utf-8");
+    }
+
+    function updateFileName(name) {
+      fileNameText.textContent = name || "未選択";
     }
 
     function renderMusicXML() {
