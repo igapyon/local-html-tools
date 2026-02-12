@@ -50,3 +50,9 @@ You can copy, modify, distribute and perform the work, even for commercial
 purposes, all without asking permission.
 
 For more information, please refer to https://creativecommons.org/publicdomain/zero/1.0/.
+
+## Mermaid
+- Project: https://github.com/mermaid-js/mermaid
+- License: MIT
+
+Mermaid is used for diagram rendering in `docs/diagram/mermaid-to-svg.html`.
