@@ -119,6 +119,21 @@
       gap: 0.7rem;
     }
 
+    .md-radio-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+    }
+
+    .md-radio-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
     @media (min-width: 720px) {
       .md-grid {
         grid-template-columns: 1fr 1fr;

@@ -77,10 +77,19 @@ limitations under the License.
           </span>
         </div>
 
-        <label class="md-label" for="xmlInput">
-          ソース<span class="md-required">Required</span>
-        </label>
-        <textarea id="xmlInput" class="md-textarea" spellcheck="false"><?xml version="1.0" encoding="UTF-8"?>
+        <div class="md-radio-group" role="radiogroup" aria-label="入力方式">
+          <label class="md-radio-option">
+            <input id="inputModeFile" type="radio" name="inputMode" value="file" checked />
+            <span>ファイル読込</span>
+          </label>
+          <label class="md-radio-option">
+            <input id="inputModeSource" type="radio" name="inputMode" value="source" />
+            <span>ソースコード入力</span>
+          </label>
+        </div>
+
+        <div id="sourceInputBlock">
+          <textarea id="xmlInput" class="md-textarea" spellcheck="false"><?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1">
   <work><work-title>Simple Scale</work-title></work>
   <identification><creator type="composer">Unknown</creator></identification>
@@ -102,20 +111,22 @@ limitations under the License.
     </measure>
   </part>
 </score-partwise></textarea>
-
-        <label class="md-label" for="fileInput">ファイル読込</label>
-        <div class="md-actions">
-          <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
-            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.35rem">
-              <path d="M12 16V4" />
-              <path d="M8 8l4-4 4 4" />
-              <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-            </svg>
-            <span>ファイルを選択</span>
-          </button>
-          <span id="fileNameText">未選択</span>
         </div>
-        <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" hidden />
+
+        <div id="fileInputBlock" class="md-hidden">
+          <div class="md-actions">
+            <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.35rem">
+                <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <path d="M12 10v6" />
+                <path d="M9.5 13.5 12 16l2.5-2.5" />
+              </svg>
+              <span>ファイルを選択</span>
+            </button>
+            <span id="fileNameText">未選択</span>
+          </div>
+          <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" hidden />
+        </div>
       </section>
 
       <section class="md-section">
@@ -133,28 +144,37 @@ limitations under the License.
           </span>
         </div>
 
-        <div class="md-grid">
-          <div>
-            <label class="md-label" for="defaultTitleInput">既定タイトル</label>
-            <input id="defaultTitleInput" class="md-input" type="text" value="Untitled" />
+        <details class="md-disclosure">
+          <summary class="md-disclosure-summary">詳細設定（既定タイトル / 既定作曲者 / 既定音価）</summary>
+          <div class="md-grid md-grid--defaults">
+            <div>
+              <label class="md-label" for="defaultTitleInput">既定タイトル</label>
+              <input id="defaultTitleInput" class="md-input" type="text" value="Untitled" />
+            </div>
+            <div>
+              <label class="md-label" for="defaultComposerInput">既定作曲者</label>
+              <input id="defaultComposerInput" class="md-input" type="text" value="Unknown" />
+            </div>
+            <div>
+              <label class="md-label" for="defaultLengthSelect">既定音価 (L:)</label>
+              <select id="defaultLengthSelect" class="md-select">
+                <option value="1/16">1/16</option>
+                <option value="1/8" selected>1/8</option>
+                <option value="1/4">1/4</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label class="md-label" for="defaultComposerInput">既定作曲者</label>
-            <input id="defaultComposerInput" class="md-input" type="text" value="Unknown" />
-          </div>
-          <div>
-            <label class="md-label" for="defaultLengthSelect">既定音価 (L:)</label>
-            <select id="defaultLengthSelect" class="md-select">
-              <option value="1/16">1/16</option>
-              <option value="1/8" selected>1/8</option>
-              <option value="1/4">1/4</option>
-            </select>
-          </div>
-        </div>
+        </details>
 
         <div class="md-actions">
           <button id="convertBtn" class="md-button md-button--primary" type="button">変換</button>
           <button id="downloadBtn" class="md-button md-button--secondary" type="button" disabled>ABC保存</button>
+          <button id="playSineBtn" class="md-button md-button--secondary" type="button" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="vertical-align:middle;margin-right:0.35rem">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            <span>sine再生</span>
+          </button>
         </div>
         <p id="errorText" class="md-error md-hidden" role="alert"></p>
         <p id="warningText" class="md-warning md-hidden"></p>
@@ -205,6 +225,10 @@ limitations under the License.
 
   <div id="toast" class="md-snackbar md-hidden" role="status" aria-live="polite"></div>
 
+    <script src="src/common/js/musicxml-common.js"></script>
+    <script src="src/common/js/musicxml-synth-schedule-common.js"></script>
+    <script src="src/common/js/music-synth-common.js"></script>
+    <script src="src/common/js/abc-common.js"></script>
     <script src="src/musicxml-to-abc/js/main.js"></script>
 </body>
 </html>

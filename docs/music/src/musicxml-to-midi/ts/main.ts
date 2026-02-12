@@ -1,3 +1,8 @@
+const musicXmlCommon = window["MusicXmlCommon"] || (typeof MusicXmlCommon !== "undefined" ? MusicXmlCommon : null);
+const musicSynthCommon = window["MusicSynthCommon"] || (typeof MusicSynthCommon !== "undefined" ? MusicSynthCommon : null);
+if (!musicXmlCommon || !musicSynthCommon) {
+  throw new Error("Common scripts are not loaded.");
+}
 const xmlInput = document.getElementById("xmlInput");
     const fileInput = document.getElementById("fileInput");
     const inputModeSourceRadio = document.getElementById("inputModeSource");
@@ -26,9 +31,9 @@ const xmlInput = document.getElementById("xmlInput");
 
     let lastMidiBytes = null;
     let lastSynthSchedule = null;
-    let audioContext = null;
-    let activeSynthNodes = [];
-    let synthStopTimer = null;
+    const synthEngine = musicSynthCommon.createBasicWaveSynthEngine({
+      ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+    });
 
     restoreSettings();
 
@@ -59,15 +64,12 @@ const xmlInput = document.getElementById("xmlInput");
       inputModeFileRadio.checked = true;
       applyInputMode();
       updateFileName(file.name);
-      const reader = new FileReader();
-      reader.onload = () => {
-        xmlInput.value = String(reader.result || "");
+      musicXmlCommon.readTextFileUtf8(file, (text) => {
+        xmlInput.value = text;
         showToast("MusicXMLを読み込みました。");
-      };
-      reader.onerror = () => {
+      }, () => {
         setError("ファイルの読み込みに失敗しました。");
-      };
-      reader.readAsText(file, "utf-8");
+      });
     }
 
     function updateFileName(name) {
@@ -148,7 +150,7 @@ const xmlInput = document.getElementById("xmlInput");
           "composer: " + result.meta.composer,
           "tempo: " + result.meta.tempo,
           "instrument override: " + instrumentOverrideLabel(instrumentOverride),
-          "synth waveform: " + normalizeWaveform(synthWaveformSelect.value),
+          "synth waveform: " + musicSynthCommon.normalizeWaveform(synthWaveformSelect.value),
           "meter: " + result.meta.meter.beats + "/" + result.meta.meter.beatType,
           "parts: " + result.meta.partCount,
           "voices: " + result.meta.voiceCount,
@@ -173,17 +175,8 @@ const xmlInput = document.getElementById("xmlInput");
     }
 
     function parseMusicXml(source, settings) {
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(source, "application/xml");
-      const parseErr = xmlDoc.querySelector("parsererror");
-      if (parseErr) {
-        throw new Error("XMLの構文解釈に失敗しました。");
-      }
-
+      const xmlDoc = musicXmlCommon.parseScorePartwiseXml(source);
       const root = xmlDoc.documentElement;
-      if (!root || root.nodeName !== "score-partwise") {
-        throw new Error("score-partwise 形式のMusicXMLに対応しています。");
-      }
 
       const warnings = [];
       const partNodes = Array.from(root.children).filter(
@@ -577,32 +570,7 @@ const xmlInput = document.getElementById("xmlInput");
     }
 
     function normalizeSource(rawText) {
-      if (!rawText) {
-        return "";
-      }
-
-      const lines = rawText.split("\n");
-      let first = 0;
-      let last = lines.length - 1;
-
-      while (first <= last && lines[first].trim() === "") {
-        first += 1;
-      }
-      while (last >= first && lines[last].trim() === "") {
-        last -= 1;
-      }
-      if (first > last) {
-        return "";
-      }
-
-      const firstLine = lines[first].trim();
-      const lastLine = lines[last].trim();
-      const hasCodeFencePair = /^```.*$/.test(firstLine) && /^```\s*$/.test(lastLine);
-      if (hasCodeFencePair) {
-        return lines.slice(first + 1, last).join("\n").trim();
-      }
-
-      return lines.slice(first, last + 1).join("\n").trim();
+      return musicXmlCommon.normalizeMusicXmlSource(rawText);
     }
 
     function clampTempo(value) {
@@ -767,22 +735,10 @@ const xmlInput = document.getElementById("xmlInput");
         setError("先に変換してください。");
         return;
       }
-      const AudioContextCtor =
-        window.AudioContext ||
-        (window).webkitAudioContext;
-      if (!AudioContextCtor) {
-        setError("このブラウザはWebAudioに対応していません。");
-        return;
-      }
-
-      if (!audioContext) {
-        audioContext = new AudioContextCtor();
-      }
-
-      stopMidi(false);
-
-      audioContext.resume().then(() => {
-        startSynthPlayback();
+      const waveform = musicSynthCommon.normalizeWaveform(synthWaveformSelect.value);
+      synthEngine.playSchedule(lastSynthSchedule, waveform, () => {
+        stopBtn.disabled = true;
+      }).then(() => {
         clearError();
         stopBtn.disabled = false;
         showToast("内蔵シンセ再生を開始しました。");
@@ -792,100 +748,12 @@ const xmlInput = document.getElementById("xmlInput");
       });
     }
 
-    function startSynthPlayback() {
-      if (!audioContext || !lastSynthSchedule || lastSynthSchedule.events.length === 0) {
-        return;
-      }
-      const waveform = normalizeWaveform(synthWaveformSelect.value);
-      const secPerTick = 60 / (lastSynthSchedule.tempo * MIDI_TICKS_PER_QUARTER);
-      const baseTime = audioContext.currentTime + 0.04;
-      let latestEndTime = baseTime;
-
-      for (const event of lastSynthSchedule.events) {
-        const startAt = baseTime + (event.start * secPerTick);
-        const bodyDuration = Math.max(0.04, event.ticks * secPerTick);
-        latestEndTime = Math.max(latestEndTime, scheduleBasicWaveNote(event, startAt, bodyDuration, waveform));
-      }
-
-      if (synthStopTimer) {
-        clearTimeout(synthStopTimer);
-      }
-      const waitMs = Math.max(0, Math.ceil((latestEndTime - audioContext.currentTime) * 1000));
-      synthStopTimer = setTimeout(() => {
-        activeSynthNodes = [];
-        stopBtn.disabled = true;
-      }, waitMs);
-    }
-
-    function scheduleBasicWaveNote(event, startAt, bodyDuration, waveform) {
-      const attack = 0.005;
-      const release = 0.03;
-      const endAt = startAt + bodyDuration;
-      const oscillator = audioContext.createOscillator();
-      oscillator.type = waveform;
-      oscillator.frequency.setValueAtTime(midiNumberToFrequency(event.midiNumber), startAt);
-
-      const gainNode = audioContext.createGain();
-      const gainLevel = event.channel === 10 ? 0.06 : 0.1;
-      gainNode.gain.setValueAtTime(0.0001, startAt);
-      gainNode.gain.linearRampToValueAtTime(gainLevel, startAt + attack);
-      gainNode.gain.setValueAtTime(gainLevel, endAt);
-      gainNode.gain.linearRampToValueAtTime(0.0001, endAt + release);
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      oscillator.start(startAt);
-      oscillator.stop(endAt + release + 0.01);
-      registerSynthNode(oscillator, gainNode);
-      return endAt + release + 0.02;
-    }
-
-    function registerSynthNode(oscillator, gainNode) {
-      oscillator.onended = () => {
-        try {
-          oscillator.disconnect();
-          gainNode.disconnect();
-        } catch (_error) {
-          // ignore cleanup failure
-        }
-      };
-      activeSynthNodes.push({ oscillator, gainNode });
-    }
-
     function stopMidi(showMessage = true) {
-      if (synthStopTimer) {
-        clearTimeout(synthStopTimer);
-        synthStopTimer = null;
-      }
-      for (const node of activeSynthNodes) {
-        try {
-          node.oscillator.stop();
-        } catch (_error) {
-          // ignore already-stopped nodes
-        }
-        try {
-          node.oscillator.disconnect();
-          node.gainNode.disconnect();
-        } catch (_error) {
-          // ignore disconnect error
-        }
-      }
-      activeSynthNodes = [];
+      synthEngine.stop();
       stopBtn.disabled = true;
       if (showMessage) {
         showToast("内蔵シンセ再生を停止しました。");
       }
-    }
-
-    function normalizeWaveform(value) {
-      if (value === "square" || value === "triangle") {
-        return value;
-      }
-      return "sine";
-    }
-
-    function midiNumberToFrequency(midiNumber) {
-      return 440 * Math.pow(2, (midiNumber - 69) / 12);
     }
 
     function setError(message) {
@@ -971,7 +839,7 @@ const xmlInput = document.getElementById("xmlInput");
             instrumentOverrideSelect.value = data.instrumentOverride;
           }
           if (typeof data.synthWaveform === "string") {
-            synthWaveformSelect.value = normalizeWaveform(data.synthWaveform);
+            synthWaveformSelect.value = musicSynthCommon.normalizeWaveform(data.synthWaveform);
           }
         }
       } catch (_error) {

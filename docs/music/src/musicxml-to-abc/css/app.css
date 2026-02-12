@@ -122,6 +122,55 @@
       gap: 0.8rem;
     }
 
+    .md-radio-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+    }
+
+    .md-radio-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .md-grid--defaults {
+      margin-top: 0.8rem;
+    }
+
+    .md-disclosure {
+      margin-bottom: 0.8rem;
+      border: 1px solid #e5e0ec;
+      border-radius: 12px;
+      background: #faf8fc;
+      padding: 0.7rem 0.85rem;
+    }
+
+    .md-disclosure-summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #3d2e5a;
+      list-style: none;
+    }
+
+    .md-disclosure-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .md-disclosure-summary::before {
+      content: "▸";
+      display: inline-block;
+      margin-right: 0.35rem;
+      transition: transform 120ms ease;
+    }
+
+    .md-disclosure[open] .md-disclosure-summary::before {
+      transform: rotate(90deg);
+    }
+
     @media (min-width: 720px) {
       .md-grid {
         grid-template-columns: 1fr 1fr 1fr;

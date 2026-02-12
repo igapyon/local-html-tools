@@ -145,6 +145,55 @@ limitations under the License.
       gap: 0.8rem;
     }
 
+    .md-radio-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+    }
+
+    .md-radio-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .md-grid--defaults {
+      margin-top: 0.8rem;
+    }
+
+    .md-disclosure {
+      margin-bottom: 0.8rem;
+      border: 1px solid #e5e0ec;
+      border-radius: 12px;
+      background: #faf8fc;
+      padding: 0.7rem 0.85rem;
+    }
+
+    .md-disclosure-summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #3d2e5a;
+      list-style: none;
+    }
+
+    .md-disclosure-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .md-disclosure-summary::before {
+      content: "▸";
+      display: inline-block;
+      margin-right: 0.35rem;
+      transition: transform 120ms ease;
+    }
+
+    .md-disclosure[open] .md-disclosure-summary::before {
+      transform: rotate(90deg);
+    }
+
     @media (min-width: 720px) {
       .md-grid {
         grid-template-columns: 1fr 1fr 1fr;
@@ -427,10 +476,19 @@ limitations under the License.
           </span>
         </div>
 
-        <label class="md-label" for="xmlInput">
-          ソース<span class="md-required">Required</span>
-        </label>
-        <textarea id="xmlInput" class="md-textarea" spellcheck="false"><?xml version="1.0" encoding="UTF-8"?>
+        <div class="md-radio-group" role="radiogroup" aria-label="入力方式">
+          <label class="md-radio-option">
+            <input id="inputModeFile" type="radio" name="inputMode" value="file" checked />
+            <span>ファイル読込</span>
+          </label>
+          <label class="md-radio-option">
+            <input id="inputModeSource" type="radio" name="inputMode" value="source" />
+            <span>ソースコード入力</span>
+          </label>
+        </div>
+
+        <div id="sourceInputBlock">
+          <textarea id="xmlInput" class="md-textarea" spellcheck="false"><?xml version="1.0" encoding="UTF-8"?>
 <score-partwise version="3.1">
   <work><work-title>Simple Scale</work-title></work>
   <identification><creator type="composer">Unknown</creator></identification>
@@ -452,20 +510,22 @@ limitations under the License.
     </measure>
   </part>
 </score-partwise></textarea>
-
-        <label class="md-label" for="fileInput">ファイル読込</label>
-        <div class="md-actions">
-          <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
-            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.35rem">
-              <path d="M12 16V4" />
-              <path d="M8 8l4-4 4 4" />
-              <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-            </svg>
-            <span>ファイルを選択</span>
-          </button>
-          <span id="fileNameText">未選択</span>
         </div>
-        <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" hidden />
+
+        <div id="fileInputBlock" class="md-hidden">
+          <div class="md-actions">
+            <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.35rem">
+                <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <path d="M12 10v6" />
+                <path d="M9.5 13.5 12 16l2.5-2.5" />
+              </svg>
+              <span>ファイルを選択</span>
+            </button>
+            <span id="fileNameText">未選択</span>
+          </div>
+          <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" hidden />
+        </div>
       </section>
 
       <section class="md-section">
@@ -483,28 +543,37 @@ limitations under the License.
           </span>
         </div>
 
-        <div class="md-grid">
-          <div>
-            <label class="md-label" for="defaultTitleInput">既定タイトル</label>
-            <input id="defaultTitleInput" class="md-input" type="text" value="Untitled" />
+        <details class="md-disclosure">
+          <summary class="md-disclosure-summary">詳細設定（既定タイトル / 既定作曲者 / 既定音価）</summary>
+          <div class="md-grid md-grid--defaults">
+            <div>
+              <label class="md-label" for="defaultTitleInput">既定タイトル</label>
+              <input id="defaultTitleInput" class="md-input" type="text" value="Untitled" />
+            </div>
+            <div>
+              <label class="md-label" for="defaultComposerInput">既定作曲者</label>
+              <input id="defaultComposerInput" class="md-input" type="text" value="Unknown" />
+            </div>
+            <div>
+              <label class="md-label" for="defaultLengthSelect">既定音価 (L:)</label>
+              <select id="defaultLengthSelect" class="md-select">
+                <option value="1/16">1/16</option>
+                <option value="1/8" selected>1/8</option>
+                <option value="1/4">1/4</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label class="md-label" for="defaultComposerInput">既定作曲者</label>
-            <input id="defaultComposerInput" class="md-input" type="text" value="Unknown" />
-          </div>
-          <div>
-            <label class="md-label" for="defaultLengthSelect">既定音価 (L:)</label>
-            <select id="defaultLengthSelect" class="md-select">
-              <option value="1/16">1/16</option>
-              <option value="1/8" selected>1/8</option>
-              <option value="1/4">1/4</option>
-            </select>
-          </div>
-        </div>
+        </details>
 
         <div class="md-actions">
           <button id="convertBtn" class="md-button md-button--primary" type="button">変換</button>
           <button id="downloadBtn" class="md-button md-button--secondary" type="button" disabled>ABC保存</button>
+          <button id="playSineBtn" class="md-button md-button--secondary" type="button" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="vertical-align:middle;margin-right:0.35rem">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            <span>sine再生</span>
+          </button>
         </div>
         <p id="errorText" class="md-error md-hidden" role="alert"></p>
         <p id="warningText" class="md-warning md-hidden"></p>
@@ -556,9 +625,616 @@ limitations under the License.
   <div id="toast" class="md-snackbar md-hidden" role="status" aria-live="polite"></div>
 
     
+    
+    
+    
+    
   <script>
+const MusicXmlCommon = (() => {
+  function readTextFileUtf8(file, onLoad, onError) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      onLoad(String(reader.result || ""));
+    };
+    reader.onerror = () => {
+      if (typeof onError === "function") {
+        onError(reader.error || new Error("file read failed"));
+      }
+    };
+    reader.readAsText(file, "utf-8");
+  }
+
+  function normalizeMusicXmlSource(rawText) {
+    if (!rawText) {
+      return "";
+    }
+
+    const lines = String(rawText).split("\n");
+    let first = 0;
+    let last = lines.length - 1;
+
+    while (first <= last && lines[first].trim() === "") {
+      first += 1;
+    }
+    while (last >= first && lines[last].trim() === "") {
+      last -= 1;
+    }
+    if (first > last) {
+      return "";
+    }
+
+    const firstLine = lines[first].trim();
+    const lastLine = lines[last].trim();
+    const hasCodeFencePair = /^```.*$/.test(firstLine) && /^```\s*$/.test(lastLine);
+    if (hasCodeFencePair) {
+      return lines.slice(first + 1, last).join("\n").trim();
+    }
+
+    return lines.slice(first, last + 1).join("\n").trim();
+  }
+
+  function parseScorePartwiseXml(source) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(source, "application/xml");
+    const parseErr = xmlDoc.querySelector("parsererror");
+    if (parseErr) {
+      throw new Error("XMLの構文解釈に失敗しました。");
+    }
+
+    const root = xmlDoc.documentElement;
+    if (!root || root.nodeName !== "score-partwise") {
+      throw new Error("score-partwise 形式のMusicXMLに対応しています。");
+    }
+
+    return xmlDoc;
+  }
+
+  return {
+    readTextFileUtf8,
+    normalizeMusicXmlSource,
+    parseScorePartwiseXml
+  };
+})();
+
+if (typeof window !== "undefined") {
+  window["MusicXmlCommon"] = MusicXmlCommon;
+}
+  </script>
+
+  <script>
+const MusicXmlSynthScheduleCommon = (() => {
+  const musicXmlCommonRef = window["MusicXmlCommon"] || (typeof MusicXmlCommon !== "undefined" ? MusicXmlCommon : null);
+  if (!musicXmlCommonRef) {
+    throw new Error("MusicXmlCommon is not loaded.");
+  }
+
+  function buildSynthScheduleFromMusicXml(source, options) {
+    const ticksPerQuarter = normalizeTicksPerQuarter(options && options.ticksPerQuarter);
+    const xmlDoc = musicXmlCommonRef.parseScorePartwiseXml(source);
+    const root = xmlDoc.documentElement;
+    const partNodes = Array.from(root.children).filter((node) => node.nodeType === 1 && node.nodeName === "part");
+    if (partNodes.length === 0) {
+      throw new Error("part が見つかりません。");
+    }
+
+    let tempo = 120;
+    let tempoDetected = false;
+    const events = [];
+
+    for (let partIndex = 0; partIndex < partNodes.length; partIndex += 1) {
+      const part = partNodes[partIndex];
+      let divisions = 960;
+      let timelineTick = 0;
+      let currentTranspose = 0;
+      const channel = defaultChannelForPartIndex(partIndex);
+      const measureNodes = Array.from(part.children).filter((node) => node.nodeType === 1 && node.nodeName === "measure");
+
+      for (const measureNode of measureNodes) {
+        const attrNode = firstDirectChild(measureNode, "attributes");
+        if (attrNode) {
+          const divText = getChildText(attrNode, "divisions");
+          if (divText) {
+            const divVal = Number.parseInt(divText, 10);
+            if (Number.isFinite(divVal) && divVal > 0) {
+              divisions = divVal;
+            }
+          }
+          const transposeNode = firstDirectChild(attrNode, "transpose");
+          if (transposeNode) {
+            const chromaticText = getChildText(transposeNode, "chromatic");
+            const octaveChangeText = getChildText(transposeNode, "octave-change");
+            const chromatic = chromaticText ? Number.parseInt(chromaticText, 10) : 0;
+            const octaveChange = octaveChangeText ? Number.parseInt(octaveChangeText, 10) : 0;
+            currentTranspose =
+              (Number.isFinite(chromatic) ? chromatic : 0) +
+              ((Number.isFinite(octaveChange) ? octaveChange : 0) * 12);
+          }
+        }
+
+        if (!tempoDetected) {
+          for (const child of Array.from(measureNode.children)) {
+            if (child.nodeName !== "direction") {
+              continue;
+            }
+            const soundNode = firstDirectChild(child, "sound");
+            const tempoText = soundNode ? soundNode.getAttribute("tempo") : "";
+            if (tempoText) {
+              const tempoVal = Number.parseFloat(tempoText);
+              if (Number.isFinite(tempoVal) && tempoVal > 0) {
+                tempo = Math.max(20, Math.min(300, Math.round(tempoVal)));
+                tempoDetected = true;
+                break;
+              }
+            }
+          }
+        }
+
+        let cursorTick = 0;
+        let measureMaxTick = 0;
+        for (const child of Array.from(measureNode.children)) {
+          if (child.nodeName === "note") {
+            const durationVal = Number.parseInt(getChildText(child, "duration"), 10);
+            const ticks = durationToMidiTicks(durationVal, divisions, ticksPerQuarter);
+            const isRest = !!firstDirectChild(child, "rest");
+            const isChord = !!firstDirectChild(child, "chord");
+            const startTick = isChord ? Math.max(0, timelineTick + cursorTick - ticks) : timelineTick + cursorTick;
+
+            if (!isRest) {
+              const pitchNode = firstDirectChild(child, "pitch");
+              const step = getChildText(pitchNode, "step");
+              const octave = Number.parseInt(getChildText(pitchNode, "octave"), 10);
+              const alterText = getChildText(pitchNode, "alter");
+              const alter = alterText === "" ? 0 : Number.parseInt(alterText, 10);
+              if (step && Number.isFinite(octave)) {
+                const soundingMidi = stepAlterOctaveToMidiNumber(step, Number.isFinite(alter) ? alter : 0, octave) + currentTranspose;
+                if (soundingMidi >= 0 && soundingMidi <= 127) {
+                  events.push({
+                    midiNumber: soundingMidi,
+                    start: Math.max(0, Math.round(startTick)),
+                    ticks: Math.max(1, ticks),
+                    channel
+                  });
+                }
+              }
+            }
+
+            if (!isChord) {
+              cursorTick += ticks;
+              measureMaxTick = Math.max(measureMaxTick, cursorTick);
+            }
+          } else if (child.nodeName === "backup") {
+            cursorTick = Math.max(
+              0,
+              cursorTick - durationToMidiTicks(Number.parseInt(getChildText(child, "duration"), 10), divisions, ticksPerQuarter)
+            );
+          } else if (child.nodeName === "forward") {
+            cursorTick += durationToMidiTicks(Number.parseInt(getChildText(child, "duration"), 10), divisions, ticksPerQuarter);
+            measureMaxTick = Math.max(measureMaxTick, cursorTick);
+          }
+        }
+        timelineTick += Math.max(0, measureMaxTick);
+      }
+    }
+
+    events.sort((a, b) => {
+      if (a.start !== b.start) {
+        return a.start - b.start;
+      }
+      return a.midiNumber - b.midiNumber;
+    });
+    return {
+      tempo,
+      events
+    };
+  }
+
+  function normalizeTicksPerQuarter(value) {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      return Math.round(parsed);
+    }
+    return 128;
+  }
+
+  function durationToMidiTicks(durationVal, divisions, ticksPerQuarter) {
+    if (!Number.isFinite(durationVal) || durationVal <= 0 || !Number.isFinite(divisions) || divisions <= 0) {
+      return 1;
+    }
+    return Math.max(1, Math.round((durationVal * ticksPerQuarter) / divisions));
+  }
+
+  function stepAlterOctaveToMidiNumber(step, alter, octave) {
+    const base = {
+      C: 0,
+      D: 2,
+      E: 4,
+      F: 5,
+      G: 7,
+      A: 9,
+      B: 11
+    };
+    const s = String(step || "").toUpperCase();
+    if (!Object.prototype.hasOwnProperty.call(base, s)) {
+      return 60;
+    }
+    const semitone = base[s] + alter;
+    return (octave + 1) * 12 + semitone;
+  }
+
+  function defaultChannelForPartIndex(partIndex) {
+    const oneBased = (partIndex % 16) + 1;
+    if (oneBased === 10) {
+      return 11;
+    }
+    return oneBased;
+  }
+
+  function firstDirectChild(parent, tagName) {
+    if (!parent) {
+      return null;
+    }
+    for (const child of Array.from(parent.children)) {
+      if (child.nodeName === tagName) {
+        return child;
+      }
+    }
+    return null;
+  }
+
+  function getChildText(parent, tagName) {
+    const node = firstDirectChild(parent, tagName);
+    return node ? node.textContent.trim() : "";
+  }
+
+  return {
+    buildSynthScheduleFromMusicXml
+  };
+})();
+
+if (typeof window !== "undefined") {
+  window["MusicXmlSynthScheduleCommon"] = MusicXmlSynthScheduleCommon;
+}
+  </script>
+
+  <script>
+const MusicSynthCommon = (() => {
+  function normalizeWaveform(value) {
+    if (value === "square" || value === "triangle") {
+      return value;
+    }
+    return "sine";
+  }
+
+  function midiNumberToFrequency(midiNumber) {
+    return 440 * Math.pow(2, (Number(midiNumber) - 69) / 12);
+  }
+
+  function createBasicWaveSynthEngine(options = {}) {
+    const ticksPerQuarter = Number.isFinite(options.ticksPerQuarter)
+      ? Math.max(1, Math.round(options.ticksPerQuarter))
+      : 128;
+
+    let audioContext = null;
+    let activeSynthNodes = [];
+    let synthStopTimer = null;
+
+    async function playSchedule(schedule, waveform, onEnded) {
+      if (!schedule || !Array.isArray(schedule.events) || schedule.events.length === 0) {
+        throw new Error("先に変換してください。");
+      }
+
+      const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextCtor) {
+        throw new Error("このブラウザはWebAudioに対応していません。");
+      }
+
+      if (!audioContext) {
+        audioContext = new AudioContextCtor();
+      }
+
+      stop();
+      await audioContext.resume();
+
+      const normalizedWaveform = normalizeWaveform(waveform);
+      const secPerTick = 60 / (Math.max(1, Number(schedule.tempo) || 120) * ticksPerQuarter);
+      const baseTime = audioContext.currentTime + 0.04;
+      let latestEndTime = baseTime;
+
+      for (const event of schedule.events) {
+        const startAt = baseTime + (event.start * secPerTick);
+        const bodyDuration = Math.max(0.04, event.ticks * secPerTick);
+        latestEndTime = Math.max(
+          latestEndTime,
+          scheduleBasicWaveNote(event, startAt, bodyDuration, normalizedWaveform)
+        );
+      }
+
+      if (synthStopTimer) {
+        clearTimeout(synthStopTimer);
+      }
+      const waitMs = Math.max(0, Math.ceil((latestEndTime - audioContext.currentTime) * 1000));
+      synthStopTimer = setTimeout(() => {
+        activeSynthNodes = [];
+        if (typeof onEnded === "function") {
+          onEnded();
+        }
+      }, waitMs);
+    }
+
+    function stop() {
+      if (synthStopTimer) {
+        clearTimeout(synthStopTimer);
+        synthStopTimer = null;
+      }
+      for (const node of activeSynthNodes) {
+        try {
+          node.oscillator.stop();
+        } catch (_error) {
+          // ignore already-stopped nodes
+        }
+        try {
+          node.oscillator.disconnect();
+          node.gainNode.disconnect();
+        } catch (_error) {
+          // ignore disconnect error
+        }
+      }
+      activeSynthNodes = [];
+    }
+
+    function scheduleBasicWaveNote(event, startAt, bodyDuration, waveform) {
+      const attack = 0.005;
+      const release = 0.03;
+      const endAt = startAt + bodyDuration;
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = waveform;
+      oscillator.frequency.setValueAtTime(midiNumberToFrequency(event.midiNumber), startAt);
+
+      const gainNode = audioContext.createGain();
+      const gainLevel = event.channel === 10 ? 0.06 : 0.1;
+      gainNode.gain.setValueAtTime(0.0001, startAt);
+      gainNode.gain.linearRampToValueAtTime(gainLevel, startAt + attack);
+      gainNode.gain.setValueAtTime(gainLevel, endAt);
+      gainNode.gain.linearRampToValueAtTime(0.0001, endAt + release);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.start(startAt);
+      oscillator.stop(endAt + release + 0.01);
+      registerSynthNode(oscillator, gainNode);
+      return endAt + release + 0.02;
+    }
+
+    function registerSynthNode(oscillator, gainNode) {
+      oscillator.onended = () => {
+        try {
+          oscillator.disconnect();
+          gainNode.disconnect();
+        } catch (_error) {
+          // ignore cleanup failure
+        }
+      };
+      activeSynthNodes.push({ oscillator, gainNode });
+    }
+
+    return {
+      playSchedule,
+      stop
+    };
+  }
+
+  return {
+    normalizeWaveform,
+    midiNumberToFrequency,
+    createBasicWaveSynthEngine
+  };
+})();
+
+if (typeof window !== "undefined") {
+  window["MusicSynthCommon"] = MusicSynthCommon;
+}
+  </script>
+
+  <script>
+const AbcCommon = (() => {
+  function gcd(a, b) {
+    let x = Math.abs(Number(a) || 0);
+    let y = Math.abs(Number(b) || 0);
+    while (y !== 0) {
+      const t = x % y;
+      x = y;
+      y = t;
+    }
+    return x || 1;
+  }
+
+  function reduceFraction(num, den, fallback = { num: 1, den: 1 }) {
+    if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) {
+      return { num: fallback.num, den: fallback.den };
+    }
+    const sign = den < 0 ? -1 : 1;
+    const n = num * sign;
+    const d = den * sign;
+    const g = gcd(n, d);
+    return { num: n / g, den: d / g };
+  }
+
+  function multiplyFractions(a, b, fallback = { num: 1, den: 1 }) {
+    return reduceFraction(a.num * b.num, a.den * b.den, fallback);
+  }
+
+  function divideFractions(a, b, fallback = { num: 1, den: 1 }) {
+    return reduceFraction(a.num * b.den, a.den * b.num, fallback);
+  }
+
+  function parseFractionText(text, fallback = { num: 1, den: 8 }) {
+    const m = String(text || "").match(/^\s*(\d+)\/(\d+)\s*$/);
+    if (!m) {
+      return { num: fallback.num, den: fallback.den };
+    }
+    const num = Number.parseInt(m[1], 10);
+    const den = Number.parseInt(m[2], 10);
+    if (!num || !den) {
+      return { num: fallback.num, den: fallback.den };
+    }
+    return reduceFraction(num, den, fallback);
+  }
+
+  function parseAbcLengthToken(token, lineNo) {
+    if (!token) {
+      return { num: 1, den: 1 };
+    }
+    if (token === "/") {
+      return { num: 1, den: 2 };
+    }
+    if (/^\d+$/.test(token)) {
+      return { num: Number(token), den: 1 };
+    }
+    if (/^\/\d+$/.test(token)) {
+      return { num: 1, den: Number(token.slice(1)) };
+    }
+    if (/^\d+\/\d+$/.test(token)) {
+      const p = token.split("/");
+      return reduceFraction(Number(p[0]), Number(p[1]), { num: 1, den: 1 });
+    }
+    throw new Error("line " + lineNo + ": 長さ指定を解釈できません: " + token);
+  }
+
+  function abcLengthTokenFromFraction(ratio) {
+    const reduced = reduceFraction(ratio.num, ratio.den, { num: 1, den: 1 });
+    if (reduced.num === reduced.den) {
+      return "";
+    }
+    if (reduced.den === 1) {
+      return String(reduced.num);
+    }
+    if (reduced.num === 1 && reduced.den === 2) {
+      return "/";
+    }
+    if (reduced.num === 1) {
+      return "/" + reduced.den;
+    }
+    return reduced.num + "/" + reduced.den;
+  }
+
+  function abcPitchFromStepOctave(step, octave) {
+    const upperStep = String(step || "").toUpperCase();
+    if (!/^[A-G]$/.test(upperStep)) {
+      return "C";
+    }
+    if (octave >= 5) {
+      return upperStep.toLowerCase() + "'".repeat(octave - 5);
+    }
+    return upperStep + ",".repeat(Math.max(0, 4 - octave));
+  }
+
+  function accidentalFromAlter(alter) {
+    if (alter === 0) {
+      return "";
+    }
+    if (alter > 0) {
+      return "^".repeat(Math.min(2, alter));
+    }
+    return "_".repeat(Math.min(2, Math.abs(alter)));
+  }
+
+  function keyFromFifthsMode(fifths, mode) {
+    const major = ["Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#"];
+    const minor = ["Abm", "Ebm", "Bbm", "Fm", "Cm", "Gm", "Dm", "Am", "Em", "Bm", "F#m", "C#m", "G#m", "D#m", "A#m"];
+    const idx = Number(fifths) + 7;
+    if (idx < 0 || idx >= major.length) {
+      return "C";
+    }
+    const lowerMode = String(mode || "").toLowerCase();
+    if (lowerMode === "minor") {
+      return minor[idx];
+    }
+    return major[idx];
+  }
+
+  function fifthsFromAbcKey(raw) {
+    const table = {
+      "C": 0,
+      "G": 1,
+      "D": 2,
+      "A": 3,
+      "E": 4,
+      "B": 5,
+      "F#": 6,
+      "C#": 7,
+      "F": -1,
+      "Bb": -2,
+      "Eb": -3,
+      "Ab": -4,
+      "Db": -5,
+      "Gb": -6,
+      "Cb": -7,
+      "Am": 0,
+      "Em": 1,
+      "Bm": 2,
+      "F#m": 3,
+      "C#m": 4,
+      "G#m": 5,
+      "D#m": 6,
+      "A#m": 7,
+      "Dm": -1,
+      "Gm": -2,
+      "Cm": -3,
+      "Fm": -4,
+      "Bbm": -5,
+      "Ebm": -6,
+      "Abm": -7
+    };
+    const normalized = String(raw || "").trim().replace(/\s+/g, "");
+    if (Object.prototype.hasOwnProperty.call(table, normalized)) {
+      return table[normalized];
+    }
+    return null;
+  }
+
+  return {
+    gcd,
+    reduceFraction,
+    multiplyFractions,
+    divideFractions,
+    parseFractionText,
+    parseAbcLengthToken,
+    abcLengthTokenFromFraction,
+    abcPitchFromStepOctave,
+    accidentalFromAlter,
+    keyFromFifthsMode,
+    fifthsFromAbcKey
+  };
+})();
+
+if (typeof window !== "undefined") {
+  window["AbcCommon"] = AbcCommon;
+}
+  </script>
+
+  <script>
+const musicXmlCommon = window["MusicXmlCommon"] || (typeof MusicXmlCommon !== "undefined" ? MusicXmlCommon : null);
+const musicXmlSynthScheduleCommon = window["MusicXmlSynthScheduleCommon"] || (typeof MusicXmlSynthScheduleCommon !== "undefined" ? MusicXmlSynthScheduleCommon : null);
+const musicSynthCommon = window["MusicSynthCommon"] || (typeof MusicSynthCommon !== "undefined" ? MusicSynthCommon : null);
+const abcCommon = window["AbcCommon"] || (typeof AbcCommon !== "undefined" ? AbcCommon : null);
+if (!musicXmlCommon) {
+  throw new Error("MusicXmlCommon is not loaded.");
+}
+if (!musicXmlSynthScheduleCommon) {
+  throw new Error("MusicXmlSynthScheduleCommon is not loaded.");
+}
+if (!musicSynthCommon) {
+  throw new Error("MusicSynthCommon is not loaded.");
+}
+if (!abcCommon) {
+  throw new Error("AbcCommon is not loaded.");
+}
 const xmlInput = document.getElementById("xmlInput");
     const fileInput = document.getElementById("fileInput");
+    const inputModeSourceRadio = document.getElementById("inputModeSource");
+    const inputModeFileRadio = document.getElementById("inputModeFile");
+    const sourceInputBlock = document.getElementById("sourceInputBlock");
+    const fileInputBlock = document.getElementById("fileInputBlock");
     const fileSelectBtn = document.getElementById("fileSelectBtn");
     const fileNameText = document.getElementById("fileNameText");
     const defaultTitleInput = document.getElementById("defaultTitleInput");
@@ -566,6 +1242,7 @@ const xmlInput = document.getElementById("xmlInput");
     const defaultLengthSelect = document.getElementById("defaultLengthSelect");
     const convertBtn = document.getElementById("convertBtn");
     const downloadBtn = document.getElementById("downloadBtn");
+    const playSineBtn = document.getElementById("playSineBtn");
     const copyBtn = document.getElementById("copyBtn");
     const previewText = document.getElementById("previewText");
     const abcOutput = document.getElementById("abcOutput");
@@ -575,21 +1252,30 @@ const xmlInput = document.getElementById("xmlInput");
     const menuPanel = document.getElementById("menuPanel");
 
     const SETTINGS_KEY = "musicxml-to-abc-settings";
+    const MIDI_TICKS_PER_QUARTER = 128;
 
     let lastAbc = "";
+    let lastSynthSchedule = null;
+    const synthEngine = musicSynthCommon.createBasicWaveSynthEngine({
+      ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+    });
 
     restoreSettings();
 
     convertBtn.addEventListener("click", convertMusicXml);
     downloadBtn.addEventListener("click", downloadAbc);
+    playSineBtn.addEventListener("click", playSine);
     copyBtn.addEventListener("click", copyAbc);
     fileInput.addEventListener("change", loadXmlFile);
     fileSelectBtn.addEventListener("click", () => fileInput.click());
+    inputModeSourceRadio.addEventListener("change", applyInputMode);
+    inputModeFileRadio.addEventListener("change", applyInputMode);
     defaultTitleInput.addEventListener("change", persistSettings);
     defaultComposerInput.addEventListener("change", persistSettings);
     defaultLengthSelect.addEventListener("change", persistSettings);
     document.addEventListener("click", handleDocumentClick);
 
+    applyInputMode();
     convertMusicXml();
 
     function loadXmlFile(event) {
@@ -598,16 +1284,15 @@ const xmlInput = document.getElementById("xmlInput");
         updateFileName("");
         return;
       }
+      inputModeFileRadio.checked = true;
+      applyInputMode();
       updateFileName(file.name);
-      const reader = new FileReader();
-      reader.onload = () => {
-        xmlInput.value = String(reader.result || "");
+      musicXmlCommon.readTextFileUtf8(file, (text) => {
+        xmlInput.value = text;
         showToast("MusicXMLを読み込みました。");
-      };
-      reader.onerror = () => {
+      }, () => {
         setError("ファイルの読み込みに失敗しました。");
-      };
-      reader.readAsText(file, "utf-8");
+      });
     }
 
     function updateFileName(name) {
@@ -633,6 +1318,9 @@ const xmlInput = document.getElementById("xmlInput");
         });
 
         lastAbc = result.abc;
+        lastSynthSchedule = musicXmlSynthScheduleCommon.buildSynthScheduleFromMusicXml(source, {
+          ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+        });
         abcOutput.textContent = result.abc;
         previewText.textContent = [
           "title: " + result.meta.title,
@@ -640,11 +1328,13 @@ const xmlInput = document.getElementById("xmlInput");
           "meter: " + result.meta.meter,
           "unit length: " + result.meta.defaultLengthText,
           "key: " + result.meta.key,
+          "voices: " + result.meta.voiceCount,
           "measures: " + result.meta.measureCount,
           "notes/rests: " + result.meta.noteCount
         ].join("\n");
 
         downloadBtn.disabled = false;
+        playSineBtn.disabled = !lastSynthSchedule || lastSynthSchedule.events.length === 0;
 
         if (result.warnings.length > 0) {
           warningText.textContent = "警告:\n" + result.warnings.join("\n");
@@ -660,23 +1350,15 @@ const xmlInput = document.getElementById("xmlInput");
     }
 
     function parseMusicXml(source, settings) {
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(source, "application/xml");
-      const parseErr = xmlDoc.querySelector("parsererror");
-      if (parseErr) {
-        throw new Error("XMLの構文解釈に失敗しました。");
-      }
-
+      const xmlDoc = musicXmlCommon.parseScorePartwiseXml(source);
       const root = xmlDoc.documentElement;
-      if (!root || root.nodeName !== "score-partwise") {
-        throw new Error("score-partwise 形式のMusicXMLに対応しています。");
-      }
 
       const warnings = [];
-      const part = root.querySelector("part");
-      if (!part) {
+      const partNodes = Array.from(root.children).filter((node) => node.nodeType === 1 && node.nodeName === "part");
+      if (partNodes.length === 0) {
         throw new Error("part が見つかりません。");
       }
+      const partNameById = buildPartNameMap(root);
 
       const title = textOrFallback(
         root.querySelector("work > work-title") || root.querySelector("movement-title"),
@@ -691,88 +1373,103 @@ const xmlInput = document.getElementById("xmlInput");
       let meter = { beats: 4, beatType: 4 };
       let key = "C";
       let noteCount = 0;
-      const measures = [];
-
-      const measureNodes = Array.from(part.children).filter((node) => node.nodeType === 1 && node.nodeName === "measure");
-      if (measureNodes.length === 0) {
-        throw new Error("measure が見つかりません。");
-      }
+      const voices = [];
 
       let warnedBackup = false;
       let warnedForward = false;
       let warnedChord = false;
       let warnedTie = false;
 
-      for (const measureNode of measureNodes) {
-        const measureNo = measureNode.getAttribute("number") || String(measures.length + 1);
-        const attrNode = measureNode.querySelector(":scope > attributes");
-        if (attrNode) {
-          const divText = getChildText(attrNode, "divisions");
-          if (divText) {
-            const divVal = Number.parseInt(divText, 10);
-            if (Number.isFinite(divVal) && divVal > 0) {
-              divisions = divVal;
-            }
-          }
+      for (let partIndex = 0; partIndex < partNodes.length; partIndex += 1) {
+        const part = partNodes[partIndex];
+        const partId = part.getAttribute("id") || ("P" + String(partIndex + 1));
+        const voiceId = "V" + String(partIndex + 1);
+        const partName = partNameById[partId] || partId;
+        const measures = [];
 
-          const beatsText = getChildText(attrNode.querySelector("time"), "beats");
-          const beatTypeText = getChildText(attrNode.querySelector("time"), "beat-type");
-          if (beatsText && beatTypeText) {
-            const beatsVal = Number.parseInt(beatsText, 10);
-            const beatTypeVal = Number.parseInt(beatTypeText, 10);
-            if (beatsVal > 0 && beatTypeVal > 0) {
-              meter = { beats: beatsVal, beatType: beatTypeVal };
-            }
-          }
-
-          const fifthsText = getChildText(attrNode.querySelector("key"), "fifths");
-          const modeText = getChildText(attrNode.querySelector("key"), "mode") || "major";
-          if (fifthsText !== "") {
-            const fifthsVal = Number.parseInt(fifthsText, 10);
-            if (Number.isFinite(fifthsVal)) {
-              key = keyFromFifths(fifthsVal, modeText);
-            }
-          }
+        const measureNodes = Array.from(part.children).filter((node) => node.nodeType === 1 && node.nodeName === "measure");
+        if (measureNodes.length === 0) {
+          warnings.push("part " + partName + ": measure が見つかりません。");
+          continue;
         }
 
-        const tokens = [];
-
-        for (const child of Array.from(measureNode.children)) {
-          const name = child.nodeName;
-          if (name === "note") {
-            const noteToken = noteToAbc(child, divisions, settings.defaultLength, warnings, measureNo);
-            if (noteToken.skipped) {
-              if (noteToken.reason === "chord" && !warnedChord) {
-                warnings.push("和音（<chord/>）は先頭音のみ扱います。");
-                warnedChord = true;
+        for (const measureNode of measureNodes) {
+          const measureNo = measureNode.getAttribute("number") || String(measures.length + 1);
+          const attrNode = measureNode.querySelector(":scope > attributes");
+          if (attrNode) {
+            const divText = getChildText(attrNode, "divisions");
+            if (divText) {
+              const divVal = Number.parseInt(divText, 10);
+              if (Number.isFinite(divVal) && divVal > 0) {
+                divisions = divVal;
               }
-              continue;
             }
-            tokens.push(noteToken.token);
-            if (noteToken.reason === "tie" && !warnedTie) {
-              warnings.push("タイ/スラーは出力していません。");
-              warnedTie = true;
+
+            const beatsText = getChildText(attrNode.querySelector("time"), "beats");
+            const beatTypeText = getChildText(attrNode.querySelector("time"), "beat-type");
+            if (beatsText && beatTypeText) {
+              const beatsVal = Number.parseInt(beatsText, 10);
+              const beatTypeVal = Number.parseInt(beatTypeText, 10);
+              if (beatsVal > 0 && beatTypeVal > 0) {
+                meter = { beats: beatsVal, beatType: beatTypeVal };
+              }
             }
-            noteCount += 1;
-          } else if (name === "backup") {
-            if (!warnedBackup) {
-              warnings.push("backup 要素（複数声部）はMVPでは非対応です。");
-              warnedBackup = true;
-            }
-          } else if (name === "forward") {
-            if (!warnedForward) {
-              warnings.push("forward 要素（複数声部）はMVPでは非対応です。");
-              warnedForward = true;
+
+            const fifthsText = getChildText(attrNode.querySelector("key"), "fifths");
+            const modeText = getChildText(attrNode.querySelector("key"), "mode") || "major";
+            if (fifthsText !== "") {
+              const fifthsVal = Number.parseInt(fifthsText, 10);
+              if (Number.isFinite(fifthsVal)) {
+                key = keyFromFifths(fifthsVal, modeText);
+              }
             }
           }
+
+          const tokens = [];
+
+          for (const child of Array.from(measureNode.children)) {
+            const name = child.nodeName;
+            if (name === "note") {
+              const noteToken = noteToAbc(child, divisions, settings.defaultLength, warnings, measureNo);
+              if (noteToken.skipped) {
+                if (noteToken.reason === "chord" && !warnedChord) {
+                  warnings.push("和音（<chord/>）は先頭音のみ扱います。");
+                  warnedChord = true;
+                }
+                continue;
+              }
+              tokens.push(noteToken.token);
+              if (noteToken.reason === "tie" && !warnedTie) {
+                warnings.push("タイ/スラーは出力していません。");
+                warnedTie = true;
+              }
+              noteCount += 1;
+            } else if (name === "backup") {
+              if (!warnedBackup) {
+                warnings.push("backup 要素（複数声部）はMVPでは非対応です。");
+                warnedBackup = true;
+              }
+            } else if (name === "forward") {
+              if (!warnedForward) {
+                warnings.push("forward 要素（複数声部）はMVPでは非対応です。");
+                warnedForward = true;
+              }
+            }
+          }
+
+          if (tokens.length === 0) {
+            tokens.push("z");
+            warnings.push("part " + partName + " measure " + measureNo + ": 要素が空のため休符 z を補完しました。");
+          }
+
+          measures.push(tokens.join(" "));
         }
 
-        if (tokens.length === 0) {
-          tokens.push("z");
-          warnings.push("measure " + measureNo + ": 要素が空のため休符 z を補完しました。");
-        }
-
-        measures.push(tokens.join(" "));
+        voices.push({
+          id: voiceId,
+          name: partName,
+          measures
+        });
       }
 
       if (noteCount === 0) {
@@ -781,16 +1478,26 @@ const xmlInput = document.getElementById("xmlInput");
 
       const meterText = meter.beats + "/" + meter.beatType;
       const defaultLengthText = settings.defaultLength.num + "/" + settings.defaultLength.den;
-      const body = measures.join(" | ") + " |";
       const abcLines = [
         "X:1",
         "T:" + title,
         "C:" + composer,
         "M:" + meterText,
         "L:" + defaultLengthText,
-        "K:" + key,
-        body
+        "K:" + key
       ];
+      if (voices.length > 1) {
+        abcLines.push("%%score " + voices.map((voice) => "(" + voice.id + ")").join(" "));
+      }
+
+      for (const voice of voices) {
+        if (voices.length > 1) {
+          abcLines.push("V:" + voice.id + ' name="' + escapeAbcText(voice.name || voice.id) + '"');
+        }
+        abcLines.push(voice.measures.join(" | ") + " |");
+      }
+
+      const measureCount = voices.reduce((acc, voice) => Math.max(acc, voice.measures.length), 0);
 
       return {
         abc: abcLines.join("\n"),
@@ -800,7 +1507,8 @@ const xmlInput = document.getElementById("xmlInput");
           meter: meterText,
           defaultLengthText,
           key,
-          measureCount: measures.length,
+          voiceCount: voices.length,
+          measureCount,
           noteCount
         },
         warnings
@@ -827,8 +1535,12 @@ const xmlInput = document.getElementById("xmlInput");
         return { skipped: true, reason: "duration" };
       }
 
-      const ratio = divideFractions(reduceFraction(durationVal, divisions * 4), defaultLength);
-      const lengthToken = abcLengthToken(ratio);
+      const ratio = abcCommon.divideFractions(
+        abcCommon.reduceFraction(durationVal, divisions * 4, { num: 1, den: 1 }),
+        defaultLength,
+        { num: 1, den: 1 }
+      );
+      const lengthToken = abcCommon.abcLengthTokenFromFraction(ratio);
 
       if (noteNode.querySelector(":scope > rest")) {
         return { skipped: false, token: "z" + lengthToken };
@@ -849,73 +1561,24 @@ const xmlInput = document.getElementById("xmlInput");
 
       const alterText = getChildText(noteNode.querySelector(":scope > pitch"), "alter");
       const alter = alterText === "" ? 0 : Number.parseInt(alterText, 10);
-      const accidental = accidentalFromAlter(Number.isFinite(alter) ? alter : 0);
+      const accidental = abcCommon.accidentalFromAlter(Number.isFinite(alter) ? alter : 0);
 
       if (noteNode.querySelector(":scope > tie") || noteNode.querySelector(":scope > notations > tied")) {
         return {
           skipped: false,
           reason: "tie",
-          token: accidental + abcPitch(step, octave) + lengthToken
+          token: accidental + abcCommon.abcPitchFromStepOctave(step, octave) + lengthToken
         };
       }
 
       return {
         skipped: false,
-        token: accidental + abcPitch(step, octave) + lengthToken
+        token: accidental + abcCommon.abcPitchFromStepOctave(step, octave) + lengthToken
       };
     }
 
-    function abcPitch(step, octave) {
-      const upperStep = step.toUpperCase();
-      if (!/^[A-G]$/.test(upperStep)) {
-        return "C";
-      }
-
-      if (octave >= 5) {
-        return upperStep.toLowerCase() + "'".repeat(octave - 5);
-      }
-      return upperStep + ",".repeat(Math.max(0, 4 - octave));
-    }
-
-    function accidentalFromAlter(alter) {
-      if (alter === 0) {
-        return "";
-      }
-      if (alter > 0) {
-        return "^".repeat(Math.min(2, alter));
-      }
-      return "_".repeat(Math.min(2, Math.abs(alter)));
-    }
-
-    function abcLengthToken(ratio) {
-      const reduced = reduceFraction(ratio.num, ratio.den);
-      if (reduced.num === reduced.den) {
-        return "";
-      }
-      if (reduced.den === 1) {
-        return String(reduced.num);
-      }
-      if (reduced.num === 1 && reduced.den === 2) {
-        return "/";
-      }
-      if (reduced.num === 1) {
-        return "/" + reduced.den;
-      }
-      return reduced.num + "/" + reduced.den;
-    }
-
     function keyFromFifths(fifths, mode) {
-      const major = ["Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#"];
-      const minor = ["Abm", "Ebm", "Bbm", "Fm", "Cm", "Gm", "Dm", "Am", "Em", "Bm", "F#m", "C#m", "G#m", "D#m", "A#m"];
-      const idx = fifths + 7;
-      if (idx < 0 || idx >= major.length) {
-        return "C";
-      }
-      const lowerMode = String(mode || "").toLowerCase();
-      if (lowerMode === "minor") {
-        return minor[idx];
-      }
-      return major[idx];
+      return abcCommon.keyFromFifthsMode(fifths, mode);
     }
 
     function getChildText(parent, tagName) {
@@ -934,79 +1597,63 @@ const xmlInput = document.getElementById("xmlInput");
       return text || fallback;
     }
 
+    function escapeAbcText(text) {
+      return String(text || "").replace(/"/g, "'");
+    }
+
+    function buildPartNameMap(root) {
+      const map = {};
+      const partList = root.querySelector("part-list");
+      if (!partList) {
+        return map;
+      }
+      const scoreParts = Array.from(partList.children).filter((node) => node.nodeType === 1 && node.nodeName === "score-part");
+      for (const scorePart of scoreParts) {
+        const id = scorePart.getAttribute("id");
+        if (!id) {
+          continue;
+        }
+        const partNameNode = scorePart.querySelector(":scope > part-name");
+        const partName = partNameNode && partNameNode.textContent ? partNameNode.textContent.trim() : "";
+        map[id] = partName || id;
+      }
+      return map;
+    }
+
     function parseFraction(text) {
-      const m = String(text || "").match(/^\s*(\d+)\/(\d+)\s*$/);
-      if (!m) {
-        return { num: 1, den: 8 };
-      }
-      const num = Number.parseInt(m[1], 10);
-      const den = Number.parseInt(m[2], 10);
-      if (!num || !den) {
-        return { num: 1, den: 8 };
-      }
-      return reduceFraction(num, den);
+      return abcCommon.parseFractionText(text, { num: 1, den: 8 });
     }
 
     function divideFractions(a, b) {
-      return reduceFraction(a.num * b.den, a.den * b.num);
+      return abcCommon.divideFractions(a, b, { num: 1, den: 1 });
     }
 
     function reduceFraction(num, den) {
-      if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) {
-        return { num: 1, den: 1 };
-      }
-      const sign = den < 0 ? -1 : 1;
-      const n = num * sign;
-      const d = den * sign;
-      const g = gcd(Math.abs(n), Math.abs(d));
-      return { num: n / g, den: d / g };
-    }
-
-    function gcd(a, b) {
-      let x = a || 1;
-      let y = b || 1;
-      while (y !== 0) {
-        const t = x % y;
-        x = y;
-        y = t;
-      }
-      return x || 1;
+      return abcCommon.reduceFraction(num, den, { num: 1, den: 1 });
     }
 
     function normalizeSource(rawText) {
-      if (!rawText) {
-        return "";
-      }
-
-      const lines = rawText.split("\n");
-      let first = 0;
-      let last = lines.length - 1;
-
-      while (first <= last && lines[first].trim() === "") {
-        first += 1;
-      }
-      while (last >= first && lines[last].trim() === "") {
-        last -= 1;
-      }
-      if (first > last) {
-        return "";
-      }
-
-      const firstLine = lines[first].trim();
-      const lastLine = lines[last].trim();
-      const hasCodeFencePair = /^```.*$/.test(firstLine) && /^```\s*$/.test(lastLine);
-      if (hasCodeFencePair) {
-        return lines.slice(first + 1, last).join("\n").trim();
-      }
-
-      return lines.slice(first, last + 1).join("\n").trim();
+      return musicXmlCommon.normalizeMusicXmlSource(rawText);
     }
 
     function resetOutput() {
       lastAbc = "";
+      lastSynthSchedule = null;
+      synthEngine.stop();
       abcOutput.textContent = "";
       previewText.textContent = "未変換";
       downloadBtn.disabled = true;
+      playSineBtn.disabled = true;
+    }
+
+    function applyInputMode() {
+      const sourceMode = inputModeSourceRadio.checked;
+      sourceInputBlock.classList.toggle("md-hidden", !sourceMode);
+      fileInputBlock.classList.toggle("md-hidden", sourceMode);
+      if (sourceMode) {
+        fileInput.value = "";
+        updateFileName("");
+      }
     }
 
     function downloadAbc() {
@@ -1029,6 +1676,19 @@ const xmlInput = document.getElementById("xmlInput");
         showToast("ABCをコピーしました。");
       }).catch((error) => {
         setError("コピーに失敗しました: " + (error && error.message ? error.message : String(error)));
+      });
+    }
+
+    function playSine() {
+      if (!lastSynthSchedule || lastSynthSchedule.events.length === 0) {
+        setError("先に変換してください。");
+        return;
+      }
+      synthEngine.playSchedule(lastSynthSchedule, "sine").then(() => {
+        clearError();
+        showToast("sine再生を開始しました。");
+      }).catch((error) => {
+        setError("sine再生に失敗しました: " + (error && error.message ? error.message : String(error)));
       });
     }
 
