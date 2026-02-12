@@ -50,6 +50,7 @@
 ```
 docs/
 ├── index.html           # トップページ（ツール一覧へのリンク）
+├── diagram/             # 図表系ツール
 ├── ffmpeg/              # FFmpegおよび周辺ツール
 ├── git/                 # Git補助ツール
 ├── grep/                # 検索補助ツール
@@ -123,6 +124,12 @@ URL加工系ツールです。
 
 - **img2svg.html**: 画像ファイルをSVGに変換してダウンロードします。
 
+## diagram
+
+図表系ツールです。
+
+- **mermaid-to-svg.html**: Mermaid記法からSVGを生成し、SVG/PNGを保存します。
+
 ## text
 
 テキスト系ツールです。
@@ -149,7 +156,7 @@ Git補助ツールです。
 
 ## GitHub Pages
 
-GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/` 配下にあります。  
+GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/diagram/`、`docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/` 配下にあります。  
 公開URL: https://igapyon.github.io/local-html-tools/
 
 ## Third-Party Notices
@@ -162,4 +169,4 @@ GitHub Pages で公開する場合は `docs/index.html` が入口になります
 
 ## ツール群の構成
 
-本プロジェクトは複数カテゴリのツールで構成されており、FFmpeg、Git、リンク管理、パスワード、grep、画像、生活系などが並列に含まれます。FFmpeg 系ツールはその一部です。
+本プロジェクトは複数カテゴリのツールで構成されており、Diagram、FFmpeg、Git、リンク管理、パスワード、grep、画像、生活系などが並列に含まれます。FFmpeg 系ツールはその一部です。
