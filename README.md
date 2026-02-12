@@ -128,7 +128,7 @@ URL加工系ツールです。
 
 図表系ツールです。
 
-- **mermaid-to-svg.html**: Mermaid記法からSVGを生成し、SVG/PNGを保存します。
+- **mermaid-to-svg.html**: Mermaid記法からSVGを生成し、SVGを保存します。
 
 ## text
 
