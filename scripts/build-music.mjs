@@ -51,6 +51,7 @@ const TARGETS = [
       "src/common/js/musicxml-synth-schedule-common.js",
       "src/common/js/music-synth-common.js",
       "src/common/js/musicxml-writer-common.js",
+      "src/common/js/abc-compat-parser.js",
       "src/abc-to-musicxml/js/main.js"
     ],
     tsOrder: [
@@ -59,6 +60,7 @@ const TARGETS = [
       "src/common/ts/musicxml-synth-schedule-common.ts",
       "src/common/ts/music-synth-common.ts",
       "src/common/ts/musicxml-writer-common.ts",
+      "src/common/ts/abc-compat-parser.ts",
       "src/abc-to-musicxml/ts/main.ts"
     ]
   },

@@ -75,6 +75,7 @@ V:1 name="clarinet in A"
     runScript("../src/common/ts/musicxml-synth-schedule-common.ts");
     runScript("../src/common/ts/music-synth-common.ts");
     runScript("../src/common/ts/musicxml-writer-common.ts");
+    runScript("../src/common/ts/abc-compat-parser.ts");
     runScript("../src/abc-to-musicxml/ts/main.ts");
 
     const checkbox = document.getElementById("inferTransposeFromPartNameCheckbox");
@@ -143,6 +144,7 @@ C |`;
     runScript("../src/common/ts/musicxml-synth-schedule-common.ts");
     runScript("../src/common/ts/music-synth-common.ts");
     runScript("../src/common/ts/musicxml-writer-common.ts");
+    runScript("../src/common/ts/abc-compat-parser.ts");
     runScript("../src/abc-to-musicxml/ts/main.ts");
 
     const xml = document.getElementById("xmlOutput").textContent;
@@ -193,6 +195,7 @@ C |`;
     runScript("../src/common/ts/musicxml-synth-schedule-common.ts");
     runScript("../src/common/ts/music-synth-common.ts");
     runScript("../src/common/ts/musicxml-writer-common.ts");
+    runScript("../src/common/ts/abc-compat-parser.ts");
     runScript("../src/abc-to-musicxml/ts/main.ts");
 
     const xml = document.getElementById("xmlOutput").textContent;
@@ -242,6 +245,7 @@ D2-|D2 E > F "pizz." G2 |`;
     runScript("../src/common/ts/musicxml-synth-schedule-common.ts");
     runScript("../src/common/ts/music-synth-common.ts");
     runScript("../src/common/ts/musicxml-writer-common.ts");
+    runScript("../src/common/ts/abc-compat-parser.ts");
     runScript("../src/abc-to-musicxml/ts/main.ts");
 
     const xml = document.getElementById("xmlOutput").textContent;
@@ -294,10 +298,58 @@ x16|x8 z8|`;
     runScript("../src/common/ts/musicxml-synth-schedule-common.ts");
     runScript("../src/common/ts/music-synth-common.ts");
     runScript("../src/common/ts/musicxml-writer-common.ts");
+    runScript("../src/common/ts/abc-compat-parser.ts");
     runScript("../src/abc-to-musicxml/ts/main.ts");
 
     const xml = document.getElementById("xmlOutput").textContent;
     expect(xml).toContain("<rest/>");
     expect(document.getElementById("errorText").textContent).toBe("");
+  });
+
+  it("supports tuplets and chord notes", () => {
+    document.body.innerHTML = `
+      <textarea id="abcInput"></textarea>
+      <input id="fileInput" />
+      <input id="inputModeSource" type="radio" checked />
+      <input id="inputModeFile" type="radio" />
+      <div id="sourceInputBlock"></div>
+      <div id="fileInputBlock"></div>
+      <button id="fileSelectBtn"></button>
+      <span id="fileNameText"></span>
+      <input id="defaultTitleInput" value="Untitled" />
+      <input id="defaultComposerInput" value="Unknown" />
+      <input id="inferTransposeFromPartNameCheckbox" type="checkbox" />
+      <button id="convertBtn"></button>
+      <button id="downloadBtn"></button>
+      <button id="playSineBtn"></button>
+      <button id="copyBtn"></button>
+      <pre id="previewText"></pre>
+      <pre id="xmlOutput"></pre>
+      <p id="errorText"></p>
+      <p id="warningText"></p>
+      <div id="toast"></div>
+      <div id="menuPanel"></div>
+    `;
+    installLocalStorageMock();
+
+    const abcInput = document.getElementById("abcInput");
+    abcInput.value = `X:1
+T:Drowzy Maggie
+M:4/4
+L:1/8
+K:D
+(3bag (3agf gfed|[DFA] [EGB] [A,cf]|`;
+
+    runScript("../src/common/ts/abc-common.ts");
+    runScript("../src/common/ts/musicxml-common.ts");
+    runScript("../src/common/ts/musicxml-synth-schedule-common.ts");
+    runScript("../src/common/ts/music-synth-common.ts");
+    runScript("../src/common/ts/musicxml-writer-common.ts");
+    runScript("../src/common/ts/abc-compat-parser.ts");
+    runScript("../src/abc-to-musicxml/ts/main.ts");
+
+    const xml = document.getElementById("xmlOutput").textContent;
+    expect(document.getElementById("errorText").textContent).toBe("");
+    expect(xml).toContain("<chord/>");
   });
 });
