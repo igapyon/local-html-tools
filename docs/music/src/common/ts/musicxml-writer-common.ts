@@ -62,6 +62,9 @@ const MusicXmlWriterCommon = (() => {
 
         for (const note of notes) {
           lines.push('      <note>');
+          if (note.chord) {
+            lines.push("        <chord/>");
+          }
           if (note.isRest) {
             lines.push('        <rest/>');
           } else {
