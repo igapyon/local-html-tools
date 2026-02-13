@@ -29,6 +29,7 @@ const abcInput = document.getElementById("abcInput");
     const fileNameText = document.getElementById("fileNameText");
     const defaultTitleInput = document.getElementById("defaultTitleInput");
     const defaultComposerInput = document.getElementById("defaultComposerInput");
+    const inferTransposeFromPartNameCheckbox = document.getElementById("inferTransposeFromPartNameCheckbox");
     const convertBtn = document.getElementById("convertBtn");
     const downloadBtn = document.getElementById("downloadBtn");
     const playSineBtn = document.getElementById("playSineBtn");
@@ -61,6 +62,10 @@ const abcInput = document.getElementById("abcInput");
     inputModeFileRadio.addEventListener("change", applyInputMode);
     defaultTitleInput.addEventListener("change", persistSettings);
     defaultComposerInput.addEventListener("change", persistSettings);
+    inferTransposeFromPartNameCheckbox.addEventListener("change", () => {
+      persistSettings();
+      convertAbc();
+    });
     document.addEventListener("click", handleDocumentClick);
 
     applyInputMode();
@@ -114,7 +119,8 @@ const abcInput = document.getElementById("abcInput");
       try {
         const result = parseAbc(source, {
           defaultTitle: defaultTitleInput.value.trim() || "Untitled",
-          defaultComposer: defaultComposerInput.value.trim() || "Unknown"
+          defaultComposer: defaultComposerInput.value.trim() || "Unknown",
+          inferTransposeFromPartName: !!inferTransposeFromPartNameCheckbox.checked
         });
 
         const xml = musicXmlWriterCommon.buildScorePartwiseXml(result);
@@ -227,6 +233,7 @@ const abcInput = document.getElementById("abcInput");
       const meter = parseMeter(headers.M || "4/4", warnings);
       const unitLength = parseFraction(headers.L || "1/8", "L", warnings);
       const keyInfo = parseKey(headers.K || "C", warnings);
+      const keySignatureAccidentals = keySignatureAlterByStep(keyInfo.fifths);
       const measuresByVoice = {};
       let noteCount = 0;
 
@@ -240,6 +247,10 @@ const abcInput = document.getElementById("abcInput");
       for (const entry of bodyEntries) {
         const measures = ensureVoice(entry.voiceId);
         let currentMeasure = measures[measures.length - 1];
+        let measureAccidentals = {};
+        let lastNote = null;
+        let pendingTieToNext = false;
+        let pendingRhythmScale = null;
         let idx = 0;
         const text = entry.text;
 
@@ -251,16 +262,54 @@ const abcInput = document.getElementById("abcInput");
             continue;
           }
 
+          if (ch === ">" || ch === "<") {
+            if (!lastNote || lastNote.isRest) {
+              warnings.push("line " + entry.lineNo + ": broken rhythm(" + ch + ") の前にノートがないためスキップしました。");
+              idx += 1;
+              continue;
+            }
+            const lastScale = ch === ">" ? { num: 3, den: 2 } : { num: 1, den: 2 };
+            pendingRhythmScale = ch === ">" ? { num: 1, den: 2 } : { num: 3, den: 2 };
+            lastNote.duration = Math.max(1, Math.round(lastNote.duration * (lastScale.num / lastScale.den)));
+            lastNote.type = typeFromDuration(lastNote.duration, 960);
+            idx += 1;
+            continue;
+          }
+
           if (ch === "|") {
             if (currentMeasure.length > 0 || measures.length === 0) {
               currentMeasure = [];
               measures.push(currentMeasure);
             }
+            measureAccidentals = {};
+            lastNote = null;
             idx += 1;
             continue;
           }
 
-          if (ch === "[" || ch === "]" || ch === "(" || ch === ")" || ch === "{" || ch === "}" || ch === "\"" || ch === ":") {
+          if (ch === "-") {
+            if (lastNote && !lastNote.isRest) {
+              lastNote.tieStart = true;
+              pendingTieToNext = true;
+            } else {
+              warnings.push("line " + entry.lineNo + ": tie(-) の前にノートがないためスキップしました。");
+            }
+            idx += 1;
+            continue;
+          }
+
+          if (ch === "\"" ) {
+            const endQuote = text.indexOf("\"", idx + 1);
+            if (endQuote >= 0) {
+              idx = endQuote + 1;
+            } else {
+              idx = text.length;
+            }
+            warnings.push("line " + entry.lineNo + ': インライン文字列(\"...\")はスキップしました。');
+            continue;
+          }
+
+          if (ch === "[" || ch === "]" || ch === "(" || ch === ")" || ch === "{" || ch === "}" || ch === ":") {
             warnings.push("line " + entry.lineNo + ": 非対応記法をスキップしました: " + ch);
             idx += 1;
             continue;
@@ -273,7 +322,7 @@ const abcInput = document.getElementById("abcInput");
           }
 
           const pitchChar = text[idx];
-          if (!pitchChar || !/[A-Ga-gzZ]/.test(pitchChar)) {
+          if (!pitchChar || !/[A-Ga-gzZxX]/.test(pitchChar)) {
             throw new Error("line " + entry.lineNo + ": ノート/休符の解釈に失敗しました: " + text.slice(idx, idx + 12));
           }
           idx += 1;
@@ -292,15 +341,49 @@ const abcInput = document.getElementById("abcInput");
           }
 
           const len = parseLengthToken(lengthToken, entry.lineNo);
-          const absoluteLength = multiplyFractions(unitLength, len);
+          let absoluteLength = multiplyFractions(unitLength, len);
+          if (pendingRhythmScale) {
+            absoluteLength = multiplyFractions(absoluteLength, pendingRhythmScale);
+            pendingRhythmScale = null;
+          }
+
+          if (idx < text.length && (text[idx] === ">" || text[idx] === "<")) {
+            const rhythmChar = text[idx];
+            idx += 1;
+            if (rhythmChar === ">") {
+              absoluteLength = multiplyFractions(absoluteLength, { num: 3, den: 2 });
+              pendingRhythmScale = { num: 1, den: 2 };
+            } else {
+              absoluteLength = multiplyFractions(absoluteLength, { num: 1, den: 2 });
+              pendingRhythmScale = { num: 3, den: 2 };
+            }
+          }
+
           const dur = durationInDivisions(absoluteLength, 960);
           if (dur <= 0) {
             throw new Error("line " + entry.lineNo + ": 長さが不正です");
           }
 
-          const note = buildNoteData(pitchChar, accidental, octaveShift, absoluteLength, dur, entry.lineNo);
+          const note = buildNoteData(
+            pitchChar,
+            accidental,
+            octaveShift,
+            absoluteLength,
+            dur,
+            entry.lineNo,
+            keySignatureAccidentals,
+            measureAccidentals
+          );
+          if (pendingTieToNext && !note.isRest) {
+            note.tieStop = true;
+            pendingTieToNext = false;
+          } else if (note.isRest && pendingTieToNext) {
+            warnings.push("line " + entry.lineNo + ": tie(-) の後ろが休符のため tie を解除しました。");
+            pendingTieToNext = false;
+          }
           note.voice = entry.voiceId;
           currentMeasure.push(note);
+          lastNote = note;
           noteCount += 1;
         }
       }
@@ -322,7 +405,7 @@ const abcInput = document.getElementById("abcInput");
         return {
           partId: "P" + String(index + 1),
           partName,
-          transpose: inferTransposeFromPartName(partName),
+          transpose: settings.inferTransposeFromPartName ? inferTransposeFromPartName(partName) : null,
           voiceId,
           measures: measuresByVoice[voiceId] || [[]]
         };
@@ -444,7 +527,14 @@ const abcInput = document.getElementById("abcInput");
     }
 
     function parseMeter(raw, warnings) {
-      const m = raw.match(/^(\d+)\/(\d+)$/);
+      const normalized = String(raw || "").trim();
+      if (normalized === "C") {
+        return { beats: 4, beatType: 4 };
+      }
+      if (normalized === "C|") {
+        return { beats: 2, beatType: 2 };
+      }
+      const m = normalized.match(/^(\d+)\/(\d+)$/);
       if (!m) {
         warnings.push("拍子 M: の形式が不正なため 4/4 を使用しました: " + raw);
         return { beats: 4, beatType: 4 };
@@ -481,8 +571,17 @@ const abcInput = document.getElementById("abcInput");
       return abcCommon.parseAbcLengthToken(token, lineNo);
     }
 
-    function buildNoteData(pitchChar, accidental, octaveShift, absoluteLength, duration, lineNo) {
-      const isRest = /[zZ]/.test(pitchChar);
+    function buildNoteData(
+      pitchChar,
+      accidental,
+      octaveShift,
+      absoluteLength,
+      duration,
+      lineNo,
+      keySignatureAccidentals,
+      measureAccidentals
+    ) {
+      const isRest = /[zZxX]/.test(pitchChar);
       if (isRest) {
         return {
           isRest: true,
@@ -512,12 +611,23 @@ const abcInput = document.getElementById("abcInput");
       if (accidental === "^") {
         alter = 1;
         accidentalText = "sharp";
+        measureAccidentals[step] = 1;
       } else if (accidental === "_") {
         alter = -1;
         accidentalText = "flat";
+        measureAccidentals[step] = -1;
       } else if (accidental === "=") {
         alter = 0;
         accidentalText = "natural";
+        measureAccidentals[step] = 0;
+      } else {
+        let resolvedAlter = 0;
+        if (Object.prototype.hasOwnProperty.call(measureAccidentals, step)) {
+          resolvedAlter = measureAccidentals[step];
+        } else if (Object.prototype.hasOwnProperty.call(keySignatureAccidentals, step)) {
+          resolvedAlter = keySignatureAccidentals[step];
+        }
+        alter = resolvedAlter === 0 ? null : resolvedAlter;
       }
 
       return {
@@ -529,6 +639,23 @@ const abcInput = document.getElementById("abcInput");
         duration,
         type: typeFromFraction(absoluteLength)
       };
+    }
+
+    function keySignatureAlterByStep(fifths) {
+      const map = {};
+      const sharpOrder = ["F", "C", "G", "D", "A", "E", "B"];
+      const flatOrder = ["B", "E", "A", "D", "G", "C", "F"];
+      const f = Number.isFinite(fifths) ? Math.max(-7, Math.min(7, Math.trunc(fifths))) : 0;
+      if (f > 0) {
+        for (let i = 0; i < f; i += 1) {
+          map[sharpOrder[i]] = 1;
+        }
+      } else if (f < 0) {
+        for (let i = 0; i < Math.abs(f); i += 1) {
+          map[flatOrder[i]] = -1;
+        }
+      }
+      return map;
     }
 
 
@@ -554,6 +681,26 @@ const abcInput = document.getElementById("abcInput");
 
     function durationInDivisions(wholeFraction, divisionsPerQuarter) {
       return Math.round((wholeFraction.num / wholeFraction.den) * 4 * divisionsPerQuarter);
+    }
+
+    function typeFromDuration(duration, divisionsPerQuarter) {
+      const whole = Number(duration) / (4 * divisionsPerQuarter);
+      if (whole >= 1) {
+        return "whole";
+      }
+      if (whole >= 0.5) {
+        return "half";
+      }
+      if (whole >= 0.25) {
+        return "quarter";
+      }
+      if (whole >= 0.125) {
+        return "eighth";
+      }
+      if (whole >= 0.0625) {
+        return "16th";
+      }
+      return "32nd";
     }
 
     function multiplyFractions(a, b) {
@@ -728,12 +875,14 @@ const abcInput = document.getElementById("abcInput");
     function persistSettings() {
       const payload = {
         defaultTitle: defaultTitleInput.value,
-        defaultComposer: defaultComposerInput.value
+        defaultComposer: defaultComposerInput.value,
+        inferTransposeFromPartName: !!inferTransposeFromPartNameCheckbox.checked
       };
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(payload));
     }
 
     function restoreSettings() {
+      inferTransposeFromPartNameCheckbox.checked = true;
       const raw = localStorage.getItem(SETTINGS_KEY);
       if (!raw) {
         return;
@@ -747,8 +896,12 @@ const abcInput = document.getElementById("abcInput");
           if (typeof data.defaultComposer === "string") {
             defaultComposerInput.value = data.defaultComposer;
           }
+          if (typeof data.inferTransposeFromPartName === "boolean") {
+            inferTransposeFromPartNameCheckbox.checked = data.inferTransposeFromPartName;
+          }
         }
       } catch (_error) {
         // ignore broken localStorage
+        inferTransposeFromPartNameCheckbox.checked = true;
       }
     }
