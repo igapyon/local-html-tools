@@ -141,6 +141,18 @@
       margin-top: 0.8rem;
     }
 
+    .md-grid-full {
+      grid-column: 1 / -1;
+    }
+
+    .md-check-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
     .md-disclosure {
       margin-bottom: 0.8rem;
       border: 1px solid #e5e0ec;

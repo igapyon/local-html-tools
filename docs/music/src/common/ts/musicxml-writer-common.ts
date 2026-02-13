@@ -82,6 +82,22 @@ const MusicXmlWriterCommon = (() => {
           if (!note.isRest && note.accidentalText) {
             lines.push('        <accidental>' + note.accidentalText + '</accidental>');
           }
+          if (!note.isRest && note.tieStart) {
+            lines.push("        <tie type=\"start\"/>");
+          }
+          if (!note.isRest && note.tieStop) {
+            lines.push("        <tie type=\"stop\"/>");
+          }
+          if (!note.isRest && (note.tieStart || note.tieStop)) {
+            lines.push("        <notations>");
+            if (note.tieStart) {
+              lines.push("          <tied type=\"start\"/>");
+            }
+            if (note.tieStop) {
+              lines.push("          <tied type=\"stop\"/>");
+            }
+            lines.push("        </notations>");
+          }
           lines.push('      </note>');
         }
 
