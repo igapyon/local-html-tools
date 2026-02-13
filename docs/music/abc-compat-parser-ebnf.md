@@ -6,8 +6,8 @@ ABC 2.1 を土台にしつつ、`abcjs` / `abcm2ps` でよく見かける記法�
 ## Scope
 
 - ヘッダ: `X,T,C,M,L,K,V` と `%%score`
-- ボディ: 音符、休符(`z/x`)、臨時記号、長さ、タイ(`-`)、broken rhythm(`>` `<`)、小節線
-- 許容拡張: `M:C`, `M:C|`, インライン文字列(`"..."`)のスキップ
+- ボディ: 音符、休符(`z/x`)、臨時記号、長さ、タイ(`-`)、broken rhythm(`>` `<`)、小節線、和音、連符
+- 許容拡張: `M:C`, `M:C|`, インライン文字列(`"..."`)のスキップ、単独オクターブ記号(`,`/`'`)の許容
 
 ## EBNF
 
@@ -25,14 +25,20 @@ header_value     = { any_char_except_newline } ;
 
 body             = { body_token | ws } ;
 body_token       = note_or_rest
+                 | chord
+                 | tuplet
                  | barline
                  | tie
                  | broken_rhythm
                  | inline_text
                  | decoration
-                 | ignorable_symbol ;
+                 | ignorable_symbol
+                 | standalone_octave_mark ;
 
 note_or_rest     = accidental? , pitch_or_rest , octave_marks? , length? , broken_rhythm? ;
+chord            = "[" , chord_note , { chord_note } , "]" , length? , broken_rhythm? ;
+chord_note       = accidental? , pitch , octave_marks? , length? ;
+tuplet           = "(" , digit , [ ":" , digit ] , [ ":" , digit ] ;
 accidental       = "=" | "^" , ["^"] | "_" , ["_"] ;
 pitch_or_rest    = pitch | rest ;
 pitch            = "A"|"B"|"C"|"D"|"E"|"F"|"G"
@@ -46,10 +52,11 @@ length           = integer [ "/" , integer ]
 barline          = "|" | ":" ;
 tie              = "-" ;
 broken_rhythm    = ">" | "<" ;
+standalone_octave_mark = "," | "'" ;
 inline_text      = '"' , { any_char_except_quote } , '"' ;
 decoration       = "!" , { any_char_except_bang } , "!"
                  | "+" , { any_char_except_plus } , "+" ;
-ignorable_symbol = "(" | ")" | "[" | "]" | "{" | "}" ;
+ignorable_symbol = ")" | "{" | "}" ;
 
 voice_id         = ( letter | digit | "_" | "." | "-" ) ,
                    { letter | digit | "_" | "." | "-" } ;
@@ -72,8 +79,10 @@ digit            = "0".."9" ;
 - `A > B` のような空白入り broken rhythm を許容。
 - `"D"A` のような和音名/注釈は MusicXML 生成対象外としてスキップ（警告のみ）。
 - `x` 休符を `z` と同様に扱う。
+- chord (`[CEG]`, `[A,,CE]` など) を同時発音として扱う。
+- tuplet (`(3abc`, `(5:4:5abcde` など) を音価スケーリングで扱う。
 - `:|`, `|:`, `||` などの `:` は小節補助記号として無視（構文エラー化しない）。
-- 現時点で chord (`[CEG]`) / tuplet (`(3abc`) は未対応で、警告付きスキップ。
+- 単独の `,` / `'` は互換目的で無視して継続する。
 
 ## Growth Policy
 
