@@ -5,6 +5,7 @@
 ## 対象（現行）
 
 - `musicxml-to-midi`
+- `midi-to-musicxml`
 - `musicxml-to-abc`
 - `abc-to-musicxml`
 - `musicxml-to-svg`
@@ -17,6 +18,14 @@
 - `docs/music/src/musicxml-to-midi/ts/main.ts`
 - `docs/music/src/musicxml-to-midi/js/midi-writer.js`（ライブラリ同梱）
 - `docs/music/src/musicxml-to-midi/js/main.js`（TS変換後）
+
+## ファイル構成（midi-to-musicxml）
+
+- `docs/music/midi-to-musicxml-src.html`: 開発用テンプレート（手編集対象）
+- `docs/music/midi-to-musicxml.html`: 配布用生成物（手編集しない）
+- `docs/music/src/midi-to-musicxml/css/app.css`
+- `docs/music/src/midi-to-musicxml/ts/main.ts`
+- `docs/music/src/midi-to-musicxml/js/main.js`（TS変換後）
 
 ## ファイル構成（musicxml-to-abc / abc-to-musicxml）
 
