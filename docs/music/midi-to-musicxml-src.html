@@ -134,6 +134,35 @@ limitations under the License.
             <input id="defaultTempoInput" class="md-input" type="number" min="20" max="300" step="1" value="120" />
           </div>
           <div>
+            <label class="md-label" for="keyModeSelect">調性モード</label>
+            <select id="keyModeSelect" class="md-input">
+              <option value="auto" selected>自動判定</option>
+              <option value="major">長調 (major)</option>
+              <option value="minor">短調 (minor)</option>
+            </select>
+          </div>
+          <div>
+            <label class="md-label" for="keyFifthsSelect">調号（fifths）</label>
+            <select id="keyFifthsSelect" class="md-input">
+              <option value="auto" selected>自動判定 / MIDIメタ</option>
+              <option value="-7">-7 (7 flats)</option>
+              <option value="-6">-6 (6 flats)</option>
+              <option value="-5">-5 (5 flats)</option>
+              <option value="-4">-4 (4 flats)</option>
+              <option value="-3">-3 (3 flats)</option>
+              <option value="-2">-2 (2 flats)</option>
+              <option value="-1">-1 (1 flat)</option>
+              <option value="0">0 (C)</option>
+              <option value="1">1 (1 sharp)</option>
+              <option value="2">2 (2 sharps)</option>
+              <option value="3">3 (3 sharps)</option>
+              <option value="4">4 (4 sharps)</option>
+              <option value="5">5 (5 sharps)</option>
+              <option value="6">6 (6 sharps)</option>
+              <option value="7">7 (7 sharps)</option>
+            </select>
+          </div>
+          <div>
             <label class="md-label" for="defaultBeatsInput">既定拍子（分子）</label>
             <input id="defaultBeatsInput" class="md-input" type="number" min="1" max="12" step="1" value="4" />
           </div>
