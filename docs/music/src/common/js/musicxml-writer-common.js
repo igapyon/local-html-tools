@@ -44,9 +44,10 @@ const MusicXmlWriterCommon = (() => {
         lines.push('    <measure number="' + measureNo + '">');
         if (measureIndex === 0) {
           const clef = normalizeClef(part.clef);
+          const keyMode = normalizeKeyMode(meta.keyInfo && meta.keyInfo.mode);
           lines.push('      <attributes>');
           lines.push('        <divisions>960</divisions>');
-          lines.push('        <key><fifths>' + meta.keyInfo.fifths + '</fifths></key>');
+          lines.push('        <key><fifths>' + meta.keyInfo.fifths + '</fifths><mode>' + keyMode + '</mode></key>');
           lines.push('        <time><beats>' + meta.meter.beats + '</beats><beat-type>' + meta.meter.beatType + '</beat-type></time>');
           const transpose = normalizeTranspose(part.transpose);
           if (transpose) {
@@ -149,6 +150,14 @@ const MusicXmlWriterCommon = (() => {
       return { sign: "G", line: 2 };
     }
     return { sign, line };
+  }
+
+  function normalizeKeyMode(rawMode) {
+    const mode = String(rawMode || "major").trim().toLowerCase();
+    if (mode === "minor") {
+      return "minor";
+    }
+    return "major";
   }
 
   return {
