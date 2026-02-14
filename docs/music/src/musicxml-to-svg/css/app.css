@@ -197,6 +197,11 @@
       display: block;
     }
 
+    .md-preview-stage--long-line svg {
+      max-width: none;
+      width: auto;
+    }
+
     .md-pager {
       margin-top: 0.7rem;
       display: flex;
