@@ -20,6 +20,7 @@ const musicxmlInput = document.getElementById("musicxmlInput");
     const fileNameText = document.getElementById("fileNameText");
     const scaleInput = document.getElementById("scaleInput");
     const pageWidthInput = document.getElementById("pageWidthInput");
+    const longLineModeInput = document.getElementById("longLineModeInput");
     const marginTopInput = document.getElementById("marginTopInput");
     const marginBottomInput = document.getElementById("marginBottomInput");
     const marginLeftInput = document.getElementById("marginLeftInput");
@@ -41,6 +42,7 @@ const musicxmlInput = document.getElementById("musicxmlInput");
 
     const STORAGE_KEY = "diagram-musicxml-render-options";
     const MIDI_TICKS_PER_QUARTER = 128;
+    const LONG_LINE_PAGE_WIDTH = 200000;
 
     let lastSvg = "";
     let lastSynthSchedule = null;
@@ -77,8 +79,13 @@ const musicxmlInput = document.getElementById("musicxmlInput");
     ].forEach((input) => {
       input.addEventListener("change", persistOptions);
     });
+    longLineModeInput.addEventListener("change", () => {
+      applyLongLineModeUiState();
+      persistOptions();
+    });
 
     applyInputMode();
+    applyLongLineModeUiState();
     initVerovioToolkit();
 
     function initVerovioToolkit() {
@@ -143,6 +150,7 @@ const musicxmlInput = document.getElementById("musicxmlInput");
         setError("MusicXMLを入力してください。");
         return;
       }
+      const renderSource = isLongLineModeEnabled() ? removeMusicXmlForcedBreaks(source) : source;
 
       clearError();
       renderBtn.disabled = true;
@@ -150,7 +158,7 @@ const musicxmlInput = document.getElementById("musicxmlInput");
       try {
         const options = getRenderOptions();
         toolkit.setOptions(options);
-        toolkit.loadData(source);
+        toolkit.loadData(renderSource);
 
         pageCount = Number(toolkit.getPageCount()) || 0;
         if (pageCount < 1) {
@@ -164,7 +172,7 @@ const musicxmlInput = document.getElementById("musicxmlInput");
         downloadSvgBtn.disabled = false;
         downloadZipBtn.disabled = false;
         try {
-        lastSynthSchedule = musicXmlSynthScheduleCommon.buildSynthScheduleFromMusicXml(source, {
+        lastSynthSchedule = musicXmlSynthScheduleCommon.buildSynthScheduleFromMusicXml(renderSource, {
           ticksPerQuarter: MIDI_TICKS_PER_QUARTER
         });
         } catch (_error) {
@@ -268,14 +276,22 @@ const musicxmlInput = document.getElementById("musicxmlInput");
     }
 
     function getRenderOptions() {
-      return {
+      const longLineMode = isLongLineModeEnabled();
+      const options = {
         scale: sanitizeNumber(scaleInput.value, 40, 20, 200),
-        pageWidth: sanitizeNumber(pageWidthInput.value, 1600, 400, 5000),
+        pageWidth: longLineMode ? LONG_LINE_PAGE_WIDTH : getPageWidthInputValue(),
         pageMarginTop: sanitizeNumber(marginTopInput.value, 40, 0, 500),
         pageMarginBottom: sanitizeNumber(marginBottomInput.value, 40, 0, 500),
         pageMarginLeft: sanitizeNumber(marginLeftInput.value, 40, 0, 500),
-        pageMarginRight: sanitizeNumber(marginRightInput.value, 40, 0, 500)
+        pageMarginRight: sanitizeNumber(marginRightInput.value, 40, 0, 500),
+        breaks: longLineMode ? "none" : "auto",
+        adjustPageWidth: longLineMode
       };
+      return options;
+    }
+
+    function getPageWidthInputValue() {
+      return sanitizeNumber(pageWidthInput.value, 1600, 400, 50000);
     }
 
     function sanitizeNumber(rawValue, fallback, min, max) {
@@ -287,7 +303,15 @@ const musicxmlInput = document.getElementById("musicxmlInput");
     }
 
     function persistOptions() {
-      const options = getRenderOptions();
+      const options = {
+        scale: sanitizeNumber(scaleInput.value, 40, 20, 200),
+        pageWidth: getPageWidthInputValue(),
+        pageMarginTop: sanitizeNumber(marginTopInput.value, 40, 0, 500),
+        pageMarginBottom: sanitizeNumber(marginBottomInput.value, 40, 0, 500),
+        pageMarginLeft: sanitizeNumber(marginLeftInput.value, 40, 0, 500),
+        pageMarginRight: sanitizeNumber(marginRightInput.value, 40, 0, 500),
+        longLineMode: isLongLineModeEnabled()
+      };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(options));
     }
 
@@ -307,9 +331,23 @@ const musicxmlInput = document.getElementById("musicxmlInput");
         setIfFinite(marginBottomInput, options.pageMarginBottom);
         setIfFinite(marginLeftInput, options.pageMarginLeft);
         setIfFinite(marginRightInput, options.pageMarginRight);
+        if (typeof options.longLineMode === "boolean") {
+          longLineModeInput.checked = options.longLineMode;
+        }
+        applyLongLineModeUiState();
       } catch (_error) {
         // Ignore broken localStorage data
       }
+    }
+
+    function isLongLineModeEnabled() {
+      return Boolean(longLineModeInput && longLineModeInput.checked);
+    }
+
+    function applyLongLineModeUiState() {
+      const enabled = isLongLineModeEnabled();
+      pageWidthInput.disabled = enabled;
+      svgPreview.classList.toggle("md-preview-stage--long-line", enabled);
     }
 
     function setIfFinite(input, value) {
@@ -414,6 +452,12 @@ const musicxmlInput = document.getElementById("musicxmlInput");
 
     function normalizeMusicXMLSource(rawText) {
       return musicXmlCommon.normalizeMusicXmlSource(rawText);
+    }
+
+    function removeMusicXmlForcedBreaks(source) {
+      return source
+        .replace(/\s+new-system\s*=\s*"(?:yes|true|1)"/gi, "")
+        .replace(/\s+new-page\s*=\s*"(?:yes|true|1)"/gi, "");
     }
 
     function extractXmlErrorLine(message) {
