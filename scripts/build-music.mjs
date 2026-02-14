@@ -21,6 +21,20 @@ const TARGETS = [
     ]
   },
   {
+    id: "midi-to-musicxml",
+    srcHtml: "docs/music/midi-to-musicxml-src.html",
+    outHtml: "docs/music/midi-to-musicxml.html",
+    cssOrder: ["src/midi-to-musicxml/css/app.css"],
+    jsOrder: [
+      "src/common/js/musicxml-writer-common.js",
+      "src/midi-to-musicxml/js/main.js"
+    ],
+    tsOrder: [
+      "src/common/ts/musicxml-writer-common.ts",
+      "src/midi-to-musicxml/ts/main.ts"
+    ]
+  },
+  {
     id: "musicxml-to-abc",
     srcHtml: "docs/music/musicxml-to-abc-src.html",
     outHtml: "docs/music/musicxml-to-abc.html",

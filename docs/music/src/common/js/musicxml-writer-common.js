@@ -43,6 +43,7 @@ const MusicXmlWriterCommon = (() => {
 
         lines.push('    <measure number="' + measureNo + '">');
         if (measureIndex === 0) {
+          const clef = normalizeClef(part.clef);
           lines.push('      <attributes>');
           lines.push('        <divisions>960</divisions>');
           lines.push('        <key><fifths>' + meta.keyInfo.fifths + '</fifths></key>');
@@ -56,7 +57,7 @@ const MusicXmlWriterCommon = (() => {
             }
             lines.push("        </transpose>");
           }
-          lines.push('        <clef><sign>G</sign><line>2</line></clef>');
+          lines.push('        <clef><sign>' + clef.sign + '</sign><line>' + clef.line + '</line></clef>');
           lines.push('      </attributes>');
         }
 
@@ -136,6 +137,18 @@ const MusicXmlWriterCommon = (() => {
       chromatic,
       octaveChange: Number.isFinite(octaveChange) ? octaveChange : 0
     };
+  }
+
+  function normalizeClef(rawClef) {
+    if (!rawClef || typeof rawClef !== "object") {
+      return { sign: "G", line: 2 };
+    }
+    const sign = String(rawClef.sign || "G").trim().toUpperCase();
+    const line = Number.parseInt(rawClef.line, 10);
+    if ((sign !== "G" && sign !== "F" && sign !== "C") || !Number.isFinite(line) || line <= 0) {
+      return { sign: "G", line: 2 };
+    }
+    return { sign, line };
   }
 
   return {
