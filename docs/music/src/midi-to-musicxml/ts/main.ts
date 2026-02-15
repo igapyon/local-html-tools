@@ -751,7 +751,8 @@ function buildRestToken(durationTick, ppqn) {
   return {
     isRest: true,
     duration,
-    type: durationToType(duration)
+    type: durationToType(duration),
+    voice: "1"
   };
 }
 
