@@ -66,10 +66,12 @@ limitations under the License.
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 30px rgba(0, 0, 0, 0.06);
       border: 1px solid #e9e3f0;
       padding: 28px;
+      position: relative;
     }
 
     .md-headline {
       font-size: 1.8rem; font-weight: 700; margin-bottom: 0.75rem;
+      padding-right: 84px;
     }
 
     .md-subtitle {
@@ -100,6 +102,7 @@ limitations under the License.
 
     .md-input, .md-textarea {
       width: 100%;
+      box-sizing: border-box;
       border-radius: 12px;
       border: 1px solid var(--md-sys-color-outline);
       background: var(--md-sys-color-surface);
@@ -140,6 +143,34 @@ limitations under the License.
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
+    }
+
+    .md-control-flow {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+
+    .md-control-flow-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-width: 0;
+    }
+
+    .md-control-flow-item .md-label {
+      margin: 0;
+      white-space: nowrap;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+
+    .md-control-flow-item .md-input {
+      width: auto;
+      min-width: 16rem;
+      flex: 0 1 24rem;
     }
 
     .md-headline {
@@ -278,6 +309,55 @@ limitations under the License.
     .md-switch-input:checked + .md-switch::after {
       transform: translate(20px, -50%);
       background: #ffffff;
+    }
+
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      border: none;
+      background: #f0edf5;
+      color: #3f3b46;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .md-menu-button {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 30;
+    }
+
+    .md-menu-panel {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 35;
+    }
+
+    .md-menu-link {
+      display: block;
+      padding: 8px 16px;
+      color: var(--md-sys-color-on-surface);
+      text-decoration: none;
+    }
+
+    .md-menu-link:hover {
+      background: #f2edf8;
+    }
+
+    .md-hidden {
+      display: none;
     }
 
     .md-result-card {
@@ -512,6 +592,14 @@ limitations under the License.
     }
 
     @media (max-width: 799px) {
+      .md-page {
+        padding: 12px;
+      }
+
+      .md-card {
+        padding: 20px;
+      }
+
       .md-inline-select-row .md-label {
         flex: 1 1 100%;
         min-width: 0;
@@ -527,6 +615,19 @@ limitations under the License.
         min-width: 0;
         margin-top: 0;
       }
+
+      .md-control-flow {
+        align-items: stretch;
+      }
+
+      .md-control-flow-item {
+        width: 100%;
+      }
+
+      .md-control-flow-item .md-input {
+        min-width: 0;
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -534,17 +635,27 @@ limitations under the License.
   <main class="md-page">
     <div class="md-shell">
       <section class="md-card">
+        <button type="button" class="md-menu-button md-icon-btn" aria-label="メニュー" onclick="toggleMenu()">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 6h16"></path>
+            <path d="M4 12h16"></path>
+            <path d="M4 18h16"></path>
+          </svg>
+        </button>
+        <div id="menuPanel" class="md-menu-panel md-hidden">
+          <a href="../index.html" class="md-menu-link">トップへ戻る</a>
+        </div>
+
         <h1 class="md-headline">
           <span aria-hidden="true" class="md-headline__icon">🔤</span>
           <span>日本語ローマ字メモ（旅券・ヘボン・訓令・日本式）</span>
           <span class="md-tooltip-group">
             <span class="md-info-chip" aria-label="説明"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-            <span class="md-tooltip-content md-tooltip">旅券ローマ字を中心に、ヘボン式・訓令式・日本式を比較し、用途に応じた判断を支援するページです。</span>
+            <span class="md-tooltip-content md-tooltip md-tooltip-content--wide">旅券ローマ字を中心に、ヘボン式・訓令式・日本式を比較し、用途に応じた判断を支援するページです。<br>主に名前表記の検討を想定した簡易変換です。<br>旅券ローマ字は「ヘボン式をベースにした実務上の長音運用を切替できる比較モード」として扱っています。</span>
           </span>
         </h1>
         <p class="md-subtitle">
           旅券ローマ字（実務寄り）を中心に、近い方式のヘボン式、理論寄りの訓令式・日本式を並べて確認するためのページです。
-          主に名前表記の検討を想定した簡易変換です。旅券ローマ字は「ヘボン式をベースにした実務上の長音運用を切替できる比較モード」として扱っています。
         </p>
 
         <section class="md-section">
@@ -552,6 +663,69 @@ limitations under the License.
           <textarea class="md-textarea" id="sourceText" placeholder="さとう たろう
 しんじゅく
 ちゃづけ"></textarea>
+          <div class="md-control-flow">
+            <div class="md-control-flow-item">
+              <label class="md-label" for="useCaseSelect">
+                用途
+                <span class="md-tooltip-group">
+                  <span class="md-info-chip" aria-label="用途の説明"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+                  <span class="md-tooltip-content md-tooltip md-tooltip-content--wide">氏名（旅券・本人確認）: 旅券ローマ字（簡易）を主に確認。<br>地名・駅名（案内表示）: ヘボン式を主に確認。慣用綴り（OSAKA など）を優先する場合あり。<br>学校学習（2025年以降）: ヘボン式を主に確認。教材差分に注意。<br>方式比較（理論検討）: 日本式（理論寄り）を主に確認。訓令式との差分を併読。</span>
+                </span>
+              </label>
+              <select class="md-input" id="useCaseSelect">
+                <option value="passport_name" selected>氏名（旅券・本人確認）</option>
+                <option value="station_place">地名・駅名（案内表示）</option>
+                <option value="school_learning">学校学習（2025年以降）</option>
+                <option value="linguistics_compare">方式比較（理論検討）</option>
+              </select>
+            </div>
+            <div class="md-control-flow-item">
+              <label class="md-label" for="optPassportLongVowelStyle">
+                長音
+                <span class="md-tooltip-group">
+                  <span class="md-info-chip" aria-label="長音の説明"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+                  <span class="md-tooltip-content md-tooltip md-tooltip-content--wide">旅券ローマ字の長音は運用に揺れがあるため、ここでは複数パターンを切り替えられるようにしています。OH表記の例: OONO → OHNO。</span>
+                </span>
+              </label>
+              <select class="md-input" id="optPassportLongVowelStyle">
+                <option value="simplify" selected>簡略（SATOU → SATO）</option>
+                <option value="keep">保持（SATOU のまま）</option>
+                <option value="oh">OH表記（SATOU → SATOH）</option>
+              </select>
+            </div>
+            <div class="md-control-flow-item">
+              <label class="md-switch-label">
+                <input id="optUppercase" class="md-switch-input" type="checkbox" checked />
+                <span class="md-switch" aria-hidden="true"></span>
+                大文字出力
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="md-section">
+          <h2 class="md-section-title">変換結果</h2>
+          <div class="md-grid md-grid-two">
+            <div class="md-result-card" data-mode="passport">
+              <div class="md-result-label">旅券ローマ字（簡易）<span class="md-badge" id="badgePassport" hidden>推奨</span></div>
+              <pre class="md-result" id="resultPassport"></pre>
+            </div>
+            <div class="md-result-card" data-mode="hepburn">
+              <div class="md-result-label">ヘボン式<span class="md-badge" id="badgeHepburn" hidden>推奨</span></div>
+              <pre class="md-result" id="resultHepburn"></pre>
+            </div>
+            <div class="md-result-card" data-mode="kunrei">
+              <div class="md-result-label">訓令式<span class="md-badge" id="badgeKunrei" hidden>推奨</span></div>
+              <pre class="md-result" id="resultKunrei"></pre>
+            </div>
+            <div class="md-result-card" data-mode="nihon">
+              <div class="md-result-label">日本式（理論寄り）<span class="md-badge" id="badgeNihon" hidden>推奨</span></div>
+              <pre class="md-result" id="resultNihon"></pre>
+            </div>
+          </div>
+          <p class="md-note">
+            注: 本ページは比較・検討を目的にした簡易実装です。正式運用時は必ず最新の公式規則・実務運用に照らして確認してください。
+          </p>
           <details class="md-accordion">
             <summary>実名寄りプリセット</summary>
             <div class="md-inline-preset-row">
@@ -579,62 +753,6 @@ limitations under the License.
               </div>
             </div>
           </details>
-          <div class="md-check-row" style="margin-top: 0.8rem;">
-            <label class="md-switch-label">
-              <input id="optUppercase" class="md-switch-input" type="checkbox" checked />
-              <span class="md-switch" aria-hidden="true"></span>
-              出力を大文字にする
-            </label>
-          </div>
-          <div class="md-inline-select-row" style="margin-top: 0.8rem;">
-            <label class="md-label" for="useCaseSelect">用途を選ぶ</label>
-            <select class="md-input" id="useCaseSelect">
-              <option value="passport_name" selected>氏名（旅券・本人確認）</option>
-              <option value="station_place">地名・駅名（案内表示）</option>
-              <option value="school_learning">学校学習（2025年以降）</option>
-              <option value="linguistics_compare">方式比較（理論検討）</option>
-            </select>
-          </div>
-          <p class="md-note" id="useCaseRecommendation"></p>
-          <div class="md-inline-select-row" style="margin-top: 0.8rem;">
-            <label class="md-label" for="optPassportLongVowelStyle">
-              旅券ローマ字: 長音の扱い
-              <span class="md-tooltip-group">
-                <span class="md-info-chip" aria-label="長音の説明"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-                <span class="md-tooltip-content md-tooltip md-tooltip-content--wide">旅券ローマ字の長音は運用に揺れがあるため、ここでは複数パターンを切り替えられるようにしています。</span>
-              </span>
-            </label>
-            <select class="md-input" id="optPassportLongVowelStyle">
-              <option value="simplify" selected>簡略（SATOU → SATO）</option>
-              <option value="keep">保持（SATOU のまま）</option>
-              <option value="oh">OH表記（SATOU → SATOH / OONO → OHNO）</option>
-            </select>
-          </div>
-        </section>
-
-        <section class="md-section">
-          <h2 class="md-section-title">変換結果</h2>
-          <div class="md-grid md-grid-two">
-            <div class="md-result-card" data-mode="passport">
-              <div class="md-result-label">旅券ローマ字（簡易）<span class="md-badge" id="badgePassport" hidden>推奨</span></div>
-              <pre class="md-result" id="resultPassport"></pre>
-            </div>
-            <div class="md-result-card" data-mode="hepburn">
-              <div class="md-result-label">ヘボン式<span class="md-badge" id="badgeHepburn" hidden>推奨</span></div>
-              <pre class="md-result" id="resultHepburn"></pre>
-            </div>
-            <div class="md-result-card" data-mode="kunrei">
-              <div class="md-result-label">訓令式<span class="md-badge" id="badgeKunrei" hidden>推奨</span></div>
-              <pre class="md-result" id="resultKunrei"></pre>
-            </div>
-            <div class="md-result-card" data-mode="nihon">
-              <div class="md-result-label">日本式（理論寄り）<span class="md-badge" id="badgeNihon" hidden>推奨</span></div>
-              <pre class="md-result" id="resultNihon"></pre>
-            </div>
-          </div>
-          <p class="md-note">
-            注: 本ページは比較・検討を目的にした簡易実装です。正式運用時は必ず最新の公式規則・実務運用に照らして確認してください。
-          </p>
         </section>
 
         <hr class="md-appendix-divider" />
@@ -708,6 +826,7 @@ limitations under the License.
 
   <script>
     (function () {
+      const menuPanel = document.getElementById("menuPanel");
       const sourceText = document.getElementById("sourceText");
       const optUppercase = document.getElementById("optUppercase");
       const optPassportLongVowelStyle = document.getElementById("optPassportLongVowelStyle");
@@ -718,7 +837,6 @@ limitations under the License.
       const sampleTableBody = document.getElementById("sampleTableBody");
       const presetButtons = document.querySelectorAll(".js-preset");
       const useCaseSelect = document.getElementById("useCaseSelect");
-      const useCaseRecommendation = document.getElementById("useCaseRecommendation");
       const resultCards = document.querySelectorAll(".md-result-card[data-mode]");
       const badges = {
         passport: document.getElementById("badgePassport"),
@@ -835,23 +953,19 @@ limitations under the License.
       const useCaseConfig = {
         passport_name: {
           recommendedMode: "passport",
-          longVowelStyle: "simplify",
-          message: "この用途では、旅券ローマ字（簡易）を主に確認してください。最終決定は旅券申請ルールと本人の公式表記を優先します。"
+          longVowelStyle: "simplify"
         },
         station_place: {
           recommendedMode: "hepburn",
-          longVowelStyle: "simplify",
-          message: "この用途では、ヘボン式を主に確認してください。地名・駅名は実務運用と慣用綴り（OSAKA など）が優先される場合があります。"
+          longVowelStyle: "simplify"
         },
         school_learning: {
           recommendedMode: "hepburn",
-          longVowelStyle: "keep",
-          message: "この用途では、ヘボン式を主に確認してください。2025年以降の学校指導方針を想定しつつ、教材差分には注意してください。"
+          longVowelStyle: "keep"
         },
         linguistics_compare: {
           recommendedMode: "nihon",
-          longVowelStyle: "keep",
-          message: "この用途では、日本式（理論寄り）を主に確認してください。訓令式との差分を併読すると体系理解が進みます。"
+          longVowelStyle: "keep"
         }
       };
 
@@ -900,7 +1014,6 @@ limitations under the License.
           return;
         }
         optPassportLongVowelStyle.value = config.longVowelStyle;
-        useCaseRecommendation.textContent = config.message;
         setRecommendedMode(config.recommendedMode);
       }
 
@@ -1019,6 +1132,22 @@ limitations under the License.
 
       applyUseCaseRecommendation();
       updateAll();
+
+      window.toggleMenu = function () {
+        menuPanel.classList.toggle("md-hidden");
+      };
+
+      document.addEventListener("click", function (event) {
+        if (!menuPanel.contains(event.target) && !event.target.closest(".md-menu-button")) {
+          menuPanel.classList.add("md-hidden");
+        }
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          menuPanel.classList.add("md-hidden");
+        }
+      });
     }());
   </script>
 </body>
