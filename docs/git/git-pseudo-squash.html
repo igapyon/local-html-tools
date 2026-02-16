@@ -237,6 +237,9 @@ limitations under the License.
       color: #1f1b2d;
       min-height: 2.5rem;
     }
+    .md-code--dual-copy {
+      padding-bottom: 2.5rem;
+    }
 
     .md-copy-button {
       position: absolute;
@@ -248,6 +251,11 @@ limitations under the License.
       background: #f7f2fa;
       border: none;
       cursor: pointer;
+    }
+    .md-copy-button--bottom-right {
+      top: auto;
+      right: 0.5rem;
+      bottom: 0.5rem;
     }
 
     .md-snackbar {
@@ -935,7 +943,9 @@ limitations under the License.
       border: 1px solid #e5e0ec;
       color: #1f1b2d;
     }
+    .md-code--dual-copy { padding-bottom: 2.5rem; }
     .md-copy-button { position: absolute; top: 0.5rem; right: 0.5rem; }
+    .md-copy-button--bottom-right { top: auto; right: 0.5rem; bottom: 0.5rem; }
 
     .md-icon-20 { width: 20px; height: 20px; }
 
@@ -1429,8 +1439,13 @@ limitations under the License.
     </div>
 
     <div class="md-code-block">
-      <code id="rebaseCmd" class="md-code"></code>
+      <code id="rebaseCmd" class="md-code md-code--dual-copy"></code>
       <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('rebaseCmd')">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
+          </svg>
+      </button>
+      <button class="md-copy-button md-copy-button--bottom-right md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('rebaseCmd')" aria-label="コピー（右下）">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
           </svg>

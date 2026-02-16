@@ -2644,9 +2644,9 @@ Expecting `+Qe.join(", ")+", got '"+(this.terminals_[Ne]||Ne)+"'":Dt="Parse erro
         });
 
         const result = await mermaid.render(renderId, source);
-        lastSvg = result.svg;
-        svgPreview.innerHTML = result.svg;
-        svgText.textContent = result.svg;
+        lastSvg = normalizeSvgForXml(result.svg);
+        svgPreview.innerHTML = lastSvg;
+        svgText.textContent = lastSvg;
 
         downloadSvgBtn.disabled = false;
         showToast("SVGを生成しました。");
@@ -2684,6 +2684,28 @@ Expecting `+Qe.join(", ")+", got '"+(this.terminals_[Ne]||Ne)+"'":Dt="Parse erro
       }).catch((error) => {
         setError("コピーに失敗しました: " + (error && error.message ? error.message : String(error)));
       });
+    }
+
+    function normalizeSvgForXml(svgText) {
+      if (!svgText) {
+        return "";
+      }
+
+      // Mermaid can emit HTML-style <br> inside foreignObject labels.
+      // Convert them to XML-safe self-closing tags for standalone SVG consumers.
+      const candidate = svgText
+        .replace(/<br\s*>/gi, "<br/>")
+        .replace(/<br([^/>]*)><\/br>/gi, "<br$1/>");
+
+      try {
+        const parsed = new DOMParser().parseFromString(candidate, "image/svg+xml");
+        if (parsed.querySelector("parsererror")) {
+          return candidate;
+        }
+        return new XMLSerializer().serializeToString(parsed.documentElement);
+      } catch (error) {
+        return candidate;
+      }
     }
 
     function setError(message, lineNumber) {
