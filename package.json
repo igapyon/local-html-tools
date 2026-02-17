@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build:music": "node scripts/build-music.mjs",
+    "build:knowledge-timeline": "node scripts/build-knowledge-timeline.mjs",
     "typecheck:music": "tsc -p tsconfig.music.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
