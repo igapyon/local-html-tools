@@ -29,12 +29,33 @@ const MusicXmlWriterCommon = (() => {
     for (const part of parts) {
       const partId = part.partId || "P1";
       const partName = part.partName || "Music";
-      lines.push('    <score-part id="' + escapeXml(partId) + '"><part-name>' + escapeXml(partName) + '</part-name></score-part>');
+      const midiProgram = normalizeMidiProgram(part.midiProgram);
+      const midiChannel = normalizeMidiChannel(part.midiChannel);
+      const scoreInstrumentId = partId + "-I1";
+      lines.push('    <score-part id="' + escapeXml(partId) + '">');
+      lines.push('      <part-name>' + escapeXml(partName) + '</part-name>');
+      if (midiProgram !== null || midiChannel !== null) {
+        lines.push('      <score-instrument id="' + escapeXml(scoreInstrumentId) + '">');
+        lines.push('        <instrument-name>' + escapeXml(resolveMidiInstrumentName(partName, midiProgram)) + '</instrument-name>');
+        lines.push('      </score-instrument>');
+        lines.push('      <midi-instrument id="' + escapeXml(scoreInstrumentId) + '">');
+        if (midiChannel !== null) {
+          lines.push("        <midi-channel>" + midiChannel + "</midi-channel>");
+        }
+        if (midiProgram !== null) {
+          lines.push("        <midi-program>" + midiProgram + "</midi-program>");
+        }
+        lines.push("      </midi-instrument>");
+      }
+      lines.push("    </score-part>");
     }
     lines.push('  </part-list>');
-    for (const part of parts) {
+    const tempoChangesByMeasure = normalizeTempoChanges(meta.tempoChanges, meta.tempo);
+    for (let partIndex = 0; partIndex < parts.length; partIndex += 1) {
+      const part = parts[partIndex];
       const partId = part.partId || "P1";
       const measures = Array.isArray(part.measures) && part.measures.length > 0 ? part.measures : [[]];
+      const measureDynamics = Array.isArray(part.measureDynamics) ? part.measureDynamics : [];
       lines.push('  <part id="' + escapeXml(partId) + '">');
 
       for (let measureIndex = 0; measureIndex < measures.length; measureIndex += 1) {
@@ -60,6 +81,30 @@ const MusicXmlWriterCommon = (() => {
           }
           lines.push('        <clef><sign>' + clef.sign + '</sign><line>' + clef.line + '</line></clef>');
           lines.push('      </attributes>');
+        }
+        if (partIndex === 0) {
+          const tempoBpm = tempoChangesByMeasure.get(measureNo);
+          if (Number.isFinite(tempoBpm) && tempoBpm > 0) {
+            lines.push('      <direction placement="above">');
+            lines.push("        <direction-type>");
+            lines.push("          <metronome>");
+            lines.push("            <beat-unit>quarter</beat-unit>");
+            lines.push("            <per-minute>" + tempoBpm + "</per-minute>");
+            lines.push("          </metronome>");
+            lines.push("        </direction-type>");
+            lines.push("        <sound tempo=\"" + tempoBpm + "\"/>");
+            lines.push("      </direction>");
+          }
+        }
+        const dynamicMark = normalizeDynamicMark(measureDynamics[measureIndex]);
+        if (dynamicMark) {
+          lines.push('      <direction placement="below">');
+          lines.push("        <direction-type>");
+          lines.push("          <dynamics>");
+          lines.push("            <" + dynamicMark + "/>");
+          lines.push("          </dynamics>");
+          lines.push("        </direction-type>");
+          lines.push("      </direction>");
         }
 
         for (const note of notes) {
@@ -160,6 +205,70 @@ const MusicXmlWriterCommon = (() => {
     return "major";
   }
 
+  function normalizeMidiProgram(rawProgram) {
+    const value = Number.parseInt(rawProgram, 10);
+    if (!Number.isFinite(value) || value < 1 || value > 128) {
+      return null;
+    }
+    return value;
+  }
+
+  function normalizeMidiChannel(rawChannel) {
+    const value = Number.parseInt(rawChannel, 10);
+    if (!Number.isFinite(value) || value < 1 || value > 16) {
+      return null;
+    }
+    return value;
+  }
+
+  function resolveMidiInstrumentName(partName, midiProgram) {
+    const normalizedPartName = String(partName || "").trim();
+    if (normalizedPartName) {
+      return normalizedPartName;
+    }
+    if (midiProgram !== null) {
+      return "Program " + midiProgram;
+    }
+    return "Instrument";
+  }
+
+  function normalizeDynamicMark(rawMark) {
+    const mark = String(rawMark || "").trim().toLowerCase();
+    if (mark === "p" || mark === "mp" || mark === "mf" || mark === "f") {
+      return mark;
+    }
+    return null;
+  }
+
+  function normalizeTempoChanges(rawTempoChanges, fallbackTempo) {
+    const tempoByMeasure = new Map();
+    if (Array.isArray(rawTempoChanges)) {
+      for (const change of rawTempoChanges) {
+        if (!change || typeof change !== "object") {
+          continue;
+        }
+        const measure = Number.parseInt(change.measure, 10);
+        const bpm = Number.parseInt(change.bpm, 10);
+        if (!Number.isFinite(measure) || measure <= 0 || !Number.isFinite(bpm) || bpm <= 0) {
+          continue;
+        }
+        tempoByMeasure.set(measure, bpm);
+      }
+    }
+    if (tempoByMeasure.size === 0) {
+      const fallback = Number.parseInt(fallbackTempo, 10);
+      if (Number.isFinite(fallback) && fallback > 0) {
+        tempoByMeasure.set(1, fallback);
+      }
+    } else if (!tempoByMeasure.has(1)) {
+      const fallback = Number.parseInt(fallbackTempo, 10);
+      if (Number.isFinite(fallback) && fallback > 0) {
+        tempoByMeasure.set(1, fallback);
+      }
+    }
+    return tempoByMeasure;
+  }
+
   return {
     escapeXml,
     buildScorePartwiseXml
@@ -169,3 +278,4 @@ const MusicXmlWriterCommon = (() => {
 if (typeof window !== "undefined") {
   window["MusicXmlWriterCommon"] = MusicXmlWriterCommon;
 }
+  </script>
