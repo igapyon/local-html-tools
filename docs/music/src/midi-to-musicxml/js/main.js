@@ -248,6 +248,13 @@ function parseMidiFile(bytes) {
   const earliestTempo = findEarliestEvent(tempoEvents);
   const earliestMeter = findEarliestEvent(meterEvents);
   const earliestKeySignature = findEarliestEvent(keySignatureEvents);
+  const allTempoEvents = tempoEvents
+    .slice()
+    .sort((a, b) => a.tick - b.tick)
+    .map((ev) => ({
+      tick: ev.tick,
+      bpm: Math.max(20, Math.round(60000000 / ev.mpqn))
+    }));
 
   return {
     format,
@@ -255,6 +262,7 @@ function parseMidiFile(bytes) {
     ppqn,
     tracks: trackParses,
     tempoBpm: earliestTempo ? Math.max(20, Math.round(60000000 / earliestTempo.mpqn)) : null,
+    tempoEvents: allTempoEvents,
     meter: earliestMeter ? { beats: earliestMeter.beats, beatType: earliestMeter.beatType } : null,
     keySignature: earliestKeySignature ? {
       fifths: earliestKeySignature.fifths,
@@ -417,6 +425,7 @@ function convertParsedMidiToMusicXmlData(parsedMidi, settings, loadedName) {
     beatType: settings.defaultBeatType
   };
   const quantizeTicks = resolveQuantizeTicks(settings.quantize, parsedMidi.ppqn);
+  const tempoChanges = buildTempoChangesByMeasure(parsedMidi, meter);
 
   const tracksWithNotes = parsedMidi.tracks.filter((track) => track.notes.length > 0);
   if (tracksWithNotes.length === 0) {
@@ -429,9 +438,22 @@ function convertParsedMidiToMusicXmlData(parsedMidi, settings, loadedName) {
   let totalMeasures = 0;
   let partSerial = 1;
   const estimatedKey = estimateKeyFromTracks(tracksWithNotes);
-  const sourceKey = parsedMidi.keySignature || estimatedKey;
-  const keyFifths = settings.keyFifths === null ? sourceKey.fifths : settings.keyFifths;
-  const keyMode = settings.keyMode === "auto" ? sourceKey.mode : settings.keyMode;
+  const hasMidiKeySignature = !!parsedMidi.keySignature;
+  let keyFifths = 0;
+  let keyMode = "major";
+  let keySource = "estimated";
+
+  if (hasMidiKeySignature) {
+    keyFifths = parsedMidi.keySignature.fifths;
+    keyMode = parsedMidi.keySignature.mode;
+    keySource = "midi-meta";
+  } else {
+    keyFifths = settings.keyFifths === null ? estimatedKey.fifths : settings.keyFifths;
+    keyMode = settings.keyMode === "auto" ? estimatedKey.mode : settings.keyMode;
+    if (settings.keyFifths !== null || settings.keyMode !== "auto") {
+      keySource = "manual-fallback";
+    }
+  }
 
   for (let i = 0; i < tracksWithNotes.length; i += 1) {
     const track = tracksWithNotes[i];
@@ -447,6 +469,8 @@ function convertParsedMidiToMusicXmlData(parsedMidi, settings, loadedName) {
       totalRests += partBuild.restCount;
       totalMeasures = Math.max(totalMeasures, partBuild.measures.length);
       const laneNameSuffix = " " + lane.clef.label + " L" + String(lane.serialInClef);
+      const midiProgram = Number.isFinite(track.program) ? Math.max(1, Math.min(128, Number(track.program) + 1)) : null;
+      const midiChannel = detectPrimaryMidiChannel(lane.notes);
       parts.push({
         partId: "P" + String(partSerial),
         partName: clefLanes.length === 1 ? basePartName : (basePartName + laneNameSuffix),
@@ -454,7 +478,10 @@ function convertParsedMidiToMusicXmlData(parsedMidi, settings, loadedName) {
           sign: lane.clef.sign,
           line: lane.clef.line
         },
-        measures: partBuild.measures
+        measures: partBuild.measures,
+        measureDynamics: partBuild.measureDynamics,
+        midiProgram,
+        midiChannel
       });
       partSerial += 1;
     }
@@ -466,7 +493,8 @@ function convertParsedMidiToMusicXmlData(parsedMidi, settings, loadedName) {
       composer,
       keyInfo: { fifths: keyFifths, mode: keyMode },
       meter,
-      tempo
+      tempo,
+      tempoChanges
     },
     parts
   };
@@ -481,13 +509,68 @@ function convertParsedMidiToMusicXmlData(parsedMidi, settings, loadedName) {
       tempo,
       keyFifths,
       keyMode,
-      keySource: settings.keyFifths !== null ? "manual" : (parsedMidi.keySignature ? "midi-meta" : "estimated"),
+      keySource,
       meter: meter.beats + "/" + meter.beatType,
       notes: totalNotes,
       rests: totalRests,
       measures: totalMeasures
     }
   };
+}
+
+function buildTempoChangesByMeasure(parsedMidi, meter) {
+  const out = [];
+  if (!parsedMidi || !Array.isArray(parsedMidi.tempoEvents) || parsedMidi.tempoEvents.length === 0) {
+    return out;
+  }
+  const ppqn = Math.max(1, Number(parsedMidi.ppqn) || 1);
+  const beats = Math.max(1, Number(meter && meter.beats) || 4);
+  const beatType = Math.max(1, Number(meter && meter.beatType) || 4);
+  const ticksPerMeasure = Math.max(1, Math.round((ppqn * 4 * beats) / beatType));
+  const byMeasure = new Map();
+  for (const ev of parsedMidi.tempoEvents) {
+    if (!ev || typeof ev !== "object") {
+      continue;
+    }
+    const tick = Math.max(0, Number(ev.tick) || 0);
+    const bpm = Number.parseInt(ev.bpm, 10);
+    if (!Number.isFinite(bpm) || bpm <= 0) {
+      continue;
+    }
+    const measure = Math.floor(tick / ticksPerMeasure) + 1;
+    byMeasure.set(measure, bpm);
+  }
+  const sortedMeasures = Array.from(byMeasure.keys()).sort((a, b) => a - b);
+  for (const measure of sortedMeasures) {
+    out.push({ measure, bpm: byMeasure.get(measure) });
+  }
+  return out;
+}
+
+function detectPrimaryMidiChannel(notes) {
+  if (!Array.isArray(notes) || notes.length === 0) {
+    return null;
+  }
+  const counts = new Array(16).fill(0);
+  for (const note of notes) {
+    const channel = Number(note && note.channel);
+    if (!Number.isFinite(channel) || channel < 0 || channel > 15) {
+      continue;
+    }
+    counts[channel] += 1;
+  }
+  let bestChannel = -1;
+  let bestCount = -1;
+  for (let i = 0; i < counts.length; i += 1) {
+    if (counts[i] > bestCount) {
+      bestCount = counts[i];
+      bestChannel = i;
+    }
+  }
+  if (bestCount <= 0 || bestChannel < 0) {
+    return null;
+  }
+  return bestChannel + 1;
 }
 
 function estimateKeyFromTracks(tracks) {
@@ -581,9 +664,11 @@ function splitTrackNotesIntoClefLanes(notes, quantizeTicks, timeScale, trackInde
     const durationTick = Math.max(1, quantizeTick(scaledDuration, quantizeTicks));
     return {
       trackIndex: note.trackIndex,
+      channel: Number.isFinite(note.channel) ? note.channel : 0,
       noteNumber: note.noteNumber,
       startTick,
-      durationTick
+      durationTick,
+      velocity: Number.isFinite(note.velocity) ? note.velocity : 64
     };
   });
 
@@ -653,6 +738,8 @@ function buildMeasuresFromMonophonicTrack(notes, ppqn, meter, keyFifths) {
   const measures = [[]];
   const measureAccidentalStates = [];
   const keySignatureStepAlter = buildKeySignatureStepAlterMap(keyFifths);
+  const measureVelocitySums = [];
+  const measureVelocityCounts = [];
   let cursor = 0;
   let noteCount = 0;
   let restCount = 0;
@@ -660,6 +747,7 @@ function buildMeasuresFromMonophonicTrack(notes, ppqn, meter, keyFifths) {
   for (const note of notes) {
     let start = note.startTick;
     const duration = Math.max(1, note.durationTick);
+    const originalStart = Math.max(0, note.startTick);
 
     if (start < cursor) {
       start = cursor;
@@ -691,6 +779,10 @@ function buildMeasuresFromMonophonicTrack(notes, ppqn, meter, keyFifths) {
       keySignatureStepAlter
     );
     noteCount += insertedNotes;
+    const measureIndexForDynamic = Math.floor(originalStart / ticksPerMeasure);
+    const velocity = clampMidiVelocity(note.velocity);
+    measureVelocitySums[measureIndexForDynamic] = (measureVelocitySums[measureIndexForDynamic] || 0) + velocity;
+    measureVelocityCounts[measureIndexForDynamic] = (measureVelocityCounts[measureIndexForDynamic] || 0) + 1;
     cursor += duration;
   }
 
@@ -698,11 +790,52 @@ function buildMeasuresFromMonophonicTrack(notes, ppqn, meter, keyFifths) {
     measures.pop();
   }
 
+  const measureDynamics = [];
+  let previousDynamic = null;
+  for (let i = 0; i < measures.length; i += 1) {
+    const count = measureVelocityCounts[i] || 0;
+    if (count <= 0) {
+      measureDynamics.push(null);
+      continue;
+    }
+    const average = (measureVelocitySums[i] || 0) / count;
+    const dynamic = velocityToDynamicMark(average);
+    if (i === 0 || dynamic !== previousDynamic) {
+      measureDynamics.push(dynamic);
+      previousDynamic = dynamic;
+    } else {
+      measureDynamics.push(null);
+    }
+  }
+
   return {
     measures,
     noteCount,
-    restCount
+    restCount,
+    measureDynamics
   };
+}
+
+function clampMidiVelocity(rawVelocity) {
+  const velocity = Number(rawVelocity);
+  if (!Number.isFinite(velocity)) {
+    return 64;
+  }
+  return Math.max(1, Math.min(127, Math.round(velocity)));
+}
+
+function velocityToDynamicMark(rawVelocity) {
+  const velocity = clampMidiVelocity(rawVelocity);
+  if (velocity <= 39) {
+    return "p";
+  }
+  if (velocity <= 69) {
+    return "mp";
+  }
+  if (velocity <= 99) {
+    return "mf";
+  }
+  return "f";
 }
 
 function pushDurationToken(

@@ -864,6 +864,7 @@ if (typeof window !== "undefined") {
   window["MusicXmlWriterCommon"] = MusicXmlWriterCommon;
 }
   </script>
+  </script>
 
   <script>
 const musicXmlWriterCommon = window["MusicXmlWriterCommon"] || (typeof MusicXmlWriterCommon !== "undefined" ? MusicXmlWriterCommon : null);
@@ -1306,9 +1307,22 @@ function convertParsedMidiToMusicXmlData(parsedMidi, settings, loadedName) {
   let totalMeasures = 0;
   let partSerial = 1;
   const estimatedKey = estimateKeyFromTracks(tracksWithNotes);
-  const sourceKey = parsedMidi.keySignature || estimatedKey;
-  const keyFifths = settings.keyFifths === null ? sourceKey.fifths : settings.keyFifths;
-  const keyMode = settings.keyMode === "auto" ? sourceKey.mode : settings.keyMode;
+  const hasMidiKeySignature = !!parsedMidi.keySignature;
+  let keyFifths = 0;
+  let keyMode = "major";
+  let keySource = "estimated";
+
+  if (hasMidiKeySignature) {
+    keyFifths = parsedMidi.keySignature.fifths;
+    keyMode = parsedMidi.keySignature.mode;
+    keySource = "midi-meta";
+  } else {
+    keyFifths = settings.keyFifths === null ? estimatedKey.fifths : settings.keyFifths;
+    keyMode = settings.keyMode === "auto" ? estimatedKey.mode : settings.keyMode;
+    if (settings.keyFifths !== null || settings.keyMode !== "auto") {
+      keySource = "manual-fallback";
+    }
+  }
 
   for (let i = 0; i < tracksWithNotes.length; i += 1) {
     const track = tracksWithNotes[i];
@@ -1364,7 +1378,7 @@ function convertParsedMidiToMusicXmlData(parsedMidi, settings, loadedName) {
       tempo,
       keyFifths,
       keyMode,
-      keySource: settings.keyFifths !== null ? "manual" : (parsedMidi.keySignature ? "midi-meta" : "estimated"),
+      keySource,
       meter: meter.beats + "/" + meter.beatType,
       notes: totalNotes,
       rests: totalRests,
