@@ -1,0 +1,115 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git ブランチ比較コマンドジェネレータ</title>
+    <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
+  <link rel="stylesheet" href="src/git-branch-diff/css/app.css" />
+  <script src="src/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js"></script>
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
+  <div class="md-surface-card md-card">
+    <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+
+    <h1 class="md-headline">
+      <span aria-hidden="true" class="md-headline__icon">🧰</span>
+      <span>Git ブランチ比較コマンドジェネレータ</span>
+      <lht-help-tooltip label="Git ブランチ比較コマンドジェネレータの説明" wide>
+        2つのブランチ差分を表示する `git diff` コマンドを生成します。ローカル/リモートを選べ、表示形式（内容/統計/ファイル一覧）や `..` / `...` を切り替えできます。
+      </lht-help-tooltip>
+    </h1>
+
+    <div class="md-section md-stack-md">
+      <div class="md-form-row md-form-row--nowrap">
+        <lht-help-text-field field-id="branchA" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。差分の片側として使われます。例: main / devel。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-help-text-field>
+        <label class="md-switch-label">
+          <input type="checkbox" id="scopeA" class="md-switch-input" onchange="updateRemoteState()">
+          <span class="md-switch" aria-hidden="true"></span>
+          リモートとして扱う
+        </label>
+      </div>
+
+      <div class="md-form-row md-form-row--nowrap">
+        <lht-help-text-field field-id="branchB" label="比較ブランチ" required placeholder="例: devel" help-text="比較対象のブランチです。2つのブランチ差分を表示します。例: devel / feature123。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-help-text-field>
+        <label class="md-switch-label">
+          <input type="checkbox" id="scopeB" class="md-switch-input" onchange="updateRemoteState()">
+          <span class="md-switch" aria-hidden="true"></span>
+          リモートとして扱う
+        </label>
+      </div>
+    </div>
+
+    <div class="md-section md-stack-md">
+      <div class="md-choice-inline md-choice-text">
+        <lht-switch-help switch-id="lockOrigin" label="リモート名は origin 固定" help-label="リモート名は origin 固定の説明" checked on-change="updateRemoteState">
+          origin 固定で使う場合にオンにします。オフにすると任意のリモート名を入力できます。
+          ふだんは origin を使うケースが多いです。
+        </lht-switch-help>
+        <lht-switch-help switch-id="useTripleDot" label="共通祖先からの差分比較" help-label="共通祖先からの差分比較の説明" help-wide>
+          オフ時は A と B のスナップショット差分で、A/B の両方の変更が見えます。
+          オン時は共通祖先から B までの差分になり、B 側で増えた変更だけが見え、A だけの変更は見えません。
+        </lht-switch-help>
+      </div>
+      <div id="remoteNameBlock" class="md-form-row md-form-row--nowrap">
+        <lht-help-text-field field-id="remoteName" label="リモート名" placeholder="例: origin" value="origin" help-text="fetch と差分比較に使うリモート名です。"></lht-help-text-field>
+      </div>
+    </div>
+
+    <div class="md-section md-form-row md-form-row--nowrap">
+      <md-outlined-select id="diffMode" label="出力形式" class="md-outlined-field" value="">
+        <md-select-option value="" selected>
+          <div slot="headline">内容差分 (git diff)</div>
+        </md-select-option>
+        <md-select-option value="--stat">
+          <div slot="headline">差分統計 (git diff --stat)</div>
+        </md-select-option>
+        <md-select-option value="--name-only">
+          <div slot="headline">変更ファイル一覧 (git diff --name-only)</div>
+        </md-select-option>
+      </md-outlined-select>
+    </div>
+
+    <lht-command-block command-id="diffCmd"></lht-command-block>
+
+    <div id="toast" class="md-snackbar-host md-snackbar">
+      コピーしました
+    </div>
+  </div>
+
+    <script src="src/git-branch-diff/js/main.js"></script>
+</body>
+</html>

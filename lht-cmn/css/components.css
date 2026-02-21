@@ -7,8 +7,156 @@ lht-command-block {
   display: block;
 }
 
+lht-help-text-field {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+md-outlined-text-field.md-outlined-field {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+  width: 100%;
+  position: relative;
+  color-scheme: light;
+  border-radius: 12px;
+  --md-outlined-text-field-container-shape: 12px;
+  --md-outlined-field-container-shape: 12px;
+  --md-outlined-text-field-top-space: 10px;
+  --md-outlined-text-field-bottom-space: 10px;
+  --md-outlined-field-top-space: 10px;
+  --md-outlined-field-bottom-space: 10px;
+  --md-outlined-text-field-content-space: 12px;
+  --md-outlined-text-field-leading-space: 12px;
+  --md-outlined-text-field-trailing-space: 12px;
+  --md-outlined-text-field-outline-color: #bdb7c8;
+  --md-outlined-field-outline-color: #bdb7c8;
+  --md-outlined-text-field-hover-outline-color: #b1aac0;
+  --md-outlined-field-hover-outline-color: #b1aac0;
+  --md-outlined-text-field-focus-outline-color: #6c3eea;
+  --md-outlined-field-focus-outline-color: #6c3eea;
+  --md-outlined-text-field-focus-outline-width: 1.5px;
+  --md-outlined-field-focus-outline-width: 1.5px;
+  --md-outlined-text-field-focus-state-layer-color: #6c3eea;
+  --md-outlined-field-focus-state-layer-color: #6c3eea;
+  --md-outlined-text-field-focus-state-layer-opacity: 0;
+  --md-outlined-field-focus-state-layer-opacity: 0;
+  --md-outlined-text-field-error-focus-outline-width: 1px;
+  --md-outlined-field-error-focus-outline-width: 1px;
+  --md-outlined-text-field-caret-color: #6c3eea;
+  --md-outlined-field-caret-color: #6c3eea;
+  transition: none;
+}
+
+md-outlined-text-field.md-outlined-field::part(outline) {
+  transition: filter 160ms ease;
+}
+
+md-outlined-text-field.md-outlined-field:focus-within::part(outline) {
+  filter: drop-shadow(0 0 4px rgba(108, 62, 234, 0.26)) drop-shadow(0 0 12px rgba(108, 62, 234, 0.22));
+}
+
+md-outlined-text-field.md-outlined-field::part(container) {
+  transition: box-shadow 160ms ease;
+}
+
+md-outlined-text-field.md-outlined-field:focus-within::part(container) {
+  box-shadow: 0 0 0 2px rgba(108, 62, 234, 0.12), 0 0 14px rgba(108, 62, 234, 0.18);
+}
+
+md-outlined-select.md-outlined-field {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+  width: 100%;
+  position: relative;
+  color-scheme: light;
+  border-radius: 12px;
+  --md-outlined-select-text-field-container-shape: 12px;
+  --md-outlined-select-text-field-top-space: 10px;
+  --md-outlined-select-text-field-bottom-space: 10px;
+  --md-outlined-select-text-field-content-space: 12px;
+  --md-outlined-select-text-field-leading-space: 12px;
+  --md-outlined-select-text-field-trailing-space: 12px;
+  --md-outlined-field-top-space: 10px;
+  --md-outlined-field-bottom-space: 10px;
+  --md-outlined-field-content-space: 12px;
+  --md-outlined-field-leading-space: 12px;
+  --md-outlined-field-trailing-space: 12px;
+  --md-outlined-select-text-field-outline-color: #bdb7c8;
+  --md-outlined-select-text-field-hover-outline-color: #b1aac0;
+  --md-outlined-select-text-field-focus-outline-color: #6c3eea;
+  --md-outlined-select-text-field-focus-outline-width: 1.5px;
+  --md-outlined-select-text-field-focus-state-layer-color: #6c3eea;
+  --md-outlined-select-text-field-focus-state-layer-opacity: 0;
+  --md-outlined-select-text-field-caret-color: #6c3eea;
+  --md-menu-item-one-line-container-height: 44px;
+  --md-menu-item-top-space: 8px;
+  --md-menu-item-bottom-space: 8px;
+  transition: none;
+}
+
+md-outlined-select.md-outlined-field::part(outline) {
+  transition: filter 160ms ease;
+}
+
+md-outlined-select.md-outlined-field:focus-within::part(outline) {
+  filter: drop-shadow(0 0 4px rgba(108, 62, 234, 0.26)) drop-shadow(0 0 12px rgba(108, 62, 234, 0.22));
+}
+
+md-outlined-select.md-outlined-field::part(container) {
+  transition: box-shadow 160ms ease;
+}
+
+md-outlined-select.md-outlined-field:focus-within::part(container) {
+  box-shadow: 0 0 0 2px rgba(108, 62, 234, 0.12), 0 0 14px rgba(108, 62, 234, 0.18);
+}
+
+lht-switch-help {
+  display: inline-flex;
+  align-items: center;
+}
+
+lht-switch-help .md-switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.24rem;
+  font-size: 0.95rem;
+  color: var(--md-sys-color-on-surface);
+}
+
+lht-switch-help .md-switch-label md-switch {
+  --md-switch-track-width: 44px;
+  --md-switch-track-height: 24px;
+  --md-switch-track-outline-width: 1px;
+  --md-switch-handle-width: 20px;
+  --md-switch-handle-height: 20px;
+  --md-switch-selected-handle-width: 20px;
+  --md-switch-selected-handle-height: 20px;
+  --md-switch-with-icon-handle-width: 20px;
+  --md-switch-with-icon-handle-height: 20px;
+  --md-switch-state-layer-size: 24px;
+  --md-focus-ring-color: #6c3eea;
+  flex: 0 0 44px;
+  inline-size: 44px;
+  min-inline-size: 44px;
+  vertical-align: middle;
+}
+
+lht-switch-help .md-switch-label .md-info-chip {
+  margin-left: 0;
+}
+
+/* Switch rows are often near the right edge; anchor tooltip right to avoid clipping. */
+lht-switch-help .md-switch-label .md-tooltip-content {
+  left: auto;
+  right: 0;
+  transform: none;
+  max-width: calc(100vw - 2rem);
+}
+
 .md-help-icon-button {
   --md-icon-button-icon-size: 18px;
   --md-icon-button-state-layer-size: 30px;
+  --md-focus-ring-color: #6c3eea;
   color: #6f6a79;
 }

@@ -7,6 +7,8 @@
 - `lht-cmn/js/components.js`
   - 共通 Web Components 定義
   - `lht-help-tooltip`
+  - `lht-help-text-field`
+  - `lht-switch-help`
   - `lht-command-block`
   - `lht-page-menu`
 - `lht-cmn/css/components.css`

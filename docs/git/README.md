@@ -33,6 +33,10 @@
 - `docs/git/git-pseudo-squash-src.html`
 - `docs/git/src/git-pseudo-squash/css/app.css`
 - `docs/git/src/git-pseudo-squash/js/main.js`
+- `git-branch-diff` の編集元:
+- `docs/git/git-branch-diff-src.html`
+- `docs/git/src/git-branch-diff/css/app.css`
+- `docs/git/src/git-branch-diff/js/main.js`
 - `docs/git/src/vendor/material-web-outlined-text-field.bundle.js`（Material Web ローカル同梱生成物）
 - `lht-cmn/css/components.css`（共通 Web Components 用スタイル）
 - `lht-cmn/js/components.js`（共通 Web Components 定義）
@@ -95,6 +99,8 @@
 - トグル: `md-switch`
 - アイコンボタン: `md-icon-button`
 - ヘルプ `(i)`: `lht-help-tooltip`（内部で `md-icon-button` + tooltip DOM を生成）
+- フィールド活性時ヘルプ表示: `lht-help-text-field`（フォーカス時のみ入力下に説明を表示）
+- スイッチ + ヘルプ: `lht-switch-help`（`md-switch` + ラベル + `lht-help-tooltip`）
 - コマンド表示 + コピー: `lht-command-block`（`copy-buttons="single|dual"`）
 - 右上メニュー: `lht-page-menu`（`home-href` / `home-label`）
 
@@ -114,6 +120,12 @@
 - `lht-help-tooltip`
   - 属性: `label`, `wide`
   - 本文: タグ内部テキスト/HTMLをそのままツールチップ本文として扱う
+- `lht-help-text-field`
+  - 属性: `field-id`, `label`, `help-text`, `placeholder`, `required`, `field-class`
+  - 入力欄フォーカス時のみ `supportingText` を表示し、ブラー時に非表示に戻す
+- `lht-switch-help`
+  - 属性: `switch-id`, `label`, `help-label`, `help-wide`, `checked`, `on-change`
+  - スイッチと `(i)` ヘルプを1セットで生成し、`on-change` に指定した関数名を呼び出す
 - `lht-command-block`
   - 属性: `command-id`, `copy-buttons="single|dual"`
   - `command-id` の `code` 要素とコピー操作を自動生成

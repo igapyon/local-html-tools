@@ -75,7 +75,7 @@ limitations under the License.
         </div>
         <div class="md-form-row md-form-row--nowrap">
           <div class="md-input-wrap md-input-wrap--inline">
-            <md-outlined-text-field id="workBranch" label="作業ブランチ" required placeholder="例: tiga0129a" class="md-outlined-field" data-help-text="これから作業するブランチ名です。未作成なら作成先として使います。生成コマンドにそのまま反映されます。"></md-outlined-text-field>
+            <lht-help-text-field field-id="workBranch" label="作業ブランチ" required placeholder="例: tiga0129a" field-class="md-outlined-field" help-text="これから作業するブランチ名です。未作成なら作成先として使います。生成コマンドにそのまま反映されます。"></lht-help-text-field>
             <button type="button" class="md-icon-btn md-icon-btn--small md-input-action--inline" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <use href="#md-icon-refresh" xlink:href="#md-icon-refresh"></use>
@@ -85,24 +85,16 @@ limitations under the License.
         </div>
       </div>
       <div class="md-switch-row">
-        <label class="md-switch-label">
-          <md-switch id="shellEnvPowerShell"></md-switch>
-          PowerShell
-          <lht-help-tooltip label="PowerShell の説明" wide>
-            Windows PowerShell 用のコマンドを出力するかどうかを切り替えます。
-            スイッチがオフの場合は macOS / Linux の bash / zsh 向けのコマンドを出力します。
-            ご利用の環境に従って切り替えてください。
-            なお Windows コマンドプロンプトには対応していません。
-          </lht-help-tooltip>
-        </label>
-        <label class="md-switch-label">
-          <md-switch id="lockOrigin" selected onchange="toggleOriginLock()"></md-switch>
-          リモート + origin と作業
-          <lht-help-tooltip label="リモート + origin と作業の説明">
-            一連の作業を リモート + origin と連携して作業するかどうかを切り替えます。よくある利用方法が リモート + origin の組み合わせだと考えています。
-            ローカルの中で完結して作業する場合や、リモートの名称を変更したい場合は、このスイッチを OFF にして個別に値を設定してください。
-          </lht-help-tooltip>
-        </label>
+        <lht-switch-help switch-id="shellEnvPowerShell" label="PowerShell" help-label="PowerShell の説明" help-wide>
+          Windows PowerShell 用のコマンドを出力するかどうかを切り替えます。
+          スイッチがオフの場合は macOS / Linux の bash / zsh 向けのコマンドを出力します。
+          ご利用の環境に従って切り替えてください。
+          なお Windows コマンドプロンプトには対応していません。
+        </lht-switch-help>
+        <lht-switch-help switch-id="lockOrigin" label="リモート + origin と作業" help-label="リモート + origin と作業の説明" checked on-change="toggleOriginLock">
+          一連の作業を リモート + origin と連携して作業するかどうかを切り替えます。よくある利用方法が リモート + origin の組み合わせだと考えています。
+          ローカルの中で完結して作業する場合や、リモートの名称を変更したい場合は、このスイッチを OFF にして個別に値を設定してください。
+        </lht-switch-help>
         <span class="md-inline-action">
           <button type="button" class="md-button md-button--surface md-button--compact md-button--with-icon" onclick="clearUiPreferences()" title="設定をクリア" aria-label="設定をクリア">
             <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -197,13 +189,9 @@ limitations under the License.
     <div class="md-section md-stack-sm">
       <div class="md-form-row">
         <span class="md-switch-help-row">
-          <label class="md-switch-label">
-            <md-switch id="useCurrentBranch" selected onchange="toggleCurrentBranch()"></md-switch>
-            現在ブランチで作業
-          </label>
-          <lht-help-tooltip label="現在ブランチで作業の説明">
+          <lht-switch-help switch-id="useCurrentBranch" label="現在ブランチで作業" help-label="現在ブランチで作業の説明" checked on-change="toggleCurrentBranch">
             現在チェックアウト中のブランチを作業ブランチとして扱います。チェックを外すと、作業ブランチ名で switch するコマンドが含まれます。
-          </lht-help-tooltip>
+          </lht-switch-help>
         </span>
       </div>
     </div>
