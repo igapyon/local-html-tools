@@ -33,6 +33,14 @@
 - `docs/git/git-pseudo-squash-src.html`
 - `docs/git/src/git-pseudo-squash/css/app.css`
 - `docs/git/src/git-pseudo-squash/js/main.js`
+- `git-config-setup` の編集元:
+- `docs/git/git-config-setup-src.html`
+- `docs/git/src/git-config-setup/css/app.css`
+- `docs/git/src/git-config-setup/js/main.js`
+- `git-config-advanced-setup` の編集元:
+- `docs/git/git-config-advanced-setup-src.html`
+- `docs/git/src/git-config-advanced-setup/css/app.css`
+- `docs/git/src/git-config-advanced-setup/js/main.js`
 - `git-branch-diff` の編集元:
 - `docs/git/git-branch-diff-src.html`
 - `docs/git/src/git-branch-diff/css/app.css`
