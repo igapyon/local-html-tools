@@ -35,6 +35,8 @@
 - Static Web App（静的HTML/CSS/JSのみ）として構成され、サーバは不要
 - 各ツールは単一HTMLで完結して動作
 - ただし `docs/music/` は保守性確保のため「分割ソースをビルドして単一HTMLを生成」する例外運用を採用
+- `docs/grep/find-gen.html` も保守性確保のため「分割ソースをビルドして単一HTMLを生成」運用を採用
+- `docs/diagram/*.html` も保守性確保のため「分割ソースをビルドして単一HTMLを生成」運用を採用
 - ビルド基盤は段階的に Vite ベースへ移行中（まず `docs/git/` から着手）。ただし配布形態は引き続き単一HTMLを維持する
 - 基本の流れ：「入力 → 生成 → （必要に応じて）実行結果貼り付け → 次のステップの生成」で、画面要素は上から下へ流れに沿って並ぶ
 - ツールによっては「入力 → 生成」だけで完結するものもある
@@ -79,6 +81,30 @@ docs/
   - `*.html` は直接編集しない
   - 変更は `*-src.html` と `src/` を編集する
   - PRには生成済み `*.html` を含める
+
+### grep 例外運用（分割開発）
+
+- 対象: `docs/grep/find-gen.html`
+- 配布: `docs/grep/find-gen.html`（単一HTML、生成物）
+- 開発: `docs/grep/find-gen-src.html` + `docs/grep/src/find-gen/css/app.css` + `docs/grep/src/find-gen/js/main.js`
+- ビルド: `npm run build:grep`（`scripts/build-grep.mjs`）
+- ルール:
+  - `docs/grep/find-gen.html` は直接編集しない
+  - 変更は `find-gen-src.html` と `src/find-gen/` を編集する
+  - PRには生成済み `docs/grep/find-gen.html` を含める
+
+### diagram 例外運用（分割開発）
+
+- 対象: `docs/diagram/mermaid-to-svg.html`, `docs/diagram/graphviz-dot-to-svg.html`
+- 配布: `docs/diagram/*.html`（単一HTML、生成物）
+- 開発:
+  - `docs/diagram/mermaid-to-svg-src.html` + `docs/diagram/src/mermaid-to-svg/css/app.css` + `docs/diagram/src/mermaid-to-svg/js/main.js`
+  - `docs/diagram/graphviz-dot-to-svg-src.html` + `docs/diagram/src/graphviz-dot-to-svg/css/app.css` + `docs/diagram/src/graphviz-dot-to-svg/js/main.js`
+- ビルド: `npm run build:diagram`（`scripts/build-diagram.mjs`）
+- ルール:
+  - `docs/diagram/*.html` は直接編集しない
+  - 変更は `*-src.html` と `src/` 配下を編集する
+  - PRには生成済み `docs/diagram/*.html` を含める
 
 ### PR作成時のルール
 
