@@ -27,6 +27,106 @@ class LhtHelpTooltip extends HTMLElement {
   }
 }
 
+class LhtHelpTextField extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const fieldId = (this.getAttribute("field-id") || "").trim();
+    if (!fieldId) return;
+
+    const field = document.createElement("md-outlined-text-field");
+    field.id = fieldId;
+
+    const label = (this.getAttribute("label") || "").trim();
+    if (label) field.setAttribute("label", label);
+
+    const placeholder = this.getAttribute("placeholder");
+    if (placeholder != null) field.setAttribute("placeholder", placeholder);
+
+    const autocomplete = this.getAttribute("autocomplete");
+    if (autocomplete != null) field.setAttribute("autocomplete", autocomplete);
+
+    const value = this.getAttribute("value");
+    if (value != null) field.setAttribute("value", value);
+
+    const fieldClass = (this.getAttribute("field-class") || "").trim();
+    if (fieldClass) {
+      fieldClass.split(/\s+/).filter(Boolean).forEach((name) => field.classList.add(name));
+    }
+    field.classList.add("md-outlined-field");
+
+    if (this.hasAttribute("required")) field.required = true;
+    if (this.hasAttribute("disabled")) field.disabled = true;
+
+    const helpText = (this.getAttribute("help-text") || "").trim();
+    if (helpText) {
+      field.addEventListener("focus", () => {
+        field.supportingText = helpText;
+      });
+      field.addEventListener("blur", () => {
+        field.supportingText = "";
+      });
+    }
+
+    this.textContent = "";
+    this.appendChild(field);
+  }
+}
+
+class LhtSwitchHelp extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const switchId = (this.getAttribute("switch-id") || "").trim();
+    if (!switchId) return;
+    const labelText = (this.getAttribute("label") || "").trim();
+    const helpLabel = (this.getAttribute("help-label") || `${labelText}の説明`).trim();
+    const helpContentHtml = this.innerHTML.trim();
+    const onChangeFnName = (this.getAttribute("on-change") || "").trim();
+    const isChecked = this.hasAttribute("checked");
+    const isHelpWide = this.hasAttribute("help-wide");
+
+    this.textContent = "";
+
+    const label = document.createElement("label");
+    label.className = "md-switch-label";
+
+    const mdSwitch = document.createElement("md-switch");
+    mdSwitch.id = switchId;
+    if (isChecked) {
+      mdSwitch.selected = true;
+      mdSwitch.setAttribute("selected", "");
+    }
+    if (onChangeFnName) {
+      mdSwitch.addEventListener("change", () => {
+        const fn = window[onChangeFnName];
+        if (typeof fn === "function") {
+          fn();
+        }
+      });
+    }
+    label.appendChild(mdSwitch);
+
+    const labelSpan = document.createElement("span");
+    labelSpan.textContent = labelText;
+    label.appendChild(labelSpan);
+
+    if (helpContentHtml) {
+      const help = document.createElement("lht-help-tooltip");
+      help.setAttribute("label", helpLabel);
+      if (isHelpWide) {
+        help.setAttribute("wide", "");
+      }
+      help.innerHTML = helpContentHtml;
+      label.appendChild(help);
+    }
+
+    this.appendChild(label);
+  }
+}
+
 class LhtCommandBlock extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
@@ -136,6 +236,12 @@ class LhtPageMenu extends HTMLElement {
 
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
+}
+if (!customElements.get("lht-help-text-field")) {
+  customElements.define("lht-help-text-field", LhtHelpTextField);
+}
+if (!customElements.get("lht-switch-help")) {
+  customElements.define("lht-switch-help", LhtSwitchHelp);
 }
 if (!customElements.get("lht-command-block")) {
   customElements.define("lht-command-block", LhtCommandBlock);

@@ -5,6 +5,21 @@ const ROOT = process.cwd();
 
 const TARGETS = [
   {
+    id: "git-branch-diff",
+    baseDir: "docs/git",
+    srcHtml: "docs/git/git-branch-diff-src.html",
+    outHtml: "docs/git/git-branch-diff.html",
+    cssOrder: [
+      "../../lht-cmn/css/components.css",
+      "src/git-branch-diff/css/app.css"
+    ],
+    jsOrder: [
+      "src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/js/components.js",
+      "src/git-branch-diff/js/main.js"
+    ]
+  },
+  {
     id: "git-pseudo-squash",
     baseDir: "docs/git",
     srcHtml: "docs/git/git-pseudo-squash-src.html",
