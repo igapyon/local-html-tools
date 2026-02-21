@@ -38,6 +38,11 @@
 - `docs/grep/find-gen.html` も保守性確保のため「分割ソースをビルドして単一HTMLを生成」運用を採用
 - `docs/diagram/*.html` も保守性確保のため「分割ソースをビルドして単一HTMLを生成」運用を採用
 - `docs/ffmpeg/*.html` も保守性確保のため「分割ソースをビルドして単一HTMLを生成」運用を採用
+- `docs/life/*.html` は `*-src.html` を編集し、ビルドで `*.html` を生成する運用を採用
+- `docs/link/*.html` は `*-src.html` を編集し、ビルドで `*.html` を生成する運用を採用
+- `docs/text/*.html` は `*-src.html` を編集し、ビルドで `*.html` を生成する運用を採用
+- `docs/img/*.html` は `*-src.html` を編集し、ビルドで `*.html` を生成する運用を採用
+- `docs/index.html` も `docs/index-src.html` から生成する運用を採用
 - ビルド基盤は段階的に Vite ベースへ移行中（まず `docs/git/` から着手）。ただし配布形態は引き続き単一HTMLを維持する
 - 基本の流れ：「入力 → 生成 → （必要に応じて）実行結果貼り付け → 次のステップの生成」で、画面要素は上から下へ流れに沿って並ぶ
 - ツールによっては「入力 → 生成」だけで完結するものもある
@@ -120,6 +125,61 @@ docs/
   - `docs/ffmpeg/*.html` は直接編集しない
   - 変更は `*-src.html` と `src/` 配下を編集する
   - PRには生成済み `docs/ffmpeg/*.html` を含める
+
+### life 運用（src編集 + 生成）
+
+- 対象: `docs/life/*.html`
+- 配布: `docs/life/*.html`（単一HTML、生成物）
+- 開発: `docs/life/*-src.html`
+- ビルド: `npm run build:life`（`scripts/build-life.mjs`）
+- ルール:
+  - `docs/life/*.html` は直接編集しない
+  - 変更は `*-src.html` を編集する
+  - PRには生成済み `docs/life/*.html` を含める
+
+### link 運用（src編集 + 生成）
+
+- 対象: `docs/link/*.html`
+- 配布: `docs/link/*.html`（単一HTML、生成物）
+- 開発: `docs/link/*-src.html`
+- ビルド: `npm run build:link`（`scripts/build-link.mjs`）
+- ルール:
+  - `docs/link/*.html` は直接編集しない
+  - 変更は `*-src.html` を編集する
+  - PRには生成済み `docs/link/*.html` を含める
+
+### text 運用（src編集 + 生成）
+
+- 対象: `docs/text/*.html`
+- 配布: `docs/text/*.html`（単一HTML、生成物）
+- 開発: `docs/text/*-src.html`
+- ビルド: `npm run build:text`（`scripts/build-text.mjs`）
+- ルール:
+  - `docs/text/*.html` は直接編集しない
+  - 変更は `*-src.html` を編集する
+  - PRには生成済み `docs/text/*.html` を含める
+
+### img 運用（src編集 + 生成）
+
+- 対象: `docs/img/*.html`
+- 配布: `docs/img/*.html`（単一HTML、生成物）
+- 開発: `docs/img/*-src.html`
+- ビルド: `npm run build:img`（`scripts/build-img.mjs`）
+- ルール:
+  - `docs/img/*.html` は直接編集しない
+  - 変更は `*-src.html` を編集する
+  - PRには生成済み `docs/img/*.html` を含める
+
+### docs/index 運用（src編集 + 生成）
+
+- 対象: `docs/index.html`
+- 配布: `docs/index.html`（単一HTML、生成物）
+- 開発: `docs/index-src.html`
+- ビルド: `npm run build:docs`（`scripts/build-docs-index.mjs`）
+- ルール:
+  - `docs/index.html` は直接編集しない
+  - 変更は `docs/index-src.html` を編集する
+  - PRには生成済み `docs/index.html` を含める
 
 #### ffmpeg の lht 共通部品 置換済み範囲
 

@@ -286,7 +286,7 @@ class LhtPageMenu extends HTMLElement {
     button.type = "button";
     button.className = "md-menu-button md-icon-btn";
     button.setAttribute("aria-label", "メニュー");
-    button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#md-icon-menu" xlink:href="#md-icon-menu"></use></svg>';
+    button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path></svg>';
 
     const panel = document.createElement("div");
     panel.className = "md-menu-panel md-hidden";
