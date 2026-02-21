@@ -1,0 +1,193 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git 詳細設定コマンドジェネレータ</title>
+  <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
+  <link rel="stylesheet" href="src/git-config-advanced-setup/css/app.css" />
+  <script src="src/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js"></script>
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="md-surface-card md-card">
+    <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+
+    <h1 class="md-headline">
+      <span aria-hidden="true" class="md-headline__icon">🔧</span>
+      <span>Git 詳細設定コマンドジェネレータ</span>
+      <lht-help-tooltip label="Git 詳細設定コマンドジェネレータの説明" wide>
+        core.autocrlf や push.default などのGit詳細設定をグローバル設定するコマンドを生成します。
+      </lht-help-tooltip>
+    </h1>
+
+    <section id="checkSection" class="md-section md-stack-md">
+      <div class="md-flow-row">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <circle cx="20" cy="32" r="4" fill="#93C5FD"/>
+          <path d="M24 32H34" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 32H44" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="48" cy="32" r="4" fill="#93C5FD"/>
+        </svg>
+        <span class="md-title-info-row">
+          <p class="md-section-title">現在の設定を確認</p>
+          <lht-help-tooltip label="現在の設定を確認の説明" wide>
+            設定前に現在の値を確認できます。
+          </lht-help-tooltip>
+        </span>
+      </div>
+      <button type="button" onclick="generateCheckCommand()" class="md-button md-button--primary">確認コマンド生成</button>
+      <lht-command-block command-id="checkCmd"></lht-command-block>
+    </section>
+
+    <div class="md-flow-divider">
+      <svg aria-hidden="true" viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
+        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
+        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
+        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
+        <path d="M40 32h26" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
+        <path d="M116 32h70" stroke="#C4B5FD" stroke-width="4" stroke-linecap="round"/>
+        <path d="M236 32h26" stroke="#A7F3D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M312 32h70" stroke="#F9A8D4" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
+      </svg>
+    </div>
+
+    <section class="md-section md-stack-lg">
+      <div class="md-flow-row">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <circle cx="20" cy="20" r="4" fill="#A78BFA"/>
+          <path d="M24 20H34" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 20H44" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="48" cy="20" r="4" fill="#A78BFA"/>
+          <path d="M20 44L32 32L44 44" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="md-title-info-row">
+          <p class="md-section-title">詳細設定を行う</p>
+          <lht-help-tooltip label="詳細設定を行うの説明" wide>
+            必要な詳細設定を選択して、コマンドを生成します。
+          </lht-help-tooltip>
+        </span>
+      </div>
+
+      <div class="md-choice-card md-stack-md">
+        <div class="md-form-row md-form-row--start">
+          <lht-switch-help switch-id="enableAutocrlf" label="core.autocrlf を設定" help-label="core.autocrlf の説明" on-change="toggleAutocrlfOptions" help-wide>
+            改行コード自動変換の設定です。Windows/Mac/Linux間での改行コード問題を対策します。
+          </lht-switch-help>
+        </div>
+
+        <div id="autocrlfOptions" class="md-stack-sm md-choice-card md-choice-card--muted md-dimmed">
+          <div class="md-choice-row">
+            <input type="radio" id="autocrlf-true" name="autocrlf" value="true" disabled>
+            <label for="autocrlf-true" class="md-choice-sub">
+              <span>true</span>
+              <small>Windows用（LF ↔ CRLF 自動変換）</small>
+            </label>
+          </div>
+          <div class="md-choice-row">
+            <input type="radio" id="autocrlf-input" name="autocrlf" value="input" disabled>
+            <label for="autocrlf-input" class="md-choice-sub">
+              <span>input</span>
+              <small>Mac/Linux用（コミット時のみCRLF → LF）</small>
+              <span class="md-chip md-chip--primary">推奨</span>
+            </label>
+          </div>
+          <div class="md-choice-row">
+            <input type="radio" id="autocrlf-false" name="autocrlf" value="false" disabled>
+            <label for="autocrlf-false" class="md-choice-sub">
+              <span>false</span>
+              <small>変換なし（デフォルト）</small>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="md-choice-card md-stack-md">
+        <div class="md-form-row md-form-row--start">
+          <lht-switch-help switch-id="enablePushDefault" label="push.default を設定" help-label="push.default の説明" on-change="togglePushDefaultOptions" help-wide>
+            push時のデフォルト動作を指定します。指定しないと予期しない動作をすることがあります。
+          </lht-switch-help>
+        </div>
+
+        <div id="pushDefaultOptions" class="md-stack-sm md-choice-card md-choice-card--muted md-dimmed">
+          <div class="md-choice-row">
+            <input type="radio" id="pushdefault-simple" name="pushdefault" value="simple" disabled>
+            <label for="pushdefault-simple" class="md-choice-sub">
+              <span>simple</span>
+              <small>同名ブランチにpush（Git 2.0以降のデフォルト）</small>
+              <span class="md-chip md-chip--primary">推奨</span>
+            </label>
+          </div>
+          <div class="md-choice-row">
+            <input type="radio" id="pushdefault-current" name="pushdefault" value="current" disabled>
+            <label for="pushdefault-current" class="md-choice-sub">
+              <span>current</span>
+              <small>現在のブランチ名でpush</small>
+            </label>
+          </div>
+          <div class="md-choice-row">
+            <input type="radio" id="pushdefault-upstream" name="pushdefault" value="upstream" disabled>
+            <label for="pushdefault-upstream" class="md-choice-sub">
+              <span>upstream</span>
+              <small>追跡ブランチにpush</small>
+            </label>
+          </div>
+          <div class="md-choice-row">
+            <input type="radio" id="pushdefault-matching" name="pushdefault" value="matching" disabled>
+            <label for="pushdefault-matching" class="md-choice-sub">
+              <span>matching</span>
+              <small>マッチングブランチすべてをpush</small>
+              <span class="md-chip md-chip--warn">非推奨</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <button type="button" onclick="generateConfigCommand()" class="md-button md-button--primary">設定コマンド生成</button>
+    <lht-command-block command-id="configCmd"></lht-command-block>
+
+    <div id="toast" class="md-snackbar-host md-snackbar">コピーしました</div>
+  </div>
+
+  <script src="src/git-config-advanced-setup/js/main.js"></script>
+</body>
+</html>

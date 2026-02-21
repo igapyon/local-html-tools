@@ -5,6 +5,36 @@ const ROOT = process.cwd();
 
 const TARGETS = [
   {
+    id: "git-config-setup",
+    baseDir: "docs/git",
+    srcHtml: "docs/git/git-config-setup-src.html",
+    outHtml: "docs/git/git-config-setup.html",
+    cssOrder: [
+      "../../lht-cmn/css/components.css",
+      "src/git-config-setup/css/app.css"
+    ],
+    jsOrder: [
+      "src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/js/components.js",
+      "src/git-config-setup/js/main.js"
+    ]
+  },
+  {
+    id: "git-config-advanced-setup",
+    baseDir: "docs/git",
+    srcHtml: "docs/git/git-config-advanced-setup-src.html",
+    outHtml: "docs/git/git-config-advanced-setup.html",
+    cssOrder: [
+      "../../lht-cmn/css/components.css",
+      "src/git-config-advanced-setup/css/app.css"
+    ],
+    jsOrder: [
+      "src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/js/components.js",
+      "src/git-config-advanced-setup/js/main.js"
+    ]
+  },
+  {
     id: "git-branch-diff",
     baseDir: "docs/git",
     srcHtml: "docs/git/git-branch-diff-src.html",
