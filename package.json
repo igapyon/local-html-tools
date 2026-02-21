@@ -16,7 +16,13 @@
     "build:grep": "npm run build:git:material && node scripts/build-grep.mjs",
     "build:password": "npm run build:git:material && node scripts/build-password.mjs",
     "build:diagram": "npm run build:git:material && node scripts/build-diagram.mjs",
-    "build:ffmpeg": "npm run build:git:material && node scripts/build-ffmpeg.mjs"
+    "build:ffmpeg": "npm run build:git:material && node scripts/build-ffmpeg.mjs",
+    "build:life": "node scripts/build-life.mjs",
+    "build:link": "node scripts/build-link.mjs",
+    "build:text": "node scripts/build-text.mjs",
+    "build:img": "node scripts/build-img.mjs",
+    "build:docs": "node scripts/build-docs-index.mjs",
+    "build:all": "npm run build:music && npm run build:git && npm run build:knowledge-timeline && npm run build:grep && npm run build:password && npm run build:diagram && npm run build:ffmpeg && npm run build:life && npm run build:link && npm run build:text && npm run build:img && npm run build:docs"
   },
   "devDependencies": {
     "@material/web": "^2.4.1",
