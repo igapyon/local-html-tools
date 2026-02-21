@@ -23,6 +23,33 @@
 
 対象の HTML をブラウザで開き、必要事項を入力して生成されたコマンドをそのままターミナルで実行します。
 
+## Vite でのビルド（Single-file 前提）
+
+`docs/git` のターゲットは、ブラウザ単体で動く Single-file web app です。
+
+- 配布物: `docs/git/*.html`（単一HTML。オフライン動作）
+- Vite ビルド出力: `dist/docs/git/*.html`（内容確認・配布候補）
+- `git-pseudo-squash` の編集元:
+- `docs/git/git-pseudo-squash-src.html`
+- `docs/git/src/git-pseudo-squash/css/app.css`
+- `docs/git/src/git-pseudo-squash/js/main.js`
+- `docs/git/src/vendor/material-web-outlined-text-field.bundle.js`（Material Web ローカル同梱生成物）
+- `docs/git/git-pseudo-squash.html` は生成物（直接編集しない）
+
+実行コマンド:
+
+- Single-file 生成のみ: `npm run build:git:single`
+- ビルド: `npm run build:git`
+- ビルド結果確認: `npm run preview:git`
+- ローカル確認用サーバー（任意）: `npm run dev:git`
+
+`build:git:single` では `build:git:material` が先に実行され、`md-outlined-text-field` 用の Material Web をローカルバンドルしてから単一HTMLへインライン化します。
+
+## 保留事項（再開メモ）
+
+- `git-pseudo-squash` の `md-outlined-text-field` で、ブラウザ依存の autocomplete 表示を要再調整
+- 項目フォーカス時の「淡い周辺強調（ふんわりハイライト）」を、旧UIに近い見え方へ要再調整
+
 ## git-pseudo-squash.html の Material Design 実装方針
 
 `docs/git/git-pseudo-squash.html` は外部ライブラリに依存せず、単一 HTML 内で Material Design 仕様を再現しています。
