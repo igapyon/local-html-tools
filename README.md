@@ -37,6 +37,7 @@
 - ただし `docs/music/` は保守性確保のため「分割ソースをビルドして単一HTMLを生成」する例外運用を採用
 - `docs/grep/find-gen.html` も保守性確保のため「分割ソースをビルドして単一HTMLを生成」運用を採用
 - `docs/diagram/*.html` も保守性確保のため「分割ソースをビルドして単一HTMLを生成」運用を採用
+- `docs/ffmpeg/*.html` も保守性確保のため「分割ソースをビルドして単一HTMLを生成」運用を採用
 - ビルド基盤は段階的に Vite ベースへ移行中（まず `docs/git/` から着手）。ただし配布形態は引き続き単一HTMLを維持する
 - 基本の流れ：「入力 → 生成 → （必要に応じて）実行結果貼り付け → 次のステップの生成」で、画面要素は上から下へ流れに沿って並ぶ
 - ツールによっては「入力 → 生成」だけで完結するものもある
@@ -105,6 +106,33 @@ docs/
   - `docs/diagram/*.html` は直接編集しない
   - 変更は `*-src.html` と `src/` 配下を編集する
   - PRには生成済み `docs/diagram/*.html` を含める
+
+### ffmpeg 例外運用（分割開発）
+
+- 対象: `docs/ffmpeg/*.html`
+- 配布: `docs/ffmpeg/*.html`（単一HTML、生成物）
+- 開発:
+  - `docs/ffmpeg/*-src.html`
+  - `docs/ffmpeg/src/*/css/app.css`
+  - `docs/ffmpeg/src/*/js/main.js`
+- ビルド: `npm run build:ffmpeg`（`scripts/build-ffmpeg.mjs`）
+- ルール:
+  - `docs/ffmpeg/*.html` は直接編集しない
+  - 変更は `*-src.html` と `src/` 配下を編集する
+  - PRには生成済み `docs/ffmpeg/*.html` を含める
+
+#### ffmpeg の lht 共通部品 置換済み範囲
+
+- 全8ページ適用済み:
+  - 右上メニュー: `lht-page-menu`
+  - コマンド表示 + コピー: `lht-command-block`
+- 入力フィールド置換（進行中）:
+  - `lht-help-text-field`: 全ページで適用済み
+  - `lht-help-select`: `ffmpeg-audio-convert-cmdline-gen` / `ffmpeg-mp4-to-wav-gen` / `ffmpeg-replace-audio-with-wav-gen`
+  - `lht-switch-help`: `ffmpeg-loudnorm-cmdline-gen` / `ffmpeg-replace-audio-with-wav-gen`
+- 実装メモ:
+  - `lht-help-text-field` は `min` / `max` / `step` 属性透過に対応
+  - 既存JS互換のため `lht-switch-help` 内部 `md-switch` は `checked` プロパティでも参照可能
 
 ### PR作成時のルール
 
