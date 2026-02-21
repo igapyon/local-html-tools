@@ -50,6 +50,25 @@
 - `git-pseudo-squash` の `md-outlined-text-field` で、ブラウザ依存の autocomplete 表示を要再調整
 - 項目フォーカス時の「淡い周辺強調（ふんわりハイライト）」を、旧UIに近い見え方へ要再調整
 
+## Material Web 置き換え進捗メモ（2026-02-21）
+
+対象: `docs/git/git-pseudo-squash.html` 系
+
+- 旧来の「ラベル + テキストボックス + (i) ツールチップ」は、`md-outlined-text-field` と `data-help-text` を利用した構成へ段階的に置き換える
+- 旧来の `textarea` は、`md-outlined-text-field` の `type="textarea"` を利用した複数行入力へ置き換える
+- 旧来の `select` ベースのドロップダウンは、`md-outlined-select` + `md-select-option` 構成へ置き換え、候補リストの見た目トークン（角丸・配色・行高）も既存コンボボックスに寄せる
+- ヘルプ表示は、フィールドフォーカス時に `supportingText` を出す共通処理へ寄せる
+- 候補選択 UI は、フォーカス直後に自動展開せず、入力操作を起点に開く挙動へ統一する
+
+今回の主な編集ファイル:
+
+- `docs/git/git-pseudo-squash-src.html`
+- `docs/git/src/git-pseudo-squash/js/main.js`
+
+反映手順:
+
+- `npm run build:git` を実行し、`docs/git/git-pseudo-squash.html` と `dist/docs/git/git-pseudo-squash.html` を更新する
+
 ## git-pseudo-squash.html の Material Design 実装方針
 
 `docs/git/git-pseudo-squash.html` は外部ライブラリに依存せず、単一 HTML 内で Material Design 仕様を再現しています。

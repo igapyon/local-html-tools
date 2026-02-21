@@ -923,6 +923,22 @@
     .md-code--dual-copy { padding-bottom: 2.5rem; }
     .md-copy-button { position: absolute; top: 0.5rem; right: 0.5rem; }
     .md-copy-button--bottom-right { top: auto; right: 0.5rem; bottom: 0.5rem; }
+    md-icon-button.md-copy-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      --md-icon-button-icon-size: 16px;
+      --md-icon-button-icon-color: #3f3b46;
+      --md-icon-button-state-layer-shape: 16px;
+      --md-icon-button-hover-state-layer-color: #3f3b46;
+      --md-icon-button-hover-state-layer-opacity: 0.08;
+      --md-icon-button-pressed-state-layer-color: #3f3b46;
+      --md-icon-button-pressed-state-layer-opacity: 0.12;
+      background: #f7f2fa;
+    }
+    md-icon-button.md-copy-button--surface {
+      background: #f7f2fa;
+    }
 
     .md-icon-20 { width: 20px; height: 20px; }
 
@@ -1097,6 +1113,15 @@
       transition: opacity 200ms ease;
     }
     .md-snackbar-host.md-visible { opacity: 1; pointer-events: auto; }
+    #toast {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 120;
+      --md-snackbar-container-color: #2b2831;
+      --md-snackbar-supporting-text-color: #ffffff;
+      --md-snackbar-supporting-text-size: 0.85rem;
+    }
 
     .md-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
 
@@ -1164,6 +1189,73 @@
 
     md-outlined-text-field.md-disabled {
       opacity: 0.68;
+    }
+
+    md-outlined-select.md-outlined-field {
+      flex: 1 1 16rem;
+      min-width: 12rem;
+      width: 100%;
+      position: relative;
+      color-scheme: light;
+      border-radius: 12px;
+      --md-outlined-select-text-field-container-shape: 12px;
+      --md-outlined-select-text-field-top-space: 10px;
+      --md-outlined-select-text-field-bottom-space: 10px;
+      --md-outlined-select-text-field-content-space: 12px;
+      --md-outlined-select-text-field-leading-space: 12px;
+      --md-outlined-select-text-field-trailing-space: 12px;
+      --md-outlined-field-container-shape: 12px;
+      --md-outlined-field-top-space: 10px;
+      --md-outlined-field-bottom-space: 10px;
+      --md-outlined-field-content-space: 12px;
+      --md-outlined-field-leading-space: 12px;
+      --md-outlined-field-trailing-space: 12px;
+      --md-outlined-select-text-field-outline-color: #bdb7c8;
+      --md-outlined-field-outline-color: #bdb7c8;
+      --md-outlined-select-text-field-hover-outline-color: #b1aac0;
+      --md-outlined-field-hover-outline-color: #b1aac0;
+      --md-outlined-select-text-field-focus-outline-color: #6c3eea;
+      --md-outlined-field-focus-outline-color: #6c3eea;
+      --md-outlined-select-text-field-focus-outline-width: 1.5px;
+      --md-outlined-field-focus-outline-width: 1.5px;
+      --md-outlined-select-text-field-focus-state-layer-color: #6c3eea;
+      --md-outlined-field-focus-state-layer-color: #6c3eea;
+      --md-outlined-select-text-field-focus-state-layer-opacity: 0;
+      --md-outlined-field-focus-state-layer-opacity: 0;
+      --md-menu-container-color: #f7f4fb;
+      --md-menu-container-shape: 12px;
+      --md-menu-top-space: 8px;
+      --md-menu-bottom-space: 8px;
+      --md-menu-item-one-line-container-height: 44px;
+      --md-menu-item-top-space: 8px;
+      --md-menu-item-bottom-space: 8px;
+      --md-menu-item-label-text-color: #2f2a38;
+      --md-menu-item-selected-container-color: transparent;
+      --md-menu-item-selected-label-text-color: #2f2a38;
+      --md-menu-item-hover-state-layer-color: #e9e1f6;
+      --md-menu-item-hover-state-layer-opacity: 1;
+      --md-menu-item-pressed-state-layer-color: #e2d8f4;
+      --md-menu-item-pressed-state-layer-opacity: 1;
+      --md-focus-ring-color: #9b86d6;
+      --md-focus-ring-width: 2px;
+      --md-focus-ring-active-width: 3px;
+      transition: none;
+    }
+
+    md-outlined-select.md-outlined-field::part(outline) {
+      transition: filter 160ms ease;
+    }
+
+    md-outlined-select.md-outlined-field:focus-within::part(outline) {
+      filter: drop-shadow(0 0 4px rgba(108, 62, 234, 0.26)) drop-shadow(0 0 12px rgba(108, 62, 234, 0.22));
+    }
+
+    md-outlined-select.md-outlined-field::part(container) {
+      transition: box-shadow 160ms ease;
+    }
+
+    md-outlined-select.md-outlined-field:focus-within::part(container) {
+      box-shadow: 0 0 0 2px rgba(108, 62, 234, 0.12), 0 0 14px rgba(108, 62, 234, 0.18);
     }
 
     #baseBranchMenu {

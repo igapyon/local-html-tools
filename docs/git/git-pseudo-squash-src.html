@@ -73,7 +73,7 @@ limitations under the License.
     <section id="baseBlock" class="md-section md-stack-md">
       <div class="md-stack-md">
         <div class="md-form-row md-form-row--nowrap">
-          <md-outlined-text-field id="squashBaseBranch" label="基点ブランチ" required autocomplete="on" placeholder="例: devel" class="md-outlined-field" value="devel" data-help-text="基点は差分の起点です。基点が違うと差分がずれます。"></md-outlined-text-field>
+          <md-outlined-text-field id="squashBaseBranch" label="基点ブランチ" required autocomplete="on" placeholder="例: devel" class="md-outlined-field" value="devel" data-help-text="基点は git 作業の差分の起点として利用されます。git 作業をどこが基点なのか確認しましょう。基点が違うと差分がずれるため要確認です。設定の順番を揃えると意図した差分になりやすいです。"></md-outlined-text-field>
           <md-menu id="baseBranchMenu" anchor="squashBaseBranch" positioning="popover" quick no-navigation-wrap></md-menu>
           <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="clearBaseBranchHistory()" title="基点ブランチ履歴をクリア" aria-label="基点ブランチ履歴をクリア">
             <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -83,7 +83,7 @@ limitations under the License.
         </div>
         <div class="md-form-row md-form-row--nowrap">
           <div class="md-input-wrap md-input-wrap--inline">
-            <md-outlined-text-field id="workBranch" label="作業ブランチ" required placeholder="例: tiga0129a" class="md-outlined-field" data-help-text="これから作業するブランチ名です。生成コマンドに反映されます。"></md-outlined-text-field>
+            <md-outlined-text-field id="workBranch" label="作業ブランチ" required placeholder="例: tiga0129a" class="md-outlined-field" data-help-text="これから作業するブランチ名です。未作成なら作成先として使います。生成コマンドにそのまま反映されます。"></md-outlined-text-field>
             <button type="button" class="md-icon-btn md-icon-btn--small md-input-action--inline" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <use href="#md-icon-refresh" xlink:href="#md-icon-refresh"></use>
@@ -136,54 +136,23 @@ limitations under the License.
       </div>
       <div id="baseRemoteRow" class="md-form-grid md-form-grid-2">
         <div class="md-form-row">
-          <label class="md-label md-label--muted">
-            <span>基点の参照先</span>
-            <span class="md-tooltip-group">
-              <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-              <span class="md-tooltip-content md-tooltip md-tooltip--rich">
-                基点ブランチをリモートから参照するか、ローカルで参照するかを指定します。
-                ふだんは最新のリモート状態で切りたいので、リモート基点を選ぶケースが多いです。
-              </span>
-            </span>
-            <span>：</span>
-          </label>
-          <select id="squashBaseScope" class="md-select" onchange="updateBaseScope()">
-            <option value="remote" selected>リモート</option>
-            <option value="local">ローカル</option>
-          </select>
+          <md-outlined-select id="squashBaseScope" label="基点の参照先" class="md-outlined-field" value="remote" data-help-text="基点ブランチをリモートから参照するか、ローカルで参照するかを指定します。ふだんは最新のリモート状態で切りたいので、リモート基点を選ぶケースが多いです。" onchange="updateBaseScope()">
+            <md-select-option value="remote" selected>
+              <div slot="headline">リモート</div>
+            </md-select-option>
+            <md-select-option value="local">
+              <div slot="headline">ローカル</div>
+            </md-select-option>
+          </md-outlined-select>
         </div>
         <div class="md-form-row">
-          <label class="md-label md-label--muted">
-            <span>基点リモート</span>
-            <span class="md-tooltip-group">
-              <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-              <span class="md-tooltip-content md-tooltip md-tooltip--rich">
-                基点ブランチを参照するリモート名です（例: origin）。
-                「作業開始」と「まとめる予定の作業 (diff)」の基準になります。
-                リモート基点を選ぶ場合は、最新の origin/devel などを参照する想定です。
-              </span>
-            </span>
-            <span>：</span>
-          </label>
-          <md-outlined-text-field id="baseRemote" placeholder="例: origin" class="md-outlined-field" value="origin"></md-outlined-text-field>
+          <md-outlined-text-field id="baseRemote" label="基点リモート" placeholder="例: origin" class="md-outlined-field" value="origin" data-help-text="基点ブランチを参照するリモート名です（例: origin）。「作業開始」と「まとめる予定の作業 (diff)」の基準になります。リモート基点を選ぶ場合は、最新の origin/devel などを参照する想定です。"></md-outlined-text-field>
         </div>
       </div>
     </section>
     <div id="extraOptions" class="md-section md-stack-md">
-      <label id="squashRemoteLabel" class="md-label md-label--block">
-        <span>squashリモート</span>
-        <span class="md-tooltip-group">
-          <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-          <span class="md-tooltip-content md-tooltip md-tooltip--rich">
-            squash 作業で使う fetch / push のリモート名です。通常は origin です。
-            「作業をまとめる（squash）」のコマンドに反映されます。
-            基点のリモートと同じにしておくと混乱しにくいです。
-          </span>
-        </span>
-        <span>：</span>
-      </label>
       <div id="squashRemoteRow">
-        <md-outlined-text-field id="squashRemote" placeholder="例: origin" class="md-outlined-field" value="origin"></md-outlined-text-field>
+        <md-outlined-text-field id="squashRemote" label="squashリモート" placeholder="例: origin" class="md-outlined-field" value="origin" data-help-text="squash 作業で使う fetch / push のリモート名です。通常は origin です。「作業をまとめる（squash）」のコマンドに反映されます。基点のリモートと同じにしておくと混乱しにくいです。"></md-outlined-text-field>
       </div>
     </div>
 
@@ -211,11 +180,11 @@ limitations under the License.
       </div>
       <div class="md-code-block">
       <code id="createBranchCmd" class="md-code"></code>
-      <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('createBranchCmd')">
+      <md-icon-button class="md-copy-button md-copy-button--surface" aria-label="コピー" onclick="copyToClipboard('createBranchCmd')">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
           </svg>
-      </button>
+      </md-icon-button>
       </div>
 
       <div class="md-flow-divider">
@@ -255,21 +224,7 @@ limitations under the License.
         </span>
       </div>
       <div class="md-form-row">
-        <label class="md-label">
-          <span>コミットメッセージ</span>
-          <span class="md-required" aria-hidden="true">Required</span><span class="md-sr-only">必須</span>
-          <span class="md-tooltip-group">
-            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-            <span class="md-tooltip-content md-tooltip md-tooltip--rich">
-              まとめ後の1コミットの説明文です。複数行入力が可能で、内容は一時ファイルに書き込んで git commit -F で渡されます。
-              macOS / Linux は mktemp + ヒアドキュメント、Windows は PowerShell の New-TemporaryFile で対応します。
-              ヒアドキュメント経由で渡すため、シェルのクォート解析の影響を受けにくくしています。
-              あとで読んで何をおこなったのかわかる内容にしましょう。
-            </span>
-          </span>
-          <span>：</span>
-        </label>
-        <textarea id='commitMessage' placeholder='コミットの内容を表す一文&#10;&#10;コミットの内容の説明' class='md-textarea' rows='12'></textarea>
+        <md-outlined-text-field id="commitMessage" label="コミットメッセージ" type="textarea" rows="12" required class="md-outlined-field" placeholder="コミットの内容を表す一文&#10;&#10;コミットの内容の説明" data-help-text="まとめ後の1コミットの説明文です。複数行入力が可能で、内容は一時ファイルに書き込んで git commit -F で渡されます。macOS / Linux は mktemp + ヒアドキュメント、Windows は PowerShell の New-TemporaryFile で対応します。ヒアドキュメント経由で渡すため、シェルのクォート解析の影響を受けにくくしています。あとで読んで何をおこなったのかわかる内容にしましょう。"></md-outlined-text-field>
       </div>
     </section>
 
@@ -291,16 +246,16 @@ limitations under the License.
 
     <div class="md-code-block">
       <code id="rebaseCmd" class="md-code md-code--dual-copy"></code>
-      <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('rebaseCmd')">
+      <md-icon-button class="md-copy-button md-copy-button--surface" aria-label="コピー" onclick="copyToClipboard('rebaseCmd')">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
           </svg>
-      </button>
-      <button class="md-copy-button md-copy-button--bottom-right md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('rebaseCmd')" aria-label="コピー（右下）">
+      </md-icon-button>
+      <md-icon-button class="md-copy-button md-copy-button--bottom-right md-copy-button--surface" onclick="copyToClipboard('rebaseCmd')" aria-label="コピー（右下）">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
           </svg>
-      </button>
+      </md-icon-button>
     </div>
 
     <div class="md-flow-divider">
@@ -340,11 +295,11 @@ limitations under the License.
     </div>
     <div class="md-code-block">
       <code id="pushCmd" class="md-code"></code>
-      <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('pushCmd')">
+      <md-icon-button class="md-copy-button md-copy-button--surface" aria-label="コピー" onclick="copyToClipboard('pushCmd')">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
           </svg>
-      </button>
+      </md-icon-button>
     </div>
 
     <div class="md-flow-divider">
@@ -383,11 +338,11 @@ limitations under the License.
     </div>
     <div class="md-code-block">
       <code id="plannedDiffCmd" class="md-code"></code>
-      <button class="md-copy-button md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="copyToClipboard('plannedDiffCmd')">
+      <md-icon-button class="md-copy-button md-copy-button--surface" aria-label="コピー" onclick="copyToClipboard('plannedDiffCmd')">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
           </svg>
-      </button>
+      </md-icon-button>
     </div>
 
     <div id="toast" class="md-snackbar-host md-snackbar md-hidden">

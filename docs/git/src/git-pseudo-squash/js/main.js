@@ -58,10 +58,6 @@
       if (squashRemoteRow && lockOrigin) {
         squashRemoteRow.classList.toggle("md-hidden", lockOrigin.checked);
       }
-      const squashRemoteLabel = document.getElementById("squashRemoteLabel");
-      if (squashRemoteLabel && lockOrigin) {
-        squashRemoteLabel.classList.toggle("md-hidden", lockOrigin.checked);
-      }
       regenerateAllCommands();
     }
 
@@ -328,6 +324,7 @@
 
     function showToast(message) {
       const toast = document.getElementById("toast");
+      if (!toast) return;
       toast.textContent = message;
       toast.classList.remove("md-hidden");
       toast.classList.add("md-visible");
@@ -712,7 +709,7 @@
           clearTimeout(closeTimer);
           closeTimer = null;
         }
-        openMenu({ keepActive: false });
+        closeMenu();
       });
 
       input.addEventListener("input", () => {
@@ -875,7 +872,7 @@
     }
 
     function setupFieldSupportingTextHints() {
-      const fieldIds = ["squashBaseBranch", "workBranch"];
+      const fieldIds = ["squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "commitMessage"];
       fieldIds.forEach((id) => {
         const field = document.getElementById(id);
         if (!field) return;
