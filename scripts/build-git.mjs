@@ -9,9 +9,13 @@ const TARGETS = [
     baseDir: "docs/git",
     srcHtml: "docs/git/git-pseudo-squash-src.html",
     outHtml: "docs/git/git-pseudo-squash.html",
-    cssOrder: ["src/git-pseudo-squash/css/app.css"],
+    cssOrder: [
+      "../../lht-cmn/css/components.css",
+      "src/git-pseudo-squash/css/app.css"
+    ],
     jsOrder: [
       "src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/js/components.js",
       "src/git-pseudo-squash/js/main.js"
     ]
   }

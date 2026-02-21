@@ -34,6 +34,8 @@
 - `docs/git/src/git-pseudo-squash/css/app.css`
 - `docs/git/src/git-pseudo-squash/js/main.js`
 - `docs/git/src/vendor/material-web-outlined-text-field.bundle.js`（Material Web ローカル同梱生成物）
+- `lht-cmn/css/components.css`（共通 Web Components 用スタイル）
+- `lht-cmn/js/components.js`（共通 Web Components 定義）
 - `docs/git/git-pseudo-squash.html` は生成物（直接編集しない）
 
 実行コマンド:
@@ -54,31 +56,82 @@
 
 対象: `docs/git/git-pseudo-squash.html` 系
 
-- 旧来の「ラベル + テキストボックス + (i) ツールチップ」は、`md-outlined-text-field` と `data-help-text` を利用した構成へ段階的に置き換える
-- 旧来の `textarea` は、`md-outlined-text-field` の `type="textarea"` を利用した複数行入力へ置き換える
-- 旧来の `select` ベースのドロップダウンは、`md-outlined-select` + `md-select-option` 構成へ置き換え、候補リストの見た目トークン（角丸・配色・行高）も既存コンボボックスに寄せる
-- ヘルプ表示は、フィールドフォーカス時に `supportingText` を出す共通処理へ寄せる
-- 候補選択 UI は、フォーカス直後に自動展開せず、入力操作を起点に開く挙動へ統一する
+- 旧来の「ラベル + テキストボックス」は `md-outlined-text-field` へ移行済み
+- 複数行入力（コミットメッセージ）は `md-outlined-text-field type="textarea"` へ移行済み
+- 旧来の `select` は `md-outlined-select` + `md-select-option` へ移行済み（基点の参照先）
+- 旧来のチェックボックス/独自スイッチは `md-switch` へ移行済み（`PowerShell` / `リモート + origin と作業` / `現在ブランチで作業`）
+- スイッチサイズは細い見た目に統一するため、`md-switch` のサイズ系トークンを調整
+- `(i)` ヘルプアイコンは `md-icon-button` へ統一済み
+- ツールチップ表示は `md-tooltip-group` + `md-tooltip-content` を継続利用（`@material/web@2.4.1` には `md-tooltip` が同梱されないため）
+- 候補選択 UI は、フォーカス直後に自動展開せず、入力操作を起点に開く挙動へ統一済み
 
 今回の主な編集ファイル:
 
 - `docs/git/git-pseudo-squash-src.html`
 - `docs/git/src/git-pseudo-squash/js/main.js`
+- `docs/git/src/git-pseudo-squash/css/app.css`
+- `scripts/build-git-material-web.mjs`
 
 反映手順:
 
 - `npm run build:git` を実行し、`docs/git/git-pseudo-squash.html` と `dist/docs/git/git-pseudo-squash.html` を更新する
 
+## Material Web 化の具体手順（実運用）
+
+`git-pseudo-squash` を Material Web 化するときは、次の順番で実施する。
+
+1. 置換対象を `git-pseudo-squash-src.html` 上で特定する
+1. 既存の生HTML部品を、Material Web または自作Web Componentsへ置換する
+1. 状態取得/保存ロジックを `main.js` 側で `selected` / `value` ベースに合わせる
+1. 見た目差分（角丸、高さ、フォーカスリング、余白）を `app.css` のトークンで吸収する
+1. `npm run build:git:single` で生成物を更新して動作確認する
+1. 問題なければ `npm run build:git` で `dist/` まで更新する
+
+置換の基本対応表:
+
+- テキスト入力: `md-outlined-text-field`
+- テキストエリア: `md-outlined-text-field type="textarea"`
+- セレクト: `md-outlined-select` + `md-select-option`
+- トグル: `md-switch`
+- アイコンボタン: `md-icon-button`
+- ヘルプ `(i)`: `lht-help-tooltip`（内部で `md-icon-button` + tooltip DOM を生成）
+- コマンド表示 + コピー: `lht-command-block`（`copy-buttons="single|dual"`）
+- 右上メニュー: `lht-page-menu`（`home-href` / `home-label`）
+
+`@material/web@2.4.1` では `md-tooltip` が同梱されないため、ツールチップ表示は既存の `md-tooltip-group` + `md-tooltip-content` を継続利用する。
+
+## テーマ色ポリシー（Material Web 化時）
+
+- フォーカス、選択、強調は `primary` 系（`--md-sys-color-primary`）を基準にする
+- `secondary` は primary と競合しない範囲で使う。迷ったら primary に寄せる
+- フォーカスリング色はコンポーネント間で統一し、ブラウザ標準の青リングが出る場合は `:focus-visible` で上書きする
+- Material Web の色変更は、まず `:root` の `--md-sys-*` を調整し、個別部品の上書きは最小限にする
+
+## 自作 Web Components 一覧
+
+`docs/git/src/git-pseudo-squash/js/main.js` に定義:
+
+- `lht-help-tooltip`
+  - 属性: `label`, `wide`
+  - 本文: タグ内部テキスト/HTMLをそのままツールチップ本文として扱う
+- `lht-command-block`
+  - 属性: `command-id`, `copy-buttons="single|dual"`
+  - `command-id` の `code` 要素とコピー操作を自動生成
+- `lht-page-menu`
+  - 属性: `home-href`, `home-label`
+  - 右上メニューの開閉と外側クリッククローズを内包
+
 ## git-pseudo-squash.html の Material Design 実装方針
 
-`docs/git/git-pseudo-squash.html` は外部ライブラリに依存せず、単一 HTML 内で Material Design 仕様を再現しています。
+`docs/git/git-pseudo-squash.html` は単一 HTML 配布を維持しつつ、Material Web コンポーネントをローカルバンドルして利用します。
 
 - 命名は `md-*` で統一し、レイアウト/フォーム/ボタン/ツールチップ/スナックバー/コード表示をコンポーネント単位で定義する
 - 色/角丸/影/タイポグラフィは CSS 変数 `--md-sys-*` に集約し、要素側はトークン参照のみで組み立てる
 - 主要コンポーネントは以下のクラスで構成する
-- `md-card` `md-input` `md-select` `md-textarea` `md-button` `md-icon-btn` `md-switch` `md-tooltip` `md-snackbar` `md-code`
+- `md-card` `md-button` `md-icon-btn` `md-tooltip` `md-snackbar` `md-code`
+- Material Web の主利用要素は `md-outlined-text-field` `md-outlined-select` `md-select-option` `md-icon-button` `md-switch`
 - 表示切替は `md-hidden` `md-visible` `md-disabled` を使い、JS 側はクラスの付け替えだけで制御する
-- 「i」アイコンはインライン SVG で実装し、色/サイズ/余白は `md-tooltip-trigger` 側で統一する
+- 「i」アイコンは `md-icon-button` にインライン SVG を入れて実装し、色/サイズ/余白は共通クラスで統一する
 
 ## Material Design 実装ルール
 
@@ -88,9 +141,9 @@
 - トグルはラベルの左側に配置する（左右の違いで迷わないように固定）
 - 意味単位の `md-*` コンポーネントに再構成する
 - 色/角丸/影/タイポは `--md-sys-*` に集約し、要素側はトークン参照のみにする
-- `input/select/textarea` は `md-input` `md-select` `md-textarea` に統一する
+- `input/select/textarea` は Material Web の対応コンポーネント（`md-outlined-text-field` / `md-outlined-select`）へ寄せる
 - 必須表示はラベル横の `md-required-chip` に統一する
-- ツールチップは `md-tooltip-group` + `md-tooltip-content` で構成し、`i` はインライン SVG を使う
+- ツールチップは `md-tooltip-group` + `md-tooltip-content` で構成し、`i` は `md-icon-button` を使う
 - ツールチップ本文は `md-tooltip` に `font-weight: 400` を指定し、細めの表現に統一する
 - 表示状態は `md-hidden` `md-visible` `md-disabled` に統一し、JS はクラス切替のみで制御する
 
