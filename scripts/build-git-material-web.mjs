@@ -19,6 +19,7 @@ await build({
       import "@material/web/menu/menu.js";
       import "@material/web/menu/menu-item.js";
       import "@material/web/iconbutton/icon-button.js";
+      import "@material/web/switch/switch.js";
     `,
     resolveDir: ROOT,
     sourcefile: "material-web-git-entry.js",

@@ -1,0 +1,14 @@
+lht-help-tooltip {
+  display: inline-flex;
+  align-items: center;
+}
+
+lht-command-block {
+  display: block;
+}
+
+.md-help-icon-button {
+  --md-icon-button-icon-size: 18px;
+  --md-icon-button-state-layer-size: 30px;
+  color: #6f6a79;
+}

@@ -5,14 +5,14 @@
       --md-sys-color-background: #f6f4f8;
       --md-sys-color-focus-ring: rgba(98, 0, 238, 0.35);
       --md-sys-color-on-primary: #ffffff;
-      --md-sys-color-on-secondary: #00332c;
+      --md-sys-color-on-secondary: #ffffff;
       --md-sys-color-on-surface: #1c1b1f;
       --md-sys-color-on-surface-variant: #49454f;
       --md-sys-color-on-tertiary: #FFFFFF;
       --md-sys-color-on-tertiary-container: #3d2e5a;
       --md-sys-color-outline: #c8c5d0;
       --md-sys-color-primary: #6200ee;
-      --md-sys-color-secondary: #03dac6;
+      --md-sys-color-secondary: #6200ee;
       --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
       --md-sys-color-state-layer: rgba(98, 0, 238, 0.08);
       --md-sys-color-surface: #ffffff;
@@ -971,6 +971,12 @@
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
     }
     .md-icon-btn:hover { background: #e6e1ee; }
+    .md-icon-btn:focus-visible {
+      outline: none;
+      box-shadow:
+        0 0 0 2px #f6f4f8,
+        0 0 0 4px rgba(108, 62, 234, 0.65);
+    }
     .md-icon-btn--small { width: 32px; height: 32px; border-radius: 16px; }
     .md-icon-btn--surface { background: #f7f2fa; }
 
@@ -1031,6 +1037,20 @@
     }
     .md-switch-input:checked + .md-switch::after { transform: translateX(20px); background: #ffffff; }
     .md-switch-label { display: inline-flex; align-items: center; gap: 0.24rem; font-size: 0.95rem; color: var(--md-sys-color-on-surface); }
+    .md-switch-help-row { display: inline-flex; align-items: center; gap: 0.1rem; }
+    .md-switch-label md-switch {
+      --md-switch-track-width: 44px;
+      --md-switch-track-height: 24px;
+      --md-switch-track-outline-width: 1px;
+      --md-switch-handle-width: 20px;
+      --md-switch-handle-height: 20px;
+      --md-switch-selected-handle-width: 20px;
+      --md-switch-selected-handle-height: 20px;
+      --md-switch-with-icon-handle-width: 20px;
+      --md-switch-with-icon-handle-height: 20px;
+      --md-switch-state-layer-size: 24px;
+      vertical-align: middle;
+    }
     .md-label .md-info-chip,
     .md-switch-label .md-info-chip { margin-left: 0; }
 

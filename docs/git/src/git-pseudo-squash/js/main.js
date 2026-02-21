@@ -18,8 +18,54 @@
       return s1 + s2 + s3;
     }
 
+    function getUseCurrentBranchSelected() {
+      const useCurrentBranch = document.getElementById("useCurrentBranch");
+      if (!useCurrentBranch) return true;
+      if ("selected" in useCurrentBranch) {
+        return !!useCurrentBranch.selected;
+      }
+      return !!useCurrentBranch.checked;
+    }
+
+    function setUseCurrentBranchSelected(value) {
+      const useCurrentBranch = document.getElementById("useCurrentBranch");
+      if (!useCurrentBranch) return;
+      if ("selected" in useCurrentBranch) {
+        useCurrentBranch.selected = !!value;
+        return;
+      }
+      useCurrentBranch.checked = !!value;
+    }
+
+    function getSwitchSelected(id, fallbackValue = false) {
+      const switchElement = document.getElementById(id);
+      if (!switchElement) return !!fallbackValue;
+      if ("selected" in switchElement) {
+        return !!switchElement.selected;
+      }
+      return !!switchElement.checked;
+    }
+
+    function setSwitchSelected(id, value) {
+      const switchElement = document.getElementById(id);
+      if (!switchElement) return;
+      if ("selected" in switchElement) {
+        switchElement.selected = !!value;
+        return;
+      }
+      switchElement.checked = !!value;
+    }
+
+    function isShellEnvPowerShell() {
+      return getSwitchSelected("shellEnvPowerShell", false);
+    }
+
+    function isLockOriginEnabled() {
+      return getSwitchSelected("lockOrigin", true);
+    }
+
     function toggleCurrentBranch() {
-      const useCurrent = document.getElementById("useCurrentBranch").checked;
+      const useCurrent = getUseCurrentBranchSelected();
       const workBranch = document.getElementById("workBranch");
       if (workBranch) {
         // 編集は常に可能にする（現在のブランチ使用時も入力は保持）
@@ -32,38 +78,37 @@
     function updateBaseScope() {
       const scope = document.getElementById("squashBaseScope");
       const baseRemote = document.getElementById("baseRemote");
-      const lockOrigin = document.getElementById("lockOrigin");
+      const lockOriginEnabled = isLockOriginEnabled();
       const baseRemoteRow = document.getElementById("baseRemoteRow");
       if (scope && baseRemote) {
-        const disableRemote = scope.value !== "remote" || (lockOrigin && lockOrigin.checked);
+        const disableRemote = scope.value !== "remote" || lockOriginEnabled;
         baseRemote.disabled = disableRemote;
         baseRemote.classList.toggle("md-disabled", disableRemote);
       }
-      if (scope && lockOrigin && lockOrigin.checked) {
+      if (scope && lockOriginEnabled) {
         baseRemote.value = "origin";
       }
       const squashRemote = document.getElementById("squashRemote");
       const squashRemoteRow = document.getElementById("squashRemoteRow");
-      if (squashRemote && lockOrigin) {
-        const disableRemoteName = lockOrigin.checked;
+      if (squashRemote) {
+        const disableRemoteName = lockOriginEnabled;
         squashRemote.disabled = disableRemoteName;
         squashRemote.classList.toggle("md-disabled", disableRemoteName);
         if (disableRemoteName) {
           squashRemote.value = "origin";
         }
       }
-      if (baseRemoteRow && lockOrigin) {
-        baseRemoteRow.classList.toggle("md-hidden", lockOrigin.checked);
+      if (baseRemoteRow) {
+        baseRemoteRow.classList.toggle("md-hidden", lockOriginEnabled);
       }
-      if (squashRemoteRow && lockOrigin) {
-        squashRemoteRow.classList.toggle("md-hidden", lockOrigin.checked);
+      if (squashRemoteRow) {
+        squashRemoteRow.classList.toggle("md-hidden", lockOriginEnabled);
       }
       regenerateAllCommands();
     }
 
     function toggleOriginLock() {
-      const lockOrigin = document.getElementById("lockOrigin");
-      const isLocked = !!(lockOrigin && lockOrigin.checked);
+      const isLocked = isLockOriginEnabled();
       if (!isLocked) {
         const baseRemote = document.getElementById("baseRemote");
         const squashRemote = document.getElementById("squashRemote");
@@ -122,10 +167,10 @@
       const squashBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
       let base = "";
       const workBranch = document.getElementById("workBranch").value.trim();
-      const useCurrent = document.getElementById("useCurrentBranch").checked;
+      const useCurrent = getUseCurrentBranchSelected();
       const commitMessage = document.getElementById("commitMessage").value.trim();
       const squashRemote = document.getElementById("squashRemote").value.trim() || "origin";
-      const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
+      const shellEnv = isShellEnvPowerShell() ? "powershell" : "posix";
 
       if (!squashBranch) {
         if (!silent) alert("基点ブランチを入力してください。");
@@ -184,9 +229,9 @@
       if (!output) return;
 
       const workBranch = document.getElementById("workBranch").value.trim();
-      const useCurrent = document.getElementById("useCurrentBranch").checked;
+      const useCurrent = getUseCurrentBranchSelected();
       const squashRemote = document.getElementById("squashRemote").value.trim() || "origin";
-      const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
+      const shellEnv = isShellEnvPowerShell() ? "powershell" : "posix";
 
       if (!useCurrent && !workBranch) {
         if (!silent) alert("push する場合は作業ブランチ名を入力してください。");
@@ -216,8 +261,8 @@
       const baseRemote = document.getElementById("baseRemote")?.value.trim() || "origin";
       const squashBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
       const workBranch = document.getElementById("workBranch").value.trim();
-      const useCurrent = document.getElementById("useCurrentBranch").checked;
-      const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
+      const useCurrent = getUseCurrentBranchSelected();
+      const shellEnv = isShellEnvPowerShell() ? "powershell" : "posix";
 
       const output = document.getElementById("plannedDiffCmd");
       if (!output) return;
@@ -254,7 +299,7 @@
       const scope = document.getElementById("squashBaseScope").value;
       const remote = document.getElementById("baseRemote").value.trim() || "origin";
       const baseBranch = document.getElementById("squashBaseBranch").value.trim();
-      const shellEnv = document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
+      const shellEnv = isShellEnvPowerShell() ? "powershell" : "posix";
 
       if (!workBranch) {
         if (!silent) alert("作業ブランチ名を入力してください。");
@@ -332,12 +377,6 @@
         toast.classList.remove("md-visible");
         toast.classList.add("md-hidden");
       }, 2000);
-    }
-
-    function toggleMenu() {
-      const panel = document.getElementById("menuPanel");
-      if (!panel) return;
-      panel.classList.toggle("md-hidden");
     }
 
     function setupCodeSelectAll() {
@@ -430,13 +469,13 @@
       const squashRemoteValue = getStoredString(UI_SQUASH_REMOTE_STORAGE_KEY);
 
       if (shellEnvPowerShell && shellEnvValue !== null) {
-        shellEnvPowerShell.checked = shellEnvValue;
+        setSwitchSelected("shellEnvPowerShell", shellEnvValue);
       }
       if (lockOrigin && lockOriginValue !== null) {
-        lockOrigin.checked = lockOriginValue;
+        setSwitchSelected("lockOrigin", lockOriginValue);
       }
       if (useCurrentBranch && useCurrentBranchValue !== null) {
-        useCurrentBranch.checked = useCurrentBranchValue;
+        setUseCurrentBranchSelected(useCurrentBranchValue);
       }
       if (squashBaseScope && (scopeValue === "remote" || scopeValue === "local")) {
         squashBaseScope.value = scopeValue;
@@ -458,20 +497,20 @@
       const useCurrentBranch = document.getElementById("useCurrentBranch");
 
       if (shellEnvPowerShell) {
-        setStoredValue(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY, shellEnvPowerShell.checked);
+        setStoredValue(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY, isShellEnvPowerShell());
       }
       if (lockOrigin) {
-        setStoredValue(UI_LOCK_ORIGIN_STORAGE_KEY, lockOrigin.checked);
+        setStoredValue(UI_LOCK_ORIGIN_STORAGE_KEY, isLockOriginEnabled());
       }
       if (squashBaseScope) {
         setStoredValue(UI_SQUASH_BASE_SCOPE_STORAGE_KEY, squashBaseScope.value);
       }
       if (useCurrentBranch) {
-        setStoredValue(UI_USE_CURRENT_BRANCH_STORAGE_KEY, useCurrentBranch.checked);
+        setStoredValue(UI_USE_CURRENT_BRANCH_STORAGE_KEY, getUseCurrentBranchSelected());
       }
 
       // lockOrigin ON 時は origin を強制表示するため、ユーザーのリモート入力値は保持する。
-      const isLockOrigin = !!(lockOrigin && lockOrigin.checked);
+      const isLockOrigin = isLockOriginEnabled();
       if (!isLockOrigin && baseRemote) {
         setStoredValue(UI_BASE_REMOTE_STORAGE_KEY, baseRemote.value.trim());
       }
@@ -519,12 +558,12 @@
       const workBranch = document.getElementById("workBranch");
       const commitMessage = document.getElementById("commitMessage");
 
-      if (shellEnvPowerShell) shellEnvPowerShell.checked = false;
-      if (lockOrigin) lockOrigin.checked = true;
+      if (shellEnvPowerShell) setSwitchSelected("shellEnvPowerShell", false);
+      if (lockOrigin) setSwitchSelected("lockOrigin", true);
       if (squashBaseScope) squashBaseScope.value = "remote";
       if (baseRemote) baseRemote.value = "origin";
       if (squashRemote) squashRemote.value = "origin";
-      if (useCurrentBranch) useCurrentBranch.checked = true;
+      if (useCurrentBranch) setUseCurrentBranchSelected(true);
       if (squashBaseBranch) squashBaseBranch.value = "devel";
       if (workBranch) workBranch.value = "";
       if (commitMessage) commitMessage.value = "";
