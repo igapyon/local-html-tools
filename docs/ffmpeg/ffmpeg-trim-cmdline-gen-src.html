@@ -1,0 +1,99 @@
+<!--
+Copyright 2025 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FFmpeg 切り出しコマンドジェネレータ</title>
+    <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
+  <link rel="stylesheet" href="src/ffmpeg-trim-cmdline-gen/css/app.css" />
+
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
+  <div class="md-shell md-card">
+    <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+<h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">✂️</span>FFmpeg 切り出しコマンドジェネレータ</h1>
+
+    <lht-help-text-field
+      field-id="filename"
+      label="入力ファイル名*"
+      required
+      placeholder="例: 250503_130527_TrMic.wav / sample.mp4"
+      field-class="md-field-block"
+      help-text="例: 250503_130527_TrMic.wav / sample.mp4"
+    ></lht-help-text-field>
+
+    <lht-help-text-field
+      field-id="start"
+      label="開始時刻（任意）"
+      placeholder="例: 3:10 または 190 または 1:15:30"
+      field-class="md-field-block"
+      help-text="開始位置。時:分:秒 または 秒指定に対応。"
+    ></lht-help-text-field>
+
+    <lht-help-text-field
+      field-id="end"
+      label="終了時刻（任意）"
+      placeholder="例: 12:45 または 765 または 0:12:45"
+      field-class="md-field-block"
+      help-text="終了位置。未指定なら末尾まで。"
+    ></lht-help-text-field>
+
+    <lht-help-text-field
+      field-id="partNumber"
+      type="number"
+      min="1"
+      label="出力パート番号"
+      placeholder="例: 1"
+      field-class="md-field-block"
+      help-text="出力ファイル名の連番に利用します。"
+    ></lht-help-text-field>
+
+    <button onclick="generateClipCommand()" class="md-button md-button--primary md-field-block">
+      切り出しコマンド生成
+    </button>
+
+    <lht-command-block command-id="clipCmd"></lht-command-block>
+
+    <div id="toast" class="md-snackbar md-hidden">
+      コピーしました
+    </div>
+  </div>
+
+    <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js"></script>
+  <script src="src/ffmpeg-trim-cmdline-gen/js/main.js"></script>
+
+</body>
+</html>

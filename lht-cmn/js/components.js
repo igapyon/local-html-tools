@@ -50,6 +50,15 @@ class LhtHelpTextField extends HTMLElement {
     const type = this.getAttribute("type");
     if (type != null) field.setAttribute("type", type);
 
+    const min = this.getAttribute("min");
+    if (min != null) field.setAttribute("min", min);
+
+    const max = this.getAttribute("max");
+    if (max != null) field.setAttribute("max", max);
+
+    const step = this.getAttribute("step");
+    if (step != null) field.setAttribute("step", step);
+
     const rows = this.getAttribute("rows");
     if (rows != null) field.setAttribute("rows", rows);
 
@@ -156,6 +165,14 @@ class LhtSwitchHelp extends HTMLElement {
 
     const mdSwitch = document.createElement("md-switch");
     mdSwitch.id = switchId;
+    Object.defineProperty(mdSwitch, "checked", {
+      get() {
+        return !!mdSwitch.selected;
+      },
+      set(value) {
+        mdSwitch.selected = !!value;
+      }
+    });
     if (isChecked) {
       mdSwitch.selected = true;
       mdSwitch.setAttribute("selected", "");
