@@ -14,8 +14,11 @@ await build({
   stdin: {
     contents: `
       import "@material/web/textfield/outlined-text-field.js";
+      import "@material/web/select/outlined-select.js";
+      import "@material/web/select/select-option.js";
       import "@material/web/menu/menu.js";
       import "@material/web/menu/menu-item.js";
+      import "@material/web/iconbutton/icon-button.js";
     `,
     resolveDir: ROOT,
     sourcefile: "material-web-git-entry.js",
