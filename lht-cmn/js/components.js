@@ -47,6 +47,12 @@ class LhtHelpTextField extends HTMLElement {
     const autocomplete = this.getAttribute("autocomplete");
     if (autocomplete != null) field.setAttribute("autocomplete", autocomplete);
 
+    const type = this.getAttribute("type");
+    if (type != null) field.setAttribute("type", type);
+
+    const rows = this.getAttribute("rows");
+    if (rows != null) field.setAttribute("rows", rows);
+
     const value = this.getAttribute("value");
     if (value != null) field.setAttribute("value", value);
 
@@ -58,6 +64,61 @@ class LhtHelpTextField extends HTMLElement {
 
     if (this.hasAttribute("required")) field.required = true;
     if (this.hasAttribute("disabled")) field.disabled = true;
+
+    const helpText = (this.getAttribute("help-text") || "").trim();
+    if (helpText) {
+      field.addEventListener("focus", () => {
+        field.supportingText = helpText;
+      });
+      field.addEventListener("blur", () => {
+        field.supportingText = "";
+      });
+    }
+
+    this.textContent = "";
+    this.appendChild(field);
+  }
+}
+
+class LhtHelpSelect extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const fieldId = (this.getAttribute("field-id") || "").trim();
+    if (!fieldId) return;
+
+    const field = document.createElement("md-outlined-select");
+    field.id = fieldId;
+
+    const label = (this.getAttribute("label") || "").trim();
+    if (label) field.setAttribute("label", label);
+
+    const value = this.getAttribute("value");
+    if (value != null) field.value = value;
+
+    const fieldClass = (this.getAttribute("field-class") || "").trim();
+    if (fieldClass) {
+      fieldClass.split(/\s+/).filter(Boolean).forEach((name) => field.classList.add(name));
+    }
+    field.classList.add("md-outlined-field");
+
+    if (this.hasAttribute("required")) field.required = true;
+    if (this.hasAttribute("disabled")) field.disabled = true;
+
+    const sourceOptions = Array.from(this.querySelectorAll("option"));
+    for (const sourceOption of sourceOptions) {
+      const option = document.createElement("md-select-option");
+      const optionValue = sourceOption.getAttribute("value") ?? sourceOption.textContent ?? "";
+      option.value = optionValue;
+      if (sourceOption.hasAttribute("selected")) {
+        option.selected = true;
+        option.setAttribute("selected", "");
+        field.value = optionValue;
+      }
+      option.innerHTML = `<div slot="headline">${sourceOption.textContent ?? ""}</div>`;
+      field.appendChild(option);
+    }
 
     const helpText = (this.getAttribute("help-text") || "").trim();
     if (helpText) {
@@ -239,6 +300,9 @@ if (!customElements.get("lht-help-tooltip")) {
 }
 if (!customElements.get("lht-help-text-field")) {
   customElements.define("lht-help-text-field", LhtHelpTextField);
+}
+if (!customElements.get("lht-help-select")) {
+  customElements.define("lht-help-select", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

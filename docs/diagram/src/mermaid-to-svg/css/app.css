@@ -1,0 +1,395 @@
+    /* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
+    :root {
+      --md-danger: #b3261e;
+      --md-state-layer: rgba(98, 0, 238, 0.12);
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-focus-ring: rgba(98, 0, 238, 0.35);
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-on-secondary: #00332c;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-on-tertiary: #FFFFFF;
+      --md-sys-color-on-tertiary-container: #3d2e5a;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-secondary: #03dac6;
+      --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
+      --md-sys-color-state-layer: rgba(98, 0, 238, 0.08);
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-tertiary: #7D5260;
+      --md-sys-color-tertiary-container: #f3e8fd;
+      --md-typography-body-medium: 1rem;
+      --md-typography-body-small: 0.875rem;
+      --md-typography-headline-large: 1.85rem;
+      --md-typography-title-medium: 1.1rem;
+      --md-typography-title-small: 1.05rem;
+      --status-later: #ff9800;
+      --status-ok: #4caf50;
+      --status-todo: #00bcd4;
+    }
+
+    /* local-html-tools MD3 Core Spec v1.0.2 (2026-02-08) */
+    .md-page {
+      background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; min-height: 100vh;
+    }
+
+    .md-shell {
+      max-width: 980px; margin: 0 auto;
+    }
+
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid #ece7f3;
+    }
+
+    .md-surface-card {
+      max-width: 48rem; margin: 0 auto; padding: 24px; position: relative;
+    }
+
+    .md-headline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      padding-right: 2.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .md-headline__icon { margin-right: 0.5rem; }
+
+    .md-section {
+      margin-top: 1.2rem;
+    }
+
+    .md-section-title {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
+    }
+
+    .md-title-info-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.08rem;
+    }
+
+    .md-title-info-row .md-section-title {
+      margin: 0;
+    }
+
+    .md-title-info-row .md-info-chip {
+      margin-left: 0;
+    }
+
+    .md-grid {
+      display: grid; gap: 16px;
+    }
+
+    .md-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+      margin-bottom: 0.35rem;
+    }
+
+    .md-required {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.15rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.54rem;
+      font-weight: 600;
+      background: #ECEAF1;
+      color: #49454F;
+    }
+
+    .md-input, .md-textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .md-textarea {
+      min-height: 16rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      line-height: 1.5;
+    }
+
+    .md-input:focus, .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-field-block {
+      margin-bottom: 1rem;
+    }
+
+    .md-section > .md-title-info-row + .md-field-block {
+      margin-top: 0.6rem;
+    }
+
+    .md-button {
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .md-button--primary {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
+    }
+
+    .md-button--primary:hover {
+      background: #4f00c9;
+    }
+
+    .md-button--secondary {
+      background: #e8f5f3;
+      color: #15443e;
+      box-shadow: 0 2px 6px rgba(3, 218, 198, 0.25);
+    }
+
+    .md-button:disabled {
+      background: #e6e1ee;
+      color: #9a94a7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .md-icon-btn:hover { background: #e6e1ee; }
+    .md-icon-btn--small { width: 32px; height: 32px; border-radius: 16px; }
+    .md-icon-btn--surface { background: #f7f2fa; }
+    .md-icon-20 { width: 20px; height: 20px; }
+
+    .md-tooltip-group {
+      position: relative; display: inline-flex; align-items: center;
+    }
+
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: 20rem;
+      max-width: 90vw;
+    }
+
+    .md-tooltip-group:hover .md-tooltip-content {
+      opacity: 1;
+    }
+
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: transparent;
+      color: #4a4458;
+      margin-left: 0.2rem;
+    }
+
+    .md-info-icon {
+      width: 18px; height: 18px;
+    }
+
+    .md-code-block {
+      position: relative; margin-top: 0.5rem;
+    }
+
+    .md-code {
+      display: block;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      white-space: pre;
+      background: var(--md-sys-color-surface-variant);
+      border: 1px solid #e5e0ec;
+      color: #1f1b2d;
+      min-height: 2.5rem;
+    }
+
+    .md-copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      background: #f7f2fa;
+      border: none;
+      cursor: pointer;
+    }
+
+    .md-snackbar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #2b2831;
+      color: #f7f4fb;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      font-size: 0.85rem;
+    }
+
+    .md-hidden {
+      display: none;
+    }
+
+    .md-menu-button { position: absolute; top: 16px; right: 16px; }
+    .md-menu-panel {
+      position: absolute;
+      top: 48px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 10;
+    }
+    .md-menu-link { display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface); text-decoration: none; }
+    .md-menu-link:hover { background: #f2edf8; }
+
+    .md-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .md-select {
+      min-width: 11rem;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.65rem 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .md-select:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-preview-wrap {
+      border: 1px solid #e5e0ec;
+      border-radius: 14px;
+      padding: 0.75rem;
+      background: linear-gradient(180deg, #ffffff 0%, #faf8fc 100%);
+      overflow: auto;
+      min-height: 12rem;
+    }
+
+    .md-preview-stage {
+      min-height: 10rem;
+    }
+
+    .md-error {
+      color: var(--md-danger);
+      font-size: 0.9rem;
+    }
+
+    .md-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 0.9rem;
+    }
+
+    .md-snackbar-host {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+
+    .md-snackbar-host.md-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: "Roboto", "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif; font-size: 1rem; line-height: 1.5; }
+    button { border: none; cursor: pointer; background: transparent; }
+
+    @media (max-width: 680px) {
+      .md-page {
+        padding: 12px;
+      }
+
+      .md-surface-card {
+        padding: 18px;
+      }
+
+      .md-row {
+        align-items: stretch;
+      }
+
+      .md-select {
+        width: 100%;
+      }
+
+      .md-actions .md-button {
+        width: 100%;
+      }
+    }

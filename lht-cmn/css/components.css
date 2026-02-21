@@ -13,6 +13,12 @@ lht-help-text-field {
   min-width: 0;
 }
 
+lht-help-select {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 md-outlined-text-field.md-outlined-field {
   flex: 1 1 16rem;
   min-width: 12rem;

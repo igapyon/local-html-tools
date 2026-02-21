@@ -12,7 +12,10 @@
     "preview:git": "vite preview --config vite.git.config.mjs",
     "typecheck:music": "tsc -p tsconfig.music.json --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:grep": "npm run build:git:material && node scripts/build-grep.mjs",
+    "build:password": "npm run build:git:material && node scripts/build-password.mjs",
+    "build:diagram": "npm run build:git:material && node scripts/build-diagram.mjs"
   },
   "devDependencies": {
     "@material/web": "^2.4.1",
