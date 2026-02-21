@@ -4,14 +4,22 @@
   "type": "module",
   "scripts": {
     "build:music": "node scripts/build-music.mjs",
+    "build:git:material": "node scripts/build-git-material-web.mjs",
+    "build:git:single": "npm run build:git:material && node scripts/build-git.mjs",
+    "build:git": "npm run build:git:single && vite build --config vite.git.config.mjs",
     "build:knowledge-timeline": "node scripts/build-knowledge-timeline.mjs",
+    "dev:git": "vite --config vite.git.config.mjs",
+    "preview:git": "vite preview --config vite.git.config.mjs",
     "typecheck:music": "tsc -p tsconfig.music.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "devDependencies": {
+    "@material/web": "^2.4.1",
+    "esbuild": "^0.27.3",
     "jsdom": "^26.0.0",
     "typescript": "^5.7.3",
+    "vite": "^7.3.1",
     "vitest": "^3.0.0"
   }
 }

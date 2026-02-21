@@ -6,6 +6,7 @@
 *.m4a
 *.mkv
 *.json
+node_modules
 filelist.txt
 !package.json
 !tsconfig.music.json
