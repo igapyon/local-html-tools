@@ -1,3 +1,10 @@
+/*
+ * lht-cmn components.js
+ * Version: v20260222
+ * Copyright 2026 Toshiki Iga
+ * Licensed under the Apache License, Version 2.0
+ */
+
 class LhtHelpTooltip extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
@@ -100,12 +107,20 @@ class LhtSelectHelp extends HTMLElement {
     const fieldId = (this.getAttribute("field-id") || "").trim();
     if (!fieldId) return;
 
-    const field = document.createElement("md-outlined-select");
+    const hasMdOutlinedSelect = !!(window.customElements && window.customElements.get("md-outlined-select"));
+    const field = document.createElement(hasMdOutlinedSelect ? "md-outlined-select" : "select");
     field.id = fieldId;
     this._lhtField = field;
+    this._isFallbackSelect = !hasMdOutlinedSelect;
 
     const label = (this.getAttribute("label") || "").trim();
-    if (label) field.setAttribute("label", label);
+    if (label) {
+      if (this._isFallbackSelect) {
+        field.setAttribute("aria-label", label);
+      } else {
+        field.setAttribute("label", label);
+      }
+    }
 
     const value = this.getAttribute("value");
     if (value != null) field.value = value;
@@ -114,7 +129,11 @@ class LhtSelectHelp extends HTMLElement {
     if (fieldClass) {
       fieldClass.split(/\s+/).filter(Boolean).forEach((name) => field.classList.add(name));
     }
-    field.classList.add("md-outlined-field");
+    if (this._isFallbackSelect) {
+      field.classList.add("lht-select-help__fallback");
+    } else {
+      field.classList.add("md-outlined-field");
+    }
 
     if (this.hasAttribute("required")) {
       field.required = true;
@@ -124,12 +143,16 @@ class LhtSelectHelp extends HTMLElement {
 
     const helpText = (this.getAttribute("help-text") || "").trim();
     if (helpText) {
-      field.addEventListener("focus", () => {
-        field.supportingText = helpText;
-      });
-      field.addEventListener("blur", () => {
-        field.supportingText = "";
-      });
+      if (this._isFallbackSelect) {
+        field.title = helpText;
+      } else {
+        field.addEventListener("focus", () => {
+          field.supportingText = helpText;
+        });
+        field.addEventListener("blur", () => {
+          field.supportingText = "";
+        });
+      }
     }
 
     this.appendChild(field);
@@ -212,19 +235,31 @@ class LhtSelectHelp extends HTMLElement {
     field.innerHTML = "";
 
     for (const entry of options) {
-      const option = document.createElement("md-select-option");
-      option.value = entry.value;
-      if (entry.disabled) option.disabled = true;
-      if (entry.selected) {
-        option.selected = true;
-        option.setAttribute("selected", "");
-        field.value = entry.value;
+      if (this._isFallbackSelect) {
+        const option = document.createElement("option");
+        option.value = entry.value;
+        option.textContent = entry.label;
+        if (entry.disabled) option.disabled = true;
+        if (entry.selected) {
+          option.selected = true;
+          field.value = entry.value;
+        }
+        field.appendChild(option);
+      } else {
+        const option = document.createElement("md-select-option");
+        option.value = entry.value;
+        if (entry.disabled) option.disabled = true;
+        if (entry.selected) {
+          option.selected = true;
+          option.setAttribute("selected", "");
+          field.value = entry.value;
+        }
+        const headline = document.createElement("div");
+        headline.slot = "headline";
+        headline.textContent = entry.label;
+        option.appendChild(headline);
+        field.appendChild(option);
       }
-      const headline = document.createElement("div");
-      headline.slot = "headline";
-      headline.textContent = entry.label;
-      option.appendChild(headline);
-      field.appendChild(option);
     }
   }
 

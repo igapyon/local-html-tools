@@ -7,8 +7,13 @@ const TARGETS = [
     id: "musicxml-to-midi",
     srcHtml: "docs/music/musicxml-to-midi-src.html",
     outHtml: "docs/music/musicxml-to-midi.html",
-    cssOrder: ["src/musicxml-to-midi/css/app.css"],
+    cssOrder: [
+      "../../lht-cmn/css/components.css",
+      "src/musicxml-to-midi/css/app.css"
+    ],
     jsOrder: [
+      "../git/src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/js/components.js",
       "src/musicxml-to-midi/js/midi-writer.js",
       "src/common/js/musicxml-common.js",
       "src/common/js/music-synth-common.js",
@@ -173,12 +178,16 @@ function buildTarget(target) {
   assertExactOrder(`${target.id} js`, jsRefs, target.jsOrder);
 
   const cssText = target.cssOrder
-    .map((relPath) => fs.readFileSync(path.resolve(ROOT, "docs/music", relPath), "utf8").trimEnd())
+    .map((relPath) => {
+      const css = fs.readFileSync(path.resolve(ROOT, "docs/music", relPath), "utf8").trimEnd();
+      return escapeInlineStyleText(css);
+    })
     .join("\n\n");
 
   const jsBlocks = target.jsOrder.map((relPath) => {
     const scriptText = fs.readFileSync(path.resolve(ROOT, "docs/music", relPath), "utf8").trimEnd();
-    return `  <script>\n${scriptText}\n  </script>`;
+    const safeScriptText = escapeInlineScriptText(scriptText);
+    return `  <script>\n${safeScriptText}\n  </script>`;
   });
 
   let output = sourceHtml;
@@ -195,10 +204,10 @@ function buildTarget(target) {
 
   output = output.replace(
     /<\/head>/,
-    `  <style>\n${cssText}\n  </style>\n</head>`
+    () => `  <style>\n${cssText}\n  </style>\n</head>`
   );
 
-  output = output.replace(/<\/body>/, `${jsBlocks.join("\n\n")}\n</body>`);
+  output = output.replace(/<\/body>/, () => `${jsBlocks.join("\n\n")}\n</body>`);
 
   fs.writeFileSync(outHtmlPath, output, "utf8");
 }
@@ -215,4 +224,12 @@ function assertExactOrder(label, actual, expected) {
       );
     }
   }
+}
+
+function escapeInlineScriptText(text) {
+  return text.replace(/<\/script/gi, "<\\/script");
+}
+
+function escapeInlineStyleText(text) {
+  return text.replace(/<\/style/gi, "<\\/style");
 }
