@@ -136,12 +136,12 @@ HTML から次を読み込みます。
 ### `lht-text-field-help`
 
 - 用途: テキスト/数値/複数行入力 + フォーカス時ヘルプ
-- 主な属性: `field-id`, `label`, `help-text`, `type`, `placeholder`, `value`, `rows`, `min`, `max`, `step`, `required`, `disabled`, `field-class`
+- 主な属性: `field-id`, `label`, `help-text`, `hide-delay-ms`, `type`, `placeholder`, `value`, `rows`, `min`, `max`, `step`, `required`, `disabled`, `field-class`
 
 ### `lht-select-help`
 
 - 用途: セレクト入力 + フォーカス時ヘルプ
-- 主な属性: `field-id`, `label`, `help-text`, `value`, `required`, `disabled`, `field-class`
+- 主な属性: `field-id`, `label`, `help-text`, `hide-delay-ms`, `value`, `required`, `disabled`, `field-class`
 - 選択肢定義: `<script type="application/json" slot="options">[...]</script>`
 
 ### `lht-switch-help`

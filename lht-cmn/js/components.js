@@ -85,12 +85,25 @@ class LhtTextFieldHelp extends HTMLElement {
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();
+    const hideDelayMsRaw = Number(this.getAttribute("hide-delay-ms"));
+    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 120;
     if (helpText) {
+      let blurHideTimer = null;
       field.addEventListener("focus", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+          blurHideTimer = null;
+        }
         field.supportingText = helpText;
       });
       field.addEventListener("blur", () => {
-        field.supportingText = "";
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+        }
+        blurHideTimer = setTimeout(() => {
+          field.supportingText = "";
+          blurHideTimer = null;
+        }, hideDelayMs);
       });
     }
 
@@ -142,15 +155,28 @@ class LhtSelectHelp extends HTMLElement {
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();
+    const hideDelayMsRaw = Number(this.getAttribute("hide-delay-ms"));
+    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 120;
     if (helpText) {
       if (this._isFallbackSelect) {
         field.title = helpText;
       } else {
+        let blurHideTimer = null;
         field.addEventListener("focus", () => {
+          if (blurHideTimer) {
+            clearTimeout(blurHideTimer);
+            blurHideTimer = null;
+          }
           field.supportingText = helpText;
         });
         field.addEventListener("blur", () => {
-          field.supportingText = "";
+          if (blurHideTimer) {
+            clearTimeout(blurHideTimer);
+          }
+          blurHideTimer = setTimeout(() => {
+            field.supportingText = "";
+            blurHideTimer = null;
+          }, hideDelayMs);
         });
       }
     }
