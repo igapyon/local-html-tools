@@ -48,6 +48,7 @@
 
 # DONE
 
+- `scripts/lib/single-html.mjs` を導入し、`text/link/life/img/docs-index` の `*-src.html` から配布用 `*.html` 生成時にローカル `link/script src` をインライン化（単一HTML化）する運用へ統一
 - [優先度高] タイトルに「?」が未設置のHTML一覧（対応済み分）
 - 対象: docs/grep/find-gen.html
 - 対象: docs/img/img2svg.html
