@@ -18,8 +18,17 @@
 - ImageMagick/sox: 画像/音声変換のパラメータ生成（バッチリサイズ/ウォーターマーク）
 - regex/sed/awk: 文字列変換テンプレの生成
 - [後まわし] docker/docker-compose: よくある起動・開発用コマンド生成
+- [検討] `docs/index.html` のカード構造を JSON データ化し、画面構築時に展開する方式へ移行できるか確認する
+- [既存バグ] `docs/text/text-processing.html` の入力欄で、文字入力後にスペースを連打すると `.`（ピリオド）が自動挿入される
+  - 不要な自動挿入のため、発生条件を切り分けて無効化する（ブラウザ/OSの自動補正影響も確認）
+- [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
+- [music] `docs/music/*` の「ファイルを選択」操作を、Material Design のよくあるパターン（Filled ボタン + 選択ファイル名表示）で目立たせる
+
+# DONE
+
+- `scripts/lib/single-html.mjs` を導入し、`text/link/life/img/docs-index` の `*-src.html` から配布用 `*.html` 生成時にローカル `link/script src` をインライン化（単一HTML化）する運用へ統一
 - 各HTMLのタイトル右に「?」説明を置く方針に統一し、その文言を docs/index.html のホバー説明へ転記する対応を実施
-- [優先度高] タイトルに「?」が未設置のHTML一覧
+- [優先度高] タイトルに「?」が未設置のHTML一覧（対応済み分）
 - 対象: docs/ffmpeg/ffmpeg-audio-convert-cmdline-gen.html
 - 対象: docs/ffmpeg/ffmpeg-concat-cmdline-gen.html
 - 対象: docs/ffmpeg/ffmpeg-loudnorm-cmdline-gen.html
@@ -37,19 +46,9 @@
 - 対象: docs/link/url-encode-decode.html
 - 対象: docs/link/utm-remove.html
 - 対象: docs/text/text-viewer.html
-- [検討] `docs/index.html` のカード構造を JSON データ化し、画面構築時に展開する方式へ移行できるか確認する
-- [対応] `docs/text/file-rename-cmdline-gen.html` の lht 化（`lht-help-text-field` / `lht-help-select` / `lht-switch-help` への置換）を実施する
-- [検討] ドロップダウン項目（`md-select-option`）の生成ロジックを `lht-cmn/js/components.js` 側へ共通化し、各画面の個別JS実装を減らせるか確認する
-- [検討] `lht-cmn/js/components.js` の読み込み順依存を減らす（現在は `defer` 統一で回避）。将来的に `lht-help-select` 側でも子 `option` 後着を吸収できるか検討する
-- [既存バグ] `docs/text/text-processing.html` の入力欄で、文字入力後にスペースを連打すると `.`（ピリオド）が自動挿入される
-  - 不要な自動挿入のため、発生条件を切り分けて無効化する（ブラウザ/OSの自動補正影響も確認）
-- [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
-- [music] `docs/music/*` の「ファイルを選択」操作を、Material Design のよくあるパターン（Filled ボタン + 選択ファイル名表示）で目立たせる
-
-# DONE
-
-- `scripts/lib/single-html.mjs` を導入し、`text/link/life/img/docs-index` の `*-src.html` から配布用 `*.html` 生成時にローカル `link/script src` をインライン化（単一HTML化）する運用へ統一
-- [優先度高] タイトルに「?」が未設置のHTML一覧（対応済み分）
+- [対応] `docs/text/file-rename-cmdline-gen.html` の lht 化（`lht-help-text-field` / `lht-help-select` / `lht-switch-help` への置換）
+- [対応] ドロップダウン項目（`md-select-option`）の生成ロジックを `lht-cmn/js/components.js` 側へ共通化
+- [対応] `lht-cmn/js/components.js` の読み込み順依存軽減（`defer` 運用 + `lht-help-select` 側で宣言オプション/後着 option を吸収）
 - 対象: docs/grep/find-gen.html
 - 対象: docs/img/img2svg.html
 - 対象: docs/password/password-gen.html

@@ -166,3 +166,33 @@ lht-switch-help .md-switch-label .md-tooltip-content {
   --md-focus-ring-color: #6c3eea;
   color: #6f6a79;
 }
+
+lht-index-card-link {
+  display: block;
+}
+
+.lht-index-card-link__icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.3rem;
+}
+
+.lht-index-card-link__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.45rem;
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #534a64;
+  background: rgba(108, 62, 234, 0.13);
+}
+
+.lht-index-card-link__desc--clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lht-desc-lines, 3);
+  overflow: hidden;
+}
