@@ -71,7 +71,10 @@ class LhtHelpTextField extends HTMLElement {
     }
     field.classList.add("md-outlined-field");
 
-    if (this.hasAttribute("required")) field.required = true;
+    if (this.hasAttribute("required")) {
+      field.required = true;
+      field.setAttribute("required", "");
+    }
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();
@@ -113,7 +116,10 @@ class LhtHelpSelect extends HTMLElement {
     }
     field.classList.add("md-outlined-field");
 
-    if (this.hasAttribute("required")) field.required = true;
+    if (this.hasAttribute("required")) {
+      field.required = true;
+      field.setAttribute("required", "");
+    }
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();

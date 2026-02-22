@@ -720,7 +720,7 @@ limitations under the License.
             </div>
           </div>
           <p class="md-note">
-            注: 本ページは比較・検討を目的にした簡易実装です。正式運用時は必ず最新の公式規則・実務運用に照らして確認してください。
+            注: 本ページは比較・検討を目的にした簡易実装です。長音・撥音・慣用綴りは用途ごとに運用差があるため、正式運用時は必ず最新の公式規則・実務運用に照らして確認してください。
           </p>
           <details class="md-accordion">
             <summary>実名寄りプリセット</summary>
@@ -739,8 +739,8 @@ limitations under the License.
                   <span class="md-preset-hint">旅券目安: 長音設定に依存（KOHNO / KONO）</span>
                 </div>
                 <div class="md-preset-item">
-                  <button class="md-preset-button js-preset" type="button" data-text="しんよう" data-style="simplify">SHINYO / SHIN'YO</button>
-                  <span class="md-preset-hint">旅券目安: SHINYO</span>
+                  <button class="md-preset-button js-preset" type="button" data-text="しんよう" data-style="simplify">SHIN'YO / SHIN'YOU</button>
+                  <span class="md-preset-hint">旅券目安: SHIN'YO</span>
                 </div>
                 <div class="md-preset-item">
                   <button class="md-preset-button js-preset" type="button" data-text="まつもと りょう\nおおた にっき" data-style="simplify">複数行サンプル</button>
@@ -797,6 +797,7 @@ limitations under the License.
           <summary>未対応・注意（誤用防止）</summary>
           <ul class="md-list">
             <li>助詞読み（は/へ/を）の文脈判定は未対応です。入力どおりの仮名を変換します。</li>
+            <li>外来音の細かな拗音（例: ティ / ファ / ヴァ など）は厳密対応していません。</li>
             <li>固有名詞の慣用綴り（例: OHNO, TOKYO など）は、最終的に本人・組織・公式表記を優先してください。</li>
             <li>組織独自ルール（自治体、鉄道会社、学校、企業）には未対応です。提出先の規程を必ず確認してください。</li>
           </ul>
@@ -821,7 +822,16 @@ limitations under the License.
   </main>
 
   <script>
-    window.addEventListener("DOMContentLoaded", function () {
+    window.addEventListener("DOMContentLoaded", async function () {
+      if (window.customElements && typeof window.customElements.whenDefined === "function") {
+        await Promise.all([
+          window.customElements.whenDefined("lht-help-text-field"),
+          window.customElements.whenDefined("lht-help-select"),
+          window.customElements.whenDefined("lht-switch-help")
+        ]);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+
       const sourceText = document.getElementById("sourceText");
       const optUppercase = document.getElementById("optUppercase");
       const optPassportLongVowelStyle = document.getElementById("optPassportLongVowelStyle");
@@ -839,6 +849,10 @@ limitations under the License.
         kunrei: document.getElementById("badgeKunrei"),
         nihon: document.getElementById("badgeNihon")
       };
+
+      if (!sourceText || !optUppercase || !optPassportLongVowelStyle || !useCaseSelect) {
+        return;
+      }
 
       const baseMap = {
         "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
@@ -890,6 +904,7 @@ limitations under the License.
           "りゃ": "rya", "りゅ": "ryu", "りょ": "ryo",
           "ぎゃ": "gya", "ぎゅ": "gyu", "ぎょ": "gyo",
           "じゃ": "ja", "じゅ": "ju", "じょ": "jo",
+          "ぢゃ": "ja", "ぢゅ": "ju", "ぢょ": "jo",
           "びゃ": "bya", "びゅ": "byu", "びょ": "byo",
           "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo"
         },
@@ -903,6 +918,7 @@ limitations under the License.
           "りゃ": "rya", "りゅ": "ryu", "りょ": "ryo",
           "ぎゃ": "gya", "ぎゅ": "gyu", "ぎょ": "gyo",
           "じゃ": "ja", "じゅ": "ju", "じょ": "jo",
+          "ぢゃ": "ja", "ぢゅ": "ju", "ぢょ": "jo",
           "びゃ": "bya", "びゅ": "byu", "びょ": "byo",
           "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo"
         },
@@ -915,6 +931,7 @@ limitations under the License.
           "みゃ": "mya", "みゅ": "myu", "みょ": "myo",
           "りゃ": "rya", "りゅ": "ryu", "りょ": "ryo",
           "じゃ": "zya", "じゅ": "zyu", "じょ": "zyo",
+          "ぢゃ": "zya", "ぢゅ": "zyu", "ぢょ": "zyo",
           "ぎゃ": "gya", "ぎゅ": "gyu", "ぎょ": "gyo",
           "びゃ": "bya", "びゅ": "byu", "びょ": "byo",
           "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo"
@@ -941,7 +958,7 @@ limitations under the License.
         { kana: "はっぴょう", reason: "促音: 子音重ねの規則差（発音寄り/体系寄り）" },
         { kana: "さとう", reason: "長音運用: 実務簡略（ou->o）か保持か" },
         { kana: "おおの", reason: "長音運用: OH表記（OHNO）など慣用差" },
-        { kana: "しんよう", reason: "ん + 母音: SHINYO と SHIN'YO の曖昧回避" },
+        { kana: "しんよう", reason: "ん + y: SHIN'YO（旅券簡略）と SHIN'YOU（長音保持）の差" },
         { kana: "を", reason: "方式差: ヘボン系 o / 訓令・日本式 wo" }
       ];
 
@@ -1107,8 +1124,14 @@ limitations under the License.
 
       sourceText.addEventListener("input", updateResults);
       optUppercase.addEventListener("change", updateAll);
+      optUppercase.addEventListener("input", updateAll);
       optPassportLongVowelStyle.addEventListener("change", updateAll);
+      optPassportLongVowelStyle.addEventListener("input", updateAll);
       useCaseSelect.addEventListener("change", function () {
+        applyUseCaseRecommendation();
+        updateAll();
+      });
+      useCaseSelect.addEventListener("input", function () {
         applyUseCaseRecommendation();
         updateAll();
       });

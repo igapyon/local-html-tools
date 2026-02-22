@@ -1072,7 +1072,16 @@
 
     <div class="md-grid md-grid-2 md-section">
       <div>
-        <lht-help-select field-id="preset" label="プリセット" help-text="用途に応じた推奨値を選択します。" value="illustration"></lht-help-select>
+        <lht-help-select field-id="preset" label="プリセット" help-text="用途に応じた推奨値を選択します。" value="illustration">
+          <script type="application/json" slot="options">
+            [
+              { "value": "icon", "label": "アイコン・ロゴ（軽量・鋭利）" },
+              { "value": "illustration", "label": "イラスト（なめらか・曲線）", "selected": true },
+              { "value": "photo", "label": "写真（芸術的・油絵風）" },
+              { "value": "pixelart", "label": "ドット絵（ピクセル完全再現）" }
+            ]
+          </script>
+        </lht-help-select>
       </div>
 
       <div>
@@ -2381,17 +2390,6 @@ if(typeof define === 'function' && define.amd){
       }
     };
 
-    function appendPresetOption(value, label) {
-      const option = document.createElement("md-select-option");
-      option.value = value;
-      option.innerHTML = `<div slot="headline">${label}</div>`;
-      presetSelect.appendChild(option);
-    }
-
-    appendPresetOption("icon", "アイコン・ロゴ（軽量・鋭利）");
-    appendPresetOption("illustration", "イラスト（なめらか・曲線）");
-    appendPresetOption("photo", "写真（芸術的・油絵風）");
-    appendPresetOption("pixelart", "ドット絵（ピクセル完全再現）");
     presetSelect.value = presetSelect.value || "illustration";
 
     // プリセット適用関数（説明文も動的に更新）

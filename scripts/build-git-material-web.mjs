@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
 import { build } from "esbuild";
 
 const ROOT = process.cwd();
@@ -9,6 +10,27 @@ const outFile = path.resolve(
 );
 
 fs.mkdirSync(path.dirname(outFile), { recursive: true });
+
+const require = createRequire(import.meta.url);
+let hasMaterialWeb = true;
+try {
+  require.resolve("@material/web/package.json");
+} catch {
+  hasMaterialWeb = false;
+}
+
+if (!hasMaterialWeb) {
+  if (fs.existsSync(outFile)) {
+    console.warn(
+      "[build:git:material] @material/web not found. Reusing existing vendor bundle."
+    );
+    process.exit(0);
+  }
+  console.error(
+    "[build:git:material] @material/web not found and vendor bundle is missing."
+  );
+  process.exit(1);
+}
 
 await build({
   stdin: {
