@@ -6,11 +6,22 @@
 
 - `lht-cmn` は `local-html-tools` の UI 抽象化レイヤーです
 - Material Web を使う場合でも、画面側で `md-*` を直接多用せず、原則 `lht-*` コンポーネントとして提供してから利用します
+- `lht-*` を画面側の公開APIとして扱い、内部実装（Material Web / 自前DOM）は `lht-cmn` 側に閉じ込めます
 - 目的:
   - 画面ごとの重複実装を減らす
   - 見た目と挙動を統一する
   - 変更点を `lht-cmn` に集約して保守しやすくする
   - 生成AIが扱いやすい構造にする
+
+## 実装方針（重要）
+
+- 優先順位:
+  - 1. Material Web が利用可能なら内部で活用する
+  - 2. 利用不可環境では `lht-cmn` 内フォールバック実装で同等操作を維持する
+- 画面側（`docs/*-src.html`）は `lht-*` を利用し、`md-*` 直接実装の追加は原則避ける
+- 将来方針:
+  - `lht-cmn/css/components.css` を正本とし、`md3/` 依存を段階的に縮退する
+  - `md3/` はリファレンスとして扱い、実運用スタイルは `lht-cmn` に集約する
 
 ## 構成
 
@@ -23,6 +34,7 @@
   - `lht-command-block`
   - `lht-page-menu`
   - `lht-index-card-link`
+  - `lht-file-select`
 - `lht-cmn/css/components.css`
   - 上記コンポーネントの共通スタイル
 

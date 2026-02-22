@@ -252,6 +252,82 @@ class LhtHelpSelect extends HTMLElement {
   }
 }
 
+class LhtFileSelect extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const inputId = (this.getAttribute("input-id") || "fileInput").trim();
+    const buttonId = (this.getAttribute("button-id") || "fileSelectBtn").trim();
+    const fileNameId = (this.getAttribute("file-name-id") || "fileNameText").trim();
+    const accept = (this.getAttribute("accept") || "").trim();
+    const buttonLabel = (this.getAttribute("button-label") || "ファイルを選択").trim();
+    const placeholder = (this.getAttribute("placeholder") || "未選択").trim();
+    const showFileName = this.hasAttribute("show-file-name");
+
+    this.textContent = "";
+
+    const root = document.createElement("div");
+    root.className = "lht-file-select";
+
+    const hasMdFilledButton = !!(window.customElements && window.customElements.get("md-filled-button"));
+    const triggerButton = document.createElement(hasMdFilledButton ? "md-filled-button" : "button");
+    if (!hasMdFilledButton) {
+      triggerButton.type = "button";
+    }
+    triggerButton.id = buttonId;
+    triggerButton.className = `lht-file-select__button${hasMdFilledButton ? "" : " lht-file-select__button--fallback"}`;
+
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("slot", "icon");
+    icon.setAttribute("aria-hidden", "true");
+    icon.setAttribute("viewBox", "0 0 24 24");
+    icon.setAttribute("class", "lht-file-select__button-icon");
+    icon.setAttribute("fill", "none");
+    icon.setAttribute("stroke", "currentColor");
+    icon.setAttribute("stroke-width", "1.9");
+    icon.setAttribute("stroke-linecap", "round");
+    icon.setAttribute("stroke-linejoin", "round");
+    icon.innerHTML = '<path d="M4 7h7l2 2h7v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M12 10v6"></path><path d="M9 13l3 3 3-3"></path>';
+
+    const labelNode = document.createElement("span");
+    labelNode.className = "lht-file-select__button-text";
+    labelNode.textContent = buttonLabel;
+    triggerButton.appendChild(icon);
+    triggerButton.appendChild(labelNode);
+
+    const input = document.createElement("input");
+    input.id = inputId;
+    input.type = "file";
+    input.className = "md-file";
+    input.hidden = true;
+    if (accept) input.setAttribute("accept", accept);
+    if (this.hasAttribute("multiple")) input.multiple = true;
+
+    const fileName = document.createElement("span");
+    fileName.id = fileNameId;
+    fileName.className = "lht-file-select__file-name";
+    fileName.textContent = placeholder;
+    if (!showFileName) fileName.hidden = true;
+
+    if (this.hasAttribute("disabled")) {
+      input.disabled = true;
+      triggerButton.disabled = true;
+    }
+
+    triggerButton.addEventListener("click", () => input.click());
+    input.addEventListener("change", () => {
+      const names = Array.from(input.files || []).map((file) => file.name).filter(Boolean);
+      fileName.textContent = names.length > 0 ? names.join(", ") : placeholder;
+    });
+
+    root.appendChild(triggerButton);
+    root.appendChild(fileName);
+    this.appendChild(root);
+    this.appendChild(input);
+  }
+}
+
 class LhtSwitchHelp extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
@@ -516,6 +592,9 @@ if (!customElements.get("lht-help-text-field")) {
 }
 if (!customElements.get("lht-help-select")) {
   customElements.define("lht-help-select", LhtHelpSelect);
+}
+if (!customElements.get("lht-file-select")) {
+  customElements.define("lht-file-select", LhtFileSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

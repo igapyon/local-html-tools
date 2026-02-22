@@ -19,6 +19,60 @@ lht-help-select {
   min-width: 0;
 }
 
+lht-file-select {
+  display: block;
+}
+
+lht-file-select .lht-file-select {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+lht-file-select .lht-file-select__button {
+  --md-filled-button-container-color: var(--md-sys-color-primary, #6200ee);
+  --md-filled-button-label-text-color: #ffffff;
+  --md-filled-button-container-shape: 999px;
+  --md-filled-button-container-height: 54px;
+  --md-filled-button-leading-space: 20px;
+  --md-filled-button-trailing-space: 24px;
+  --md-filled-button-icon-size: 20px;
+  --md-focus-ring-color: #6c3eea;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(98, 0, 238, 0.24);
+}
+
+lht-file-select .lht-file-select__button--fallback {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 1.55rem;
+  line-height: 1;
+  color: #ffffff;
+  background: var(--md-sys-color-primary, #6200ee);
+  cursor: pointer;
+}
+
+lht-file-select .lht-file-select__button-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+}
+
+lht-file-select .lht-file-select__button-text {
+  white-space: nowrap;
+}
+
+lht-file-select .lht-file-select__file-name {
+  font-size: 0.85rem;
+  color: var(--md-sys-color-on-surface-variant, #49454f);
+  word-break: break-all;
+}
+
 md-outlined-text-field.md-outlined-field {
   flex: 1 1 16rem;
   min-width: 12rem;
