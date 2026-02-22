@@ -37,9 +37,17 @@ HTML から次を読み込みます。
 ## ドロップダウン置換手順（`lht-help-select`）
 
 1. 基本は `lht-help-select` を使い、`field-id` / `label` / `help-text` を設定する
-2. 選択肢はまず子要素の `<option>` で定義する
+2. 選択肢は `lht-help-select` に対して宣言する
+   - 推奨: 子要素の `<script type="application/json" slot="options">[...]</script>`
+   - 代替: 子要素の `<option>`（後方互換）
 3. 表示崩れや選択肢非表示が出る画面は、初期化時に JS で `md-select-option` を注入する方式へ切り替える
 4. 既存JS互換のため、DOM参照ID（`document.getElementById(...)`）は変更しない
+
+### 静的定義で成立する事例
+
+- すべての画面で動的注入が必須ではない
+- 例: `docs/git/git-branch-diff-src.html` の「出力形式」は、`md-outlined-select` + `md-select-option` の静的定義で安定動作している
+- そのため方針は「まず静的定義を試す → 崩れが出る画面のみ動的注入へ切替」が基本
 
 ### 崩れ対策の実装方針
 

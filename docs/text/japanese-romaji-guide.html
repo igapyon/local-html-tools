@@ -21,7 +21,7 @@ limitations under the License.
   <title>日本語ローマ字（旅券・ヘボン・訓令・日本式）</title>
   <link rel="stylesheet" href="../../lht-cmn/css/components.css">
   <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
-  <script src="../../lht-cmn/js/components.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
   <style>
     /* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
     :root {
@@ -667,14 +667,31 @@ limitations under the License.
                 field-id="useCaseSelect"
                 label="用途"
                 help-text="氏名・地名・学校学習・方式比較の用途に応じて推奨モードを切り替えます。"
-              ></lht-help-select>
+              >
+                <script type="application/json" slot="options">
+                  [
+                    { "value": "passport_name", "label": "氏名（旅券・本人確認）", "selected": true },
+                    { "value": "station_place", "label": "地名・駅名（案内表示）" },
+                    { "value": "school_learning", "label": "学校学習（2025年以降）" },
+                    { "value": "linguistics_compare", "label": "方式比較（理論検討）" }
+                  ]
+                </script>
+              </lht-help-select>
             </div>
             <div class="md-control-flow-item">
               <lht-help-select
                 field-id="optPassportLongVowelStyle"
                 label="長音"
                 help-text="旅券ローマ字の長音運用を切り替えます（簡略/保持/OH）。"
-              ></lht-help-select>
+              >
+                <script type="application/json" slot="options">
+                  [
+                    { "value": "simplify", "label": "簡略（SATOU → SATO）", "selected": true },
+                    { "value": "keep", "label": "保持（SATOU のまま）" },
+                    { "value": "oh", "label": "OH表記（SATOU → SATOH）" }
+                  ]
+                </script>
+              </lht-help-select>
             </div>
             <div class="md-control-flow-item">
               <lht-switch-help switch-id="optUppercase" label="大文字出力" checked></lht-switch-help>
@@ -804,7 +821,8 @@ limitations under the License.
   </main>
 
   <script>
-    (function () {      const sourceText = document.getElementById("sourceText");
+    window.addEventListener("DOMContentLoaded", function () {
+      const sourceText = document.getElementById("sourceText");
       const optUppercase = document.getElementById("optUppercase");
       const optPassportLongVowelStyle = document.getElementById("optPassportLongVowelStyle");
       const resultPassport = document.getElementById("resultPassport");
@@ -945,44 +963,6 @@ limitations under the License.
           longVowelStyle: "keep"
         }
       };
-
-      const useCaseOptions = [
-        { value: "passport_name", label: "氏名（旅券・本人確認）", selected: true },
-        { value: "station_place", label: "地名・駅名（案内表示）" },
-        { value: "school_learning", label: "学校学習（2025年以降）" },
-        { value: "linguistics_compare", label: "方式比較（理論検討）" }
-      ];
-
-      const longVowelOptions = [
-        { value: "simplify", label: "簡略（SATOU → SATO）", selected: true },
-        { value: "keep", label: "保持（SATOU のまま）" },
-        { value: "oh", label: "OH表記（SATOU → SATOH）" }
-      ];
-
-      function renderSelectOptions(selectElement, options) {
-        if (!selectElement) return;
-        selectElement.innerHTML = "";
-        const isMdSelect = selectElement.tagName.toLowerCase() === "md-outlined-select";
-        options.forEach(function (entry) {
-          if (isMdSelect) {
-            const option = document.createElement("md-select-option");
-            option.value = entry.value;
-            if (entry.selected) {
-              option.selected = true;
-              option.setAttribute("selected", "");
-              selectElement.value = entry.value;
-            }
-            option.innerHTML = "<div slot=\"headline\">" + entry.label + "</div>";
-            selectElement.appendChild(option);
-            return;
-          }
-          const option = document.createElement("option");
-          option.value = entry.value;
-          option.textContent = entry.label;
-          if (entry.selected) option.selected = true;
-          selectElement.appendChild(option);
-        });
-      }
 
       function toHiragana(text) {
         return text.replace(/[\u30a1-\u30f6]/g, function (match) {
@@ -1145,10 +1125,9 @@ limitations under the License.
         });
       });
 
-      renderSelectOptions(useCaseSelect, useCaseOptions);
-      renderSelectOptions(optPassportLongVowelStyle, longVowelOptions);
       applyUseCaseRecommendation();
-      updateAll();    }());
+      updateAll();
+    });
   </script>
 </body>
 </html>

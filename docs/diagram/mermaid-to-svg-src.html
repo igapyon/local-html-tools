@@ -23,7 +23,7 @@ limitations under the License.
   <link rel="stylesheet" href="src/mermaid-to-svg/css/app.css" />
   <script src="mermaid.min.js"></script>
   <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
-  <script src="../../lht-cmn/js/components.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
 </head>
 <body class="md-page">
   <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;left:-9999px;overflow:hidden">
@@ -89,11 +89,28 @@ limitations under the License.
             label="テーマ"
             help-text="配色テーマを選択します。変更後は再レンダリングで反映されます。"
           >
-            <option value="default" selected>default</option>
-            <option value="neutral">neutral</option>
-            <option value="forest">forest</option>
-            <option value="dark">dark</option>
-          </lht-help-select>
+            <script type="application/json" slot="options">
+            [
+              {
+                "value": "default",
+                "label": "default",
+                "selected": true
+              },
+              {
+                "value": "neutral",
+                "label": "neutral"
+              },
+              {
+                "value": "forest",
+                "label": "forest"
+              },
+              {
+                "value": "dark",
+                "label": "dark"
+              }
+            ]
+            </script>
+</lht-help-select>
           <button id="renderBtn" class="md-button md-button--primary" type="button">レンダリング</button>
           <button id="downloadSvgBtn" class="md-button md-button--secondary" type="button" disabled>SVG保存</button>
         </div>

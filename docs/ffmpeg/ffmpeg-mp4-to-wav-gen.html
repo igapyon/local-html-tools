@@ -1265,11 +1265,28 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       field-class="md-field-block"
       help-text="出力WAVのサンプルレートを選択します。"
     >
-      <option value="44100" selected>44.1 kHz（標準）</option>
-      <option value="48000">48 kHz</option>
-      <option value="96000">96 kHz</option>
-      <option value="192000">192 kHz</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "44100",
+          "label": "44.1 kHz（標準）",
+          "selected": true
+        },
+        {
+          "value": "48000",
+          "label": "48 kHz"
+        },
+        {
+          "value": "96000",
+          "label": "96 kHz"
+        },
+        {
+          "value": "192000",
+          "label": "192 kHz"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <lht-help-select
       field-id="channels"
@@ -1277,10 +1294,24 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       field-class="md-field-block"
       help-text="自動または固定チャンネル数を選択します。"
     >
-      <option value="auto" selected>ソースに合わせる（自動）</option>
-      <option value="1">モノラル（1ch）</option>
-      <option value="2">ステレオ（2ch）</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "auto",
+          "label": "ソースに合わせる（自動）",
+          "selected": true
+        },
+        {
+          "value": "1",
+          "label": "モノラル（1ch）"
+        },
+        {
+          "value": "2",
+          "label": "ステレオ（2ch）"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <lht-help-select
       field-id="bitDepth"
@@ -1288,10 +1319,24 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       field-class="md-field-block"
       help-text="WAVエンコード形式（PCM）を選択します。"
     >
-      <option value="pcm_s16le" selected>16-bit（標準）</option>
-      <option value="pcm_s24le">24-bit</option>
-      <option value="pcm_s32le">32-bit</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "pcm_s16le",
+          "label": "16-bit（標準）",
+          "selected": true
+        },
+        {
+          "value": "pcm_s24le",
+          "label": "24-bit"
+        },
+        {
+          "value": "pcm_s32le",
+          "label": "32-bit"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <button onclick="generateWavCommand()" class="md-button md-button--primary md-field-block">
       ffmpeg コマンド生成
@@ -1827,6 +1872,7 @@ class LhtHelpSelect extends HTMLElement {
 
     const field = document.createElement("md-outlined-select");
     field.id = fieldId;
+    this._lhtField = field;
 
     const label = (this.getAttribute("label") || "").trim();
     if (label) field.setAttribute("label", label);
@@ -1843,20 +1889,6 @@ class LhtHelpSelect extends HTMLElement {
     if (this.hasAttribute("required")) field.required = true;
     if (this.hasAttribute("disabled")) field.disabled = true;
 
-    const sourceOptions = Array.from(this.querySelectorAll("option"));
-    for (const sourceOption of sourceOptions) {
-      const option = document.createElement("md-select-option");
-      const optionValue = sourceOption.getAttribute("value") ?? sourceOption.textContent ?? "";
-      option.value = optionValue;
-      if (sourceOption.hasAttribute("selected")) {
-        option.selected = true;
-        option.setAttribute("selected", "");
-        field.value = optionValue;
-      }
-      option.innerHTML = `<div slot="headline">${sourceOption.textContent ?? ""}</div>`;
-      field.appendChild(option);
-    }
-
     const helpText = (this.getAttribute("help-text") || "").trim();
     if (helpText) {
       field.addEventListener("focus", () => {
@@ -1867,8 +1899,123 @@ class LhtHelpSelect extends HTMLElement {
       });
     }
 
-    this.textContent = "";
     this.appendChild(field);
+    this.hydrateOptions();
+
+    if (!this._hasDeclarativeOptions()) {
+      this._optionsObserver = new MutationObserver(() => {
+        this.hydrateOptions();
+      });
+      this._optionsObserver.observe(this, { childList: true, subtree: true });
+      requestAnimationFrame(() => this.hydrateOptions());
+    }
+  }
+
+  disconnectedCallback() {
+    if (this._optionsObserver) {
+      this._optionsObserver.disconnect();
+      this._optionsObserver = null;
+    }
+  }
+
+  _hasDeclarativeOptions() {
+    return this.hasAttribute("options") || !!this.querySelector("script[type='application/json'][slot='options']");
+  }
+
+  _normalizeOptions(rawOptions) {
+    return rawOptions
+      .map((entry) => {
+        const value = String(entry?.value ?? entry?.label ?? "");
+        const label = String(entry?.label ?? entry?.text ?? entry?.value ?? "");
+        return {
+          value,
+          label,
+          selected: !!entry?.selected,
+          disabled: !!entry?.disabled
+        };
+      })
+      .filter((entry) => entry.value || entry.label);
+  }
+
+  _readDeclarativeOptions() {
+    const optionsJson = (this.getAttribute("options") || "").trim();
+    if (optionsJson) {
+      try {
+        const parsed = JSON.parse(optionsJson);
+        if (Array.isArray(parsed)) return this._normalizeOptions(parsed);
+      } catch (_) {
+        // JSON 不正時は次の入力ソースへフォールバック
+      }
+    }
+
+    const script = this.querySelector("script[type='application/json'][slot='options']");
+    if (script) {
+      try {
+        const parsed = JSON.parse(script.textContent || "[]");
+        if (Array.isArray(parsed)) return this._normalizeOptions(parsed);
+      } catch (_) {
+        // JSON 不正時は空扱い
+      }
+      return [];
+    }
+
+    return null;
+  }
+
+  _readChildOptionElements() {
+    const sourceOptions = Array.from(this.querySelectorAll("option"));
+    if (sourceOptions.length === 0) return [];
+    return sourceOptions.map((sourceOption) => ({
+      value: sourceOption.getAttribute("value") ?? sourceOption.textContent ?? "",
+      label: sourceOption.textContent ?? "",
+      selected: sourceOption.hasAttribute("selected"),
+      disabled: sourceOption.hasAttribute("disabled")
+    }));
+  }
+
+  _setFieldOptions(options) {
+    const field = this._lhtField;
+    if (!field) return;
+    field.innerHTML = "";
+
+    for (const entry of options) {
+      const option = document.createElement("md-select-option");
+      option.value = entry.value;
+      if (entry.disabled) option.disabled = true;
+      if (entry.selected) {
+        option.selected = true;
+        option.setAttribute("selected", "");
+        field.value = entry.value;
+      }
+      const headline = document.createElement("div");
+      headline.slot = "headline";
+      headline.textContent = entry.label;
+      option.appendChild(headline);
+      field.appendChild(option);
+    }
+  }
+
+  hydrateOptions() {
+    const declarativeOptions = this._readDeclarativeOptions();
+    if (Array.isArray(declarativeOptions)) {
+      this._setFieldOptions(declarativeOptions);
+      const jsonScript = this.querySelector("script[type='application/json'][slot='options']");
+      if (jsonScript) jsonScript.remove();
+      if (this._optionsObserver) {
+        this._optionsObserver.disconnect();
+        this._optionsObserver = null;
+      }
+      return;
+    }
+
+    const optionsFromChildren = this._readChildOptionElements();
+    if (optionsFromChildren.length === 0) return;
+    this._setFieldOptions(optionsFromChildren);
+    this.querySelectorAll("option").forEach((option) => option.remove());
+    if (this._optionsObserver) {
+      this._optionsObserver.disconnect();
+      this._optionsObserver = null;
+    }
   }
 }
 
@@ -2014,7 +2161,7 @@ class LhtPageMenu extends HTMLElement {
     button.type = "button";
     button.className = "md-menu-button md-icon-btn";
     button.setAttribute("aria-label", "メニュー");
-    button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#md-icon-menu" xlink:href="#md-icon-menu"></use></svg>';
+    button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path></svg>';
 
     const panel = document.createElement("div");
     panel.className = "md-menu-panel md-hidden";
