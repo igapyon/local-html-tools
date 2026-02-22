@@ -1230,7 +1230,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
 
     <lht-help-text-field
       field-id="audioFile"
-      label="音声ファイル名*"
+      label="音声ファイル名"
       required
       placeholder="例: sample.wav"
       field-class="md-field-block"
@@ -1239,7 +1239,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
 
     <lht-help-select
       field-id="outputFormat"
-      label="出力フォーマット*"
+      label="出力フォーマット"
       required
       field-class="md-field-block"
       help-text="m4a: 高圧縮で互換性が高い / mp3: 汎用的 / opus: 低ビットレートに強い / flac: 可逆圧縮 / wav: 無圧縮PCM"
@@ -1975,7 +1975,10 @@ class LhtHelpTextField extends HTMLElement {
     }
     field.classList.add("md-outlined-field");
 
-    if (this.hasAttribute("required")) field.required = true;
+    if (this.hasAttribute("required")) {
+      field.required = true;
+      field.setAttribute("required", "");
+    }
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();
@@ -2017,7 +2020,10 @@ class LhtHelpSelect extends HTMLElement {
     }
     field.classList.add("md-outlined-field");
 
-    if (this.hasAttribute("required")) field.required = true;
+    if (this.hasAttribute("required")) {
+      field.required = true;
+      field.setAttribute("required", "");
+    }
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();

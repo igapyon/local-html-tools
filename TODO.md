@@ -38,6 +38,7 @@
 - 対象: docs/link/utm-remove.html
 - 対象: docs/text/text-viewer.html
 - [検討] `docs/index.html` のカード構造を JSON データ化し、画面構築時に展開する方式へ移行できるか確認する
+- [対応] `docs/text/file-rename-cmdline-gen.html` の lht 化（`lht-help-text-field` / `lht-help-select` / `lht-switch-help` への置換）を実施する
 - [検討] ドロップダウン項目（`md-select-option`）の生成ロジックを `lht-cmn/js/components.js` 側へ共通化し、各画面の個別JS実装を減らせるか確認する
 - [検討] `lht-cmn/js/components.js` の読み込み順依存を減らす（現在は `defer` 統一で回避）。将来的に `lht-help-select` 側でも子 `option` 後着を吸収できるか検討する
 - [既存バグ] `docs/text/text-processing.html` の入力欄で、文字入力後にスペースを連打すると `.`（ピリオド）が自動挿入される

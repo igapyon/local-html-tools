@@ -1966,33 +1966,45 @@ limitations under the License.
       ids.forEach((id) => {
         const element = document.getElementById(id);
         if (!element) return;
-        const eventName = element.tagName === 'SELECT' || element.type === 'checkbox' ? 'change' : 'input';
-        element.addEventListener(eventName, updateOutput);
-        if (element.tagName === 'SELECT' || element.type === 'checkbox') {
-          element.addEventListener('input', updateOutput);
-        }
+        // Web Components (md-outlined-select / md-switch) と native 要素の差異を吸収するため両方を購読
+        element.addEventListener('change', updateOutput);
+        element.addEventListener('input', updateOutput);
       });
       updateOutput();
     }
 
-    setupAutoUpdate();
-    const optSymbolAll = document.getElementById('optSymbolAll');
-    if (optSymbolAll) {
-      optSymbolAll.addEventListener('change', () => {
-        toggleAllSymbols(optSymbolAll.checked);
-        updateSymbolAllState();
-        updateOutput();
+    async function initTextProcessingPage() {
+      if (window.customElements && typeof window.customElements.whenDefined === 'function') {
+        await Promise.all([
+          window.customElements.whenDefined('lht-help-text-field'),
+          window.customElements.whenDefined('lht-help-select'),
+          window.customElements.whenDefined('lht-switch-help')
+        ]);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+
+      setupAutoUpdate();
+
+      const optSymbolAll = document.getElementById('optSymbolAll');
+      if (optSymbolAll) {
+        optSymbolAll.addEventListener('change', () => {
+          toggleAllSymbols(optSymbolAll.checked);
+          updateSymbolAllState();
+          updateOutput();
+        });
+      }
+      getSymbolOptionIds().forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('change', () => {
+          updateSymbolAllState();
+          updateOutput();
+        });
       });
+      updateSymbolAllState();
     }
-    getSymbolOptionIds().forEach((id) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('change', () => {
-        updateSymbolAllState();
-        updateOutput();
-      });
-    });
-    updateSymbolAllState();
+
+    initTextProcessingPage();
   </script>
 </body>
 </html>

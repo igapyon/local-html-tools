@@ -34,9 +34,163 @@ lht-command-block {
   display: block;
 }
 
+lht-help-text-field {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+lht-help-select {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+md-outlined-text-field.md-outlined-field {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+  width: 100%;
+  position: relative;
+  color-scheme: light;
+  border-radius: 12px;
+  --md-outlined-text-field-container-shape: 12px;
+  --md-outlined-field-container-shape: 12px;
+  --md-outlined-text-field-top-space: 10px;
+  --md-outlined-text-field-bottom-space: 10px;
+  --md-outlined-field-top-space: 10px;
+  --md-outlined-field-bottom-space: 10px;
+  --md-outlined-text-field-content-space: 12px;
+  --md-outlined-text-field-leading-space: 12px;
+  --md-outlined-text-field-trailing-space: 12px;
+  --md-outlined-text-field-outline-color: #bdb7c8;
+  --md-outlined-field-outline-color: #bdb7c8;
+  --md-outlined-text-field-hover-outline-color: #b1aac0;
+  --md-outlined-field-hover-outline-color: #b1aac0;
+  --md-outlined-text-field-focus-outline-color: #6c3eea;
+  --md-outlined-field-focus-outline-color: #6c3eea;
+  --md-outlined-text-field-focus-outline-width: 1.5px;
+  --md-outlined-field-focus-outline-width: 1.5px;
+  --md-outlined-text-field-focus-state-layer-color: #6c3eea;
+  --md-outlined-field-focus-state-layer-color: #6c3eea;
+  --md-outlined-text-field-focus-state-layer-opacity: 0;
+  --md-outlined-field-focus-state-layer-opacity: 0;
+  --md-outlined-text-field-error-focus-outline-width: 1px;
+  --md-outlined-field-error-focus-outline-width: 1px;
+  --md-outlined-text-field-caret-color: #6c3eea;
+  --md-outlined-field-caret-color: #6c3eea;
+  transition: none;
+}
+
+md-outlined-text-field.md-outlined-field::part(outline) {
+  transition: filter 160ms ease;
+}
+
+md-outlined-text-field.md-outlined-field:focus-within::part(outline) {
+  filter: drop-shadow(0 0 4px rgba(108, 62, 234, 0.26)) drop-shadow(0 0 12px rgba(108, 62, 234, 0.22));
+}
+
+md-outlined-text-field.md-outlined-field::part(container) {
+  transition: box-shadow 160ms ease;
+}
+
+md-outlined-text-field.md-outlined-field:focus-within::part(container) {
+  box-shadow: 0 0 0 2px rgba(108, 62, 234, 0.12), 0 0 14px rgba(108, 62, 234, 0.18);
+}
+
+md-outlined-select.md-outlined-field {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+  width: 100%;
+  position: relative;
+  color-scheme: light;
+  border-radius: 12px;
+  --md-outlined-select-text-field-container-shape: 12px;
+  --md-outlined-select-text-field-top-space: 10px;
+  --md-outlined-select-text-field-bottom-space: 10px;
+  --md-outlined-select-text-field-content-space: 12px;
+  --md-outlined-select-text-field-leading-space: 12px;
+  --md-outlined-select-text-field-trailing-space: 12px;
+  --md-outlined-field-top-space: 10px;
+  --md-outlined-field-bottom-space: 10px;
+  --md-outlined-field-content-space: 12px;
+  --md-outlined-field-leading-space: 12px;
+  --md-outlined-field-trailing-space: 12px;
+  --md-outlined-select-text-field-outline-color: #bdb7c8;
+  --md-outlined-select-text-field-hover-outline-color: #b1aac0;
+  --md-outlined-select-text-field-focus-outline-color: #6c3eea;
+  --md-outlined-select-text-field-focus-outline-width: 1.5px;
+  --md-outlined-select-text-field-focus-state-layer-color: #6c3eea;
+  --md-outlined-select-text-field-focus-state-layer-opacity: 0;
+  --md-outlined-select-text-field-caret-color: #6c3eea;
+  --md-menu-item-one-line-container-height: 44px;
+  --md-menu-item-top-space: 8px;
+  --md-menu-item-bottom-space: 8px;
+  transition: none;
+}
+
+md-outlined-select.md-outlined-field::part(outline) {
+  transition: filter 160ms ease;
+}
+
+md-outlined-select.md-outlined-field:focus-within::part(outline) {
+  filter: drop-shadow(0 0 4px rgba(108, 62, 234, 0.26)) drop-shadow(0 0 12px rgba(108, 62, 234, 0.22));
+}
+
+md-outlined-select.md-outlined-field::part(container) {
+  transition: box-shadow 160ms ease;
+}
+
+md-outlined-select.md-outlined-field:focus-within::part(container) {
+  box-shadow: 0 0 0 2px rgba(108, 62, 234, 0.12), 0 0 14px rgba(108, 62, 234, 0.18);
+}
+
+lht-switch-help {
+  display: inline-flex;
+  align-items: center;
+}
+
+lht-switch-help .md-switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.24rem;
+  font-size: 0.95rem;
+  color: var(--md-sys-color-on-surface);
+}
+
+lht-switch-help .md-switch-label md-switch {
+  --md-switch-track-width: 44px;
+  --md-switch-track-height: 24px;
+  --md-switch-track-outline-width: 1px;
+  --md-switch-handle-width: 20px;
+  --md-switch-handle-height: 20px;
+  --md-switch-selected-handle-width: 20px;
+  --md-switch-selected-handle-height: 20px;
+  --md-switch-with-icon-handle-width: 20px;
+  --md-switch-with-icon-handle-height: 20px;
+  --md-switch-state-layer-size: 24px;
+  --md-focus-ring-color: #6c3eea;
+  flex: 0 0 44px;
+  inline-size: 44px;
+  min-inline-size: 44px;
+  vertical-align: middle;
+}
+
+lht-switch-help .md-switch-label .md-info-chip {
+  margin-left: 0;
+}
+
+/* Switch rows are often near the right edge; anchor tooltip right to avoid clipping. */
+lht-switch-help .md-switch-label .md-tooltip-content {
+  left: auto;
+  right: 0;
+  transform: none;
+  max-width: calc(100vw - 2rem);
+}
+
 .md-help-icon-button {
   --md-icon-button-icon-size: 18px;
   --md-icon-button-state-layer-size: 30px;
+  --md-focus-ring-color: #6c3eea;
   color: #6f6a79;
 }
 
@@ -467,6 +621,8 @@ lht-command-block {
     .md-switch {
       position: relative;
       width: 44px;
+      min-width: 44px;
+      flex: 0 0 44px;
       height: 24px;
       background: #f0ebf7;
       border-radius: 9999px;
@@ -1053,6 +1209,8 @@ lht-command-block {
     .md-switch {
       position: relative;
       width: 44px;
+      min-width: 44px;
+      flex: 0 0 44px;
       height: 24px;
       background: #f0ebf7;
       border-radius: 9999px;
@@ -1078,21 +1236,7 @@ lht-command-block {
       box-shadow: inset 0 0 0 1px #7c3aed;
     }
     .md-switch-input:checked + .md-switch::after { transform: translateX(20px); background: #ffffff; }
-    .md-switch-label { display: inline-flex; align-items: center; gap: 0.24rem; font-size: 0.95rem; color: var(--md-sys-color-on-surface); }
     .md-switch-help-row { display: inline-flex; align-items: center; gap: 0.1rem; }
-    .md-switch-label md-switch {
-      --md-switch-track-width: 44px;
-      --md-switch-track-height: 24px;
-      --md-switch-track-outline-width: 1px;
-      --md-switch-handle-width: 20px;
-      --md-switch-handle-height: 20px;
-      --md-switch-selected-handle-width: 20px;
-      --md-switch-selected-handle-height: 20px;
-      --md-switch-with-icon-handle-width: 20px;
-      --md-switch-with-icon-handle-height: 20px;
-      --md-switch-state-layer-size: 24px;
-      vertical-align: middle;
-    }
     .md-label .md-info-chip,
     .md-switch-label .md-info-chip { margin-left: 0; }
 
@@ -1400,7 +1544,7 @@ lht-command-block {
         </div>
         <div class="md-form-row md-form-row--nowrap">
           <div class="md-input-wrap md-input-wrap--inline">
-            <md-outlined-text-field id="workBranch" label="作業ブランチ" required placeholder="例: tiga0129a" class="md-outlined-field" data-help-text="これから作業するブランチ名です。未作成なら作成先として使います。生成コマンドにそのまま反映されます。"></md-outlined-text-field>
+            <lht-help-text-field field-id="workBranch" label="作業ブランチ" required placeholder="例: tiga0129a" field-class="md-outlined-field" help-text="これから作業するブランチ名です。未作成なら作成先として使います。生成コマンドにそのまま反映されます。"></lht-help-text-field>
             <button type="button" class="md-icon-btn md-icon-btn--small md-input-action--inline" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <use href="#md-icon-refresh" xlink:href="#md-icon-refresh"></use>
@@ -1410,24 +1554,16 @@ lht-command-block {
         </div>
       </div>
       <div class="md-switch-row">
-        <label class="md-switch-label">
-          <md-switch id="shellEnvPowerShell"></md-switch>
-          PowerShell
-          <lht-help-tooltip label="PowerShell の説明" wide>
-            Windows PowerShell 用のコマンドを出力するかどうかを切り替えます。
-            スイッチがオフの場合は macOS / Linux の bash / zsh 向けのコマンドを出力します。
-            ご利用の環境に従って切り替えてください。
-            なお Windows コマンドプロンプトには対応していません。
-          </lht-help-tooltip>
-        </label>
-        <label class="md-switch-label">
-          <md-switch id="lockOrigin" selected onchange="toggleOriginLock()"></md-switch>
-          リモート + origin と作業
-          <lht-help-tooltip label="リモート + origin と作業の説明">
-            一連の作業を リモート + origin と連携して作業するかどうかを切り替えます。よくある利用方法が リモート + origin の組み合わせだと考えています。
-            ローカルの中で完結して作業する場合や、リモートの名称を変更したい場合は、このスイッチを OFF にして個別に値を設定してください。
-          </lht-help-tooltip>
-        </label>
+        <lht-switch-help switch-id="shellEnvPowerShell" label="PowerShell" help-label="PowerShell の説明" help-wide>
+          Windows PowerShell 用のコマンドを出力するかどうかを切り替えます。
+          スイッチがオフの場合は macOS / Linux の bash / zsh 向けのコマンドを出力します。
+          ご利用の環境に従って切り替えてください。
+          なお Windows コマンドプロンプトには対応していません。
+        </lht-switch-help>
+        <lht-switch-help switch-id="lockOrigin" label="リモート + origin と作業" help-label="リモート + origin と作業の説明" checked on-change="toggleOriginLock">
+          一連の作業を リモート + origin と連携して作業するかどうかを切り替えます。よくある利用方法が リモート + origin の組み合わせだと考えています。
+          ローカルの中で完結して作業する場合や、リモートの名称を変更したい場合は、このスイッチを OFF にして個別に値を設定してください。
+        </lht-switch-help>
         <span class="md-inline-action">
           <button type="button" class="md-button md-button--surface md-button--compact md-button--with-icon" onclick="clearUiPreferences()" title="設定をクリア" aria-label="設定をクリア">
             <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1522,13 +1658,9 @@ lht-command-block {
     <div class="md-section md-stack-sm">
       <div class="md-form-row">
         <span class="md-switch-help-row">
-          <label class="md-switch-label">
-            <md-switch id="useCurrentBranch" selected onchange="toggleCurrentBranch()"></md-switch>
-            現在ブランチで作業
-          </label>
-          <lht-help-tooltip label="現在ブランチで作業の説明">
+          <lht-switch-help switch-id="useCurrentBranch" label="現在ブランチで作業" help-label="現在ブランチで作業の説明" checked on-change="toggleCurrentBranch">
             現在チェックアウト中のブランチを作業ブランチとして扱います。チェックを外すと、作業ブランチ名で switch するコマンドが含まれます。
-          </lht-help-tooltip>
+          </lht-switch-help>
         </span>
       </div>
     </div>
@@ -2060,6 +2192,292 @@ class LhtHelpTooltip extends HTMLElement {
   }
 }
 
+class LhtHelpTextField extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const fieldId = (this.getAttribute("field-id") || "").trim();
+    if (!fieldId) return;
+
+    const field = document.createElement("md-outlined-text-field");
+    field.id = fieldId;
+
+    const label = (this.getAttribute("label") || "").trim();
+    if (label) field.setAttribute("label", label);
+
+    const placeholder = this.getAttribute("placeholder");
+    if (placeholder != null) field.setAttribute("placeholder", placeholder);
+
+    const autocomplete = this.getAttribute("autocomplete");
+    if (autocomplete != null) field.setAttribute("autocomplete", autocomplete);
+
+    const type = this.getAttribute("type");
+    if (type != null) field.setAttribute("type", type);
+
+    const min = this.getAttribute("min");
+    if (min != null) field.setAttribute("min", min);
+
+    const max = this.getAttribute("max");
+    if (max != null) field.setAttribute("max", max);
+
+    const step = this.getAttribute("step");
+    if (step != null) field.setAttribute("step", step);
+
+    const rows = this.getAttribute("rows");
+    if (rows != null) field.setAttribute("rows", rows);
+
+    const value = this.getAttribute("value");
+    if (value != null) field.setAttribute("value", value);
+
+    const fieldClass = (this.getAttribute("field-class") || "").trim();
+    if (fieldClass) {
+      fieldClass.split(/\s+/).filter(Boolean).forEach((name) => field.classList.add(name));
+    }
+    field.classList.add("md-outlined-field");
+
+    if (this.hasAttribute("required")) {
+      field.required = true;
+      field.setAttribute("required", "");
+    }
+    if (this.hasAttribute("disabled")) field.disabled = true;
+
+    const helpText = (this.getAttribute("help-text") || "").trim();
+    if (helpText) {
+      field.addEventListener("focus", () => {
+        field.supportingText = helpText;
+      });
+      field.addEventListener("blur", () => {
+        field.supportingText = "";
+      });
+    }
+
+    this.textContent = "";
+    this.appendChild(field);
+  }
+}
+
+class LhtHelpSelect extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const fieldId = (this.getAttribute("field-id") || "").trim();
+    if (!fieldId) return;
+
+    const field = document.createElement("md-outlined-select");
+    field.id = fieldId;
+    this._lhtField = field;
+
+    const label = (this.getAttribute("label") || "").trim();
+    if (label) field.setAttribute("label", label);
+
+    const value = this.getAttribute("value");
+    if (value != null) field.value = value;
+
+    const fieldClass = (this.getAttribute("field-class") || "").trim();
+    if (fieldClass) {
+      fieldClass.split(/\s+/).filter(Boolean).forEach((name) => field.classList.add(name));
+    }
+    field.classList.add("md-outlined-field");
+
+    if (this.hasAttribute("required")) {
+      field.required = true;
+      field.setAttribute("required", "");
+    }
+    if (this.hasAttribute("disabled")) field.disabled = true;
+
+    const helpText = (this.getAttribute("help-text") || "").trim();
+    if (helpText) {
+      field.addEventListener("focus", () => {
+        field.supportingText = helpText;
+      });
+      field.addEventListener("blur", () => {
+        field.supportingText = "";
+      });
+    }
+
+    this.appendChild(field);
+    this.hydrateOptions();
+
+    if (!this._hasDeclarativeOptions()) {
+      this._optionsObserver = new MutationObserver(() => {
+        this.hydrateOptions();
+      });
+      this._optionsObserver.observe(this, { childList: true, subtree: true });
+      requestAnimationFrame(() => this.hydrateOptions());
+    }
+  }
+
+  disconnectedCallback() {
+    if (this._optionsObserver) {
+      this._optionsObserver.disconnect();
+      this._optionsObserver = null;
+    }
+  }
+
+  _hasDeclarativeOptions() {
+    return this.hasAttribute("options") || !!this.querySelector("script[type='application/json'][slot='options']");
+  }
+
+  _normalizeOptions(rawOptions) {
+    return rawOptions
+      .map((entry) => {
+        const value = String(entry?.value ?? entry?.label ?? "");
+        const label = String(entry?.label ?? entry?.text ?? entry?.value ?? "");
+        return {
+          value,
+          label,
+          selected: !!entry?.selected,
+          disabled: !!entry?.disabled
+        };
+      })
+      .filter((entry) => entry.value || entry.label);
+  }
+
+  _readDeclarativeOptions() {
+    const optionsJson = (this.getAttribute("options") || "").trim();
+    if (optionsJson) {
+      try {
+        const parsed = JSON.parse(optionsJson);
+        if (Array.isArray(parsed)) return this._normalizeOptions(parsed);
+      } catch (_) {
+        // JSON 不正時は次の入力ソースへフォールバック
+      }
+    }
+
+    const script = this.querySelector("script[type='application/json'][slot='options']");
+    if (script) {
+      try {
+        const parsed = JSON.parse(script.textContent || "[]");
+        if (Array.isArray(parsed)) return this._normalizeOptions(parsed);
+      } catch (_) {
+        // JSON 不正時は空扱い
+      }
+      return [];
+    }
+
+    return null;
+  }
+
+  _readChildOptionElements() {
+    const sourceOptions = Array.from(this.querySelectorAll("option"));
+    if (sourceOptions.length === 0) return [];
+    return sourceOptions.map((sourceOption) => ({
+      value: sourceOption.getAttribute("value") ?? sourceOption.textContent ?? "",
+      label: sourceOption.textContent ?? "",
+      selected: sourceOption.hasAttribute("selected"),
+      disabled: sourceOption.hasAttribute("disabled")
+    }));
+  }
+
+  _setFieldOptions(options) {
+    const field = this._lhtField;
+    if (!field) return;
+    field.innerHTML = "";
+
+    for (const entry of options) {
+      const option = document.createElement("md-select-option");
+      option.value = entry.value;
+      if (entry.disabled) option.disabled = true;
+      if (entry.selected) {
+        option.selected = true;
+        option.setAttribute("selected", "");
+        field.value = entry.value;
+      }
+      const headline = document.createElement("div");
+      headline.slot = "headline";
+      headline.textContent = entry.label;
+      option.appendChild(headline);
+      field.appendChild(option);
+    }
+  }
+
+  hydrateOptions() {
+    const declarativeOptions = this._readDeclarativeOptions();
+    if (Array.isArray(declarativeOptions)) {
+      this._setFieldOptions(declarativeOptions);
+      const jsonScript = this.querySelector("script[type='application/json'][slot='options']");
+      if (jsonScript) jsonScript.remove();
+      if (this._optionsObserver) {
+        this._optionsObserver.disconnect();
+        this._optionsObserver = null;
+      }
+      return;
+    }
+
+    const optionsFromChildren = this._readChildOptionElements();
+    if (optionsFromChildren.length === 0) return;
+    this._setFieldOptions(optionsFromChildren);
+    this.querySelectorAll("option").forEach((option) => option.remove());
+    if (this._optionsObserver) {
+      this._optionsObserver.disconnect();
+      this._optionsObserver = null;
+    }
+  }
+}
+
+class LhtSwitchHelp extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const switchId = (this.getAttribute("switch-id") || "").trim();
+    if (!switchId) return;
+    const labelText = (this.getAttribute("label") || "").trim();
+    const helpLabel = (this.getAttribute("help-label") || `${labelText}の説明`).trim();
+    const helpContentHtml = this.innerHTML.trim();
+    const onChangeFnName = (this.getAttribute("on-change") || "").trim();
+    const isChecked = this.hasAttribute("checked");
+    const isHelpWide = this.hasAttribute("help-wide");
+
+    this.textContent = "";
+
+    const label = document.createElement("label");
+    label.className = "md-switch-label";
+
+    const mdSwitch = document.createElement("md-switch");
+    mdSwitch.id = switchId;
+    Object.defineProperty(mdSwitch, "checked", {
+      get() {
+        return !!mdSwitch.selected;
+      },
+      set(value) {
+        mdSwitch.selected = !!value;
+      }
+    });
+    if (isChecked) {
+      mdSwitch.selected = true;
+      mdSwitch.setAttribute("selected", "");
+    }
+    if (onChangeFnName) {
+      mdSwitch.addEventListener("change", () => {
+        const fn = window[onChangeFnName];
+        if (typeof fn === "function") {
+          fn();
+        }
+      });
+    }
+    label.appendChild(mdSwitch);
+
+    const labelSpan = document.createElement("span");
+    labelSpan.textContent = labelText;
+    label.appendChild(labelSpan);
+
+    if (helpContentHtml) {
+      const help = document.createElement("lht-help-tooltip");
+      help.setAttribute("label", helpLabel);
+      if (isHelpWide) {
+        help.setAttribute("wide", "");
+      }
+      help.innerHTML = helpContentHtml;
+      label.appendChild(help);
+    }
+
+    this.appendChild(label);
+  }
+}
+
 class LhtCommandBlock extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
@@ -2141,7 +2559,7 @@ class LhtPageMenu extends HTMLElement {
     button.type = "button";
     button.className = "md-menu-button md-icon-btn";
     button.setAttribute("aria-label", "メニュー");
-    button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#md-icon-menu" xlink:href="#md-icon-menu"></use></svg>';
+    button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path></svg>';
 
     const panel = document.createElement("div");
     panel.className = "md-menu-panel md-hidden";
@@ -2169,6 +2587,15 @@ class LhtPageMenu extends HTMLElement {
 
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
+}
+if (!customElements.get("lht-help-text-field")) {
+  customElements.define("lht-help-text-field", LhtHelpTextField);
+}
+if (!customElements.get("lht-help-select")) {
+  customElements.define("lht-help-select", LhtHelpSelect);
+}
+if (!customElements.get("lht-switch-help")) {
+  customElements.define("lht-switch-help", LhtSwitchHelp);
 }
 if (!customElements.get("lht-command-block")) {
   customElements.define("lht-command-block", LhtCommandBlock);

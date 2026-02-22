@@ -1301,7 +1301,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
 
     <lht-help-text-field
       field-id="filename"
-      label="音声ファイル名*"
+      label="音声ファイル名"
       required
       placeholder="例: 250503_130527_TrMic.WAV"
       field-class="md-field-block"
@@ -2000,7 +2000,10 @@ class LhtHelpTextField extends HTMLElement {
     }
     field.classList.add("md-outlined-field");
 
-    if (this.hasAttribute("required")) field.required = true;
+    if (this.hasAttribute("required")) {
+      field.required = true;
+      field.setAttribute("required", "");
+    }
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();
@@ -2042,7 +2045,10 @@ class LhtHelpSelect extends HTMLElement {
     }
     field.classList.add("md-outlined-field");
 
-    if (this.hasAttribute("required")) field.required = true;
+    if (this.hasAttribute("required")) {
+      field.required = true;
+      field.setAttribute("required", "");
+    }
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();
