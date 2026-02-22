@@ -1067,7 +1067,14 @@
         <span>画像ファイル（PNG/JPEG/WebP/GIF）</span>
         <span class="md-required">REQUIRED</span>
       </label>
-      <input id="file" type="file" accept="image/*" class="md-input" />
+      <lht-file-select
+        input-id="file"
+        button-id="fileSelectBtn"
+        file-name-id="fileNameText"
+        accept="image/*"
+        button-label="ファイルを選択"
+        placeholder="未選択"
+      ></lht-file-select>
     </div>
 
     <div class="md-grid md-grid-2 md-section">
@@ -2359,7 +2366,8 @@ if(typeof define === 'function' && define.amd){
       if (window.customElements && typeof window.customElements.whenDefined === "function") {
         await Promise.all([
           window.customElements.whenDefined("lht-help-text-field"),
-          window.customElements.whenDefined("lht-help-select")
+          window.customElements.whenDefined("lht-help-select"),
+          window.customElements.whenDefined("lht-file-select")
         ]);
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       }

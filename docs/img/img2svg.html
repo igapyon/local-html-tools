@@ -1049,6 +1049,60 @@ lht-help-select {
   min-width: 0;
 }
 
+lht-file-select {
+  display: block;
+}
+
+lht-file-select .lht-file-select {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+lht-file-select .lht-file-select__button {
+  --md-filled-button-container-color: var(--md-sys-color-primary, #6200ee);
+  --md-filled-button-label-text-color: #ffffff;
+  --md-filled-button-container-shape: 999px;
+  --md-filled-button-container-height: 54px;
+  --md-filled-button-leading-space: 20px;
+  --md-filled-button-trailing-space: 24px;
+  --md-filled-button-icon-size: 20px;
+  --md-focus-ring-color: #6c3eea;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(98, 0, 238, 0.24);
+}
+
+lht-file-select .lht-file-select__button--fallback {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 1.55rem;
+  line-height: 1;
+  color: #ffffff;
+  background: var(--md-sys-color-primary, #6200ee);
+  cursor: pointer;
+}
+
+lht-file-select .lht-file-select__button-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+}
+
+lht-file-select .lht-file-select__button-text {
+  white-space: nowrap;
+}
+
+lht-file-select .lht-file-select__file-name {
+  font-size: 0.85rem;
+  color: var(--md-sys-color-on-surface-variant, #49454f);
+  word-break: break-all;
+}
+
 md-outlined-text-field.md-outlined-field {
   flex: 1 1 16rem;
   min-width: 12rem;
@@ -1196,6 +1250,36 @@ lht-switch-help .md-switch-label .md-tooltip-content {
   --md-focus-ring-color: #6c3eea;
   color: #6f6a79;
 }
+
+lht-index-card-link {
+  display: block;
+}
+
+.lht-index-card-link__icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.3rem;
+}
+
+.lht-index-card-link__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.45rem;
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #534a64;
+  background: rgba(108, 62, 234, 0.13);
+}
+
+.lht-index-card-link__desc--clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lht-desc-lines, 3);
+  overflow: hidden;
+}
   </style>
 </head>
 <body class="md-page">
@@ -1237,7 +1321,14 @@ lht-switch-help .md-switch-label .md-tooltip-content {
         <span>画像ファイル（PNG/JPEG/WebP/GIF）</span>
         <span class="md-required">REQUIRED</span>
       </label>
-      <input id="file" type="file" accept="image/*" class="md-input" />
+      <lht-file-select
+        input-id="file"
+        button-id="fileSelectBtn"
+        file-name-id="fileNameText"
+        accept="image/*"
+        button-label="ファイルを選択"
+        placeholder="未選択"
+      ></lht-file-select>
     </div>
 
     <div class="md-grid md-grid-2 md-section">
@@ -2529,7 +2620,8 @@ if(typeof define === 'function' && define.amd){
       if (window.customElements && typeof window.customElements.whenDefined === "function") {
         await Promise.all([
           window.customElements.whenDefined("lht-help-text-field"),
-          window.customElements.whenDefined("lht-help-select")
+          window.customElements.whenDefined("lht-help-select"),
+          window.customElements.whenDefined("lht-file-select")
         ]);
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       }
@@ -3410,6 +3502,82 @@ class LhtHelpSelect extends HTMLElement {
   }
 }
 
+class LhtFileSelect extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const inputId = (this.getAttribute("input-id") || "fileInput").trim();
+    const buttonId = (this.getAttribute("button-id") || "fileSelectBtn").trim();
+    const fileNameId = (this.getAttribute("file-name-id") || "fileNameText").trim();
+    const accept = (this.getAttribute("accept") || "").trim();
+    const buttonLabel = (this.getAttribute("button-label") || "ファイルを選択").trim();
+    const placeholder = (this.getAttribute("placeholder") || "未選択").trim();
+    const showFileName = this.hasAttribute("show-file-name");
+
+    this.textContent = "";
+
+    const root = document.createElement("div");
+    root.className = "lht-file-select";
+
+    const hasMdFilledButton = !!(window.customElements && window.customElements.get("md-filled-button"));
+    const triggerButton = document.createElement(hasMdFilledButton ? "md-filled-button" : "button");
+    if (!hasMdFilledButton) {
+      triggerButton.type = "button";
+    }
+    triggerButton.id = buttonId;
+    triggerButton.className = `lht-file-select__button${hasMdFilledButton ? "" : " lht-file-select__button--fallback"}`;
+
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("slot", "icon");
+    icon.setAttribute("aria-hidden", "true");
+    icon.setAttribute("viewBox", "0 0 24 24");
+    icon.setAttribute("class", "lht-file-select__button-icon");
+    icon.setAttribute("fill", "none");
+    icon.setAttribute("stroke", "currentColor");
+    icon.setAttribute("stroke-width", "1.9");
+    icon.setAttribute("stroke-linecap", "round");
+    icon.setAttribute("stroke-linejoin", "round");
+    icon.innerHTML = '<path d="M4 7h7l2 2h7v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M12 10v6"></path><path d="M9 13l3 3 3-3"></path>';
+
+    const labelNode = document.createElement("span");
+    labelNode.className = "lht-file-select__button-text";
+    labelNode.textContent = buttonLabel;
+    triggerButton.appendChild(icon);
+    triggerButton.appendChild(labelNode);
+
+    const input = document.createElement("input");
+    input.id = inputId;
+    input.type = "file";
+    input.className = "md-file";
+    input.hidden = true;
+    if (accept) input.setAttribute("accept", accept);
+    if (this.hasAttribute("multiple")) input.multiple = true;
+
+    const fileName = document.createElement("span");
+    fileName.id = fileNameId;
+    fileName.className = "lht-file-select__file-name";
+    fileName.textContent = placeholder;
+    if (!showFileName) fileName.hidden = true;
+
+    if (this.hasAttribute("disabled")) {
+      input.disabled = true;
+      triggerButton.disabled = true;
+    }
+
+    triggerButton.addEventListener("click", () => input.click());
+    input.addEventListener("change", () => {
+      const names = Array.from(input.files || []).map((file) => file.name).filter(Boolean);
+      fileName.textContent = names.length > 0 ? names.join(", ") : placeholder;
+    });
+
+    root.appendChild(triggerButton);
+    root.appendChild(fileName);
+    this.appendChild(root);
+    this.appendChild(input);
+  }
+}
+
 class LhtSwitchHelp extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
@@ -3537,6 +3705,94 @@ class LhtCommandBlock extends HTMLElement {
   }
 }
 
+class LhtIndexCardLink extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const href = (this.getAttribute("href") || "").trim();
+    if (!href) return;
+
+    const title = (this.getAttribute("title") || "").trim();
+    const descAttr = (this.getAttribute("desc") || "").trim();
+    const iconAttr = (this.getAttribute("icon") || "").trim();
+    const target = (this.getAttribute("target") || "").trim();
+    const relAttr = (this.getAttribute("rel") || "").trim();
+    const variant = (this.getAttribute("variant") || "default").trim().toLowerCase();
+    const arrowMode = (this.getAttribute("arrow") || "auto").trim().toLowerCase();
+    const badgeText = (this.getAttribute("badge") || "").trim();
+    const descLines = (this.getAttribute("desc-lines") || "").trim();
+
+    if (!title || !descAttr) {
+      const missing = [];
+      if (!title) missing.push("title");
+      if (!descAttr) missing.push("desc");
+      // Fail fast for authoring mistakes in index cards.
+      console.warn(`[lht-index-card-link] Missing required attribute(s): ${missing.join(", ")}`, this);
+      return;
+    }
+
+    this.textContent = "";
+
+    const link = document.createElement("a");
+    link.href = href;
+    link.className = "md-link-card";
+    const isExternalHref = /^(https?:)?\/\//i.test(href);
+    const isExternal = variant === "external" || isExternalHref || target === "_blank";
+    const effectiveTarget = target || (isExternal ? "_blank" : "");
+    if (effectiveTarget) link.target = effectiveTarget;
+    if (effectiveTarget === "_blank") {
+      link.rel = relAttr || "noopener noreferrer";
+    } else if (relAttr) {
+      link.rel = relAttr;
+    }
+    if (variant === "simple") link.classList.add("lht-index-card-link--simple");
+    if (isExternal) link.classList.add("lht-index-card-link--external");
+
+    const head = document.createElement("div");
+    head.className = "md-card-head";
+
+    const h3 = document.createElement("h3");
+    h3.className = "md-card-title";
+    if (iconAttr) {
+      const iconContainer = document.createElement("span");
+      iconContainer.className = "lht-index-card-link__icon";
+      iconContainer.textContent = iconAttr;
+      h3.appendChild(iconContainer);
+    }
+    const titleContainer = document.createElement("span");
+    titleContainer.className = "lht-index-card-link__title";
+    titleContainer.textContent = title;
+    h3.appendChild(titleContainer);
+    if (badgeText) {
+      const badge = document.createElement("span");
+      badge.className = "lht-index-card-link__badge";
+      badge.textContent = badgeText;
+      h3.appendChild(badge);
+    }
+
+    const arrow = document.createElement("span");
+    arrow.className = "md-card-arrow";
+    const showArrow = arrowMode === "auto" ? variant !== "simple" : arrowMode !== "none";
+    arrow.textContent = isExternal ? "↗" : "→";
+    if (!showArrow) arrow.hidden = true;
+
+    const desc = document.createElement("p");
+    desc.className = "md-card-desc";
+    desc.textContent = descAttr;
+    if (descLines && /^\d+$/.test(descLines)) {
+      desc.classList.add("lht-index-card-link__desc--clamp");
+      desc.style.setProperty("--lht-desc-lines", descLines);
+    }
+
+    head.appendChild(h3);
+    head.appendChild(arrow);
+    link.appendChild(head);
+    link.appendChild(desc);
+    this.appendChild(link);
+  }
+}
+
 class LhtPageMenu extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
@@ -3587,11 +3843,17 @@ if (!customElements.get("lht-help-text-field")) {
 if (!customElements.get("lht-help-select")) {
   customElements.define("lht-help-select", LhtHelpSelect);
 }
+if (!customElements.get("lht-file-select")) {
+  customElements.define("lht-file-select", LhtFileSelect);
+}
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);
 }
 if (!customElements.get("lht-command-block")) {
   customElements.define("lht-command-block", LhtCommandBlock);
+}
+if (!customElements.get("lht-index-card-link")) {
+  customElements.define("lht-index-card-link", LhtIndexCardLink);
 }
 if (!customElements.get("lht-page-menu")) {
   customElements.define("lht-page-menu", LhtPageMenu);

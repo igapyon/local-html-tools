@@ -8,6 +8,12 @@
 - [MD3リファレンス](../../md3/README.md)
 - [PasswordツールREADME](../password/README.md)
 
+## 現在のUI方針（LHT優先）
+
+- `docs/git/` でも画面側は `lht-*` 利用を優先します
+- Material Web（`md-outlined-text-field` など）は `lht-cmn` 内部で利用し、画面側へ直接露出させない方針です
+- このREADMEに残る `md-*` 中心の記述は、移行前メモまたは内部実装の説明として扱ってください
+
 ## 一覧
 
 - `docs/git/git-config-setup.html`
@@ -66,6 +72,8 @@
 
 ## Material Web 置き換え進捗メモ（2026-02-21）
 
+※この節は移行前〜移行中の記録です。新規実装では `lht-*` を優先してください。
+
 対象: `docs/git/git-pseudo-squash.html` 系
 
 - 旧来の「ラベル + テキストボックス」は `md-outlined-text-field` へ移行済み
@@ -89,6 +97,8 @@
 - `npm run build:git` を実行し、`docs/git/git-pseudo-squash.html` と `dist/docs/git/git-pseudo-squash.html` を更新する
 
 ## Material Web 化の具体手順（実運用）
+
+※この節は内部実装レイヤー向けの手順です。画面側HTMLは原則 `lht-*` で構築します。
 
 `git-pseudo-squash` を Material Web 化するときは、次の順番で実施する。
 
@@ -143,9 +153,11 @@
 
 ## git-pseudo-squash.html の Material Design 実装方針
 
+※以下は主に内部実装の設計情報です。画面側での新規実装は `lht-*` 優先とします。
+
 `docs/git/git-pseudo-squash.html` は単一 HTML 配布を維持しつつ、Material Web コンポーネントをローカルバンドルして利用します。
 
-- 命名は `md-*` で統一し、レイアウト/フォーム/ボタン/ツールチップ/スナックバー/コード表示をコンポーネント単位で定義する
+- 命名は内部実装として `md-*` を利用しつつ、画面側では `lht-*` を公開APIとして扱う
 - 色/角丸/影/タイポグラフィは CSS 変数 `--md-sys-*` に集約し、要素側はトークン参照のみで組み立てる
 - 主要コンポーネントは以下のクラスで構成する
 - `md-card` `md-button` `md-icon-btn` `md-tooltip` `md-snackbar` `md-code`

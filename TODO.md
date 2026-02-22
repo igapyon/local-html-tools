@@ -18,10 +18,9 @@
 - ImageMagick/sox: 画像/音声変換のパラメータ生成（バッチリサイズ/ウォーターマーク）
 - regex/sed/awk: 文字列変換テンプレの生成
 - [後まわし] docker/docker-compose: よくある起動・開発用コマンド生成
-- [検討] `docs/index.html` のカード構造を JSON データ化し、画面構築時に展開する方式へ移行できるか確認する
-- [既存バグ] `docs/text/text-processing.html` の入力欄で、文字入力後にスペースを連打すると `.`（ピリオド）が自動挿入される
-  - 不要な自動挿入のため、発生条件を切り分けて無効化する（ブラウザ/OSの自動補正影響も確認）
 - [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
+  - 現状: Web Audio による簡易シンセ再生は実装済み
+  - 未実装: 生成したMIDI実データ（SMF）のその場再生（MIDIパーサ/プレイヤー経由）
 - [music] `docs/music/*` の「ファイルを選択」操作を、Material Design のよくあるパターン（Filled ボタン + 選択ファイル名表示）で目立たせる
 
 # DONE
@@ -49,6 +48,8 @@
 - [対応] `docs/text/file-rename-cmdline-gen.html` の lht 化（`lht-help-text-field` / `lht-help-select` / `lht-switch-help` への置換）
 - [対応] ドロップダウン項目（`md-select-option`）の生成ロジックを `lht-cmn/js/components.js` 側へ共通化
 - [対応] `lht-cmn/js/components.js` の読み込み順依存軽減（`defer` 運用 + `lht-help-select` 側で宣言オプション/後着 option を吸収）
+- [クローズ] `docs/text/text-processing.html` の「スペース連打で `.` 自動挿入」は OS 側の自動補正由来として対応終了
+- [クローズ] `docs/index.html` のカード構造JSON化検討は、`lht` 対応で目的を満たしたため対応終了
 - 対象: docs/grep/find-gen.html
 - 対象: docs/img/img2svg.html
 - 対象: docs/password/password-gen.html

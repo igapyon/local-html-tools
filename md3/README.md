@@ -2,6 +2,13 @@
 
 `md3/index.html` は、このリポジトリの Single-File Web App 群（主に `docs/` 配下）で蓄積した UI 実装知見を、`md-*` コンポーネントとして蒸留・整理したリファレンスです。
 
+## 現方針との関係（重要）
+
+- 現在の実装方針では、画面側は `lht-*` を公開UI層として利用します
+- Material Web や `md-*` は `lht-cmn` 内部実装として扱い、画面HTMLへ直接露出させない方針です
+- `md3/` は「設計知見の参照用カタログ」として維持し、実運用の正本は `lht-cmn/css/components.css` / `lht-cmn/js/components.js` へ段階的に集約します
+- このREADME内の `md-*` 直接運用記述は、移行前の経緯説明として残している箇所があります
+
 ## 関連README
 
 - [ルートREADME](../README.md)
