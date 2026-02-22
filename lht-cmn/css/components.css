@@ -1,3 +1,10 @@
+/*
+ * lht-cmn components.css
+ * Version: v20260222
+ * Copyright 2026 Toshiki Iga
+ * Licensed under the Apache License, Version 2.0
+ */
+
 lht-help-tooltip {
   display: inline-flex;
   align-items: center;
@@ -17,6 +24,17 @@ lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
+}
+
+lht-select-help .lht-select-help__fallback {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--md-sys-color-outline, #79747e);
+  background: var(--md-sys-color-surface, #fffbfe);
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--md-sys-color-on-surface, #1d1b20);
+  box-sizing: border-box;
 }
 
 lht-file-select {

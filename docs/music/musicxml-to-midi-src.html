@@ -19,6 +19,7 @@ limitations under the License.
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MusicXML → MIDI 変換</title>
+    <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
     <link rel="stylesheet" href="src/musicxml-to-midi/css/app.css" />
 </head>
 <body>
@@ -110,18 +111,15 @@ limitations under the License.
         </div>
 
         <div id="fileInputBlock" class="md-hidden">
-          <div class="md-actions">
-            <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
-              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.35rem">
-                <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <path d="M12 10v6" />
-                <path d="M9.5 13.5 12 16l2.5-2.5" />
-              </svg>
-              <span>ファイルを選択</span>
-            </button>
-            <span id="fileNameText">未選択</span>
-          </div>
-          <input id="fileInput" class="md-file" type="file" accept=".musicxml,.xml,text/xml,application/xml" hidden />
+          <lht-file-select
+            input-id="fileInput"
+            button-id="fileSelectBtn"
+            file-name-id="fileNameText"
+            accept=".musicxml,.xml,text/xml,application/xml"
+            button-label="ファイルを選択"
+            placeholder="未選択"
+            show-file-name>
+          </lht-file-select>
         </div>
       </section>
 
@@ -143,37 +141,51 @@ limitations under the License.
         <details class="md-disclosure">
           <summary class="md-disclosure-summary">詳細設定（既定タイトル / 既定作曲者 / 既定テンポ）</summary>
           <div class="md-grid md-grid--defaults">
-            <div>
-              <label class="md-label" for="defaultTitleInput">既定タイトル</label>
-              <input id="defaultTitleInput" class="md-input" type="text" value="Untitled" />
-            </div>
-            <div>
-              <label class="md-label" for="defaultComposerInput">既定作曲者</label>
-              <input id="defaultComposerInput" class="md-input" type="text" value="Unknown" />
-            </div>
-            <div>
-              <label class="md-label" for="defaultTempoInput">既定テンポ (BPM)</label>
-              <input id="defaultTempoInput" class="md-input" type="number" min="20" max="300" step="1" value="120" />
-            </div>
+            <lht-text-field-help
+              field-id="defaultTitleInput"
+              label="既定タイトル"
+              value="Untitled">
+            </lht-text-field-help>
+            <lht-text-field-help
+              field-id="defaultComposerInput"
+              label="既定作曲者"
+              value="Unknown">
+            </lht-text-field-help>
+            <lht-text-field-help
+              field-id="defaultTempoInput"
+              label="既定テンポ (BPM)"
+              type="number"
+              min="20"
+              max="300"
+              step="1"
+              value="120">
+            </lht-text-field-help>
           </div>
         </details>
         <div class="md-grid">
-          <div>
-            <label class="md-label" for="instrumentOverrideSelect">音色上書き</label>
-            <select id="instrumentOverrideSelect" class="md-input">
-              <option value="">MusicXMLを使用</option>
-              <option value="fm_piano_1">FM Piano 1 (Electric Piano 1)</option>
-              <option value="fm_piano_2">FM Piano 2 (Electric Piano 2)</option>
-            </select>
-          </div>
-          <div>
-            <label class="md-label" for="synthWaveformSelect">内蔵シンセ波形</label>
-            <select id="synthWaveformSelect" class="md-input">
-              <option value="sine">sine (やわらかい音)</option>
-              <option value="square">square (明るく硬い音)</option>
-              <option value="triangle">triangle (中間の音)</option>
-            </select>
-          </div>
+          <lht-select-help
+            field-id="instrumentOverrideSelect"
+            label="音色上書き">
+            <script type="application/json" slot="options">
+              [
+                { "value": "", "label": "MusicXMLを使用", "selected": true },
+                { "value": "fm_piano_1", "label": "FM Piano 1 (Electric Piano 1)" },
+                { "value": "fm_piano_2", "label": "FM Piano 2 (Electric Piano 2)" }
+              ]
+            </script>
+          </lht-select-help>
+          <lht-select-help
+            field-id="synthWaveformSelect"
+            label="内蔵シンセ波形"
+            value="sine">
+            <script type="application/json" slot="options">
+              [
+                { "value": "sine", "label": "sine (やわらかい音)", "selected": true },
+                { "value": "square", "label": "square (明るく硬い音)" },
+                { "value": "triangle", "label": "triangle (中間の音)" }
+              ]
+            </script>
+          </lht-select-help>
         </div>
 
         <div class="md-actions">
@@ -232,6 +244,8 @@ limitations under the License.
 
   <div id="toast" class="md-snackbar md-hidden" role="status" aria-live="polite"></div>
 
+    <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
+    <script src="../../lht-cmn/js/components.js"></script>
     <script src="src/musicxml-to-midi/js/midi-writer.js"></script>
     <script src="src/common/js/musicxml-common.js"></script>
     <script src="src/common/js/music-synth-common.js"></script>

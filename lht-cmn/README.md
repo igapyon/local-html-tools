@@ -2,6 +2,18 @@
 
 `lht-cmn` は `local-html-tools` 全体で共有する UI コンポーネント基盤です。
 
+- Version: `v20260222`
+- License: Apache License 2.0 (`lht-cmn/LICENSE`)
+- Copyright: Toshiki Iga
+
+## ライセンスと帰属
+
+- `lht-cmn` 自体は Apache License 2.0 で配布します。
+- デザイン方針は Material Design 3 の設計原則を参照します。
+- 実装技術として、`lht-cmn` は必要に応じて Material Web（`@material/web`）を優先利用します。
+- Material Web のライセンスは Apache License 2.0 です。
+- 帰属情報の詳細は `lht-cmn/NOTICE` に記載します。
+
 ## 目的
 
 `local-html-tools` では、入力・選択・ヘルプ・コピー・メニューなどの UI を複数ページで繰り返し実装してきました。  
@@ -192,3 +204,44 @@ HTML から次を読み込みます。
 ### Appendix D: tooltip 実装制約メモ
 
 - `@material/web@2.4.1` では `md-tooltip` が同梱されないため、`lht-help-tooltip` は `md-tooltip-group` + `md-tooltip-content` ベースで運用する
+
+### Appendix E: ドロップダウンでよくあるミスと回避方法
+
+`lht-select-help` は `md-outlined-select` を内部利用するため、単一HTML化や依存読込順の影響を受けやすいです。  
+以下のミスが、ドロップダウン崩れ（選択肢がただのテキストになる等）を起こしやすいです。
+
+1. `md-outlined-select` が未定義のまま初期化される
+- 症状:
+  - 選択UIが表示されず、選択肢テキストだけが並ぶ
+- 回避:
+  - Material Web バンドル読込を `lht-cmn/js/components.js` より前に配置する
+  - `lht-cmn` 側のフォールバック（ネイティブ `select`）が効く実装を維持する
+
+2. `lht-select-help` の選択肢定義が不正
+- 症状:
+  - 選択肢が空になる / 既定値が反映されない
+- 回避:
+  - `<script type="application/json" slot="options">[...]</script>` の JSON を必ず配列で定義する
+  - `value` と `label` を明示する
+  - 既定値は `selected: true` と `value` の整合を取る
+
+3. `field-id` を変えて既存JS参照が壊れる
+- 症状:
+  - `document.getElementById(...)` が `null` になり、初期化やイベント登録で失敗する
+- 回避:
+  - 置換時も DOM 参照ID（`field-id`）は既存IDを維持する
+
+4. 単一HTML化でインラインスクリプトが壊れる
+- 症状:
+  - `Unexpected end of input`
+  - バンドル内文字列が壊れ、`popover` などの警告が連鎖する
+- 回避:
+  - ビルド時に `</script>` を `<\\/script>` へエスケープする
+  - 文字列置換でJSを差し込む場合は `replace` の関数置換を使い、`$` 展開事故を避ける
+
+5. CSSの責務が混在して見た目が崩れる
+- 症状:
+  - ドロップダウンの幅・余白・フォーカス装飾がページごとに不揃い
+- 回避:
+  - 基本スタイルは `lht-cmn/css/components.css` に集約する
+  - 画面側CSSはレイアウト差分（余白・配置）に限定する
