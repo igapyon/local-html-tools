@@ -32,6 +32,7 @@
     /* local-html-tools MD3 Core Spec v1.0.2 (2026-02-08) */
     .md-page {
       background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; min-height: 100vh;
+      overflow-x: clip;
     }
 
     .md-shell {
@@ -158,6 +159,7 @@
       left: 50%;
       transform: translateX(-50%);
       margin-top: 0.5rem;
+      display: none;
       opacity: 0;
       pointer-events: none;
       transition: opacity 150ms ease;
@@ -166,7 +168,9 @@
       max-width: 90vw;
     }
 
-    .md-tooltip-group:hover .md-tooltip-content {
+    .md-tooltip-group:hover .md-tooltip-content,
+    .md-tooltip-group:focus-within .md-tooltip-content {
+      display: block;
       opacity: 1;
     }
 
@@ -842,7 +846,12 @@
     button { border: none; cursor: pointer; background: transparent; }
     a { text-decoration: none; color: inherit; }
 
-    .md-page { background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; }
+    .md-page {
+      background-color: var(--md-sys-color-background);
+      color: var(--md-sys-color-on-surface);
+      padding: 24px;
+      overflow-x: clip;
+    }
     .md-surface-card { max-width: 48rem; margin: 0 auto; padding: 24px; position: relative; }
 
     .md-card {
@@ -951,14 +960,23 @@
       left: 50%;
       transform: translateX(-50%);
       margin-top: 0.5rem;
+      display: none;
       opacity: 0;
       pointer-events: none;
       transition: opacity 150ms ease;
       z-index: 50;
       width: 20rem;
+      max-width: min(20rem, calc(100vw - 2rem));
     }
-    .md-tooltip-group:hover .md-tooltip-content { opacity: 1; }
-    .md-tooltip--wide { width: 24rem; max-width: 90vw; }
+    .md-tooltip-group:hover .md-tooltip-content,
+    .md-tooltip-group:focus-within .md-tooltip-content {
+      display: block;
+      opacity: 1;
+    }
+    .md-tooltip--wide {
+      width: min(24rem, calc(100vw - 2rem));
+      max-width: calc(100vw - 2rem);
+    }
 
     .md-icon-btn {
       width: 40px;
@@ -1295,4 +1313,15 @@
 
     @media (max-width: 640px) {
       .md-form-row--nowrap { flex-wrap: wrap; }
+      .md-tooltip-content {
+        left: auto;
+        right: 0;
+        transform: none;
+        width: min(20rem, calc(100vw - 2rem));
+        max-width: calc(100vw - 2rem);
+      }
+      .md-tooltip--wide {
+        width: min(24rem, calc(100vw - 2rem));
+        max-width: calc(100vw - 2rem);
+      }
     }

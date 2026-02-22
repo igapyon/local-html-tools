@@ -10,6 +10,32 @@ lht-help-tooltip {
   align-items: center;
 }
 
+/* Keep accidental horizontal overflow from creating blank right-space on narrow screens. */
+.md-page {
+  overflow-x: clip;
+}
+
+/* Tooltip defaults are centralized in lht to avoid per-page overflow regressions. */
+lht-help-tooltip .md-tooltip-content {
+  display: none;
+  max-width: min(24rem, calc(100vw - 2rem));
+}
+
+lht-help-tooltip .md-tooltip-group:hover .md-tooltip-content,
+lht-help-tooltip .md-tooltip-group:focus-within .md-tooltip-content {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  lht-help-tooltip .md-tooltip-content {
+    left: auto;
+    right: 0;
+    transform: none;
+    width: min(24rem, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
+  }
+}
+
 lht-page-hero {
   display: block;
   margin-bottom: 1.2rem;
