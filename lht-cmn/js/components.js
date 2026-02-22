@@ -604,6 +604,78 @@ class LhtIndexCardLink extends HTMLElement {
   }
 }
 
+class LhtPageHero extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const title = (this.getAttribute("title") || "").trim();
+    if (!title) return;
+    const subtitle = (this.getAttribute("subtitle") || "").trim();
+    const icon = (this.getAttribute("icon") || "").trim();
+    const helpLabel = (this.getAttribute("help-label") || "説明").trim();
+    const homeHref = (this.getAttribute("menu-home-href") || "../index.html").trim();
+    const homeLabel = (this.getAttribute("menu-home-label") || "トップへ戻る").trim();
+    const useWideHelp = this.hasAttribute("help-wide");
+    const showMenu = !this.hasAttribute("no-menu");
+    const helpHtml = this.innerHTML.trim();
+
+    this.textContent = "";
+    this.classList.add("lht-page-hero");
+
+    const topRow = document.createElement("div");
+    topRow.className = "lht-page-hero__title-row";
+
+    const titleMain = document.createElement("span");
+    titleMain.className = "lht-page-hero__title-main";
+
+    const heading = document.createElement("h1");
+    heading.className = "lht-page-hero__title";
+    if (icon) {
+      const iconNode = document.createElement("span");
+      iconNode.className = "lht-page-hero__icon";
+      iconNode.setAttribute("aria-hidden", "true");
+      iconNode.textContent = icon;
+      heading.appendChild(iconNode);
+    }
+    const titleNode = document.createElement("span");
+    titleNode.textContent = title;
+    heading.appendChild(titleNode);
+    titleMain.appendChild(heading);
+
+    if (helpHtml) {
+      const help = document.createElement("lht-help-tooltip");
+      help.setAttribute("label", helpLabel);
+      if (useWideHelp) {
+        help.setAttribute("wide", "");
+      }
+      help.innerHTML = helpHtml;
+      titleMain.appendChild(help);
+    }
+
+    topRow.appendChild(titleMain);
+
+    if (showMenu) {
+      const actions = document.createElement("span");
+      actions.className = "lht-page-hero__actions";
+      const menu = document.createElement("lht-page-menu");
+      menu.setAttribute("home-href", homeHref);
+      menu.setAttribute("home-label", homeLabel);
+      actions.appendChild(menu);
+      topRow.appendChild(actions);
+    }
+
+    this.appendChild(topRow);
+
+    if (subtitle) {
+      const subtitleNode = document.createElement("div");
+      subtitleNode.className = "lht-page-hero__subtitle";
+      subtitleNode.textContent = subtitle;
+      this.appendChild(subtitleNode);
+    }
+  }
+}
+
 class LhtPageMenu extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
@@ -665,6 +737,9 @@ if (!customElements.get("lht-command-block")) {
 }
 if (!customElements.get("lht-index-card-link")) {
   customElements.define("lht-index-card-link", LhtIndexCardLink);
+}
+if (!customElements.get("lht-page-hero")) {
+  customElements.define("lht-page-hero", LhtPageHero);
 }
 if (!customElements.get("lht-page-menu")) {
   customElements.define("lht-page-menu", LhtPageMenu);

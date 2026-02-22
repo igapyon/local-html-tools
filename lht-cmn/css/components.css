@@ -10,6 +10,132 @@ lht-help-tooltip {
   align-items: center;
 }
 
+lht-page-hero {
+  display: block;
+  margin-bottom: 1.2rem;
+  padding: 1rem 1rem 0.9rem;
+  position: relative;
+  z-index: 40;
+  overflow: visible;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #f6f1ff 0%, #fbf8ff 100%);
+  border: 1px solid #e7dff6;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+lht-page-hero .lht-page-hero__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
+}
+
+lht-page-hero .lht-page-hero__title-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+lht-page-hero .lht-page-hero__title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
+  font-size: clamp(1.12rem, 4.2vw, 1.45rem);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: #2f1f52;
+  overflow-wrap: anywhere;
+}
+
+lht-page-hero .lht-page-hero__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 0.85rem;
+  background: rgba(98, 0, 238, 0.14);
+  flex: 0 0 auto;
+}
+
+lht-page-hero .lht-page-hero__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+}
+
+lht-page-hero .lht-page-hero__subtitle {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  color: #514a5f;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+lht-page-hero .lht-page-hero__title-main .md-tooltip-group {
+  transform: translateY(1px);
+  flex: 0 0 auto;
+  z-index: 41;
+}
+
+lht-page-hero .lht-page-hero__title-main .md-tooltip-content {
+  z-index: 260;
+}
+
+lht-page-hero .lht-page-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+lht-page-hero .md-menu-button {
+  position: static;
+  top: auto;
+  right: auto;
+  margin: 0;
+}
+
+lht-page-hero .md-menu-panel {
+  top: calc(100% + 0.45rem);
+  right: 0;
+  left: auto;
+  z-index: 280;
+}
+
+@media (max-width: 640px) {
+  lht-page-hero {
+    padding: 0.9rem 0.85rem 0.8rem;
+  }
+
+  lht-page-hero .lht-page-hero__title-row {
+    gap: 0.5rem;
+  }
+
+  lht-page-hero .lht-page-hero__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  lht-page-hero .lht-page-hero__icon {
+    width: 1.55rem;
+    height: 1.55rem;
+  }
+
+  lht-page-hero .lht-page-hero__subtitle {
+    font-size: 0.82rem;
+  }
+}
+
 lht-command-block {
   display: block;
 }
