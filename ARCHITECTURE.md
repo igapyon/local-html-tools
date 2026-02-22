@@ -2,13 +2,15 @@
 
 ## UIレイヤー方針（LHT）
 
-- 画面側のUIは `lht-*` Web Components を基本とする
-- `lht-*` の内部では Material Web を優先利用し、未利用環境では `lht-cmn` のフォールバック実装を使う
-- 実運用の共通スタイルは `lht-cmn/css/components.css` に集約し、`md3/` は段階的にリファレンス用途へ縮退する
+- 方針の正本は `lht-cmn/README.md` とする
+- 本書では要点のみ扱う:
+  - 画面側のUIは `lht-*` Web Components を基本とする
+  - Material Web は `lht-cmn` 内部で優先利用する
+  - 実運用の共通スタイルは `lht-cmn/css/components.css` に集約する
 
 ## Material Design 実装ガイド
 
-本プロジェクトでは、外部CSSに依存せず Material Design 系の見た目と操作感を再現する。画面側は原則 `lht-*` を利用し、`md-*` は `lht-cmn` 内部実装として扱う。
+本プロジェクトでは、外部CSSに依存せず Material Design 系の見た目と操作感を再現する。画面側は原則 `lht-*` を利用し、`md-*` は `lht-cmn` 内部実装として扱う。詳細ルールやコンポーネント仕様は `lht-cmn/README.md` を参照する。
 
 ### 基本トークン
 

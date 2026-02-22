@@ -11,8 +11,8 @@
 ## 現在のUI方針（LHT優先）
 
 - `docs/git/` でも画面側は `lht-*` 利用を優先します
-- Material Web（`md-outlined-text-field` など）は `lht-cmn` 内部で利用し、画面側へ直接露出させない方針です
-- このREADMEに残る `md-*` 中心の記述は、移行前メモまたは内部実装の説明として扱ってください
+- Material Web（`md-outlined-text-field` など）は `lht-cmn` 内部で利用し、画面側へ直接露出させません
+- 共通方針・コンポーネント仕様・適用ルールの正本は `lht-cmn/README.md` を参照してください
 
 ## 一覧
 
@@ -96,88 +96,16 @@
 
 - `npm run build:git` を実行し、`docs/git/git-pseudo-squash.html` と `dist/docs/git/git-pseudo-squash.html` を更新する
 
-## Material Web 化の具体手順（実運用）
+## 共通UI方針の参照先
 
-※この節は内部実装レイヤー向けの手順です。画面側HTMLは原則 `lht-*` で構築します。
+`docs/git/` でも共通UI方針は `lht-cmn/README.md` を正本として参照します。  
+このREADMEでは、Gitツール固有の差分（ビルド手順・移行メモ・画面固有調整）だけを残します。
 
-`git-pseudo-squash` を Material Web 化するときは、次の順番で実施する。
+最小ヒント:
 
-1. 置換対象を `git-pseudo-squash-src.html` 上で特定する
-1. 既存の生HTML部品を、Material Web または自作Web Componentsへ置換する
-1. 状態取得/保存ロジックを `main.js` 側で `selected` / `value` ベースに合わせる
-1. 見た目差分（角丸、高さ、フォーカスリング、余白）を `app.css` のトークンで吸収する
-1. `npm run build:git:single` で生成物を更新して動作確認する
-1. 問題なければ `npm run build:git` で `dist/` まで更新する
-
-置換の基本対応表:
-
-- テキスト入力: `md-outlined-text-field`
-- テキストエリア: `md-outlined-text-field type="textarea"`
-- セレクト: `md-outlined-select` + `md-select-option`
-- トグル: `md-switch`
-- アイコンボタン: `md-icon-button`
-- ヘルプ `(i)`: `lht-help-tooltip`（内部で `md-icon-button` + tooltip DOM を生成）
-- フィールド活性時ヘルプ表示: `lht-text-field-help`（フォーカス時のみ入力下に説明を表示）
-- スイッチ + ヘルプ: `lht-switch-help`（`md-switch` + ラベル + `lht-help-tooltip`）
-- コマンド表示 + コピー: `lht-command-block`（`copy-buttons="single|dual"`）
-- 右上メニュー: `lht-page-menu`（`home-href` / `home-label`）
-
-`@material/web@2.4.1` では `md-tooltip` が同梱されないため、ツールチップ表示は既存の `md-tooltip-group` + `md-tooltip-content` を継続利用する。
-
-## テーマ色ポリシー（Material Web 化時）
-
-- フォーカス、選択、強調は `primary` 系（`--md-sys-color-primary`）を基準にする
-- `secondary` は primary と競合しない範囲で使う。迷ったら primary に寄せる
-- フォーカスリング色はコンポーネント間で統一し、ブラウザ標準の青リングが出る場合は `:focus-visible` で上書きする
-- Material Web の色変更は、まず `:root` の `--md-sys-*` を調整し、個別部品の上書きは最小限にする
-
-## 自作 Web Components 一覧
-
-`docs/git/src/git-pseudo-squash/js/main.js` に定義:
-
-- `lht-help-tooltip`
-  - 属性: `label`, `wide`
-  - 本文: タグ内部テキスト/HTMLをそのままツールチップ本文として扱う
-- `lht-text-field-help`
-  - 属性: `field-id`, `label`, `help-text`, `placeholder`, `required`, `field-class`
-  - 入力欄フォーカス時のみ `supportingText` を表示し、ブラー時に非表示に戻す
-- `lht-switch-help`
-  - 属性: `switch-id`, `label`, `help-label`, `help-wide`, `checked`, `on-change`
-  - スイッチと `(i)` ヘルプを1セットで生成し、`on-change` に指定した関数名を呼び出す
-- `lht-command-block`
-  - 属性: `command-id`, `copy-buttons="single|dual"`
-  - `command-id` の `code` 要素とコピー操作を自動生成
-- `lht-page-menu`
-  - 属性: `home-href`, `home-label`
-  - 右上メニューの開閉と外側クリッククローズを内包
-
-## git-pseudo-squash.html の Material Design 実装方針
-
-※以下は主に内部実装の設計情報です。画面側での新規実装は `lht-*` 優先とします。
-
-`docs/git/git-pseudo-squash.html` は単一 HTML 配布を維持しつつ、Material Web コンポーネントをローカルバンドルして利用します。
-
-- 命名は内部実装として `md-*` を利用しつつ、画面側では `lht-*` を公開APIとして扱う
-- 色/角丸/影/タイポグラフィは CSS 変数 `--md-sys-*` に集約し、要素側はトークン参照のみで組み立てる
-- 主要コンポーネントは以下のクラスで構成する
-- `md-card` `md-button` `md-icon-btn` `md-tooltip` `md-snackbar` `md-code`
-- Material Web の主利用要素は `md-outlined-text-field` `md-outlined-select` `md-select-option` `md-icon-button` `md-switch`
-- 表示切替は `md-hidden` `md-visible` `md-disabled` を使い、JS 側はクラスの付け替えだけで制御する
-- 「i」アイコンは `md-icon-button` にインライン SVG を入れて実装し、色/サイズ/余白は共通クラスで統一する
-
-## Material Design 実装ルール
-
-このプロジェクトでは、外部CSS依存を避け、Material Design のコンポーネント指向に統一しています。
-
-- チェックボックスとトグルの使い分けは行わず、選択肢はすべてトグルに統一する
-- トグルはラベルの左側に配置する（左右の違いで迷わないように固定）
-- 意味単位の `md-*` コンポーネントに再構成する
-- 色/角丸/影/タイポは `--md-sys-*` に集約し、要素側はトークン参照のみにする
-- `input/select/textarea` は Material Web の対応コンポーネント（`md-outlined-text-field` / `md-outlined-select`）へ寄せる
-- 必須表示はラベル横の `md-required-chip` に統一する
-- ツールチップは `md-tooltip-group` + `md-tooltip-content` で構成し、`i` は `md-icon-button` を使う
-- ツールチップ本文は `md-tooltip` に `font-weight: 400` を指定し、細めの表現に統一する
-- 表示状態は `md-hidden` `md-visible` `md-disabled` に統一し、JS はクラス切替のみで制御する
+- 画面側は `lht-*` を使う
+- Material Web は `lht-cmn` 内部で使う
+- 新規のUIルール追加は先に `lht-cmn/README.md` を更新する
 
 ## フォーム配置の実装メモ
 
