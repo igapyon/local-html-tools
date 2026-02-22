@@ -159,6 +159,12 @@ HTML から次を読み込みます。
 - 用途: 右上メニュー（戻るリンク等）
 - 主な属性: `home-href`, `home-label`
 
+### `lht-page-hero`
+
+- 用途: ページ先頭の見出しブロック（タイトル + 補助説明 + ヘルプ + メニュー）
+- 主な属性: `title`, `subtitle`, `icon`, `help-label`, `help-wide`, `menu-home-href`, `menu-home-label`, `no-menu`
+- 本文スロット: ヘルプポップアップに表示する説明HTML
+
 ### `lht-index-card-link`
 
 - 用途: `docs/index` 用カードリンク

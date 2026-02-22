@@ -51,16 +51,17 @@ limitations under the License.
     </defs>
   </svg>
   <div class="md-surface-card md-card">
-    <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
-
-    <h1 class="md-headline">
-      <span aria-hidden="true" class="md-headline__icon">🧩</span>
-      <span>Git pseudo-squash コマンドジェネレータ</span>
-      <lht-help-tooltip label="Git pseudo-squash の説明">
-        reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。
-        運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。
-      </lht-help-tooltip>
-    </h1>
+    <lht-page-hero
+      title="Git pseudo-squash コマンドジェネレータ"
+      subtitle="履歴を1コミットにまとめるコマンドを生成します。"
+      icon="🧩"
+      help-label="Git pseudo-squash の説明"
+      help-wide
+      menu-home-href="../index.html"
+      menu-home-label="トップへ戻る">
+      reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。<br><br>
+      運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。
+    </lht-page-hero>
 
     <section id="baseBlock" class="md-section md-stack-md">
       <div class="md-stack-md">
