@@ -379,6 +379,94 @@ class LhtCommandBlock extends HTMLElement {
   }
 }
 
+class LhtIndexCardLink extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const href = (this.getAttribute("href") || "").trim();
+    if (!href) return;
+
+    const title = (this.getAttribute("title") || "").trim();
+    const descAttr = (this.getAttribute("desc") || "").trim();
+    const iconAttr = (this.getAttribute("icon") || "").trim();
+    const target = (this.getAttribute("target") || "").trim();
+    const relAttr = (this.getAttribute("rel") || "").trim();
+    const variant = (this.getAttribute("variant") || "default").trim().toLowerCase();
+    const arrowMode = (this.getAttribute("arrow") || "auto").trim().toLowerCase();
+    const badgeText = (this.getAttribute("badge") || "").trim();
+    const descLines = (this.getAttribute("desc-lines") || "").trim();
+
+    if (!title || !descAttr) {
+      const missing = [];
+      if (!title) missing.push("title");
+      if (!descAttr) missing.push("desc");
+      // Fail fast for authoring mistakes in index cards.
+      console.warn(`[lht-index-card-link] Missing required attribute(s): ${missing.join(", ")}`, this);
+      return;
+    }
+
+    this.textContent = "";
+
+    const link = document.createElement("a");
+    link.href = href;
+    link.className = "md-link-card";
+    const isExternalHref = /^(https?:)?\/\//i.test(href);
+    const isExternal = variant === "external" || isExternalHref || target === "_blank";
+    const effectiveTarget = target || (isExternal ? "_blank" : "");
+    if (effectiveTarget) link.target = effectiveTarget;
+    if (effectiveTarget === "_blank") {
+      link.rel = relAttr || "noopener noreferrer";
+    } else if (relAttr) {
+      link.rel = relAttr;
+    }
+    if (variant === "simple") link.classList.add("lht-index-card-link--simple");
+    if (isExternal) link.classList.add("lht-index-card-link--external");
+
+    const head = document.createElement("div");
+    head.className = "md-card-head";
+
+    const h3 = document.createElement("h3");
+    h3.className = "md-card-title";
+    if (iconAttr) {
+      const iconContainer = document.createElement("span");
+      iconContainer.className = "lht-index-card-link__icon";
+      iconContainer.textContent = iconAttr;
+      h3.appendChild(iconContainer);
+    }
+    const titleContainer = document.createElement("span");
+    titleContainer.className = "lht-index-card-link__title";
+    titleContainer.textContent = title;
+    h3.appendChild(titleContainer);
+    if (badgeText) {
+      const badge = document.createElement("span");
+      badge.className = "lht-index-card-link__badge";
+      badge.textContent = badgeText;
+      h3.appendChild(badge);
+    }
+
+    const arrow = document.createElement("span");
+    arrow.className = "md-card-arrow";
+    const showArrow = arrowMode === "auto" ? variant !== "simple" : arrowMode !== "none";
+    arrow.textContent = isExternal ? "↗" : "→";
+    if (!showArrow) arrow.hidden = true;
+
+    const desc = document.createElement("p");
+    desc.className = "md-card-desc";
+    desc.textContent = descAttr;
+    if (descLines && /^\d+$/.test(descLines)) {
+      desc.classList.add("lht-index-card-link__desc--clamp");
+      desc.style.setProperty("--lht-desc-lines", descLines);
+    }
+
+    head.appendChild(h3);
+    head.appendChild(arrow);
+    link.appendChild(head);
+    link.appendChild(desc);
+    this.appendChild(link);
+  }
+}
+
 class LhtPageMenu extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
@@ -434,6 +522,9 @@ if (!customElements.get("lht-switch-help")) {
 }
 if (!customElements.get("lht-command-block")) {
   customElements.define("lht-command-block", LhtCommandBlock);
+}
+if (!customElements.get("lht-index-card-link")) {
+  customElements.define("lht-index-card-link", LhtIndexCardLink);
 }
 if (!customElements.get("lht-page-menu")) {
   customElements.define("lht-page-menu", LhtPageMenu);

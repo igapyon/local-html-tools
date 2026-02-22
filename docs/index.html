@@ -1193,6 +1193,36 @@ lht-switch-help .md-switch-label .md-tooltip-content {
   --md-focus-ring-color: #6c3eea;
   color: #6f6a79;
 }
+
+lht-index-card-link {
+  display: block;
+}
+
+.lht-index-card-link__icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.3rem;
+}
+
+.lht-index-card-link__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.45rem;
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #534a64;
+  background: rgba(108, 62, 234, 0.13);
+}
+
+.lht-index-card-link__desc--clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lht-desc-lines, 3);
+  overflow: hidden;
+}
   </style>
 </head>
 <body class="md-page">
@@ -1248,44 +1278,10 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </h3>
       <p class="md-section-subtitle">Git操作の補助ツール</p>
       <div class="md-grid md-grid-3 md-section">
-        <a href="git/git-pseudo-squash.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🧩</span>Git pseudo-squash
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-
-
-          <p class="md-card-desc">reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。</p>
-        </a>
-        <a href="git/git-branch-diff.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🧰</span>Git ブランチ比較
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">2つのブランチ差分を表示する `git diff` コマンドを生成します。ローカル/リモートを選べ、表示形式（内容/統計/ファイル一覧）や `..` / `...` を切り替えできます。</p>
-        </a>
-        <a href="git/git-config-setup.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">⚙️</span>Git ユーザー設定
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">グローバル設定でGitユーザー名とメールアドレスを設定するためのコマンドを生成します。</p>
-        </a>
-        <a href="git/git-config-advanced-setup.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🔧</span>Git 詳細設定
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">core.autocrlf や push.default などのGit詳細設定をグローバル設定するコマンドを生成します。</p>
-        </a>
+        <lht-index-card-link href="git/git-pseudo-squash.html" icon="🧩" title="Git pseudo-squash" desc="reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。"></lht-index-card-link>
+        <lht-index-card-link href="git/git-branch-diff.html" icon="🧰" title="Git ブランチ比較" desc="2つのブランチ差分を表示する `git diff` コマンドを生成します。ローカル/リモートを選べ、表示形式（内容/統計/ファイル一覧）や `..` / `...` を切り替えできます。"></lht-index-card-link>
+        <lht-index-card-link href="git/git-config-setup.html" icon="⚙️" title="Git ユーザー設定" desc="グローバル設定でGitユーザー名とメールアドレスを設定するためのコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="git/git-config-advanced-setup.html" icon="🔧" title="Git 詳細設定" desc="core.autocrlf や push.default などのGit詳細設定をグローバル設定するコマンドを生成します。"></lht-index-card-link>
       </div>
       </section>
 
@@ -1295,51 +1291,11 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </h3>
       <p class="md-section-subtitle">楽譜データの変換</p>
       <div class="md-grid md-grid-3 md-section">
-        <a href="music/musicxml-to-svg.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🎼</span>MusicXML → SVG 変換
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">MusicXMLから楽譜SVGを生成し、SVGとして保存できます。</p>
-        </a>
-        <a href="music/musicxml-to-midi.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🥁</span>MusicXML → MIDI 変換
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">MusicXMLからMIDIを生成し、.midとして保存できます。</p>
-        </a>
-        <a href="music/midi-to-musicxml.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🎹</span>MIDI → MusicXML 変換
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">MIDIからMusicXMLを生成し、MusicXMLとして保存できます。</p>
-        </a>
-        <a href="music/musicxml-to-abc.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🎶</span>MusicXML → ABC 変換
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">MusicXMLからABC記法を生成し、ABCとして保存できます。</p>
-        </a>
-        <a href="music/abc-to-musicxml.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🎵</span>ABC → MusicXML 変換
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">ABC記法をMusicXMLへ変換し、MusicXMLとして保存できます。</p>
-        </a>
+        <lht-index-card-link href="music/musicxml-to-svg.html" icon="🎼" title="MusicXML → SVG 変換" desc="MusicXMLから楽譜SVGを生成し、SVGとして保存できます。"></lht-index-card-link>
+        <lht-index-card-link href="music/musicxml-to-midi.html" icon="🥁" title="MusicXML → MIDI 変換" desc="MusicXMLからMIDIを生成し、.midとして保存できます。"></lht-index-card-link>
+        <lht-index-card-link href="music/midi-to-musicxml.html" icon="🎹" title="MIDI → MusicXML 変換" desc="MIDIからMusicXMLを生成し、MusicXMLとして保存できます。"></lht-index-card-link>
+        <lht-index-card-link href="music/musicxml-to-abc.html" icon="🎶" title="MusicXML → ABC 変換" desc="MusicXMLからABC記法を生成し、ABCとして保存できます。"></lht-index-card-link>
+        <lht-index-card-link href="music/abc-to-musicxml.html" icon="🎵" title="ABC → MusicXML 変換" desc="ABC記法をMusicXMLへ変換し、MusicXMLとして保存できます。"></lht-index-card-link>
       </div>
       </section>
 
@@ -1355,17 +1311,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </h3>
       <p class="md-section-subtitle">ローカル検索コマンド生成</p>
       <div class="md-grid md-grid-3 md-section">
-        <a href="grep/find-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🔎</span>find 検索
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-
-
-          <p class="md-card-desc">findでファイル/ディレクトリを検索するコマンドを生成します。条件（名前/拡張子/サイズ/更新日時/内容検索）を組み合わせて作れます。</p>
-        </a>
+        <lht-index-card-link href="grep/find-gen.html" icon="🔎" title="find 検索" desc="findでファイル/ディレクトリを検索するコマンドを生成します。条件（名前/拡張子/サイズ/更新日時/内容検索）を組み合わせて作れます。"></lht-index-card-link>
       </div>
       </section>
 
@@ -1381,80 +1327,14 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </h2>
       <p class="md-section-subtitle">FFmpeg向けコマンド生成</p>
       <div class="md-grid md-grid-3 md-section">
-        <a href="ffmpeg/ffmpeg-concat-cmdline-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🧩</span>FFmpeg ファイル結合
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-
-
-          <p class="md-card-desc">複数の.wavファイルを1つに結合するコマンドを生成します。</p>
-        </a>
-        <a href="ffmpeg/ffmpeg-loudnorm-cmdline-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🔊</span>FFmpeg 音量正規化 (Loudnorm)
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">.wavファイルの音量をラウドネス基準に合わせて正規化します。</p>
-        </a>
-        <a href="ffmpeg/ffmpeg-trim-cmdline-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">✂️</span>FFmpeg 切り出し (Trim)
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">音声/動画ファイルの一部を時間指定で切り出すコマンドを生成します。</p>
-        </a>
-        <a href="ffmpeg/ffmpeg-audio-convert-cmdline-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🎧</span>FFmpeg 音声変換
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">音声ファイルを指定の形式に変換するコマンドを生成します。</p>
-        </a>
-        <a href="ffmpeg/ffmpeg-youtube-mkv-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">📺</span>YouTube向け動画生成
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">一枚の画像と音声ファイルから、YouTube投稿用の動画ファイル(.mkv)を生成します。</p>
-        </a>
-        <a href="ffmpeg/ffmpeg-mp4-to-wav-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🎵</span>MP4からWAV抽出
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">mp4ファイルから音声をWAVとして取り出すコマンドを生成します。</p>
-        </a>
-        <a href="ffmpeg/ffmpeg-replace-audio-with-wav-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🔁</span>MP4音声差し替え（WAV）
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">動画の映像はそのままに、WAV音声へ差し替えるコマンドを生成します。</p>
-        </a>
-        <a href="ffmpeg/ffmpeg-silence-detect-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🔇</span>無音区間検出
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">silencedetect で無音区間を検出するコマンドを生成します。</p>
-        </a>
+        <lht-index-card-link href="ffmpeg/ffmpeg-concat-cmdline-gen.html" icon="🧩" title="FFmpeg ファイル結合" desc="複数の.wavファイルを1つに結合するコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-loudnorm-cmdline-gen.html" icon="🔊" title="FFmpeg 音量正規化 (Loudnorm)" desc=".wavファイルの音量をラウドネス基準に合わせて正規化します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-trim-cmdline-gen.html" icon="✂️" title="FFmpeg 切り出し (Trim)" desc="音声/動画ファイルの一部を時間指定で切り出すコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-audio-convert-cmdline-gen.html" icon="🎧" title="FFmpeg 音声変換" desc="音声ファイルを指定の形式に変換するコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-youtube-mkv-gen.html" icon="📺" title="YouTube向け動画生成" desc="一枚の画像と音声ファイルから、YouTube投稿用の動画ファイル(.mkv)を生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-mp4-to-wav-gen.html" icon="🎵" title="MP4からWAV抽出" desc="mp4ファイルから音声をWAVとして取り出すコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-replace-audio-with-wav-gen.html" icon="🔁" title="MP4音声差し替え（WAV）" desc="動画の映像はそのままに、WAV音声へ差し替えるコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-silence-detect-gen.html" icon="🔇" title="無音区間検出" desc="silencedetect で無音区間を検出するコマンドを生成します。"></lht-index-card-link>
       </div>
       </section>
 
@@ -1470,53 +1350,11 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </h3>
       <p class="md-section-subtitle">URL処理のユーティリティ</p>
       <div class="md-grid md-grid-3 md-section">
-        <a href="link/amazon-dp-extract.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🛒</span>Amazon dp 抽出
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-
-
-          <p class="md-card-desc">Amazon URL から dp/ASIN を取り出します。</p>
-        </a>
-        <a href="link/facebook-fbclid-remove.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🔗</span>Facebook識別子（fbclid）除去
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">URL から Facebook識別子（fbclid）を除去します。</p>
-        </a>
-        <a href="link/url-encode-decode.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🔤</span>URL エンコード/デコード
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">URLのエンコードとデコードを行います。</p>
-        </a>
-        <a href="link/mime-base64.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">📦</span>MIME Base64
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">MIME Base64のエンコード/デコードを行います。</p>
-        </a>
-        <a href="link/utm-remove.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🧹</span>UTM除去
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">URL から utm_* パラメータを削除します。</p>
-        </a>
+        <lht-index-card-link href="link/amazon-dp-extract.html" icon="🛒" title="Amazon dp 抽出" desc="Amazon URL から dp/ASIN を取り出します。"></lht-index-card-link>
+        <lht-index-card-link href="link/facebook-fbclid-remove.html" icon="🔗" title="Facebook識別子（fbclid）除去" desc="URL から Facebook識別子（fbclid）を除去します。"></lht-index-card-link>
+        <lht-index-card-link href="link/url-encode-decode.html" icon="🔤" title="URL エンコード/デコード" desc="URLのエンコードとデコードを行います。"></lht-index-card-link>
+        <lht-index-card-link href="link/mime-base64.html" icon="📦" title="MIME Base64" desc="MIME Base64のエンコード/デコードを行います。"></lht-index-card-link>
+        <lht-index-card-link href="link/utm-remove.html" icon="🧹" title="UTM除去" desc="URL から utm_* パラメータを削除します。"></lht-index-card-link>
       </div>
       </section>
 
@@ -1532,24 +1370,8 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </h3>
       <p class="md-section-subtitle">図表の作成・変換</p>
       <div class="md-grid md-grid-3 md-section">
-        <a href="diagram/mermaid-to-svg.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🧭</span>Mermaid → SVG 変換
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">Mermaid記法からSVGを生成し、SVGとして保存できます。</p>
-        </a>
-        <a href="diagram/graphviz-dot-to-svg.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🕸️</span>Graphviz DOT → SVG 変換
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">Graphviz DOT記法からSVGを生成し、SVGとして保存できます。</p>
-        </a>
+        <lht-index-card-link href="diagram/mermaid-to-svg.html" icon="🧭" title="Mermaid → SVG 変換" desc="Mermaid記法からSVGを生成し、SVGとして保存できます。"></lht-index-card-link>
+        <lht-index-card-link href="diagram/graphviz-dot-to-svg.html" icon="🕸️" title="Graphviz DOT → SVG 変換" desc="Graphviz DOT記法からSVGを生成し、SVGとして保存できます。"></lht-index-card-link>
       </div>
       </section>
 
@@ -1559,17 +1381,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
         <span aria-hidden="true" class="md-icon-inline">🖼️</span>画像/SVG
       </h3>
       <div class="md-grid md-grid-3 md-section">
-        <a href="img/img2svg.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🧩</span>画像 → SVG 変換
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-
-
-          <p class="md-card-desc">画像ファイルをSVGに変換します。これは困難なことを実現するツールです。アイコン・ロゴのようなものはよく再現できますが、イラスト・写真などは技術的な理由から再現度が高くないことをあらかじめご承知ください。</p>
-        </a>
+        <lht-index-card-link href="img/img2svg.html" icon="🧩" title="画像 → SVG 変換" desc="画像ファイルをSVGに変換します。これは困難なことを実現するツールです。アイコン・ロゴのようなものはよく再現できますが、イラスト・写真などは技術的な理由から再現度が高くないことをあらかじめご承知ください。"></lht-index-card-link>
       </div>
       </section>
 
@@ -1585,44 +1397,10 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </h3>
       <p class="md-section-subtitle">テキスト表示/加工</p>
       <div class="md-grid md-grid-3 md-section">
-        <a href="text/text-viewer.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">📄</span>テキスト表示
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-
-
-          <p class="md-card-desc">テキストをペーストして、読みやすく表示します。マークダウン形式にも対応しています。</p>
-        </a>
-        <a href="text/text-processing.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🧩</span>テキスト加工
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">テキストを即時に変換・整形するためのツールです。入力内容に対して選択した変換オプションが順番に適用され、結果が出力欄に反映されます。文字の変換・行の変換・空白の変換を組み合わせて使えます。</p>
-        </a>
-        <a href="text/file-rename-cmdline-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🏷️</span>ファイル名連番リネーム
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">ファイル名リストから連番にリネームするコマンドを生成します。bashまたはPowerShellで実行できるコマンドを出力します。</p>
-        </a>
-        <a href="text/japanese-romaji-guide.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🔤</span>日本語ローマ字メモ
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">旅券ローマ字を中心に、ヘボン式・訓令式・日本式（理論寄り）を比較しながら、かなをローマ字に変換します。</p>
-        </a>
+        <lht-index-card-link href="text/text-viewer.html" icon="📄" title="テキスト表示" desc="テキストをペーストして、読みやすく表示します。マークダウン形式にも対応しています。"></lht-index-card-link>
+        <lht-index-card-link href="text/text-processing.html" icon="🧩" title="テキスト加工" desc="テキストを即時に変換・整形するためのツールです。入力内容に対して選択した変換オプションが順番に適用され、結果が出力欄に反映されます。文字の変換・行の変換・空白の変換を組み合わせて使えます。"></lht-index-card-link>
+        <lht-index-card-link href="text/file-rename-cmdline-gen.html" icon="🏷️" title="ファイル名連番リネーム" desc="ファイル名リストから連番にリネームするコマンドを生成します。bashまたはPowerShellで実行できるコマンドを出力します。"></lht-index-card-link>
+        <lht-index-card-link href="text/japanese-romaji-guide.html" icon="🔤" title="日本語ローマ字メモ" desc="旅券ローマ字を中心に、ヘボン式・訓令式・日本式（理論寄り）を比較しながら、かなをローマ字に変換します。"></lht-index-card-link>
       </div>
       </section>
 
@@ -1638,17 +1416,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </h3>
       <p class="md-section-subtitle">パスワード生成</p>
       <div class="md-grid md-grid-3 md-section">
-        <a href="password/password-gen.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🛡️</span>パスワードジェネレーター
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-
-
-          <p class="md-card-desc">選択した文字種と文字数でパスワードを生成します。英大文字または英小文字は必須で、生成結果は英字から始まります。目視で認識しづらい文字は除外した設計になっています。</p>
-        </a>
+        <lht-index-card-link href="password/password-gen.html" icon="🛡️" title="パスワードジェネレーター" desc="選択した文字種と文字数でパスワードを生成します。英大文字または英小文字は必須で、生成結果は英字から始まります。目視で認識しづらい文字は除外した設計になっています。"></lht-index-card-link>
       </div>
       </section>
 
@@ -1664,15 +1432,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </h3>
       <p class="md-section-subtitle">知識を時系列で俯瞰するツール</p>
       <div class="md-grid md-grid-3 md-section">
-        <a href="knowledge-timeline/composers.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🎼</span>クラシック作曲家タイムライン
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">作曲家の生没年・主要作品・時代背景を同一時間軸で確認できます。</p>
-        </a>
+        <lht-index-card-link href="knowledge-timeline/composers.html" icon="🎼" title="クラシック作曲家タイムライン" desc="作曲家の生没年・主要作品・時代背景を同一時間軸で確認できます。"></lht-index-card-link>
       </div>
       </section>
 
@@ -1687,26 +1447,8 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </h2>
       <p class="md-section-subtitle">生活系の小ツール</p>
       <div class="md-grid md-grid-3 md-section">
-        <a href="life/japan-weather.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">🌤️</span>Japan Weather
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-
-
-          <p class="md-card-desc">地域と府県を選んで天気予報を表示します（オンライン取得）。</p>
-        </a>
-        <a href="life/forgot-items-check.html" class="md-link-card">
-          <div class="md-card-head">
-            <h3 class="md-card-title">
-              <span aria-hidden="true" class="md-icon-inline">✅</span>忘れ物チェック
-            </h3>
-            <span class="md-card-arrow">→</span>
-          </div>
-          <p class="md-card-desc">持ち物を順番に確認して、忘れ物を防ぎます。</p>
-        </a>
+        <lht-index-card-link href="life/japan-weather.html" icon="🌤️" title="Japan Weather" desc="地域と府県を選んで天気予報を表示します（オンライン取得）。"></lht-index-card-link>
+        <lht-index-card-link href="life/forgot-items-check.html" icon="✅" title="忘れ物チェック" desc="持ち物を順番に確認して、忘れ物を防ぎます。"></lht-index-card-link>
       </div>
       </section>
 
@@ -2539,6 +2281,94 @@ class LhtCommandBlock extends HTMLElement {
   }
 }
 
+class LhtIndexCardLink extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const href = (this.getAttribute("href") || "").trim();
+    if (!href) return;
+
+    const title = (this.getAttribute("title") || "").trim();
+    const descAttr = (this.getAttribute("desc") || "").trim();
+    const iconAttr = (this.getAttribute("icon") || "").trim();
+    const target = (this.getAttribute("target") || "").trim();
+    const relAttr = (this.getAttribute("rel") || "").trim();
+    const variant = (this.getAttribute("variant") || "default").trim().toLowerCase();
+    const arrowMode = (this.getAttribute("arrow") || "auto").trim().toLowerCase();
+    const badgeText = (this.getAttribute("badge") || "").trim();
+    const descLines = (this.getAttribute("desc-lines") || "").trim();
+
+    if (!title || !descAttr) {
+      const missing = [];
+      if (!title) missing.push("title");
+      if (!descAttr) missing.push("desc");
+      // Fail fast for authoring mistakes in index cards.
+      console.warn(`[lht-index-card-link] Missing required attribute(s): ${missing.join(", ")}`, this);
+      return;
+    }
+
+    this.textContent = "";
+
+    const link = document.createElement("a");
+    link.href = href;
+    link.className = "md-link-card";
+    const isExternalHref = /^(https?:)?\/\//i.test(href);
+    const isExternal = variant === "external" || isExternalHref || target === "_blank";
+    const effectiveTarget = target || (isExternal ? "_blank" : "");
+    if (effectiveTarget) link.target = effectiveTarget;
+    if (effectiveTarget === "_blank") {
+      link.rel = relAttr || "noopener noreferrer";
+    } else if (relAttr) {
+      link.rel = relAttr;
+    }
+    if (variant === "simple") link.classList.add("lht-index-card-link--simple");
+    if (isExternal) link.classList.add("lht-index-card-link--external");
+
+    const head = document.createElement("div");
+    head.className = "md-card-head";
+
+    const h3 = document.createElement("h3");
+    h3.className = "md-card-title";
+    if (iconAttr) {
+      const iconContainer = document.createElement("span");
+      iconContainer.className = "lht-index-card-link__icon";
+      iconContainer.textContent = iconAttr;
+      h3.appendChild(iconContainer);
+    }
+    const titleContainer = document.createElement("span");
+    titleContainer.className = "lht-index-card-link__title";
+    titleContainer.textContent = title;
+    h3.appendChild(titleContainer);
+    if (badgeText) {
+      const badge = document.createElement("span");
+      badge.className = "lht-index-card-link__badge";
+      badge.textContent = badgeText;
+      h3.appendChild(badge);
+    }
+
+    const arrow = document.createElement("span");
+    arrow.className = "md-card-arrow";
+    const showArrow = arrowMode === "auto" ? variant !== "simple" : arrowMode !== "none";
+    arrow.textContent = isExternal ? "↗" : "→";
+    if (!showArrow) arrow.hidden = true;
+
+    const desc = document.createElement("p");
+    desc.className = "md-card-desc";
+    desc.textContent = descAttr;
+    if (descLines && /^\d+$/.test(descLines)) {
+      desc.classList.add("lht-index-card-link__desc--clamp");
+      desc.style.setProperty("--lht-desc-lines", descLines);
+    }
+
+    head.appendChild(h3);
+    head.appendChild(arrow);
+    link.appendChild(head);
+    link.appendChild(desc);
+    this.appendChild(link);
+  }
+}
+
 class LhtPageMenu extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
@@ -2594,6 +2424,9 @@ if (!customElements.get("lht-switch-help")) {
 }
 if (!customElements.get("lht-command-block")) {
   customElements.define("lht-command-block", LhtCommandBlock);
+}
+if (!customElements.get("lht-index-card-link")) {
+  customElements.define("lht-index-card-link", LhtIndexCardLink);
 }
 if (!customElements.get("lht-page-menu")) {
   customElements.define("lht-page-menu", LhtPageMenu);

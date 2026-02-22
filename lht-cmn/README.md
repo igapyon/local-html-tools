@@ -22,6 +22,7 @@
   - `lht-switch-help`
   - `lht-command-block`
   - `lht-page-menu`
+  - `lht-index-card-link`
 - `lht-cmn/css/components.css`
   - 上記コンポーネントの共通スタイル
 
@@ -68,3 +69,36 @@ HTML から次を読み込みます。
   - 既定値は `selected` 属性と `selectElement.value` を両方設定
 - ネイティブ `select` の場合:
   - 従来どおり `<option>` を生成して設定
+
+## カード共通化（`lht-index-card-link`）
+
+トップ `index` のリンクカードは、基本的に `lht-index-card-link` で共通化します。
+
+- 目的:
+  - カードDOM（`a + title + desc + arrow`）の型を固定する
+  - 見た目と挙動をコンポーネント側へ集約する
+
+### 主な属性
+
+- `href`（必須）: 遷移先
+- `title`（必須）: タイトル
+- `desc`（必須）: 説明文
+- `icon`（任意）: タイトル先頭に出すアイコン文字（例: `🧰`）
+- `variant`: `default | simple | external`
+- `arrow`: `auto | none`
+- `target` / `rel`: 必要時に指定（`external` / 外部URL / `_blank` は自動補完あり）
+- `badge`: バッジ文字列
+- `desc-lines`: 説明文の行数クランプ（数値）
+
+### 使用例
+
+```html
+<lht-index-card-link
+  href="git/git-branch-diff.html"
+  icon="🧰"
+  title="Git ブランチ比較"
+  desc="2つのブランチ差分を表示するコマンドを生成します。"
+  variant="default"
+  desc-lines="3">
+</lht-index-card-link>
+```
