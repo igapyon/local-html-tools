@@ -23,6 +23,7 @@
   - 現状: Web Audio による簡易シンセ再生は実装済み
   - 未実装: 生成したMIDI実データ（SMF）のその場再生（MIDIパーサ/プレイヤー経由）
 - [music] `docs/music/*` の「ファイルを選択」操作を、Material Design のよくあるパターン（Filled ボタン + 選択ファイル名表示）で目立たせる
+- [優先度高] Git 以外も含む全アプリで、狭幅端末の不要な右スクロール（謎の右余白）を発火させない。特殊な個別対応ではなく `lht` 共通ルール（`lht-help-tooltip` と `.md-page`）を優先して適用し、残件のみ個別調整する
 - なんの変哲もないカレンダアプリが欲しい
 
 # DONE
@@ -52,6 +53,18 @@
 - [対応] `lht-cmn/js/components.js` の読み込み順依存軽減（`defer` 運用 + `lht-select-help` 側で宣言オプション/後着 option を吸収）
 - [クローズ] `docs/text/text-processing.html` の「スペース連打で `.` 自動挿入」は OS 側の自動補正由来として対応終了
 - [クローズ] `docs/index.html` のカード構造JSON化検討は、`lht` 対応で目的を満たしたため対応終了
+- [対応] `docs/git/git-pseudo-squash.html` の iPhone SE 幅で右スクロールして謎の右余白が見える不具合を修正
+- 原因: `tooltip` が非表示時でも幅を持ったまま配置され、狭幅画面でビューポート外にはみ出してページ全体の横幅を押し広げていた
+- 実施内容: `docs/git/src/git-pseudo-squash/css/app.css` で `.md-tooltip-content` を非表示時 `display:none` に変更し、表示時のみ `display:block` へ。あわせてモバイル向けに `tooltip` の幅を `calc(100vw - 2rem)` 以内へ制限し、右寄せ配置で画面外はみ出しを防止
+- 実施内容: `.md-page` に `overflow-x: clip` を追加して、ページ全体の横方向オーバーフローを抑制
+- 反映: `npm run build:git` 実行済み（`docs/git/git-pseudo-squash.html` へ反映）
+- [対応] 右スクロール不具合の横展開に向けて、同系レイアウト（`.md-tooltip-content` / `.md-tooltip--wide` / `.md-page`）の利用画面を全体棚卸し
+- 対象分類: Git 3画面（`git-config-setup` / `git-config-advanced-setup` / `git-branch-diff`）、Grep 1画面（`find-gen`）、Password 1画面（`password-gen`）、Diagram 2画面（`mermaid-to-svg` / `graphviz-dot-to-svg`）、Music 5画面（`abc-to-musicxml` / `midi-to-musicxml` / `musicxml-to-abc` / `musicxml-to-midi` / `musicxml-to-svg`）
+- 記録: 横展開の優先対応対象は `TODO` の `[優先度高]` 項目（狭幅端末での右余白対策）に集約
+- [対応] `lht-cmn/css/components.css` に横スクロール抑止の共通ルールを追加（`.md-page { overflow-x: clip; }`）
+- [対応] `lht-help-tooltip` の表示制御と幅制限を `lht` 側へ共通化（非表示時 `display:none`、表示時のみ表示、モバイルで右寄せ + `calc(100vw - 2rem)` 制限）
+- [反映] Music 以外の各アプリを再ビルドし、共通ルールを生成HTMLへ反映（`git/grep/password/diagram/ffmpeg/life/link/text/img/docs-index`）
+- [注意] `npm run build:all` は既存の Music 側 TypeScript エラー（`src/common/ts/musicxml-writer-common.ts`）で停止するため、Music 系への同反映は別途対応が必要
 - 対象: docs/grep/find-gen.html
 - 対象: docs/img/img2svg.html
 - 対象: docs/password/password-gen.html
