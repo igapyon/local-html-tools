@@ -156,3 +156,39 @@ HTML から次を読み込みます。
 
 - 用途: ファイル選択UI（ボタン + hidden file input + ファイル名表示）
 - 主な属性: `input-id`, `button-id`, `file-name-id`, `accept`, `button-label`, `placeholder`, `file-label`, `multiple`, `disabled`, `show-file-name`
+
+## Appendix
+
+### Appendix A: Material Web 置換の実施手順（実装メモ）
+
+`*-src.html` を `lht-*` 前提へ寄せるときの、実務上の手順メモです。
+
+1. 置換対象を `*-src.html` 上で特定する
+2. 既存の生HTML部品を `lht-*`（内部的には Material Web または自前実装）へ置換する
+3. 状態取得/保存ロジックを `selected` / `value` ベースへ揃える
+4. 見た目差分（角丸、高さ、フォーカスリング、余白）を CSS トークンで吸収する
+5. 単一HTMLビルドを実行して動作確認する
+
+### Appendix B: 置換対応表（内部実装の目安）
+
+- テキスト入力: `md-outlined-text-field`
+- テキストエリア: `md-outlined-text-field type="textarea"`
+- セレクト: `md-outlined-select` + `md-select-option`
+- トグル: `md-switch`
+- アイコンボタン: `md-icon-button`
+- ヘルプ `(i)`: `lht-help-tooltip`
+- フィールド活性時ヘルプ表示: `lht-text-field-help`
+- スイッチ + ヘルプ: `lht-switch-help`
+- コマンド表示 + コピー: `lht-command-block`
+- 右上メニュー: `lht-page-menu`
+
+### Appendix C: テーマ色運用メモ
+
+- フォーカス、選択、強調は `primary` 系（`--md-sys-color-primary`）を基準にする
+- `secondary` は `primary` と競合しない範囲で使う。迷ったら `primary` に寄せる
+- フォーカスリング色はコンポーネント間で統一する
+- Material Web の色変更は、まず `:root` の `--md-sys-*` を調整し、個別上書きは最小限にする
+
+### Appendix D: tooltip 実装制約メモ
+
+- `@material/web@2.4.1` では `md-tooltip` が同梱されないため、`lht-help-tooltip` は `md-tooltip-group` + `md-tooltip-content` ベースで運用する
