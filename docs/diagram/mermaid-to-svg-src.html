@@ -73,18 +73,18 @@ limitations under the License.
           </span>
         </div>
         <div class="md-field-block">
-          <lht-help-text-field
+          <lht-text-field-help
             field-id="mermaidInput"
             label="ソース"
             type="textarea"
             rows="12"
             required
             help-text="Mermaid記法を入力します。未完成の記法はレンダリングでエラーになります。"
-          ></lht-help-text-field>
+          ></lht-text-field-help>
         </div>
 
         <div class="md-row">
-          <lht-help-select
+          <lht-select-help
             field-id="themeSelect"
             label="テーマ"
             help-text="配色テーマを選択します。変更後は再レンダリングで反映されます。"
@@ -110,7 +110,7 @@ limitations under the License.
               }
             ]
             </script>
-</lht-help-select>
+</lht-select-help>
           <button id="renderBtn" class="md-button md-button--primary" type="button">レンダリング</button>
           <button id="downloadSvgBtn" class="md-button md-button--secondary" type="button" disabled>SVG保存</button>
         </div>

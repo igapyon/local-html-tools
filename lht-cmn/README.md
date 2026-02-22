@@ -1,42 +1,56 @@
 # lht-cmn
 
-`local-html-tools` 全体で共有する UI コンポーネント置き場です。
+`lht-cmn` は `local-html-tools` 全体で共有する UI コンポーネント基盤です。
 
-## 位置づけ
+## 目的
 
-- `lht-cmn` は `local-html-tools` の UI 抽象化レイヤーです
-- Material Web を使う場合でも、画面側で `md-*` を直接多用せず、原則 `lht-*` コンポーネントとして提供してから利用します
-- `lht-*` を画面側の公開APIとして扱い、内部実装（Material Web / 自前DOM）は `lht-cmn` 側に閉じ込めます
-- 目的:
-  - 画面ごとの重複実装を減らす
-  - 見た目と挙動を統一する
-  - 変更点を `lht-cmn` に集約して保守しやすくする
-  - 生成AIが扱いやすい構造にする
+`local-html-tools` では、入力・選択・ヘルプ・コピー・メニューなどの UI を複数ページで繰り返し実装してきました。  
+`lht-cmn` はこの重複を減らし、UI を `lht-*` Web Components として共通化するためのレイヤーです。
 
-## 実装方針（重要）
+## 基本方針
 
-- 優先順位:
-  - 1. Material Web が利用可能なら内部で活用する
-  - 2. 利用不可環境では `lht-cmn` 内フォールバック実装で同等操作を維持する
+- デザイン基準は Material Design 3
+- 実現手段として Material Web を優先利用する
+- Material Web に妥当な選択肢がない場合は、`lht-cmn` 側に自前実装（必要に応じて新規 Web Component）を追加し、`lht-*` として提供する
+- Material Web で直接実現できる要素も、画面側では一旦 `lht-*` でラップして利用する
+- 画面側で利用するのは原則 `lht-*` とし、`md-*` 直接利用は `lht-cmn` 内部実装に限定する
+
+## メリット
+
+- 画面ごとの重複実装を削減できる
+- 見た目と挙動（必須表示、ヘルプ表示、フォーカス時の挙動）を統一できる
+- 変更点を `lht-cmn` に集約でき、保守・レビューがしやすくなる
+- 単一HTML生成前提でも、開発時の部品再利用性を維持できる
+- 変更点が局所化され、生成AIが誤って別画面を壊す確率が下がる
+- UI規約が `lht-*` に集約され、提案が毎回同じ型で出せる
+- レビュー時に「画面の見た目差分」より「共通部品の差分」を見ればよくなり、判断が速くなる
+
+## 運用方針（重要）
+
 - 画面側（`docs/*-src.html`）は `lht-*` を利用し、`md-*` 直接実装の追加は原則避ける
-- 将来方針:
-  - `lht-cmn/css/components.css` を正本とし、`md3/` 依存を段階的に縮退する
-  - `md3/` はリファレンスとして扱い、実運用スタイルは `lht-cmn` に集約する
+- `lht-cmn/js/components.js` を共通コンポーネントの正本とする
+- `lht-cmn/css/components.css` を実運用スタイルの正本とする
+- `md3/` は段階的にリファレンス用途へ縮退し、実運用スタイルは `lht-cmn` に集約する
 
 ## 構成
 
 - `lht-cmn/js/components.js`
   - 共通 Web Components 定義
-  - `lht-help-tooltip`
-  - `lht-help-text-field`
-  - `lht-help-select`
-  - `lht-switch-help`
-  - `lht-command-block`
-  - `lht-page-menu`
-  - `lht-index-card-link`
-  - `lht-file-select`
 - `lht-cmn/css/components.css`
   - 上記コンポーネントの共通スタイル
+
+### コンポーネント一覧
+
+| コンポーネント | できること | 内部構造（概要） |
+|---|---|---|
+| `lht-help-tooltip` | `(i)` ヘルプアイコンとツールチップを1タグで配置できる | 内部で `md-icon-button` + `md-tooltip-content` を生成し、タグ内HTMLをツールチップ本文へ差し込む |
+| `lht-text-field-help` | ラベル付き入力（単一行/複数行）とフォーカス時ヘルプ表示を共通化できる | 内部で `md-outlined-text-field` を生成し、属性（`field-id`/`label`/`type`/`rows` など）を透過。`focus/blur` で `supportingText` を制御 |
+| `lht-select-help` | ラベル付きドロップダウンとヘルプ表示を共通化できる | 内部で `md-outlined-select` を生成し、`<script type="application/json" slot="options">` から `md-select-option` を構築 |
+| `lht-switch-help` | スイッチ + ラベル + ヘルプを1セットで配置できる | 内部で `md-switch` と `lht-help-tooltip` を組み合わせ、`on-change` 指定時はグローバル関数を呼び出す |
+| `lht-command-block` | コマンド表示枠とコピー操作（単一/二重ボタン）を共通化できる | 内部で `code` と `md-icon-button` を生成。クリック時に Clipboard API（不可時は `textarea` フォールバック）でコピー |
+| `lht-page-menu` | 右上メニュー（トップへ戻る等）を共通化できる | 内部でメニューボタン + パネル + リンクを生成。外側クリックで自動クローズ |
+| `lht-index-card-link` | `docs/index` のカードリンクを統一フォーマットで記述できる | 内部でカードDOM（`a` + タイトル + 説明 + 矢印/バッジ）を生成し、`variant`/`target`/外部リンク判定を吸収 |
+| `lht-file-select` | ファイル選択UI（Filledボタン + ファイル名表示）を共通化できる | 内部で hidden `input[type=file]` とトリガUIを生成。`md-filled-button` が使える環境ではそれを利用し、未定義時はフォールバックボタンで動作維持 |
 
 ## 利用方法
 
@@ -45,42 +59,27 @@ HTML から次を読み込みます。
 - `../../lht-cmn/css/components.css`
 - `../../lht-cmn/js/components.js`
 
+開発時は上記ファイルを参照し、最終的な配布物はビルド時に単一HTMLへインライン化します。
+
 ページ固有の見た目調整は各画面側の CSS で実施し、共通的な DOM 生成と振る舞いは `lht-cmn` 側で管理します。
 
 ## 適用ルール
 
-- `lht-help-text-field` を使う場合は、`label` と `help-text` の設定を「できない理由がない限り」行う
-- `lht-help-select` を使う場合も、`label` と `help-text` の設定を「できない理由がない限り」行う
+- `lht-text-field-help` を使う場合は、`label` と `help-text` の設定を「できない理由がない限り」行う
+- `lht-select-help` を使う場合も、`label` と `help-text` の設定を「できない理由がない限り」行う
 - `lht` 前提の形へ揃える:
-  - 外側の旧ラベル（`label + Required + (i) + :`）は整理する
-  - 入力系は `lht-help-text-field` / `lht-help-select` / `lht-switch-help` 側に `label` と `help-text` を集約する
-  - 必須指定は可能な限りコンポーネント側（`required` と `label` の `*`）へ寄せる
+  - 外側の旧ラベル（`label + Required + (i) + :`）は整理する（全画面で対応完了した時点で、この項目はREADMEから削除する）
+  - 入力系は `lht-text-field-help` / `lht-select-help` / `lht-switch-help` 側に `label` と `help-text` を集約する
+  - 必須指定は可能な限りコンポーネント側（`required`）へ寄せる
 - 例外にする場合は、対象画面側に理由を残す（表示密度・既存互換・重複説明の回避など）
 
-## ドロップダウン置換手順（`lht-help-select`）
+## ドロップダウン置換手順（`lht-select-help`）
 
-1. 基本は `lht-help-select` を使い、`field-id` / `label` / `help-text` を設定する
-2. 選択肢は `lht-help-select` に対して宣言する
-   - 推奨: 子要素の `<script type="application/json" slot="options">[...]</script>`
-   - 代替: 子要素の `<option>`（後方互換）
-3. 表示崩れや選択肢非表示が出る画面は、初期化時に JS で `md-select-option` を注入する方式へ切り替える
+1. 基本は `lht-select-help` を使い、`field-id` / `label` / `help-text` を設定する
+2. 選択肢は `lht-select-help` に対して宣言する
+   - `<script type="application/json" slot="options">[...]</script>` を使用する
+3. `lht-select-help` で `<option>` 子要素は使用しない（後方互換運用は終了）
 4. 既存JS互換のため、DOM参照ID（`document.getElementById(...)`）は変更しない
-
-### 静的定義で成立する事例
-
-- すべての画面で動的注入が必須ではない
-- 例: `docs/git/git-branch-diff-src.html` の「出力形式」は、`md-outlined-select` + `md-select-option` の静的定義で安定動作している
-- そのため方針は「まず静的定義を試す → 崩れが出る画面のみ動的注入へ切替」が基本
-
-### 崩れ対策の実装方針
-
-- `selectElement.tagName === "MD-OUTLINED-SELECT"` の場合:
-  - `md-select-option` を `createElement` で生成
-  - `option.value` を設定
-  - 表示文字列は `<div slot="headline">...</div>` で設定
-  - 既定値は `selected` 属性と `selectElement.value` を両方設定
-- ネイティブ `select` の場合:
-  - 従来どおり `<option>` を生成して設定
 
 ## カード共通化（`lht-index-card-link`）
 
@@ -114,3 +113,46 @@ HTML から次を読み込みます。
   desc-lines="3">
 </lht-index-card-link>
 ```
+
+## LHT リファレンス
+
+### `lht-help-tooltip`
+
+- 用途: `(i)` ヘルプ表示
+- 主な属性: `label`, `wide`
+
+### `lht-text-field-help`
+
+- 用途: テキスト/数値/複数行入力 + フォーカス時ヘルプ
+- 主な属性: `field-id`, `label`, `help-text`, `type`, `placeholder`, `value`, `rows`, `min`, `max`, `step`, `required`, `disabled`, `field-class`
+
+### `lht-select-help`
+
+- 用途: セレクト入力 + フォーカス時ヘルプ
+- 主な属性: `field-id`, `label`, `help-text`, `value`, `required`, `disabled`, `field-class`
+- 選択肢定義: `<script type="application/json" slot="options">[...]</script>`
+
+### `lht-switch-help`
+
+- 用途: スイッチ + ラベル + ヘルプ
+- 主な属性: `switch-id`, `label`, `help-label`, `help-wide`, `checked`, `on-change`
+
+### `lht-command-block`
+
+- 用途: コマンド表示 + コピーUI
+- 主な属性: `command-id`, `copy-buttons`（`single` / `dual`）
+
+### `lht-page-menu`
+
+- 用途: 右上メニュー（戻るリンク等）
+- 主な属性: `home-href`, `home-label`
+
+### `lht-index-card-link`
+
+- 用途: `docs/index` 用カードリンク
+- 主な属性: `href`, `title`, `desc`, `icon`, `variant`, `arrow`, `target`, `rel`, `badge`, `desc-lines`
+
+### `lht-file-select`
+
+- 用途: ファイル選択UI（ボタン + hidden file input + ファイル名表示）
+- 主な属性: `input-id`, `button-id`, `file-name-id`, `accept`, `button-label`, `placeholder`, `file-label`, `multiple`, `disabled`, `show-file-name`

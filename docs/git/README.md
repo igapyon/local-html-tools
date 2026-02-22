@@ -117,7 +117,7 @@
 - トグル: `md-switch`
 - アイコンボタン: `md-icon-button`
 - ヘルプ `(i)`: `lht-help-tooltip`（内部で `md-icon-button` + tooltip DOM を生成）
-- フィールド活性時ヘルプ表示: `lht-help-text-field`（フォーカス時のみ入力下に説明を表示）
+- フィールド活性時ヘルプ表示: `lht-text-field-help`（フォーカス時のみ入力下に説明を表示）
 - スイッチ + ヘルプ: `lht-switch-help`（`md-switch` + ラベル + `lht-help-tooltip`）
 - コマンド表示 + コピー: `lht-command-block`（`copy-buttons="single|dual"`）
 - 右上メニュー: `lht-page-menu`（`home-href` / `home-label`）
@@ -138,7 +138,7 @@
 - `lht-help-tooltip`
   - 属性: `label`, `wide`
   - 本文: タグ内部テキスト/HTMLをそのままツールチップ本文として扱う
-- `lht-help-text-field`
+- `lht-text-field-help`
   - 属性: `field-id`, `label`, `help-text`, `placeholder`, `required`, `field-class`
   - 入力欄フォーカス時のみ `supportingText` を表示し、ブラー時に非表示に戻す
 - `lht-switch-help`

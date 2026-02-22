@@ -18,6 +18,7 @@
 - ImageMagick/sox: 画像/音声変換のパラメータ生成（バッチリサイズ/ウォーターマーク）
 - regex/sed/awk: 文字列変換テンプレの生成
 - [後まわし] docker/docker-compose: よくある起動・開発用コマンド生成
+- [方針] `md3/` は段階的にリファレンス用途へ縮退し、実運用スタイルは `lht-cmn` に集約する
 - [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
   - 現状: Web Audio による簡易シンセ再生は実装済み
   - 未実装: 生成したMIDI実データ（SMF）のその場再生（MIDIパーサ/プレイヤー経由）
@@ -45,9 +46,9 @@
 - 対象: docs/link/url-encode-decode.html
 - 対象: docs/link/utm-remove.html
 - 対象: docs/text/text-viewer.html
-- [対応] `docs/text/file-rename-cmdline-gen.html` の lht 化（`lht-help-text-field` / `lht-help-select` / `lht-switch-help` への置換）
+- [対応] `docs/text/file-rename-cmdline-gen.html` の lht 化（`lht-text-field-help` / `lht-select-help` / `lht-switch-help` への置換）
 - [対応] ドロップダウン項目（`md-select-option`）の生成ロジックを `lht-cmn/js/components.js` 側へ共通化
-- [対応] `lht-cmn/js/components.js` の読み込み順依存軽減（`defer` 運用 + `lht-help-select` 側で宣言オプション/後着 option を吸収）
+- [対応] `lht-cmn/js/components.js` の読み込み順依存軽減（`defer` 運用 + `lht-select-help` 側で宣言オプション/後着 option を吸収）
 - [クローズ] `docs/text/text-processing.html` の「スペース連打で `.` 自動挿入」は OS 側の自動補正由来として対応終了
 - [クローズ] `docs/index.html` のカード構造JSON化検討は、`lht` 対応で目的を満たしたため対応終了
 - 対象: docs/grep/find-gen.html

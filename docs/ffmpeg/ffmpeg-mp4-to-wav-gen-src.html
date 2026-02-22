@@ -45,14 +45,14 @@ limitations under the License.
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🎵</span>FFmpeg MP4→WAV コマンドジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="mp4File"
       label="MP4ファイル名"
       required
       placeholder="例: sample.mp4"
       field-class="md-field-block"
       help-text="例: sample.mp4"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <h2 class="md-section-title md-section-title--lg">1. 解析用 ffprobe コマンド</h2>
     <button onclick="generateProbeCommand()" class="md-button md-button--primary md-field-block">
@@ -62,7 +62,7 @@ limitations under the License.
       <lht-command-block command-id="probeCmd"></lht-command-block>
     </div>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="probeOutput"
       type="textarea"
       rows="6"
@@ -70,14 +70,14 @@ limitations under the License.
       placeholder="ffprobe の出力を貼り付けてください"
       field-class="md-field-block"
       help-text="解析用 ffprobe コマンドの出力を貼り付けます。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
     <button onclick="applyProbeResult()" class="md-button md-button--tonal md-field-block">
       解析結果を反映
     </button>
     <p id="probeSummary" class="md-muted md-field-block">解析結果: 未反映</p>
 
     <h2 class="md-section-title md-section-title--lg">2. 抽出設定</h2>
-    <lht-help-select
+    <lht-select-help
       field-id="sampleRate"
       label="サンプルレート"
       field-class="md-field-block"
@@ -104,9 +104,9 @@ limitations under the License.
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
-    <lht-help-select
+    <lht-select-help
       field-id="channels"
       label="チャンネル数"
       field-class="md-field-block"
@@ -129,9 +129,9 @@ limitations under the License.
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
-    <lht-help-select
+    <lht-select-help
       field-id="bitDepth"
       label="ビット深度"
       field-class="md-field-block"
@@ -154,7 +154,7 @@ limitations under the License.
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
     <button onclick="generateWavCommand()" class="md-button md-button--primary md-field-block">
       ffmpeg コマンド生成

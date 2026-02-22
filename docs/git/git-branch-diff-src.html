@@ -55,7 +55,7 @@ limitations under the License.
 
     <div class="md-section md-stack-md">
       <div class="md-form-row md-form-row--nowrap">
-        <lht-help-text-field field-id="branchA" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。差分の片側として使われます。例: main / devel。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-help-text-field>
+        <lht-text-field-help field-id="branchA" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。差分の片側として使われます。例: main / devel。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-text-field-help>
         <label class="md-switch-label">
           <input type="checkbox" id="scopeA" class="md-switch-input" onchange="updateRemoteState()">
           <span class="md-switch" aria-hidden="true"></span>
@@ -64,7 +64,7 @@ limitations under the License.
       </div>
 
       <div class="md-form-row md-form-row--nowrap">
-        <lht-help-text-field field-id="branchB" label="比較ブランチ" required placeholder="例: devel" help-text="比較対象のブランチです。2つのブランチ差分を表示します。例: devel / feature123。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-help-text-field>
+        <lht-text-field-help field-id="branchB" label="比較ブランチ" required placeholder="例: devel" help-text="比較対象のブランチです。2つのブランチ差分を表示します。例: devel / feature123。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-text-field-help>
         <label class="md-switch-label">
           <input type="checkbox" id="scopeB" class="md-switch-input" onchange="updateRemoteState()">
           <span class="md-switch" aria-hidden="true"></span>
@@ -85,7 +85,7 @@ limitations under the License.
         </lht-switch-help>
       </div>
       <div id="remoteNameBlock" class="md-form-row md-form-row--nowrap">
-        <lht-help-text-field field-id="remoteName" label="リモート名" placeholder="例: origin" value="origin" help-text="fetch と差分比較に使うリモート名です。"></lht-help-text-field>
+        <lht-text-field-help field-id="remoteName" label="リモート名" placeholder="例: origin" value="origin" help-text="fetch と差分比較に使うリモート名です。"></lht-text-field-help>
       </div>
     </div>
 

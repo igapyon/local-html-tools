@@ -45,7 +45,7 @@ limitations under the License.
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🧩</span>FFmpeg ファイル結合コマンドジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="fileList"
       label="結合する .wav ファイル"
       type="textarea"
@@ -54,7 +54,7 @@ limitations under the License.
       placeholder="例:\nfile1.wav\nfile2.wav"
       field-class="md-field-block"
       help-text="例: file1.wav / file2.wav（1行に1ファイル）"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <button onclick="generateConcatCmd()" class="md-button md-button--primary md-field-block">
       filelist.txt + 結合コマンド生成

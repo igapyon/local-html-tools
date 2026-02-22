@@ -29,13 +29,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1228,16 +1228,16 @@ lht-switch-help .md-switch-label .md-tooltip-content {
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🎧</span>FFmpeg 音声変換 コマンドジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="audioFile"
       label="音声ファイル名"
       required
       placeholder="例: sample.wav"
       field-class="md-field-block"
       help-text="例: sample.wav / sample.flac / sample.mp3"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
-    <lht-help-select
+    <lht-select-help
       field-id="outputFormat"
       label="出力フォーマット"
       required
@@ -1270,10 +1270,10 @@ lht-switch-help .md-switch-label .md-tooltip-content {
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
     <div id="bitrateBlock">
-      <lht-help-select
+      <lht-select-help
         field-id="bitrate"
         label="ビットレート"
         field-class="md-field-block"
@@ -1304,12 +1304,12 @@ lht-switch-help .md-switch-label .md-tooltip-content {
           }
         ]
         </script>
-</lht-help-select>
+</lht-select-help>
     </div>
 
     <div id="vbrBlock">
       <div class="md-form-grid md-form-grid-2 md-field-block">
-        <lht-help-select
+        <lht-select-help
           field-id="vbrMode"
           label="VBR"
           help-text="ON/OFF を切り替えます。"
@@ -1328,8 +1328,8 @@ lht-switch-help .md-switch-label .md-tooltip-content {
             }
           ]
           </script>
-</lht-help-select>
-        <lht-help-select
+</lht-select-help>
+        <lht-select-help
           field-id="vbrQuality"
           label="VBR品質"
           help-text="高め: 音質優先 / 標準: バランス / 低め: 容量優先"
@@ -1352,12 +1352,12 @@ lht-switch-help .md-switch-label .md-tooltip-content {
             }
           ]
           </script>
-</lht-help-select>
+</lht-select-help>
       </div>
     </div>
 
     <div id="flacBlock" class="md-hidden">
-      <lht-help-select
+      <lht-select-help
         field-id="flacLevel"
         label="FLAC圧縮レベル"
         field-class="md-field-block"
@@ -1380,10 +1380,10 @@ lht-switch-help .md-switch-label .md-tooltip-content {
           }
         ]
         </script>
-</lht-help-select>
+</lht-select-help>
     </div>
 
-    <lht-help-select
+    <lht-select-help
       field-id="sampleRate"
       label="サンプルレート"
       field-class="md-field-block"
@@ -1406,7 +1406,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
     <div class="md-section">
       <div class="md-section-title">用途別プリセット:</div>
@@ -2327,11 +2327,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

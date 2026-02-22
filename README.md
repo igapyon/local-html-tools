@@ -213,11 +213,11 @@ docs/
   - 右上メニュー: `lht-page-menu`
   - コマンド表示 + コピー: `lht-command-block`
 - 入力フィールド置換（進行中）:
-  - `lht-help-text-field`: 全ページで適用済み
-  - `lht-help-select`: `ffmpeg-audio-convert-cmdline-gen` / `ffmpeg-mp4-to-wav-gen` / `ffmpeg-replace-audio-with-wav-gen`
+  - `lht-text-field-help`: 全ページで適用済み
+  - `lht-select-help`: `ffmpeg-audio-convert-cmdline-gen` / `ffmpeg-mp4-to-wav-gen` / `ffmpeg-replace-audio-with-wav-gen`
   - `lht-switch-help`: `ffmpeg-loudnorm-cmdline-gen` / `ffmpeg-replace-audio-with-wav-gen`
 - 実装メモ:
-  - `lht-help-text-field` は `min` / `max` / `step` 属性透過に対応
+  - `lht-text-field-help` は `min` / `max` / `step` 属性透過に対応
   - 既存JS互換のため `lht-switch-help` 内部 `md-switch` は `checked` プロパティでも参照可能
 
 ### PR作成時のルール

@@ -492,7 +492,7 @@
     }
 
     /* Keep floating labels from visually overlapping explanatory text blocks. */
-    .md-tab-panel .md-muted + lht-help-text-field {
+    .md-tab-panel .md-muted + lht-text-field-help {
       margin-top: 0.85rem;
     }
     

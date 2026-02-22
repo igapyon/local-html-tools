@@ -1031,13 +1031,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1216,14 +1216,14 @@ lht-switch-help .md-switch-label .md-tooltip-content {
 
     <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🔗</span>Facebook fbclid 除去ツール</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       class="md-field-block"
       field-id="inputUrl"
       label="URL"
       placeholder="例: https://example.com/?a=1&fbclid=..."
       help-text="fbclid パラメータだけを削除します。"
       required
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <button onclick="generateCleanUrl()" class="md-button md-button--primary md-field-block">
       Facebook識別子（fbclid）を除去
@@ -2122,11 +2122,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

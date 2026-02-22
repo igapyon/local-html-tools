@@ -905,8 +905,8 @@
       background-repeat: no-repeat;
     }
     .md-select:focus { outline: none; border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2); }
-    lht-help-select { display: block; min-width: 200px; }
-    lht-help-select md-outlined-select.md-outlined-field {
+    lht-select-help { display: block; min-width: 200px; }
+    lht-select-help md-outlined-select.md-outlined-field {
       width: 100%;
       --md-outlined-select-text-field-container-shape: 12px;
       --md-outlined-select-text-field-top-space: 10px;
@@ -971,13 +971,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1159,8 +1159,8 @@ lht-switch-help .md-switch-label .md-tooltip-content {
           <div class="md-headline"><span aria-hidden="true">🌦️</span>Japan Weather</div>
           <p id="update-time" class="md-subtitle"></p>
           <div class="md-filters">
-            <lht-help-select field-id="region-select" label="地域" help-text="表示する都道府県グループを選択します。"></lht-help-select>
-            <lht-help-select field-id="area-select" label="府県/地方" help-text="天気を表示したい府県/地方を選択します。"></lht-help-select>
+            <lht-select-help field-id="region-select" label="地域" help-text="表示する都道府県グループを選択します。"></lht-select-help>
+            <lht-select-help field-id="area-select" label="府県/地方" help-text="天気を表示したい府県/地方を選択します。"></lht-select-help>
           </div>
         </header>
 
@@ -2355,11 +2355,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

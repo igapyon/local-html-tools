@@ -1061,13 +1061,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1246,7 +1246,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
 
     <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">📦</span>MIME Base64 エンコード/デコード</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       class="md-field-block"
       field-id="inputText"
       type="textarea"
@@ -1255,7 +1255,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       placeholder="例: こんにちは / SGVsbG8="
       help-text="Base64 をエンコード/デコードします。"
       required
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <lht-switch-help class="md-field-block" switch-id="mimeWrap" label="76文字で改行（MIME形式）" help-label="MIME改行の説明">
       エンコード時のみ適用されます。
@@ -2180,11 +2180,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

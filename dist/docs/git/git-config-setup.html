@@ -33,13 +33,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1310,8 +1310,8 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       </div>
 
       <div class="md-stack-md">
-        <lht-help-text-field field-id="userName" label="ユーザー名" required placeholder="例: Taro Yamada" help-text="Gitコミットに記録される名前です。本名またはニックネームを入力してください。"></lht-help-text-field>
-        <lht-help-text-field field-id="userEmail" label="メールアドレス" required placeholder="例: taro@example.com" help-text="Gitコミットに記録されるメールアドレスです。連絡可能なメールアドレスを入力してください。"></lht-help-text-field>
+        <lht-text-field-help field-id="userName" label="ユーザー名" required placeholder="例: Taro Yamada" help-text="Gitコミットに記録される名前です。本名またはニックネームを入力してください。"></lht-text-field-help>
+        <lht-text-field-help field-id="userEmail" label="メールアドレス" required placeholder="例: taro@example.com" help-text="Gitコミットに記録されるメールアドレスです。連絡可能なメールアドレスを入力してください。"></lht-text-field-help>
       </div>
     </section>
 
@@ -2170,11 +2170,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

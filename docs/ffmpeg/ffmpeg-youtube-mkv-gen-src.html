@@ -45,23 +45,23 @@ limitations under the License.
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">📺</span>YouTube向け FFmpeg コマンドジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="audioFile"
       label="音声ファイル（.wav）"
       required
       placeholder="例: 250503_TrMic-part1.wav"
       field-class="md-field-block"
       help-text="例: 250503_TrMic-part1.wav"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="imageFile"
       label="画像ファイル（.png, .jpg, .jpeg）"
       required
       placeholder="例: Borodin.png"
       field-class="md-field-block"
       help-text="例: Borodin.png"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <button onclick="generateYoutubeCmd()" class="md-button md-button--primary md-field-block">
       ffmpeg コマンド生成

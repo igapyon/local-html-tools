@@ -29,13 +29,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1198,7 +1198,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
     .md-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
 
     /* Keep floating labels from visually overlapping explanatory text blocks. */
-    .md-muted + lht-help-text-field {
+    .md-muted + lht-text-field-help {
       margin-top: 0.85rem;
     }
 
@@ -1227,14 +1227,14 @@ lht-switch-help .md-switch-label .md-tooltip-content {
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🎵</span>FFmpeg MP4→WAV コマンドジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="mp4File"
       label="MP4ファイル名"
       required
       placeholder="例: sample.mp4"
       field-class="md-field-block"
       help-text="例: sample.mp4"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <h2 class="md-section-title md-section-title--lg">1. 解析用 ffprobe コマンド</h2>
     <button onclick="generateProbeCommand()" class="md-button md-button--primary md-field-block">
@@ -1244,7 +1244,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       <lht-command-block command-id="probeCmd"></lht-command-block>
     </div>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="probeOutput"
       type="textarea"
       rows="6"
@@ -1252,14 +1252,14 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       placeholder="ffprobe の出力を貼り付けてください"
       field-class="md-field-block"
       help-text="解析用 ffprobe コマンドの出力を貼り付けます。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
     <button onclick="applyProbeResult()" class="md-button md-button--tonal md-field-block">
       解析結果を反映
     </button>
     <p id="probeSummary" class="md-muted md-field-block">解析結果: 未反映</p>
 
     <h2 class="md-section-title md-section-title--lg">2. 抽出設定</h2>
-    <lht-help-select
+    <lht-select-help
       field-id="sampleRate"
       label="サンプルレート"
       field-class="md-field-block"
@@ -1286,9 +1286,9 @@ lht-switch-help .md-switch-label .md-tooltip-content {
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
-    <lht-help-select
+    <lht-select-help
       field-id="channels"
       label="チャンネル数"
       field-class="md-field-block"
@@ -1311,9 +1311,9 @@ lht-switch-help .md-switch-label .md-tooltip-content {
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
-    <lht-help-select
+    <lht-select-help
       field-id="bitDepth"
       label="ビット深度"
       field-class="md-field-block"
@@ -1336,7 +1336,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
     <button onclick="generateWavCommand()" class="md-button md-button--primary md-field-block">
       ffmpeg コマンド生成
@@ -2196,11 +2196,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);
