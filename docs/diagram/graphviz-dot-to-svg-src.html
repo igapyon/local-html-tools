@@ -22,7 +22,7 @@ limitations under the License.
     <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
   <link rel="stylesheet" href="src/graphviz-dot-to-svg/css/app.css" />
   <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
-  <script src="../../lht-cmn/js/components.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
 </head>
 <body>
   <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -77,13 +77,35 @@ limitations under the License.
             label="エンジン"
             help-text="レイアウトアルゴリズムを選択します。一般的な有向グラフは dot が扱いやすいです。"
           >
-              <option value="dot">dot</option>
-              <option value="neato">neato</option>
-              <option value="fdp">fdp</option>
-              <option value="sfdp">sfdp</option>
-              <option value="circo">circo</option>
-              <option value="twopi">twopi</option>
-          </lht-help-select>
+              <script type="application/json" slot="options">
+              [
+                {
+                  "value": "dot",
+                  "label": "dot"
+                },
+                {
+                  "value": "neato",
+                  "label": "neato"
+                },
+                {
+                  "value": "fdp",
+                  "label": "fdp"
+                },
+                {
+                  "value": "sfdp",
+                  "label": "sfdp"
+                },
+                {
+                  "value": "circo",
+                  "label": "circo"
+                },
+                {
+                  "value": "twopi",
+                  "label": "twopi"
+                }
+              ]
+              </script>
+</lht-help-select>
           <button id="renderBtn" class="md-button md-button--primary" type="button">レンダリング</button>
           <button id="downloadSvgBtn" class="md-button md-button--secondary" type="button" disabled>SVG保存</button>
         </div>

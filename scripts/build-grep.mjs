@@ -28,7 +28,7 @@ function buildTarget(target) {
   const sourceHtml = fs.readFileSync(srcHtmlPath, "utf8");
 
   const cssRefs = [...sourceHtml.matchAll(/<link\s+rel="stylesheet"\s+href="([^"]+)"\s*\/?\s*>/g)].map((m) => m[1]);
-  const jsRefs = [...sourceHtml.matchAll(/<script\s+src="([^"]+)"\s*><\/script>/g)].map((m) => m[1]);
+  const jsRefs = [...sourceHtml.matchAll(/<script\s+src="([^"]+)"[^>]*><\/script>/g)].map((m) => m[1]);
 
   assertExactOrder(`${target.id} css`, cssRefs, target.cssOrder);
   assertExactOrder(`${target.id} js`, jsRefs, target.jsOrder);
@@ -44,7 +44,7 @@ function buildTarget(target) {
 
   let output = sourceHtml;
   output = output.replace(/<link\s+rel="stylesheet"\s+href="[^"]+"\s*\/?\s*>/g, "");
-  output = output.replace(/<script\s+src="[^"]+"\s*><\/script>/g, "");
+  output = output.replace(/<script\s+src="[^"]+"[^>]*><\/script>/g, "");
   output = output.replace(/<\/head>/, () => `  <style>\n${cssText}\n  </style>\n</head>`);
   output = output.replace(/<\/body>/, () => `${jsBlocks.join("\n\n")}\n</body>`);
 

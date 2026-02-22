@@ -83,11 +83,28 @@ limitations under the License.
       field-class="md-field-block"
       help-text="出力WAVのサンプルレートを選択します。"
     >
-      <option value="44100" selected>44.1 kHz（標準）</option>
-      <option value="48000">48 kHz</option>
-      <option value="96000">96 kHz</option>
-      <option value="192000">192 kHz</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "44100",
+          "label": "44.1 kHz（標準）",
+          "selected": true
+        },
+        {
+          "value": "48000",
+          "label": "48 kHz"
+        },
+        {
+          "value": "96000",
+          "label": "96 kHz"
+        },
+        {
+          "value": "192000",
+          "label": "192 kHz"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <lht-help-select
       field-id="channels"
@@ -95,10 +112,24 @@ limitations under the License.
       field-class="md-field-block"
       help-text="自動または固定チャンネル数を選択します。"
     >
-      <option value="auto" selected>ソースに合わせる（自動）</option>
-      <option value="1">モノラル（1ch）</option>
-      <option value="2">ステレオ（2ch）</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "auto",
+          "label": "ソースに合わせる（自動）",
+          "selected": true
+        },
+        {
+          "value": "1",
+          "label": "モノラル（1ch）"
+        },
+        {
+          "value": "2",
+          "label": "ステレオ（2ch）"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <lht-help-select
       field-id="bitDepth"
@@ -106,10 +137,24 @@ limitations under the License.
       field-class="md-field-block"
       help-text="WAVエンコード形式（PCM）を選択します。"
     >
-      <option value="pcm_s16le" selected>16-bit（標準）</option>
-      <option value="pcm_s24le">24-bit</option>
-      <option value="pcm_s32le">32-bit</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "pcm_s16le",
+          "label": "16-bit（標準）",
+          "selected": true
+        },
+        {
+          "value": "pcm_s24le",
+          "label": "24-bit"
+        },
+        {
+          "value": "pcm_s32le",
+          "label": "32-bit"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <button onclick="generateWavCommand()" class="md-button md-button--primary md-field-block">
       ffmpeg コマンド生成
@@ -123,7 +168,7 @@ limitations under the License.
   </div>
 
     <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
-  <script src="../../lht-cmn/js/components.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
   <script src="src/ffmpeg-mp4-to-wav-gen/js/main.js"></script>
 
 </body>

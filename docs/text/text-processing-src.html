@@ -22,7 +22,7 @@ limitations under the License.
 <title>テキスト加工</title>
 <link rel="stylesheet" href="../../lht-cmn/css/components.css">
   <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
-  <script src="../../lht-cmn/js/components.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
   <style>
     /* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
     :root {
@@ -1168,7 +1168,15 @@ limitations under the License.
   field-id="optWidth"
   label="全角/半角"
   help-text="全角と半角の相互変換を指定します。"
-></lht-help-select>
+>
+<script type="application/json" slot="options">
+[
+  { "value": "none", "label": "変換しない", "selected": true },
+  { "value": "toHalf", "label": "半角に変換" },
+  { "value": "toFull", "label": "全角に変換" }
+]
+</script>
+</lht-help-select>
 <lht-switch-help
   switch-id="optIncludeKana"
   label="仮名を含める"
@@ -1178,12 +1186,28 @@ limitations under the License.
   field-id="optKana"
   label="ひらがな/カタカナ"
   help-text="ひらがなとカタカナの変換方向を指定します。"
-></lht-help-select>
+>
+<script type="application/json" slot="options">
+[
+  { "value": "none", "label": "変換しない", "selected": true },
+  { "value": "toKata", "label": "ひらがな → カタカナ" },
+  { "value": "toHira", "label": "カタカナ → ひらがな" }
+]
+</script>
+</lht-help-select>
 <lht-help-select
   field-id="optCase"
   label="大文字/小文字（英字）"
   help-text="英字の大文字化または小文字化を指定します。"
-></lht-help-select>
+>
+<script type="application/json" slot="options">
+[
+  { "value": "none", "label": "変換しない", "selected": true },
+  { "value": "upper", "label": "大文字に変換" },
+  { "value": "lower", "label": "小文字に変換" }
+]
+</script>
+</lht-help-select>
 </div>
 </details>
 <details class="md-accordion">
@@ -1924,48 +1948,6 @@ limitations under the License.
       });
     }
 
-    const textProcessingSelectOptions = {
-      optWidth: [
-        { value: "none", label: "変換しない", selected: true },
-        { value: "toHalf", label: "半角に変換" },
-        { value: "toFull", label: "全角に変換" }
-      ],
-      optKana: [
-        { value: "none", label: "変換しない", selected: true },
-        { value: "toKata", label: "ひらがな → カタカナ" },
-        { value: "toHira", label: "カタカナ → ひらがな" }
-      ],
-      optCase: [
-        { value: "none", label: "変換しない", selected: true },
-        { value: "upper", label: "大文字に変換" },
-        { value: "lower", label: "小文字に変換" }
-      ]
-    };
-
-    function renderSelectOptions(selectElement, options) {
-      if (!selectElement) return;
-      selectElement.innerHTML = "";
-      const isMdSelect = selectElement.tagName.toLowerCase() === "md-outlined-select";
-      options.forEach((entry) => {
-        if (isMdSelect) {
-          const option = document.createElement("md-select-option");
-          option.value = entry.value;
-          if (entry.selected) {
-            option.selected = true;
-            option.setAttribute("selected", "");
-            selectElement.value = entry.value;
-          }
-          option.innerHTML = `<div slot="headline">${entry.label}</div>`;
-          selectElement.appendChild(option);
-          return;
-        }
-        const option = document.createElement("option");
-        option.value = entry.value;
-        option.textContent = entry.label;
-        if (entry.selected) option.selected = true;
-        selectElement.appendChild(option);
-      });
-    }
 
     function setupAutoUpdate() {
       const ids = [
@@ -1993,9 +1975,6 @@ limitations under the License.
       updateOutput();
     }
 
-    Object.entries(textProcessingSelectOptions).forEach(([fieldId, options]) => {
-      renderSelectOptions(document.getElementById(fieldId), options);
-    });
     setupAutoUpdate();
     const optSymbolAll = document.getElementById('optSymbolAll');
     if (optSymbolAll) {

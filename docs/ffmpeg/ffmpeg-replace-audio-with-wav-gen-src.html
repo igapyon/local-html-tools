@@ -110,10 +110,24 @@ limitations under the License.
       help-text="生成する動画コンテナ形式を選択します。"
       onchange="handleContainerChange()"
     >
-      <option value="mp4" selected>MP4</option>
-      <option value="mkv">MKV</option>
-      <option value="mov">MOV</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "mp4",
+          "label": "MP4",
+          "selected": true
+        },
+        {
+          "value": "mkv",
+          "label": "MKV"
+        },
+        {
+          "value": "mov",
+          "label": "MOV"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <lht-switch-help class="md-field-block" switch-id="regenPts" label="PTS再生成" checked help-wide>
       YouTubeでの音ズレ対策に有効な場合があります。
@@ -126,12 +140,32 @@ limitations under the License.
       help-text="音声コーデックを選択します。PCM は無圧縮です。"
       onchange="handleCodecChange()"
     >
-      <option value="aac" selected>AAC（一般的）</option>
-      <option value="libopus">Opus</option>
-      <option value="ac3">AC-3</option>
-      <option value="pcm_s16le">PCM 16-bit（無圧縮）</option>
-      <option value="pcm_s24le">PCM 24-bit（無圧縮）</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "aac",
+          "label": "AAC（一般的）",
+          "selected": true
+        },
+        {
+          "value": "libopus",
+          "label": "Opus"
+        },
+        {
+          "value": "ac3",
+          "label": "AC-3"
+        },
+        {
+          "value": "pcm_s16le",
+          "label": "PCM 16-bit（無圧縮）"
+        },
+        {
+          "value": "pcm_s24le",
+          "label": "PCM 24-bit（無圧縮）"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <lht-help-select
       field-id="sampleRate"
@@ -139,12 +173,32 @@ limitations under the License.
       field-class="md-field-block"
       help-text="AAC を選ぶと 96 kHz までに制限されます。"
     >
-      <option value="auto" selected>WAVに合わせる（自動）</option>
-      <option value="44100">44.1 kHz</option>
-      <option value="48000">48 kHz</option>
-      <option value="96000">96 kHz</option>
-      <option value="192000">192 kHz</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "auto",
+          "label": "WAVに合わせる（自動）",
+          "selected": true
+        },
+        {
+          "value": "44100",
+          "label": "44.1 kHz"
+        },
+        {
+          "value": "48000",
+          "label": "48 kHz"
+        },
+        {
+          "value": "96000",
+          "label": "96 kHz"
+        },
+        {
+          "value": "192000",
+          "label": "192 kHz"
+        }
+      ]
+      </script>
+</lht-help-select>
     <p id="sampleRateNote" class="md-muted md-field-block"></p>
 
     <lht-help-select
@@ -153,10 +207,24 @@ limitations under the License.
       field-class="md-field-block"
       help-text="自動または固定チャンネル数を選択します。"
     >
-      <option value="auto" selected>WAVに合わせる（自動）</option>
-      <option value="1">モノラル（1ch）</option>
-      <option value="2">ステレオ（2ch）</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "auto",
+          "label": "WAVに合わせる（自動）",
+          "selected": true
+        },
+        {
+          "value": "1",
+          "label": "モノラル（1ch）"
+        },
+        {
+          "value": "2",
+          "label": "ステレオ（2ch）"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <lht-help-select
       field-id="audioBitrate"
@@ -164,10 +232,24 @@ limitations under the License.
       field-class="md-field-block"
       help-text="PCM を選ぶとビットレート指定は無視されます。"
     >
-      <option value="192k" selected>192 kbps（標準）</option>
-      <option value="256k">256 kbps</option>
-      <option value="320k">320 kbps</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "192k",
+          "label": "192 kbps（標準）",
+          "selected": true
+        },
+        {
+          "value": "256k",
+          "label": "256 kbps"
+        },
+        {
+          "value": "320k",
+          "label": "320 kbps"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <lht-help-text-field
       field-id="outputFile"
@@ -198,7 +280,7 @@ limitations under the License.
   </div>
 
     <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
-  <script src="../../lht-cmn/js/components.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
   <script src="src/ffmpeg-replace-audio-with-wav-gen/js/main.js"></script>
 
 </body>

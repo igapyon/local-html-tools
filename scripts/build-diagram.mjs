@@ -48,7 +48,7 @@ function buildTarget(target) {
   const sourceHtml = fs.readFileSync(srcHtmlPath, "utf8");
 
   const cssRefs = [...sourceHtml.matchAll(/<link\s+rel="stylesheet"\s+href="([^"]+)"\s*\/?\s*>/g)].map((m) => m[1]);
-  const jsRefs = [...sourceHtml.matchAll(/<script\s+src="([^"]+)"\s*><\/script>/g)].map((m) => m[1]);
+  const jsRefs = [...sourceHtml.matchAll(/<script\s+src="([^"]+)"[^>]*><\/script>/g)].map((m) => m[1]);
 
   assertExactOrder(`${target.id} css`, cssRefs, target.cssOrder);
   assertExactOrder(`${target.id} js`, jsRefs, target.jsOrder);
@@ -96,7 +96,7 @@ function stripConfiguredScriptTags(html, jsOrder) {
   let result = html;
   for (const relPath of jsOrder) {
     const escaped = escapeRegExp(relPath);
-    result = result.replace(new RegExp(`\\s*<script\\s+src="${escaped}"\\s*><\\/script>\\s*`, "g"), "\n");
+    result = result.replace(new RegExp(`\\s*<script\\s+src="${escaped}"[^>]*><\\/script>\\s*`, "g"), "\n");
   }
   return result;
 }

@@ -62,12 +62,32 @@ limitations under the License.
       help-text="m4a: 高圧縮で互換性が高い / mp3: 汎用的 / opus: 低ビットレートに強い / flac: 可逆圧縮 / wav: 無圧縮PCM"
       onchange="updateFormatOptions()"
     >
-      <option value="m4a" selected>m4a (AAC)</option>
-      <option value="mp3">mp3 (MP3)</option>
-      <option value="opus">opus (Opus)</option>
-      <option value="flac">flac (FLAC)</option>
-      <option value="wav">wav (PCM)</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "m4a",
+          "label": "m4a (AAC)",
+          "selected": true
+        },
+        {
+          "value": "mp3",
+          "label": "mp3 (MP3)"
+        },
+        {
+          "value": "opus",
+          "label": "opus (Opus)"
+        },
+        {
+          "value": "flac",
+          "label": "flac (FLAC)"
+        },
+        {
+          "value": "wav",
+          "label": "wav (PCM)"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <div id="bitrateBlock">
       <lht-help-select
@@ -76,12 +96,32 @@ limitations under the License.
         field-class="md-field-block"
         help-text="VBR OFF 時に使用します（自動も選択可能）"
       >
-        <option value="auto">元のまま（自動）</option>
-        <option value="128k">128 kbps</option>
-        <option value="192k" selected>192 kbps（デフォルト）</option>
-        <option value="256k">256 kbps</option>
-        <option value="320k">320 kbps</option>
-      </lht-help-select>
+        <script type="application/json" slot="options">
+        [
+          {
+            "value": "auto",
+            "label": "元のまま（自動）"
+          },
+          {
+            "value": "128k",
+            "label": "128 kbps"
+          },
+          {
+            "value": "192k",
+            "label": "192 kbps（デフォルト）",
+            "selected": true
+          },
+          {
+            "value": "256k",
+            "label": "256 kbps"
+          },
+          {
+            "value": "320k",
+            "label": "320 kbps"
+          }
+        ]
+        </script>
+</lht-help-select>
     </div>
 
     <div id="vbrBlock">
@@ -92,19 +132,44 @@ limitations under the License.
           help-text="ON/OFF を切り替えます。"
           onchange="updateVbrOptions()"
         >
-          <option value="off" selected>OFF</option>
-          <option value="on">ON</option>
-        </lht-help-select>
+          <script type="application/json" slot="options">
+          [
+            {
+              "value": "off",
+              "label": "OFF",
+              "selected": true
+            },
+            {
+              "value": "on",
+              "label": "ON"
+            }
+          ]
+          </script>
+</lht-help-select>
         <lht-help-select
           field-id="vbrQuality"
           label="VBR品質"
           help-text="高め: 音質優先 / 標準: バランス / 低め: 容量優先"
           disabled
         >
-          <option value="low">低め</option>
-          <option value="mid" selected>標準</option>
-          <option value="high">高め</option>
-        </lht-help-select>
+          <script type="application/json" slot="options">
+          [
+            {
+              "value": "low",
+              "label": "低め"
+            },
+            {
+              "value": "mid",
+              "label": "標準",
+              "selected": true
+            },
+            {
+              "value": "high",
+              "label": "高め"
+            }
+          ]
+          </script>
+</lht-help-select>
       </div>
     </div>
 
@@ -115,10 +180,24 @@ limitations under the License.
         field-class="md-field-block"
         help-text="数字が大きいほど圧縮が強くなります。"
       >
-        <option value="0">0 (高速)</option>
-        <option value="5" selected>5 (標準)</option>
-        <option value="8">8 (高圧縮)</option>
-      </lht-help-select>
+        <script type="application/json" slot="options">
+        [
+          {
+            "value": "0",
+            "label": "0 (高速)"
+          },
+          {
+            "value": "5",
+            "label": "5 (標準)",
+            "selected": true
+          },
+          {
+            "value": "8",
+            "label": "8 (高圧縮)"
+          }
+        ]
+        </script>
+</lht-help-select>
     </div>
 
     <lht-help-select
@@ -127,10 +206,24 @@ limitations under the License.
       field-class="md-field-block"
       help-text="元のまま / 44.1k / 48k から選択"
     >
-      <option value="keep" selected>元のまま</option>
-      <option value="44100">44.1kHz</option>
-      <option value="48000">48kHz</option>
-    </lht-help-select>
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "keep",
+          "label": "元のまま",
+          "selected": true
+        },
+        {
+          "value": "44100",
+          "label": "44.1kHz"
+        },
+        {
+          "value": "48000",
+          "label": "48kHz"
+        }
+      ]
+      </script>
+</lht-help-select>
 
     <div class="md-section">
       <div class="md-section-title">用途別プリセット:</div>
@@ -205,7 +298,7 @@ limitations under the License.
   </div>
 
     <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
-  <script src="../../lht-cmn/js/components.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
   <script src="src/ffmpeg-audio-convert-cmdline-gen/js/main.js"></script>
 
 </body>
