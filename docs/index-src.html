@@ -833,6 +833,10 @@
       border: 1px solid #ede7f3;
       box-shadow: 0 6px 20px rgba(41, 35, 58, 0.08);
     }
+    .md-app-heading {
+      display: grid;
+      gap: 0.35rem;
+    }
     .md-app-title {
       display: flex;
       align-items: center;
@@ -840,6 +844,14 @@
       font-size: var(--md-typography-headline-large);
       font-weight: 700;
       letter-spacing: -0.01em;
+    }
+    .md-app-supporting {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: #5f5b67;
+      font-size: 0.98rem;
+      line-height: 1.45;
     }
     .md-app-meta { font-size: 0.95rem; color: #6a6675; }
     .md-icon-inline { margin-right: 0.5rem; }
@@ -1042,29 +1054,25 @@
   <div class="md-container">
     <header class="md-app-bar">
       <div class="md-app-bar-inner">
-        <div class="md-app-title">
-          <span aria-hidden="true" class="md-icon-inline">🗂️</span>
-          <span>local-html-tools</span>
+        <div class="md-app-heading">
+          <div class="md-app-title">
+            <span aria-hidden="true" class="md-icon-inline">🗂️</span>
+            <span>local-html-tools</span>
+          </div>
+          <div class="md-app-supporting">
+            <span>ウェブブラウザで動くローカルHTMLツール集（Single-file Web App）です。</span>
+            <lht-help-tooltip label="このツール集について" wide>
+              各ツール（HTMLファイル）をウェブブラウザで開くと、専用の入力画面が表示されます。必要な情報を入力するだけで、用途に応じたテキストやコマンドを生成できます。<br><br>
+              主な特徴:<br>
+              ・ローカル動作（サーバ不要）<br>
+              ・単一HTML配布（必要な資産を内包）<br>
+              ・入力から生成までを短手順で実行
+            </lht-help-tooltip>
+          </div>
         </div>
-        <div class="md-app-meta">更新日: 2026-02-12</div>
+        <div class="md-app-meta">更新日: {{BUILD_DATE}}</div>
       </div>
     </header>
-
-    <div class="md-info-card md-card">
-        <p class="md-info-row">
-          <span>ウェブブラウザで動くローカルHTMLツール集（Static Web App）です。</span>
-          <span class="md-tooltip-group">
-            <button type="button" class="md-info-chip" aria-label="このツール集について">?</button>
-            <span class="md-tooltip-content md-tooltip md-tooltip--rich md-tooltip--wide">
-              各ツール（HTMLファイル）をウェブブラウザで開くと、専用の入力画面が表示されます。そこにファイル名などの必要な情報を入力するだけで、FFmpegで使えるコマンドラインのテキストが自動的に作成されます。
-              主な特徴:
-              ・ローカル動作: お使いのPC内で動作し、サーバは不要です。
-              ・簡単な操作: ウェブブラウザでファイルを開き、情報を入力するだけでコマンドが手に入ります。
-              ・効率化: （FFmpeg系の場合）複雑なコマンドの構文を覚える必要がなく、手入力によるミスを防ぎます。
-            </span>
-          </span>
-        </p>
-    </div>
 
     <div class="md-section-wrap">
 
