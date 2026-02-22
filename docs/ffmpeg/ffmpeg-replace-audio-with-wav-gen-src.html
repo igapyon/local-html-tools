@@ -45,23 +45,23 @@ limitations under the License.
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🔁</span>FFmpeg 音声差し替え（WAV）コマンドジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="videoFile"
       label="元の動画ファイル"
       required
       placeholder="例: input.mp4 / input.mkv / input.mov"
       field-class="md-field-block"
       help-text="例: input.mp4"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="audioFile"
       label="差し替える音声ファイル"
       required
       placeholder="例: new_audio.wav"
       field-class="md-field-block"
       help-text="例: new_audio.wav"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <h2 class="md-section-title md-section-title--lg">1. WAV 解析（ffprobe）</h2>
     <button onclick="generateProbeCommand()" class="md-button md-button--primary md-field-block">
@@ -71,7 +71,7 @@ limitations under the License.
       <lht-command-block command-id="probeCmd"></lht-command-block>
     </div>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="probeOutput"
       type="textarea"
       rows="6"
@@ -79,7 +79,7 @@ limitations under the License.
       placeholder="ffprobe の出力を貼り付けてください"
       field-class="md-field-block"
       help-text="解析用 ffprobe コマンドの出力を貼り付けます。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
     <button onclick="applyProbeResult()" class="md-button md-button--tonal md-field-block">
       解析結果を反映
     </button>
@@ -103,7 +103,7 @@ limitations under the License.
       </span>
     </div>
 
-    <lht-help-select
+    <lht-select-help
       field-id="container"
       label="出力コンテナ"
       field-class="md-field-block"
@@ -127,13 +127,13 @@ limitations under the License.
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
     <lht-switch-help class="md-field-block" switch-id="regenPts" label="PTS再生成" checked help-wide>
       YouTubeでの音ズレ対策に有効な場合があります。
     </lht-switch-help>
 
-    <lht-help-select
+    <lht-select-help
       field-id="audioCodec"
       label="音声エンコード"
       field-class="md-field-block"
@@ -165,9 +165,9 @@ limitations under the License.
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
-    <lht-help-select
+    <lht-select-help
       field-id="sampleRate"
       label="サンプルレート"
       field-class="md-field-block"
@@ -198,10 +198,10 @@ limitations under the License.
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
     <p id="sampleRateNote" class="md-muted md-field-block"></p>
 
-    <lht-help-select
+    <lht-select-help
       field-id="channels"
       label="チャンネル数"
       field-class="md-field-block"
@@ -224,9 +224,9 @@ limitations under the License.
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
-    <lht-help-select
+    <lht-select-help
       field-id="audioBitrate"
       label="音声ビットレート"
       field-class="md-field-block"
@@ -249,24 +249,24 @@ limitations under the License.
         }
       ]
       </script>
-</lht-help-select>
+</lht-select-help>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="outputFile"
       label="出力ファイル名"
       placeholder="例: output.mp4"
       field-class="md-field-block"
       help-text="任意。空欄なら自動生成します。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="audioOffsetMs"
       type="number"
       label="音声タイミング調整（ms）"
       placeholder="例: 120（+で遅らせる / -で先行）"
       field-class="md-field-block"
       help-text="正の値は音声を遅らせます。負の値は音声を前に出します。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <button onclick="generateReplaceAudioCmd()" class="md-button md-button--primary md-field-block">
       ffmpeg コマンド生成

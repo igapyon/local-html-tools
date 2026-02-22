@@ -45,32 +45,32 @@ limitations under the License.
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">✂️</span>FFmpeg 切り出しコマンドジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="filename"
       label="入力ファイル名"
       required
       placeholder="例: 250503_130527_TrMic.wav / sample.mp4"
       field-class="md-field-block"
       help-text="例: 250503_130527_TrMic.wav / sample.mp4"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="start"
       label="開始時刻（任意）"
       placeholder="例: 3:10 または 190 または 1:15:30"
       field-class="md-field-block"
       help-text="開始位置。時:分:秒 または 秒指定に対応。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="end"
       label="終了時刻（任意）"
       placeholder="例: 12:45 または 765 または 0:12:45"
       field-class="md-field-block"
       help-text="終了位置。未指定なら末尾まで。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="partNumber"
       type="number"
       min="1"
@@ -78,7 +78,7 @@ limitations under the License.
       placeholder="例: 1"
       field-class="md-field-block"
       help-text="出力ファイル名の連番に利用します。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <button onclick="generateClipCommand()" class="md-button md-button--primary md-field-block">
       切り出しコマンド生成

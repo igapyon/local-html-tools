@@ -19,13 +19,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1206,16 +1206,16 @@ lht-switch-help .md-switch-label .md-tooltip-content {
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🔇</span>FFmpeg 無音区間検出コマンドジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="audioFile"
       label="音声ファイル名"
       required
       placeholder="例: input.wav"
       field-class="md-field-block"
       help-text="例: input.wav / input.flac / input.mp3"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="noiseDb"
       type="number"
       step="1"
@@ -1223,9 +1223,9 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       label="無音判定しきい値 (dB)"
       field-class="md-field-block"
       help-text="この値より小さい音を無音として扱います。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="minDuration"
       type="number"
       step="0.1"
@@ -1233,7 +1233,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       label="無音とみなす最小時間 (秒)"
       field-class="md-field-block"
       help-text="0.5 は「0.5秒以上続いたら無音」と判定します。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
     <p class="md-muted md-field-block">例: 0.5 は「0.5秒以上続いたら無音」とみなします。</p>
 
     <button onclick="generateSilenceCmd()" class="md-button md-button--primary md-field-block">
@@ -2094,11 +2094,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

@@ -35,14 +35,14 @@ Licensed under the Apache License, Version 2.0
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true">🔊</span>FFmpeg Loudnorm スクリプトジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="filename"
       label="音声ファイル名"
       required
       placeholder="例: 250503_130527_TrMic.WAV"
       field-class="md-field-block"
       help-text="例: 250503_130527_TrMic.WAV"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <div class="md-section">
       <lht-switch-help switch-id="hires" label="ハイレゾ（192kHz / 24bit）"></lht-switch-help>
@@ -196,7 +196,7 @@ Licensed under the Apache License, Version 2.0
     <div class="md-tab-panel" data-tab="tab-gain" id="tab-gain" hidden>
       <h2 class="md-section-title md-section-title--lg">1. 単純ゲイン</h2>
       <p class="md-muted">測定結果の input_tp を基準に、ピークが目標TPに到達する分だけゲインします。</p>
-      <lht-help-text-field
+      <lht-text-field-help
         field-id="gainTargetTp"
         type="number"
         step="0.1"
@@ -204,7 +204,7 @@ Licensed under the Apache License, Version 2.0
         label="目標TP (dBTP)"
         field-class="md-field-block"
         help-text="最終ピークの目標値です。一般的には -1.0 dBTP 前後を使用します。"
-      ></lht-help-text-field>
+      ></lht-text-field-help>
       <lht-switch-help switch-id="gainUseCompressor" label="軽いコンプを追加（自然にピークを抑える）"></lht-switch-help>
     </div>
 
@@ -217,7 +217,7 @@ Licensed under the Apache License, Version 2.0
 
     <!-- 3. 仕上げフェーズ -->
     <h2 class="md-section-title md-section-title--lg">3. 仕上げフェーズ</h2>
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="jsonInput"
       type="textarea"
       rows="10"
@@ -225,7 +225,7 @@ Licensed under the Apache License, Version 2.0
       placeholder="ffmpeg の出力全文を貼り付けてください"
       field-class="md-field-block"
       help-text="測定フェーズの ffmpeg 出力（JSONを含む全文）を貼り付けます。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <div class="md-tab-panel" data-tab="tab-icu" id="finish-normalize">
       <button onclick="generateNormalizeCmd()" class="md-button md-button--primary md-field-block">正規化コマンド生成</button>

@@ -1037,13 +1037,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1333,7 +1333,7 @@ lht-index-card-link {
 
     <div class="md-grid md-grid-2 md-section">
       <div>
-        <lht-help-select field-id="preset" label="プリセット" help-text="用途に応じた推奨値を選択します。" value="illustration">
+        <lht-select-help field-id="preset" label="プリセット" help-text="用途に応じた推奨値を選択します。" value="illustration">
           <script type="application/json" slot="options">
             [
               { "value": "icon", "label": "アイコン・ロゴ（軽量・鋭利）" },
@@ -1342,28 +1342,28 @@ lht-index-card-link {
               { "value": "pixelart", "label": "ドット絵（ピクセル完全再現）" }
             ]
           </script>
-        </lht-help-select>
+        </lht-select-help>
       </div>
 
       <div>
-        <lht-help-text-field field-id="colors" type="number" min="2" max="64" value="12" label="色数" help-text="使用する色の数（2〜64）。多いほど詳細ですが重くなります。"></lht-help-text-field>
+        <lht-text-field-help field-id="colors" type="number" min="2" max="64" value="12" label="色数" help-text="使用する色の数（2〜64）。多いほど詳細ですが重くなります。"></lht-text-field-help>
       </div>
 
       <div>
-        <lht-help-text-field field-id="ltres" type="number" min="0" max="10" step="0.1" value="1.0" label="輪郭の精度 (ltres)" help-text="低いほど元の形に忠実、高いほどノイズを無視します。"></lht-help-text-field>
+        <lht-text-field-help field-id="ltres" type="number" min="0" max="10" step="0.1" value="1.0" label="輪郭の精度 (ltres)" help-text="低いほど元の形に忠実、高いほどノイズを無視します。"></lht-text-field-help>
       </div>
 
       <div>
-        <lht-help-text-field field-id="qtres" type="number" min="0.1" max="10" step="0.1" value="0.1" label="曲線の精度 (qtres)" help-text="低いほど滑らかな曲線、高いほど直線的な描画になります。"></lht-help-text-field>
+        <lht-text-field-help field-id="qtres" type="number" min="0.1" max="10" step="0.1" value="0.1" label="曲線の精度 (qtres)" help-text="低いほど滑らかな曲線、高いほど直線的な描画になります。"></lht-text-field-help>
       </div>
     </div>
 
     <div class="md-grid md-grid-2 md-section">
       <div>
-        <lht-help-text-field field-id="scalePercent" type="number" min="10" max="100" value="100" label="縮小率（前処理）" help-text="小さくしてからトレースすることで、パスの数を減らします（10〜100%）。"></lht-help-text-field>
+        <lht-text-field-help field-id="scalePercent" type="number" min="10" max="100" value="100" label="縮小率（前処理）" help-text="小さくしてからトレースすることで、パスの数を減らします（10〜100%）。"></lht-text-field-help>
       </div>
       <div>
-        <lht-help-text-field field-id="blurPx" type="number" min="0" max="5" step="0.5" value="0" label="ぼかし（前処理）" help-text="0以上の値で細かいノイズをならします（0〜5px）。"></lht-help-text-field>
+        <lht-text-field-help field-id="blurPx" type="number" min="0" max="5" step="0.5" value="0" label="ぼかし（前処理）" help-text="0以上の値で細かいノイズをならします（0〜5px）。"></lht-text-field-help>
       </div>
     </div>
 
@@ -2619,8 +2619,8 @@ if(typeof define === 'function' && define.amd){
     window.addEventListener("DOMContentLoaded", async () => {
       if (window.customElements && typeof window.customElements.whenDefined === "function") {
         await Promise.all([
-          window.customElements.whenDefined("lht-help-text-field"),
-          window.customElements.whenDefined("lht-help-select"),
+          window.customElements.whenDefined("lht-text-field-help"),
+          window.customElements.whenDefined("lht-select-help"),
           window.customElements.whenDefined("lht-file-select")
         ]);
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -3837,11 +3837,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-file-select")) {
   customElements.define("lht-file-select", LhtFileSelect);

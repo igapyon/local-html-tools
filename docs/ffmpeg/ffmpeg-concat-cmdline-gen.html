@@ -29,13 +29,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1212,7 +1212,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🧩</span>FFmpeg ファイル結合コマンドジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="fileList"
       label="結合する .wav ファイル"
       type="textarea"
@@ -1221,7 +1221,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       placeholder="例:\nfile1.wav\nfile2.wav"
       field-class="md-field-block"
       help-text="例: file1.wav / file2.wav（1行に1ファイル）"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <button onclick="generateConcatCmd()" class="md-button md-button--primary md-field-block">
       filelist.txt + 結合コマンド生成
@@ -2081,11 +2081,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

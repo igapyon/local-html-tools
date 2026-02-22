@@ -27,7 +27,7 @@ class LhtHelpTooltip extends HTMLElement {
   }
 }
 
-class LhtHelpTextField extends HTMLElement {
+class LhtTextFieldHelp extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
     this.dataset.initialized = "true";
@@ -92,7 +92,7 @@ class LhtHelpTextField extends HTMLElement {
   }
 }
 
-class LhtHelpSelect extends HTMLElement {
+class LhtSelectHelp extends HTMLElement {
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
     this.dataset.initialized = "true";
@@ -587,11 +587,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtTextFieldHelp);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtSelectHelp);
 }
 if (!customElements.get("lht-file-select")) {
   customElements.define("lht-file-select", LhtFileSelect);

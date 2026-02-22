@@ -56,7 +56,7 @@ limitations under the License.
         </div>
 
         <div class="md-field-block">
-          <lht-help-text-field
+          <lht-text-field-help
             field-id="dotInput"
             label="ソース"
             type="textarea"
@@ -68,11 +68,11 @@ limitations under the License.
   Start -> Parse -> Render -> Save;
   Parse -> Error [style=dashed];
 }"
-          ></lht-help-text-field>
+          ></lht-text-field-help>
         </div>
 
         <div class="md-row">
-          <lht-help-select
+          <lht-select-help
             field-id="engineSelect"
             label="エンジン"
             help-text="レイアウトアルゴリズムを選択します。一般的な有向グラフは dot が扱いやすいです。"
@@ -105,7 +105,7 @@ limitations under the License.
                 }
               ]
               </script>
-</lht-help-select>
+</lht-select-help>
           <button id="renderBtn" class="md-button md-button--primary" type="button">レンダリング</button>
           <button id="downloadSvgBtn" class="md-button md-button--secondary" type="button" disabled>SVG保存</button>
         </div>

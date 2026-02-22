@@ -1032,13 +1032,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1217,7 +1217,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
 
     <h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🔤</span>URL エンコード/デコード ツール</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       class="md-field-block"
       field-id="inputText"
       type="textarea"
@@ -1226,7 +1226,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       placeholder="例: こんにちは / %E3%81%93%E3%82%93%E3%81%AB%E3%81%A1%E3%81%AF"
       help-text="日本語をURLエンコード/デコードします。"
       required
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <div class="md-field-block" style="display:flex; flex-wrap:wrap; gap: 0.5rem;">
       <button onclick="encodeText()" class="md-button md-button--primary">
@@ -2126,11 +2126,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

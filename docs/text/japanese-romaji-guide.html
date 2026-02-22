@@ -643,13 +643,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -823,17 +823,17 @@ lht-switch-help .md-switch-label .md-tooltip-content {
         </p>
 
         <section class="md-section">
-          <lht-help-text-field
+          <lht-text-field-help
             field-id="sourceText"
             type="textarea"
             rows="3"
             label="かな入力（ひらがな / カタカナ）"
             placeholder="さとう たろう&#10;しんじゅく&#10;ちゃづけ"
             help-text="ひらがな・カタカナの入力を比較ローマ字へ変換します。"
-          ></lht-help-text-field>
+          ></lht-text-field-help>
           <div class="md-control-flow">
             <div class="md-control-flow-item">
-              <lht-help-select
+              <lht-select-help
                 field-id="useCaseSelect"
                 label="用途"
                 help-text="氏名・地名・学校学習・方式比較の用途に応じて推奨モードを切り替えます。"
@@ -846,10 +846,10 @@ lht-switch-help .md-switch-label .md-tooltip-content {
                     { "value": "linguistics_compare", "label": "方式比較（理論検討）" }
                   ]
                 </script>
-              </lht-help-select>
+              </lht-select-help>
             </div>
             <div class="md-control-flow-item">
-              <lht-help-select
+              <lht-select-help
                 field-id="optPassportLongVowelStyle"
                 label="長音"
                 help-text="旅券ローマ字の長音運用を切り替えます（簡略/保持/OH）。"
@@ -861,7 +861,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
                     { "value": "oh", "label": "OH表記（SATOU → SATOH）" }
                   ]
                 </script>
-              </lht-help-select>
+              </lht-select-help>
             </div>
             <div class="md-control-flow-item">
               <lht-switch-help switch-id="optUppercase" label="大文字出力" checked></lht-switch-help>
@@ -995,8 +995,8 @@ lht-switch-help .md-switch-label .md-tooltip-content {
     window.addEventListener("DOMContentLoaded", async function () {
       if (window.customElements && typeof window.customElements.whenDefined === "function") {
         await Promise.all([
-          window.customElements.whenDefined("lht-help-text-field"),
-          window.customElements.whenDefined("lht-help-select"),
+          window.customElements.whenDefined("lht-text-field-help"),
+          window.customElements.whenDefined("lht-select-help"),
           window.customElements.whenDefined("lht-switch-help")
         ]);
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -2170,11 +2170,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

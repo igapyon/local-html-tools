@@ -19,13 +19,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -673,7 +673,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
     }
 
     /* Keep floating labels from visually overlapping explanatory text blocks. */
-    .md-tab-panel .md-muted + lht-help-text-field {
+    .md-tab-panel .md-muted + lht-text-field-help {
       margin-top: 0.85rem;
     }
     
@@ -1299,14 +1299,14 @@ lht-switch-help .md-switch-label .md-tooltip-content {
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
 <h1 class="md-headline"><span aria-hidden="true">🔊</span>FFmpeg Loudnorm スクリプトジェネレータ</h1>
 
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="filename"
       label="音声ファイル名"
       required
       placeholder="例: 250503_130527_TrMic.WAV"
       field-class="md-field-block"
       help-text="例: 250503_130527_TrMic.WAV"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <div class="md-section">
       <lht-switch-help switch-id="hires" label="ハイレゾ（192kHz / 24bit）"></lht-switch-help>
@@ -1460,7 +1460,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
     <div class="md-tab-panel" data-tab="tab-gain" id="tab-gain" hidden>
       <h2 class="md-section-title md-section-title--lg">1. 単純ゲイン</h2>
       <p class="md-muted">測定結果の input_tp を基準に、ピークが目標TPに到達する分だけゲインします。</p>
-      <lht-help-text-field
+      <lht-text-field-help
         field-id="gainTargetTp"
         type="number"
         step="0.1"
@@ -1468,7 +1468,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
         label="目標TP (dBTP)"
         field-class="md-field-block"
         help-text="最終ピークの目標値です。一般的には -1.0 dBTP 前後を使用します。"
-      ></lht-help-text-field>
+      ></lht-text-field-help>
       <lht-switch-help switch-id="gainUseCompressor" label="軽いコンプを追加（自然にピークを抑える）"></lht-switch-help>
     </div>
 
@@ -1481,7 +1481,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
 
     <!-- 3. 仕上げフェーズ -->
     <h2 class="md-section-title md-section-title--lg">3. 仕上げフェーズ</h2>
-    <lht-help-text-field
+    <lht-text-field-help
       field-id="jsonInput"
       type="textarea"
       rows="10"
@@ -1489,7 +1489,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
       placeholder="ffmpeg の出力全文を貼り付けてください"
       field-class="md-field-block"
       help-text="測定フェーズの ffmpeg 出力（JSONを含む全文）を貼り付けます。"
-    ></lht-help-text-field>
+    ></lht-text-field-help>
 
     <div class="md-tab-panel" data-tab="tab-icu" id="finish-normalize">
       <button onclick="generateNormalizeCmd()" class="md-button md-button--primary md-field-block">正規化コマンド生成</button>
@@ -2352,11 +2352,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

@@ -33,13 +33,13 @@ lht-command-block {
   display: block;
 }
 
-lht-help-text-field {
+lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-lht-help-select {
+lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
@@ -1271,7 +1271,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
 
     <div class="md-section md-stack-md">
       <div class="md-form-row md-form-row--nowrap">
-        <lht-help-text-field field-id="basePath" label="検索開始パス" required placeholder="例: . / ~/projects" value="."></lht-help-text-field>
+        <lht-text-field-help field-id="basePath" label="検索開始パス" required placeholder="例: . / ~/projects" value="."></lht-text-field-help>
       </div>
       <div class="md-form-row md-form-row--nowrap">
         <md-outlined-select id="targetType" label="対象の種類" class="md-outlined-field" value="file">
@@ -1284,11 +1284,11 @@ lht-switch-help .md-switch-label .md-tooltip-content {
 
     <div class="md-section md-stack-md">
       <div class="md-form-row md-form-row--nowrap">
-        <lht-help-text-field field-id="extension" label="拡張子" placeholder="例: txt / wav / jpg / java"></lht-help-text-field>
+        <lht-text-field-help field-id="extension" label="拡張子" placeholder="例: txt / wav / jpg / java"></lht-text-field-help>
       </div>
       <div class="md-field">
         <div class="md-form-row md-form-row--nowrap">
-          <lht-help-text-field field-id="namePattern" label="名前パターン（ワイルドカード可）" placeholder="例: report / *.log / data??.csv"></lht-help-text-field>
+          <lht-text-field-help field-id="namePattern" label="名前パターン（ワイルドカード可）" placeholder="例: report / *.log / data??.csv"></lht-text-field-help>
         </div>
         <lht-switch-help switch-id="caseInsensitive" label="大文字・小文字を区別しない (-iname)"></lht-switch-help>
       </div>
@@ -1303,7 +1303,7 @@ lht-switch-help .md-switch-label .md-tooltip-content {
             <md-select-option value="min" selected><div slot="headline">以上 (&gt;=)</div></md-select-option>
             <md-select-option value="max"><div slot="headline">以下 (&lt;=)</div></md-select-option>
           </md-outlined-select>
-          <lht-help-text-field field-id="sizeValue" type="number" label="サイズ" placeholder="例: 10"></lht-help-text-field>
+          <lht-text-field-help field-id="sizeValue" type="number" label="サイズ" placeholder="例: 10"></lht-text-field-help>
           <md-outlined-select id="sizeUnit" label="単位" class="md-outlined-field" value="M">
             <md-select-option value="K"><div slot="headline">KB</div></md-select-option>
             <md-select-option value="M" selected><div slot="headline">MB</div></md-select-option>
@@ -1317,21 +1317,21 @@ lht-switch-help .md-switch-label .md-tooltip-content {
             <md-select-option value="within" selected><div slot="headline">直近N日以内</div></md-select-option>
             <md-select-option value="older"><div slot="headline">N日より前</div></md-select-option>
           </md-outlined-select>
-          <lht-help-text-field field-id="mtimeValue" type="number" label="日数" placeholder="例: 7"></lht-help-text-field>
+          <lht-text-field-help field-id="mtimeValue" type="number" label="日数" placeholder="例: 7"></lht-text-field-help>
           <div class="md-label md-label--muted">日</div>
         </div>
 
         <label class="md-label">深さ条件:</label>
         <div class="md-grid md-grid-2">
-          <lht-help-text-field field-id="minDepth" type="number" label="最小深さ" placeholder="mindepth"></lht-help-text-field>
-          <lht-help-text-field field-id="maxDepth" type="number" label="最大深さ" placeholder="maxdepth"></lht-help-text-field>
+          <lht-text-field-help field-id="minDepth" type="number" label="最小深さ" placeholder="mindepth"></lht-text-field-help>
+          <lht-text-field-help field-id="maxDepth" type="number" label="最大深さ" placeholder="maxdepth"></lht-text-field-help>
         </div>
       </div>
     </details>
 
     <div class="md-section md-stack-sm">
       <div class="md-form-row md-form-row--nowrap">
-        <lht-help-text-field field-id="contentPattern" label="内容検索" placeholder="例: ERROR / TODO / 404"></lht-help-text-field>
+        <lht-text-field-help field-id="contentPattern" label="内容検索" placeholder="例: ERROR / TODO / 404"></lht-text-field-help>
       </div>
       <lht-switch-help switch-id="useRipgrep" label="rg で検索（未チェックなら grep -E を使用）" checked></lht-switch-help>
     </div>
@@ -2191,11 +2191,11 @@ class LhtPageMenu extends HTMLElement {
 if (!customElements.get("lht-help-tooltip")) {
   customElements.define("lht-help-tooltip", LhtHelpTooltip);
 }
-if (!customElements.get("lht-help-text-field")) {
-  customElements.define("lht-help-text-field", LhtHelpTextField);
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtHelpTextField);
 }
-if (!customElements.get("lht-help-select")) {
-  customElements.define("lht-help-select", LhtHelpSelect);
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtHelpSelect);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

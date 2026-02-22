@@ -1138,7 +1138,7 @@ limitations under the License.
         </span>
 </span>
 </h1>
-<lht-help-text-field
+<lht-text-field-help
   field-id="inputText"
   label="入力テキスト"
   type="textarea"
@@ -1146,7 +1146,7 @@ limitations under the License.
   field-class="md-input-block"
   placeholder="加工したいテキストを入力してください"
   help-text="ここに入力したテキストが変換対象になります。"
-></lht-help-text-field>
+></lht-text-field-help>
 <div class="md-section">
 <div class="md-section-title md-section-title-row">
 <div>
@@ -1164,7 +1164,7 @@ limitations under the License.
 <details class="md-accordion">
 <summary>文字の変換</summary>
 <div class="md-subpanel" id="charConvertPanel">
-<lht-help-select
+<lht-select-help
   field-id="optWidth"
   label="全角/半角"
   help-text="全角と半角の相互変換を指定します。"
@@ -1176,13 +1176,13 @@ limitations under the License.
   { "value": "toFull", "label": "全角に変換" }
 ]
 </script>
-</lht-help-select>
+</lht-select-help>
 <lht-switch-help
   switch-id="optIncludeKana"
   label="仮名を含める"
   help-label="仮名変換の説明"
 >全角/半角変換時に、かな文字も対象へ含めます。</lht-switch-help>
-<lht-help-select
+<lht-select-help
   field-id="optKana"
   label="ひらがな/カタカナ"
   help-text="ひらがなとカタカナの変換方向を指定します。"
@@ -1194,8 +1194,8 @@ limitations under the License.
   { "value": "toHira", "label": "カタカナ → ひらがな" }
 ]
 </script>
-</lht-help-select>
-<lht-help-select
+</lht-select-help>
+<lht-select-help
   field-id="optCase"
   label="大文字/小文字（英字）"
   help-text="英字の大文字化または小文字化を指定します。"
@@ -1207,7 +1207,7 @@ limitations under the License.
   { "value": "lower", "label": "小文字に変換" }
 ]
 </script>
-</lht-help-select>
+</lht-select-help>
 </div>
 </details>
 <details class="md-accordion">
@@ -1976,8 +1976,8 @@ limitations under the License.
     async function initTextProcessingPage() {
       if (window.customElements && typeof window.customElements.whenDefined === 'function') {
         await Promise.all([
-          window.customElements.whenDefined('lht-help-text-field'),
-          window.customElements.whenDefined('lht-help-select'),
+          window.customElements.whenDefined('lht-text-field-help'),
+          window.customElements.whenDefined('lht-select-help'),
           window.customElements.whenDefined('lht-switch-help')
         ]);
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
