@@ -917,12 +917,24 @@
         if (!field) return;
         const helpText = (field.getAttribute("data-help-text") || "").trim();
         if (!helpText) return;
+        let blurHideTimer = null;
 
         const show = () => {
+          if (blurHideTimer) {
+            clearTimeout(blurHideTimer);
+            blurHideTimer = null;
+          }
           field.supportingText = helpText;
         };
         const hide = () => {
-          field.supportingText = "";
+          if (blurHideTimer) {
+            clearTimeout(blurHideTimer);
+          }
+          // blur の即時反映でクリックが取りこぼされるケースを避けるため、非表示は少し遅延させる。
+          blurHideTimer = setTimeout(() => {
+            field.supportingText = "";
+            blurHideTimer = null;
+          }, 120);
         };
 
         field.addEventListener("focus", show);

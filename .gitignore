@@ -7,6 +7,7 @@
 *.mkv
 *.json
 node_modules
+dist
 filelist.txt
 !package.json
 !tsconfig.music.json
