@@ -18,6 +18,14 @@ function escapeScriptForInlineHtml(scriptText) {
   return scriptText.replace(/<\/script/gi, "<\\/script");
 }
 
+function injectBeforeLastClosingTag(html, tagName, injectText) {
+  const closeTag = `</${tagName.toLowerCase()}>`;
+  const lowerHtml = html.toLowerCase();
+  const idx = lowerHtml.lastIndexOf(closeTag);
+  if (idx < 0) return html;
+  return html.slice(0, idx) + injectText + html.slice(idx);
+}
+
 export function buildSingleHtmlFromSource(sourceHtml, srcHtmlPath) {
   const srcDir = path.dirname(srcHtmlPath);
 
@@ -45,13 +53,21 @@ export function buildSingleHtmlFromSource(sourceHtml, srcHtmlPath) {
     return "";
   });
 
+  // Inline scripts written directly in -src HTML can also contain literal
+  // "</script>" inside JS strings (e.g. HTML template builders), which breaks
+  // the final single-file HTML parser. Escape those safely.
+  output = output.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi, (full, attrs, body) => {
+    if (/\bsrc\s*=/.test(attrs)) return full;
+    return `<script${attrs}>${escapeScriptForInlineHtml(body)}</script>`;
+  });
+
   if (cssBlocks.length > 0) {
-    output = output.replace(/<\/head>/i, () => `  <style>\n${cssBlocks.join("\n\n")}\n  </style>\n</head>`);
+    output = injectBeforeLastClosingTag(output, "head", `  <style>\n${cssBlocks.join("\n\n")}\n  </style>\n`);
   }
 
   if (jsBlocks.length > 0) {
     const scriptTags = jsBlocks.map((text) => `  <script>\n${text}\n  </script>`).join("\n\n");
-    output = output.replace(/<\/body>/i, () => `${scriptTags}\n</body>`);
+    output = injectBeforeLastClosingTag(output, "body", `${scriptTags}\n`);
   }
 
   return output;

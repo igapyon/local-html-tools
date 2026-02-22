@@ -2355,6 +2355,15 @@ if(typeof define === 'function' && define.amd){
   </script>
 
   <script>
+    window.addEventListener("DOMContentLoaded", async () => {
+      if (window.customElements && typeof window.customElements.whenDefined === "function") {
+        await Promise.all([
+          window.customElements.whenDefined("lht-help-text-field"),
+          window.customElements.whenDefined("lht-help-select")
+        ]);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+
     const fileInput = document.getElementById("file");
     const convertBtn = document.getElementById("convert");
     const downloadBtn = document.getElementById("download");
@@ -2366,6 +2375,12 @@ if(typeof define === 'function' && define.amd){
     const presetSelect = document.getElementById("preset");
     const scaleInput = document.getElementById("scalePercent");
     const blurInput = document.getElementById("blurPx");
+
+    if (!fileInput || !convertBtn || !downloadBtn || !preview || !loading ||
+        !colorsInput || !ltresInput || !qtresInput || !presetSelect || !scaleInput || !blurInput) {
+      console.error("[img2svg] required elements are missing.");
+      return;
+    }
 
     let selectedFile = null;
     let lastSvgText = "";
@@ -2546,6 +2561,7 @@ if(typeof define === 'function' && define.amd){
 
       return new XMLSerializer().serializeToString(svg);
     }
+    });
   </script>
 </body>
 </html>
