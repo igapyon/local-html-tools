@@ -43,7 +43,7 @@
 - `docs/text/*.html` は `*-src.html` を編集し、ビルドで `*.html` を生成する運用を採用
 - `docs/img/*.html` は `*-src.html` を編集し、ビルドで `*.html` を生成する運用を採用
 - `docs/index.html` も `docs/index-src.html` から生成する運用を採用
-- ビルド基盤は段階的に Vite ベースへ移行中（まず `docs/git/` から着手）。ただし配布形態は引き続き単一HTMLを維持する
+- ビルド基盤は `scripts/build-*.mjs` ベースで運用し、配布形態は引き続き単一HTMLを維持する
 - `lht-cmn/` はリポジトリ直下を正本として扱う（`docs/` 配下へ複製しない）
 - `scripts/lib/single-html.mjs` で `*-src.html` のローカル `link/script src` をインライン化し、配布用 `*.html` は外部依存なしの単一HTMLとして生成する
 - Material Web を採用する場合でも、画面で `md-*` を直接ばらで使うより、原則 `lht-cmn` に `lht-*` として抽象化してから適用する

@@ -180,6 +180,14 @@ limitations under the License.
             ローカルの複数のコミットを1つにまとめます。
             reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
           </lht-help-tooltip>
+          <button type="button" class="md-button md-button--surface md-button--compact md-title-action-btn" onclick="normalizeCommitMessageForPr()" title="コミットメッセージをPRテキスト向けに整形" aria-label="コミットメッセージをPRテキスト向けに整形">PR整形</button>
+          <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface md-title-action-icon" onclick="openNormalizeDiffDialog()" title="整形差分を表示" aria-label="整形差分を表示">
+            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 10v6"></path>
+              <circle cx="12" cy="7.5" r="0.9" fill="currentColor" stroke="none"></circle>
+            </svg>
+          </button>
         </span>
       </div>
       <div class="md-form-row">
@@ -269,6 +277,28 @@ limitations under the License.
     <div id="toast" class="md-snackbar-host md-snackbar md-hidden">
       コピーしました
     </div>
+
+    <dialog id="normalizeDiffDialog" class="md-diff-dialog">
+      <div class="md-diff-dialog__head">
+        <h3 class="md-diff-dialog__title">PR整形の差分</h3>
+        <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="closeNormalizeDiffDialog()" title="閉じる" aria-label="閉じる">
+          <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 6l12 12"></path>
+            <path d="M18 6l-12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="md-diff-dialog__content">
+        <div class="md-diff-block">
+          <div class="md-diff-block__label">Before</div>
+          <pre id="normalizeDiffBefore" class="md-diff-block__text"></pre>
+        </div>
+        <div class="md-diff-block">
+          <div class="md-diff-block__label">After</div>
+          <pre id="normalizeDiffAfter" class="md-diff-block__text"></pre>
+        </div>
+      </div>
+    </dialog>
   </div>
 
   <script src="src/git-pseudo-squash/js/main.js"></script>
