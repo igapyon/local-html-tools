@@ -278,4 +278,3 @@ const MusicXmlWriterCommon = (() => {
 if (typeof window !== "undefined") {
   window["MusicXmlWriterCommon"] = MusicXmlWriterCommon;
 }
-  </script>

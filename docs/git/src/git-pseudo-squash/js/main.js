@@ -379,6 +379,204 @@
       }, 2000);
     }
 
+    function summarizeTextDiffForToast(beforeText, afterText) {
+      const before = String(beforeText || "");
+      const after = String(afterText || "");
+      if (before === after) {
+        return "変更なし";
+      }
+
+      let start = 0;
+      const minLen = Math.min(before.length, after.length);
+      while (start < minLen && before[start] === after[start]) {
+        start += 1;
+      }
+
+      let endBefore = before.length - 1;
+      let endAfter = after.length - 1;
+      while (endBefore >= start && endAfter >= start && before[endBefore] === after[endAfter]) {
+        endBefore -= 1;
+        endAfter -= 1;
+      }
+
+      const changedBefore = before.slice(start, endBefore + 1).replace(/\s+/g, " ").trim();
+      const changedAfter = after.slice(start, endAfter + 1).replace(/\s+/g, " ").trim();
+      const compactBefore = changedBefore.length > 16 ? `${changedBefore.slice(0, 16)}...` : changedBefore;
+      const compactAfter = changedAfter.length > 16 ? `${changedAfter.slice(0, 16)}...` : changedAfter;
+
+      if (!compactBefore && compactAfter) {
+        return `追加: ${compactAfter}`;
+      }
+      if (compactBefore && !compactAfter) {
+        return `削除: ${compactBefore}`;
+      }
+      return `${compactBefore} → ${compactAfter}`;
+    }
+
+    function buildLineDiffOnly(beforeText, afterText) {
+      const beforeLines = String(beforeText || "").replace(/\r\n?/g, "\n").split("\n");
+      const afterLines = String(afterText || "").replace(/\r\n?/g, "\n").split("\n");
+      const n = beforeLines.length;
+      const m = afterLines.length;
+      const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
+
+      for (let i = n - 1; i >= 0; i -= 1) {
+        for (let j = m - 1; j >= 0; j -= 1) {
+          if (beforeLines[i] === afterLines[j]) {
+            dp[i][j] = dp[i + 1][j + 1] + 1;
+          } else {
+            dp[i][j] = Math.max(dp[i + 1][j], dp[i][j + 1]);
+          }
+        }
+      }
+
+      const beforeOnly = [];
+      const afterOnly = [];
+      let i = 0;
+      let j = 0;
+      while (i < n && j < m) {
+        if (beforeLines[i] === afterLines[j]) {
+          i += 1;
+          j += 1;
+          continue;
+        }
+        if (dp[i + 1][j] >= dp[i][j + 1]) {
+          beforeOnly.push(`- ${beforeLines[i]}`);
+          i += 1;
+        } else {
+          afterOnly.push(`+ ${afterLines[j]}`);
+          j += 1;
+        }
+      }
+      while (i < n) {
+        beforeOnly.push(`- ${beforeLines[i]}`);
+        i += 1;
+      }
+      while (j < m) {
+        afterOnly.push(`+ ${afterLines[j]}`);
+        j += 1;
+      }
+
+      return {
+        beforeOnly: beforeOnly.length > 0 ? beforeOnly.join("\n") : "(差分なし)",
+        afterOnly: afterOnly.length > 0 ? afterOnly.join("\n") : "(差分なし)"
+      };
+    }
+
+    function isPrTitleHeadingLine(line) {
+      const normalized = String(line || "").trim();
+      if (!/^#{1,6}\s*/.test(normalized)) {
+        return false;
+      }
+      const titleText = normalized.replace(/^#{1,6}\s*/, "").trim().toLowerCase();
+      return /^(?:pr\s*タイトル|pr\s*title|タイトル|title)\s*[:：]?$/.test(titleText);
+    }
+
+    function isFenceStartLine(line) {
+      return /^```(?:[a-z0-9_-]+)?\s*$/i.test(String(line || "").trim());
+    }
+
+    function isFenceEndLine(line) {
+      return /^```\s*$/.test(String(line || "").trim());
+    }
+
+    function normalizeCommitMessageForPr() {
+      const commitMessageField = document.getElementById("commitMessage");
+      if (!commitMessageField) return;
+
+      const original = String(commitMessageField.value || "");
+      let lines = original.replace(/\r\n?/g, "\n").split("\n");
+
+      // 先頭は「空行 / PRタイトル見出し / 開始フェンス」が
+      // 混在しやすいため、順不同で連続除去する。
+      let changed = true;
+      while (changed) {
+        changed = false;
+        while (lines.length > 0 && lines[0].trim() === "") {
+          lines.shift();
+          changed = true;
+        }
+        if (lines.length > 0) {
+          lines[0] = lines[0].replace(/^\uFEFF/, "");
+        }
+        if (lines.length > 0 && isPrTitleHeadingLine(lines[0])) {
+          lines.shift();
+          changed = true;
+          continue;
+        }
+        if (lines.length > 0 && isFenceStartLine(lines[0])) {
+          lines.shift();
+          changed = true;
+        }
+      }
+
+      if (lines.length > 0) {
+        lines[0] = lines[0].replace(/^`+/, "").replace(/`+$/, "");
+      }
+
+      while (lines.length > 0 && lines[lines.length - 1].trim() === "") {
+        lines.pop();
+      }
+
+      if (lines.length > 0 && isFenceEndLine(lines[lines.length - 1])) {
+        lines.pop();
+      }
+
+      let normalized = lines.join("\n").trim();
+      // 先頭文が「`<40桁コミットID>` の ...」で始まる場合は導入句を除去する。
+      // 例: `3caa...fe8c0` の変更は〜 → 変更は〜
+      normalized = normalized.replace(
+        /^[\s\u3000\uFEFF]*[`'"\u2018\u2019\u201C\u201D「」『』]*\s*[0-9a-f]{40}\s*[`'"\u2018\u2019\u201C\u201D「」『』]*\s*の[\s\u3000]*/gim,
+        ""
+      );
+      normalized = normalized.trim();
+      lastNormalizeBefore = original;
+      lastNormalizeAfter = normalized;
+      commitMessageField.value = normalized;
+      regenerateAllCommands();
+      const summary = summarizeTextDiffForToast(original, normalized);
+      showToast(`コミットメッセージを整形: ${summary}`);
+    }
+
+    function openNormalizeDiffDialog() {
+      const dialog = document.getElementById("normalizeDiffDialog");
+      const beforeNode = document.getElementById("normalizeDiffBefore");
+      const afterNode = document.getElementById("normalizeDiffAfter");
+      if (!dialog || !beforeNode || !afterNode) return;
+
+      const commitMessageField = document.getElementById("commitMessage");
+      const currentValue = commitMessageField ? String(commitMessageField.value || "") : "";
+      const beforeText = lastNormalizeBefore || currentValue;
+      const afterText = lastNormalizeAfter || currentValue;
+      const diffOnly = buildLineDiffOnly(beforeText, afterText);
+
+      beforeNode.textContent = diffOnly.beforeOnly;
+      afterNode.textContent = diffOnly.afterOnly;
+
+      if (!dialog.dataset.boundOutsideClose) {
+        dialog.addEventListener("click", (event) => {
+          if (event.target === dialog) {
+            dialog.close();
+          }
+        });
+        dialog.dataset.boundOutsideClose = "true";
+      }
+
+      if (typeof dialog.showModal === "function") {
+        dialog.showModal();
+      } else {
+        showToast("このブラウザではダイアログ表示に対応していません");
+      }
+    }
+
+    function closeNormalizeDiffDialog() {
+      const dialog = document.getElementById("normalizeDiffDialog");
+      if (!dialog) return;
+      if (dialog.open && typeof dialog.close === "function") {
+        dialog.close();
+      }
+    }
+
     function setupCodeSelectAll() {
       document.querySelectorAll("code.selectable-code").forEach((el) => {
         el.addEventListener("click", () => {
@@ -426,6 +624,8 @@
     let baseBranchActiveIndex = -1;
     let baseBranchActiveValue = "";
     let suppressBaseBranchFocusOpen = false;
+    let lastNormalizeBefore = "";
+    let lastNormalizeAfter = "";
 
     function getStoredString(key) {
       try {

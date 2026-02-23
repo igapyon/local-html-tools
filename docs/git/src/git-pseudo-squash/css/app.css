@@ -913,7 +913,67 @@
     .md-title-info-row { display: inline-flex; align-items: center; gap: 0.08rem; }
     .md-title-info-row .md-section-title { margin: 0; }
     .md-title-info-row .md-info-chip { margin-left: 0; }
+    .md-title-action-btn { margin-left: 0.35rem; }
+    .md-title-action-icon { margin-left: 0.25rem; }
     .md-flow-divider { display: flex; justify-content: center; padding: 0.5rem 0; }
+
+    .md-diff-dialog {
+      width: min(780px, calc(100vw - 2rem));
+      border: 1px solid #ddd7e8;
+      border-radius: 14px;
+      padding: 0;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
+      background: #ffffff;
+    }
+    .md-diff-dialog::backdrop {
+      background: rgba(17, 24, 39, 0.45);
+    }
+    .md-diff-dialog__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid #ece7f3;
+    }
+    .md-diff-dialog__title {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #2b2635;
+    }
+    .md-diff-dialog__content {
+      display: grid;
+      gap: 0.75rem;
+      padding: 0.85rem 0.9rem 1rem;
+    }
+    .md-diff-block {
+      border: 1px solid #ebe6f2;
+      border-radius: 10px;
+      background: #faf8fd;
+      overflow: hidden;
+    }
+    .md-diff-block__label {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #554c66;
+      border-bottom: 1px solid #ebe6f2;
+      background: #f0ecf7;
+    }
+    .md-diff-block__text {
+      margin: 0;
+      padding: 0.6rem;
+      max-height: 220px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: #2c2736;
+      background: #ffffff;
+    }
 
     .md-step-icon { width: 3.5rem; height: 3.5rem; }
     .md-flow-strip { width: 100%; max-width: 36rem; height: 2.5rem; }

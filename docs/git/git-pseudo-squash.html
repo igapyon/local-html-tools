@@ -1363,7 +1363,67 @@ lht-index-card-link {
     .md-title-info-row { display: inline-flex; align-items: center; gap: 0.08rem; }
     .md-title-info-row .md-section-title { margin: 0; }
     .md-title-info-row .md-info-chip { margin-left: 0; }
+    .md-title-action-btn { margin-left: 0.35rem; }
+    .md-title-action-icon { margin-left: 0.25rem; }
     .md-flow-divider { display: flex; justify-content: center; padding: 0.5rem 0; }
+
+    .md-diff-dialog {
+      width: min(780px, calc(100vw - 2rem));
+      border: 1px solid #ddd7e8;
+      border-radius: 14px;
+      padding: 0;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
+      background: #ffffff;
+    }
+    .md-diff-dialog::backdrop {
+      background: rgba(17, 24, 39, 0.45);
+    }
+    .md-diff-dialog__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid #ece7f3;
+    }
+    .md-diff-dialog__title {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #2b2635;
+    }
+    .md-diff-dialog__content {
+      display: grid;
+      gap: 0.75rem;
+      padding: 0.85rem 0.9rem 1rem;
+    }
+    .md-diff-block {
+      border: 1px solid #ebe6f2;
+      border-radius: 10px;
+      background: #faf8fd;
+      overflow: hidden;
+    }
+    .md-diff-block__label {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #554c66;
+      border-bottom: 1px solid #ebe6f2;
+      background: #f0ecf7;
+    }
+    .md-diff-block__text {
+      margin: 0;
+      padding: 0.6rem;
+      max-height: 220px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: #2c2736;
+      background: #ffffff;
+    }
 
     .md-step-icon { width: 3.5rem; height: 3.5rem; }
     .md-flow-strip { width: 100%; max-width: 36rem; height: 2.5rem; }
@@ -1932,6 +1992,14 @@ lht-index-card-link {
             ローカルの複数のコミットを1つにまとめます。
             reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
           </lht-help-tooltip>
+          <button type="button" class="md-button md-button--surface md-button--compact md-title-action-btn" onclick="normalizeCommitMessageForPr()" title="コミットメッセージをPRテキスト向けに整形" aria-label="コミットメッセージをPRテキスト向けに整形">PR整形</button>
+          <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface md-title-action-icon" onclick="openNormalizeDiffDialog()" title="整形差分を表示" aria-label="整形差分を表示">
+            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 10v6"></path>
+              <circle cx="12" cy="7.5" r="0.9" fill="currentColor" stroke="none"></circle>
+            </svg>
+          </button>
         </span>
       </div>
       <div class="md-form-row">
@@ -2021,6 +2089,28 @@ lht-index-card-link {
     <div id="toast" class="md-snackbar-host md-snackbar md-hidden">
       コピーしました
     </div>
+
+    <dialog id="normalizeDiffDialog" class="md-diff-dialog">
+      <div class="md-diff-dialog__head">
+        <h3 class="md-diff-dialog__title">PR整形の差分</h3>
+        <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="closeNormalizeDiffDialog()" title="閉じる" aria-label="閉じる">
+          <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 6l12 12"></path>
+            <path d="M18 6l-12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="md-diff-dialog__content">
+        <div class="md-diff-block">
+          <div class="md-diff-block__label">Before</div>
+          <pre id="normalizeDiffBefore" class="md-diff-block__text"></pre>
+        </div>
+        <div class="md-diff-block">
+          <div class="md-diff-block__label">After</div>
+          <pre id="normalizeDiffAfter" class="md-diff-block__text"></pre>
+        </div>
+      </div>
+    </dialog>
   </div>
 
   
@@ -3617,6 +3707,204 @@ if (!customElements.get("lht-page-menu")) {
       }, 2000);
     }
 
+    function summarizeTextDiffForToast(beforeText, afterText) {
+      const before = String(beforeText || "");
+      const after = String(afterText || "");
+      if (before === after) {
+        return "変更なし";
+      }
+
+      let start = 0;
+      const minLen = Math.min(before.length, after.length);
+      while (start < minLen && before[start] === after[start]) {
+        start += 1;
+      }
+
+      let endBefore = before.length - 1;
+      let endAfter = after.length - 1;
+      while (endBefore >= start && endAfter >= start && before[endBefore] === after[endAfter]) {
+        endBefore -= 1;
+        endAfter -= 1;
+      }
+
+      const changedBefore = before.slice(start, endBefore + 1).replace(/\s+/g, " ").trim();
+      const changedAfter = after.slice(start, endAfter + 1).replace(/\s+/g, " ").trim();
+      const compactBefore = changedBefore.length > 16 ? `${changedBefore.slice(0, 16)}...` : changedBefore;
+      const compactAfter = changedAfter.length > 16 ? `${changedAfter.slice(0, 16)}...` : changedAfter;
+
+      if (!compactBefore && compactAfter) {
+        return `追加: ${compactAfter}`;
+      }
+      if (compactBefore && !compactAfter) {
+        return `削除: ${compactBefore}`;
+      }
+      return `${compactBefore} → ${compactAfter}`;
+    }
+
+    function buildLineDiffOnly(beforeText, afterText) {
+      const beforeLines = String(beforeText || "").replace(/\r\n?/g, "\n").split("\n");
+      const afterLines = String(afterText || "").replace(/\r\n?/g, "\n").split("\n");
+      const n = beforeLines.length;
+      const m = afterLines.length;
+      const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
+
+      for (let i = n - 1; i >= 0; i -= 1) {
+        for (let j = m - 1; j >= 0; j -= 1) {
+          if (beforeLines[i] === afterLines[j]) {
+            dp[i][j] = dp[i + 1][j + 1] + 1;
+          } else {
+            dp[i][j] = Math.max(dp[i + 1][j], dp[i][j + 1]);
+          }
+        }
+      }
+
+      const beforeOnly = [];
+      const afterOnly = [];
+      let i = 0;
+      let j = 0;
+      while (i < n && j < m) {
+        if (beforeLines[i] === afterLines[j]) {
+          i += 1;
+          j += 1;
+          continue;
+        }
+        if (dp[i + 1][j] >= dp[i][j + 1]) {
+          beforeOnly.push(`- ${beforeLines[i]}`);
+          i += 1;
+        } else {
+          afterOnly.push(`+ ${afterLines[j]}`);
+          j += 1;
+        }
+      }
+      while (i < n) {
+        beforeOnly.push(`- ${beforeLines[i]}`);
+        i += 1;
+      }
+      while (j < m) {
+        afterOnly.push(`+ ${afterLines[j]}`);
+        j += 1;
+      }
+
+      return {
+        beforeOnly: beforeOnly.length > 0 ? beforeOnly.join("\n") : "(差分なし)",
+        afterOnly: afterOnly.length > 0 ? afterOnly.join("\n") : "(差分なし)"
+      };
+    }
+
+    function isPrTitleHeadingLine(line) {
+      const normalized = String(line || "").trim();
+      if (!/^#{1,6}\s*/.test(normalized)) {
+        return false;
+      }
+      const titleText = normalized.replace(/^#{1,6}\s*/, "").trim().toLowerCase();
+      return /^(?:pr\s*タイトル|pr\s*title|タイトル|title)\s*[:：]?$/.test(titleText);
+    }
+
+    function isFenceStartLine(line) {
+      return /^```(?:[a-z0-9_-]+)?\s*$/i.test(String(line || "").trim());
+    }
+
+    function isFenceEndLine(line) {
+      return /^```\s*$/.test(String(line || "").trim());
+    }
+
+    function normalizeCommitMessageForPr() {
+      const commitMessageField = document.getElementById("commitMessage");
+      if (!commitMessageField) return;
+
+      const original = String(commitMessageField.value || "");
+      let lines = original.replace(/\r\n?/g, "\n").split("\n");
+
+      // 先頭は「空行 / PRタイトル見出し / 開始フェンス」が
+      // 混在しやすいため、順不同で連続除去する。
+      let changed = true;
+      while (changed) {
+        changed = false;
+        while (lines.length > 0 && lines[0].trim() === "") {
+          lines.shift();
+          changed = true;
+        }
+        if (lines.length > 0) {
+          lines[0] = lines[0].replace(/^\uFEFF/, "");
+        }
+        if (lines.length > 0 && isPrTitleHeadingLine(lines[0])) {
+          lines.shift();
+          changed = true;
+          continue;
+        }
+        if (lines.length > 0 && isFenceStartLine(lines[0])) {
+          lines.shift();
+          changed = true;
+        }
+      }
+
+      if (lines.length > 0) {
+        lines[0] = lines[0].replace(/^`+/, "").replace(/`+$/, "");
+      }
+
+      while (lines.length > 0 && lines[lines.length - 1].trim() === "") {
+        lines.pop();
+      }
+
+      if (lines.length > 0 && isFenceEndLine(lines[lines.length - 1])) {
+        lines.pop();
+      }
+
+      let normalized = lines.join("\n").trim();
+      // 先頭文が「`<40桁コミットID>` の ...」で始まる場合は導入句を除去する。
+      // 例: `3caa...fe8c0` の変更は〜 → 変更は〜
+      normalized = normalized.replace(
+        /^[\s\u3000\uFEFF]*[`'"\u2018\u2019\u201C\u201D「」『』]*\s*[0-9a-f]{40}\s*[`'"\u2018\u2019\u201C\u201D「」『』]*\s*の[\s\u3000]*/gim,
+        ""
+      );
+      normalized = normalized.trim();
+      lastNormalizeBefore = original;
+      lastNormalizeAfter = normalized;
+      commitMessageField.value = normalized;
+      regenerateAllCommands();
+      const summary = summarizeTextDiffForToast(original, normalized);
+      showToast(`コミットメッセージを整形: ${summary}`);
+    }
+
+    function openNormalizeDiffDialog() {
+      const dialog = document.getElementById("normalizeDiffDialog");
+      const beforeNode = document.getElementById("normalizeDiffBefore");
+      const afterNode = document.getElementById("normalizeDiffAfter");
+      if (!dialog || !beforeNode || !afterNode) return;
+
+      const commitMessageField = document.getElementById("commitMessage");
+      const currentValue = commitMessageField ? String(commitMessageField.value || "") : "";
+      const beforeText = lastNormalizeBefore || currentValue;
+      const afterText = lastNormalizeAfter || currentValue;
+      const diffOnly = buildLineDiffOnly(beforeText, afterText);
+
+      beforeNode.textContent = diffOnly.beforeOnly;
+      afterNode.textContent = diffOnly.afterOnly;
+
+      if (!dialog.dataset.boundOutsideClose) {
+        dialog.addEventListener("click", (event) => {
+          if (event.target === dialog) {
+            dialog.close();
+          }
+        });
+        dialog.dataset.boundOutsideClose = "true";
+      }
+
+      if (typeof dialog.showModal === "function") {
+        dialog.showModal();
+      } else {
+        showToast("このブラウザではダイアログ表示に対応していません");
+      }
+    }
+
+    function closeNormalizeDiffDialog() {
+      const dialog = document.getElementById("normalizeDiffDialog");
+      if (!dialog) return;
+      if (dialog.open && typeof dialog.close === "function") {
+        dialog.close();
+      }
+    }
+
     function setupCodeSelectAll() {
       document.querySelectorAll("code.selectable-code").forEach((el) => {
         el.addEventListener("click", () => {
@@ -3664,6 +3952,8 @@ if (!customElements.get("lht-page-menu")) {
     let baseBranchActiveIndex = -1;
     let baseBranchActiveValue = "";
     let suppressBaseBranchFocusOpen = false;
+    let lastNormalizeBefore = "";
+    let lastNormalizeAfter = "";
 
     function getStoredString(key) {
       try {
