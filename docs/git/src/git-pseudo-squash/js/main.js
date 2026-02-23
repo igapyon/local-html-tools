@@ -413,7 +413,7 @@
       return `${compactBefore} → ${compactAfter}`;
     }
 
-    function buildLineDiffOnly(beforeText, afterText) {
+    function buildLineDiffHighlightData(beforeText, afterText) {
       const beforeLines = String(beforeText || "").replace(/\r\n?/g, "\n").split("\n");
       const afterLines = String(afterText || "").replace(/\r\n?/g, "\n").split("\n");
       const n = beforeLines.length;
@@ -430,37 +430,59 @@
         }
       }
 
-      const beforeOnly = [];
-      const afterOnly = [];
+      const beforeHighlighted = [];
+      const afterHighlighted = [];
       let i = 0;
       let j = 0;
       while (i < n && j < m) {
         if (beforeLines[i] === afterLines[j]) {
+          beforeHighlighted.push({ text: beforeLines[i], changed: false });
+          afterHighlighted.push({ text: afterLines[j], changed: false });
           i += 1;
           j += 1;
           continue;
         }
         if (dp[i + 1][j] >= dp[i][j + 1]) {
-          beforeOnly.push(`- ${beforeLines[i]}`);
+          beforeHighlighted.push({ text: beforeLines[i], changed: true });
           i += 1;
         } else {
-          afterOnly.push(`+ ${afterLines[j]}`);
+          afterHighlighted.push({ text: afterLines[j], changed: true });
           j += 1;
         }
       }
       while (i < n) {
-        beforeOnly.push(`- ${beforeLines[i]}`);
+        beforeHighlighted.push({ text: beforeLines[i], changed: true });
         i += 1;
       }
       while (j < m) {
-        afterOnly.push(`+ ${afterLines[j]}`);
+        afterHighlighted.push({ text: afterLines[j], changed: true });
         j += 1;
       }
 
       return {
-        beforeOnly: beforeOnly.length > 0 ? beforeOnly.join("\n") : "(差分なし)",
-        afterOnly: afterOnly.length > 0 ? afterOnly.join("\n") : "(差分なし)"
+        beforeHighlighted,
+        afterHighlighted
       };
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function renderDiffHighlightHtml(lines, changedClass) {
+      if (!lines || lines.length === 0) {
+        return '<span class="md-diff-line">(空)</span>';
+      }
+      return lines.map((line) => {
+        const cssClass = line.changed ? `md-diff-line ${changedClass}` : "md-diff-line";
+        const safeText = escapeHtml(line.text);
+        return `<span class="${cssClass}">${safeText || "&nbsp;"}</span>`;
+      }).join("");
     }
 
     function isPrTitleHeadingLine(line) {
@@ -470,6 +492,15 @@
       }
       const titleText = normalized.replace(/^#{1,6}\s*/, "").trim().toLowerCase();
       return /^(?:pr\s*タイトル|pr\s*title|タイトル|title)\s*[:：]?$/.test(titleText);
+    }
+
+    function isPrTextHeadingLine(line) {
+      const normalized = String(line || "").trim();
+      if (!/^#{1,6}\s*/.test(normalized)) {
+        return false;
+      }
+      const headingText = normalized.replace(/^#{1,6}\s*/, "").trim().toLowerCase();
+      return /^(?:pr\s*テキスト|pr\s*text)\s*[:：]?$/.test(headingText);
     }
 
     function isFenceStartLine(line) {
@@ -490,6 +521,7 @@
       // 先頭は「空行 / PRタイトル見出し / 開始フェンス」が
       // 混在しやすいため、順不同で連続除去する。
       let changed = true;
+      let removedPrTitleHeading = false;
       while (changed) {
         changed = false;
         while (lines.length > 0 && lines[0].trim() === "") {
@@ -501,6 +533,7 @@
         }
         if (lines.length > 0 && isPrTitleHeadingLine(lines[0])) {
           lines.shift();
+          removedPrTitleHeading = true;
           changed = true;
           continue;
         }
@@ -510,8 +543,56 @@
         }
       }
 
-      if (lines.length > 0) {
-        lines[0] = lines[0].replace(/^`+/, "").replace(/`+$/, "");
+      if (removedPrTitleHeading) {
+        const firstNonEmptyIndex = lines.findIndex((line) => line.trim() !== "");
+        if (firstNonEmptyIndex >= 0) {
+          const line = lines[firstNonEmptyIndex];
+          if (/^\s*`.*`\s*$/.test(line)) {
+            lines[firstNonEmptyIndex] = line.replace(/^\s*`+/, "").replace(/`+\s*$/, "");
+          }
+        }
+      }
+
+      // 「## PRテキスト」セクションは、見出し自体を除去する。
+      // 直後が ```markdown で始まる場合はフェンスを外して本文だけ残す。
+      {
+        const rewritten = [];
+        let i = 0;
+        while (i < lines.length) {
+          if (!isPrTextHeadingLine(lines[i])) {
+            rewritten.push(lines[i]);
+            i += 1;
+            continue;
+          }
+
+          // 見出し行を除去し、直後の空行をスキップ。
+          i += 1;
+          while (i < lines.length && lines[i].trim() === "") {
+            i += 1;
+          }
+
+          // この条件の ```markdown だけを除去対象にする。
+          if (i < lines.length && /^```markdown\s*$/i.test(lines[i].trim())) {
+            i += 1;
+            const blockLines = [];
+            while (i < lines.length && !isFenceEndLine(lines[i])) {
+              blockLines.push(lines[i]);
+              i += 1;
+            }
+            if (i < lines.length && isFenceEndLine(lines[i])) {
+              i += 1;
+            }
+
+            while (blockLines.length > 0 && blockLines[0].trim() === "") {
+              blockLines.shift();
+            }
+            while (blockLines.length > 0 && blockLines[blockLines.length - 1].trim() === "") {
+              blockLines.pop();
+            }
+            rewritten.push(...blockLines);
+          }
+        }
+        lines = rewritten;
       }
 
       while (lines.length > 0 && lines[lines.length - 1].trim() === "") {
@@ -548,10 +629,9 @@
       const currentValue = commitMessageField ? String(commitMessageField.value || "") : "";
       const beforeText = lastNormalizeBefore || currentValue;
       const afterText = lastNormalizeAfter || currentValue;
-      const diffOnly = buildLineDiffOnly(beforeText, afterText);
-
-      beforeNode.textContent = diffOnly.beforeOnly;
-      afterNode.textContent = diffOnly.afterOnly;
+      const diffData = buildLineDiffHighlightData(beforeText, afterText);
+      beforeNode.innerHTML = renderDiffHighlightHtml(diffData.beforeHighlighted, "md-diff-line--before");
+      afterNode.innerHTML = renderDiffHighlightHtml(diffData.afterHighlighted, "md-diff-line--after");
 
       if (!dialog.dataset.boundOutsideClose) {
         dialog.addEventListener("click", (event) => {
