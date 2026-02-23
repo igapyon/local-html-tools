@@ -29,12 +29,11 @@
 
 対象の HTML をブラウザで開き、必要事項を入力して生成されたコマンドをそのままターミナルで実行します。
 
-## Vite でのビルド（Single-file 前提）
+## ビルド（Single-file 前提）
 
 `docs/git` のターゲットは、ブラウザ単体で動く Single-file web app です。
 
 - 配布物: `docs/git/*.html`（単一HTML。オフライン動作）
-- Vite ビルド出力: `dist/docs/git/*.html`（内容確認・配布候補）
 - `git-pseudo-squash` の編集元:
 - `docs/git/git-pseudo-squash-src.html`
 - `docs/git/src/git-pseudo-squash/css/app.css`
@@ -58,12 +57,9 @@
 
 実行コマンド:
 
-- Single-file 生成のみ: `npm run build:git:single`
 - ビルド: `npm run build:git`
-- ビルド結果確認: `npm run preview:git`
-- ローカル確認用サーバー（任意）: `npm run dev:git`
 
-`build:git:single` では `build:git:material` が先に実行され、`md-outlined-text-field` 用の Material Web をローカルバンドルしてから単一HTMLへインライン化します。
+`build:git` では `build:git:material` が先に実行され、`md-outlined-text-field` 用の Material Web をローカルバンドルしてから単一HTMLへインライン化します。
 
 ## 保留事項（再開メモ）
 
@@ -94,7 +90,7 @@
 
 反映手順:
 
-- `npm run build:git` を実行し、`docs/git/git-pseudo-squash.html` と `dist/docs/git/git-pseudo-squash.html` を更新する
+- `npm run build:git` を実行し、`docs/git/git-pseudo-squash.html` を更新する
 
 ## 共通UI方針の参照先
 

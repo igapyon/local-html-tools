@@ -99,7 +99,7 @@ G A B c |`;
 
     const xml2 = xmlOutput.textContent;
     expect(xml2).not.toContain("<transpose>");
-    expect(xml2).toContain("<key><fifths>3</fifths></key>");
+    expect(xml2).toContain("<key><fifths>3</fifths><mode>major</mode></key>");
     expect(xml2).toContain("<step>G</step>");
     expect(xml2).toContain("<alter>1</alter>");
   });
