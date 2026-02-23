@@ -966,13 +966,26 @@
       padding: 0.6rem;
       max-height: 220px;
       overflow: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
+      white-space: pre;
+      word-break: normal;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 0.82rem;
       line-height: 1.45;
       color: #2c2736;
       background: #ffffff;
+    }
+    .md-diff-line {
+      display: block;
+      padding: 0 0.15rem;
+      border-radius: 4px;
+    }
+    .md-diff-line--before {
+      background: #ffe8ea;
+      color: #8a1f2b;
+    }
+    .md-diff-line--after {
+      background: #e7f8ed;
+      color: #1f6a36;
     }
 
     .md-step-icon { width: 3.5rem; height: 3.5rem; }

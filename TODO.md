@@ -19,6 +19,7 @@
 - regex/sed/awk: 文字列変換テンプレの生成
 - [後まわし] docker/docker-compose: よくある起動・開発用コマンド生成
 - [方針] `md3/` は段階的にリファレンス用途へ縮退し、実運用スタイルは `lht-cmn` に集約する
+- [方針] 最優先: Material Web vendor バンドル（`material-web-outlined-text-field.bundle.js`）の配置場所を `lht-cmn` 基準へ適正化し、各 `*-src.html` / build script の参照を整理する
 - [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
   - 現状: Web Audio による簡易シンセ再生は実装済み
   - 未実装: 生成したMIDI実データ（SMF）のその場再生（MIDIパーサ/プレイヤー経由）

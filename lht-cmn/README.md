@@ -42,6 +42,7 @@
 - 画面側（`docs/*-src.html`）は `lht-*` を利用し、`md-*` 直接実装の追加は原則避ける
 - `lht-cmn/js/components.js` を共通コンポーネントの正本とする
 - `lht-cmn/css/components.css` を実運用スタイルの正本とする
+- `lht-cmn/` 配下（特に `js/components.js` / `css/components.css`）の変更は、必ずユーザーの明示許可を得てから実施する
 - `md3/` は段階的にリファレンス用途へ縮退し、実運用スタイルは `lht-cmn` に集約する
 
 ## 構成
