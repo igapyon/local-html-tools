@@ -18,10 +18,9 @@
 
     function updateRemoteState() {
       const lockOrigin = getToggleSelected("lockOrigin", true);
-      const scopeA = document.getElementById("scopeA").checked;
-      const scopeB = document.getElementById("scopeB").checked;
       const remoteInput = document.getElementById("remoteName");
       const remoteBlock = document.getElementById("remoteNameBlock");
+      if (!remoteInput || !remoteBlock) return;
       remoteBlock.classList.toggle("md-hidden", lockOrigin);
       remoteInput.disabled = lockOrigin;
       if (lockOrigin) {
@@ -29,14 +28,26 @@
       }
     }
 
+    function updateStatWidthState() {
+      const diffMode = document.getElementById("diffMode")?.value || "";
+      const statWidthBlock = document.getElementById("statWidthBlock");
+      const show = diffMode === "--stat";
+      if (statWidthBlock) {
+        statWidthBlock.classList.toggle("md-hidden", !show);
+      }
+    }
+
     function generateCommands({ silent = false } = {}) {
+      updateStatWidthState();
       const branchA = document.getElementById("branchA").value.trim();
       const branchB = document.getElementById("branchB").value.trim();
       const scopeA = document.getElementById("scopeA").checked;
       const scopeB = document.getElementById("scopeB").checked;
       const lockOrigin = getToggleSelected("lockOrigin", true);
-      const remoteName = lockOrigin ? "origin" : document.getElementById("remoteName").value.trim();
+      const remoteInput = document.getElementById("remoteName");
+      const remoteName = lockOrigin ? "origin" : (remoteInput ? remoteInput.value.trim() : "");
       const diffMode = document.getElementById("diffMode").value;
+      const useStat200 = getToggleSelected("useStat200", false);
       const useTripleDot = getToggleSelected("useTripleDot", false);
       const output = document.getElementById("diffCmd");
 
@@ -54,7 +65,12 @@
 
       const refA = scopeA ? `${remoteName}/${branchA}` : branchA;
       const refB = scopeB ? `${remoteName}/${branchB}` : branchB;
-      const diffOption = diffMode ? ` ${diffMode}` : "";
+      let diffOption = "";
+      if (diffMode === "--stat") {
+        diffOption = useStat200 ? " --stat=200" : " --stat";
+      } else if (diffMode) {
+        diffOption = ` ${diffMode}`;
+      }
       const rangeSeparator = useTripleDot ? "..." : "..";
       const commands = [];
       if (useRemote) {
@@ -67,7 +83,7 @@
     function setupAutoUpdate() {
       const handler = () => generateCommands({ silent: true });
       const inputIds = ["branchA", "branchB", "remoteName"];
-      const changeIds = ["scopeA", "scopeB", "lockOrigin", "diffMode", "useTripleDot"];
+      const changeIds = ["scopeA", "scopeB", "lockOrigin", "diffMode", "useTripleDot", "useStat200"];
       inputIds.forEach((id) => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -90,6 +106,15 @@
       }, 2000);
     }
 
-    updateRemoteState();
-    setupAutoUpdate();
-    generateCommands({ silent: true });
+    function bootstrap() {
+      updateRemoteState();
+      updateStatWidthState();
+      setupAutoUpdate();
+      generateCommands({ silent: true });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootstrap);
+    } else {
+      bootstrap();
+    }
