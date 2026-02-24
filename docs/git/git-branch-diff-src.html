@@ -104,6 +104,16 @@ limitations under the License.
       </md-outlined-select>
     </div>
 
+    <div id="statWidthBlock" class="md-section md-form-row md-form-row--nowrap md-hidden">
+      <lht-switch-help
+        switch-id="useStat200"
+        label="長いファイル名向けに --stat=200 を使う"
+        help-label="--stat=200 の説明">
+        オフ: `git diff --stat`（デフォルト）<br>
+        オン: `git diff --stat=200`
+      </lht-switch-help>
+    </div>
+
     <lht-command-block command-id="diffCmd"></lht-command-block>
 
     <div id="toast" class="md-snackbar-host md-snackbar">

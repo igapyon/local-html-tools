@@ -1572,6 +1572,16 @@ lht-index-card-link {
       </md-outlined-select>
     </div>
 
+    <div id="statWidthBlock" class="md-section md-form-row md-form-row--nowrap md-hidden">
+      <lht-switch-help
+        switch-id="useStat200"
+        label="長いファイル名向けに --stat=200 を使う"
+        help-label="--stat=200 の説明">
+        オフ: `git diff --stat`（デフォルト）<br>
+        オン: `git diff --stat=200`
+      </lht-switch-help>
+    </div>
+
     <lht-command-block command-id="diffCmd"></lht-command-block>
 
     <div id="toast" class="md-snackbar-host md-snackbar">
@@ -2812,10 +2822,9 @@ if (!customElements.get("lht-page-menu")) {
 
     function updateRemoteState() {
       const lockOrigin = getToggleSelected("lockOrigin", true);
-      const scopeA = document.getElementById("scopeA").checked;
-      const scopeB = document.getElementById("scopeB").checked;
       const remoteInput = document.getElementById("remoteName");
       const remoteBlock = document.getElementById("remoteNameBlock");
+      if (!remoteInput || !remoteBlock) return;
       remoteBlock.classList.toggle("md-hidden", lockOrigin);
       remoteInput.disabled = lockOrigin;
       if (lockOrigin) {
@@ -2823,14 +2832,26 @@ if (!customElements.get("lht-page-menu")) {
       }
     }
 
+    function updateStatWidthState() {
+      const diffMode = document.getElementById("diffMode")?.value || "";
+      const statWidthBlock = document.getElementById("statWidthBlock");
+      const show = diffMode === "--stat";
+      if (statWidthBlock) {
+        statWidthBlock.classList.toggle("md-hidden", !show);
+      }
+    }
+
     function generateCommands({ silent = false } = {}) {
+      updateStatWidthState();
       const branchA = document.getElementById("branchA").value.trim();
       const branchB = document.getElementById("branchB").value.trim();
       const scopeA = document.getElementById("scopeA").checked;
       const scopeB = document.getElementById("scopeB").checked;
       const lockOrigin = getToggleSelected("lockOrigin", true);
-      const remoteName = lockOrigin ? "origin" : document.getElementById("remoteName").value.trim();
+      const remoteInput = document.getElementById("remoteName");
+      const remoteName = lockOrigin ? "origin" : (remoteInput ? remoteInput.value.trim() : "");
       const diffMode = document.getElementById("diffMode").value;
+      const useStat200 = getToggleSelected("useStat200", false);
       const useTripleDot = getToggleSelected("useTripleDot", false);
       const output = document.getElementById("diffCmd");
 
@@ -2848,7 +2869,12 @@ if (!customElements.get("lht-page-menu")) {
 
       const refA = scopeA ? `${remoteName}/${branchA}` : branchA;
       const refB = scopeB ? `${remoteName}/${branchB}` : branchB;
-      const diffOption = diffMode ? ` ${diffMode}` : "";
+      let diffOption = "";
+      if (diffMode === "--stat") {
+        diffOption = useStat200 ? " --stat=200" : " --stat";
+      } else if (diffMode) {
+        diffOption = ` ${diffMode}`;
+      }
       const rangeSeparator = useTripleDot ? "..." : "..";
       const commands = [];
       if (useRemote) {
@@ -2861,7 +2887,7 @@ if (!customElements.get("lht-page-menu")) {
     function setupAutoUpdate() {
       const handler = () => generateCommands({ silent: true });
       const inputIds = ["branchA", "branchB", "remoteName"];
-      const changeIds = ["scopeA", "scopeB", "lockOrigin", "diffMode", "useTripleDot"];
+      const changeIds = ["scopeA", "scopeB", "lockOrigin", "diffMode", "useTripleDot", "useStat200"];
       inputIds.forEach((id) => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -2884,9 +2910,18 @@ if (!customElements.get("lht-page-menu")) {
       }, 2000);
     }
 
-    updateRemoteState();
-    setupAutoUpdate();
-    generateCommands({ silent: true });
+    function bootstrap() {
+      updateRemoteState();
+      updateStatWidthState();
+      setupAutoUpdate();
+      generateCommands({ silent: true });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootstrap);
+    } else {
+      bootstrap();
+    }
   </script>
 </body>
 </html>
