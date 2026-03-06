@@ -19,6 +19,7 @@ limitations under the License.
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ABC → MusicXML 変換</title>
+    <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
     <link rel="stylesheet" href="src/abc-to-musicxml/css/app.css" />
 </head>
 <body>
@@ -77,16 +78,16 @@ limitations under the License.
           </span>
         </div>
 
-        <div class="md-radio-group" role="radiogroup" aria-label="入力方式">
-          <label class="md-radio-option">
-            <input id="inputModeFile" type="radio" name="inputMode" value="file" checked />
-            <span>ファイル読込</span>
-          </label>
-          <label class="md-radio-option">
-            <input id="inputModeSource" type="radio" name="inputMode" value="source" />
-            <span>ソースコード入力</span>
-          </label>
-        </div>
+        <lht-input-mode-toggle
+          name="inputMode"
+          group-label="入力方式"
+          file-id="inputModeFile"
+          source-id="inputModeSource"
+          file-label="ファイル読込"
+          source-label="ソースコード入力"
+          source-target-id="sourceInputBlock"
+          file-target-id="fileInputBlock">
+        </lht-input-mode-toggle>
 
         <div id="sourceInputBlock">
           <textarea id="abcInput" class="md-textarea" spellcheck="false">X:1
@@ -99,18 +100,15 @@ C D E F | G A B c |</textarea>
         </div>
 
         <div id="fileInputBlock" class="md-hidden">
-          <div class="md-actions">
-            <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
-              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:0.35rem">
-                <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <path d="M12 10v6" />
-                <path d="M9.5 13.5 12 16l2.5-2.5" />
-              </svg>
-              <span>ファイルを選択</span>
-            </button>
-            <span id="fileNameText">未選択</span>
-          </div>
-          <input id="fileInput" class="md-file" type="file" accept=".abc,.txt,text/plain" hidden />
+          <lht-file-select
+            input-id="fileInput"
+            button-id="fileSelectBtn"
+            file-name-id="fileNameText"
+            accept=".abc,.txt,text/plain"
+            button-label="ファイルを選択"
+            placeholder="未選択"
+            show-file-name>
+          </lht-file-select>
         </div>
       </section>
 
@@ -159,7 +157,7 @@ C D E F | G A B c |</textarea>
             <span>sine再生</span>
           </button>
         </div>
-        <p id="errorText" class="md-error md-hidden" role="alert"></p>
+        <lht-error-alert id="errorText"></lht-error-alert>
         <p id="warningText" class="md-warning md-hidden"></p>
       </section>
 
@@ -206,8 +204,9 @@ C D E F | G A B c |</textarea>
     </section>
   </main>
 
-  <div id="toast" class="md-snackbar md-hidden" role="status" aria-live="polite"></div>
+  <lht-toast id="toast"></lht-toast>
 
+    <script src="../../lht-cmn/js/components.js"></script>
     <script src="src/common/js/abc-common.js"></script>
     <script src="src/common/js/musicxml-common.js"></script>
     <script src="src/common/js/musicxml-synth-schedule-common.js"></script>

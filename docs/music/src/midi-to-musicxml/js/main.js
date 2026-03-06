@@ -38,7 +38,9 @@ let loadedMidiName = "";
 let lastXmlText = "";
 restoreSettings();
 fileInput.addEventListener("change", onFileChange);
-fileSelectBtn.addEventListener("click", () => fileInput.click());
+if (!(fileSelectBtn && fileSelectBtn.closest("lht-file-select"))) {
+    fileSelectBtn.addEventListener("click", () => fileInput.click());
+}
 inputModeSourceRadio.addEventListener("change", applyInputMode);
 inputModeFileRadio.addEventListener("change", applyInputMode);
 defaultTitleInput.addEventListener("change", persistSettings);
@@ -1077,12 +1079,22 @@ function resetOutput() {
     copyBtn.disabled = true;
 }
 function setError(message) {
-    errorText.textContent = message;
-    errorText.classList.remove("md-hidden");
+    if (errorText && typeof errorText.show === "function") {
+        errorText.show(message);
+    }
+    else if (errorText) {
+        errorText.textContent = message;
+        errorText.classList.remove("md-hidden");
+    }
 }
 function clearError() {
-    errorText.textContent = "";
-    errorText.classList.add("md-hidden");
+    if (errorText && typeof errorText.clear === "function") {
+        errorText.clear();
+    }
+    else if (errorText) {
+        errorText.textContent = "";
+        errorText.classList.add("md-hidden");
+    }
 }
 function clearWarning() {
     warningText.textContent = "";
@@ -1172,18 +1184,11 @@ async function copyMusicXml() {
         showToast("コピーに失敗しました。");
     }
 }
-let toastTimer = 0;
 function showToast(message) {
-    toast.textContent = message;
-    toast.classList.remove("md-hidden");
-    toast.classList.add("md-visible");
-    if (toastTimer) {
-        clearTimeout(toastTimer);
+    if (!toast || typeof toast.show !== "function") {
+        return;
     }
-    toastTimer = setTimeout(() => {
-        toast.classList.remove("md-visible");
-        toast.classList.add("md-hidden");
-    }, 1600);
+    toast.show(message, 1600);
 }
 window["toggleMenu"] = function toggleMenu() {
     menuPanel.classList.toggle("md-hidden");

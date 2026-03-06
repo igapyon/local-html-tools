@@ -189,6 +189,7 @@
       background: #fff;
       overflow: auto;
       min-height: 9rem;
+      max-height: min(70vh, 42rem);
     }
 
     .md-preview-stage svg {

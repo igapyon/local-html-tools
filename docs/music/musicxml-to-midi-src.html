@@ -74,16 +74,16 @@ limitations under the License.
           </span>
         </div>
 
-        <div class="md-radio-group" role="radiogroup" aria-label="入力方式">
-          <label class="md-radio-option">
-            <input id="inputModeFile" type="radio" name="inputMode" value="file" checked />
-            <span>ファイル読込</span>
-          </label>
-          <label class="md-radio-option">
-            <input id="inputModeSource" type="radio" name="inputMode" value="source" />
-            <span>ソースコード入力</span>
-          </label>
-        </div>
+        <lht-input-mode-toggle
+          name="inputMode"
+          group-label="入力方式"
+          file-id="inputModeFile"
+          source-id="inputModeSource"
+          file-label="ファイル読込"
+          source-label="ソースコード入力"
+          source-target-id="sourceInputBlock"
+          file-target-id="fileInputBlock">
+        </lht-input-mode-toggle>
 
         <div id="sourceInputBlock">
           <textarea id="xmlInput" class="md-textarea md-textarea--compact" rows="10" spellcheck="false"><?xml version="1.0" encoding="UTF-8"?>
@@ -219,7 +219,7 @@ limitations under the License.
             <span>停止</span>
           </button>
         </div>
-        <p id="errorText" class="md-error md-hidden" role="alert"></p>
+        <lht-error-alert id="errorText"></lht-error-alert>
         <p id="warningText" class="md-warning md-hidden"></p>
       </section>
 
@@ -242,7 +242,7 @@ limitations under the License.
     </section>
   </main>
 
-  <div id="toast" class="md-snackbar md-hidden" role="status" aria-live="polite"></div>
+  <lht-toast id="toast"></lht-toast>
 
     <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
     <script src="../../lht-cmn/js/components.js"></script>
