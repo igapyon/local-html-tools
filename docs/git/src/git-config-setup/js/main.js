@@ -39,12 +39,8 @@ function generateSetupCommand({ silent = false } = {}) {
 
 function showToast(message) {
   const toast = document.getElementById("toast");
-  if (!toast) return;
-  toast.textContent = message;
-  toast.classList.add("md-visible");
-  setTimeout(() => {
-    toast.classList.remove("md-visible");
-  }, 2000);
+  if (!toast || typeof toast.show !== "function") return;
+  toast.show(message, 2200);
 }
 
 function setupAutoUpdate() {

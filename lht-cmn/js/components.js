@@ -1,6 +1,6 @@
 /*
  * lht-cmn components.js
- * Version: v20260222
+ * Version: v20260306
  * Copyright 2026 Toshiki Iga
  * Licensed under the Apache License, Version 2.0
  */
@@ -309,6 +309,432 @@ class LhtSelectHelp extends HTMLElement {
     if (this._optionsObserver) {
       this._optionsObserver.disconnect();
       this._optionsObserver = null;
+    }
+  }
+}
+
+class LhtLoadingOverlay extends HTMLElement {
+  static get observedAttributes() {
+    return ["active", "text"];
+  }
+
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    this.setAttribute("role", "status");
+    this.setAttribute("aria-live", "polite");
+
+    const text = (this.getAttribute("text") || "Loading...").trim();
+
+    this.textContent = "";
+
+    const dialog = document.createElement("div");
+    dialog.className = "lht-loading-overlay__dialog";
+
+    const spinner = document.createElement("div");
+    spinner.className = "lht-loading-overlay__spinner";
+    spinner.setAttribute("aria-hidden", "true");
+
+    const message = document.createElement("p");
+    message.className = "lht-loading-overlay__text";
+    message.textContent = text;
+
+    dialog.appendChild(spinner);
+    dialog.appendChild(message);
+    this.appendChild(dialog);
+
+    this._messageNode = message;
+    this.setActive(this.hasAttribute("active"));
+  }
+
+  attributeChangedCallback(name, _oldValue, newValue) {
+    if (name === "text" && this._messageNode) {
+      const text = (newValue || "Loading...").trim();
+      this._messageNode.textContent = text || "Loading...";
+      return;
+    }
+    if (name === "active") {
+      this.setActive(newValue !== null);
+    }
+  }
+
+  isActive() {
+    return this.hasAttribute("active");
+  }
+
+  setActive(inProgress) {
+    const next = !!inProgress;
+    this.toggleAttribute("active", next);
+    this.setAttribute("aria-hidden", next ? "false" : "true");
+
+    const busyTargetId = (this.getAttribute("busy-target-id") || "").trim();
+    if (busyTargetId) {
+      const target = document.getElementById(busyTargetId);
+      if (target) target.setAttribute("aria-busy", next ? "true" : "false");
+    }
+
+    const disableTargetIds = (this.getAttribute("disable-target-ids") || "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+    for (const id of disableTargetIds) {
+      const element = document.getElementById(id);
+      if (!element || !("disabled" in element)) continue;
+      element.disabled = next;
+    }
+  }
+
+  waitForNextPaint() {
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+  }
+}
+
+class LhtToast extends HTMLElement {
+  static get observedAttributes() {
+    return ["text", "active"];
+  }
+
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    this.setAttribute("role", "status");
+    this.setAttribute("aria-live", "polite");
+    this.setAttribute("aria-atomic", "true");
+
+    const initialText = (this.getAttribute("text") || this.textContent || "完了").trim();
+    const text = initialText || "完了";
+
+    this.textContent = "";
+
+    const body = document.createElement("div");
+    body.className = "lht-toast__body";
+    body.textContent = text;
+    this.appendChild(body);
+    this._body = body;
+
+    this.setActive(this.hasAttribute("active"));
+
+    if (typeof window.showToast !== "function") {
+      window.showToast = (message, durationMs) => {
+        this.show(message, durationMs);
+      };
+    }
+  }
+
+  disconnectedCallback() {
+    if (this._hideTimer) {
+      clearTimeout(this._hideTimer);
+      this._hideTimer = null;
+    }
+  }
+
+  attributeChangedCallback(name, _oldValue, newValue) {
+    if (name === "text") {
+      if (!this._body) return;
+      const text = (newValue || "").trim();
+      if (text) this._body.textContent = text;
+      return;
+    }
+    if (name === "active") {
+      this.setActive(newValue !== null);
+    }
+  }
+
+  show(message, durationMs) {
+    if (this._hideTimer) {
+      clearTimeout(this._hideTimer);
+      this._hideTimer = null;
+    }
+
+    const defaultDurationMs = Number(this.getAttribute("duration-ms"));
+    const fallbackDuration = Number.isFinite(defaultDurationMs) && defaultDurationMs > 0 ? defaultDurationMs : 1600;
+    const nextDuration = Number(durationMs);
+    const hideAfterMs = Number.isFinite(nextDuration) && nextDuration > 0 ? nextDuration : fallbackDuration;
+
+    const text = (message || this.getAttribute("text") || this._body?.textContent || "完了").trim();
+    if (this._body) this._body.textContent = text || "完了";
+
+    this.setActive(true);
+
+    this._hideTimer = setTimeout(() => {
+      this.hide();
+    }, hideAfterMs);
+  }
+
+  hide() {
+    if (this._hideTimer) {
+      clearTimeout(this._hideTimer);
+      this._hideTimer = null;
+    }
+    this.setActive(false);
+  }
+
+  setActive(active) {
+    const next = !!active;
+    this.toggleAttribute("active", next);
+    this.setAttribute("data-visible", next ? "true" : "false");
+    this.setAttribute("aria-hidden", next ? "false" : "true");
+  }
+}
+
+class LhtErrorAlert extends HTMLElement {
+  static get observedAttributes() {
+    return ["text", "active"];
+  }
+
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    this.setAttribute("role", "alert");
+    this.setAttribute("aria-live", "assertive");
+    this.setAttribute("aria-atomic", "true");
+
+    const initialText = (this.getAttribute("text") || this.textContent || "").trim();
+
+    this.textContent = "";
+
+    const body = document.createElement("p");
+    body.className = "lht-error-alert__body";
+    body.textContent = initialText;
+    this.appendChild(body);
+    this._body = body;
+
+    this.setActive(this.hasAttribute("active"));
+  }
+
+  attributeChangedCallback(name, _oldValue, newValue) {
+    if (name === "text") {
+      const text = (newValue || "").trim();
+      if (this._body) this._body.textContent = text;
+      return;
+    }
+    if (name === "active") {
+      this.setActive(newValue !== null);
+    }
+  }
+
+  isVisible() {
+    return this.getAttribute("data-visible") === "true";
+  }
+
+  show(message) {
+    const text = (message || this.getAttribute("text") || "").trim();
+    if (this._body) this._body.textContent = text;
+    this.setActive(text.length > 0);
+  }
+
+  clear() {
+    if (this._body) this._body.textContent = "";
+    this.hide();
+  }
+
+  hide() {
+    this.setActive(false);
+  }
+
+  setActive(active) {
+    const next = !!active;
+    this.toggleAttribute("active", next);
+    this.setAttribute("data-visible", next ? "true" : "false");
+    this.setAttribute("aria-hidden", next ? "false" : "true");
+  }
+}
+
+class LhtInputModeToggle extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const groupLabel = (this.getAttribute("group-label") || "入力方式").trim();
+    const groupName = (this.getAttribute("name") || "inputMode").trim();
+    const fileId = (this.getAttribute("file-id") || "inputModeFile").trim();
+    const sourceId = (this.getAttribute("source-id") || "inputModeSource").trim();
+    const fileLabel = (this.getAttribute("file-label") || "ファイル読込").trim();
+    const sourceLabel = (this.getAttribute("source-label") || "ソースコード入力").trim();
+    const defaultMode = (this.getAttribute("default-mode") || "file").trim().toLowerCase();
+    const disabled = this.hasAttribute("disabled");
+
+    this.textContent = "";
+    this.classList.add("lht-input-mode-toggle");
+
+    const group = document.createElement("div");
+    group.className = "lht-input-mode-toggle__group";
+    group.setAttribute("role", "radiogroup");
+    group.setAttribute("aria-label", groupLabel);
+
+    const fileOption = this.createOption({
+      id: fileId,
+      name: groupName,
+      label: fileLabel,
+      value: "file",
+      checked: defaultMode !== "source",
+      disabled
+    });
+
+    const sourceOption = this.createOption({
+      id: sourceId,
+      name: groupName,
+      label: sourceLabel,
+      value: "source",
+      checked: defaultMode === "source",
+      disabled
+    });
+
+    group.appendChild(fileOption.label);
+    group.appendChild(sourceOption.label);
+    this.appendChild(group);
+
+    this._fileRadio = fileOption.input;
+    this._sourceRadio = sourceOption.input;
+
+    const onChange = () => this.applyModeUi();
+    this._fileRadio.addEventListener("change", onChange);
+    this._sourceRadio.addEventListener("change", onChange);
+
+    this.applyModeUi();
+  }
+
+  createOption({ id, name, label, value, checked, disabled }) {
+    const optionLabel = document.createElement("label");
+    optionLabel.className = "lht-input-mode-toggle__option";
+
+    const input = document.createElement("input");
+    input.id = id;
+    input.type = "radio";
+    input.name = name;
+    input.value = value;
+    input.checked = !!checked;
+    input.disabled = !!disabled;
+
+    const text = document.createElement("span");
+    text.textContent = label;
+
+    optionLabel.appendChild(input);
+    optionLabel.appendChild(text);
+    return { label: optionLabel, input };
+  }
+
+  getMode() {
+    return this._sourceRadio?.checked ? "source" : "file";
+  }
+
+  setMode(mode) {
+    const normalized = (mode || "").trim().toLowerCase();
+    const sourceMode = normalized === "source";
+    if (this._sourceRadio) this._sourceRadio.checked = sourceMode;
+    if (this._fileRadio) this._fileRadio.checked = !sourceMode;
+    this.applyModeUi();
+  }
+
+  applyModeUi() {
+    const sourceMode = this.getMode() === "source";
+    const sourceTargetId = (this.getAttribute("source-target-id") || "").trim();
+    const fileTargetId = (this.getAttribute("file-target-id") || "").trim();
+
+    if (sourceTargetId) {
+      const sourceTarget = document.getElementById(sourceTargetId);
+      if (sourceTarget) sourceTarget.classList.toggle("md-hidden", !sourceMode);
+    }
+    if (fileTargetId) {
+      const fileTarget = document.getElementById(fileTargetId);
+      if (fileTarget) fileTarget.classList.toggle("md-hidden", sourceMode);
+    }
+
+    const onChangeFnName = (this.getAttribute("on-change") || "").trim();
+    if (onChangeFnName) {
+      const fn = window[onChangeFnName];
+      if (typeof fn === "function") fn(this.getMode());
+    }
+
+    this.dispatchEvent(new CustomEvent("input-mode-change", {
+      detail: { mode: this.getMode() },
+      bubbles: true
+    }));
+  }
+}
+
+class LhtPreviewOutput extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const previewId = (this.getAttribute("preview-id") || "previewText").trim();
+    const copyButtonId = (this.getAttribute("copy-button-id") || "copyBtn").trim();
+    const copyTargetId = (this.getAttribute("copy-target-id") || previewId).trim();
+    const placeholder = this.getAttribute("placeholder") || "未変換";
+    const copyLabel = (this.getAttribute("copy-label") || "コピー").trim();
+    const copyAriaLabel = (this.getAttribute("copy-aria-label") || `${copyLabel}をコピー`).trim();
+    const previewTag = (this.getAttribute("preview-tag") || "div").trim().toLowerCase();
+    const showCopyButton = !this.hasAttribute("no-copy");
+
+    this.textContent = "";
+    this.classList.add("lht-preview-output");
+
+    const root = document.createElement("div");
+    root.className = "lht-preview-output__root";
+
+    const preview = document.createElement(previewTag === "pre" ? "pre" : "div");
+    preview.id = previewId;
+    preview.className = "lht-preview-output__preview";
+    preview.textContent = placeholder;
+    root.appendChild(preview);
+    this._previewNode = preview;
+
+    if (showCopyButton) {
+      const copyButton = document.createElement("button");
+      copyButton.type = "button";
+      copyButton.id = copyButtonId;
+      copyButton.className = "lht-preview-output__copy-button";
+      copyButton.setAttribute("aria-label", copyAriaLabel);
+      copyButton.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="lht-preview-output__copy-icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><rect x="4" y="4" width="11" height="11" rx="2"></rect></svg>';
+      copyButton.addEventListener("click", () => this.copy(copyTargetId));
+      root.appendChild(copyButton);
+      this._copyButton = copyButton;
+    }
+
+    this.appendChild(root);
+  }
+
+  getText() {
+    return (this._previewNode?.textContent || "").trim();
+  }
+
+  setText(text) {
+    if (!this._previewNode) return;
+    this._previewNode.textContent = text == null ? "" : String(text);
+  }
+
+  clear() {
+    if (!this._previewNode) return;
+    const placeholder = this.getAttribute("placeholder") || "";
+    this._previewNode.textContent = placeholder;
+  }
+
+  async copy(targetId) {
+    const target = document.getElementById(targetId);
+    const text = (target?.textContent || "").trim();
+    if (!text) return;
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+      }
+      if (typeof window.showToast === "function") {
+        window.showToast("コピーしました");
+      }
+    } catch (_) {
+      // コピー不可環境では失敗を握りつぶす
     }
   }
 }
@@ -728,6 +1154,21 @@ if (!customElements.get("lht-select-help")) {
 }
 if (!customElements.get("lht-file-select")) {
   customElements.define("lht-file-select", LhtFileSelect);
+}
+if (!customElements.get("lht-loading-overlay")) {
+  customElements.define("lht-loading-overlay", LhtLoadingOverlay);
+}
+if (!customElements.get("lht-toast")) {
+  customElements.define("lht-toast", LhtToast);
+}
+if (!customElements.get("lht-error-alert")) {
+  customElements.define("lht-error-alert", LhtErrorAlert);
+}
+if (!customElements.get("lht-input-mode-toggle")) {
+  customElements.define("lht-input-mode-toggle", LhtInputModeToggle);
+}
+if (!customElements.get("lht-preview-output")) {
+  customElements.define("lht-preview-output", LhtPreviewOutput);
 }
 if (!customElements.get("lht-switch-help")) {
   customElements.define("lht-switch-help", LhtSwitchHelp);

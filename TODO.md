@@ -20,6 +20,19 @@
 - [後まわし] docker/docker-compose: よくある起動・開発用コマンド生成
 - [方針] `md3/` は段階的にリファレンス用途へ縮退し、実運用スタイルは `lht-cmn` に集約する
 - [方針] 最優先: Material Web vendor バンドル（`material-web-outlined-text-field.bundle.js`）の配置場所を `lht-cmn` 基準へ適正化し、各 `*-src.html` / build script の参照を整理する
+- [lht-cmn] `lht-toast` を追加し、`toast + showToast()` の重複実装を共通化する（`role="status"` / `aria-live="polite"` を標準化）
+- [横展開] music/git 以外の全アプリでも `lht-toast` 統一を適用し、`showToast` の旧フォールバック（`md-visible` / `md-hidden` 手動制御）を削除する
+- [横展開] music/git 以外の全アプリでも `lht-error-alert`（エラー表示）を適用し、エラー表示の重複実装を共通化する
+- [横展開] music/git 以外の全アプリでも `lht-input-mode-toggle`（source/file 切替）を適用し、切替UIの重複実装を共通化する
+- [横展開] music/git 以外の全アプリでも `lht-file-select`（ファイル選択UI）を適用し、選択ボタン＋ファイル名表示を共通化する
+- [横展開] music/git 以外の全アプリでも `lht-preview-output`（プレビュー表示＋コピー導線）を適用し、表示領域の重複実装を共通化する
+- [横展開] music/git 以外の全アプリでも `lht-command-block`（コマンド表示ブロック）を適用し、コマンド表示・コピー導線を共通化する
+- [ルール横展開] 表示制御属性は `active` に統一し、既存の `md-hidden` / `md-visible` 依存を段階的に削減する
+- [ルール横展開] API命名規約を統一する（表示系は `show/hide`、内容消去系は `show/clear`）
+- [運用スタイル] 新規実装は上記 `lht-cmn` コンポーネント + ルール準拠を必須とし、既存画面は「触るタイミングで順次置換」を原則に進める
+- [lht-cmn] `lht-error-alert` を追加し、`errorText` の表示/非表示と `role="alert"` 運用を共通化する
+- [lht-cmn] `lht-input-mode-toggle`（file/source 切替）を追加し、music系で反復しているラジオUIを共通化する
+- [lht-cmn] `lht-preview-output`（プレビュー + コピー導線）を追加し、`previewText` 周辺の反復UIを共通化する
 - [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
   - 現状: Web Audio による簡易シンセ再生は実装済み
   - 未実装: 生成したMIDI実データ（SMF）のその場再生（MIDIパーサ/プレイヤー経由）

@@ -369,14 +369,8 @@
 
     function showToast(message) {
       const toast = document.getElementById("toast");
-      if (!toast) return;
-      toast.textContent = message;
-      toast.classList.remove("md-hidden");
-      toast.classList.add("md-visible");
-      setTimeout(() => {
-        toast.classList.remove("md-visible");
-        toast.classList.add("md-hidden");
-      }, 2000);
+      if (!toast || typeof toast.show !== "function") return;
+      toast.show(message, 2200);
     }
 
     function summarizeTextDiffForToast(beforeText, afterText) {

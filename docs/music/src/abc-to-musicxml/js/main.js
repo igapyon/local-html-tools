@@ -56,7 +56,9 @@ downloadBtn.addEventListener("click", downloadMusicXml);
 playSineBtn.addEventListener("click", playSine);
 copyBtn.addEventListener("click", copyMusicXml);
 fileInput.addEventListener("change", loadAbcFile);
-fileSelectBtn.addEventListener("click", () => fileInput.click());
+if (!(fileSelectBtn && fileSelectBtn.closest("lht-file-select"))) {
+    fileSelectBtn.addEventListener("click", () => fileInput.click());
+}
 inputModeSourceRadio.addEventListener("change", applyInputMode);
 inputModeFileRadio.addEventListener("change", applyInputMode);
 defaultTitleInput.addEventListener("change", persistSettings);
@@ -215,29 +217,35 @@ function playSine() {
     });
 }
 function setError(message, lineNumber) {
-    errorText.textContent = message;
-    errorText.classList.remove("md-hidden");
+    if (errorText && typeof errorText.show === "function") {
+        errorText.show(message);
+    }
+    else if (errorText) {
+        errorText.textContent = message;
+        errorText.classList.remove("md-hidden");
+    }
     if (Number.isInteger(lineNumber) && lineNumber > 0) {
         focusLine(lineNumber);
     }
 }
 function clearError() {
-    errorText.textContent = "";
-    errorText.classList.add("md-hidden");
+    if (errorText && typeof errorText.clear === "function") {
+        errorText.clear();
+    }
+    else if (errorText) {
+        errorText.textContent = "";
+        errorText.classList.add("md-hidden");
+    }
 }
 function clearWarning() {
     warningText.textContent = "";
     warningText.classList.add("md-hidden");
 }
 function showToast(message) {
-    toast.textContent = message;
-    toast.classList.remove("md-hidden");
-    toast.classList.add("md-visible");
-    clearTimeout(showToast.timer);
-    showToast.timer = setTimeout(() => {
-        toast.classList.remove("md-visible");
-        toast.classList.add("md-hidden");
-    }, 1400);
+    if (!toast || typeof toast.show !== "function") {
+        return;
+    }
+    toast.show(message, 1400);
 }
 function toggleMenu() {
     menuPanel.classList.toggle("md-hidden");

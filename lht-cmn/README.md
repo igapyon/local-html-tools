@@ -2,7 +2,7 @@
 
 `lht-cmn` は `local-html-tools` 全体で共有する UI コンポーネント基盤です。
 
-- Version: `v20260222`
+- Version: `v20260306`
 - License: Apache License 2.0 (`lht-cmn/LICENSE`)
 - Copyright: Toshiki Iga
 
@@ -64,6 +64,11 @@
 | `lht-page-menu` | 右上メニュー（トップへ戻る等）を共通化できる | 内部でメニューボタン + パネル + リンクを生成。外側クリックで自動クローズ |
 | `lht-index-card-link` | `docs/index` のカードリンクを統一フォーマットで記述できる | 内部でカードDOM（`a` + タイトル + 説明 + 矢印/バッジ）を生成し、`variant`/`target`/外部リンク判定を吸収 |
 | `lht-file-select` | ファイル選択UI（Filledボタン + ファイル名表示）を共通化できる | 内部で hidden `input[type=file]` とトリガUIを生成。`md-filled-button` が使える環境ではそれを利用し、未定義時はフォールバックボタンで動作維持 |
+| `lht-loading-overlay` | 処理中オーバーレイ（スピナー + メッセージ）を共通化できる | `active` で表示制御し、`aria-live`/`aria-hidden` を同期。必要に応じて `aria-busy` 更新と操作無効化も連動 |
+| `lht-toast` | 一時通知トースト（コピー完了など）を共通化できる | `active` と `show()/hide()` で表示制御し、`role="status"` / `aria-live="polite"` を標準化。`window.showToast` が未定義なら自動補完 |
+| `lht-error-alert` | エラー表示（`role="alert"`）を共通化できる | `active` と `show()/hide()` で表示制御し、`aria-live="assertive"` と表示/非表示同期を標準化（`clear()` は補助） |
+| `lht-input-mode-toggle` | 入力モード切替（file/source ラジオ）を共通化できる | 既定ID（`inputModeFile`/`inputModeSource`）を維持しつつ、`source/file` ブロックの `md-hidden` 切替を自動化できる |
+| `lht-preview-output` | プレビュー表示 + コピー導線を共通化できる | `preview` 枠とコピーボタンを1タグで提供し、`copy-target-id` 指定で既存出力要素からのコピーにも対応 |
 
 ## 利用方法
 
@@ -85,6 +90,13 @@ HTML から次を読み込みます。
   - 入力系は `lht-text-field-help` / `lht-select-help` / `lht-switch-help` 側に `label` と `help-text` を集約する
   - 必須指定は可能な限りコンポーネント側（`required`）へ寄せる
 - 例外にする場合は、対象画面側に理由を残す（表示密度・既存互換・重複説明の回避など）
+
+### コンポーネント設計規約（表示制御とAPI）
+
+- 表示/非表示を持つ `lht-*` は、表示状態の正本属性を `active` とする
+- 表示制御メソッドは `show()` / `hide()` を標準とする
+- `clear()` は「内容を消して非表示にする」用途でのみ任意追加する（`show/hide` の代替にはしない）
+- `active` の更新時は `aria-hidden` を同期する
 
 ## ドロップダウン置換手順（`lht-select-help`）
 
@@ -175,6 +187,61 @@ HTML から次を読み込みます。
 
 - 用途: ファイル選択UI（ボタン + hidden file input + ファイル名表示）
 - 主な属性: `input-id`, `button-id`, `file-name-id`, `accept`, `button-label`, `placeholder`, `file-label`, `multiple`, `disabled`, `show-file-name`
+
+### `lht-loading-overlay`
+
+- 用途: ファイル読み込みなどの非同期処理中オーバーレイ（indeterminate loading）
+- 主な属性: `active`, `text`, `busy-target-id`, `disable-target-ids`
+- 補助メソッド: `setActive(boolean)`, `isActive()`, `waitForNextPaint()`
+- ARIAルール:
+  - 常時 `role="status"` と `aria-live="polite"` を持つ
+  - `active` に応じて `aria-hidden` を `false/true` へ同期する
+  - `busy-target-id` 指定時は対象へ `aria-busy` を `true/false` で同期する
+- 推奨フロー:
+  1. `overlay.setActive(true)` で開始
+  2. `await overlay.waitForNextPaint()` で先に描画を確定
+  3. 重い処理を実行
+  4. `finally` で `overlay.setActive(false)` を必ず実行
+
+### `lht-toast`
+
+- 用途: コピー完了などの短時間通知（toast/snackbar）
+- 主な属性: `active`, `text`, `duration-ms`
+- 補助メソッド: `show(message?, durationMs?)`, `hide()`
+- ARIAルール:
+  - 常時 `role="status"` と `aria-live="polite"` を持つ
+  - 常時 `aria-atomic="true"` を持つ
+- 運用メモ:
+  - ページ側に `<lht-toast id="toast"></lht-toast>` を1つ配置して使う
+  - 既存コードが `window.showToast(...)` を呼ぶ場合、未定義時は `lht-toast` 側が自動補完する
+
+### `lht-error-alert`
+
+- 用途: 画面内エラー表示の共通化（`errorText` パターンの置換）
+- 主な属性: `text`, `active`
+- 補助メソッド: `show(message?)`, `hide()`, `clear()`, `isVisible()`
+- ARIAルール:
+  - 常時 `role="alert"` と `aria-live="assertive"` を持つ
+  - 常時 `aria-atomic="true"` を持つ
+  - 表示状態に応じて `aria-hidden` を同期する
+
+### `lht-input-mode-toggle`
+
+- 用途: `file/source` 入力切替ラジオUIの共通化（music系の重複置換）
+- 主な属性: `name`, `group-label`, `file-id`, `source-id`, `file-label`, `source-label`, `default-mode`, `source-target-id`, `file-target-id`, `on-change`, `disabled`
+- 補助メソッド: `getMode()`, `setMode(mode)`, `applyModeUi()`
+- 互換メモ:
+  - 既定の `file-id` / `source-id` は `inputModeFile` / `inputModeSource`
+  - 既存JSが `document.getElementById("inputModeFile")` 等を参照していても置換しやすい
+
+### `lht-preview-output`
+
+- 用途: プレビュー表示とコピー導線の共通化（`preview + copyBtn` パターンの置換）
+- 主な属性: `preview-id`, `copy-button-id`, `copy-target-id`, `placeholder`, `copy-label`, `copy-aria-label`, `preview-tag`, `no-copy`
+- 補助メソッド: `getText()`, `setText(text)`, `copy(targetId?)`, `clear()`
+- 運用メモ:
+  - 既定の `preview-id` / `copy-button-id` は `previewText` / `copyBtn`
+  - `copy-target-id` を指定すると、プレビュー枠とは別要素のテキストをコピーできる
 
 ## Appendix
 

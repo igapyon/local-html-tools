@@ -29,8 +29,12 @@ const TARGETS = [
     id: "midi-to-musicxml",
     srcHtml: "docs/music/midi-to-musicxml-src.html",
     outHtml: "docs/music/midi-to-musicxml.html",
-    cssOrder: ["src/midi-to-musicxml/css/app.css"],
+    cssOrder: [
+      "../../lht-cmn/css/components.css",
+      "src/midi-to-musicxml/css/app.css"
+    ],
     jsOrder: [
+      "../../lht-cmn/js/components.js",
       "src/common/js/musicxml-writer-common.js",
       "src/midi-to-musicxml/js/main.js"
     ],
@@ -43,8 +47,12 @@ const TARGETS = [
     id: "musicxml-to-abc",
     srcHtml: "docs/music/musicxml-to-abc-src.html",
     outHtml: "docs/music/musicxml-to-abc.html",
-    cssOrder: ["src/musicxml-to-abc/css/app.css"],
+    cssOrder: [
+      "../../lht-cmn/css/components.css",
+      "src/musicxml-to-abc/css/app.css"
+    ],
     jsOrder: [
+      "../../lht-cmn/js/components.js",
       "src/common/js/musicxml-common.js",
       "src/common/js/musicxml-synth-schedule-common.js",
       "src/common/js/music-synth-common.js",
@@ -63,8 +71,12 @@ const TARGETS = [
     id: "abc-to-musicxml",
     srcHtml: "docs/music/abc-to-musicxml-src.html",
     outHtml: "docs/music/abc-to-musicxml.html",
-    cssOrder: ["src/abc-to-musicxml/css/app.css"],
+    cssOrder: [
+      "../../lht-cmn/css/components.css",
+      "src/abc-to-musicxml/css/app.css"
+    ],
     jsOrder: [
+      "../../lht-cmn/js/components.js",
       "src/common/js/abc-common.js",
       "src/common/js/musicxml-common.js",
       "src/common/js/musicxml-synth-schedule-common.js",
@@ -87,8 +99,12 @@ const TARGETS = [
     id: "musicxml-to-svg",
     srcHtml: "docs/music/musicxml-to-svg-src.html",
     outHtml: "docs/music/musicxml-to-svg.html",
-    cssOrder: ["src/musicxml-to-svg/css/app.css"],
+    cssOrder: [
+      "../../lht-cmn/css/components.css",
+      "src/musicxml-to-svg/css/app.css"
+    ],
     jsOrder: [
+      "../../lht-cmn/js/components.js",
       "src/musicxml-to-svg/js/verovio.js",
       "src/musicxml-to-svg/js/jszip.js",
       "src/common/js/musicxml-common.js",

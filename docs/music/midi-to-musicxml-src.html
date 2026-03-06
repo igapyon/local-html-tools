@@ -19,6 +19,7 @@ limitations under the License.
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MIDI → MusicXML 変換</title>
+    <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
     <link rel="stylesheet" href="src/midi-to-musicxml/css/app.css" />
 </head>
 <body>
@@ -67,25 +68,27 @@ limitations under the License.
           <h2 class="md-section-title">MIDI入力</h2>
         </div>
 
-        <div class="md-radio-group" role="radiogroup" aria-label="入力方式">
-          <label class="md-radio-option">
-            <input id="inputModeFile" type="radio" name="inputMode" value="file" checked />
-            <span>ファイル読込</span>
-          </label>
-          <label class="md-radio-option">
-            <input id="inputModeSource" type="radio" name="inputMode" value="source" />
-            <span>16進ソース入力</span>
-          </label>
-        </div>
+        <lht-input-mode-toggle
+          name="inputMode"
+          group-label="入力方式"
+          file-id="inputModeFile"
+          source-id="inputModeSource"
+          file-label="ファイル読込"
+          source-label="16進ソース入力"
+          source-target-id="sourceInputBlock"
+          file-target-id="fileInputBlock">
+        </lht-input-mode-toggle>
 
         <div id="fileInputBlock">
-          <div class="md-actions">
-            <button id="fileSelectBtn" class="md-button md-button--primary" type="button">
-              <span>ファイルを選択</span>
-            </button>
-            <span id="fileNameText">未選択</span>
-          </div>
-          <input id="fileInput" class="md-file" type="file" accept=".mid,.midi,audio/midi,audio/x-midi,application/octet-stream" hidden />
+          <lht-file-select
+            input-id="fileInput"
+            button-id="fileSelectBtn"
+            file-name-id="fileNameText"
+            accept=".mid,.midi,audio/midi,audio/x-midi,application/octet-stream"
+            button-label="ファイルを選択"
+            placeholder="未選択"
+            show-file-name>
+          </lht-file-select>
         </div>
 
         <div id="sourceInputBlock" class="md-hidden">
@@ -186,7 +189,7 @@ limitations under the License.
             <span>コピー</span>
           </button>
         </div>
-        <p id="errorText" class="md-error md-hidden" role="alert"></p>
+        <lht-error-alert id="errorText"></lht-error-alert>
         <p id="warningText" class="md-warning md-hidden"></p>
       </section>
 
@@ -202,8 +205,9 @@ limitations under the License.
     </section>
   </main>
 
-  <div id="toast" class="md-snackbar md-hidden" role="status" aria-live="polite"></div>
+  <lht-toast id="toast"></lht-toast>
 
+    <script src="../../lht-cmn/js/components.js"></script>
     <script src="src/common/js/musicxml-writer-common.js"></script>
     <script src="src/midi-to-musicxml/js/main.js"></script>
 </body>
