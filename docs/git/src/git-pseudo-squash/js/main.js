@@ -332,6 +332,10 @@
         element.addEventListener("input", handler);
         element.addEventListener("change", handler);
       });
+      const squashBaseScope = document.getElementById("squashBaseScope");
+      if (squashBaseScope) {
+        squashBaseScope.addEventListener("change", updateBaseScope);
+      }
     }
 
     function setupRebaseAutoUpdate() {

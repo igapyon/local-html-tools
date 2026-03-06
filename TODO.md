@@ -33,6 +33,7 @@
 - [lht-cmn] `lht-error-alert` を追加し、`errorText` の表示/非表示と `role="alert"` 運用を共通化する
 - [lht-cmn] `lht-input-mode-toggle`（file/source 切替）を追加し、music系で反復しているラジオUIを共通化する
 - [lht-cmn] `lht-preview-output`（プレビュー + コピー導線）を追加し、`previewText` 周辺の反復UIを共通化する
+- [優先度高][lht-cmn] `lht-*` 全体を棚卸しし、各コンポーネントを「内部保証」または「フォールバック保証」のどちらかへ統一する
 - [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
   - 現状: Web Audio による簡易シンセ再生は実装済み
   - 未実装: 生成したMIDI実データ（SMF）のその場再生（MIDIパーサ/プレイヤー経由）
@@ -78,7 +79,20 @@
 - [対応] `lht-cmn/css/components.css` に横スクロール抑止の共通ルールを追加（`.md-page { overflow-x: clip; }`）
 - [対応] `lht-help-tooltip` の表示制御と幅制限を `lht` 側へ共通化（非表示時 `display:none`、表示時のみ表示、モバイルで右寄せ + `calc(100vw - 2rem)` 制限）
 - [反映] Music 以外の各アプリを再ビルドし、共通ルールを生成HTMLへ反映（`git/grep/password/diagram/ffmpeg/life/link/text/img/docs-index`）
-- [注意] `npm run build:all` は既存の Music 側 TypeScript エラー（`src/common/ts/musicxml-writer-common.ts`）で停止するため、Music 系への同反映は別途対応が必要
+- [対応] `lht-select-help` で declarative-options 判定を script 消費前に確定し、不要な再 hydration を防止
+- [対応] `lht-switch-help` を self-contained 化し、`md-switch` 未読込時 fallback を正式サポート
+- [対応] `lht-help-tooltip` を self-contained 化し、`md-icon-button` 未読込時 fallback と `placement="auto|left|right|top|bottom"` を追加
+- [対応] pre-upgrade content flash を防ぐ初期化ガードを `lht-cmn/css/components.css` に追加し、`data-initialized="true"` 契約を明文化
+- [対応] `lht-file-select` に `lht-file-select:before-open` / `lht-file-select:change` と `auto-open="false"` を追加し、event ownership を明文化
+- [対応] `lht-select-help` に `setOptions([...])` / `getValue()` / `setValue()` を追加し、selected-value retention を定義
+- [対応] `lht-cmn/README.md` に integration contract / fallback parity 表 / `lht-select-help` lifecycle を追加
+- [反映] `npm run build:all` が最後まで通る状態を確認
+- [対応] `lht-error-alert` に `variant="error|warning|info"` を追加し、variant ごとに `role` / `aria-live` を整理
+- [対応] `lht-cmn/components.test.js` に Material 読込あり / なし の両モード回帰テストを追加
+- [対応] `lht-text-field-help` を self-contained 化し、`md-outlined-text-field` 未読込時 fallback を追加
+- [対応] `lht-command-block` を self-contained 化し、`md-icon-button` 未読込時 fallback を追加
+- [対応] `docs/git/git-branch-diff-src.html` と `docs/git/git-pseudo-squash-src.html` に残っていた raw `md-*` field/switch/select を `lht-*` へ置換
+- [対応] `docs/grep/find-gen-src.html` に残っていた raw `md-outlined-select` を `lht-select-help` へ置換
 - 対象: docs/grep/find-gen.html
 - 対象: docs/img/img2svg.html
 - 対象: docs/password/password-gen.html

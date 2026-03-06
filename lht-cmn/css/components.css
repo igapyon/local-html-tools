@@ -10,6 +10,28 @@ lht-help-tooltip {
   align-items: center;
 }
 
+/*
+ * Hide raw pre-upgrade content until each component finishes connectedCallback()
+ * and marks itself initialized. This prevents tooltip/help text from flashing
+ * into the normal layout before the component rewrites its internal DOM.
+ */
+lht-help-tooltip:not([data-initialized="true"]),
+lht-text-field-help:not([data-initialized="true"]),
+lht-select-help:not([data-initialized="true"]),
+lht-file-select:not([data-initialized="true"]),
+lht-switch-help:not([data-initialized="true"]),
+lht-command-block:not([data-initialized="true"]),
+lht-page-menu:not([data-initialized="true"]),
+lht-page-hero:not([data-initialized="true"]),
+lht-index-card-link:not([data-initialized="true"]),
+lht-loading-overlay:not([data-initialized="true"]),
+lht-toast:not([data-initialized="true"]),
+lht-error-alert:not([data-initialized="true"]),
+lht-input-mode-toggle:not([data-initialized="true"]),
+lht-preview-output:not([data-initialized="true"]) {
+  visibility: hidden;
+}
+
 /* Keep accidental horizontal overflow from creating blank right-space on narrow screens. */
 .md-page {
   overflow-x: clip;
@@ -24,6 +46,10 @@ lht-help-tooltip .md-tooltip-content {
 lht-help-tooltip .md-tooltip-group:hover .md-tooltip-content,
 lht-help-tooltip .md-tooltip-group:focus-within .md-tooltip-content {
   display: block;
+}
+
+lht-help-tooltip .md-tooltip-group[data-force-hidden="true"] .md-tooltip-content {
+  display: none !important;
 }
 
 @media (max-width: 640px) {
@@ -166,10 +192,43 @@ lht-command-block {
   display: block;
 }
 
+lht-command-block .md-copy-button--fallback {
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #efe9fa;
+  color: #3f3564;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+lht-command-block .md-copy-button--fallback .md-icon-small {
+  width: 16px;
+  height: 16px;
+}
+
 lht-text-field-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
+}
+
+lht-text-field-help .lht-text-field-help__fallback {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--md-sys-color-outline, #79747e);
+  background: var(--md-sys-color-surface, #fffbfe);
+  padding: 0.9rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--md-sys-color-on-surface, #1d1b20);
+  box-sizing: border-box;
+  font: inherit;
+  resize: vertical;
 }
 
 lht-select-help {
@@ -338,6 +397,18 @@ lht-error-alert .lht-error-alert__body {
   padding: 0.58rem 0.72rem;
   font-size: 0.88rem;
   line-height: 1.45;
+}
+
+lht-error-alert[variant="warning"] .lht-error-alert__body {
+  border-color: #f0d59b;
+  background: #fff8e6;
+  color: #8a5a00;
+}
+
+lht-error-alert[variant="info"] .lht-error-alert__body {
+  border-color: #bdd7f5;
+  background: #eef6ff;
+  color: #175ea8;
 }
 
 lht-input-mode-toggle {
@@ -544,6 +615,43 @@ lht-switch-help .md-switch-label md-switch {
   vertical-align: middle;
 }
 
+lht-switch-help .md-switch-label .md-switch-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+lht-switch-help .md-switch-label .md-switch {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #d7d2de;
+  position: relative;
+  transition: background 150ms ease;
+  flex: 0 0 44px;
+}
+
+lht-switch-help .md-switch-label .md-switch::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 150ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+lht-switch-help .md-switch-label .md-switch-input:checked + .md-switch {
+  background: var(--md-sys-color-primary, #6200ee);
+}
+
+lht-switch-help .md-switch-label .md-switch-input:checked + .md-switch::after {
+  transform: translateX(20px);
+}
+
 lht-switch-help .md-switch-label .md-info-chip {
   margin-left: 0;
 }
@@ -561,6 +669,24 @@ lht-switch-help .md-switch-label .md-tooltip-content {
   --md-icon-button-state-layer-size: 30px;
   --md-focus-ring-color: #6c3eea;
   color: #6f6a79;
+}
+
+.md-help-icon-button--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  cursor: help;
+}
+
+.md-help-icon-button--fallback .md-info-icon {
+  width: 18px;
+  height: 18px;
 }
 
 lht-index-card-link {

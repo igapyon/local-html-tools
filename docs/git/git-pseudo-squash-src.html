@@ -66,7 +66,7 @@ limitations under the License.
     <section id="baseBlock" class="md-section md-stack-md">
       <div class="md-stack-md">
         <div class="md-form-row md-form-row--nowrap">
-          <md-outlined-text-field id="squashBaseBranch" label="基点ブランチ" required autocomplete="on" placeholder="例: devel" class="md-outlined-field" value="devel" data-help-text="基点は git 作業の差分の起点として利用されます。git 作業をどこが基点なのか確認しましょう。基点が違うと差分がずれるため要確認です。設定の順番を揃えると意図した差分になりやすいです。"></md-outlined-text-field>
+          <lht-text-field-help field-id="squashBaseBranch" label="基点ブランチ" required autocomplete="on" placeholder="例: devel" value="devel" help-text="基点は git 作業の差分の起点として利用されます。git 作業をどこが基点なのか確認しましょう。基点が違うと差分がずれるため要確認です。設定の順番を揃えると意図した差分になりやすいです。"></lht-text-field-help>
           <md-menu id="baseBranchMenu" anchor="squashBaseBranch" positioning="popover" quick no-navigation-wrap></md-menu>
           <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="clearBaseBranchHistory()" title="基点ブランチ履歴をクリア" aria-label="基点ブランチ履歴をクリア">
             <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -108,23 +108,21 @@ limitations under the License.
       </div>
       <div id="baseRemoteRow" class="md-form-grid md-form-grid-2">
         <div class="md-form-row">
-          <md-outlined-select id="squashBaseScope" label="基点の参照先" class="md-outlined-field" value="remote" data-help-text="基点ブランチをリモートから参照するか、ローカルで参照するかを指定します。ふだんは最新のリモート状態で切りたいので、リモート基点を選ぶケースが多いです。" onchange="updateBaseScope()">
-            <md-select-option value="remote" selected>
-              <div slot="headline">リモート</div>
-            </md-select-option>
-            <md-select-option value="local">
-              <div slot="headline">ローカル</div>
-            </md-select-option>
-          </md-outlined-select>
+          <lht-select-help field-id="squashBaseScope" label="基点の参照先" value="remote" help-text="基点ブランチをリモートから参照するか、ローカルで参照するかを指定します。ふだんは最新のリモート状態で切りたいので、リモート基点を選ぶケースが多いです。">
+            <script type="application/json" slot="options">[
+              { "value": "remote", "label": "リモート", "selected": true },
+              { "value": "local", "label": "ローカル" }
+            ]</script>
+          </lht-select-help>
         </div>
         <div class="md-form-row">
-          <md-outlined-text-field id="baseRemote" label="基点リモート" placeholder="例: origin" class="md-outlined-field" value="origin" data-help-text="基点ブランチを参照するリモート名です（例: origin）。「作業開始」と「まとめる予定の作業 (diff)」の基準になります。リモート基点を選ぶ場合は、最新の origin/devel などを参照する想定です。"></md-outlined-text-field>
+          <lht-text-field-help field-id="baseRemote" label="基点リモート" placeholder="例: origin" value="origin" help-text="基点ブランチを参照するリモート名です（例: origin）。「作業開始」と「まとめる予定の作業 (diff)」の基準になります。リモート基点を選ぶ場合は、最新の origin/devel などを参照する想定です。"></lht-text-field-help>
         </div>
       </div>
     </section>
     <div id="extraOptions" class="md-section md-stack-md">
       <div id="squashRemoteRow">
-        <md-outlined-text-field id="squashRemote" label="squashリモート" placeholder="例: origin" class="md-outlined-field" value="origin" data-help-text="squash 作業で使う fetch / push のリモート名です。通常は origin です。「作業をまとめる（squash）」のコマンドに反映されます。基点のリモートと同じにしておくと混乱しにくいです。"></md-outlined-text-field>
+        <lht-text-field-help field-id="squashRemote" label="squashリモート" placeholder="例: origin" value="origin" help-text="squash 作業で使う fetch / push のリモート名です。通常は origin です。「作業をまとめる（squash）」のコマンドに反映されます。基点のリモートと同じにしておくと混乱しにくいです。"></lht-text-field-help>
       </div>
     </div>
 
@@ -191,7 +189,7 @@ limitations under the License.
         </span>
       </div>
       <div class="md-form-row">
-        <md-outlined-text-field id="commitMessage" label="コミットメッセージ" type="textarea" rows="12" required class="md-outlined-field" placeholder="コミットの内容を表す一文&#10;&#10;コミットの内容の説明" data-help-text="まとめ後の1コミットの説明文です。複数行入力が可能で、内容は一時ファイルに書き込んで git commit -F で渡されます。macOS / Linux は mktemp + ヒアドキュメント、Windows は PowerShell の New-TemporaryFile で対応します。ヒアドキュメント経由で渡すため、シェルのクォート解析の影響を受けにくくしています。あとで読んで何をおこなったのかわかる内容にしましょう。"></md-outlined-text-field>
+        <lht-text-field-help field-id="commitMessage" label="コミットメッセージ" type="textarea" rows="12" required placeholder="コミットの内容を表す一文&#10;&#10;コミットの内容の説明" help-text="まとめ後の1コミットの説明文です。複数行入力が可能で、内容は一時ファイルに書き込んで git commit -F で渡されます。macOS / Linux は mktemp + ヒアドキュメント、Windows は PowerShell の New-TemporaryFile で対応します。ヒアドキュメント経由で渡すため、シェルのクォート解析の影響を受けにくくしています。あとで読んで何をおこなったのかわかる内容にしましょう。"></lht-text-field-help>
       </div>
     </section>
 
