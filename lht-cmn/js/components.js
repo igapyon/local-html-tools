@@ -13,24 +13,196 @@ class LhtHelpTooltip extends HTMLElement {
     const label = this.getAttribute("label") || "説明";
     const isWide = this.hasAttribute("wide");
     const helpContentHtml = this.innerHTML.trim();
+    const placement = this._normalizePlacement(this.getAttribute("placement"));
 
     this.textContent = "";
 
     const group = document.createElement("span");
     group.className = "md-tooltip-group";
 
-    const button = document.createElement("md-icon-button");
+    const hasMdIconButton = !!(window.customElements && window.customElements.get("md-icon-button"));
+    const button = document.createElement(hasMdIconButton ? "md-icon-button" : "button");
     button.className = "md-help-icon-button";
+    if (!hasMdIconButton) {
+      button.type = "button";
+      button.classList.add("md-help-icon-button--fallback");
+    }
     button.setAttribute("aria-label", label);
     button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg>';
 
     const tooltip = document.createElement("span");
     tooltip.className = `md-tooltip-content md-tooltip md-tooltip--rich${isWide ? " md-tooltip--wide" : ""}`;
     tooltip.innerHTML = helpContentHtml;
+    tooltip.dataset.placement = placement;
 
     group.appendChild(button);
     group.appendChild(tooltip);
     this.appendChild(group);
+
+    this._group = group;
+    this._tooltip = tooltip;
+    this._activeTooltip = false;
+    this._handleTooltipEnter = () => {
+      this._activeTooltip = true;
+      group.removeAttribute("data-force-hidden");
+      this._applyTooltipPlacement();
+    };
+    this._handleTooltipLeave = () => {
+      this._activeTooltip = false;
+      group.removeAttribute("data-force-hidden");
+      this._resetTooltipPlacement();
+    };
+    this._handleTooltipKeydown = (event) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      this._activeTooltip = false;
+      group.setAttribute("data-force-hidden", "true");
+      this._resetTooltipPlacement();
+      if (document.activeElement && group.contains(document.activeElement)) {
+        document.activeElement.blur();
+      }
+    };
+    this._handleTooltipResize = () => {
+      if (!this._activeTooltip) return;
+      this._applyTooltipPlacement();
+    };
+
+    group.addEventListener("mouseenter", this._handleTooltipEnter);
+    group.addEventListener("focusin", this._handleTooltipEnter);
+    group.addEventListener("mouseleave", this._handleTooltipLeave);
+    group.addEventListener("keydown", this._handleTooltipKeydown);
+    group.addEventListener("focusout", () => {
+      requestAnimationFrame(() => {
+        if (!group.matches(":focus-within")) {
+          this._handleTooltipLeave();
+        }
+      });
+    });
+    window.addEventListener("resize", this._handleTooltipResize);
+  }
+
+  disconnectedCallback() {
+    if (this._group && this._handleTooltipEnter) {
+      this._group.removeEventListener("mouseenter", this._handleTooltipEnter);
+      this._group.removeEventListener("focusin", this._handleTooltipEnter);
+      this._group.removeEventListener("mouseleave", this._handleTooltipLeave);
+      this._group.removeEventListener("keydown", this._handleTooltipKeydown);
+    }
+    if (this._handleTooltipResize) {
+      window.removeEventListener("resize", this._handleTooltipResize);
+    }
+  }
+
+  _normalizePlacement(rawPlacement) {
+    const normalized = (rawPlacement || "auto").trim().toLowerCase();
+    return ["auto", "left", "right", "top", "bottom"].includes(normalized) ? normalized : "auto";
+  }
+
+  _applyTooltipPlacement() {
+    const tooltip = this._tooltip;
+    const group = this._group;
+    if (!tooltip || !group) return;
+
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const safeWidth = Math.max(120, viewportWidth - 32);
+    tooltip.style.maxWidth = `${safeWidth}px`;
+    tooltip.style.visibility = "hidden";
+    tooltip.style.display = "block";
+
+    const anchorRect = group.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const placement = this._normalizePlacement(this.getAttribute("placement"));
+    const appliedPlacement = placement === "auto"
+      ? this._pickAutoPlacement(anchorRect, tooltipRect, viewportWidth, viewportHeight)
+      : placement;
+    const position = this._computeTooltipPosition(appliedPlacement, anchorRect, tooltipRect, viewportWidth, viewportHeight);
+    const relativeLeft = position.left - anchorRect.left;
+    const relativeTop = position.top - anchorRect.top;
+
+    tooltip.dataset.placement = appliedPlacement;
+    tooltip.style.left = `${relativeLeft}px`;
+    tooltip.style.top = `${relativeTop}px`;
+    tooltip.style.right = "auto";
+    tooltip.style.bottom = "auto";
+    tooltip.style.transform = "none";
+    tooltip.style.marginTop = "0";
+    tooltip.style.visibility = "";
+  }
+
+  _resetTooltipPlacement() {
+    const tooltip = this._tooltip;
+    if (!tooltip) return;
+    tooltip.dataset.placement = this._normalizePlacement(this.getAttribute("placement"));
+    tooltip.style.left = "";
+    tooltip.style.top = "";
+    tooltip.style.right = "";
+    tooltip.style.bottom = "";
+    tooltip.style.transform = "";
+    tooltip.style.marginTop = "";
+    tooltip.style.maxWidth = "";
+    tooltip.style.visibility = "";
+    tooltip.style.display = "";
+  }
+
+  _pickAutoPlacement(anchorRect, tooltipRect, viewportWidth, viewportHeight) {
+    const candidates = ["right", "left", "bottom", "top"];
+    let bestPlacement = "right";
+    let bestScore = Number.POSITIVE_INFINITY;
+
+    for (const candidate of candidates) {
+      const position = this._computeTooltipPosition(candidate, anchorRect, tooltipRect, viewportWidth, viewportHeight);
+      const score = this._computeOverflowScore(position, tooltipRect, viewportWidth, viewportHeight);
+      if (score < bestScore) {
+        bestScore = score;
+        bestPlacement = candidate;
+      }
+    }
+
+    return bestPlacement;
+  }
+
+  _computeTooltipPosition(placement, anchorRect, tooltipRect, viewportWidth, viewportHeight) {
+    const gap = 8;
+    const minInset = 16;
+    const maxLeft = Math.max(minInset, viewportWidth - tooltipRect.width - minInset);
+    const maxTop = Math.max(minInset, viewportHeight - tooltipRect.height - minInset);
+
+    if (placement === "left") {
+      return {
+        left: Math.max(minInset, anchorRect.left - tooltipRect.width - gap),
+        top: this._clamp(anchorRect.top + (anchorRect.height - tooltipRect.height) / 2, minInset, maxTop)
+      };
+    }
+    if (placement === "right") {
+      return {
+        left: Math.min(maxLeft, anchorRect.right + gap),
+        top: this._clamp(anchorRect.top + (anchorRect.height - tooltipRect.height) / 2, minInset, maxTop)
+      };
+    }
+    if (placement === "top") {
+      return {
+        left: this._clamp(anchorRect.left + (anchorRect.width - tooltipRect.width) / 2, minInset, maxLeft),
+        top: Math.max(minInset, anchorRect.top - tooltipRect.height - gap)
+      };
+    }
+    return {
+      left: this._clamp(anchorRect.left + (anchorRect.width - tooltipRect.width) / 2, minInset, maxLeft),
+      top: Math.min(maxTop, anchorRect.bottom + gap)
+    };
+  }
+
+  _computeOverflowScore(position, tooltipRect, viewportWidth, viewportHeight) {
+    const overflowLeft = Math.max(0, 16 - position.left);
+    const overflowRight = Math.max(0, position.left + tooltipRect.width + 16 - viewportWidth);
+    const overflowTop = Math.max(0, 16 - position.top);
+    const overflowBottom = Math.max(0, position.top + tooltipRect.height + 16 - viewportHeight);
+    return overflowLeft + overflowRight + overflowTop + overflowBottom;
+  }
+
+  _clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
   }
 }
 
@@ -42,11 +214,22 @@ class LhtTextFieldHelp extends HTMLElement {
     const fieldId = (this.getAttribute("field-id") || "").trim();
     if (!fieldId) return;
 
-    const field = document.createElement("md-outlined-text-field");
+    const hasMdOutlinedTextField = !!(window.customElements && window.customElements.get("md-outlined-text-field"));
+    const isTextarea = (this.getAttribute("type") || "").trim().toLowerCase() === "textarea" || this.hasAttribute("rows");
+    const field = hasMdOutlinedTextField
+      ? document.createElement("md-outlined-text-field")
+      : document.createElement(isTextarea ? "textarea" : "input");
     field.id = fieldId;
+    this._isFallbackTextField = !hasMdOutlinedTextField;
 
     const label = (this.getAttribute("label") || "").trim();
-    if (label) field.setAttribute("label", label);
+    if (label) {
+      if (this._isFallbackTextField) {
+        field.setAttribute("aria-label", label);
+      } else {
+        field.setAttribute("label", label);
+      }
+    }
 
     const placeholder = this.getAttribute("placeholder");
     if (placeholder != null) field.setAttribute("placeholder", placeholder);
@@ -55,7 +238,11 @@ class LhtTextFieldHelp extends HTMLElement {
     if (autocomplete != null) field.setAttribute("autocomplete", autocomplete);
 
     const type = this.getAttribute("type");
-    if (type != null) field.setAttribute("type", type);
+    if (isTextarea && !this._isFallbackTextField) {
+      field.setAttribute("type", "textarea");
+    } else if (type != null && !isTextarea) {
+      field.setAttribute("type", type);
+    }
 
     const min = this.getAttribute("min");
     if (min != null) field.setAttribute("min", min);
@@ -70,13 +257,19 @@ class LhtTextFieldHelp extends HTMLElement {
     if (rows != null) field.setAttribute("rows", rows);
 
     const value = this.getAttribute("value");
-    if (value != null) field.setAttribute("value", value);
+    if (value != null) {
+      if (this._isFallbackTextField) {
+        field.value = value;
+      } else {
+        field.setAttribute("value", value);
+      }
+    }
 
     const fieldClass = (this.getAttribute("field-class") || "").trim();
     if (fieldClass) {
       fieldClass.split(/\s+/).filter(Boolean).forEach((name) => field.classList.add(name));
     }
-    field.classList.add("md-outlined-field");
+    field.classList.add(this._isFallbackTextField ? "lht-text-field-help__fallback" : "md-outlined-field");
 
     if (this.hasAttribute("required")) {
       field.required = true;
@@ -85,26 +278,31 @@ class LhtTextFieldHelp extends HTMLElement {
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();
-    const hideDelayMsRaw = Number(this.getAttribute("hide-delay-ms"));
-    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 120;
+    const hideDelayMsAttr = this.getAttribute("hide-delay-ms");
+    const hideDelayMsRaw = hideDelayMsAttr == null ? Number.NaN : Number(hideDelayMsAttr);
+    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 160;
     if (helpText) {
-      let blurHideTimer = null;
-      field.addEventListener("focus", () => {
-        if (blurHideTimer) {
-          clearTimeout(blurHideTimer);
-          blurHideTimer = null;
-        }
-        field.supportingText = helpText;
-      });
-      field.addEventListener("blur", () => {
-        if (blurHideTimer) {
-          clearTimeout(blurHideTimer);
-        }
-        blurHideTimer = setTimeout(() => {
-          field.supportingText = "";
-          blurHideTimer = null;
-        }, hideDelayMs);
-      });
+      if (this._isFallbackTextField) {
+        field.title = helpText;
+      } else {
+        let blurHideTimer = null;
+        field.addEventListener("focus", () => {
+          if (blurHideTimer) {
+            clearTimeout(blurHideTimer);
+            blurHideTimer = null;
+          }
+          field.supportingText = helpText;
+        });
+        field.addEventListener("blur", () => {
+          if (blurHideTimer) {
+            clearTimeout(blurHideTimer);
+          }
+          blurHideTimer = setTimeout(() => {
+            field.supportingText = "";
+            blurHideTimer = null;
+          }, hideDelayMs);
+        });
+      }
     }
 
     this.textContent = "";
@@ -119,6 +317,7 @@ class LhtSelectHelp extends HTMLElement {
 
     const fieldId = (this.getAttribute("field-id") || "").trim();
     if (!fieldId) return;
+    const hasDeclarativeOptions = this._hasDeclarativeOptions();
 
     const hasMdOutlinedSelect = !!(window.customElements && window.customElements.get("md-outlined-select"));
     const field = document.createElement(hasMdOutlinedSelect ? "md-outlined-select" : "select");
@@ -155,8 +354,9 @@ class LhtSelectHelp extends HTMLElement {
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();
-    const hideDelayMsRaw = Number(this.getAttribute("hide-delay-ms"));
-    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 120;
+    const hideDelayMsAttr = this.getAttribute("hide-delay-ms");
+    const hideDelayMsRaw = hideDelayMsAttr == null ? Number.NaN : Number(hideDelayMsAttr);
+    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 160;
     if (helpText) {
       if (this._isFallbackSelect) {
         field.title = helpText;
@@ -184,7 +384,7 @@ class LhtSelectHelp extends HTMLElement {
     this.appendChild(field);
     this.hydrateOptions();
 
-    if (!this._hasDeclarativeOptions()) {
+    if (!hasDeclarativeOptions) {
       this._optionsObserver = new MutationObserver(() => {
         this.hydrateOptions();
       });
@@ -258,6 +458,7 @@ class LhtSelectHelp extends HTMLElement {
   _setFieldOptions(options) {
     const field = this._lhtField;
     if (!field) return;
+    const previousValue = field.value;
     field.innerHTML = "";
 
     for (const entry of options) {
@@ -287,6 +488,10 @@ class LhtSelectHelp extends HTMLElement {
         field.appendChild(option);
       }
     }
+
+    if (!field.value && previousValue) {
+      field.value = previousValue;
+    }
   }
 
   hydrateOptions() {
@@ -310,6 +515,43 @@ class LhtSelectHelp extends HTMLElement {
       this._optionsObserver.disconnect();
       this._optionsObserver = null;
     }
+  }
+
+  setOptions(rawOptions, config = {}) {
+    const options = this._normalizeOptions(Array.isArray(rawOptions) ? rawOptions : []);
+    const preserveValue = config?.preserveValue !== false;
+    const field = this._lhtField;
+    const previousValue = preserveValue ? (field?.value || "") : "";
+
+    if (field) {
+      field.innerHTML = "";
+    }
+    this.querySelectorAll("option, script[type='application/json'][slot='options']").forEach((node) => node.remove());
+    if (this._optionsObserver) {
+      this._optionsObserver.disconnect();
+      this._optionsObserver = null;
+    }
+
+    const nextOptions = preserveValue && previousValue
+      ? options.map((entry) => ({
+          ...entry,
+          selected: entry.value === previousValue || entry.selected
+        }))
+      : options;
+
+    this._setFieldOptions(nextOptions);
+    if (field && previousValue && !nextOptions.some((entry) => entry.value === previousValue)) {
+      field.value = "";
+    }
+  }
+
+  getValue() {
+    return this._lhtField?.value ?? "";
+  }
+
+  setValue(value) {
+    if (!this._lhtField) return;
+    this._lhtField.value = value == null ? "" : String(value);
   }
 }
 
@@ -483,15 +725,13 @@ class LhtToast extends HTMLElement {
 
 class LhtErrorAlert extends HTMLElement {
   static get observedAttributes() {
-    return ["text", "active"];
+    return ["text", "active", "variant"];
   }
 
   connectedCallback() {
     if (this.dataset.initialized === "true") return;
     this.dataset.initialized = "true";
 
-    this.setAttribute("role", "alert");
-    this.setAttribute("aria-live", "assertive");
     this.setAttribute("aria-atomic", "true");
 
     const initialText = (this.getAttribute("text") || this.textContent || "").trim();
@@ -504,6 +744,7 @@ class LhtErrorAlert extends HTMLElement {
     this.appendChild(body);
     this._body = body;
 
+    this._syncVariant();
     this.setActive(this.hasAttribute("active"));
   }
 
@@ -511,6 +752,10 @@ class LhtErrorAlert extends HTMLElement {
     if (name === "text") {
       const text = (newValue || "").trim();
       if (this._body) this._body.textContent = text;
+      return;
+    }
+    if (name === "variant") {
+      this._syncVariant();
       return;
     }
     if (name === "active") {
@@ -542,6 +787,29 @@ class LhtErrorAlert extends HTMLElement {
     this.toggleAttribute("active", next);
     this.setAttribute("data-visible", next ? "true" : "false");
     this.setAttribute("aria-hidden", next ? "false" : "true");
+  }
+
+  _normalizeVariant(value) {
+    const normalized = (value || "error").trim().toLowerCase();
+    return ["error", "warning", "info"].includes(normalized) ? normalized : "error";
+  }
+
+  _syncVariant() {
+    const variant = this._normalizeVariant(this.getAttribute("variant"));
+    if (this.getAttribute("variant") !== variant) {
+      this.setAttribute("variant", variant);
+      return;
+    }
+    this.setAttribute("data-variant", variant);
+
+    if (variant === "error") {
+      this.setAttribute("role", "alert");
+      this.setAttribute("aria-live", "assertive");
+      return;
+    }
+
+    this.setAttribute("role", "status");
+    this.setAttribute("aria-live", "polite");
   }
 }
 
@@ -751,6 +1019,8 @@ class LhtFileSelect extends HTMLElement {
     const buttonLabel = (this.getAttribute("button-label") || "ファイルを選択").trim();
     const placeholder = (this.getAttribute("placeholder") || "未選択").trim();
     const showFileName = this.hasAttribute("show-file-name");
+    const autoOpenValue = (this.getAttribute("auto-open") || "").trim().toLowerCase();
+    const autoOpen = autoOpenValue !== "false";
 
     this.textContent = "";
 
@@ -802,10 +1072,35 @@ class LhtFileSelect extends HTMLElement {
       triggerButton.disabled = true;
     }
 
-    triggerButton.addEventListener("click", () => input.click());
+    triggerButton.addEventListener("click", () => {
+      const beforeOpenEvent = new CustomEvent("lht-file-select:before-open", {
+        detail: {
+          inputId,
+          buttonId,
+          input,
+          triggerButton,
+          autoOpen
+        },
+        bubbles: true,
+        cancelable: true
+      });
+      const canAutoOpen = this.dispatchEvent(beforeOpenEvent);
+      if (autoOpen && canAutoOpen) {
+        input.click();
+      }
+    });
     input.addEventListener("change", () => {
       const names = Array.from(input.files || []).map((file) => file.name).filter(Boolean);
       fileName.textContent = names.length > 0 ? names.join(", ") : placeholder;
+      this.dispatchEvent(new CustomEvent("lht-file-select:change", {
+        detail: {
+          files: Array.from(input.files || []),
+          names,
+          input,
+          fileName
+        },
+        bubbles: true
+      }));
     });
 
     root.appendChild(triggerButton);
@@ -834,29 +1129,20 @@ class LhtSwitchHelp extends HTMLElement {
     const label = document.createElement("label");
     label.className = "md-switch-label";
 
-    const mdSwitch = document.createElement("md-switch");
-    mdSwitch.id = switchId;
-    Object.defineProperty(mdSwitch, "checked", {
-      get() {
-        return !!mdSwitch.selected;
-      },
-      set(value) {
-        mdSwitch.selected = !!value;
-      }
-    });
-    if (isChecked) {
-      mdSwitch.selected = true;
-      mdSwitch.setAttribute("selected", "");
-    }
+    const hasMdSwitch = !!(window.customElements && window.customElements.get("md-switch"));
+    const switchControl = hasMdSwitch
+      ? this._createMaterialSwitch(switchId, isChecked)
+      : this._createFallbackSwitch(switchId, isChecked);
+
     if (onChangeFnName) {
-      mdSwitch.addEventListener("change", () => {
+      switchControl.control.addEventListener("change", () => {
         const fn = window[onChangeFnName];
         if (typeof fn === "function") {
           fn();
         }
       });
     }
-    label.appendChild(mdSwitch);
+    label.appendChild(switchControl.node);
 
     const labelSpan = document.createElement("span");
     labelSpan.textContent = labelText;
@@ -873,6 +1159,47 @@ class LhtSwitchHelp extends HTMLElement {
     }
 
     this.appendChild(label);
+  }
+
+  _createMaterialSwitch(switchId, isChecked) {
+    const mdSwitch = document.createElement("md-switch");
+    mdSwitch.id = switchId;
+    Object.defineProperty(mdSwitch, "checked", {
+      get() {
+        return !!mdSwitch.selected;
+      },
+      set(value) {
+        mdSwitch.selected = !!value;
+      }
+    });
+    if (isChecked) {
+      mdSwitch.selected = true;
+      mdSwitch.setAttribute("selected", "");
+    }
+    return { node: mdSwitch, control: mdSwitch };
+  }
+
+  _createFallbackSwitch(switchId, isChecked) {
+    const input = document.createElement("input");
+    input.id = switchId;
+    input.type = "checkbox";
+    input.className = "md-switch-input";
+    input.checked = isChecked;
+    input.setAttribute("role", "switch");
+    input.setAttribute("aria-checked", isChecked ? "true" : "false");
+
+    input.addEventListener("change", () => {
+      input.setAttribute("aria-checked", input.checked ? "true" : "false");
+    });
+
+    const visual = document.createElement("span");
+    visual.className = "md-switch";
+    visual.setAttribute("aria-hidden", "true");
+
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(input);
+    fragment.appendChild(visual);
+    return { node: fragment, control: input };
   }
 }
 
@@ -909,8 +1236,12 @@ class LhtCommandBlock extends HTMLElement {
   }
 
   createCopyButton(label, onClick) {
-    const button = document.createElement("md-icon-button");
-    button.className = "md-copy-button md-copy-button--surface";
+    const hasMdIconButton = !!(window.customElements && window.customElements.get("md-icon-button"));
+    const button = document.createElement(hasMdIconButton ? "md-icon-button" : "button");
+    button.className = `md-copy-button md-copy-button--surface${hasMdIconButton ? "" : " md-copy-button--fallback"}`;
+    if (!hasMdIconButton) {
+      button.type = "button";
+    }
     button.setAttribute("aria-label", label);
     button.innerHTML = '<svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#md-icon-copy" xlink:href="#md-icon-copy"></use></svg>';
     button.addEventListener("click", onClick);

@@ -22,10 +22,15 @@
 ## 基本方針
 
 - デザイン基準は Material Design 3
-- 実現手段として Material Web を優先利用する
-- Material Web に妥当な選択肢がない場合は、`lht-cmn` 側に自前実装（必要に応じて新規 Web Component）を追加し、`lht-*` として提供する
-- Material Web で直接実現できる要素も、画面側では一旦 `lht-*` でラップして利用する
-- 画面側で利用するのは原則 `lht-*` とし、`md-*` 直接利用は `lht-cmn` 内部実装に限定する
+- 画面側の公開 UI レイヤーは常に `lht-*` とし、`md-*` を直接使わせない
+- `lht-*` は self-contained を原則とし、アプリ側へ `md-*` の登録責務を漏らさない
+- 実現手段として Material Web を優先利用してよい
+- ただし Material 利用の有無に関わらず、`lht-*` は最低保証で壊れないことを優先する
+- 内部実装として許可する型は次の 2 つに限定する:
+  - `md-*` 優先 + fallback
+  - 完全自前実装
+- 「Material 依存で fallback なし」は原則避け、採る場合は README に明示する
+- fallback は Material の完全再現ではなく、公開 API の最低保証に留める
 
 ## メリット
 
@@ -56,17 +61,17 @@
 
 | コンポーネント | できること | 内部構造（概要） |
 |---|---|---|
-| `lht-help-tooltip` | `(i)` ヘルプアイコンとツールチップを1タグで配置できる | 内部で `md-icon-button` + `md-tooltip-content` を生成し、タグ内HTMLをツールチップ本文へ差し込む |
-| `lht-text-field-help` | ラベル付き入力（単一行/複数行）とフォーカス時ヘルプ表示を共通化できる | 内部で `md-outlined-text-field` を生成し、属性（`field-id`/`label`/`type`/`rows` など）を透過。`focus/blur` で `supportingText` を制御 |
+| `lht-help-tooltip` | `(i)` ヘルプアイコンとツールチップを1タグで配置できる | `md-icon-button` が使える環境ではそれを利用し、未定義時はネイティブ `button` fallback を生成。タグ内HTMLをツールチップ本文へ差し込む |
+| `lht-text-field-help` | ラベル付き入力（単一行/複数行）とフォーカス時ヘルプ表示を共通化できる | `md-outlined-text-field` が使える環境ではそれを利用し、未定義時はネイティブ `input` / `textarea` fallback を生成。属性（`field-id`/`label`/`type`/`rows` など）を透過する |
 | `lht-select-help` | ラベル付きドロップダウンとヘルプ表示を共通化できる | 内部で `md-outlined-select` を生成し、`<script type="application/json" slot="options">` から `md-select-option` を構築 |
-| `lht-switch-help` | スイッチ + ラベル + ヘルプを1セットで配置できる | 内部で `md-switch` と `lht-help-tooltip` を組み合わせ、`on-change` 指定時はグローバル関数を呼び出す |
-| `lht-command-block` | コマンド表示枠とコピー操作（単一/二重ボタン）を共通化できる | 内部で `code` と `md-icon-button` を生成。クリック時に Clipboard API（不可時は `textarea` フォールバック）でコピー |
+| `lht-switch-help` | スイッチ + ラベル + ヘルプを1セットで配置できる | `md-switch` が使える環境ではそれを利用し、未定義時は `input.md-switch-input + span.md-switch` fallback を生成。`on-change` 指定時はグローバル関数を呼び出す |
+| `lht-command-block` | コマンド表示枠とコピー操作（単一/二重ボタン）を共通化できる | `md-icon-button` が使える環境ではそれを利用し、未定義時はネイティブ `button` fallback を生成。クリック時に Clipboard API（不可時は `textarea` フォールバック）でコピー |
 | `lht-page-menu` | 右上メニュー（トップへ戻る等）を共通化できる | 内部でメニューボタン + パネル + リンクを生成。外側クリックで自動クローズ |
 | `lht-index-card-link` | `docs/index` のカードリンクを統一フォーマットで記述できる | 内部でカードDOM（`a` + タイトル + 説明 + 矢印/バッジ）を生成し、`variant`/`target`/外部リンク判定を吸収 |
-| `lht-file-select` | ファイル選択UI（Filledボタン + ファイル名表示）を共通化できる | 内部で hidden `input[type=file]` とトリガUIを生成。`md-filled-button` が使える環境ではそれを利用し、未定義時はフォールバックボタンで動作維持 |
+| `lht-file-select` | ファイル選択UI（Filledボタン + ファイル名表示）を共通化できる | 内部で hidden `input[type=file]` とトリガUIを生成。`md-filled-button` が使える環境ではそれを利用し、未定義時はフォールバックボタンで動作維持。公開イベントで open ownership を制御できる |
 | `lht-loading-overlay` | 処理中オーバーレイ（スピナー + メッセージ）を共通化できる | `active` で表示制御し、`aria-live`/`aria-hidden` を同期。必要に応じて `aria-busy` 更新と操作無効化も連動 |
 | `lht-toast` | 一時通知トースト（コピー完了など）を共通化できる | `active` と `show()/hide()` で表示制御し、`role="status"` / `aria-live="polite"` を標準化。`window.showToast` が未定義なら自動補完 |
-| `lht-error-alert` | エラー表示（`role="alert"`）を共通化できる | `active` と `show()/hide()` で表示制御し、`aria-live="assertive"` と表示/非表示同期を標準化（`clear()` は補助） |
+| `lht-error-alert` | エラー/警告/情報表示を共通化できる | `variant="error|warning|info"` と `active` / `show()/hide()` で表示制御し、variant ごとに `role` / `aria-live` を標準化（`clear()` は補助） |
 | `lht-input-mode-toggle` | 入力モード切替（file/source ラジオ）を共通化できる | 既定ID（`inputModeFile`/`inputModeSource`）を維持しつつ、`source/file` ブロックの `md-hidden` 切替を自動化できる |
 | `lht-preview-output` | プレビュー表示 + コピー導線を共通化できる | `preview` 枠とコピーボタンを1タグで提供し、`copy-target-id` 指定で既存出力要素からのコピーにも対応 |
 
@@ -80,6 +85,28 @@ HTML から次を読み込みます。
 開発時は上記ファイルを参照し、最終的な配布物はビルド時に単一HTMLへインライン化します。
 
 ページ固有の見た目調整は各画面側の CSS で実施し、共通的な DOM 生成と振る舞いは `lht-cmn` 側で管理します。
+
+## Integration Contract
+
+- アプリ側の公開 UI レイヤーは `lht-*` とし、`md-*` の登録有無を前提に分岐しない
+- `lht-*` が内部で `md-*` を使う場合も、その依存解決責務は `lht-cmn` 側に置く
+- 各コンポーネントは次のどちらかで実装する:
+  - `md-*` 優先 + fallback
+  - 完全自前実装
+- 例外的に Material 依存を残す場合は、その事実と理由を README に明示する
+- fallback の責務は「公開 API の最低保証」であり、Material の完全再現ではない
+- ID の責務:
+  - `field-id` / `switch-id` / `input-id` / `button-id` / `file-name-id` などの公開 ID はアプリ側が指定する
+  - `lht-cmn` はその ID を、公開 API の対象となる内部要素へ引き継ぐ
+- 初期化ライフサイクル:
+  - 各 `lht-*` は `connectedCallback()` 完了時に `data-initialized="true"` を付与する
+  - それまでは `lht-cmn/css/components.css` が pre-upgrade flash を抑止する
+- 公開 API:
+  - 属性、公開イベント、公開メソッドとして README に書いたものだけを契約対象とする
+  - 内部 DOM の細部は fallback 契約で明記したものを除き非公開とみなす
+- CSS 拡張点:
+  - アプリ側 CSS は `lht-*` タグ自身、README に明記した公開 class、テーマ変数の上書きに寄せる
+  - 内部生成 DOM のタグ構造に直接依存する拡張は、fallback 契約で明記された箇所に限定する
 
 ## 適用ルール
 
@@ -97,6 +124,18 @@ HTML から次を読み込みます。
 - 表示制御メソッドは `show()` / `hide()` を標準とする
 - `clear()` は「内容を消して非表示にする」用途でのみ任意追加する（`show/hide` の代替にはしない）
 - `active` の更新時は `aria-hidden` を同期する
+- 初期化完了後は `data-initialized="true"` を付与する
+- `lht-cmn/css/components.css` は `data-initialized="true"` が付くまで未初期化コンテンツを `visibility:hidden` で隠し、pre-upgrade flash を防ぐ
+
+### Fallback / Parity Table
+
+| コンポーネント | Material 未読込時 | fallback | 現在の最小保証 |
+|---|---|---|---|
+| `lht-select-help` | 動作する | ネイティブ `select` | `value` / `required` / `disabled` / `change` / `setOptions()` / `getValue()` / `setValue()` |
+| `lht-text-field-help` | 動作する | ネイティブ `input` / `textarea` | `value` / `required` / `disabled` / `placeholder` / `min` / `max` / `step` / `rows` |
+| `lht-switch-help` | 動作する | `input.md-switch-input + span.md-switch` | `checked` / `change` / `switch-id` / ラベル表示 |
+| `lht-file-select` | 動作する | ネイティブ `button` + hidden `input[type=file]` | `input-id` / `button-id` / `file-name-id` / `before-open` / `change` / `multiple` / `disabled` |
+| `lht-command-block` | 動作する | ネイティブ `button` | `command-id` / 単一・二重 copy button / click-to-copy |
 
 ## ドロップダウン置換手順（`lht-select-help`）
 
@@ -144,28 +183,59 @@ HTML から次を読み込みます。
 ### `lht-help-tooltip`
 
 - 用途: `(i)` ヘルプ表示
-- 主な属性: `label`, `wide`
+- 主な属性: `label`, `wide`, `placement`
+- fallback:
+  - `md-icon-button` 未読込時はネイティブ `button.md-help-icon-button--fallback` を内部生成する
+  - hover / focus-within による tooltip 表示契約は Material / fallback の両方で共通
+- placement:
+  - `placement="auto|left|right|top|bottom"` を指定できる
+  - 既定値は `auto`
+  - `auto` は active 時に viewport overflow が最小になる向きを選び、必要に応じて位置を clamp する
 
 ### `lht-text-field-help`
 
 - 用途: テキスト/数値/複数行入力 + フォーカス時ヘルプ
 - 主な属性: `field-id`, `label`, `help-text`, `hide-delay-ms`, `type`, `placeholder`, `value`, `rows`, `min`, `max`, `step`, `required`, `disabled`, `field-class`
+- fallback:
+  - `md-outlined-text-field` 未読込時はネイティブ `input` / `textarea` を内部生成する
+  - `rows` 指定時は `textarea` fallback を優先する
+  - fallback 時の `help-text` は `title` 属性として提供する
 
 ### `lht-select-help`
 
 - 用途: セレクト入力 + フォーカス時ヘルプ
 - 主な属性: `field-id`, `label`, `help-text`, `hide-delay-ms`, `value`, `required`, `disabled`, `field-class`
 - 選択肢定義: `<script type="application/json" slot="options">[...]</script>`
+- 補助メソッド:
+  - `setOptions([{ value, label, selected?, disabled? }], { preserveValue? })`
+  - `getValue()`
+  - `setValue(value)`
+- lifecycle メモ:
+  - declarative options の有無は初期化開始時点で判定する
+  - `script[slot="options"]` を利用した場合、初期化時に JSON を読んで内部 option へ反映したあと script ノードは消費される
+  - declarative options 利用時は child `option` 監視による再 hydration を行わない
+- dynamic options:
+  - 動的更新は `setOptions([...])` を正規ルートとする
+  - 既定では `preserveValue: true` と同等に動作し、同じ `value` が次の options に残っていれば選択を維持する
+  - 既存選択値が次の options に存在しない場合は空に戻す
+  - 動的更新と declarative JSON / 手動 child mutation の混在は避ける
 
 ### `lht-switch-help`
 
 - 用途: スイッチ + ラベル + ヘルプ
 - 主な属性: `switch-id`, `label`, `help-label`, `help-wide`, `checked`, `on-change`
+- fallback:
+  - `md-switch` 未読込時は `input.md-switch-input + span.md-switch` を内部生成する
+  - `switch-id` は fallback 時も checkbox input に付与される
+  - `checked` 状態と `change` イベントは Material / fallback の両方で利用できる
 
 ### `lht-command-block`
 
 - 用途: コマンド表示 + コピーUI
 - 主な属性: `command-id`, `copy-buttons`（`single` / `dual`）
+- fallback:
+  - `md-icon-button` 未読込時はネイティブ `button.md-copy-button--fallback` を内部生成する
+  - コピー動作は Material / fallback の両方で共通
 
 ### `lht-page-menu`
 
@@ -186,7 +256,15 @@ HTML から次を読み込みます。
 ### `lht-file-select`
 
 - 用途: ファイル選択UI（ボタン + hidden file input + ファイル名表示）
-- 主な属性: `input-id`, `button-id`, `file-name-id`, `accept`, `button-label`, `placeholder`, `file-label`, `multiple`, `disabled`, `show-file-name`
+- 主な属性: `input-id`, `button-id`, `file-name-id`, `accept`, `button-label`, `placeholder`, `file-label`, `multiple`, `disabled`, `show-file-name`, `auto-open`
+- 公開イベント:
+  - `lht-file-select:before-open`
+    - button click 時に発火する cancellable event
+    - `auto-open="false"` のときは発火のみ行い、内部 `input.click()` は実行しない
+    - `auto-open` が既定 `true` の場合でも `preventDefault()` で内部 open を抑止できる
+  - `lht-file-select:change`
+    - hidden file input の `change` 後に発火する
+    - `detail.names` と `detail.files` で選択結果を参照できる
 
 ### `lht-loading-overlay`
 
@@ -217,11 +295,12 @@ HTML から次を読み込みます。
 
 ### `lht-error-alert`
 
-- 用途: 画面内エラー表示の共通化（`errorText` パターンの置換）
-- 主な属性: `text`, `active`
+- 用途: 画面内エラー/警告/情報表示の共通化（`errorText` パターンの置換）
+- 主な属性: `text`, `active`, `variant`
 - 補助メソッド: `show(message?)`, `hide()`, `clear()`, `isVisible()`
 - ARIAルール:
-  - 常時 `role="alert"` と `aria-live="assertive"` を持つ
+  - `variant="error"` は `role="alert"` と `aria-live="assertive"`
+  - `variant="warning|info"` は `role="status"` と `aria-live="polite"`
   - 常時 `aria-atomic="true"` を持つ
   - 表示状態に応じて `aria-hidden` を同期する
 

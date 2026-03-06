@@ -59,11 +59,13 @@ limitations under the License.
         <lht-text-field-help field-id="basePath" label="検索開始パス" required placeholder="例: . / ~/projects" value="."></lht-text-field-help>
       </div>
       <div class="md-form-row md-form-row--nowrap">
-        <md-outlined-select id="targetType" label="対象の種類" class="md-outlined-field" value="file">
-          <md-select-option value="any"><div slot="headline">指定なし（ファイル/ディレクトリ）</div></md-select-option>
-          <md-select-option value="file" selected><div slot="headline">ファイルのみ (-type f)</div></md-select-option>
-          <md-select-option value="dir"><div slot="headline">ディレクトリのみ (-type d)</div></md-select-option>
-        </md-outlined-select>
+        <lht-select-help field-id="targetType" label="対象の種類" value="file">
+          <script type="application/json" slot="options">[
+            { "value": "any", "label": "指定なし（ファイル/ディレクトリ）" },
+            { "value": "file", "label": "ファイルのみ (-type f)", "selected": true },
+            { "value": "dir", "label": "ディレクトリのみ (-type d)" }
+          ]</script>
+        </lht-select-help>
       </div>
     </div>
 
@@ -84,24 +86,30 @@ limitations under the License.
       <div class="md-details-body md-stack-md">
         <label class="md-label">サイズ条件:</label>
         <div class="md-grid md-grid-3">
-          <md-outlined-select id="sizeComparator" label="比較" class="md-outlined-field" value="min">
-            <md-select-option value="min" selected><div slot="headline">以上 (&gt;=)</div></md-select-option>
-            <md-select-option value="max"><div slot="headline">以下 (&lt;=)</div></md-select-option>
-          </md-outlined-select>
+          <lht-select-help field-id="sizeComparator" label="比較" value="min">
+            <script type="application/json" slot="options">[
+              { "value": "min", "label": "以上 (>=)", "selected": true },
+              { "value": "max", "label": "以下 (<=)" }
+            ]</script>
+          </lht-select-help>
           <lht-text-field-help field-id="sizeValue" type="number" label="サイズ" placeholder="例: 10"></lht-text-field-help>
-          <md-outlined-select id="sizeUnit" label="単位" class="md-outlined-field" value="M">
-            <md-select-option value="K"><div slot="headline">KB</div></md-select-option>
-            <md-select-option value="M" selected><div slot="headline">MB</div></md-select-option>
-            <md-select-option value="G"><div slot="headline">GB</div></md-select-option>
-          </md-outlined-select>
+          <lht-select-help field-id="sizeUnit" label="単位" value="M">
+            <script type="application/json" slot="options">[
+              { "value": "K", "label": "KB" },
+              { "value": "M", "label": "MB", "selected": true },
+              { "value": "G", "label": "GB" }
+            ]</script>
+          </lht-select-help>
         </div>
 
         <label class="md-label">更新日時条件:</label>
         <div class="md-grid md-grid-3">
-          <md-outlined-select id="mtimeComparator" label="期間" class="md-outlined-field" value="within">
-            <md-select-option value="within" selected><div slot="headline">直近N日以内</div></md-select-option>
-            <md-select-option value="older"><div slot="headline">N日より前</div></md-select-option>
-          </md-outlined-select>
+          <lht-select-help field-id="mtimeComparator" label="期間" value="within">
+            <script type="application/json" slot="options">[
+              { "value": "within", "label": "直近N日以内", "selected": true },
+              { "value": "older", "label": "N日より前" }
+            ]</script>
+          </lht-select-help>
           <lht-text-field-help field-id="mtimeValue" type="number" label="日数" placeholder="例: 7"></lht-text-field-help>
           <div class="md-label md-label--muted">日</div>
         </div>

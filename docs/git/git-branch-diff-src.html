@@ -57,20 +57,12 @@ limitations under the License.
     <div class="md-section md-stack-md">
       <div class="md-form-row md-form-row--nowrap">
         <lht-text-field-help field-id="branchA" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。差分の片側として使われます。例: main / devel。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-text-field-help>
-        <label class="md-switch-label">
-          <input type="checkbox" id="scopeA" class="md-switch-input" onchange="updateRemoteState()">
-          <span class="md-switch" aria-hidden="true"></span>
-          リモートとして扱う
-        </label>
+        <lht-switch-help switch-id="scopeA" label="リモートとして扱う" on-change="updateRemoteState"></lht-switch-help>
       </div>
 
       <div class="md-form-row md-form-row--nowrap">
         <lht-text-field-help field-id="branchB" label="比較ブランチ" required placeholder="例: devel" help-text="比較対象のブランチです。2つのブランチ差分を表示します。例: devel / feature123。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-text-field-help>
-        <label class="md-switch-label">
-          <input type="checkbox" id="scopeB" class="md-switch-input" onchange="updateRemoteState()">
-          <span class="md-switch" aria-hidden="true"></span>
-          リモートとして扱う
-        </label>
+        <lht-switch-help switch-id="scopeB" label="リモートとして扱う" on-change="updateRemoteState"></lht-switch-help>
       </div>
     </div>
 
@@ -91,17 +83,13 @@ limitations under the License.
     </div>
 
     <div class="md-section md-form-row md-form-row--nowrap">
-      <md-outlined-select id="diffMode" label="出力形式" class="md-outlined-field" value="">
-        <md-select-option value="" selected>
-          <div slot="headline">内容差分 (git diff)</div>
-        </md-select-option>
-        <md-select-option value="--stat">
-          <div slot="headline">差分統計 (git diff --stat)</div>
-        </md-select-option>
-        <md-select-option value="--name-only">
-          <div slot="headline">変更ファイル一覧 (git diff --name-only)</div>
-        </md-select-option>
-      </md-outlined-select>
+      <lht-select-help field-id="diffMode" label="出力形式">
+        <script type="application/json" slot="options">[
+          { "value": "", "label": "内容差分 (git diff)", "selected": true },
+          { "value": "--stat", "label": "差分統計 (git diff --stat)" },
+          { "value": "--name-only", "label": "変更ファイル一覧 (git diff --name-only)" }
+        ]</script>
+      </lht-select-help>
     </div>
 
     <div id="statWidthBlock" class="md-section md-form-row md-form-row--nowrap md-hidden">
