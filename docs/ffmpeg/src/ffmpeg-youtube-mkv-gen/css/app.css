@@ -133,6 +133,37 @@
     .md-button--primary:hover {
       background: #4f00c9;
     }
+
+    .md-mode-fieldset {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin: 0 0 1rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid #e0d9eb;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #fbf8ff 0%, #f5f0fb 100%);
+    }
+
+    .md-mode-legend {
+      padding: 0 0.35rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #453f4f;
+    }
+
+    .md-mode-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      cursor: pointer;
+    }
+
+    .md-mode-option input {
+      accent-color: var(--md-sys-color-primary);
+    }
     
     .md-icon-btn {
       width: 40px;

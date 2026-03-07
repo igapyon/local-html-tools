@@ -13,4 +13,4 @@ Assets loaded by the catalog:
 
 - `../css/components.css`
 - `../js/components.js`
-- `../../docs/git/src/vendor/material-web-outlined-text-field.bundle.js`
+- `../vendor/material-web-outlined-text-field.bundle.js`

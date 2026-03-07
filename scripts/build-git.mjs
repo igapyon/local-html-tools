@@ -14,7 +14,7 @@ const TARGETS = [
       "src/git-config-setup/css/app.css"
     ],
     jsOrder: [
-      "src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js",
       "../../lht-cmn/js/components.js",
       "src/git-config-setup/js/main.js"
     ]
@@ -29,7 +29,7 @@ const TARGETS = [
       "src/git-config-advanced-setup/css/app.css"
     ],
     jsOrder: [
-      "src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js",
       "../../lht-cmn/js/components.js",
       "src/git-config-advanced-setup/js/main.js"
     ]
@@ -44,7 +44,7 @@ const TARGETS = [
       "src/git-branch-diff/css/app.css"
     ],
     jsOrder: [
-      "src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js",
       "../../lht-cmn/js/components.js",
       "src/git-branch-diff/js/main.js"
     ]
@@ -59,7 +59,7 @@ const TARGETS = [
       "src/git-pseudo-squash/css/app.css"
     ],
     jsOrder: [
-      "src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js",
       "../../lht-cmn/js/components.js",
       "src/git-pseudo-squash/js/main.js"
     ]

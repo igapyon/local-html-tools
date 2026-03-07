@@ -13,7 +13,7 @@ const TARGET = {
     "src/password-gen/css/app.css"
   ],
   jsOrder: [
-    "../git/src/vendor/material-web-outlined-text-field.bundle.js",
+    "../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js",
     "../../lht-cmn/js/components.js",
     "src/password-gen/js/main.js"
   ]

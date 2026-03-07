@@ -27,6 +27,7 @@
 - [横展開] music/git 以外の全アプリでも `lht-file-select`（ファイル選択UI）を適用し、選択ボタン＋ファイル名表示を共通化する
 - [横展開] music/git 以外の全アプリでも `lht-preview-output`（プレビュー表示＋コピー導線）を適用し、表示領域の重複実装を共通化する
 - [横展開] music/git 以外の全アプリでも `lht-command-block`（コマンド表示ブロック）を適用し、コマンド表示・コピー導線を共通化する
+- [ffmpeg] `docs/ffmpeg/ffmpeg-youtube-mkv-gen.html` を YouTube 専用命名から汎用寄りへ再設計する（ツール名・説明文・spec・出力プリセット差分の整理）
 - [ルール横展開] 表示制御属性は `active` に統一し、既存の `md-hidden` / `md-visible` 依存を段階的に削減する
 - [ルール横展開] API命名規約を統一する（表示系は `show/hide`、内容消去系は `show/clear`）
 - [運用スタイル] 新規実装は上記 `lht-cmn` コンポーネント + ルール準拠を必須とし、既存画面は「触るタイミングで順次置換」を原則に進める

@@ -15,7 +15,7 @@ const TARGETS = [
     ],
     jsOrder: [
       "mermaid.min.js",
-      "../git/src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js",
       "../../lht-cmn/js/components.js",
       "src/mermaid-to-svg/js/main.js"
     ]
@@ -30,7 +30,7 @@ const TARGETS = [
       "src/graphviz-dot-to-svg/css/app.css"
     ],
     jsOrder: [
-      "../git/src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js",
       "../../lht-cmn/js/components.js",
       "src/graphviz-dot-to-svg/js/main.js"
     ]

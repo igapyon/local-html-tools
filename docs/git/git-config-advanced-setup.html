@@ -26,7 +26,7 @@ limitations under the License.
   <style>
 /*
  * lht-cmn components.css
- * Version: v20260306
+ * Version: v20260308
  * Copyright 2026 Toshiki Iga
  * Licensed under the Apache License, Version 2.0
  */
@@ -34,6 +34,102 @@ limitations under the License.
 lht-help-tooltip {
   display: inline-flex;
   align-items: center;
+}
+
+.md-tooltip-group {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.md-tooltip-content {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  z-index: 50;
+  width: min(20rem, 90vw);
+  max-width: 90vw;
+}
+
+.md-tooltip-group:hover .md-tooltip-content,
+.md-tooltip-group:focus-within .md-tooltip-content {
+  opacity: 1;
+}
+
+.md-tooltip {
+  background: #2b2831;
+  color: #f7f4fb;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.md-tooltip--wide {
+  width: min(32rem, 90vw);
+}
+
+.md-tooltip--rich {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.md-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0edf5;
+  color: #3f3b46;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.md-icon-btn:hover {
+  background: #ebe6f3;
+}
+
+.md-menu-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.md-menu-panel {
+  position: absolute;
+  top: 56px;
+  right: 16px;
+  background: var(--md-sys-color-surface, #fffbfe);
+  border: 1px solid #e6e1ee;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 4px 0;
+  min-width: 160px;
+  z-index: 20;
+}
+
+.md-menu-link {
+  display: block;
+  padding: 8px 16px;
+  color: var(--md-sys-color-on-surface, #1d1b20);
+  text-decoration: none;
+}
+
+.md-menu-link:hover {
+  background: #f2edf8;
+}
+
+.md-hidden {
+  display: none !important;
 }
 
 /*
@@ -243,6 +339,12 @@ lht-text-field-help {
   min-width: 0;
 }
 
+lht-text-field-help .lht-text-field-help__fallback-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
 lht-text-field-help .lht-text-field-help__fallback {
   width: 100%;
   border-radius: 12px;
@@ -257,10 +359,25 @@ lht-text-field-help .lht-text-field-help__fallback {
   resize: vertical;
 }
 
+lht-text-field-help .lht-text-field-help__supporting-text {
+  min-height: 1rem;
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--md-sys-color-on-surface-variant, #49454f);
+  box-sizing: border-box;
+}
+
 lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
+}
+
+lht-select-help .lht-select-help__fallback-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
 lht-select-help .lht-select-help__fallback {
@@ -271,6 +388,15 @@ lht-select-help .lht-select-help__fallback {
   padding: 0.75rem;
   font-size: 0.95rem;
   color: var(--md-sys-color-on-surface, #1d1b20);
+  box-sizing: border-box;
+}
+
+lht-select-help .lht-select-help__supporting-text {
+  min-height: 1rem;
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--md-sys-color-on-surface-variant, #49454f);
   box-sizing: border-box;
 }
 
@@ -717,6 +843,102 @@ lht-switch-help .md-switch-label .md-tooltip-content {
 
 lht-index-card-link {
   display: block;
+}
+
+.md-link-card {
+  position: relative;
+  display: block;
+  padding: 1rem;
+  border-radius: 16px;
+  background: var(--md-sys-color-surface, #fffbfe);
+  border: 1px solid #ece7f3;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 150ms ease, border-color 150ms ease, background 150ms ease;
+  overflow: hidden;
+  outline: none;
+  color: inherit;
+  text-decoration: none;
+}
+
+.md-link-card:hover {
+  box-shadow: 0 6px 16px rgba(35, 29, 49, 0.12);
+  border-color: #d7cfee;
+}
+
+.md-link-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--md-sys-color-state-layer, rgba(103, 80, 164, 0.08));
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.md-link-card:hover::after {
+  opacity: 1;
+}
+
+.md-link-card:focus-visible {
+  border-color: rgba(98, 0, 238, 0.55);
+  box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring, rgba(98, 0, 238, 0.22)), 0 6px 16px rgba(35, 29, 49, 0.12);
+}
+
+.md-link-card:focus-visible::after {
+  opacity: 1;
+}
+
+.md-link-card:active::after {
+  opacity: 0.18;
+}
+
+.md-link-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.md-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.md-card-title {
+  font-size: var(--md-typography-title-small, 1.1rem);
+  font-weight: 600;
+  color: #2f2a35;
+}
+
+.md-card-arrow {
+  color: #8f8a98;
+  font-size: 1.2rem;
+}
+
+.md-link-card:hover .md-card-arrow {
+  color: #6d6483;
+}
+
+.md-card-desc {
+  margin-top: 0.5rem;
+  font-size: var(--md-typography-body-small, 0.95rem);
+  color: #5f5a6b;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .md-link-card:hover,
+  .md-link-card:focus-visible {
+    overflow: visible;
+    z-index: 2;
+  }
+
+  .md-link-card:hover .md-card-desc,
+  .md-link-card:focus-visible .md-card-desc {
+    display: block;
+  }
 }
 
 .lht-index-card-link__icon {
@@ -2428,7 +2650,7 @@ lht-index-card-link {
   <script>
 /*
  * lht-cmn components.js
- * Version: v20260306
+ * Version: v20260308
  * Copyright 2026 Toshiki Iga
  * Licensed under the Apache License, Version 2.0
  */
@@ -2649,6 +2871,8 @@ class LhtTextFieldHelp extends HTMLElement {
       : document.createElement(isTextarea ? "textarea" : "input");
     field.id = fieldId;
     this._isFallbackTextField = !hasMdOutlinedTextField;
+    let fallbackWrapper = null;
+    let fallbackSupportingText = null;
 
     const label = (this.getAttribute("label") || "").trim();
     if (label) {
@@ -2712,28 +2936,52 @@ class LhtTextFieldHelp extends HTMLElement {
     if (helpText) {
       if (this._isFallbackTextField) {
         field.title = helpText;
+        fallbackWrapper = document.createElement("div");
+        fallbackWrapper.className = "lht-text-field-help__fallback-wrap";
+        fallbackSupportingText = document.createElement("div");
+        fallbackSupportingText.className = "lht-text-field-help__supporting-text";
+        fallbackSupportingText.textContent = helpText;
+        fallbackSupportingText.hidden = true;
+        fallbackSupportingText.setAttribute("aria-hidden", "true");
+        fallbackSupportingText.setAttribute("aria-live", "polite");
       } else {
-        let blurHideTimer = null;
-        field.addEventListener("focus", () => {
-          if (blurHideTimer) {
-            clearTimeout(blurHideTimer);
-            blurHideTimer = null;
-          }
-          field.supportingText = helpText;
-        });
-        field.addEventListener("blur", () => {
-          if (blurHideTimer) {
-            clearTimeout(blurHideTimer);
-          }
-          blurHideTimer = setTimeout(() => {
-            field.supportingText = "";
-            blurHideTimer = null;
-          }, hideDelayMs);
-        });
       }
+      let blurHideTimer = null;
+      field.addEventListener("focus", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+          blurHideTimer = null;
+        }
+        if (this._isFallbackTextField) {
+          fallbackSupportingText.hidden = false;
+          fallbackSupportingText.setAttribute("aria-hidden", "false");
+        } else {
+          field.supportingText = helpText;
+        }
+      });
+      field.addEventListener("blur", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+        }
+        blurHideTimer = setTimeout(() => {
+          if (this._isFallbackTextField) {
+            fallbackSupportingText.hidden = true;
+            fallbackSupportingText.setAttribute("aria-hidden", "true");
+          } else {
+            field.supportingText = "";
+          }
+          blurHideTimer = null;
+        }, hideDelayMs);
+      });
     }
 
     this.textContent = "";
+    if (fallbackWrapper) {
+      fallbackWrapper.appendChild(field);
+      fallbackWrapper.appendChild(fallbackSupportingText);
+      this.appendChild(fallbackWrapper);
+      return;
+    }
     this.appendChild(field);
   }
 }
@@ -2752,6 +3000,8 @@ class LhtSelectHelp extends HTMLElement {
     field.id = fieldId;
     this._lhtField = field;
     this._isFallbackSelect = !hasMdOutlinedSelect;
+    let fallbackWrapper = null;
+    let fallbackSupportingText = null;
 
     const label = (this.getAttribute("label") || "").trim();
     if (label) {
@@ -2788,28 +3038,52 @@ class LhtSelectHelp extends HTMLElement {
     if (helpText) {
       if (this._isFallbackSelect) {
         field.title = helpText;
+        fallbackWrapper = document.createElement("div");
+        fallbackWrapper.className = "lht-select-help__fallback-wrap";
+        fallbackSupportingText = document.createElement("div");
+        fallbackSupportingText.className = "lht-select-help__supporting-text";
+        fallbackSupportingText.textContent = helpText;
+        fallbackSupportingText.hidden = true;
+        fallbackSupportingText.setAttribute("aria-hidden", "true");
+        fallbackSupportingText.setAttribute("aria-live", "polite");
       } else {
-        let blurHideTimer = null;
-        field.addEventListener("focus", () => {
-          if (blurHideTimer) {
-            clearTimeout(blurHideTimer);
-            blurHideTimer = null;
-          }
-          field.supportingText = helpText;
-        });
-        field.addEventListener("blur", () => {
-          if (blurHideTimer) {
-            clearTimeout(blurHideTimer);
-          }
-          blurHideTimer = setTimeout(() => {
-            field.supportingText = "";
-            blurHideTimer = null;
-          }, hideDelayMs);
-        });
       }
+      let blurHideTimer = null;
+      field.addEventListener("focus", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+          blurHideTimer = null;
+        }
+        if (this._isFallbackSelect) {
+          fallbackSupportingText.hidden = false;
+          fallbackSupportingText.setAttribute("aria-hidden", "false");
+        } else {
+          field.supportingText = helpText;
+        }
+      });
+      field.addEventListener("blur", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+        }
+        blurHideTimer = setTimeout(() => {
+          if (this._isFallbackSelect) {
+            fallbackSupportingText.hidden = true;
+            fallbackSupportingText.setAttribute("aria-hidden", "true");
+          } else {
+            field.supportingText = "";
+          }
+          blurHideTimer = null;
+        }, hideDelayMs);
+      });
     }
 
-    this.appendChild(field);
+    if (fallbackWrapper) {
+      fallbackWrapper.appendChild(field);
+      fallbackWrapper.appendChild(fallbackSupportingText);
+      this.appendChild(fallbackWrapper);
+    } else {
+      this.appendChild(field);
+    }
     this.hydrateOptions();
 
     if (!hasDeclarativeOptions) {

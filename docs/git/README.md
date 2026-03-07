@@ -50,7 +50,7 @@
 - `docs/git/git-branch-diff-src.html`
 - `docs/git/src/git-branch-diff/css/app.css`
 - `docs/git/src/git-branch-diff/js/main.js`
-- `docs/git/src/vendor/material-web-outlined-text-field.bundle.js`（Material Web ローカル同梱生成物）
+- `lht-cmn/vendor/material-web-outlined-text-field.bundle.js`（Material Web ローカル同梱生成物）
 - `lht-cmn/css/components.css`（共通 Web Components 用スタイル）
 - `lht-cmn/js/components.js`（共通 Web Components 定義）
 - `docs/git/git-pseudo-squash.html` は生成物（直接編集しない）

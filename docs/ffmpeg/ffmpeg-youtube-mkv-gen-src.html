@@ -43,7 +43,20 @@ limitations under the License.
   </svg>
   <div class="md-shell md-card">
     <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
-<h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">📺</span>YouTube向け FFmpeg コマンドジェネレータ</h1>
+<h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">📺</span>FFmpeg 動画生成コマンドジェネレータ</h1>
+    <p id="modeLead" class="md-subtitle md-field-block">YouTube向けプリセットと一般動画向けプリセットを切り替えて、静止画 + 音声から動画を作る ffmpeg コマンドを生成します。</p>
+
+    <fieldset class="md-mode-fieldset md-field-block">
+      <legend class="md-mode-legend">出力モード</legend>
+      <label class="md-mode-option">
+        <input type="radio" name="videoMode" id="videoModeYoutube" value="youtube" checked />
+        <span>YouTube向け</span>
+      </label>
+      <label class="md-mode-option">
+        <input type="radio" name="videoMode" id="videoModeGeneral" value="general" />
+        <span>一般動画</span>
+      </label>
+    </fieldset>
 
     <lht-text-field-help
       field-id="audioFile"
@@ -63,10 +76,6 @@ limitations under the License.
       help-text="例: Borodin.png"
     ></lht-text-field-help>
 
-    <button onclick="generateYoutubeCmd()" class="md-button md-button--primary md-field-block">
-      ffmpeg コマンド生成
-    </button>
-
     <lht-command-block command-id="youtubeCmd"></lht-command-block>
 
     <div id="toast" class="md-snackbar md-hidden">
@@ -74,7 +83,7 @@ limitations under the License.
     </div>
   </div>
 
-    <script src="../git/src/vendor/material-web-outlined-text-field.bundle.js"></script>
+    <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
   <script src="../../lht-cmn/js/components.js" defer></script>
   <script src="src/ffmpeg-youtube-mkv-gen/js/main.js"></script>
 

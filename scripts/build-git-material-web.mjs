@@ -6,7 +6,7 @@ import { build } from "esbuild";
 const ROOT = process.cwd();
 const outFile = path.resolve(
   ROOT,
-  "docs/git/src/vendor/material-web-outlined-text-field.bundle.js"
+  "lht-cmn/vendor/material-web-outlined-text-field.bundle.js"
 );
 
 fs.mkdirSync(path.dirname(outFile), { recursive: true });
@@ -57,4 +57,4 @@ await build({
   legalComments: "none"
 });
 
-console.log("[build:git:material] generated docs/git/src/vendor/material-web-outlined-text-field.bundle.js");
+console.log("[build:git:material] generated lht-cmn/vendor/material-web-outlined-text-field.bundle.js");
