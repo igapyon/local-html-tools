@@ -56,6 +56,8 @@
   - 共通 Web Components 定義
 - `lht-cmn/css/components.css`
   - 上記コンポーネントの共通スタイル
+- `lht-cmn/catalog/index.html`
+  - 実表示と HTML 利用例を並べて確認するコンポーネントカタログ
 
 ### コンポーネント一覧
 
