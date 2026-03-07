@@ -1,6 +1,6 @@
 /*
  * lht-cmn components.js
- * Version: v20260306
+ * Version: v20260308
  * Copyright 2026 Toshiki Iga
  * Licensed under the Apache License, Version 2.0
  */
@@ -221,6 +221,8 @@ class LhtTextFieldHelp extends HTMLElement {
       : document.createElement(isTextarea ? "textarea" : "input");
     field.id = fieldId;
     this._isFallbackTextField = !hasMdOutlinedTextField;
+    let fallbackWrapper = null;
+    let fallbackSupportingText = null;
 
     const label = (this.getAttribute("label") || "").trim();
     if (label) {
@@ -284,28 +286,52 @@ class LhtTextFieldHelp extends HTMLElement {
     if (helpText) {
       if (this._isFallbackTextField) {
         field.title = helpText;
+        fallbackWrapper = document.createElement("div");
+        fallbackWrapper.className = "lht-text-field-help__fallback-wrap";
+        fallbackSupportingText = document.createElement("div");
+        fallbackSupportingText.className = "lht-text-field-help__supporting-text";
+        fallbackSupportingText.textContent = helpText;
+        fallbackSupportingText.hidden = true;
+        fallbackSupportingText.setAttribute("aria-hidden", "true");
+        fallbackSupportingText.setAttribute("aria-live", "polite");
       } else {
-        let blurHideTimer = null;
-        field.addEventListener("focus", () => {
-          if (blurHideTimer) {
-            clearTimeout(blurHideTimer);
-            blurHideTimer = null;
-          }
-          field.supportingText = helpText;
-        });
-        field.addEventListener("blur", () => {
-          if (blurHideTimer) {
-            clearTimeout(blurHideTimer);
-          }
-          blurHideTimer = setTimeout(() => {
-            field.supportingText = "";
-            blurHideTimer = null;
-          }, hideDelayMs);
-        });
       }
+      let blurHideTimer = null;
+      field.addEventListener("focus", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+          blurHideTimer = null;
+        }
+        if (this._isFallbackTextField) {
+          fallbackSupportingText.hidden = false;
+          fallbackSupportingText.setAttribute("aria-hidden", "false");
+        } else {
+          field.supportingText = helpText;
+        }
+      });
+      field.addEventListener("blur", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+        }
+        blurHideTimer = setTimeout(() => {
+          if (this._isFallbackTextField) {
+            fallbackSupportingText.hidden = true;
+            fallbackSupportingText.setAttribute("aria-hidden", "true");
+          } else {
+            field.supportingText = "";
+          }
+          blurHideTimer = null;
+        }, hideDelayMs);
+      });
     }
 
     this.textContent = "";
+    if (fallbackWrapper) {
+      fallbackWrapper.appendChild(field);
+      fallbackWrapper.appendChild(fallbackSupportingText);
+      this.appendChild(fallbackWrapper);
+      return;
+    }
     this.appendChild(field);
   }
 }
@@ -324,6 +350,8 @@ class LhtSelectHelp extends HTMLElement {
     field.id = fieldId;
     this._lhtField = field;
     this._isFallbackSelect = !hasMdOutlinedSelect;
+    let fallbackWrapper = null;
+    let fallbackSupportingText = null;
 
     const label = (this.getAttribute("label") || "").trim();
     if (label) {
@@ -360,28 +388,52 @@ class LhtSelectHelp extends HTMLElement {
     if (helpText) {
       if (this._isFallbackSelect) {
         field.title = helpText;
+        fallbackWrapper = document.createElement("div");
+        fallbackWrapper.className = "lht-select-help__fallback-wrap";
+        fallbackSupportingText = document.createElement("div");
+        fallbackSupportingText.className = "lht-select-help__supporting-text";
+        fallbackSupportingText.textContent = helpText;
+        fallbackSupportingText.hidden = true;
+        fallbackSupportingText.setAttribute("aria-hidden", "true");
+        fallbackSupportingText.setAttribute("aria-live", "polite");
       } else {
-        let blurHideTimer = null;
-        field.addEventListener("focus", () => {
-          if (blurHideTimer) {
-            clearTimeout(blurHideTimer);
-            blurHideTimer = null;
-          }
-          field.supportingText = helpText;
-        });
-        field.addEventListener("blur", () => {
-          if (blurHideTimer) {
-            clearTimeout(blurHideTimer);
-          }
-          blurHideTimer = setTimeout(() => {
-            field.supportingText = "";
-            blurHideTimer = null;
-          }, hideDelayMs);
-        });
       }
+      let blurHideTimer = null;
+      field.addEventListener("focus", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+          blurHideTimer = null;
+        }
+        if (this._isFallbackSelect) {
+          fallbackSupportingText.hidden = false;
+          fallbackSupportingText.setAttribute("aria-hidden", "false");
+        } else {
+          field.supportingText = helpText;
+        }
+      });
+      field.addEventListener("blur", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+        }
+        blurHideTimer = setTimeout(() => {
+          if (this._isFallbackSelect) {
+            fallbackSupportingText.hidden = true;
+            fallbackSupportingText.setAttribute("aria-hidden", "true");
+          } else {
+            field.supportingText = "";
+          }
+          blurHideTimer = null;
+        }, hideDelayMs);
+      });
     }
 
-    this.appendChild(field);
+    if (fallbackWrapper) {
+      fallbackWrapper.appendChild(field);
+      fallbackWrapper.appendChild(fallbackSupportingText);
+      this.appendChild(fallbackWrapper);
+    } else {
+      this.appendChild(field);
+    }
     this.hydrateOptions();
 
     if (!hasDeclarativeOptions) {

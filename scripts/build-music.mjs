@@ -12,7 +12,7 @@ const TARGETS = [
       "src/musicxml-to-midi/css/app.css"
     ],
     jsOrder: [
-      "../git/src/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js",
       "../../lht-cmn/js/components.js",
       "src/musicxml-to-midi/js/midi-writer.js",
       "src/common/js/musicxml-common.js",

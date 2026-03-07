@@ -106,6 +106,90 @@ describe("lht-select-help declarative options", () => {
     ]);
     expect(field.value).toBe("");
   });
+
+  it("renders fallback supporting text and keeps title for native select", () => {
+    document.body.innerHTML = `
+      <lht-select-help
+        field-id="test-select"
+        label="Choice"
+        help-text="Select one option"
+      >
+        <script type="application/json" slot="options">[
+          {"value":"a","label":"Alpha","selected":true}
+        ]</script>
+      </lht-select-help>
+    `;
+
+    const field = document.querySelector("lht-select-help select");
+    const supportingText = document.querySelector("lht-select-help .lht-select-help__supporting-text");
+
+    expect(field).not.toBeNull();
+    expect(field.title).toBe("Select one option");
+    expect(field.getAttribute("aria-label")).toBe("Choice");
+    expect(supportingText).not.toBeNull();
+    expect(supportingText.textContent).toBe("Select one option");
+    expect(supportingText.hidden).toBe(true);
+  });
+
+  it("shows fallback select help text on focus and hides it after blur delay", () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = `
+      <lht-select-help
+        field-id="test-select"
+        label="Choice"
+        help-text="Select one option"
+        hide-delay-ms="220"
+      >
+        <script type="application/json" slot="options">[
+          {"value":"a","label":"Alpha","selected":true}
+        ]</script>
+      </lht-select-help>
+    `;
+
+    const field = document.querySelector("lht-select-help select");
+    const supportingText = document.querySelector("lht-select-help .lht-select-help__supporting-text");
+
+    field.dispatchEvent(new Event("focus"));
+    expect(supportingText.hidden).toBe(false);
+    expect(supportingText.getAttribute("aria-hidden")).toBe("false");
+
+    field.dispatchEvent(new Event("blur"));
+    vi.advanceTimersByTime(219);
+    expect(supportingText.hidden).toBe(false);
+
+    vi.advanceTimersByTime(1);
+    expect(supportingText.hidden).toBe(true);
+    expect(supportingText.getAttribute("aria-hidden")).toBe("true");
+    vi.useRealTimers();
+  });
+
+  it("uses the default 160ms hide delay for fallback select when hide-delay-ms is omitted", () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = `
+      <lht-select-help
+        field-id="test-select"
+        label="Choice"
+        help-text="Select one option"
+      >
+        <script type="application/json" slot="options">[
+          {"value":"a","label":"Alpha","selected":true}
+        ]</script>
+      </lht-select-help>
+    `;
+
+    const field = document.querySelector("lht-select-help select");
+    const supportingText = document.querySelector("lht-select-help .lht-select-help__supporting-text");
+
+    field.dispatchEvent(new Event("focus"));
+    field.dispatchEvent(new Event("blur"));
+
+    vi.advanceTimersByTime(159);
+    expect(supportingText.hidden).toBe(false);
+
+    vi.advanceTimersByTime(1);
+    expect(supportingText.hidden).toBe(true);
+    vi.useRealTimers();
+  });
 });
 
 describe("lht-help-tooltip fallback", () => {
@@ -194,12 +278,16 @@ describe("lht-text-field-help fallback", () => {
     `;
 
     const field = document.querySelector("lht-text-field-help input");
+    const supportingText = document.querySelector("lht-text-field-help .lht-text-field-help__supporting-text");
 
     expect(field).not.toBeNull();
     expect(field.id).toBe("nameField");
     expect(field.value).toBe("Alice");
     expect(field.getAttribute("aria-label")).toBe("Name");
     expect(field.title).toBe("Enter your name");
+    expect(supportingText).not.toBeNull();
+    expect(supportingText.textContent).toBe("Enter your name");
+    expect(supportingText.hidden).toBe(true);
   });
 
   it("renders native textarea fallback when rows is specified", () => {
@@ -218,6 +306,58 @@ describe("lht-text-field-help fallback", () => {
     expect(field.id).toBe("memoField");
     expect(field.getAttribute("rows")).toBe("4");
     expect(field.value).toBe("hello");
+  });
+
+  it("shows help text on focus and hides it after blur delay", () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = `
+      <lht-text-field-help
+        field-id="nameField"
+        label="Name"
+        help-text="Enter your name"
+        hide-delay-ms="240"
+      ></lht-text-field-help>
+    `;
+
+    const field = document.querySelector("lht-text-field-help input");
+    const supportingText = document.querySelector("lht-text-field-help .lht-text-field-help__supporting-text");
+
+    field.dispatchEvent(new Event("focus"));
+    expect(supportingText.hidden).toBe(false);
+    expect(supportingText.getAttribute("aria-hidden")).toBe("false");
+
+    field.dispatchEvent(new Event("blur"));
+    vi.advanceTimersByTime(239);
+    expect(supportingText.hidden).toBe(false);
+
+    vi.advanceTimersByTime(1);
+    expect(supportingText.hidden).toBe(true);
+    expect(supportingText.getAttribute("aria-hidden")).toBe("true");
+    vi.useRealTimers();
+  });
+
+  it("uses the default 160ms hide delay when hide-delay-ms is omitted", () => {
+    vi.useFakeTimers();
+    document.body.innerHTML = `
+      <lht-text-field-help
+        field-id="nameField"
+        label="Name"
+        help-text="Enter your name"
+      ></lht-text-field-help>
+    `;
+
+    const field = document.querySelector("lht-text-field-help input");
+    const supportingText = document.querySelector("lht-text-field-help .lht-text-field-help__supporting-text");
+
+    field.dispatchEvent(new Event("focus"));
+    field.dispatchEvent(new Event("blur"));
+
+    vi.advanceTimersByTime(159);
+    expect(supportingText.hidden).toBe(false);
+
+    vi.advanceTimersByTime(1);
+    expect(supportingText.hidden).toBe(true);
+    vi.useRealTimers();
   });
 });
 

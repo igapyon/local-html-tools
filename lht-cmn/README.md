@@ -2,7 +2,7 @@
 
 `lht-cmn` は `local-html-tools` 全体で共有する UI コンポーネント基盤です。
 
-- Version: `v20260306`
+- Version: `v20260308`
 - License: Apache License 2.0 (`lht-cmn/LICENSE`)
 - Copyright: Toshiki Iga
 
@@ -201,12 +201,17 @@ HTML から次を読み込みます。
 - fallback:
   - `md-outlined-text-field` 未読込時はネイティブ `input` / `textarea` を内部生成する
   - `rows` 指定時は `textarea` fallback を優先する
-  - fallback 時の `help-text` は `title` 属性として提供する
+  - fallback 時の `help-text` は field 下部の supporting text として表示し、`focus` で表示・`blur` 後 `hide-delay-ms` で非表示にする
+  - fallback 時も `title` 属性は補助的に維持する
 
 ### `lht-select-help`
 
 - 用途: セレクト入力 + フォーカス時ヘルプ
 - 主な属性: `field-id`, `label`, `help-text`, `hide-delay-ms`, `value`, `required`, `disabled`, `field-class`
+- fallback:
+  - `md-outlined-select` 未読込時はネイティブ `select` を内部生成する
+  - fallback 時の `help-text` は field 下部の supporting text として表示し、`focus` で表示・`blur` 後 `hide-delay-ms` で非表示にする
+  - fallback 時も `title` 属性は補助的に維持する
 - 選択肢定義: `<script type="application/json" slot="options">[...]</script>`
 - 補助メソッド:
   - `setOptions([{ value, label, selected?, disabled? }], { preserveValue? })`
@@ -369,7 +374,7 @@ HTML から次を読み込みます。
 - 症状:
   - 選択UIが表示されず、選択肢テキストだけが並ぶ
 - 回避:
-  - Material Web バンドル読込を `lht-cmn/js/components.js` より前に配置する
+  - 標準配置の Material Web バンドル（`lht-cmn/vendor/material-web-outlined-text-field.bundle.js`）を `lht-cmn/js/components.js` より前に配置する
   - `lht-cmn` 側のフォールバック（ネイティブ `select`）が効く実装を維持する
 
 2. `lht-select-help` の選択肢定義が不正

@@ -1,6 +1,6 @@
 /*
  * lht-cmn components.css
- * Version: v20260306
+ * Version: v20260308
  * Copyright 2026 Toshiki Iga
  * Licensed under the Apache License, Version 2.0
  */
@@ -313,6 +313,12 @@ lht-text-field-help {
   min-width: 0;
 }
 
+lht-text-field-help .lht-text-field-help__fallback-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
 lht-text-field-help .lht-text-field-help__fallback {
   width: 100%;
   border-radius: 12px;
@@ -327,10 +333,25 @@ lht-text-field-help .lht-text-field-help__fallback {
   resize: vertical;
 }
 
+lht-text-field-help .lht-text-field-help__supporting-text {
+  min-height: 1rem;
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--md-sys-color-on-surface-variant, #49454f);
+  box-sizing: border-box;
+}
+
 lht-select-help {
   display: block;
   flex: 1 1 auto;
   min-width: 0;
+}
+
+lht-select-help .lht-select-help__fallback-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
 lht-select-help .lht-select-help__fallback {
@@ -341,6 +362,15 @@ lht-select-help .lht-select-help__fallback {
   padding: 0.75rem;
   font-size: 0.95rem;
   color: var(--md-sys-color-on-surface, #1d1b20);
+  box-sizing: border-box;
+}
+
+lht-select-help .lht-select-help__supporting-text {
+  min-height: 1rem;
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--md-sys-color-on-surface-variant, #49454f);
   box-sizing: border-box;
 }
 
