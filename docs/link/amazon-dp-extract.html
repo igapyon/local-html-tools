@@ -2588,7 +2588,11 @@ class LhtTextFieldHelp extends HTMLElement {
     if (autocomplete != null) field.setAttribute("autocomplete", autocomplete);
 
     const type = this.getAttribute("type");
-    if (type != null && !isTextarea) field.setAttribute("type", type);
+    if (isTextarea && !this._isFallbackTextField) {
+      field.setAttribute("type", "textarea");
+    } else if (type != null && !isTextarea) {
+      field.setAttribute("type", type);
+    }
 
     const min = this.getAttribute("min");
     if (min != null) field.setAttribute("min", min);
@@ -2624,8 +2628,9 @@ class LhtTextFieldHelp extends HTMLElement {
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();
-    const hideDelayMsRaw = Number(this.getAttribute("hide-delay-ms"));
-    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 120;
+    const hideDelayMsAttr = this.getAttribute("hide-delay-ms");
+    const hideDelayMsRaw = hideDelayMsAttr == null ? Number.NaN : Number(hideDelayMsAttr);
+    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 160;
     if (helpText) {
       if (this._isFallbackTextField) {
         field.title = helpText;
@@ -2699,8 +2704,9 @@ class LhtSelectHelp extends HTMLElement {
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     const helpText = (this.getAttribute("help-text") || "").trim();
-    const hideDelayMsRaw = Number(this.getAttribute("hide-delay-ms"));
-    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 120;
+    const hideDelayMsAttr = this.getAttribute("hide-delay-ms");
+    const hideDelayMsRaw = hideDelayMsAttr == null ? Number.NaN : Number(hideDelayMsAttr);
+    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 160;
     if (helpText) {
       if (this._isFallbackSelect) {
         field.title = helpText;
