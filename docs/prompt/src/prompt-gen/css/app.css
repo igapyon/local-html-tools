@@ -25,6 +25,31 @@ body.md-page {
   margin-top: 28px;
 }
 
+.ms-hero-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #4a3d6b;
+  text-decoration: none;
+  transition: color 150ms ease, transform 150ms ease;
+}
+
+.ms-hero-link:hover {
+  color: #2f2347;
+  transform: translateY(-1px);
+}
+
+.ms-hero-link span {
+  display: none;
+}
+
+.ms-btn-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+}
+
 .md-stack-md {
   display: grid;
   gap: 16px;

@@ -14,7 +14,7 @@ const promptDefinitions = [
         keywords: ["release", "github release", "github", "リリース", "release文面", "release本文", "文面", "作成", "りりーす", "ぶんめんさくせい", "riri-su", "bunmensakusei", "ぎっとはぶ", "りりーす"],
         requiresCommitId: true,
         buildBody: (commitId) => commitId
-            ? `${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown 形式で作文してください。`
+            ? `${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文は ~~~~ で囲まれた一塊として回答してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
             : ""
     },
     {
@@ -22,14 +22,14 @@ const promptDefinitions = [
         label: "303: Markdown をチルダフェンスで出力",
         keywords: ["markdown", "tilde fence", "tilde fenced", "tilde-fence", "tilde-fenced", "fenced markdown", "code fence", "code block", "code", "チルダフェンス", "markdown出力", "コード形式", "出力", "ちるだふぇんす", "こーどふぇんす", "こーどぶろっく", "shutsuryoku", "まーくだうん", "こーど"],
         requiresCommitId: false,
-        buildBody: () => "回答は、そのままコピーしやすいように markdown テキストを ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+        buildBody: () => "markdown テキスト形式で出力してください。回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
     },
     {
         id: "extract-to-inline-code-request",
         label: "351: 添付ファイル等の抽出結果をチルダフェンスで出力",
         keywords: ["extract", "attachment", "text", "tilde fence", "tilde fenced", "tilde-fence", "tilde-fenced", "fenced markdown", "code fence", "code block", "markdown", "抽出", "添付ファイル", "テキスト", "チルダフェンス", "出力", "ちゅうしゅつ", "てんぷふぁいる", "てきすと", "ちるだふぇんす", "こーどふぇんす", "こーどぶろっく", "しゅつりょく"],
         requiresCommitId: false,
-        buildBody: () => "添付ファイルから、あるいは与えるテキストから情報を抽出して、markdown テキストを ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+        buildBody: () => "添付ファイルから、あるいは与えるテキストから情報を抽出して、markdown テキスト形式で出力してください。回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
     },
     {
         id: "github-no-change-request",
