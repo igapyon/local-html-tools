@@ -35,6 +35,16 @@
 - [lht-cmn] `lht-input-mode-toggle`（file/source 切替）を追加し、music系で反復しているラジオUIを共通化する
 - [lht-cmn] `lht-preview-output`（プレビュー + コピー導線）を追加し、`previewText` 周辺の反復UIを共通化する
 - [lht-cmn] `lht-text-field-help` の trailing action を正式設計する。現在は `prompt-gen` 向けに `clearable` を暫定追加しているが、`lht-cmn` チームの更新版を受領したら、slot / action API を含めてちゃんとした実装へ置き換える
+- [prompt-gen][仕様検討] JSON から追加ボタン定義を投入し、`localStorage` に保存して再表示できる仕組みを初版スコープで整理する
+- [prompt-gen][仕様検討] 初版は「固定文面ボタンのみ追加可能」とし、`commitId` 差し込みや任意ロジックは対象外と明記する
+- [prompt-gen][仕様検討] 追加ボタン定義の JSON schema を固定する（初版: `id` / `label` / `keywords` / `body`。`requiresCommitId` は常に `false` 扱い）
+- [prompt-gen][仕様検討] JSON schema の妥当性チェック方針を決める（必須項目欠落・重複 `id`・不正 JSON の扱い）
+- [prompt-gen][仕様検討] 組み込み定義とユーザー追加定義のマージ方針を決める（組み込み優先。衝突時は追加定義を拒否する想定）
+- [prompt-gen][仕様検討] `localStorage` 保存キーを 1 つに固定し、保存データに `version` を持たせるか決める
+- [prompt-gen][仕様検討] `localStorage` 破損時の復旧方針を決める（読み飛ばし・初期化・エラーメッセージ表示）
+- [prompt-gen][仕様検討] 追加定義の削除 UI は初版で「追加ボタン全削除」のみとし、個別削除は次段階に回す
+- [prompt-gen][仕様検討] 追加ボタンの投入 UI を決める（JSON 入力欄、取り込みボタン、エラー表示、保存完了通知）
+- [prompt-gen][仕様検討] Single-file Web App 方針のまま成立することを確認し、README / prompt README への反映要否を整理する
 - [優先度高][lht-cmn] `lht-*` 全体を棚卸しし、各コンポーネントを「内部保証」または「フォールバック保証」のどちらかへ統一する
 - [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
   - 現状: Web Audio による簡易シンセ再生は実装済み

@@ -13,7 +13,7 @@ const promptDefinitions: PromptDefinition[] = [
     keywords: ["pr", "pull request", "pr作成依頼", "prタイトル", "pr本文", "文面", "作成", "ぶんめんさくせい", "bunmensakusei", "ぴーあーる", "ぷるりくえすと", "ぎっとはぶ"],
     requiresCommitId: true,
     buildBody: (commitId: string) => commitId
-      ? `対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文は \`\`\` で囲まれた一塊として回答してください。`
+      ? `対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文は ~~~~ で囲まれた一塊として回答してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
       : ""
   },
   {
@@ -27,17 +27,17 @@ const promptDefinitions: PromptDefinition[] = [
   },
   {
     id: "inline-code-request",
-    label: "303: Markdown インラインコードとして出力",
-    keywords: ["markdown", "inline code", "code", "インラインコード", "markdown出力", "コード形式", "出力", "いんらいんこーど", "しゅつりょく", "inrainko-do", "shutsuryoku", "まーくだうん", "こーど"],
+    label: "303: Markdown をチルダフェンスで出力",
+    keywords: ["markdown", "tilde fence", "tilde fenced", "tilde-fence", "tilde-fenced", "fenced markdown", "code fence", "code block", "code", "チルダフェンス", "markdown出力", "コード形式", "出力", "ちるだふぇんす", "こーどふぇんす", "こーどぶろっく", "shutsuryoku", "まーくだうん", "こーど"],
     requiresCommitId: false,
-    buildBody: () => "出力はインラインコード形式で markdown テキストで出力してください。回答が ``` と ``` とで囲まれるイメージです。"
+    buildBody: () => "回答は、そのままコピーしやすいように markdown テキストを ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
   },
   {
     id: "extract-to-inline-code-request",
-    label: "351: 添付ファイル等の抽出結果をインラインコードで出力",
-    keywords: ["extract", "attachment", "text", "inline code", "markdown", "抽出", "添付ファイル", "テキスト", "インラインコード", "出力", "ちゅうしゅつ", "てんぷふぁいる", "てきすと", "しゅつりょく"],
+    label: "351: 添付ファイル等の抽出結果をチルダフェンスで出力",
+    keywords: ["extract", "attachment", "text", "tilde fence", "tilde fenced", "tilde-fence", "tilde-fenced", "fenced markdown", "code fence", "code block", "markdown", "抽出", "添付ファイル", "テキスト", "チルダフェンス", "出力", "ちゅうしゅつ", "てんぷふぁいる", "てきすと", "ちるだふぇんす", "こーどふぇんす", "こーどぶろっく", "しゅつりょく"],
     requiresCommitId: false,
-    buildBody: () => "添付ファイルから、あるいは与えるテキストから 情報を抽出して、インラインコードの markdown テキストに出力してください。"
+    buildBody: () => "添付ファイルから、あるいは与えるテキストから情報を抽出して、markdown テキストを ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
   },
   {
     id: "github-no-change-request",
@@ -72,14 +72,14 @@ const promptDefinitions: PromptDefinition[] = [
     label: "702: 事象の再発防止テストを追加",
     keywords: ["test", "testing", "small test", "再発", "防止", "テスト", "追加", "再現テスト", "小さなテスト", "軽量テスト", "てすと", "さいげんてすと", "しょうさなてすと", "tesuto", "saigentesuto"],
     requiresCommitId: false,
-    buildBody: () => "今回の事象が再現したときにすぐに気づくように、とても小さなシンプルなテストについて、よういに実現可能であればこれを追加して欲しいです。困難な場合は作業せずにその旨指摘してください。"
+    buildBody: () => "今回の事象が再現したときにすぐに気づくように、とても小さなシンプルなテストについて、容易に実現可能であればこれを追加して欲しいです。困難な場合は作業せずにその旨指摘してください。"
   },
   {
     id: "disagreement-first-request",
     label: "302: 違和感や誤りを先に指摘",
     keywords: ["disagree", "wrong", "違和感", "誤り", "間違い", "指摘", "先", "先に指摘", "いわかん", "まちがい", "してき", "iwakan", "machigai", "shiteki"],
     requiresCommitId: false,
-    buildBody: () => "私の指示や指摘について、あなたか強い違和感を感じたり、あるいはあなたが間違っていると感じている場合には、指示を続行せずに、その違和感や間違いを回答して欲しい。"
+    buildBody: () => "私の指示や指摘について、あなたが強い違和感を感じたり、あるいはあなたが間違っていると感じている場合には、指示を続行せずに、その違和感や間違いを回答して欲しい。"
   },
   {
     id: "todo-cleanup-request",
@@ -128,7 +128,7 @@ const promptDefinitions: PromptDefinition[] = [
     label: "300: 確認範囲は概ね良好で LGTM",
     keywords: ["lgtm", "looks good to me", "確認", "範囲", "良さそう", "良好", "概ね", "おおよそ", "レビュー", "かくにん", "はんい", "りょうこう", "れびゅー"],
     requiresCommitId: false,
-    buildBody: () => "いいえ。いい感じ。確認した範囲はおおよそ良さそうだ。LGTMです。"
+    buildBody: () => "いいね！いい感じです。確認した範囲はおおよそ良さそうです。LGTMです。"
   },
   {
     id: "peer-feedback-analysis-request",
@@ -159,11 +159,18 @@ const promptDefinitions: PromptDefinition[] = [
     buildBody: () => "開発中の試行錯誤や調査の過程で入れた暫定変更、デバッグ用コード、確認用の一時対応が、解決後も残ったままになっていないか確認してください。もし不要な暫定変更が残っていれば、どこにあり、なぜ不要と判断できるのかを指摘してください。"
   },
   {
+    id: "reconsider-answer-request",
+    label: "313: 回答を改めて再考して確認",
+    keywords: ["reconsider", "rethink", "fresh look", "answer review", "再考", "再確認", "改めて", "新鮮な気持ち", "もう一度", "回答", "見直し", "さいこう", "さいかくにん", "あらためて", "みなおし"],
+    requiresCommitId: false,
+    buildBody: () => "その回答について、いったん先入観を外して、改めて新鮮な気持ちでよく考え直したうえでもう一度回答してください。見落としや早とちり、先入観による偏った考え方、さらに別の解釈の余地がないかも含めて再確認して欲しいです。"
+  },
+  {
     id: "directory-summary-markdown-request",
     label: "101: ディレクトリ内容整理 markdown を作成",
     keywords: ["directory", "markdown", "summary", "index", "scan cost", "ディレクトリ", "内容", "整理", "markdown作成", "作成", "md作成", "概要整理", "走査コスト削減", "でぃれくとり", "せいり", "がいよう", "そうさこすと"],
     requiresCommitId: false,
-    buildBody: () => "いま作業しているディレクトリに含まれるファイルについて、無理のない範囲で、内容を調べて、それを整理した markdown (.md)ファイルを作成してほしい。既存の該当する対象ファイルがあればそれを更新あるいは加筆し、もし妥当な該当する対象ファイルがない場合は適切ないファイル名のmarkdownファイルを新規作成してそこに記述して欲しい。これは次回に生成AIがこのディレクトリを開いた時の走査のコストを削減することについても期待される効果となっています。"
+    buildBody: () => "いま作業しているディレクトリに含まれるファイルについて、無理のない範囲で、内容を調べて、それを整理した markdown (.md)ファイルを作成してほしい。既存の該当する対象ファイルがあればそれを更新あるいは加筆し、もし妥当な該当する対象ファイルがない場合は適切なファイル名の markdown ファイルを新規作成してそこに記述して欲しい。これは次回に生成AIがこのディレクトリを開いた時の走査のコストを削減することについても期待される効果となっています。"
   },
   {
     id: "build-check-request",
@@ -177,13 +184,13 @@ const promptDefinitions: PromptDefinition[] = [
     label: "706: 作業終了時の引継確認",
     keywords: ["session close", "wrap up", "handover", "todo", "todo.md", "作業終了", "終了", "引継", "伝達事項", "再開", "復帰", "さぎょうしゅうりょう", "しゅうりょう", "ひきつぎ", "でんたつじこう", "さいかい", "ふっき"],
     requiresCommitId: false,
-    buildBody: () => "今回の作業はここまで。終わりにします。なお、次回に再開する時にスムーズに復帰できるように何か伝達事項はあるだろうか。もしそのようなものがあるのであれば、TODO.mdに 必要な情報を記入してもらえませんか。そして必要があれば、直近の作業出ないを実施したのかを実施済み引き継ぎ事項として TODO.md に記載して欲しいです。"
+    buildBody: () => "今回の作業はここまで。終わりにします。なお、次回に再開する時にスムーズに復帰できるように何か伝達事項はあるだろうか。もしそのようなものがあるのであれば、TODO.mdに必要な情報を記入してもらえませんか。そして必要があれば、直近の作業で何を実施したのかを実施済み引き継ぎ事項として TODO.md に記載して欲しいです。"
   },
   {
     id: "single-file-web-app-request",
     label: "701: Single-file Web App の維持",
     keywords: ["single-file", "single file", "web app", "html", "css", "js", "cdn", "維持", "依存なし", "単一html", "single-file web app", "しんぐるふぁいる", "しんぐるふぁいるうぇぶあぷり", "たんいつhtml", "いぞんなし"],
     requiresCommitId: false,
-    buildBody: () => "このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDNや 別ファイルのcss/jsファイルを利用していないことを確認してください。"
+    buildBody: () => "このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
   }
 ];
