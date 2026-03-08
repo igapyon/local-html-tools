@@ -44,6 +44,31 @@
 
 # DONE
 
+- [引継] `docs/prompt/prompt-gen` を段階的に整理済み
+- `docs/prompt/prompt-gen-src.html` の巨大 inline CSS / JS は外出し済み
+- 開発時ソースは `docs/prompt/src/prompt-gen/css/app.css` と `docs/prompt/src/prompt-gen/ts/*.ts`
+- `scripts/build-prompt.mjs` で `ts -> js` を行ってから single-file の `docs/prompt/prompt-gen.html` を生成する構成に変更済み
+- `promptDefinitions` は `docs/prompt/src/prompt-gen/ts/prompt-definitions.ts` へ切り出し済み
+- 各定義は `id / label / keywords / requiresCommitId / buildBody()` を持つ形に整理済み
+- `main.ts` は検索・選択・表示制御側へ寄せ、本文生成ロジックは定義側へ集約済み
+- `docs/prompt/tests/prompt-gen-main.test.js` を追加済み
+- 現在の最小テスト対象:
+- 一意候補絞り込み後の PR 文面生成
+- 固定文面でのラベル接頭辞 ON/OFF
+- 検索語変更時の commit ID クリアと出力切替
+- `prompt-gen` の候補ボタンには分類用の番号帯を付与済み
+- `100` 台: ディレクトリ/markdown 確認系
+- `300` 台: 会話/レビュー/確認系
+- `500` 台: GitHub 文面系
+- `700` 台: 実装方針/運用/ビルド系
+- 直近では `keywords` に、日本語ラベル由来の名詞・動詞を明示追加する改善を実施済み
+- 例: `306: 依頼内容の実施状況を確認` に `依頼 / 内容 / 実施 / 状況 / じょうきょう / joukyou` を追加
+- 例: `304: 批判的レビューの依頼` に `依頼` を追加
+- 例: `102: markdown 更新漏れの確認` に `更新 / 漏れ / 確認` を追加
+- 直近で `705: 完全ビルドの実施確認` と `706: 作業終了時の引継確認` を追加済み
+- 最新状態で `npm run build:all` は実施済み
+- 次回再開時は、まず `git status --short` と `npm test -- docs/prompt/tests/prompt-gen-main.test.js` を見ると状況把握が早い
+
 - `scripts/lib/single-html.mjs` を導入し、`text/link/life/img/docs-index` の `*-src.html` から配布用 `*.html` 生成時にローカル `link/script src` をインライン化（単一HTML化）する運用へ統一
 - 各HTMLのタイトル右に「?」説明を置く方針に統一し、その文言を docs/index.html のホバー説明へ転記する対応を実施
 - [優先度高] タイトルに「?」が未設置のHTML一覧（対応済み分）
