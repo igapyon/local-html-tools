@@ -3677,63 +3677,141 @@ async function initializePromptPage() {
         }
         return result;
     }
-    function buildSearchTokens(definition) {
+    function buildExpandedForms(token) {
         const tokens = new Set();
-        const label = (definition.label || "").toLowerCase();
-        const keywords = Array.isArray(definition.keywords) ? definition.keywords : [];
-        if (label) {
-            tokens.add(label);
-            for (const part of label.split(/\s+/).filter(Boolean)) {
-                tokens.add(part);
-                const hiraganaPart = toHiragana(part);
-                const katakanaPart = toKatakana(part);
-                if (hiraganaPart !== part) {
-                    tokens.add(hiraganaPart);
-                }
-                if (katakanaPart !== part) {
-                    tokens.add(katakanaPart);
-                }
-                const romaji = kanaToRomaji(part);
-                if (romaji) {
-                    tokens.add(romaji);
-                }
+        const normalizedToken = String(token || "").toLowerCase().trim();
+        if (!normalizedToken) {
+            return [];
+        }
+        tokens.add(normalizedToken);
+        for (const part of normalizedToken.split(/\s+/).filter(Boolean)) {
+            tokens.add(part);
+        }
+        for (const current of Array.from(tokens)) {
+            const hiragana = toHiragana(current);
+            const katakana = toKatakana(current);
+            const romaji = kanaToRomaji(current);
+            if (hiragana !== current) {
+                tokens.add(hiragana);
+            }
+            if (katakana !== current) {
+                tokens.add(katakana);
+            }
+            if (romaji) {
+                tokens.add(romaji);
             }
         }
+        return Array.from(tokens);
+    }
+    function buildLabelTokens(definition) {
+        const tokens = new Set();
+        const label = (definition.label || "").toLowerCase().trim();
+        if (!label) {
+            return [];
+        }
+        tokens.add(label);
+        for (const part of label.split(/\s+/).filter(Boolean)) {
+            tokens.add(part);
+        }
+        return Array.from(tokens);
+    }
+    function buildKeywordTokens(definition) {
+        const tokens = new Set();
+        const keywords = Array.isArray(definition.keywords) ? definition.keywords : [];
         for (const keyword of keywords) {
             const normalizedKeyword = String(keyword || "").toLowerCase().trim();
             if (!normalizedKeyword) {
                 continue;
             }
             tokens.add(normalizedKeyword);
-            const hiraganaKeyword = toHiragana(normalizedKeyword);
-            const katakanaKeyword = toKatakana(normalizedKeyword);
-            if (hiraganaKeyword !== normalizedKeyword) {
-                tokens.add(hiraganaKeyword);
-            }
-            if (katakanaKeyword !== normalizedKeyword) {
-                tokens.add(katakanaKeyword);
-            }
-            const romajiKeyword = kanaToRomaji(normalizedKeyword);
-            if (romajiKeyword) {
-                tokens.add(romajiKeyword);
-            }
             for (const part of normalizedKeyword.split(/\s+/).filter(Boolean)) {
                 tokens.add(part);
-                const hiraganaPart = toHiragana(part);
-                const katakanaPart = toKatakana(part);
-                if (hiraganaPart !== part) {
-                    tokens.add(hiraganaPart);
-                }
-                if (katakanaPart !== part) {
-                    tokens.add(katakanaPart);
-                }
-                const romaji = kanaToRomaji(part);
-                if (romaji) {
-                    tokens.add(romaji);
-                }
             }
         }
         return Array.from(tokens);
+    }
+    function buildExpandedTokens(definition) {
+        const tokens = new Set();
+        for (const token of buildLabelTokens(definition)) {
+            for (const expanded of buildExpandedForms(token)) {
+                tokens.add(expanded);
+            }
+        }
+        for (const token of buildKeywordTokens(definition)) {
+            for (const expanded of buildExpandedForms(token)) {
+                tokens.add(expanded);
+            }
+        }
+        for (const token of buildLabelTokens(definition)) {
+            tokens.delete(token);
+        }
+        for (const token of buildKeywordTokens(definition)) {
+            tokens.delete(token);
+        }
+        return Array.from(tokens);
+    }
+    function matchesAllTerms(tokens, terms) {
+        if (terms.length === 0) {
+            return true;
+        }
+        return terms.every((term) => tokens.some((token) => token.includes(term)));
+    }
+    function calculateMatchScore(tokens, terms) {
+        if (terms.length === 0) {
+            return 0;
+        }
+        let score = 0;
+        for (const term of terms) {
+            let bestScoreForTerm = 0;
+            for (const token of tokens) {
+                if (!token.includes(term) || token.length === 0) {
+                    continue;
+                }
+                const currentScore = term.length / token.length;
+                if (currentScore > bestScoreForTerm) {
+                    bestScoreForTerm = currentScore;
+                }
+            }
+            score += bestScoreForTerm;
+        }
+        return score;
+    }
+    function sortDefinitions(definitions) {
+        return [...definitions].sort((left, right) => {
+            if (left.label < right.label)
+                return -1;
+            if (left.label > right.label)
+                return 1;
+            return 0;
+        });
+    }
+    function sortDefinitionsByScore(definitions, terms, tokenBuilder) {
+        return [...definitions].sort((left, right) => {
+            const rightScore = calculateMatchScore(tokenBuilder(right), terms);
+            const leftScore = calculateMatchScore(tokenBuilder(left), terms);
+            if (rightScore !== leftScore) {
+                return rightScore - leftScore;
+            }
+            if (left.label < right.label)
+                return -1;
+            if (left.label > right.label)
+                return 1;
+            return 0;
+        });
+    }
+    function mergeDefinitionGroups(groups) {
+        const merged = [];
+        const seenIds = new Set();
+        for (const group of groups) {
+            for (const definition of group) {
+                if (seenIds.has(definition.id)) {
+                    continue;
+                }
+                seenIds.add(definition.id);
+                merged.push(definition);
+            }
+        }
+        return merged;
     }
     function buildDisplayKeywords(definition) {
         const tokens = new Set();
@@ -3832,16 +3910,18 @@ async function initializePromptPage() {
             promptOutput.textContent = "";
         }
         const terms = query ? query.split(/\s+/).filter(Boolean) : [];
+        const labelMatches = query
+            ? sortDefinitions(promptDefinitions.filter((definition) => matchesAllTerms(buildLabelTokens(definition), terms)))
+            : sortDefinitions(promptDefinitions);
+        const keywordMatches = query
+            ? sortDefinitionsByScore(promptDefinitions.filter((definition) => matchesAllTerms(buildKeywordTokens(definition), terms)), terms, buildKeywordTokens)
+            : [];
+        const expandedMatches = query
+            ? sortDefinitionsByScore(promptDefinitions.filter((definition) => matchesAllTerms(buildExpandedTokens(definition), terms)), terms, buildExpandedTokens)
+            : [];
         const matchedDefinitions = query
-            ? promptDefinitions.filter((definition) => terms.every((term) => buildSearchTokens(definition).some((token) => token.includes(term))))
-            : promptDefinitions;
-        matchedDefinitions.sort((left, right) => {
-            if (left.label < right.label)
-                return -1;
-            if (left.label > right.label)
-                return 1;
-            return 0;
-        });
+            ? mergeDefinitionGroups([labelMatches, keywordMatches, expandedMatches])
+            : labelMatches;
         if (matchedDefinitions.length === 0) {
             if (selectedPrompt) {
                 selectedPrompt = "";
@@ -3851,24 +3931,29 @@ async function initializePromptPage() {
             }
             return;
         }
-        const hasSingleMatch = matchedDefinitions.length === 1;
-        if (hasSingleMatch && !selectedPrompt) {
-            selectedPrompt = matchedDefinitions[0].id;
+        const prioritizedSingleDefinition = labelMatches.length === 1
+            ? labelMatches[0]
+            : labelMatches.length === 0 && keywordMatches.length === 1
+                ? keywordMatches[0]
+                : labelMatches.length === 0 && keywordMatches.length === 0 && expandedMatches.length === 1
+                    ? expandedMatches[0]
+                    : null;
+        if (prioritizedSingleDefinition) {
+            selectedPrompt = prioritizedSingleDefinition.id;
         }
-        else if (!hasSingleMatch &&
-            selectedPrompt &&
+        else if (selectedPrompt &&
             !matchedDefinitions.some((definition) => definition.id === selectedPrompt)) {
             selectedPrompt = "";
         }
         for (const definition of matchedDefinitions) {
             const button = createCandidateButton(definition);
-            if (hasSingleMatch && selectedPrompt === definition.id) {
+            if (prioritizedSingleDefinition && selectedPrompt === definition.id) {
                 button.classList.add("is-active");
             }
             promptCandidateArea.appendChild(button);
         }
-        if (hasSingleMatch && selectedPrompt === matchedDefinitions[0].id) {
-            const selectedDefinition = matchedDefinitions[0];
+        if (prioritizedSingleDefinition && selectedPrompt === prioritizedSingleDefinition.id) {
+            const selectedDefinition = prioritizedSingleDefinition;
             if (selectedDefinition.requiresCommitId) {
                 commitInputSection.classList.remove("md-hidden");
             }
