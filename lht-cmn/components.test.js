@@ -1,8 +1,13 @@
 // @vitest-environment jsdom
 
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 import { describe, expect, it, vi } from "vitest";
 
 import "./js/components.js";
+
+const componentsCss = readFileSync(resolve(process.cwd(), "lht-cmn/css/components.css"), "utf8");
 
 function waitForMicrotask() {
   return new Promise((resolve) => queueMicrotask(resolve));
@@ -23,6 +28,21 @@ function defineMaterialTestDoubles() {
       customElements.define(tagName, ctor);
     }
   }
+}
+
+function renderCriticalComponentsMarkup() {
+  document.body.innerHTML = `
+    <lht-help-tooltip label="help">body</lht-help-tooltip>
+    <lht-text-field-help field-id="textField" label="Text"></lht-text-field-help>
+    <lht-select-help field-id="selectField"></lht-select-help>
+    <lht-file-select input-id="fileInput" button-id="fileButton"></lht-file-select>
+    <lht-switch-help switch-id="switchField" label="Switch">help</lht-switch-help>
+    <lht-command-block command-id="cmdField"></lht-command-block>
+  `;
+}
+
+function mountTooltipStyles() {
+  document.head.innerHTML = `<style>${componentsCss}</style>`;
 }
 
 describe("lht-select-help declarative options", () => {
@@ -210,6 +230,18 @@ describe("lht-help-tooltip fallback", () => {
     expect(tooltip.innerHTML).toContain("<strong>help</strong>");
   });
 
+  it("bundles the self-contained CSS contract for anchoring and visibility", () => {
+    expect(componentsCss).toContain("lht-help-tooltip {");
+    expect(componentsCss).toContain("position: relative;");
+    expect(componentsCss).toContain("overflow: visible;");
+    expect(componentsCss).toContain("lht-help-tooltip .md-tooltip-group {");
+    expect(componentsCss).toContain("lht-help-tooltip .md-tooltip-content {");
+    expect(componentsCss).toContain("display: none;");
+    expect(componentsCss).toContain("lht-help-tooltip .md-tooltip-group:hover .md-tooltip-content,");
+    expect(componentsCss).toContain("lht-help-tooltip .md-tooltip-group:focus-within .md-tooltip-content {");
+    expect(componentsCss).toContain("display: block;");
+  });
+
   it("supports placement auto and clamps to the lower-overflow side", () => {
     document.body.innerHTML = `
       <lht-help-tooltip label="説明ラベル" placement="auto">
@@ -241,6 +273,30 @@ describe("lht-help-tooltip fallback", () => {
     expect(tooltip.dataset.placement).toBe("right");
     expect(tooltip.style.left).toBe("-76px");
     expect(tooltip.style.top).toBe("-15px");
+  });
+
+  it("hides by default, becomes visible while active, and resets on leave", () => {
+    mountTooltipStyles();
+    document.body.innerHTML = `
+      <lht-help-tooltip label="説明ラベル">
+        help
+      </lht-help-tooltip>
+    `;
+
+    const element = document.querySelector("lht-help-tooltip");
+    const tooltip = element.querySelector(".md-tooltip-content");
+
+    expect(window.getComputedStyle(tooltip).display).toBe("none");
+
+    element._handleTooltipEnter();
+    expect(window.getComputedStyle(tooltip).display).toBe("block");
+    expect(tooltip.style.left).not.toBe("");
+    expect(tooltip.style.top).not.toBe("");
+
+    element._handleTooltipLeave();
+    expect(window.getComputedStyle(tooltip).display).toBe("none");
+    expect(tooltip.style.left).toBe("");
+    expect(tooltip.style.top).toBe("");
   });
 
   it("supports Escape to force-hide the active tooltip", () => {
@@ -492,6 +548,31 @@ describe("lht-switch-help fallback", () => {
     expect(onChange).toHaveBeenCalledTimes(1);
 
     delete window.testSwitchChange;
+  });
+});
+
+describe("lht critical components mode matrix", () => {
+  it("renders self-contained fallback DOM when material components are unavailable", () => {
+    renderCriticalComponentsMarkup();
+
+    expect(document.querySelector("lht-help-tooltip .md-help-icon-button--fallback")).not.toBeNull();
+    expect(document.querySelector("lht-text-field-help input")).not.toBeNull();
+    expect(document.querySelector("lht-select-help select")).not.toBeNull();
+    expect(document.querySelector("lht-file-select button.lht-file-select__button--fallback")).not.toBeNull();
+    expect(document.querySelector("lht-switch-help input.md-switch-input")).not.toBeNull();
+    expect(document.querySelector("lht-command-block button.md-copy-button--fallback")).not.toBeNull();
+  });
+
+  it("renders md-* primitives when material components are registered", () => {
+    defineMaterialTestDoubles();
+    renderCriticalComponentsMarkup();
+
+    expect(document.querySelector("lht-help-tooltip md-icon-button")).not.toBeNull();
+    expect(document.querySelector("lht-text-field-help md-outlined-text-field")).not.toBeNull();
+    expect(document.querySelector("lht-select-help md-outlined-select")).not.toBeNull();
+    expect(document.querySelector("lht-file-select md-filled-button")).not.toBeNull();
+    expect(document.querySelector("lht-switch-help md-switch")).not.toBeNull();
+    expect(document.querySelector("lht-command-block md-icon-button")).not.toBeNull();
   });
 });
 

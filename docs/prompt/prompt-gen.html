@@ -16,215 +16,113 @@ limitations under the License.
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ファイル名連番リネームコマンドジェネレータ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プロンプト作成支援</title>
   
   
   
   <style>
-    /* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
-    :root {
-      --md-danger: #b3261e;
-      --md-state-layer: rgba(98, 0, 238, 0.12);
-      --md-sys-color-background: #f6f4f8;
-      --md-sys-color-focus-ring: rgba(98, 0, 238, 0.35);
-      --md-sys-color-on-primary: #ffffff;
-      --md-sys-color-on-secondary: #00332c;
-      --md-sys-color-on-surface: #1c1b1f;
-      --md-sys-color-on-surface-variant: #49454f;
-      --md-sys-color-outline: #c8c5d0;
-      --md-sys-color-primary: #6200ee;
-      --md-sys-color-surface: #ffffff;
-      --md-sys-color-surface-variant: #f4f1f7;
-      --md-typography-body-small: 0.875rem;
-    }
-
-    .md-page {
-      background: var(--md-sys-color-background);
-      color: var(--md-sys-color-on-surface);
+    body.md-page {
+      margin: 0;
       padding: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(174, 231, 255, 0.52), transparent 28%),
+        radial-gradient(circle at top left, rgba(221, 221, 255, 0.45), transparent 24%),
+        linear-gradient(180deg, #f6f7fb 0%, #eef2f8 100%);
+      color: #1c1b1f;
       min-height: 100vh;
-    }
-
-    .md-surface-card {
-      max-width: 48rem;
-      margin: 0 auto;
-      padding: 24px;
-      position: relative;
-    }
-
-    .md-card {
-      background: var(--md-sys-color-surface);
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
-      border: 1px solid #ece7f3;
-    }
-
-    .md-headline {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      padding-right: 2.5rem;
-    }
-
-    .md-section { margin-bottom: 1rem; }
-
-    .md-section-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.75rem;
-    }
-
-    .md-flow-row {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 0.65rem;
-    }
-
-    .md-step-icon {
-      width: 3rem;
-      height: 3rem;
-      flex-shrink: 0;
-    }
-
-    .md-flow-divider {
-      margin: 1rem 0 0.75rem;
-    }
-
-    .md-flow-strip {
-      width: 100%;
-      height: 52px;
-      display: block;
-    }
-
-    .md-label {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.18rem;
-      font-weight: 600;
-      color: var(--md-sys-color-on-surface);
-    }
-
-    .md-required {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.15rem 0.4rem;
-      border-radius: 999px;
-      font-size: 0.54rem;
-      font-weight: 600;
-      background: #eceaf1;
-      color: #49454f;
-    }
-
-    .md-input,
-    .md-select,
-    .md-textarea {
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid var(--md-sys-color-outline);
-      background: var(--md-sys-color-surface);
-      padding: 0.75rem;
-      font-size: 0.95rem;
-      color: var(--md-sys-color-on-surface);
-      transition: border-color 150ms ease, box-shadow 150ms ease;
       box-sizing: border-box;
     }
 
-    .md-textarea {
-      min-height: 11rem;
-      resize: vertical;
+    .md-surface-card {
+      max-width: 980px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(216, 223, 235, 0.95);
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(45, 62, 96, 0.10);
+      padding: 28px;
     }
 
-    .md-input:focus,
-    .md-select:focus,
-    .md-textarea:focus {
-      outline: none;
-      border-color: var(--md-sys-color-primary);
-      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    .md-section {
+      margin-top: 28px;
     }
 
-    .md-form-row {
+    .md-stack-md {
+      display: grid;
+      gap: 16px;
+    }
+
+    .md-form-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .md-form-grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .md-chip-row {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
-      gap: 0.5rem;
+      gap: 10px;
     }
 
-    .md-form-row--nowrap {
-      flex-wrap: nowrap;
+    md-outlined-text-field.md-outlined-field {
+      --md-outlined-text-field-input-text-placeholder-color: #8f8a98;
     }
 
-    .md-form-row--nowrap > .md-label {
-      flex: 0 0 13rem;
-      min-width: 13rem;
+    lht-text-field-help .lht-text-field-help__fallback::placeholder {
+      color: #8f8a98;
+      opacity: 1;
     }
 
-    .md-form-row--compact > .md-label {
-      flex: 0 0 11.5rem;
-      min-width: 11.5rem;
+    .md-chip-button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      background: var(--md-sys-color-primary, #6200ee);
+      color: var(--md-sys-color-on-primary, #ffffff);
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
     }
 
-    .md-label--tight {
-      flex-wrap: nowrap;
-      white-space: nowrap;
-      gap: 0.12rem;
+    .md-chip-button:hover {
+      background: #4f00c9;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(98, 0, 238, 0.24);
     }
 
-    .md-row-input {
-      flex: 1 1 auto;
-      min-width: 0;
+    .md-chip-button.is-active {
+      background: #4f00c9;
+      color: var(--md-sys-color-on-primary, #ffffff);
+      box-shadow: 0 6px 14px rgba(98, 0, 238, 0.24);
     }
 
-    .md-step1-fields .md-form-row + .md-form-row {
-      margin-top: 0.5rem;
-    }
-
-    .md-inline-fields {
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-      align-items: flex-start;
-      margin-top: 0.75rem;
-    }
-
-    .md-inline-field {
-      display: flex;
-      align-items: center;
-      flex-wrap: nowrap;
-      gap: 0.4rem;
-      white-space: nowrap;
-      width: 100%;
-    }
-
-    .md-inline-field .md-label {
+    .md-helper-text {
       margin: 0;
-      flex: 0 0 10.5rem;
-      min-width: 10.5rem;
-      flex-wrap: nowrap;
-      white-space: nowrap;
+      padding: 0 1rem;
+      font-size: 0.75rem;
+      line-height: 1rem;
+      color: var(--md-sys-color-on-surface-variant, #49454f);
     }
 
-    .md-input--prefix { width: 14rem; }
-    .md-input--short { width: 6rem; }
-    .md-input--count { width: 7rem; }
-    .md-input--output {
-      background: #f4f1f7;
-      color: #5b5663;
-      border-style: dashed;
-      cursor: default;
+    .md-output-title {
+      margin: 0;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #27364b;
     }
 
     .md-code-block {
       position: relative;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
     }
 
     .md-code {
@@ -233,324 +131,59 @@ limitations under the License.
       padding-right: 2.5rem;
       border-radius: 12px;
       overflow-x: auto;
-      white-space: pre;
+      white-space: pre-wrap;
+      word-break: break-word;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 1rem;
-      line-height: 1.5;
-      background: var(--md-sys-color-surface-variant);
+      background: #f4f1f7;
       border: 1px solid #e5e0ec;
       color: #1f1b2d;
       min-height: 2.5rem;
-    }
-
-    .md-icon-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #f0edf5;
-      color: #3f3b46;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-    }
-
-    .md-button {
-      border-radius: 999px;
-      padding: 0.6rem 1.2rem;
-      font-weight: 600;
-      font-size: 0.95rem;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
-    }
-
-    .md-button--surface {
-      background: var(--md-sys-color-surface-variant);
-      color: var(--md-sys-color-on-surface);
-      border: 1px solid var(--md-sys-color-outline);
-    }
-
-    .md-button--compact {
-      padding: 0.38rem 0.75rem;
-      font-size: 0.82rem;
-      font-weight: 500;
-      line-height: 1.2;
-    }
-
-    .md-button--with-icon {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    .md-inline-action {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2rem;
-    }
-
-    .md-icon-btn:hover {
-      background: #e6e1ee;
+      line-height: 1.65;
+      box-sizing: border-box;
     }
 
     .md-copy-button {
       position: absolute;
       top: 0.5rem;
       right: 0.5rem;
+    }
+
+    md-icon-button.md-copy-button {
       width: 32px;
       height: 32px;
       border-radius: 16px;
+      --md-icon-button-icon-size: 16px;
+      --md-icon-button-icon-color: #3f3b46;
+      --md-icon-button-state-layer-shape: 16px;
+      --md-icon-button-hover-state-layer-color: #3f3b46;
+      --md-icon-button-hover-state-layer-opacity: 0.08;
+      --md-icon-button-pressed-state-layer-color: #3f3b46;
+      --md-icon-button-pressed-state-layer-opacity: 0.12;
       background: #f7f2fa;
-      border: none;
-      cursor: pointer;
     }
 
-    .md-tooltip-group {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .md-tooltip-content {
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      margin-top: 0.5rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 150ms ease;
-      z-index: 50;
-      width: 20rem;
-      max-width: 90vw;
-    }
-
-    .md-tooltip-group:hover .md-tooltip-content {
-      opacity: 1;
-    }
-
-    .md-tooltip {
-      background: #2b2831;
-      color: #f7f4fb;
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
-      font-size: 0.8125rem;
-      font-weight: 400;
-      line-height: 1.35;
-      white-space: normal;
-      overflow-wrap: anywhere;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .md-info-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 9999px;
-      background: transparent;
-      color: #4a4458;
-      margin-left: 0.2rem;
-    }
-
-    .md-info-icon {
-      width: 18px;
-      height: 18px;
-    }
-
-    .md-switch-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.75rem;
-      margin-top: 1rem;
-      margin-bottom: 0.4rem;
-    }
-
-    .md-switch-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.95rem;
-      color: var(--md-sys-color-on-surface);
-    }
-
-    .md-switch {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      background: #f0ebf7;
-      border-radius: 9999px;
-      display: inline-flex;
-      align-items: center;
-      padding: 2px;
-      transition: background 150ms ease, box-shadow 150ms ease;
-      box-shadow: inset 0 0 0 1px #cfc7dc;
-    }
-
-    .md-switch::after {
-      content: "";
-      width: 20px;
-      height: 20px;
-      border-radius: 9999px;
-      background: #ffffff;
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      transition: transform 150ms ease;
-    }
-
-    .md-switch-input {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .md-switch-input:checked + .md-switch {
-      background: rgba(98, 0, 238, 0.32);
-      box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.6);
-    }
-
-    .md-switch-input:checked + .md-switch::after {
-      transform: translateX(20px);
-    }
-
-    .md-menu-button {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-    }
-
-    .md-menu-panel {
-      position: absolute;
-      top: 48px;
-      right: 16px;
-      background: var(--md-sys-color-surface);
-      border: 1px solid #e6e1ee;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-      padding: 4px 0;
-      min-width: 160px;
-      z-index: 20;
-    }
-
-    .md-menu-link {
-      display: block;
-      padding: 8px 16px;
-      color: var(--md-sys-color-on-surface);
-      text-decoration: none;
-    }
-
-    .md-menu-link:hover {
-      background: #f2edf8;
+    md-icon-button.md-copy-button--surface {
+      background: #f7f2fa;
     }
 
     .md-hidden {
       display: none;
     }
 
-    .md-error {
-      margin-top: 0.5rem;
-      color: var(--md-danger);
-      font-size: var(--md-typography-body-small);
-    }
-
-    .md-preview {
-      overflow-x: auto;
-      border: 1px solid #e6e1ee;
-      border-radius: 12px;
-      background: #fff;
-      margin-top: 0.5rem;
-    }
-
-    .md-preview-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-    }
-
-    .md-preview-table th,
-    .md-preview-table td {
-      padding: 0.5rem 0.6rem;
-      border-bottom: 1px solid #ede7f5;
-      text-align: left;
-      white-space: nowrap;
-    }
-
-    .md-preview-table tbody tr:nth-child(even) {
-      background: #faf8fd;
-    }
-
-    .md-preview-empty {
-      padding: 0.75rem;
-      color: var(--md-sys-color-on-surface-variant);
-      font-size: 0.9rem;
-    }
-
-    .md-snackbar-host {
-      position: fixed;
-      right: 1.25rem;
-      bottom: 1.25rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 200ms ease;
-    }
-
-    .md-snackbar {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #2b2831;
-      color: #f7f4fb;
-      padding: 0.6rem 1rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      font-size: 0.85rem;
-    }
-
-    .md-snackbar-host.md-visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .md-flow-divider {
-      display: flex;
-      justify-content: center;
-      padding: 0.5rem 0;
-    }
-
-    .md-flow-strip {
-      width: 100%;
-      max-width: 36rem;
-      height: 2.5rem;
-    }
-
-    @media (max-width: 640px) {
-      .md-form-row--nowrap { flex-wrap: wrap; }
-      .md-form-row--nowrap > .md-label {
-        flex-basis: auto;
-        min-width: auto;
+    @media (max-width: 720px) {
+      body.md-page {
+        padding: 14px;
       }
-      .md-form-row--compact > .md-label {
-        flex-basis: auto;
-        min-width: auto;
+
+      .md-surface-card {
+        padding: 18px;
+        border-radius: 22px;
       }
-      .md-inline-field .md-label {
-        flex-basis: auto;
-        min-width: auto;
+
+      .md-form-grid-2 {
+        grid-template-columns: 1fr;
       }
-      .md-input--prefix,
-      .md-input--short,
-      .md-input--count {
-        width: 100%;
-      }
+
     }
   </style>
   <style>
@@ -1504,7 +1137,7 @@ lht-index-card-link {
   </style>
 </head>
 <body class="md-page">
-  <svg aria-hidden="true" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
     <defs>
       <symbol id="md-icon-menu" viewBox="0 0 24 24">
         <path d="M4 6h16"/>
@@ -1515,551 +1148,143 @@ lht-index-card-link {
         <rect x="9" y="9" width="11" height="11" rx="2"/>
         <rect x="4" y="4" width="11" height="11" rx="2"/>
       </symbol>
-      <symbol id="md-icon-trash" viewBox="0 0 24 24">
-        <path d="M4 7h16"/>
-        <path d="M10 11v6"/>
-        <path d="M14 11v6"/>
-        <path d="M6 7l1 12h10l1-12"/>
-        <path d="M9 7V5h6v2"/>
-      </symbol>
     </defs>
   </svg>
+  <div class="md-surface-card md-card">
+    <lht-page-hero
+      title="プロンプト作成支援"
+      subtitle="定型よくある生成AIプロンプトを作成支援。"
+      icon="📝"
+      help-label="プロンプト作成支援の説明"
+      help-wide
+      menu-home-href="../index.html"
+      menu-home-label="トップへ戻る">
+      AI や人に依頼するための文面を、用途別に短く組み立てるためのページです。<br><br>
+      初版では、PR タイトルと PR 本文を作成依頼するための文面を生成します。
+    </lht-page-hero>
 
-  <main class="md-surface-card md-card">
-    <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+    <section class="md-section md-stack-md">
+      <lht-text-field-help
+        field-id="promptSearch"
+        label="やりたいこと"
+        required
+        placeholder="例: pr"
+        help-text="やりたいことを短く入力します。初版では入力文字列が候補キーワードに部分一致したら PR 作成依頼を表示します。">
+      </lht-text-field-help>
 
-    <h1 class="md-headline">
-      <span aria-hidden="true">🏷️</span>
-      <span>ファイル名連番リネームコマンドジェネレータ</span>
-      <span class="md-tooltip-group">
-        <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-        <span class="md-tooltip-content md-tooltip">ファイル名リストから連番にリネームするコマンドを生成します。bashまたはPowerShellで実行できるコマンドを出力します。</span>
-      </span>
-    </h1>
-
-    <div class="md-switch-row">
-      <lht-switch-help
-        switch-id="shellEnvPowerShell"
-        label="PowerShell環境"
-        help-label="PowerShell環境の説明"
-      >Windows PowerShell用のコマンドを出力するかどうかを切り替えます。スイッチがオフの場合はmacOS/Linuxのbash/zsh向けのコマンドを出力します。ご利用の環境に従って切り替えてください。</lht-switch-help>
-      <span class="md-inline-action">
-        <button type="button" class="md-button md-button--surface md-button--compact md-button--with-icon" onclick="clearUiPreferences()" title="設定をクリア" aria-label="設定をクリア">
-          <svg viewBox="0 0 24 24" class="md-info-icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <use href="#md-icon-trash" xlink:href="#md-icon-trash"></use>
-          </svg>
-          <span>設定をクリア</span>
-        </button>
-        <span class="md-tooltip-group">
-          <span class="md-info-chip">
-            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg>
-          </span>
-          <span class="md-tooltip-content md-tooltip">ローカルに保存されているこのツールの設定をクリアします。</span>
-        </span>
-      </span>
-    </div>
-
-    <section class="md-section">
-      <div class="md-flow-row">
-        <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-          <rect x="14" y="17" width="36" height="30" rx="6" fill="#DBEAFE" />
-          <path d="M20 25h24M20 31h24M20 37h16" stroke="#4F46E5" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="50" cy="47" r="7" fill="#A7F3D0" />
-        </svg>
-        <p class="md-section-title">ファイル一覧取得コマンド</p>
-      </div>
-
-      <div class="md-step1-fields">
-        <div class="md-form-row md-form-row--nowrap md-form-row--compact">
-          <label class="md-label md-label--tight" for="extensionFilter">
-            <span>拡張子</span>
-            <span class="md-required" aria-hidden="true">Required</span>
-            <span class="md-tooltip-group">
-              <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-              <span class="md-tooltip-content md-tooltip">対象とする拡張子。*.png形式でもpngだけでもOKです。</span>
-            </span>
-            <span>：</span>
-          </label>
-          <input id="extensionFilter" list="extensionSuggestions" class="md-input md-row-input" placeholder="png" value="png" />
-          <datalist id="extensionSuggestions">
-            <option value="png"></option>
-            <option value="jpg"></option>
-            <option value="jpeg"></option>
-            <option value="gif"></option>
-            <option value="webp"></option>
-            <option value="svg"></option>
-            <option value="txt"></option>
-            <option value="csv"></option>
-            <option value="md"></option>
-            <option value="json"></option>
-            <option value="html"></option>
-            <option value="docx"></option>
-            <option value="xlsx"></option>
-            <option value="pdf"></option>
-            <option value="mp3"></option>
-            <option value="wav"></option>
-            <option value="mp4"></option>
-            <option value="mkv"></option>
-          </datalist>
-        </div>
-        <div class="md-form-row md-form-row--nowrap md-form-row--compact">
-          <label class="md-label md-label--tight" for="filenamePattern">
-            <span>名前パターン</span>
-            <span class="md-tooltip-group">
-              <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-              <span class="md-tooltip-content md-tooltip">ファイル名の一部で絞り込み（ワイルドカード使用可）。空欄の場合は拡張子のみでフィルタリングします。</span>
-            </span>
-            <span>：</span>
-          </label>
-          <input id="filenamePattern" list="filenamePatternSuggestions" class="md-input md-row-input" placeholder="スクリーンショット*" value="スクリーンショット*" />
-          <datalist id="filenamePatternSuggestions">
-            <option value="スクリーンショット"></option>
-            <option value="スクリーンショット*"></option>
-            <option value="IMG_*"></option>
-            <option value="DSC_*"></option>
-            <option value="report-*"></option>
-            <option value="sample-*"></option>
-            <option value="test-*"></option>
-            <option value="draft-*"></option>
-            <option value="backup-*"></option>
-            <option value="export-*"></option>
-            <option value="*"></option>
-          </datalist>
-        </div>
-      </div>
-
-      <lht-command-block command-id="listCmd"></lht-command-block>
+      <p class="md-helper-text">小窓に `p` `r` `pr` などを入れると、候補キーワードへの部分一致として `PR作成依頼` ボタンを表示します。</p>
+      <div id="promptCandidateArea" class="md-chip-row" aria-live="polite"></div>
     </section>
 
-    <div class="md-flow-divider" aria-hidden="true">
-      <svg viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
-        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
-        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
-        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
-      </svg>
-    </div>
-
-    <section class="md-section">
-      <div class="md-flow-row">
-        <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-          <rect x="12" y="14" width="40" height="36" rx="6" fill="#F5F3FF" />
-          <path d="M18 22h28M18 30h22M18 38h26" stroke="#7C3AED" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="50" cy="18" r="5" fill="#93C5FD"/>
-        </svg>
-        <p class="md-section-title">実行結果貼り付け + リネームルール</p>
+    <section id="prRequestSection" class="md-section md-stack-md md-hidden">
+      <div class="md-form-grid md-form-grid-2">
+        <lht-text-field-help
+          field-id="commitId"
+          label="コミットID"
+          required
+          placeholder="例: abc1234"
+          help-text="PR 文面の作成対象にしたいコミット ID を入力します。短縮 SHA でも構いません。">
+        </lht-text-field-help>
       </div>
 
-      <div class="md-form-row md-form-row--nowrap">
-        <label class="md-label md-label--tight" for="fileListInput">
-          <span>ファイル名リスト</span>
-          <span class="md-required" aria-hidden="true">Required</span>
-          <span class="md-tooltip-group">
-            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
-            <span class="md-tooltip-content md-tooltip">PowerShellやbashの出力結果をそのまま貼り付けられます。空行やヘッダー行は自動的にスキップします。</span>
-          </span>
-          <span>：</span>
-        </label>
-        <textarea id="fileListInput" class="md-textarea md-row-input" rows="10" placeholder="スクリーンショット-2024-01-15-123456.png&#10;スクリーンショット-2024-01-15-123457.png"></textarea>
-      </div>
-
-      <div class="md-inline-fields">
-        <div class="md-inline-field">
-          <label class="md-label" for="prefixInput"><span>プレフィックス</span><span class="md-required" aria-hidden="true">Required</span><span>：</span></label>
-          <input id="prefixInput" class="md-input md-input--prefix" placeholder="MyImage_" value="MyImage_" />
-        </div>
-        <div class="md-inline-field">
-          <label class="md-label" for="startNoInput"><span>開始番号</span><span class="md-required" aria-hidden="true">Required</span><span>：</span></label>
-          <input id="startNoInput" class="md-input md-input--short" type="number" min="1" value="1" />
-        </div>
-        <div class="md-inline-field">
-          <label class="md-label" for="digitsInput"><span>桁数</span><span class="md-required" aria-hidden="true">Required</span><span>：</span></label>
-          <select id="digitsInput" class="md-select md-input--short">
-            <option value="2">2</option>
-            <option value="3" selected>3</option>
-            <option value="4">4</option>
-          </select>
-        </div>
-        <div class="md-inline-field">
-          <label class="md-label" for="fileCount"><span>対象件数（出力）</span><span>：</span></label>
-          <input id="fileCount" class="md-input md-input--count md-input--output" value="0" readonly aria-readonly="true" />
-        </div>
-      </div>
-      <p id="inputError" class="md-error"></p>
+      <p class="md-output-title">生成結果</p>
+      <lht-command-block command-id="promptOutput"></lht-command-block>
     </section>
 
-    <div class="md-flow-divider" aria-hidden="true">
-      <svg viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
-        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
-        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
-        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
-      </svg>
-    </div>
-
-    <section class="md-section">
-      <div class="md-flow-row">
-        <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-          <path d="M18 24h14M18 32h14M18 40h14" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"/>
-          <path d="M34 32h12" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
-          <path d="M42 26l8 6-8 6" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <p class="md-section-title">結果表示: リネームコマンド</p>
-      </div>
-
-      <lht-command-block command-id="renameCmd"></lht-command-block>
-
-    </section>
-  </main>
-
-  <div id="toast" class="md-snackbar-host md-hidden">
-    <div class="md-snackbar">コピーしました</div>
+    <lht-toast id="toast"></lht-toast>
   </div>
 
   <script>
-    const UI_SHELL_ENV_POWERSHELL_STORAGE_KEY = "fileRenameCmdlineGen.ui.shellEnvPowerShell";
-    const UI_EXTENSION_FILTER_STORAGE_KEY = "fileRenameCmdlineGen.ui.extensionFilter";
-    const UI_FILENAME_PATTERN_STORAGE_KEY = "fileRenameCmdlineGen.ui.filenamePattern";
-    const UI_PREFIX_STORAGE_KEY = "fileRenameCmdlineGen.ui.prefix";
-    const UI_START_NO_STORAGE_KEY = "fileRenameCmdlineGen.ui.startNo";
-    const UI_DIGITS_STORAGE_KEY = "fileRenameCmdlineGen.ui.digits";
-
-    function getStoredString(key) {
-      try {
-        const value = localStorage.getItem(key);
-        return value == null ? null : value;
-      } catch (error) {
-        return null;
-      }
-    }
-
-    function getStoredBoolean(key) {
-      const raw = getStoredString(key);
-      if (raw === "true") return true;
-      if (raw === "false") return false;
-      return null;
-    }
-
-    function setStoredValue(key, value) {
-      try {
-        localStorage.setItem(key, String(value));
-      } catch (error) {
-        // localStorage が使えない環境でも動作継続
-      }
-    }
-    function getShellEnv() {
-      return document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
-    }
-
-    function normalizeExtension(raw) {
-      let value = (raw || "").trim();
-      if (!value) return "";
-      value = value.replace(/^\*\./, "");
-      value = value.replace(/^\./, "");
-      value = value.replace(/^\*/, "");
-      value = value.replace(/\s+/g, "");
-      return value;
-    }
-
-    function buildNamePattern(namePattern, ext) {
-      const pattern = (namePattern || "").trim();
-      if (!pattern) {
-        return `*.${ext}`;
-      }
-      const extSuffix = `.${ext}`.toLowerCase();
-      if (pattern.toLowerCase().endsWith(extSuffix)) {
-        return pattern;
-      }
-      return `${pattern}.${ext}`;
-    }
-
-    function quoteLiteral(value, shellEnv) {
-      if (shellEnv === "powershell") {
-        return `'${String(value).replace(/'/g, "''")}'`;
-      }
-      return `'${String(value).replace(/'/g, `'\\''`)}'`;
-    }
-
-    function generateListCommand(options = {}) {
-      const silent = options && options.silent === true;
-      const output = document.getElementById("listCmd");
-      const extRaw = document.getElementById("extensionFilter")?.value;
-      const patternRaw = document.getElementById("filenamePattern")?.value;
-      const ext = normalizeExtension(extRaw);
-      const shellEnv = getShellEnv();
-
-      if (!ext) {
-        if (!silent) {
-          document.getElementById("inputError").textContent = "拡張子フィルターを入力してください。";
-        }
-        output.textContent = "";
-        return "";
+    async function initializePromptPage() {
+      if (window.customElements && window.customElements.whenDefined) {
+        await window.customElements.whenDefined("lht-text-field-help");
       }
 
-      const namePattern = buildNamePattern(patternRaw, ext);
-      if (shellEnv === "powershell") {
-        output.textContent = `Get-ChildItem -File -Filter ${quoteLiteral(namePattern, shellEnv)} | Select-Object -ExpandProperty Name`;
-      } else {
-        output.textContent = `find . -maxdepth 1 -type f -name ${quoteLiteral(namePattern, shellEnv)} -print`;
-      }
-      return namePattern;
-    }
+      const promptSearch = document.getElementById("promptSearch");
+      const promptCandidateArea = document.getElementById("promptCandidateArea");
+      const prRequestSection = document.getElementById("prRequestSection");
+      const commitIdInput = document.getElementById("commitId");
+      const promptOutput = document.getElementById("promptOutput");
 
-    function normalizeListedFilename(value) {
-      return String(value)
-        .replace(/^\.\//, "")
-        .replace(/^\.\\/, "");
-    }
-
-    function parseFileList(text) {
-      const lines = String(text || "").split(/\r?\n/);
-      const skipHeaders = new Set(["name", "filename", "file name"]);
-      const files = [];
-      lines.forEach((line) => {
-        const trimmed = normalizeListedFilename(line.trim());
-        if (!trimmed) return;
-        const lower = trimmed.toLowerCase();
-        if (skipHeaders.has(lower)) return;
-        files.push(trimmed);
-      });
-      return files;
-    }
-
-    function getFileExtension(filename) {
-      const lastDot = filename.lastIndexOf(".");
-      if (lastDot <= 0 || lastDot === filename.length - 1) {
-        return "";
-      }
-      return filename.slice(lastDot);
-    }
-
-    function buildRenamePlan(files, prefix, startNo, digits) {
-      const plan = [];
-      files.forEach((oldName, index) => {
-        const nextNo = startNo + index;
-        const seq = String(nextNo).padStart(digits, "0");
-        const ext = getFileExtension(oldName);
-        const newName = `${prefix}${seq}${ext}`;
-        plan.push({ oldName, newName });
-      });
-      return plan;
-    }
-
-    function generateRenameCommands(plan, shellEnv) {
-      return plan.map((item) => {
-        if (shellEnv === "powershell") {
-          return `Rename-Item ${quoteLiteral(item.oldName, shellEnv)} ${quoteLiteral(item.newName, shellEnv)}`;
-        }
-        return `mv ${quoteLiteral(item.oldName, shellEnv)} ${quoteLiteral(item.newName, shellEnv)}`;
-      }).join("\n");
-    }
-
-    function escapeHtml(value) {
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-
-    function regenerateAll() {
-      const shellEnv = getShellEnv();
-      const err = document.getElementById("inputError");
-      const renameCmd = document.getElementById("renameCmd");
-      const fileCount = document.getElementById("fileCount");
-      err.textContent = "";
-
-      generateListCommand({ silent: true });
-
-      const fileListRaw = document.getElementById("fileListInput")?.value || "";
-      const prefix = (document.getElementById("prefixInput")?.value || "").trim();
-      const startNo = Number(document.getElementById("startNoInput")?.value || "0");
-      const digits = Number(document.getElementById("digitsInput")?.value || "3");
-      const files = parseFileList(fileListRaw);
-      fileCount.value = String(files.length);
-
-      if (!normalizeExtension(document.getElementById("extensionFilter")?.value || "")) {
-        err.textContent = "拡張子フィルターを入力してください。";
-      }
-
-      if (!files.length || !prefix || !Number.isInteger(startNo) || startNo < 1) {
-        renameCmd.textContent = "";
-        if (!files.length) {
-          err.textContent = err.textContent || "";
-        } else if (!prefix) {
-          err.textContent = err.textContent || "プレフィックスを入力してください。";
-        } else {
-          err.textContent = err.textContent || "開始番号は1以上の整数で入力してください。";
-        }
+      if (!promptSearch || !commitIdInput) {
         return;
       }
 
-      if (files.length > 9999) {
-        renameCmd.textContent = "";
-        err.textContent = "最大9999件まで対応です。入力件数を減らしてください。";
-        return;
+      let selectedPrompt = "";
+      const prRequestKeywords = ["pr", "pull request", "pr作成依頼", "prタイトル", "pr本文"];
+
+      function createCandidateButton(label, id) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "md-chip-button";
+        button.textContent = label;
+        button.dataset.promptId = id;
+        button.addEventListener("click", () => selectPrompt(id, button));
+        return button;
       }
 
-      const plan = buildRenamePlan(files, prefix, startNo, digits);
-      renameCmd.textContent = generateRenameCommands(plan, shellEnv);
-    }
-    function showToast(message) {
-      const host = document.getElementById("toast");
-      if (!host) return;
-      host.querySelector(".md-snackbar").textContent = message;
-      host.classList.remove("md-hidden");
-      host.classList.add("md-visible");
-      setTimeout(() => {
-        host.classList.remove("md-visible");
-        host.classList.add("md-hidden");
-      }, 1800);
-    }
+      function renderCandidates() {
+        const query = (promptSearch.value || "").trim().toLowerCase();
+        promptCandidateArea.innerHTML = "";
 
-    function setupAutoUpdate() {
-      const ids = [
-        "shellEnvPowerShell",
-        "extensionFilter",
-        "filenamePattern",
-        "fileListInput",
-        "prefixInput",
-        "startNoInput",
-        "digitsInput"
-      ];
-      ids.forEach((id) => {
-        const element = document.getElementById(id);
-        if (!element) return;
-        element.addEventListener("input", regenerateAll);
-        element.addEventListener("change", regenerateAll);
-      });
-    }
+        const matched = query && prRequestKeywords.some((keyword) => keyword.includes(query));
 
-    function loadPersistedInputs() {
-      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
-      const extensionFilter = document.getElementById("extensionFilter");
-      const filenamePattern = document.getElementById("filenamePattern");
-      const prefixInput = document.getElementById("prefixInput");
-      const startNoInput = document.getElementById("startNoInput");
-      const digitsInput = document.getElementById("digitsInput");
-
-      const shellEnvValue = getStoredBoolean(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY);
-      const extensionValue = getStoredString(UI_EXTENSION_FILTER_STORAGE_KEY);
-      const filenamePatternValue = getStoredString(UI_FILENAME_PATTERN_STORAGE_KEY);
-      const prefixValue = getStoredString(UI_PREFIX_STORAGE_KEY);
-      const startNoValue = getStoredString(UI_START_NO_STORAGE_KEY);
-      const digitsValue = getStoredString(UI_DIGITS_STORAGE_KEY);
-
-      if (shellEnvPowerShell && shellEnvValue !== null) {
-        shellEnvPowerShell.checked = shellEnvValue;
-      }
-      if (extensionFilter && extensionValue !== null) {
-        extensionFilter.value = extensionValue;
-      }
-      if (filenamePattern && filenamePatternValue !== null) {
-        filenamePattern.value = filenamePatternValue;
-      }
-      if (prefixInput && prefixValue !== null) {
-        prefixInput.value = prefixValue;
-      }
-      if (startNoInput && startNoValue !== null) {
-        const parsed = Number(startNoValue);
-        if (Number.isInteger(parsed) && parsed >= 1) {
-          startNoInput.value = String(parsed);
+        if (!matched) {
+          if (selectedPrompt === "pr-request") {
+            selectedPrompt = "";
+            prRequestSection.classList.add("md-hidden");
+            updateOutput();
+          }
+          return;
         }
+
+        const button = createCandidateButton("PR作成依頼", "pr-request");
+        if (selectedPrompt === "pr-request") {
+          button.classList.add("is-active");
+        }
+        promptCandidateArea.appendChild(button);
       }
-      if (digitsInput && digitsValue && digitsInput.querySelector(`option[value="${digitsValue}"]`)) {
-        digitsInput.value = digitsValue;
+
+      function selectPrompt(id, button) {
+        selectedPrompt = id;
+        for (const element of promptCandidateArea.querySelectorAll(".md-chip-button")) {
+          element.classList.remove("is-active");
+        }
+        button.classList.add("is-active");
+
+        if (id === "pr-request") {
+          prRequestSection.classList.remove("md-hidden");
+          commitIdInput.focus();
+        }
+
+        updateOutput();
       }
+
+      function buildPromptText() {
+        const commitId = (commitIdInput.value || "").trim();
+        if (selectedPrompt !== "pr-request" || !commitId) {
+          return "";
+        }
+        return `${commitId} における変更内容についての、PRテキストとPRタイトルを markdown 形式で欲しい。`;
+      }
+
+      function updateOutput() {
+        const text = buildPromptText();
+        promptOutput.textContent = text;
+      }
+
+      promptSearch.addEventListener("input", renderCandidates);
+      commitIdInput.addEventListener("input", updateOutput);
+
+      renderCandidates();
+      updateOutput();
     }
 
-    function savePersistedInputs() {
-      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
-      const extensionFilter = document.getElementById("extensionFilter");
-      const filenamePattern = document.getElementById("filenamePattern");
-      const prefixInput = document.getElementById("prefixInput");
-      const startNoInput = document.getElementById("startNoInput");
-      const digitsInput = document.getElementById("digitsInput");
-
-      if (shellEnvPowerShell) {
-        setStoredValue(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY, shellEnvPowerShell.checked);
-      }
-      if (extensionFilter) {
-        setStoredValue(UI_EXTENSION_FILTER_STORAGE_KEY, extensionFilter.value);
-      }
-      if (filenamePattern) {
-        setStoredValue(UI_FILENAME_PATTERN_STORAGE_KEY, filenamePattern.value);
-      }
-      if (prefixInput) {
-        setStoredValue(UI_PREFIX_STORAGE_KEY, prefixInput.value);
-      }
-      if (startNoInput) {
-        setStoredValue(UI_START_NO_STORAGE_KEY, startNoInput.value);
-      }
-      if (digitsInput) {
-        setStoredValue(UI_DIGITS_STORAGE_KEY, digitsInput.value);
-      }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initializePromptPage, { once: true });
+    } else {
+      initializePromptPage();
     }
-
-    function setupInputPersistence() {
-      const ids = [
-        "shellEnvPowerShell",
-        "extensionFilter",
-        "filenamePattern",
-        "prefixInput",
-        "startNoInput",
-        "digitsInput"
-      ];
-      ids.forEach((id) => {
-        const element = document.getElementById(id);
-        if (!element) return;
-        element.addEventListener("input", savePersistedInputs);
-        element.addEventListener("change", savePersistedInputs);
-      });
-    }
-
-    function clearUiPreferences() {
-      const confirmed = confirm("ローカルに保存されているこのツールの設定をクリアします。よろしいですか？");
-      if (!confirmed) return;
-
-      try {
-        localStorage.removeItem(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY);
-        localStorage.removeItem(UI_EXTENSION_FILTER_STORAGE_KEY);
-        localStorage.removeItem(UI_FILENAME_PATTERN_STORAGE_KEY);
-        localStorage.removeItem(UI_PREFIX_STORAGE_KEY);
-        localStorage.removeItem(UI_START_NO_STORAGE_KEY);
-        localStorage.removeItem(UI_DIGITS_STORAGE_KEY);
-      } catch (error) {
-        showToast("設定のクリアに失敗しました");
-        return;
-      }
-
-      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
-      const extensionFilter = document.getElementById("extensionFilter");
-      const filenamePattern = document.getElementById("filenamePattern");
-      const prefixInput = document.getElementById("prefixInput");
-      const startNoInput = document.getElementById("startNoInput");
-      const digitsInput = document.getElementById("digitsInput");
-
-      if (shellEnvPowerShell) shellEnvPowerShell.checked = false;
-      if (extensionFilter) extensionFilter.value = "png";
-      if (filenamePattern) filenamePattern.value = "スクリーンショット*";
-      if (prefixInput) prefixInput.value = "MyImage_";
-      if (startNoInput) startNoInput.value = "1";
-      if (digitsInput) digitsInput.value = "3";
-
-      regenerateAll();
-      showToast("設定をクリアしました");
-    }
-
-    loadPersistedInputs();
-    setupAutoUpdate();
-    setupInputPersistence();
-    regenerateAll();
   </script>
   <script>
 (()=>{function s(o,e,t,r){var i=arguments.length,n=i<3?e:r===null?r=Object.getOwnPropertyDescriptor(e,t):r,a;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")n=Reflect.decorate(o,e,t,r);else for(var d=o.length-1;d>=0;d--)(a=o[d])&&(n=(i<3?a(n):i>3?a(e,t,n):a(e,t))||n);return i>3&&n&&Object.defineProperty(e,t,n),n}var E=o=>(e,t)=>{t!==void 0?t.addInitializer(()=>{customElements.define(o,e)}):customElements.define(o,e)};var Qe=globalThis,et=Qe.ShadowRoot&&(Qe.ShadyCSS===void 0||Qe.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,Bt=Symbol(),$r=new WeakMap,Ne=class{constructor(e,t,r){if(this._$cssResult$=!0,r!==Bt)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o,t=this.t;if(et&&e===void 0){let r=t!==void 0&&t.length===1;r&&(e=$r.get(t)),e===void 0&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),r&&$r.set(t,e))}return e}toString(){return this.cssText}},Tr=o=>new Ne(typeof o=="string"?o:o+"",void 0,Bt),g=(o,...e)=>{let t=o.length===1?o[0]:e.reduce((r,i,n)=>r+(a=>{if(a._$cssResult$===!0)return a.cssText;if(typeof a=="number")return a;throw Error("Value passed to 'css' function must be a 'css' function result: "+a+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+o[n+1],o[0]);return new Ne(t,o,Bt)},Sr=(o,e)=>{if(et)o.adoptedStyleSheets=e.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(let t of e){let r=document.createElement("style"),i=Qe.litNonce;i!==void 0&&r.setAttribute("nonce",i),r.textContent=t.cssText,o.appendChild(r)}},Ft=et?o=>o:o=>o instanceof CSSStyleSheet?(e=>{let t="";for(let r of e.cssRules)t+=r.cssText;return Tr(t)})(o):o;var{is:Io,defineProperty:ko,getOwnPropertyDescriptor:Oo,getOwnPropertyNames:Ro,getOwnPropertySymbols:Po,getPrototypeOf:Lo}=Object,ce=globalThis,Ir=ce.trustedTypes,Do=Ir?Ir.emptyScript:"",zo=ce.reactiveElementPolyfillSupport,Be=(o,e)=>o,Fe={toAttribute(o,e){switch(e){case Boolean:o=o?Do:null;break;case Object:case Array:o=o==null?o:JSON.stringify(o)}return o},fromAttribute(o,e){let t=o;switch(e){case Boolean:t=o!==null;break;case Number:t=o===null?null:Number(o);break;case Object:case Array:try{t=JSON.parse(o)}catch{t=null}}return t}},tt=(o,e)=>!Io(o,e),kr={attribute:!0,type:String,converter:Fe,reflect:!1,useDefault:!1,hasChanged:tt};Symbol.metadata??(Symbol.metadata=Symbol("metadata")),ce.litPropertyMetadata??(ce.litPropertyMetadata=new WeakMap);var re=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??(this.l=[])).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=kr){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){let r=Symbol(),i=this.getPropertyDescriptor(e,r,t);i!==void 0&&ko(this.prototype,e,i)}}static getPropertyDescriptor(e,t,r){let{get:i,set:n}=Oo(this.prototype,e)??{get(){return this[t]},set(a){this[t]=a}};return{get:i,set(a){let d=i?.call(this);n?.call(this,a),this.requestUpdate(e,d,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??kr}static _$Ei(){if(this.hasOwnProperty(Be("elementProperties")))return;let e=Lo(this);e.finalize(),e.l!==void 0&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(Be("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(Be("properties"))){let t=this.properties,r=[...Ro(t),...Po(t)];for(let i of r)this.createProperty(i,t[i])}let e=this[Symbol.metadata];if(e!==null){let t=litPropertyMetadata.get(e);if(t!==void 0)for(let[r,i]of t)this.elementProperties.set(r,i)}this._$Eh=new Map;for(let[t,r]of this.elementProperties){let i=this._$Eu(t,r);i!==void 0&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){let t=[];if(Array.isArray(e)){let r=new Set(e.flat(1/0).reverse());for(let i of r)t.unshift(Ft(i))}else e!==void 0&&t.push(Ft(e));return t}static _$Eu(e,t){let r=t.attribute;return r===!1?void 0:typeof r=="string"?r:typeof e=="string"?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??(this._$EO=new Set)).add(e),this.renderRoot!==void 0&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){let e=new Map,t=this.constructor.elementProperties;for(let r of t.keys())this.hasOwnProperty(r)&&(e.set(r,this[r]),delete this[r]);e.size>0&&(this._$Ep=e)}createRenderRoot(){let e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return Sr(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,r){this._$AK(e,r)}_$ET(e,t){let r=this.constructor.elementProperties.get(e),i=this.constructor._$Eu(e,r);if(i!==void 0&&r.reflect===!0){let n=(r.converter?.toAttribute!==void 0?r.converter:Fe).toAttribute(t,r.type);this._$Em=e,n==null?this.removeAttribute(i):this.setAttribute(i,n),this._$Em=null}}_$AK(e,t){let r=this.constructor,i=r._$Eh.get(e);if(i!==void 0&&this._$Em!==i){let n=r.getPropertyOptions(i),a=typeof n.converter=="function"?{fromAttribute:n.converter}:n.converter?.fromAttribute!==void 0?n.converter:Fe;this._$Em=i;let d=a.fromAttribute(t,n.type);this[i]=d??this._$Ej?.get(i)??d,this._$Em=null}}requestUpdate(e,t,r,i=!1,n){if(e!==void 0){let a=this.constructor;if(i===!1&&(n=this[e]),r??(r=a.getPropertyOptions(e)),!((r.hasChanged??tt)(n,t)||r.useDefault&&r.reflect&&n===this._$Ej?.get(e)&&!this.hasAttribute(a._$Eu(e,r))))return;this.C(e,t,r)}this.isUpdatePending===!1&&(this._$ES=this._$EP())}C(e,t,{useDefault:r,reflect:i,wrapped:n},a){r&&!(this._$Ej??(this._$Ej=new Map)).has(e)&&(this._$Ej.set(e,a??t??this[e]),n!==!0||a!==void 0)||(this._$AL.has(e)||(this.hasUpdated||r||(t=void 0),this._$AL.set(e,t)),i===!0&&this._$Em!==e&&(this._$Eq??(this._$Eq=new Set)).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}let e=this.scheduleUpdate();return e!=null&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??(this.renderRoot=this.createRenderRoot()),this._$Ep){for(let[i,n]of this._$Ep)this[i]=n;this._$Ep=void 0}let r=this.constructor.elementProperties;if(r.size>0)for(let[i,n]of r){let{wrapped:a}=n,d=this[i];a!==!0||this._$AL.has(i)||d===void 0||this.C(i,void 0,n,d)}}let e=!1,t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(r=>r.hostUpdate?.()),this.update(t)):this._$EM()}catch(r){throw e=!1,this._$EM(),r}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&(this._$Eq=this._$Eq.forEach(t=>this._$ET(t,this[t]))),this._$EM()}updated(e){}firstUpdated(e){}};re.elementStyles=[],re.shadowRootOptions={mode:"open"},re[Be("elementProperties")]=new Map,re[Be("finalized")]=new Map,zo?.({ReactiveElement:re}),(ce.reactiveElementVersions??(ce.reactiveElementVersions=[])).push("2.1.2");var Mo={attribute:!0,type:String,converter:Fe,reflect:!1,hasChanged:tt},No=(o=Mo,e,t)=>{let{kind:r,metadata:i}=t,n=globalThis.litPropertyMetadata.get(i);if(n===void 0&&globalThis.litPropertyMetadata.set(i,n=new Map),r==="setter"&&((o=Object.create(o)).wrapped=!0),n.set(t.name,o),r==="accessor"){let{name:a}=t;return{set(d){let c=e.get.call(this);e.set.call(this,d),this.requestUpdate(a,c,o,!0,d)},init(d){return d!==void 0&&this.C(a,void 0,o,d),d}}}if(r==="setter"){let{name:a}=t;return function(d){let c=this[a];e.call(this,d),this.requestUpdate(a,c,o,!0,d)}}throw Error("Unsupported decorator location: "+r)};function l(o){return(e,t)=>typeof t=="object"?No(o,e,t):((r,i,n)=>{let a=i.hasOwnProperty(n);return i.constructor.createProperty(n,r),a?Object.getOwnPropertyDescriptor(i,n):void 0})(o,e,t)}function k(o){return l({...o,state:!0,attribute:!1})}var Q=(o,e,t)=>(t.configurable=!0,t.enumerable=!0,Reflect.decorate&&typeof e!="object"&&Object.defineProperty(o,e,t),t);function S(o,e){return(t,r,i)=>{let n=a=>a.renderRoot?.querySelector(o)??null;if(e){let{get:a,set:d}=typeof r=="object"?t:i??(()=>{let c=Symbol();return{get(){return this[c]},set(h){this[c]=h}}})();return Q(t,r,{get(){let c=a.call(this);return c===void 0&&(c=n(this),(c!==null||this.hasUpdated)&&d.call(this,c)),c}})}return Q(t,r,{get(){return n(this)}})}}var Bo;function Or(o){return(e,t)=>Q(e,t,{get(){return(this.renderRoot??Bo??(Bo=document.createDocumentFragment())).querySelectorAll(o)}})}function N(o){return(e,t)=>{let{slot:r,selector:i}=o??{},n="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){let a=this.renderRoot?.querySelector(n),d=a?.assignedElements(o)??[];return i===void 0?d:d.filter(c=>c.matches(i))}})}}function rt(o){return(e,t)=>{let{slot:r}=o??{},i="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){return this.renderRoot?.querySelector(i)?.assignedNodes(o)??[]}})}}var qe=globalThis,Rr=o=>o,ot=qe.trustedTypes,Pr=ot?ot.createPolicy("lit-html",{createHTML:o=>o}):void 0,qt="$lit$",oe=`lit$${Math.random().toFixed(9).slice(2)}$`,Vt="?"+oe,Fo=`<${Vt}>`,_e=document,Ve=()=>_e.createComment(""),He=o=>o===null||typeof o!="object"&&typeof o!="function",Ht=Array.isArray,Br=o=>Ht(o)||typeof o?.[Symbol.iterator]=="function",Ut=`[ 	

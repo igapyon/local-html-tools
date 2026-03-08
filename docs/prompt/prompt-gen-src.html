@@ -1,0 +1,341 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プロンプト作成支援</title>
+  <link rel="stylesheet" href="../../lht-cmn/css/components.css">
+  <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+  <style>
+    body.md-page {
+      margin: 0;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(174, 231, 255, 0.52), transparent 28%),
+        radial-gradient(circle at top left, rgba(221, 221, 255, 0.45), transparent 24%),
+        linear-gradient(180deg, #f6f7fb 0%, #eef2f8 100%);
+      color: #1c1b1f;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .md-surface-card {
+      max-width: 980px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(216, 223, 235, 0.95);
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(45, 62, 96, 0.10);
+      padding: 28px;
+    }
+
+    .md-section {
+      margin-top: 28px;
+    }
+
+    .md-stack-md {
+      display: grid;
+      gap: 16px;
+    }
+
+    .md-form-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .md-form-grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .md-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    md-outlined-text-field.md-outlined-field {
+      --md-outlined-text-field-input-text-placeholder-color: #8f8a98;
+    }
+
+    lht-text-field-help .lht-text-field-help__fallback::placeholder {
+      color: #8f8a98;
+      opacity: 1;
+    }
+
+    .md-chip-button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      background: var(--md-sys-color-primary, #6200ee);
+      color: var(--md-sys-color-on-primary, #ffffff);
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .md-chip-button:hover {
+      background: #4f00c9;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(98, 0, 238, 0.24);
+    }
+
+    .md-chip-button.is-active {
+      background: #4f00c9;
+      color: var(--md-sys-color-on-primary, #ffffff);
+      box-shadow: 0 6px 14px rgba(98, 0, 238, 0.24);
+    }
+
+    .md-helper-text {
+      margin: 0;
+      padding: 0 1rem;
+      font-size: 0.75rem;
+      line-height: 1rem;
+      color: var(--md-sys-color-on-surface-variant, #49454f);
+    }
+
+    .md-output-title {
+      margin: 0;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #27364b;
+    }
+
+    .md-code-block {
+      position: relative;
+      margin-top: 0.5rem;
+    }
+
+    .md-code {
+      display: block;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: #f4f1f7;
+      border: 1px solid #e5e0ec;
+      color: #1f1b2d;
+      min-height: 2.5rem;
+      line-height: 1.65;
+      box-sizing: border-box;
+    }
+
+    .md-copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+
+    md-icon-button.md-copy-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      --md-icon-button-icon-size: 16px;
+      --md-icon-button-icon-color: #3f3b46;
+      --md-icon-button-state-layer-shape: 16px;
+      --md-icon-button-hover-state-layer-color: #3f3b46;
+      --md-icon-button-hover-state-layer-opacity: 0.08;
+      --md-icon-button-pressed-state-layer-color: #3f3b46;
+      --md-icon-button-pressed-state-layer-opacity: 0.12;
+      background: #f7f2fa;
+    }
+
+    md-icon-button.md-copy-button--surface {
+      background: #f7f2fa;
+    }
+
+    .md-hidden {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      body.md-page {
+        padding: 14px;
+      }
+
+      .md-surface-card {
+        padding: 18px;
+        border-radius: 22px;
+      }
+
+      .md-form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+    }
+  </style>
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+    </defs>
+  </svg>
+  <div class="md-surface-card md-card">
+    <lht-page-hero
+      title="プロンプト作成支援"
+      subtitle="定型よくある生成AIプロンプトを作成支援。"
+      icon="📝"
+      help-label="プロンプト作成支援の説明"
+      help-wide
+      menu-home-href="../index.html"
+      menu-home-label="トップへ戻る">
+      AI や人に依頼するための文面を、用途別に短く組み立てるためのページです。<br><br>
+      初版では、PR タイトルと PR 本文を作成依頼するための文面を生成します。
+    </lht-page-hero>
+
+    <section class="md-section md-stack-md">
+      <lht-text-field-help
+        field-id="promptSearch"
+        label="やりたいこと"
+        required
+        placeholder="例: pr"
+        help-text="やりたいことを短く入力します。初版では入力文字列が候補キーワードに部分一致したら PR 作成依頼を表示します。">
+      </lht-text-field-help>
+
+      <p class="md-helper-text">小窓に `p` `r` `pr` などを入れると、候補キーワードへの部分一致として `PR作成依頼` ボタンを表示します。</p>
+      <div id="promptCandidateArea" class="md-chip-row" aria-live="polite"></div>
+    </section>
+
+    <section id="prRequestSection" class="md-section md-stack-md md-hidden">
+      <div class="md-form-grid md-form-grid-2">
+        <lht-text-field-help
+          field-id="commitId"
+          label="コミットID"
+          required
+          placeholder="例: abc1234"
+          help-text="PR 文面の作成対象にしたいコミット ID を入力します。短縮 SHA でも構いません。">
+        </lht-text-field-help>
+      </div>
+
+      <p class="md-output-title">生成結果</p>
+      <lht-command-block command-id="promptOutput"></lht-command-block>
+    </section>
+
+    <lht-toast id="toast"></lht-toast>
+  </div>
+
+  <script>
+    async function initializePromptPage() {
+      if (window.customElements && window.customElements.whenDefined) {
+        await window.customElements.whenDefined("lht-text-field-help");
+      }
+
+      const promptSearch = document.getElementById("promptSearch");
+      const promptCandidateArea = document.getElementById("promptCandidateArea");
+      const prRequestSection = document.getElementById("prRequestSection");
+      const commitIdInput = document.getElementById("commitId");
+      const promptOutput = document.getElementById("promptOutput");
+
+      if (!promptSearch || !commitIdInput) {
+        return;
+      }
+
+      let selectedPrompt = "";
+      const prRequestKeywords = ["pr", "pull request", "pr作成依頼", "prタイトル", "pr本文"];
+
+      function createCandidateButton(label, id) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "md-chip-button";
+        button.textContent = label;
+        button.dataset.promptId = id;
+        button.addEventListener("click", () => selectPrompt(id, button));
+        return button;
+      }
+
+      function renderCandidates() {
+        const query = (promptSearch.value || "").trim().toLowerCase();
+        promptCandidateArea.innerHTML = "";
+
+        const matched = query && prRequestKeywords.some((keyword) => keyword.includes(query));
+
+        if (!matched) {
+          if (selectedPrompt === "pr-request") {
+            selectedPrompt = "";
+            prRequestSection.classList.add("md-hidden");
+            updateOutput();
+          }
+          return;
+        }
+
+        const button = createCandidateButton("PR作成依頼", "pr-request");
+        if (selectedPrompt === "pr-request") {
+          button.classList.add("is-active");
+        }
+        promptCandidateArea.appendChild(button);
+      }
+
+      function selectPrompt(id, button) {
+        selectedPrompt = id;
+        for (const element of promptCandidateArea.querySelectorAll(".md-chip-button")) {
+          element.classList.remove("is-active");
+        }
+        button.classList.add("is-active");
+
+        if (id === "pr-request") {
+          prRequestSection.classList.remove("md-hidden");
+          commitIdInput.focus();
+        }
+
+        updateOutput();
+      }
+
+      function buildPromptText() {
+        const commitId = (commitIdInput.value || "").trim();
+        if (selectedPrompt !== "pr-request" || !commitId) {
+          return "";
+        }
+        return `${commitId} における変更内容についての、PRテキストとPRタイトルを markdown 形式で欲しい。`;
+      }
+
+      function updateOutput() {
+        const text = buildPromptText();
+        promptOutput.textContent = text;
+      }
+
+      promptSearch.addEventListener("input", renderCandidates);
+      commitIdInput.addEventListener("input", updateOutput);
+
+      renderCandidates();
+      updateOutput();
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initializePromptPage, { once: true });
+    } else {
+      initializePromptPage();
+    }
+  </script>
+</body>
+</html>
