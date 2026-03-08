@@ -223,7 +223,9 @@ async function initializePromptPage() {
     button.type = "button";
     button.className = "md-chip-button";
     button.dataset.promptId = definition.id;
-    button.addEventListener("click", () => selectPrompt(definition.id, button));
+    button.addEventListener("click", () => {
+      void selectPrompt(definition.id, button, { autoCopy: true });
+    });
 
     const label = document.createElement("span");
     label.className = "md-chip-label";
@@ -256,6 +258,37 @@ async function initializePromptPage() {
         block: "start"
       });
     });
+  }
+
+  async function copyText(text: string) {
+    if (!text) {
+      return false;
+    }
+
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const helper = document.createElement("textarea");
+        helper.value = text;
+        helper.setAttribute("readonly", "");
+        helper.style.position = "fixed";
+        helper.style.opacity = "0";
+        document.body.appendChild(helper);
+        helper.select();
+        document.execCommand("copy");
+        helper.remove();
+      }
+      if (typeof window.showToast === "function") {
+        window.showToast("コピーしました");
+      }
+      return true;
+    } catch (_error) {
+      if (typeof window.showToast === "function") {
+        window.showToast("コピーに失敗しました");
+      }
+      return false;
+    }
   }
 
   function renderCandidates() {
@@ -330,7 +363,7 @@ async function initializePromptPage() {
     }
   }
 
-  function selectPrompt(id: string, button: HTMLButtonElement) {
+  async function selectPrompt(id: string, button: HTMLButtonElement, options?: { autoCopy?: boolean }) {
     selectedPrompt = id;
     for (const element of promptCandidateArea.querySelectorAll(".md-chip-button")) {
       element.classList.remove("is-active");
@@ -348,6 +381,10 @@ async function initializePromptPage() {
     }
 
     updateOutput();
+
+    if (options?.autoCopy && selectedDefinition && !selectedDefinition.requiresCommitId) {
+      await copyText(promptOutput.textContent || "");
+    }
   }
 
   function buildPromptText() {
