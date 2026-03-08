@@ -35,3 +35,20 @@
 - 補足:
   - 現状の `lht-switch-help` は `window.customElements.get("md-switch")` が false のとき fallback DOM を生成する実装になっている
   - `lht-cmn/vendor` には `material-web-outlined-text-field.bundle.js` はあるが、`md-switch` 相当の bundle は見当たらない
+
+## 2026-03-09 `lht-text-field-help` trailing action gap
+
+- 症状:
+  - `prompt-gen` で「やりたいこと」入力欄に `×` クリアボタンを付けたかったが、`lht-text-field-help` 自体には trailing action / trailing icon を安全に差し込む契約がない
+  - 外付け absolute 配置では、Material 側の見た目中心と合いにくく、位置合わせが不安定だった
+- 問題:
+  - 画面ごとに似た「入力クリア」「末尾アイコン」「補助アクション」実装が再発しやすい
+  - `lht-text-field-help` を使っていても、入力欄内アクションはページ側の局所 CSS に依存しやすい
+  - fallback 実装と Material 実装で、末尾アクションの見た目や余白が揃いにくい
+- 期待:
+  - `lht-text-field-help` に trailing action slot、または `clearable` のような共通機能を検討したい
+  - もし汎用化しない場合でも、「入力欄右端に後付けアクションを重ねる時の推奨パターン」を README に明記したい
+- 補足:
+  - 今回は暫定対応として `lht-text-field-help` に `clearable` 属性をローカル追加し、`prompt-gen` ではそれを利用する形へ寄せた
+  - ただしこれは prompt-gen 都合で先に入れた provisional API なので、`lht-cmn` チーム側では trailing action 全般を扱える正式な契約として見直したい
+  - 正式方針が固まったら、今回の `clearable` 実装や CSS 調整はレビューのうえ置き換えたい

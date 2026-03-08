@@ -18,7 +18,7 @@ limitations under the License.
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>プロンプト作成支援</title>
+  <title>生成AIプロンプト作成支援</title>
   
   
   
@@ -344,6 +344,10 @@ lht-text-field-help {
   min-width: 0;
 }
 
+lht-text-field-help .lht-text-field-help__control-wrap {
+  position: relative;
+}
+
 lht-text-field-help .lht-text-field-help__fallback-wrap {
   display: flex;
   flex-direction: column;
@@ -364,6 +368,10 @@ lht-text-field-help .lht-text-field-help__fallback {
   resize: vertical;
 }
 
+lht-text-field-help .lht-text-field-help__fallback.lht-text-field-help__field--clearable {
+  padding-right: 2.8rem;
+}
+
 lht-text-field-help .lht-text-field-help__supporting-text {
   min-height: 1rem;
   padding: 0 1rem;
@@ -371,6 +379,63 @@ lht-text-field-help .lht-text-field-help__supporting-text {
   line-height: 1rem;
   color: var(--md-sys-color-on-surface-variant, #49454f);
   box-sizing: border-box;
+}
+
+lht-text-field-help .md-outlined-field.lht-text-field-help__field--clearable {
+  --md-outlined-text-field-trailing-space: 40px;
+  --md-outlined-field-trailing-space: 40px;
+}
+
+lht-text-field-help .lht-text-field-help__clear-button {
+  position: absolute;
+  top: 28px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(103, 80, 164, 0.10);
+  color: #625b71;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transform: translateY(-50%);
+  transition: background 150ms ease, color 150ms ease, transform 150ms ease;
+  z-index: 2;
+}
+
+lht-text-field-help .lht-text-field-help__clear-button:hover {
+  background: rgba(103, 80, 164, 0.18);
+  color: #4f378b;
+}
+
+lht-text-field-help .lht-text-field-help__clear-button:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+lht-text-field-help .lht-text-field-help__clear-button:focus-visible {
+  outline: 2px solid #6750a4;
+  outline-offset: 2px;
+}
+
+lht-text-field-help .lht-text-field-help__clear-button::before,
+lht-text-field-help .lht-text-field-help__clear-button::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+lht-text-field-help .lht-text-field-help__clear-button::before {
+  transform: rotate(45deg);
+}
+
+lht-text-field-help .lht-text-field-help__clear-button::after {
+  transform: rotate(-45deg);
 }
 
 lht-select-help {
@@ -1036,6 +1101,7 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
 }
 
 .md-chip-button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1051,6 +1117,8 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease, border-color 150ms ease, color 150ms ease;
+  overflow: visible;
+  isolation: isolate;
 }
 
 .md-chip-button:hover {
@@ -1075,6 +1143,16 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
 
 .md-chip-button lht-help-tooltip {
   flex: 0 0 auto;
+}
+
+.md-chip-button:hover,
+.md-chip-button:focus-within {
+  z-index: 10;
+}
+
+.md-chip-button lht-help-tooltip:hover,
+.md-chip-button lht-help-tooltip:focus-within {
+  z-index: 20;
 }
 
 .md-chip-button lht-help-tooltip .md-tooltip-content {
@@ -1170,15 +1248,15 @@ md-icon-button.md-copy-button--surface {
   </svg>
   <div class="md-surface-card md-card">
     <lht-page-hero
-      title="プロンプト作成支援"
-      subtitle="定型的な生成AIプロンプトを作成支援します。"
+      title="生成AIプロンプト作成支援"
+      subtitle="定型的な生成AIプロンプトの作成を支援します。"
       icon="📝"
-      help-label="プロンプト作成支援の説明"
+      help-label="生成AIプロンプト作成支援の説明"
       help-wide
       menu-home-href="../index.html"
       menu-home-label="トップへ戻る">
-      このツールは、生成AIに引き渡すためのプロンプト作成を支援します。<br><br>
-      初版では、PR 文面、GitHub Release 文面、Markdown 出力指示、GitHub 操作禁止指示、ディレクトリ内容確認指示、会話引き継ぎ指示、仕様検討指示、軽量テスト追加指示、違和感や誤りの指摘優先指示、TODO 整理指示、実施状況確認指示、批判的レビュー指示、markdown 更新漏れ確認指示を作成依頼するための文面を生成します。
+      頻出する依頼文を都度手作業で起案する負担を減らし、生成AIに対する指示文を効率的かつ一定の品質で作成できます。<br><br>
+      文面の表現や粒度を揃えやすく、PR 作成、Release 文面、レビュー依頼、引継ぎ、作業確認といった反復的な場面で、指示内容の標準化と再利用性の向上が期待できます。
     </lht-page-hero>
 
     <section class="md-section md-stack-md">
@@ -1187,8 +1265,9 @@ md-icon-button.md-copy-button--surface {
           field-id="promptSearch"
           label="やりたいこと"
           required
+          clearable
           placeholder="例: pr / release"
-          help-text="やりたいことを短く入力します。初版では入力文字列が候補キーワードに部分一致したら各種プロンプト候補を表示します。">
+          help-text="生成AIに与えたいプロンプトへのキーワードを短く入力します。キーワードへの部分一致でプロンプトを絞り込むことができます。">
         </lht-text-field-help>
       </div>
 
@@ -1903,6 +1982,7 @@ class LhtTextFieldHelp extends HTMLElement {
 
     const hasMdOutlinedTextField = !!(window.customElements && window.customElements.get("md-outlined-text-field"));
     const isTextarea = (this.getAttribute("type") || "").trim().toLowerCase() === "textarea" || this.hasAttribute("rows");
+    const isClearable = this.hasAttribute("clearable") && !isTextarea;
     const field = hasMdOutlinedTextField
       ? document.createElement("md-outlined-text-field")
       : document.createElement(isTextarea ? "textarea" : "input");
@@ -1910,6 +1990,8 @@ class LhtTextFieldHelp extends HTMLElement {
     this._isFallbackTextField = !hasMdOutlinedTextField;
     let fallbackWrapper = null;
     let fallbackSupportingText = null;
+    let controlWrap = null;
+    let clearButton = null;
 
     const label = (this.getAttribute("label") || "").trim();
     if (label) {
@@ -1959,12 +2041,48 @@ class LhtTextFieldHelp extends HTMLElement {
       fieldClass.split(/\s+/).filter(Boolean).forEach((name) => field.classList.add(name));
     }
     field.classList.add(this._isFallbackTextField ? "lht-text-field-help__fallback" : "md-outlined-field");
+    if (isClearable) {
+      field.classList.add("lht-text-field-help__field--clearable");
+    }
 
     if (this.hasAttribute("required")) {
       field.required = true;
       field.setAttribute("required", "");
     }
     if (this.hasAttribute("disabled")) field.disabled = true;
+
+    if (isClearable) {
+      controlWrap = document.createElement("div");
+      controlWrap.className = "lht-text-field-help__control-wrap";
+
+      clearButton = document.createElement("button");
+      clearButton.type = "button";
+      clearButton.className = "lht-text-field-help__clear-button";
+      clearButton.hidden = true;
+      clearButton.setAttribute("aria-label", `${label || fieldId}をクリア`);
+
+      const syncClearButtonVisibility = () => {
+        const currentValue = String(field.value || "");
+        clearButton.hidden = currentValue.length === 0 || !!field.disabled;
+      };
+
+      clearButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        field.value = "";
+        if (!this._isFallbackTextField) {
+          field.setAttribute("value", "");
+        }
+        syncClearButtonVisibility();
+        field.focus();
+        field.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
+        field.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
+      });
+
+      field.addEventListener("input", syncClearButtonVisibility);
+      field.addEventListener("change", syncClearButtonVisibility);
+      queueMicrotask(syncClearButtonVisibility);
+    }
 
     const helpText = (this.getAttribute("help-text") || "").trim();
     const hideDelayMsAttr = this.getAttribute("hide-delay-ms");
@@ -2014,9 +2132,21 @@ class LhtTextFieldHelp extends HTMLElement {
 
     this.textContent = "";
     if (fallbackWrapper) {
-      fallbackWrapper.appendChild(field);
+      if (controlWrap) {
+        controlWrap.appendChild(field);
+        controlWrap.appendChild(clearButton);
+        fallbackWrapper.appendChild(controlWrap);
+      } else {
+        fallbackWrapper.appendChild(field);
+      }
       fallbackWrapper.appendChild(fallbackSupportingText);
       this.appendChild(fallbackWrapper);
+      return;
+    }
+    if (controlWrap) {
+      controlWrap.appendChild(field);
+      controlWrap.appendChild(clearButton);
+      this.appendChild(controlWrap);
       return;
     }
     this.appendChild(field);
@@ -3367,6 +3497,48 @@ const promptDefinitions = [
         keywords: ["hallucination", "fact check", "web search", "回答", "有無", "再確認", "裏どり", "裏取り", "ハルシネーション", "回答確認", "うらどり", "さいかくにん", "かいとうかくにん"],
         requiresCommitId: false,
         buildBody: () => "先程の回答にハルシネーションが含まれていないか、いまいちど新しい気持ちで考えてみて欲しいです。適宜必要に応じてWebを検索して裏どりを実施してください。"
+    },
+    {
+        id: "resource-handover-ok-request",
+        label: "307: リソース受領中は OK のみ回答",
+        keywords: ["resource", "resources", "multiple resources", "ok", "複数", "リソース", "情報", "引き渡し", "受領", "回答", "okのみ", "OKのみ", "ふくすう", "りそーす", "じょうほう", "ひきわたし", "じゅりょう", "かいとう"],
+        requiresCommitId: false,
+        buildBody: () => "これから複数のリソースの情報を渡します。一連のリソースの引き渡しが終わるまでは、単にOKとのみ回答してください。"
+    },
+    {
+        id: "lgtm-request",
+        label: "300: 確認範囲は概ね良好で LGTM",
+        keywords: ["lgtm", "looks good to me", "確認", "範囲", "良さそう", "良好", "概ね", "おおよそ", "レビュー", "かくにん", "はんい", "りょうこう", "れびゅー"],
+        requiresCommitId: false,
+        buildBody: () => "いいえ。いい感じ。確認した範囲はおおよそ良さそうだ。LGTMです。"
+    },
+    {
+        id: "peer-feedback-analysis-request",
+        label: "309: 他メンバー指摘の受入可否を判断",
+        keywords: ["feedback", "review", "peer review", "comment", "accept", "reject", "判断", "指摘", "受け入れ", "受入", "可否", "解析", "メンバー", "はんだん", "してき", "うけいれ", "かひ", "かいせき"],
+        requiresCommitId: false,
+        buildBody: () => "他のメンバーから指摘をもらいました。この内容について、あなたなりに解析して判断して、そして受け入れられるかどうか、受け入れられないか、を判断して教えて欲しいです。"
+    },
+    {
+        id: "recent-work-status-request",
+        label: "310: 直近の作業状況を確認",
+        keywords: ["recent work", "current status", "what was I doing", "直近", "作業状況", "確認", "離席", "現在", "未完了", "次に何を見る", "ちょっきん", "さぎょうじょうきょう", "りせき", "げんざい", "みかんりょう", "tsuginanimiru"],
+        requiresCommitId: false,
+        buildBody: () => "すみません、少し離席していました。直近で何の作業をしていたのか、現在どこまで進んでいるのか、未完了のものがあるか、次に何を見ればよいかを整理して教えてください。回答は markdownでお願いします。"
+    },
+    {
+        id: "solution-soundness-review-request",
+        label: "311: 場当たり対応や本質解決漏れを確認",
+        keywords: ["ad hoc", "proper solution", "root cause", "architecture", "場当たり", "本質", "解決", "別解", "正しい解決方法", "設計", "妥当性", "ばあたり", "ほんしつ", "かいけつ", "べっかい", "せっけい"],
+        requiresCommitId: false,
+        buildBody: () => "今回の対応について、場当たり的な変更に留まっていないか、本質的には別のより適切な解決方法があるのにそれを選択していないところがないか、設計面と保守面から批判的に確認して教えてください。"
+    },
+    {
+        id: "temporary-change-cleanup-request",
+        label: "312: 暫定変更の置き忘れを確認",
+        keywords: ["temporary", "temporary change", "cleanup", "debug code", "investigation", "暫定", "変更", "置き忘れ", "消し忘れ", "調査用", "試行錯誤", "デバッグ", "片付け", "ざんてい", "おきわすれ", "けしわすれ", "ちょうさよう", "でばっぐ"],
+        requiresCommitId: false,
+        buildBody: () => "開発中の試行錯誤や調査の過程で入れた暫定変更、デバッグ用コード、確認用の一時対応が、解決後も残ったままになっていないか確認してください。もし不要な暫定変更が残っていれば、どこにあり、なぜ不要と判断できるのかを指摘してください。"
     },
     {
         id: "directory-summary-markdown-request",

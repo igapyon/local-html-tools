@@ -117,6 +117,48 @@ const promptDefinitions: PromptDefinition[] = [
     buildBody: () => "先程の回答にハルシネーションが含まれていないか、いまいちど新しい気持ちで考えてみて欲しいです。適宜必要に応じてWebを検索して裏どりを実施してください。"
   },
   {
+    id: "resource-handover-ok-request",
+    label: "307: リソース受領中は OK のみ回答",
+    keywords: ["resource", "resources", "multiple resources", "ok", "複数", "リソース", "情報", "引き渡し", "受領", "回答", "okのみ", "OKのみ", "ふくすう", "りそーす", "じょうほう", "ひきわたし", "じゅりょう", "かいとう"],
+    requiresCommitId: false,
+    buildBody: () => "これから複数のリソースの情報を渡します。一連のリソースの引き渡しが終わるまでは、単にOKとのみ回答してください。"
+  },
+  {
+    id: "lgtm-request",
+    label: "300: 確認範囲は概ね良好で LGTM",
+    keywords: ["lgtm", "looks good to me", "確認", "範囲", "良さそう", "良好", "概ね", "おおよそ", "レビュー", "かくにん", "はんい", "りょうこう", "れびゅー"],
+    requiresCommitId: false,
+    buildBody: () => "いいえ。いい感じ。確認した範囲はおおよそ良さそうだ。LGTMです。"
+  },
+  {
+    id: "peer-feedback-analysis-request",
+    label: "309: 他メンバー指摘の受入可否を判断",
+    keywords: ["feedback", "review", "peer review", "comment", "accept", "reject", "判断", "指摘", "受け入れ", "受入", "可否", "解析", "メンバー", "はんだん", "してき", "うけいれ", "かひ", "かいせき"],
+    requiresCommitId: false,
+    buildBody: () => "他のメンバーから指摘をもらいました。この内容について、あなたなりに解析して判断して、そして受け入れられるかどうか、受け入れられないか、を判断して教えて欲しいです。"
+  },
+  {
+    id: "recent-work-status-request",
+    label: "310: 直近の作業状況を確認",
+    keywords: ["recent work", "current status", "what was I doing", "直近", "作業状況", "確認", "離席", "現在", "未完了", "次に何を見る", "ちょっきん", "さぎょうじょうきょう", "りせき", "げんざい", "みかんりょう", "tsuginanimiru"],
+    requiresCommitId: false,
+    buildBody: () => "すみません、少し離席していました。直近で何の作業をしていたのか、現在どこまで進んでいるのか、未完了のものがあるか、次に何を見ればよいかを整理して教えてください。回答は markdownでお願いします。"
+  },
+  {
+    id: "solution-soundness-review-request",
+    label: "311: 場当たり対応や本質解決漏れを確認",
+    keywords: ["ad hoc", "proper solution", "root cause", "architecture", "場当たり", "本質", "解決", "別解", "正しい解決方法", "設計", "妥当性", "ばあたり", "ほんしつ", "かいけつ", "べっかい", "せっけい"],
+    requiresCommitId: false,
+    buildBody: () => "今回の対応について、場当たり的な変更に留まっていないか、本質的には別のより適切な解決方法があるのにそれを選択していないところがないか、設計面と保守面から批判的に確認して教えてください。"
+  },
+  {
+    id: "temporary-change-cleanup-request",
+    label: "312: 暫定変更の置き忘れを確認",
+    keywords: ["temporary", "temporary change", "cleanup", "debug code", "investigation", "暫定", "変更", "置き忘れ", "消し忘れ", "調査用", "試行錯誤", "デバッグ", "片付け", "ざんてい", "おきわすれ", "けしわすれ", "ちょうさよう", "でばっぐ"],
+    requiresCommitId: false,
+    buildBody: () => "開発中の試行錯誤や調査の過程で入れた暫定変更、デバッグ用コード、確認用の一時対応が、解決後も残ったままになっていないか確認してください。もし不要な暫定変更が残っていれば、どこにあり、なぜ不要と判断できるのかを指摘してください。"
+  },
+  {
     id: "directory-summary-markdown-request",
     label: "101: ディレクトリ内容整理 markdown を作成",
     keywords: ["directory", "markdown", "summary", "index", "scan cost", "ディレクトリ", "内容", "整理", "markdown作成", "作成", "md作成", "概要整理", "走査コスト削減", "でぃれくとり", "せいり", "がいよう", "そうさこすと"],

@@ -216,6 +216,7 @@ class LhtTextFieldHelp extends HTMLElement {
 
     const hasMdOutlinedTextField = !!(window.customElements && window.customElements.get("md-outlined-text-field"));
     const isTextarea = (this.getAttribute("type") || "").trim().toLowerCase() === "textarea" || this.hasAttribute("rows");
+    const isClearable = this.hasAttribute("clearable") && !isTextarea;
     const field = hasMdOutlinedTextField
       ? document.createElement("md-outlined-text-field")
       : document.createElement(isTextarea ? "textarea" : "input");
@@ -223,6 +224,8 @@ class LhtTextFieldHelp extends HTMLElement {
     this._isFallbackTextField = !hasMdOutlinedTextField;
     let fallbackWrapper = null;
     let fallbackSupportingText = null;
+    let controlWrap = null;
+    let clearButton = null;
 
     const label = (this.getAttribute("label") || "").trim();
     if (label) {
@@ -272,12 +275,48 @@ class LhtTextFieldHelp extends HTMLElement {
       fieldClass.split(/\s+/).filter(Boolean).forEach((name) => field.classList.add(name));
     }
     field.classList.add(this._isFallbackTextField ? "lht-text-field-help__fallback" : "md-outlined-field");
+    if (isClearable) {
+      field.classList.add("lht-text-field-help__field--clearable");
+    }
 
     if (this.hasAttribute("required")) {
       field.required = true;
       field.setAttribute("required", "");
     }
     if (this.hasAttribute("disabled")) field.disabled = true;
+
+    if (isClearable) {
+      controlWrap = document.createElement("div");
+      controlWrap.className = "lht-text-field-help__control-wrap";
+
+      clearButton = document.createElement("button");
+      clearButton.type = "button";
+      clearButton.className = "lht-text-field-help__clear-button";
+      clearButton.hidden = true;
+      clearButton.setAttribute("aria-label", `${label || fieldId}をクリア`);
+
+      const syncClearButtonVisibility = () => {
+        const currentValue = String(field.value || "");
+        clearButton.hidden = currentValue.length === 0 || !!field.disabled;
+      };
+
+      clearButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        field.value = "";
+        if (!this._isFallbackTextField) {
+          field.setAttribute("value", "");
+        }
+        syncClearButtonVisibility();
+        field.focus();
+        field.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
+        field.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
+      });
+
+      field.addEventListener("input", syncClearButtonVisibility);
+      field.addEventListener("change", syncClearButtonVisibility);
+      queueMicrotask(syncClearButtonVisibility);
+    }
 
     const helpText = (this.getAttribute("help-text") || "").trim();
     const hideDelayMsAttr = this.getAttribute("hide-delay-ms");
@@ -327,9 +366,21 @@ class LhtTextFieldHelp extends HTMLElement {
 
     this.textContent = "";
     if (fallbackWrapper) {
-      fallbackWrapper.appendChild(field);
+      if (controlWrap) {
+        controlWrap.appendChild(field);
+        controlWrap.appendChild(clearButton);
+        fallbackWrapper.appendChild(controlWrap);
+      } else {
+        fallbackWrapper.appendChild(field);
+      }
       fallbackWrapper.appendChild(fallbackSupportingText);
       this.appendChild(fallbackWrapper);
+      return;
+    }
+    if (controlWrap) {
+      controlWrap.appendChild(field);
+      controlWrap.appendChild(clearButton);
+      this.appendChild(controlWrap);
       return;
     }
     this.appendChild(field);

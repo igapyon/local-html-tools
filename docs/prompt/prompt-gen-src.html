@@ -18,7 +18,7 @@ limitations under the License.
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>プロンプト作成支援</title>
+  <title>生成AIプロンプト作成支援</title>
   <link rel="stylesheet" href="../../lht-cmn/css/components.css">
   <link rel="stylesheet" href="src/prompt-gen/css/app.css">
   <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
@@ -40,15 +40,15 @@ limitations under the License.
   </svg>
   <div class="md-surface-card md-card">
     <lht-page-hero
-      title="プロンプト作成支援"
-      subtitle="定型的な生成AIプロンプトを作成支援します。"
+      title="生成AIプロンプト作成支援"
+      subtitle="定型的な生成AIプロンプトの作成を支援します。"
       icon="📝"
-      help-label="プロンプト作成支援の説明"
+      help-label="生成AIプロンプト作成支援の説明"
       help-wide
       menu-home-href="../index.html"
       menu-home-label="トップへ戻る">
-      このツールは、生成AIに引き渡すためのプロンプト作成を支援します。<br><br>
-      初版では、PR 文面、GitHub Release 文面、Markdown 出力指示、GitHub 操作禁止指示、ディレクトリ内容確認指示、会話引き継ぎ指示、仕様検討指示、軽量テスト追加指示、違和感や誤りの指摘優先指示、TODO 整理指示、実施状況確認指示、批判的レビュー指示、markdown 更新漏れ確認指示を作成依頼するための文面を生成します。
+      頻出する依頼文を都度手作業で起案する負担を減らし、生成AIに対する指示文を効率的かつ一定の品質で作成できます。<br><br>
+      文面の表現や粒度を揃えやすく、PR 作成、Release 文面、レビュー依頼、引継ぎ、作業確認といった反復的な場面で、指示内容の標準化と再利用性の向上が期待できます。
     </lht-page-hero>
 
     <section class="md-section md-stack-md">
@@ -57,8 +57,9 @@ limitations under the License.
           field-id="promptSearch"
           label="やりたいこと"
           required
+          clearable
           placeholder="例: pr / release"
-          help-text="やりたいことを短く入力します。初版では入力文字列が候補キーワードに部分一致したら各種プロンプト候補を表示します。">
+          help-text="生成AIに与えたいプロンプトへのキーワードを短く入力します。キーワードへの部分一致でプロンプトを絞り込むことができます。">
         </lht-text-field-help>
       </div>
 
