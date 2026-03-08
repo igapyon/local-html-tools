@@ -19,3 +19,19 @@
 - 補足:
   - 今回 `docs/prompt/prompt-gen-src.html` では、既存画面に合わせるためページ側へ上記スタイルを追加して回避した
   - 根本対応は `lht-cmn` 側で行うべき
+
+## 2026-03-08 `lht-switch-help` material bundle gap
+
+- 症状:
+  - `lht-switch-help` を利用しても、ページ側で `md-switch` が未登録のため fallback 実装に落ちる
+  - `prompt-gen` では text field は Material 表示なのに switch だけ fallback 表示になる
+- 問題:
+  - `lht-*` を使っても、入力部品ごとに Material / fallback が混在しやすい
+  - ページ側から見ると `lht-switch-help` の見た目が他の Material 部品と揃わず、利用側で原因が見えにくい
+- 期待:
+  - `lht-switch-help` も `lht-cmn` 側で Material 実装を self-contained に利用できる形に寄せたい
+  - 少なくとも `md-switch` 用 bundle の vendor / 読み込み導線を `lht-cmn` 側で用意したい
+  - それが難しい場合でも、README に「switch は fallback 前提になりうる」ことを明記したい
+- 補足:
+  - 現状の `lht-switch-help` は `window.customElements.get("md-switch")` が false のとき fallback DOM を生成する実装になっている
+  - `lht-cmn/vendor` には `material-web-outlined-text-field.bundle.js` はあるが、`md-switch` 相当の bundle は見当たらない
