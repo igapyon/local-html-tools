@@ -22,6 +22,7 @@
   - `docs/prompt/tests/prompt-gen-main.test.js`
 
 `prompt-gen.html` は直接編集せず、編集元を更新してビルドで反映します。
+候補ボタンの追加・変更・削除は `docs/prompt/src/prompt-gen/ts/prompt-definitions.ts` を変更対象とし、`prompt-gen.html` や生成済み `js` を直接編集しません。
 
 ## ビルド
 
@@ -42,6 +43,7 @@
 ## 実装メモ
 
 - `prompt-definitions.ts` に候補ボタン定義を集約する
+- 候補ボタンの文言や本文追加は `prompt-definitions.ts` を編集して反映する
 - 各定義は `id / label / keywords / requiresCommitId / buildBody()` を持つ
 - `main.ts` は検索、選択状態、入力欄表示、生成結果更新、スクロール制御を担当する
 - 検索は空欄で全候補表示、空白区切りで AND、各語の照合先は label / keywords / かな・カナ・ローマ字展開を含む
