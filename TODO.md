@@ -34,6 +34,7 @@
 - [lht-cmn] `lht-error-alert` を追加し、`errorText` の表示/非表示と `role="alert"` 運用を共通化する
 - [lht-cmn] `lht-input-mode-toggle`（file/source 切替）を追加し、music系で反復しているラジオUIを共通化する
 - [lht-cmn] `lht-preview-output`（プレビュー + コピー導線）を追加し、`previewText` 周辺の反復UIを共通化する
+- [lht-cmn] `lht-text-field-help` の trailing action を正式設計する。現在は `prompt-gen` 向けに `clearable` を暫定追加しているが、`lht-cmn` チームの更新版を受領したら、slot / action API を含めてちゃんとした実装へ置き換える
 - [優先度高][lht-cmn] `lht-*` 全体を棚卸しし、各コンポーネントを「内部保証」または「フォールバック保証」のどちらかへ統一する
 - [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
   - 現状: Web Audio による簡易シンセ再生は実装済み
@@ -66,6 +67,8 @@
 - 例: `304: 批判的レビューの依頼` に `依頼` を追加
 - 例: `102: markdown 更新漏れの確認` に `更新 / 漏れ / 確認` を追加
 - 直近で `705: 完全ビルドの実施確認` と `706: 作業終了時の引継確認` を追加済み
+- `prompt-gen` の検索欄クリア導線は、外付け absolute 配置をやめて `lht-text-field-help clearable` の暫定実装へ寄せた
+- この `clearable` は正式仕様確定前の provisional API として扱い、`lht-cmn` 側の更新版受領後に見直す前提
 - 最新状態で `npm run build:all` は実施済み
 - 次回再開時は、まず `git status --short` と `npm test -- docs/prompt/tests/prompt-gen-main.test.js` を見ると状況把握が早い
 

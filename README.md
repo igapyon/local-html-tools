@@ -9,6 +9,7 @@
 - [MD3リファレンス](md3/README.md)
 - [GitツールREADME](docs/git/README.md)
 - [PasswordツールREADME](docs/password/README.md)
+- [PromptツールREADME](docs/prompt/README.md)
 - [Musicビルドプロセス](docs/music/BUILD_PROCESS.md)
 
 ## 前提条件
@@ -40,6 +41,7 @@
 - `docs/ffmpeg/*.html` も保守性確保のため「分割ソースをビルドして単一HTMLを生成」運用を採用
 - `docs/life/*.html` は `*-src.html` を編集し、ビルドで `*.html` を生成する運用を採用
 - `docs/link/*.html` は `*-src.html` を編集し、ビルドで `*.html` を生成する運用を採用
+- `docs/prompt/*.html` も保守性確保のため「分割ソースをビルドして単一HTMLを生成」運用を採用
 - `docs/text/*.html` は `*-src.html` を編集し、ビルドで `*.html` を生成する運用を採用
 - `docs/img/*.html` は `*-src.html` を編集し、ビルドで `*.html` を生成する運用を採用
 - `docs/index.html` も `docs/index-src.html` から生成する運用を採用
@@ -87,6 +89,7 @@ docs/
 ├── git/                 # Git補助ツール
 ├── grep/                # 検索補助ツール
 ├── img/                 # 画像系ツール
+├── prompt/              # 生成AI向けプロンプト作成支援ツール
 ├── text/                # テキスト系ツール
 ├── life/                # 生活系ツール
 ├── link/                # URL加工系ツール
@@ -164,6 +167,23 @@ docs/
   - `docs/link/*.html` は直接編集しない
   - 変更は `*-src.html` を編集する
   - PRには生成済み `docs/link/*.html` を含める
+
+### prompt 例外運用（分割開発）
+
+- 対象: `docs/prompt/prompt-gen.html`
+- 配布: `docs/prompt/prompt-gen.html`（単一HTML、生成物）
+- 開発:
+  - `docs/prompt/prompt-gen-src.html`
+  - `docs/prompt/src/prompt-gen/css/app.css`
+  - `docs/prompt/src/prompt-gen/ts/prompt-definitions.ts`
+  - `docs/prompt/src/prompt-gen/ts/main.ts`
+  - `docs/prompt/tests/prompt-gen-main.test.js`
+- ビルド: `npm run build:prompt`（`scripts/build-prompt.mjs`）
+- ルール:
+  - `docs/prompt/prompt-gen.html` は直接編集しない
+  - 変更は `prompt-gen-src.html` と `src/prompt-gen/` 配下を編集する
+  - `scripts/build-prompt.mjs` は `ts -> js` を行ってから single-file の `prompt-gen.html` を生成する
+  - PRには生成済み `docs/prompt/prompt-gen.html` を含める
 
 ### text 運用（src編集 + 生成）
 

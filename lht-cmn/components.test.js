@@ -415,6 +415,37 @@ describe("lht-text-field-help fallback", () => {
     expect(supportingText.hidden).toBe(true);
     vi.useRealTimers();
   });
+
+  it("supports clearable fallback text fields and dispatches input/change when cleared", async () => {
+    document.body.innerHTML = `
+      <lht-text-field-help
+        field-id="nameField"
+        label="Name"
+        value="Alice"
+        clearable
+      ></lht-text-field-help>
+    `;
+
+    const field = document.querySelector("lht-text-field-help input");
+    const clearButton = document.querySelector("lht-text-field-help .lht-text-field-help__clear-button");
+    const inputListener = vi.fn();
+    const changeListener = vi.fn();
+
+    field.addEventListener("input", inputListener);
+    field.addEventListener("change", changeListener);
+
+    await waitForMicrotask();
+
+    expect(clearButton).not.toBeNull();
+    expect(clearButton.hidden).toBe(false);
+
+    clearButton.click();
+
+    expect(field.value).toBe("");
+    expect(clearButton.hidden).toBe(true);
+    expect(inputListener).toHaveBeenCalledTimes(1);
+    expect(changeListener).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("lht-file-select events", () => {
