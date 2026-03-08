@@ -5529,6 +5529,10 @@ class LhtPageHero extends HTMLElement {
     const useWideHelp = this.hasAttribute("help-wide");
     const showMenu = !this.hasAttribute("no-menu");
     const helpHtml = this.innerHTML.trim();
+    const actionHref = (this.getAttribute("action-href") || "").trim();
+    const actionLabel = (this.getAttribute("action-label") || "").trim();
+    const actionAriaLabel = (this.getAttribute("action-aria-label") || actionLabel).trim();
+    const actionIconId = (this.getAttribute("action-icon-id") || "").trim();
 
     this.textContent = "";
     this.classList.add("lht-page-hero");
@@ -5561,6 +5565,33 @@ class LhtPageHero extends HTMLElement {
       }
       help.innerHTML = helpHtml;
       titleMain.appendChild(help);
+    }
+
+    if (actionHref && actionLabel) {
+      const actionLink = document.createElement("a");
+      actionLink.href = actionHref;
+      actionLink.className = "ms-hero-link";
+      actionLink.target = "_blank";
+      actionLink.rel = "noopener noreferrer";
+      if (actionAriaLabel) {
+        actionLink.setAttribute("aria-label", actionAriaLabel);
+      }
+      if (actionIconId) {
+        const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        iconSvg.setAttribute("aria-hidden", "true");
+        iconSvg.setAttribute("viewBox", "0 0 16 16");
+        iconSvg.setAttribute("class", "ms-btn-icon");
+        iconSvg.setAttribute("fill", "currentColor");
+        const useNode = document.createElementNS("http://www.w3.org/2000/svg", "use");
+        useNode.setAttribute("href", `#${actionIconId}`);
+        useNode.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `#${actionIconId}`);
+        iconSvg.appendChild(useNode);
+        actionLink.appendChild(iconSvg);
+      }
+      const labelNode = document.createElement("span");
+      labelNode.textContent = actionLabel;
+      actionLink.appendChild(labelNode);
+      titleMain.appendChild(actionLink);
     }
 
     topRow.appendChild(titleMain);

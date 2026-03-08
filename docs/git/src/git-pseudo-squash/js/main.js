@@ -498,15 +498,15 @@
         return false;
       }
       const headingText = normalized.replace(/^#{1,6}\s*/, "").trim().toLowerCase();
-      return /^(?:pr\s*テキスト|pr\s*text)\s*[:：]?$/.test(headingText);
+      return /^(?:pr\s*テキスト|pr\s*text|pr\s*本文)\s*[:：]?$/.test(headingText);
     }
 
-    function isFenceStartLine(line) {
-      return /^```(?:[a-z0-9_-]+)?\s*$/i.test(String(line || "").trim());
+    function isTildeFenceStartLine(line) {
+      return /^~~~+(?:[a-z0-9_-]+)?\s*$/i.test(String(line || "").trim());
     }
 
-    function isFenceEndLine(line) {
-      return /^```\s*$/.test(String(line || "").trim());
+    function isTildeFenceEndLine(line) {
+      return /^~~~+\s*$/.test(String(line || "").trim());
     }
 
     function normalizeCommitMessageForPr() {
@@ -516,7 +516,7 @@
       const original = String(commitMessageField.value || "");
       let lines = original.replace(/\r\n?/g, "\n").split("\n");
 
-      // 先頭は「空行 / PRタイトル見出し / 開始フェンス」が
+      // 先頭は「空行 / PRタイトル見出し / チルダフェンス開始」が
       // 混在しやすいため、順不同で連続除去する。
       let changed = true;
       let removedPrTitleHeading = false;
@@ -535,7 +535,7 @@
           changed = true;
           continue;
         }
-        if (lines.length > 0 && isFenceStartLine(lines[0])) {
+        if (lines.length > 0 && isTildeFenceStartLine(lines[0])) {
           lines.shift();
           changed = true;
         }
@@ -551,8 +551,8 @@
         }
       }
 
-      // 「## PRテキスト」セクションは、見出し自体を除去する。
-      // 直後が ```markdown で始まる場合はフェンスを外して本文だけ残す。
+      // 「## PRテキスト」「## PR本文」見出しは、見出し行自体を除去する。
+      // 見出し直後の空行もスキップする。
       {
         const rewritten = [];
         let i = 0;
@@ -568,27 +568,6 @@
           while (i < lines.length && lines[i].trim() === "") {
             i += 1;
           }
-
-          // この条件の ```markdown だけを除去対象にする。
-          if (i < lines.length && /^```markdown\s*$/i.test(lines[i].trim())) {
-            i += 1;
-            const blockLines = [];
-            while (i < lines.length && !isFenceEndLine(lines[i])) {
-              blockLines.push(lines[i]);
-              i += 1;
-            }
-            if (i < lines.length && isFenceEndLine(lines[i])) {
-              i += 1;
-            }
-
-            while (blockLines.length > 0 && blockLines[0].trim() === "") {
-              blockLines.shift();
-            }
-            while (blockLines.length > 0 && blockLines[blockLines.length - 1].trim() === "") {
-              blockLines.pop();
-            }
-            rewritten.push(...blockLines);
-          }
         }
         lines = rewritten;
       }
@@ -597,7 +576,7 @@
         lines.pop();
       }
 
-      if (lines.length > 0 && isFenceEndLine(lines[lines.length - 1])) {
+      if (lines.length > 0 && isTildeFenceEndLine(lines[lines.length - 1])) {
         lines.pop();
       }
 
