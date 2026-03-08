@@ -189,6 +189,7 @@ HTML から次を読み込みます。
 - fallback:
   - `md-icon-button` 未読込時はネイティブ `button.md-help-icon-button--fallback` を内部生成する
   - hover / focus-within による tooltip 表示契約は Material / fallback の両方で共通
+  - anchor 用の最小 CSS (`position`, `overflow`, tooltip visibility) は `lht-help-tooltip` 側に同梱し、アプリ側の追加 tooltip CSS を前提にしない
 - placement:
   - `placement="auto|left|right|top|bottom"` を指定できる
   - 既定値は `auto`

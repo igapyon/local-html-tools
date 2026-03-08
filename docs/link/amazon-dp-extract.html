@@ -1032,15 +1032,20 @@ limitations under the License.
 lht-help-tooltip {
   display: inline-flex;
   align-items: center;
+  position: relative;
+  overflow: visible;
 }
 
-.md-tooltip-group {
+lht-help-tooltip .md-tooltip-group {
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  overflow: visible;
 }
 
-.md-tooltip-content {
+lht-help-tooltip .md-tooltip-content {
   position: absolute;
   top: 100%;
   left: 50%;
@@ -1054,12 +1059,12 @@ lht-help-tooltip {
   max-width: 90vw;
 }
 
-.md-tooltip-group:hover .md-tooltip-content,
-.md-tooltip-group:focus-within .md-tooltip-content {
+lht-help-tooltip .md-tooltip-group:hover .md-tooltip-content,
+lht-help-tooltip .md-tooltip-group:focus-within .md-tooltip-content {
   opacity: 1;
 }
 
-.md-tooltip {
+lht-help-tooltip .md-tooltip {
   background: #2b2831;
   color: #f7f4fb;
   border-radius: 12px;
@@ -1070,11 +1075,11 @@ lht-help-tooltip {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
-.md-tooltip--wide {
+lht-help-tooltip .md-tooltip--wide {
   width: min(32rem, 90vw);
 }
 
-.md-tooltip--rich {
+lht-help-tooltip .md-tooltip--rich {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
