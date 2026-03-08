@@ -39,6 +39,8 @@ function mountPromptDom() {
 async function bootPromptPage() {
   defineElementIfNeeded("lht-text-field-help");
   mountPromptDom();
+  const promptOutputSection = document.getElementById("promptOutputSection");
+  promptOutputSection.scrollIntoView = () => {};
   new Function(`${promptDefinitionsCode}\n${mainCode}`)();
   document.dispatchEvent(new Event("DOMContentLoaded"));
   await Promise.resolve();
@@ -60,7 +62,7 @@ describe("prompt-gen main", () => {
 
     const buttons = [...document.querySelectorAll(".md-chip-button")];
     expect(buttons).toHaveLength(1);
-    expect(buttons[0].textContent).toContain("GitHub PR 文面作成");
+    expect(buttons[0].querySelector(".md-chip-label").textContent).toContain("GitHub PR 文面の作成");
     expect(buttons[0].classList.contains("is-active")).toBe(true);
     expect(commitInputSection.classList.contains("md-hidden")).toBe(false);
     expect(promptOutputSection.classList.contains("md-hidden")).toBe(false);
@@ -87,14 +89,14 @@ describe("prompt-gen main", () => {
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
     expect(commitInputSection.classList.contains("md-hidden")).toBe(true);
     expect(promptOutput.textContent).toBe(
-      "原則として Single-file Web App であるようにしてください。ビルド後の html ファイルは、CDNや 別ファイルのcss/jsファイルを利用していないことを常に意識してください。"
+      "このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDNや 別ファイルのcss/jsファイルを利用していないことを確認してください。"
     );
 
     includeLabelPrefix.checked = true;
     includeLabelPrefix.dispatchEvent(new Event("change"));
 
     expect(promptOutput.textContent).toBe(
-      "[Single-file Web App の維持] 原則として Single-file Web App であるようにしてください。ビルド後の html ファイルは、CDNや 別ファイルのcss/jsファイルを利用していないことを常に意識してください。"
+      "[701: Single-file Web App の維持] このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDNや 別ファイルのcss/jsファイルを利用していないことを確認してください。"
     );
   });
 
@@ -122,5 +124,20 @@ describe("prompt-gen main", () => {
     expect(commitInputSection.classList.contains("md-hidden")).toBe(true);
     expect(promptOutputSection.classList.contains("md-hidden")).toBe(false);
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
+  });
+
+  it("uses a label-derived unique match as the primary selection", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    promptSearch.value = "離席";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    const buttons = [...document.querySelectorAll(".md-chip-button")];
+    expect(buttons).toHaveLength(1);
+
+    const activeButtons = buttons.filter((button) => button.classList.contains("is-active"));
+    expect(activeButtons).toHaveLength(1);
+    expect(activeButtons[0].querySelector(".md-chip-label").textContent).toContain("310: 直近の作業状況を確認");
   });
 });
