@@ -1,0 +1,180 @@
+body.md-page {
+  margin: 0;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(174, 231, 255, 0.52), transparent 28%),
+    radial-gradient(circle at top left, rgba(221, 221, 255, 0.45), transparent 24%),
+    linear-gradient(180deg, #f6f7fb 0%, #eef2f8 100%);
+  color: #1c1b1f;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.md-surface-card {
+  max-width: 980px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(216, 223, 235, 0.95);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(45, 62, 96, 0.10);
+  padding: 28px;
+}
+
+.md-section {
+  margin-top: 28px;
+}
+
+.md-stack-md {
+  display: grid;
+  gap: 16px;
+}
+
+.md-form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.md-form-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.md-search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.md-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+md-outlined-text-field.md-outlined-field {
+  --md-outlined-text-field-input-text-placeholder-color: #8f8a98;
+}
+
+lht-text-field-help .lht-text-field-help__fallback::placeholder {
+  color: #8f8a98;
+  opacity: 1;
+}
+
+.md-chip-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  appearance: none;
+  border: 1px solid #d8d1e3;
+  border-radius: 999px;
+  background: #f7f2fa;
+  color: #4a4458;
+  padding: 0.32rem 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.1;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.md-chip-button:hover {
+  background: #efe7f8;
+  border-color: #cfc3e3;
+  color: #352f41;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(74, 68, 88, 0.10);
+}
+
+.md-chip-button.is-active {
+  border-color: transparent;
+  background: var(--md-sys-color-primary, #6200ee);
+  color: var(--md-sys-color-on-primary, #ffffff);
+  box-shadow: 0 6px 14px rgba(98, 0, 238, 0.24);
+}
+
+.md-chip-button .md-chip-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.md-chip-button lht-help-tooltip {
+  flex: 0 0 auto;
+}
+
+.md-chip-button lht-help-tooltip .md-tooltip-content {
+  z-index: 400;
+}
+
+.md-output-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #27364b;
+}
+
+.md-code-block {
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.md-code {
+  display: block;
+  padding: 0.75rem;
+  padding-right: 2.5rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: #f4f1f7;
+  border: 1px solid #e5e0ec;
+  color: #1f1b2d;
+  min-height: 2.5rem;
+  line-height: 1.65;
+  box-sizing: border-box;
+}
+
+.md-copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+md-icon-button.md-copy-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  --md-icon-button-icon-size: 16px;
+  --md-icon-button-icon-color: #3f3b46;
+  --md-icon-button-state-layer-shape: 16px;
+  --md-icon-button-hover-state-layer-color: #3f3b46;
+  --md-icon-button-hover-state-layer-opacity: 0.08;
+  --md-icon-button-pressed-state-layer-color: #3f3b46;
+  --md-icon-button-pressed-state-layer-opacity: 0.12;
+  background: #f7f2fa;
+}
+
+md-icon-button.md-copy-button--surface {
+  background: #f7f2fa;
+}
+
+.md-hidden {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  body.md-page {
+    padding: 14px;
+  }
+
+  .md-surface-card {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .md-form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

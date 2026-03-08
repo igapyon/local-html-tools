@@ -22,189 +22,7 @@ limitations under the License.
   
   
   
-  <style>
-    body.md-page {
-      margin: 0;
-      padding: 24px;
-      background:
-        radial-gradient(circle at top right, rgba(174, 231, 255, 0.52), transparent 28%),
-        radial-gradient(circle at top left, rgba(221, 221, 255, 0.45), transparent 24%),
-        linear-gradient(180deg, #f6f7fb 0%, #eef2f8 100%);
-      color: #1c1b1f;
-      min-height: 100vh;
-      box-sizing: border-box;
-    }
-
-    .md-surface-card {
-      max-width: 980px;
-      margin: 0 auto;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(216, 223, 235, 0.95);
-      border-radius: 28px;
-      box-shadow: 0 24px 60px rgba(45, 62, 96, 0.10);
-      padding: 28px;
-    }
-
-    .md-section {
-      margin-top: 28px;
-    }
-
-    .md-stack-md {
-      display: grid;
-      gap: 16px;
-    }
-
-    .md-form-grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    .md-form-grid-2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .md-search-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-    }
-
-    .md-chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    md-outlined-text-field.md-outlined-field {
-      --md-outlined-text-field-input-text-placeholder-color: #8f8a98;
-    }
-
-    lht-text-field-help .lht-text-field-help__fallback::placeholder {
-      color: #8f8a98;
-      opacity: 1;
-    }
-
-    .md-chip-button {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      appearance: none;
-      border: 1px solid #d8d1e3;
-      border-radius: 999px;
-      background: #f7f2fa;
-      color: #4a4458;
-      padding: 0.32rem 0.9rem;
-      font-size: 0.88rem;
-      font-weight: 600;
-      line-height: 1.1;
-      cursor: pointer;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease, border-color 150ms ease, color 150ms ease;
-    }
-
-    .md-chip-button:hover {
-      background: #efe7f8;
-      border-color: #cfc3e3;
-      color: #352f41;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(74, 68, 88, 0.10);
-    }
-
-    .md-chip-button.is-active {
-      border-color: transparent;
-      background: var(--md-sys-color-primary, #6200ee);
-      color: var(--md-sys-color-on-primary, #ffffff);
-      box-shadow: 0 6px 14px rgba(98, 0, 238, 0.24);
-    }
-
-    .md-chip-button .md-chip-label {
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .md-chip-button lht-help-tooltip {
-      flex: 0 0 auto;
-    }
-
-    .md-chip-button lht-help-tooltip .md-tooltip-content {
-      z-index: 400;
-    }
-
-    .md-output-title {
-      margin: 0;
-      font-size: 1.02rem;
-      font-weight: 700;
-      color: #27364b;
-    }
-
-    .md-code-block {
-      position: relative;
-      margin-top: 0.5rem;
-    }
-
-    .md-code {
-      display: block;
-      padding: 0.75rem;
-      padding-right: 2.5rem;
-      border-radius: 12px;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      background: #f4f1f7;
-      border: 1px solid #e5e0ec;
-      color: #1f1b2d;
-      min-height: 2.5rem;
-      line-height: 1.65;
-      box-sizing: border-box;
-    }
-
-    .md-copy-button {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-    }
-
-    md-icon-button.md-copy-button {
-      width: 32px;
-      height: 32px;
-      border-radius: 16px;
-      --md-icon-button-icon-size: 16px;
-      --md-icon-button-icon-color: #3f3b46;
-      --md-icon-button-state-layer-shape: 16px;
-      --md-icon-button-hover-state-layer-color: #3f3b46;
-      --md-icon-button-hover-state-layer-opacity: 0.08;
-      --md-icon-button-pressed-state-layer-color: #3f3b46;
-      --md-icon-button-pressed-state-layer-opacity: 0.12;
-      background: #f7f2fa;
-    }
-
-    md-icon-button.md-copy-button--surface {
-      background: #f7f2fa;
-    }
-
-    .md-hidden {
-      display: none;
-    }
-
-    @media (max-width: 720px) {
-      body.md-page {
-        padding: 14px;
-      }
-
-      .md-surface-card {
-        padding: 18px;
-        border-radius: 22px;
-      }
-
-      .md-form-grid-2 {
-        grid-template-columns: 1fr;
-      }
-
-    }
-  </style>
+  
   <style>
 /*
  * lht-cmn components.css
@@ -1153,6 +971,187 @@ lht-index-card-link {
   -webkit-line-clamp: var(--lht-desc-lines, 3);
   overflow: hidden;
 }
+
+body.md-page {
+  margin: 0;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(174, 231, 255, 0.52), transparent 28%),
+    radial-gradient(circle at top left, rgba(221, 221, 255, 0.45), transparent 24%),
+    linear-gradient(180deg, #f6f7fb 0%, #eef2f8 100%);
+  color: #1c1b1f;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.md-surface-card {
+  max-width: 980px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(216, 223, 235, 0.95);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(45, 62, 96, 0.10);
+  padding: 28px;
+}
+
+.md-section {
+  margin-top: 28px;
+}
+
+.md-stack-md {
+  display: grid;
+  gap: 16px;
+}
+
+.md-form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.md-form-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.md-search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.md-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+md-outlined-text-field.md-outlined-field {
+  --md-outlined-text-field-input-text-placeholder-color: #8f8a98;
+}
+
+lht-text-field-help .lht-text-field-help__fallback::placeholder {
+  color: #8f8a98;
+  opacity: 1;
+}
+
+.md-chip-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  appearance: none;
+  border: 1px solid #d8d1e3;
+  border-radius: 999px;
+  background: #f7f2fa;
+  color: #4a4458;
+  padding: 0.32rem 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.1;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.md-chip-button:hover {
+  background: #efe7f8;
+  border-color: #cfc3e3;
+  color: #352f41;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(74, 68, 88, 0.10);
+}
+
+.md-chip-button.is-active {
+  border-color: transparent;
+  background: var(--md-sys-color-primary, #6200ee);
+  color: var(--md-sys-color-on-primary, #ffffff);
+  box-shadow: 0 6px 14px rgba(98, 0, 238, 0.24);
+}
+
+.md-chip-button .md-chip-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.md-chip-button lht-help-tooltip {
+  flex: 0 0 auto;
+}
+
+.md-chip-button lht-help-tooltip .md-tooltip-content {
+  z-index: 400;
+}
+
+.md-output-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #27364b;
+}
+
+.md-code-block {
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.md-code {
+  display: block;
+  padding: 0.75rem;
+  padding-right: 2.5rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: #f4f1f7;
+  border: 1px solid #e5e0ec;
+  color: #1f1b2d;
+  min-height: 2.5rem;
+  line-height: 1.65;
+  box-sizing: border-box;
+}
+
+.md-copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+md-icon-button.md-copy-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  --md-icon-button-icon-size: 16px;
+  --md-icon-button-icon-color: #3f3b46;
+  --md-icon-button-state-layer-shape: 16px;
+  --md-icon-button-hover-state-layer-color: #3f3b46;
+  --md-icon-button-hover-state-layer-opacity: 0.08;
+  --md-icon-button-pressed-state-layer-color: #3f3b46;
+  --md-icon-button-pressed-state-layer-opacity: 0.12;
+  background: #f7f2fa;
+}
+
+md-icon-button.md-copy-button--surface {
+  background: #f7f2fa;
+}
+
+.md-hidden {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  body.md-page {
+    padding: 14px;
+  }
+
+  .md-surface-card {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .md-form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
   </style>
 </head>
 <body class="md-page">
@@ -1221,465 +1220,8 @@ lht-index-card-link {
 
     <lht-toast id="toast"></lht-toast>
   </div>
-
-  <script>
-    async function initializePromptPage() {
-      if (window.customElements && window.customElements.whenDefined) {
-        await window.customElements.whenDefined("lht-text-field-help");
-      }
-
-      const promptSearch = document.getElementById("promptSearch");
-      const promptCandidateArea = document.getElementById("promptCandidateArea");
-      const commitInputSection = document.getElementById("commitInputSection");
-      const promptOutputSection = document.getElementById("promptOutputSection");
-      const commitIdInput = document.getElementById("commitId");
-      const includeLabelPrefix = document.getElementById("includeLabelPrefix");
-      const promptOutput = document.getElementById("promptOutput");
-
-      if (!promptSearch || !commitIdInput || !includeLabelPrefix) {
-        return;
-      }
-
-      let selectedPrompt = "";
-      let lastSearchQuery = "";
-      const promptDefinitions = [
-        {
-          id: "pr-request",
-          label: "GitHub PR 文面作成",
-          keywords: ["pr", "pull request", "pr作成依頼", "prタイトル", "pr本文", "ぶんめんさくせい", "bunmensakusei", "ぴーあーる", "ぷるりくえすと", "ぎっとはぶ"]
-        },
-        {
-          id: "release-request",
-          label: "GitHub Release 文面作成",
-          keywords: ["release", "github release", "github", "リリース", "release文面", "release本文", "りりーす", "ぶんめんさくせい", "riri-su", "bunmensakusei", "ぎっとはぶ", "りりーす"]
-        },
-        {
-          id: "inline-code-request",
-          label: "Markdown インラインコードとして出力",
-          keywords: ["markdown", "inline code", "code", "インラインコード", "markdown出力", "コード形式", "いんらいんこーど", "しゅつりょく", "inrainko-do", "shutsuryoku", "まーくだうん", "こーど"]
-        },
-        {
-          id: "github-no-change-request",
-          label: "GitHub 変更操作を禁止",
-          keywords: ["github", "push", "pr", "comment", "変更しない", "禁止", "github操作", "へんこうそうさ", "きんし", "henkousousa", "kinshi", "ぎっとはぶ", "ぷっしゅ", "ぴーあーる", "こめんと"]
-        },
-        {
-          id: "directory-markdown-check-request",
-          label: "100: ディレクトリ内の内容を確認して把握",
-          keywords: ["readme", "markdown", "directory", "ディレクトリ", "内容確認", "md確認", "でぃれくとり", "ないようかくにん", "direkutori", "naiyoukakunin", "りーどみー", "まーくだうん", "えむでぃー"]
-        },
-        {
-          id: "conversation-handover-request",
-          label: "会話の引継テキストを生成",
-          keywords: ["handover", "conversation", "引き継ぎ", "会話", "生成ai", "別のai", "かいわ", "ひきつぎ", "てきすと", "せいせい", "kaiwa", "hikitsugi", "tekisuto", "seisei", "はんどおーばー", "こんばーせーしょん", "えーあい"]
-        },
-        {
-          id: "spec-discussion-request",
-          label: "仕様検討モードで進める",
-          keywords: ["spec", "specification", "仕様", "検討", "todo", "todo.md", "しよう", "けんとう", "とぅーどぅー", "shiyou", "kentou", "すぺっく"]
-        },
-        {
-          id: "small-test-request",
-          label: "事象の再発防止テストを追加",
-          keywords: ["test", "testing", "small test", "再現テスト", "小さなテスト", "軽量テスト", "てすと", "さいげんてすと", "しょうさなてすと", "tesuto", "saigentesuto"]
-        },
-        {
-          id: "disagreement-first-request",
-          label: "違和感や誤りを先に指摘",
-          keywords: ["disagree", "wrong", "違和感", "間違い", "指摘", "先に指摘", "いわかん", "まちがい", "してき", "iwakan", "machigai", "shiteki"]
-        },
-        {
-          id: "todo-cleanup-request",
-          label: "TODO.md の完了項目を整理",
-          keywords: ["todo", "todo.md", "cleanup", "close", "closed", "整理", "完了", "クローズ", "削除", "とぅーどぅー", "せいり", "かんりょう", "s e i r i", "kanryou"]
-        },
-        {
-          id: "completion-check-request",
-          label: "依頼内容の実施状況を確認",
-          keywords: ["done", "completed", "status", "check", "実施済み", "未実施", "確認", "じっしずみ", "みじっし", "かくにん", "jisshizumi", "mijisshi", "kakunin"]
-        },
-        {
-          id: "critical-review-request",
-          label: "批判的レビューを依頼",
-          keywords: ["review", "critical review", "typo", "批判的", "レビュー", "誤り", "間違い", "たいぽ", "ひはんてき", "れびゅー", "まちがい", "typo", "hibanteki", "rebyu-"]
-        },
-        {
-          id: "markdown-update-check-request",
-          label: "markdown 更新漏れを確認",
-          keywords: ["markdown", "md", "update", "doc", "docs", "更新漏れ", "未更新", "追加すべき", "まーくだうん", "みこうしん", "こうしんもれ", "markdown", "mikkoushin", "koushinmore"]
-        }
-      ];
-
-      const kanaToRomajiMap = new Map([
-        ["きゃ", "kya"], ["きゅ", "kyu"], ["きょ", "kyo"],
-        ["しゃ", "sha"], ["しゅ", "shu"], ["しょ", "sho"],
-        ["ちゃ", "cha"], ["ちゅ", "chu"], ["ちょ", "cho"],
-        ["にゃ", "nya"], ["にゅ", "nyu"], ["にょ", "nyo"],
-        ["ひゃ", "hya"], ["ひゅ", "hyu"], ["ひょ", "hyo"],
-        ["みゃ", "mya"], ["みゅ", "myu"], ["みょ", "myo"],
-        ["りゃ", "rya"], ["りゅ", "ryu"], ["りょ", "ryo"],
-        ["ぎゃ", "gya"], ["ぎゅ", "gyu"], ["ぎょ", "gyo"],
-        ["じゃ", "ja"], ["じゅ", "ju"], ["じょ", "jo"],
-        ["びゃ", "bya"], ["びゅ", "byu"], ["びょ", "byo"],
-        ["ぴゃ", "pya"], ["ぴゅ", "pyu"], ["ぴょ", "pyo"],
-        ["ゔぁ", "va"], ["ゔぃ", "vi"], ["ゔ", "vu"], ["ゔぇ", "ve"], ["ゔぉ", "vo"],
-        ["あ", "a"], ["い", "i"], ["う", "u"], ["え", "e"], ["お", "o"],
-        ["か", "ka"], ["き", "ki"], ["く", "ku"], ["け", "ke"], ["こ", "ko"],
-        ["さ", "sa"], ["し", "shi"], ["す", "su"], ["せ", "se"], ["そ", "so"],
-        ["た", "ta"], ["ち", "chi"], ["つ", "tsu"], ["て", "te"], ["と", "to"],
-        ["な", "na"], ["に", "ni"], ["ぬ", "nu"], ["ね", "ne"], ["の", "no"],
-        ["は", "ha"], ["ひ", "hi"], ["ふ", "fu"], ["へ", "he"], ["ほ", "ho"],
-        ["ま", "ma"], ["み", "mi"], ["む", "mu"], ["め", "me"], ["も", "mo"],
-        ["や", "ya"], ["ゆ", "yu"], ["よ", "yo"],
-        ["ら", "ra"], ["り", "ri"], ["る", "ru"], ["れ", "re"], ["ろ", "ro"],
-        ["わ", "wa"], ["を", "wo"], ["ん", "n"],
-        ["が", "ga"], ["ぎ", "gi"], ["ぐ", "gu"], ["げ", "ge"], ["ご", "go"],
-        ["ざ", "za"], ["じ", "ji"], ["ず", "zu"], ["ぜ", "ze"], ["ぞ", "zo"],
-        ["だ", "da"], ["ぢ", "ji"], ["づ", "zu"], ["で", "de"], ["ど", "do"],
-        ["ば", "ba"], ["び", "bi"], ["ぶ", "bu"], ["べ", "be"], ["ぼ", "bo"],
-        ["ぱ", "pa"], ["ぴ", "pi"], ["ぷ", "pu"], ["ぺ", "pe"], ["ぽ", "po"]
-      ]);
-
-      function toHiragana(text) {
-        return String(text || "").replace(/[\u30A1-\u30F6]/g, (char) =>
-          String.fromCharCode(char.charCodeAt(0) - 0x60)
-        );
-      }
-
-      function toKatakana(text) {
-        return String(text || "").replace(/[\u3041-\u3096]/g, (char) =>
-          String.fromCharCode(char.charCodeAt(0) + 0x60)
-        );
-      }
-
-      function isKanaText(text) {
-        return /^[\u3041-\u3096ー]+$/.test(text);
-      }
-
-      function kanaToRomaji(text) {
-        const hiragana = toHiragana(text);
-        if (!hiragana || !isKanaText(hiragana)) {
-          return "";
-        }
-
-        let result = "";
-        for (let index = 0; index < hiragana.length; index += 1) {
-          const current = hiragana[index];
-          const next = hiragana[index + 1] || "";
-          const pair = current + next;
-
-          if (current === "っ") {
-            const nextPair = hiragana.slice(index + 1, index + 3);
-            const nextRomaji =
-              kanaToRomajiMap.get(nextPair) ||
-              kanaToRomajiMap.get(next) ||
-              "";
-            if (nextRomaji) {
-              result += nextRomaji[0];
-            }
-            continue;
-          }
-
-          if (current === "ー") {
-            const lastChar = result[result.length - 1] || "";
-            if (/[aeiou]/.test(lastChar)) {
-              result += lastChar;
-            }
-            continue;
-          }
-
-          if (kanaToRomajiMap.has(pair)) {
-            result += kanaToRomajiMap.get(pair);
-            index += 1;
-            continue;
-          }
-
-          if (kanaToRomajiMap.has(current)) {
-            result += kanaToRomajiMap.get(current);
-            continue;
-          }
-
-          return "";
-        }
-
-        return result;
-      }
-
-      function buildSearchTokens(definition) {
-        const tokens = new Set();
-        const label = (definition.label || "").toLowerCase();
-        const keywords = Array.isArray(definition.keywords) ? definition.keywords : [];
-
-        if (label) {
-          tokens.add(label);
-          for (const part of label.split(/\s+/).filter(Boolean)) {
-            tokens.add(part);
-            const hiraganaPart = toHiragana(part);
-            const katakanaPart = toKatakana(part);
-            if (hiraganaPart !== part) {
-              tokens.add(hiraganaPart);
-            }
-            if (katakanaPart !== part) {
-              tokens.add(katakanaPart);
-            }
-            const romaji = kanaToRomaji(part);
-            if (romaji) {
-              tokens.add(romaji);
-            }
-          }
-        }
-
-        for (const keyword of keywords) {
-          const normalizedKeyword = String(keyword || "").toLowerCase().trim();
-          if (!normalizedKeyword) {
-            continue;
-          }
-          tokens.add(normalizedKeyword);
-          const hiraganaKeyword = toHiragana(normalizedKeyword);
-          const katakanaKeyword = toKatakana(normalizedKeyword);
-          if (hiraganaKeyword !== normalizedKeyword) {
-            tokens.add(hiraganaKeyword);
-          }
-          if (katakanaKeyword !== normalizedKeyword) {
-            tokens.add(katakanaKeyword);
-          }
-          const romajiKeyword = kanaToRomaji(normalizedKeyword);
-          if (romajiKeyword) {
-            tokens.add(romajiKeyword);
-          }
-          for (const part of normalizedKeyword.split(/\s+/).filter(Boolean)) {
-            tokens.add(part);
-            const hiraganaPart = toHiragana(part);
-            const katakanaPart = toKatakana(part);
-            if (hiraganaPart !== part) {
-              tokens.add(hiraganaPart);
-            }
-            if (katakanaPart !== part) {
-              tokens.add(katakanaPart);
-            }
-            const romaji = kanaToRomaji(part);
-            if (romaji) {
-              tokens.add(romaji);
-            }
-          }
-        }
-
-        return Array.from(tokens);
-      }
-
-      function buildDisplayKeywords(definition) {
-        const tokens = new Set();
-        const label = (definition.label || "").trim();
-        const keywords = Array.isArray(definition.keywords) ? definition.keywords : [];
-
-        if (label) {
-          tokens.add(label);
-        }
-
-        for (const keyword of keywords) {
-          const normalizedKeyword = String(keyword || "").trim();
-          if (!normalizedKeyword) {
-            continue;
-          }
-          tokens.add(normalizedKeyword);
-        }
-
-        return Array.from(tokens);
-      }
-
-      function createCandidateButton(definition) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "md-chip-button";
-        button.dataset.promptId = definition.id;
-        button.addEventListener("click", () => selectPrompt(definition.id, button));
-
-        const label = document.createElement("span");
-        label.className = "md-chip-label";
-        label.textContent = definition.label;
-        button.appendChild(label);
-
-        const help = document.createElement("lht-help-tooltip");
-        help.setAttribute("label", "キーワード");
-        help.setAttribute("placement", "bottom");
-        help.innerHTML = buildDisplayKeywords(definition).join(", ");
-        help.addEventListener("click", (event) => {
-          event.stopPropagation();
-        });
-        help.addEventListener("mousedown", (event) => {
-          event.stopPropagation();
-        });
-        button.appendChild(help);
-
-        return button;
-      }
-
-      function renderCandidates() {
-        const query = (promptSearch.value || "").trim().toLowerCase();
-        const queryChanged = query !== lastSearchQuery;
-        lastSearchQuery = query;
-        promptCandidateArea.innerHTML = "";
-
-        if (queryChanged) {
-          selectedPrompt = "";
-          commitInputSection.classList.add("md-hidden");
-          promptOutputSection.classList.add("md-hidden");
-          commitIdInput.value = "";
-          promptOutput.textContent = "";
-        }
-
-        const terms = query ? query.split(/\s+/).filter(Boolean) : [];
-        const matchedDefinitions = query
-          ? promptDefinitions.filter((definition) =>
-              terms.every((term) =>
-                buildSearchTokens(definition).some((token) => token.includes(term))
-              )
-            )
-          : promptDefinitions;
-        matchedDefinitions.sort((left, right) => {
-          if (left.label < right.label) return -1;
-          if (left.label > right.label) return 1;
-          return 0;
-        });
-
-        if (matchedDefinitions.length === 0) {
-          if (selectedPrompt) {
-            selectedPrompt = "";
-            commitInputSection.classList.add("md-hidden");
-            promptOutputSection.classList.add("md-hidden");
-            updateOutput();
-          }
-          return;
-        }
-
-        const hasSingleMatch = matchedDefinitions.length === 1;
-
-        if (hasSingleMatch && !selectedPrompt) {
-          selectedPrompt = matchedDefinitions[0].id;
-        } else if (
-          !hasSingleMatch &&
-          selectedPrompt &&
-          !matchedDefinitions.some((definition) => definition.id === selectedPrompt)
-        ) {
-          selectedPrompt = "";
-        }
-
-        for (const definition of matchedDefinitions) {
-          const button = createCandidateButton(definition);
-          if (hasSingleMatch && selectedPrompt === definition.id) {
-            button.classList.add("is-active");
-          }
-          promptCandidateArea.appendChild(button);
-        }
-
-        if (hasSingleMatch && selectedPrompt === matchedDefinitions[0].id) {
-          if (selectedPrompt === "pr-request" || selectedPrompt === "release-request") {
-            commitInputSection.classList.remove("md-hidden");
-          } else {
-            commitInputSection.classList.add("md-hidden");
-          }
-          promptOutputSection.classList.remove("md-hidden");
-          updateOutput();
-        }
-      }
-
-      function selectPrompt(id, button) {
-        selectedPrompt = id;
-        for (const element of promptCandidateArea.querySelectorAll(".md-chip-button")) {
-          element.classList.remove("is-active");
-        }
-        button.classList.add("is-active");
-
-        promptOutputSection.classList.remove("md-hidden");
-
-        if (id === "pr-request" || id === "release-request") {
-          commitInputSection.classList.remove("md-hidden");
-          commitIdInput.focus();
-        } else {
-          commitInputSection.classList.add("md-hidden");
-        }
-
-        updateOutput();
-      }
-
-      function buildPromptText() {
-        const commitId = (commitIdInput.value || "").trim();
-        if (!selectedPrompt) {
-          return "";
-        }
-        const selectedDefinition = promptDefinitions.find((definition) => definition.id === selectedPrompt);
-        const label = selectedDefinition ? selectedDefinition.label : "";
-        let body = "";
-        if (selectedPrompt === "pr-request") {
-          if (!commitId) {
-            return "";
-          }
-          body = `対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文は \`\`\` で囲まれた一塊として回答してください。`;
-        }
-        if (selectedPrompt === "release-request") {
-          if (!commitId) {
-            return "";
-          }
-          body = `${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown 形式で作文してください。`;
-        }
-        if (selectedPrompt === "inline-code-request") {
-          body = "出力はインラインコード形式で markdown テキストで出力してください。回答が ``` と ``` とで囲まれるイメージです。";
-        }
-        if (selectedPrompt === "github-no-change-request") {
-          body = "GitHub 変更操作の禁止。GitHubへの push、GitHub PR の作成や PR へのコメントなど、GitHub への変更をおこなう操作は行わないでください。";
-        }
-        if (selectedPrompt === "directory-markdown-check-request") {
-          body = "README.md などこのディレクトリの内容をあらわす markdown の内容を確認してください。";
-        }
-        if (selectedPrompt === "conversation-handover-request") {
-          body = "今までの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを想定したうえでなるべく詳細にそして引継先で緻密に再現できるような引き継ぎテキストを生成してください。";
-        }
-        if (selectedPrompt === "spec-discussion-request") {
-          body = "今からの作業は仕様の検討です。実装を開始しないでください。一方で、まとまった仕様が実施事項に落としこめる場合には、TODO.mdに作業タスクとして分解して記述してください。";
-        }
-        if (selectedPrompt === "small-test-request") {
-          body = "今回の事象が再現したときにすぐに気づくように、とても小さなシンプルなテストについて、よういに実現可能であればこれを追加して欲しいです。困難な場合は作業せずにその旨指摘してください。";
-        }
-        if (selectedPrompt === "disagreement-first-request") {
-          body = "私の指示や指摘について、あなたか強い違和感を感じたり、あるいはあなたが間違っていると感じている場合には、指示を続行せずに、その違和感や間違いを回答して欲しい。";
-        }
-        if (selectedPrompt === "todo-cleanup-request") {
-          body = "TODO.mdのなかで、すでに対応済みで実施済みとなっているTODOがあれば、それをクローズしたり、あるいは以前にすでにクローズ済みのTODOがあればこれを削除してください。";
-        }
-        if (selectedPrompt === "completion-check-request") {
-          body = "さきほどお願いした一連の依頼内容は、基本的に全て実施済みでしょうか。それともまだ未実施のものはありますでしょうか。";
-        }
-        if (selectedPrompt === "critical-review-request") {
-          body = "これから批判的なレビューを実施して欲しいです。誤り、間違い、TYPO、ささいなものでも批判的に指摘してください。それら批判的な指摘はこのコンテキストでは喜ばれます。";
-        }
-        if (selectedPrompt === "markdown-update-check-request") {
-          body = "実装の側に変更がおこなわれましたが、これに対応する markdown (.md) で未更新のものはありますか。あるいは新規で markdown (.md) を追加すべき変更はありましたか。";
-        }
-        if (!body || !label) {
-          return "";
-        }
-        return includeLabelPrefix.checked ? `[${label}] ${body}` : body;
-      }
-
-      function updateOutput() {
-        const text = buildPromptText();
-        promptOutput.textContent = text;
-      }
-
-      promptSearch.addEventListener("input", renderCandidates);
-      commitIdInput.addEventListener("input", updateOutput);
-      includeLabelPrefix.addEventListener("change", updateOutput);
-
-      renderCandidates();
-      updateOutput();
-    }
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initializePromptPage, { once: true });
-    } else {
-      initializePromptPage();
-    }
-  </script>
+  
+  
   <script>
 (()=>{function s(o,e,t,r){var i=arguments.length,n=i<3?e:r===null?r=Object.getOwnPropertyDescriptor(e,t):r,a;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")n=Reflect.decorate(o,e,t,r);else for(var d=o.length-1;d>=0;d--)(a=o[d])&&(n=(i<3?a(n):i>3?a(e,t,n):a(e,t))||n);return i>3&&n&&Object.defineProperty(e,t,n),n}var E=o=>(e,t)=>{t!==void 0?t.addInitializer(()=>{customElements.define(o,e)}):customElements.define(o,e)};var Qe=globalThis,et=Qe.ShadowRoot&&(Qe.ShadyCSS===void 0||Qe.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,Bt=Symbol(),$r=new WeakMap,Ne=class{constructor(e,t,r){if(this._$cssResult$=!0,r!==Bt)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o,t=this.t;if(et&&e===void 0){let r=t!==void 0&&t.length===1;r&&(e=$r.get(t)),e===void 0&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),r&&$r.set(t,e))}return e}toString(){return this.cssText}},Tr=o=>new Ne(typeof o=="string"?o:o+"",void 0,Bt),g=(o,...e)=>{let t=o.length===1?o[0]:e.reduce((r,i,n)=>r+(a=>{if(a._$cssResult$===!0)return a.cssText;if(typeof a=="number")return a;throw Error("Value passed to 'css' function must be a 'css' function result: "+a+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+o[n+1],o[0]);return new Ne(t,o,Bt)},Sr=(o,e)=>{if(et)o.adoptedStyleSheets=e.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(let t of e){let r=document.createElement("style"),i=Qe.litNonce;i!==void 0&&r.setAttribute("nonce",i),r.textContent=t.cssText,o.appendChild(r)}},Ft=et?o=>o:o=>o instanceof CSSStyleSheet?(e=>{let t="";for(let r of e.cssRules)t+=r.cssText;return Tr(t)})(o):o;var{is:Io,defineProperty:ko,getOwnPropertyDescriptor:Oo,getOwnPropertyNames:Ro,getOwnPropertySymbols:Po,getPrototypeOf:Lo}=Object,ce=globalThis,Ir=ce.trustedTypes,Do=Ir?Ir.emptyScript:"",zo=ce.reactiveElementPolyfillSupport,Be=(o,e)=>o,Fe={toAttribute(o,e){switch(e){case Boolean:o=o?Do:null;break;case Object:case Array:o=o==null?o:JSON.stringify(o)}return o},fromAttribute(o,e){let t=o;switch(e){case Boolean:t=o!==null;break;case Number:t=o===null?null:Number(o);break;case Object:case Array:try{t=JSON.parse(o)}catch{t=null}}return t}},tt=(o,e)=>!Io(o,e),kr={attribute:!0,type:String,converter:Fe,reflect:!1,useDefault:!1,hasChanged:tt};Symbol.metadata??(Symbol.metadata=Symbol("metadata")),ce.litPropertyMetadata??(ce.litPropertyMetadata=new WeakMap);var re=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??(this.l=[])).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=kr){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){let r=Symbol(),i=this.getPropertyDescriptor(e,r,t);i!==void 0&&ko(this.prototype,e,i)}}static getPropertyDescriptor(e,t,r){let{get:i,set:n}=Oo(this.prototype,e)??{get(){return this[t]},set(a){this[t]=a}};return{get:i,set(a){let d=i?.call(this);n?.call(this,a),this.requestUpdate(e,d,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??kr}static _$Ei(){if(this.hasOwnProperty(Be("elementProperties")))return;let e=Lo(this);e.finalize(),e.l!==void 0&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(Be("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(Be("properties"))){let t=this.properties,r=[...Ro(t),...Po(t)];for(let i of r)this.createProperty(i,t[i])}let e=this[Symbol.metadata];if(e!==null){let t=litPropertyMetadata.get(e);if(t!==void 0)for(let[r,i]of t)this.elementProperties.set(r,i)}this._$Eh=new Map;for(let[t,r]of this.elementProperties){let i=this._$Eu(t,r);i!==void 0&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){let t=[];if(Array.isArray(e)){let r=new Set(e.flat(1/0).reverse());for(let i of r)t.unshift(Ft(i))}else e!==void 0&&t.push(Ft(e));return t}static _$Eu(e,t){let r=t.attribute;return r===!1?void 0:typeof r=="string"?r:typeof e=="string"?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??(this._$EO=new Set)).add(e),this.renderRoot!==void 0&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){let e=new Map,t=this.constructor.elementProperties;for(let r of t.keys())this.hasOwnProperty(r)&&(e.set(r,this[r]),delete this[r]);e.size>0&&(this._$Ep=e)}createRenderRoot(){let e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return Sr(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,r){this._$AK(e,r)}_$ET(e,t){let r=this.constructor.elementProperties.get(e),i=this.constructor._$Eu(e,r);if(i!==void 0&&r.reflect===!0){let n=(r.converter?.toAttribute!==void 0?r.converter:Fe).toAttribute(t,r.type);this._$Em=e,n==null?this.removeAttribute(i):this.setAttribute(i,n),this._$Em=null}}_$AK(e,t){let r=this.constructor,i=r._$Eh.get(e);if(i!==void 0&&this._$Em!==i){let n=r.getPropertyOptions(i),a=typeof n.converter=="function"?{fromAttribute:n.converter}:n.converter?.fromAttribute!==void 0?n.converter:Fe;this._$Em=i;let d=a.fromAttribute(t,n.type);this[i]=d??this._$Ej?.get(i)??d,this._$Em=null}}requestUpdate(e,t,r,i=!1,n){if(e!==void 0){let a=this.constructor;if(i===!1&&(n=this[e]),r??(r=a.getPropertyOptions(e)),!((r.hasChanged??tt)(n,t)||r.useDefault&&r.reflect&&n===this._$Ej?.get(e)&&!this.hasAttribute(a._$Eu(e,r))))return;this.C(e,t,r)}this.isUpdatePending===!1&&(this._$ES=this._$EP())}C(e,t,{useDefault:r,reflect:i,wrapped:n},a){r&&!(this._$Ej??(this._$Ej=new Map)).has(e)&&(this._$Ej.set(e,a??t??this[e]),n!==!0||a!==void 0)||(this._$AL.has(e)||(this.hasUpdated||r||(t=void 0),this._$AL.set(e,t)),i===!0&&this._$Em!==e&&(this._$Eq??(this._$Eq=new Set)).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}let e=this.scheduleUpdate();return e!=null&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??(this.renderRoot=this.createRenderRoot()),this._$Ep){for(let[i,n]of this._$Ep)this[i]=n;this._$Ep=void 0}let r=this.constructor.elementProperties;if(r.size>0)for(let[i,n]of r){let{wrapped:a}=n,d=this[i];a!==!0||this._$AL.has(i)||d===void 0||this.C(i,void 0,n,d)}}let e=!1,t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(r=>r.hostUpdate?.()),this.update(t)):this._$EM()}catch(r){throw e=!1,this._$EM(),r}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&(this._$Eq=this._$Eq.forEach(t=>this._$ET(t,this[t]))),this._$EM()}updated(e){}firstUpdated(e){}};re.elementStyles=[],re.shadowRootOptions={mode:"open"},re[Be("elementProperties")]=new Map,re[Be("finalized")]=new Map,zo?.({ReactiveElement:re}),(ce.reactiveElementVersions??(ce.reactiveElementVersions=[])).push("2.1.2");var Mo={attribute:!0,type:String,converter:Fe,reflect:!1,hasChanged:tt},No=(o=Mo,e,t)=>{let{kind:r,metadata:i}=t,n=globalThis.litPropertyMetadata.get(i);if(n===void 0&&globalThis.litPropertyMetadata.set(i,n=new Map),r==="setter"&&((o=Object.create(o)).wrapped=!0),n.set(t.name,o),r==="accessor"){let{name:a}=t;return{set(d){let c=e.get.call(this);e.set.call(this,d),this.requestUpdate(a,c,o,!0,d)},init(d){return d!==void 0&&this.C(a,void 0,o,d),d}}}if(r==="setter"){let{name:a}=t;return function(d){let c=this[a];e.call(this,d),this.requestUpdate(a,c,o,!0,d)}}throw Error("Unsupported decorator location: "+r)};function l(o){return(e,t)=>typeof t=="object"?No(o,e,t):((r,i,n)=>{let a=i.hasOwnProperty(n);return i.constructor.createProperty(n,r),a?Object.getOwnPropertyDescriptor(i,n):void 0})(o,e,t)}function k(o){return l({...o,state:!0,attribute:!1})}var Q=(o,e,t)=>(t.configurable=!0,t.enumerable=!0,Reflect.decorate&&typeof e!="object"&&Object.defineProperty(o,e,t),t);function S(o,e){return(t,r,i)=>{let n=a=>a.renderRoot?.querySelector(o)??null;if(e){let{get:a,set:d}=typeof r=="object"?t:i??(()=>{let c=Symbol();return{get(){return this[c]},set(h){this[c]=h}}})();return Q(t,r,{get(){let c=a.call(this);return c===void 0&&(c=n(this),(c!==null||this.hasUpdated)&&d.call(this,c)),c}})}return Q(t,r,{get(){return n(this)}})}}var Bo;function Or(o){return(e,t)=>Q(e,t,{get(){return(this.renderRoot??Bo??(Bo=document.createDocumentFragment())).querySelectorAll(o)}})}function N(o){return(e,t)=>{let{slot:r,selector:i}=o??{},n="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){let a=this.renderRoot?.querySelector(n),d=a?.assignedElements(o)??[];return i===void 0?d:d.filter(c=>c.matches(i))}})}}function rt(o){return(e,t)=>{let{slot:r}=o??{},i="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){return this.renderRoot?.querySelector(i)?.assignedNodes(o)??[]}})}}var qe=globalThis,Rr=o=>o,ot=qe.trustedTypes,Pr=ot?ot.createPolicy("lit-html",{createHTML:o=>o}):void 0,qt="$lit$",oe=`lit$${Math.random().toFixed(9).slice(2)}$`,Vt="?"+oe,Fo=`<${Vt}>`,_e=document,Ve=()=>_e.createComment(""),He=o=>o===null||typeof o!="object"&&typeof o!="function",Ht=Array.isArray,Br=o=>Ht(o)||typeof o?.[Symbol.iterator]=="function",Ut=`[ 	
 \f\r]`,Ue=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,Lr=/-->/g,Dr=/>/g,ye=RegExp(`>|${Ut}(?:([^\\s"'>=/]+)(${Ut}*=${Ut}*(?:[^ 	
@@ -3712,6 +3254,424 @@ if (!customElements.get("lht-page-hero")) {
 }
 if (!customElements.get("lht-page-menu")) {
   customElements.define("lht-page-menu", LhtPageMenu);
+}
+  </script>
+
+  <script>
+const promptDefinitions = [
+    {
+        id: "pr-request",
+        label: "GitHub PR 文面作成",
+        keywords: ["pr", "pull request", "pr作成依頼", "prタイトル", "pr本文", "ぶんめんさくせい", "bunmensakusei", "ぴーあーる", "ぷるりくえすと", "ぎっとはぶ"],
+        requiresCommitId: true,
+        buildBody: (commitId) => commitId
+            ? `対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文は \`\`\` で囲まれた一塊として回答してください。`
+            : ""
+    },
+    {
+        id: "release-request",
+        label: "GitHub Release 文面作成",
+        keywords: ["release", "github release", "github", "リリース", "release文面", "release本文", "りりーす", "ぶんめんさくせい", "riri-su", "bunmensakusei", "ぎっとはぶ", "りりーす"],
+        requiresCommitId: true,
+        buildBody: (commitId) => commitId
+            ? `${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown 形式で作文してください。`
+            : ""
+    },
+    {
+        id: "inline-code-request",
+        label: "Markdown インラインコードとして出力",
+        keywords: ["markdown", "inline code", "code", "インラインコード", "markdown出力", "コード形式", "いんらいんこーど", "しゅつりょく", "inrainko-do", "shutsuryoku", "まーくだうん", "こーど"],
+        requiresCommitId: false,
+        buildBody: () => "出力はインラインコード形式で markdown テキストで出力してください。回答が ``` と ``` とで囲まれるイメージです。"
+    },
+    {
+        id: "github-no-change-request",
+        label: "GitHub 変更操作の禁止",
+        keywords: ["github", "push", "pr", "comment", "変更しない", "禁止", "github操作", "へんこうそうさ", "きんし", "henkousousa", "kinshi", "ぎっとはぶ", "ぷっしゅ", "ぴーあーる", "こめんと"],
+        requiresCommitId: false,
+        buildBody: () => "GitHub 変更操作の禁止。GitHubへの push、GitHub PR の作成や PR へのコメントなど、GitHub への変更をおこなう操作は行わないでください。"
+    },
+    {
+        id: "directory-markdown-check-request",
+        label: "100: ディレクトリ内の内容を確認して把握",
+        keywords: ["readme", "markdown", "directory", "ディレクトリ", "内容確認", "md確認", "でぃれくとり", "ないようかくにん", "direkutori", "naiyoukakunin", "りーどみー", "まーくだうん", "えむでぃー"],
+        requiresCommitId: false,
+        buildBody: () => "README.md などこのディレクトリの内容をあらわす markdown の内容を確認してください。"
+    },
+    {
+        id: "conversation-handover-request",
+        label: "会話の引継テキストの生成",
+        keywords: ["handover", "conversation", "引き継ぎ", "会話", "生成ai", "別のai", "かいわ", "ひきつぎ", "てきすと", "せいせい", "kaiwa", "hikitsugi", "tekisuto", "seisei", "はんどおーばー", "こんばーせーしょん", "えーあい"],
+        requiresCommitId: false,
+        buildBody: () => "今までの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを想定したうえでなるべく詳細にそして引継先で緻密に再現できるような引き継ぎテキストを生成してください。"
+    },
+    {
+        id: "spec-discussion-request",
+        label: "仕様検討モードで進める",
+        keywords: ["spec", "specification", "仕様", "検討", "todo", "todo.md", "しよう", "けんとう", "とぅーどぅー", "shiyou", "kentou", "すぺっく"],
+        requiresCommitId: false,
+        buildBody: () => "今からの作業は仕様の検討です。実装を開始しないでください。一方で、まとまった仕様が実施事項に落としこめる場合には、TODO.mdに作業タスクとして分解して記述してください。"
+    },
+    {
+        id: "small-test-request",
+        label: "事象の再発防止テストを追加",
+        keywords: ["test", "testing", "small test", "再現テスト", "小さなテスト", "軽量テスト", "てすと", "さいげんてすと", "しょうさなてすと", "tesuto", "saigentesuto"],
+        requiresCommitId: false,
+        buildBody: () => "今回の事象が再現したときにすぐに気づくように、とても小さなシンプルなテストについて、よういに実現可能であればこれを追加して欲しいです。困難な場合は作業せずにその旨指摘してください。"
+    },
+    {
+        id: "disagreement-first-request",
+        label: "違和感や誤りを先に指摘",
+        keywords: ["disagree", "wrong", "違和感", "間違い", "指摘", "先に指摘", "いわかん", "まちがい", "してき", "iwakan", "machigai", "shiteki"],
+        requiresCommitId: false,
+        buildBody: () => "私の指示や指摘について、あなたか強い違和感を感じたり、あるいはあなたが間違っていると感じている場合には、指示を続行せずに、その違和感や間違いを回答して欲しい。"
+    },
+    {
+        id: "todo-cleanup-request",
+        label: "TODO.md の完了項目を整理",
+        keywords: ["todo", "todo.md", "cleanup", "close", "closed", "整理", "完了", "クローズ", "削除", "とぅーどぅー", "せいり", "かんりょう", "s e i r i", "kanryou"],
+        requiresCommitId: false,
+        buildBody: () => "TODO.mdのなかで、すでに対応済みで実施済みとなっているTODOがあれば、それをクローズしたり、あるいは以前にすでにクローズ済みのTODOがあればこれを削除してください。"
+    },
+    {
+        id: "completion-check-request",
+        label: "依頼内容の実施状況を確認",
+        keywords: ["done", "completed", "status", "check", "実施済み", "未実施", "確認", "じっしずみ", "みじっし", "かくにん", "jisshizumi", "mijisshi", "kakunin"],
+        requiresCommitId: false,
+        buildBody: () => "さきほどお願いした一連の依頼内容は、基本的に全て実施済みでしょうか。それともまだ未実施のものはありますでしょうか。"
+    },
+    {
+        id: "critical-review-request",
+        label: "批判的レビューを依頼",
+        keywords: ["review", "critical review", "typo", "批判的", "レビュー", "誤り", "間違い", "たいぽ", "ひはんてき", "れびゅー", "まちがい", "typo", "hibanteki", "rebyu-"],
+        requiresCommitId: false,
+        buildBody: () => "これから批判的なレビューを実施して欲しいです。誤り、間違い、TYPO、ささいなものでも批判的に指摘してください。それら批判的な指摘はこのコンテキストでは喜ばれます。"
+    },
+    {
+        id: "markdown-update-check-request",
+        label: "markdown 更新漏れの確認",
+        keywords: ["markdown", "md", "update", "doc", "docs", "更新漏れ", "未更新", "追加すべき", "まーくだうん", "みこうしん", "こうしんもれ", "markdown", "mikkoushin", "koushinmore"],
+        requiresCommitId: false,
+        buildBody: () => "実装の側に変更がおこなわれましたが、これに対応する markdown (.md) で未更新のものはありますか。あるいは新規で markdown (.md) を追加すべき変更はありましたか。"
+    },
+    {
+        id: "single-file-web-app-request",
+        label: "Single-file Web App の維持",
+        keywords: ["single-file", "single file", "web app", "html", "css", "js", "cdn", "依存なし", "単一html", "single-file web app", "しんぐるふぁいる", "しんぐるふぁいるうぇぶあぷり", "たんいつhtml", "いぞんなし"],
+        requiresCommitId: false,
+        buildBody: () => "原則として Single-file Web App であるようにしてください。ビルド後の html ファイルは、CDNや 別ファイルのcss/jsファイルを利用していないことを常に意識してください。"
+    }
+];
+  </script>
+
+  <script>
+async function initializePromptPage() {
+    if (window.customElements && window.customElements.whenDefined) {
+        await window.customElements.whenDefined("lht-text-field-help");
+    }
+    const promptSearch = document.getElementById("promptSearch");
+    const promptCandidateArea = document.getElementById("promptCandidateArea");
+    const commitInputSection = document.getElementById("commitInputSection");
+    const promptOutputSection = document.getElementById("promptOutputSection");
+    const commitIdInput = document.getElementById("commitId");
+    const includeLabelPrefix = document.getElementById("includeLabelPrefix");
+    const promptOutput = document.getElementById("promptOutput");
+    if (!promptSearch || !commitIdInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !promptOutputSection) {
+        return;
+    }
+    function applyLatinInputHints(field, enterKeyHint) {
+        field.setAttribute("inputmode", "latin");
+        field.setAttribute("autocapitalize", "off");
+        field.setAttribute("autocorrect", "off");
+        field.setAttribute("spellcheck", "false");
+        if (enterKeyHint) {
+            field.setAttribute("enterkeyhint", enterKeyHint);
+        }
+    }
+    applyLatinInputHints(promptSearch, "search");
+    applyLatinInputHints(commitIdInput, "done");
+    let selectedPrompt = "";
+    let lastSearchQuery = "";
+    const kanaToRomajiMap = new Map([
+        ["きゃ", "kya"], ["きゅ", "kyu"], ["きょ", "kyo"],
+        ["しゃ", "sha"], ["しゅ", "shu"], ["しょ", "sho"],
+        ["ちゃ", "cha"], ["ちゅ", "chu"], ["ちょ", "cho"],
+        ["にゃ", "nya"], ["にゅ", "nyu"], ["にょ", "nyo"],
+        ["ひゃ", "hya"], ["ひゅ", "hyu"], ["ひょ", "hyo"],
+        ["みゃ", "mya"], ["みゅ", "myu"], ["みょ", "myo"],
+        ["りゃ", "rya"], ["りゅ", "ryu"], ["りょ", "ryo"],
+        ["ぎゃ", "gya"], ["ぎゅ", "gyu"], ["ぎょ", "gyo"],
+        ["じゃ", "ja"], ["じゅ", "ju"], ["じょ", "jo"],
+        ["びゃ", "bya"], ["びゅ", "byu"], ["びょ", "byo"],
+        ["ぴゃ", "pya"], ["ぴゅ", "pyu"], ["ぴょ", "pyo"],
+        ["ゔぁ", "va"], ["ゔぃ", "vi"], ["ゔ", "vu"], ["ゔぇ", "ve"], ["ゔぉ", "vo"],
+        ["あ", "a"], ["い", "i"], ["う", "u"], ["え", "e"], ["お", "o"],
+        ["か", "ka"], ["き", "ki"], ["く", "ku"], ["け", "ke"], ["こ", "ko"],
+        ["さ", "sa"], ["し", "shi"], ["す", "su"], ["せ", "se"], ["そ", "so"],
+        ["た", "ta"], ["ち", "chi"], ["つ", "tsu"], ["て", "te"], ["と", "to"],
+        ["な", "na"], ["に", "ni"], ["ぬ", "nu"], ["ね", "ne"], ["の", "no"],
+        ["は", "ha"], ["ひ", "hi"], ["ふ", "fu"], ["へ", "he"], ["ほ", "ho"],
+        ["ま", "ma"], ["み", "mi"], ["む", "mu"], ["め", "me"], ["も", "mo"],
+        ["や", "ya"], ["ゆ", "yu"], ["よ", "yo"],
+        ["ら", "ra"], ["り", "ri"], ["る", "ru"], ["れ", "re"], ["ろ", "ro"],
+        ["わ", "wa"], ["を", "wo"], ["ん", "n"],
+        ["が", "ga"], ["ぎ", "gi"], ["ぐ", "gu"], ["げ", "ge"], ["ご", "go"],
+        ["ざ", "za"], ["じ", "ji"], ["ず", "zu"], ["ぜ", "ze"], ["ぞ", "zo"],
+        ["だ", "da"], ["ぢ", "ji"], ["づ", "zu"], ["で", "de"], ["ど", "do"],
+        ["ば", "ba"], ["び", "bi"], ["ぶ", "bu"], ["べ", "be"], ["ぼ", "bo"],
+        ["ぱ", "pa"], ["ぴ", "pi"], ["ぷ", "pu"], ["ぺ", "pe"], ["ぽ", "po"]
+    ]);
+    function toHiragana(text) {
+        return String(text || "").replace(/[\u30A1-\u30F6]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0x60));
+    }
+    function toKatakana(text) {
+        return String(text || "").replace(/[\u3041-\u3096]/g, (char) => String.fromCharCode(char.charCodeAt(0) + 0x60));
+    }
+    function isKanaText(text) {
+        return /^[\u3041-\u3096ー]+$/.test(text);
+    }
+    function kanaToRomaji(text) {
+        const hiragana = toHiragana(text);
+        if (!hiragana || !isKanaText(hiragana)) {
+            return "";
+        }
+        let result = "";
+        for (let index = 0; index < hiragana.length; index += 1) {
+            const current = hiragana[index];
+            const next = hiragana[index + 1] || "";
+            const pair = current + next;
+            if (current === "っ") {
+                const nextPair = hiragana.slice(index + 1, index + 3);
+                const nextRomaji = kanaToRomajiMap.get(nextPair) ||
+                    kanaToRomajiMap.get(next) ||
+                    "";
+                if (nextRomaji) {
+                    result += nextRomaji[0];
+                }
+                continue;
+            }
+            if (current === "ー") {
+                const lastChar = result[result.length - 1] || "";
+                if (/[aeiou]/.test(lastChar)) {
+                    result += lastChar;
+                }
+                continue;
+            }
+            if (kanaToRomajiMap.has(pair)) {
+                result += kanaToRomajiMap.get(pair);
+                index += 1;
+                continue;
+            }
+            if (kanaToRomajiMap.has(current)) {
+                result += kanaToRomajiMap.get(current);
+                continue;
+            }
+            return "";
+        }
+        return result;
+    }
+    function buildSearchTokens(definition) {
+        const tokens = new Set();
+        const label = (definition.label || "").toLowerCase();
+        const keywords = Array.isArray(definition.keywords) ? definition.keywords : [];
+        if (label) {
+            tokens.add(label);
+            for (const part of label.split(/\s+/).filter(Boolean)) {
+                tokens.add(part);
+                const hiraganaPart = toHiragana(part);
+                const katakanaPart = toKatakana(part);
+                if (hiraganaPart !== part) {
+                    tokens.add(hiraganaPart);
+                }
+                if (katakanaPart !== part) {
+                    tokens.add(katakanaPart);
+                }
+                const romaji = kanaToRomaji(part);
+                if (romaji) {
+                    tokens.add(romaji);
+                }
+            }
+        }
+        for (const keyword of keywords) {
+            const normalizedKeyword = String(keyword || "").toLowerCase().trim();
+            if (!normalizedKeyword) {
+                continue;
+            }
+            tokens.add(normalizedKeyword);
+            const hiraganaKeyword = toHiragana(normalizedKeyword);
+            const katakanaKeyword = toKatakana(normalizedKeyword);
+            if (hiraganaKeyword !== normalizedKeyword) {
+                tokens.add(hiraganaKeyword);
+            }
+            if (katakanaKeyword !== normalizedKeyword) {
+                tokens.add(katakanaKeyword);
+            }
+            const romajiKeyword = kanaToRomaji(normalizedKeyword);
+            if (romajiKeyword) {
+                tokens.add(romajiKeyword);
+            }
+            for (const part of normalizedKeyword.split(/\s+/).filter(Boolean)) {
+                tokens.add(part);
+                const hiraganaPart = toHiragana(part);
+                const katakanaPart = toKatakana(part);
+                if (hiraganaPart !== part) {
+                    tokens.add(hiraganaPart);
+                }
+                if (katakanaPart !== part) {
+                    tokens.add(katakanaPart);
+                }
+                const romaji = kanaToRomaji(part);
+                if (romaji) {
+                    tokens.add(romaji);
+                }
+            }
+        }
+        return Array.from(tokens);
+    }
+    function buildDisplayKeywords(definition) {
+        const tokens = new Set();
+        const label = (definition.label || "").trim();
+        const keywords = Array.isArray(definition.keywords) ? definition.keywords : [];
+        if (label) {
+            tokens.add(label);
+        }
+        for (const keyword of keywords) {
+            const normalizedKeyword = String(keyword || "").trim();
+            if (!normalizedKeyword) {
+                continue;
+            }
+            tokens.add(normalizedKeyword);
+        }
+        return Array.from(tokens);
+    }
+    function createCandidateButton(definition) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "md-chip-button";
+        button.dataset.promptId = definition.id;
+        button.addEventListener("click", () => selectPrompt(definition.id, button));
+        const label = document.createElement("span");
+        label.className = "md-chip-label";
+        label.textContent = definition.label;
+        button.appendChild(label);
+        const help = document.createElement("lht-help-tooltip");
+        help.setAttribute("label", "キーワード");
+        help.setAttribute("placement", "bottom");
+        help.innerHTML = buildDisplayKeywords(definition).join(", ");
+        help.addEventListener("click", (event) => {
+            event.stopPropagation();
+        });
+        help.addEventListener("mousedown", (event) => {
+            event.stopPropagation();
+        });
+        button.appendChild(help);
+        return button;
+    }
+    function renderCandidates() {
+        const query = (promptSearch.value || "").trim().toLowerCase();
+        const queryChanged = query !== lastSearchQuery;
+        lastSearchQuery = query;
+        promptCandidateArea.innerHTML = "";
+        if (queryChanged) {
+            selectedPrompt = "";
+            commitInputSection.classList.add("md-hidden");
+            promptOutputSection.classList.add("md-hidden");
+            commitIdInput.value = "";
+            promptOutput.textContent = "";
+        }
+        const terms = query ? query.split(/\s+/).filter(Boolean) : [];
+        const matchedDefinitions = query
+            ? promptDefinitions.filter((definition) => terms.every((term) => buildSearchTokens(definition).some((token) => token.includes(term))))
+            : promptDefinitions;
+        matchedDefinitions.sort((left, right) => {
+            if (left.label < right.label)
+                return -1;
+            if (left.label > right.label)
+                return 1;
+            return 0;
+        });
+        if (matchedDefinitions.length === 0) {
+            if (selectedPrompt) {
+                selectedPrompt = "";
+                commitInputSection.classList.add("md-hidden");
+                promptOutputSection.classList.add("md-hidden");
+                updateOutput();
+            }
+            return;
+        }
+        const hasSingleMatch = matchedDefinitions.length === 1;
+        if (hasSingleMatch && !selectedPrompt) {
+            selectedPrompt = matchedDefinitions[0].id;
+        }
+        else if (!hasSingleMatch &&
+            selectedPrompt &&
+            !matchedDefinitions.some((definition) => definition.id === selectedPrompt)) {
+            selectedPrompt = "";
+        }
+        for (const definition of matchedDefinitions) {
+            const button = createCandidateButton(definition);
+            if (hasSingleMatch && selectedPrompt === definition.id) {
+                button.classList.add("is-active");
+            }
+            promptCandidateArea.appendChild(button);
+        }
+        if (hasSingleMatch && selectedPrompt === matchedDefinitions[0].id) {
+            const selectedDefinition = matchedDefinitions[0];
+            if (selectedDefinition.requiresCommitId) {
+                commitInputSection.classList.remove("md-hidden");
+            }
+            else {
+                commitInputSection.classList.add("md-hidden");
+            }
+            promptOutputSection.classList.remove("md-hidden");
+            updateOutput();
+        }
+    }
+    function selectPrompt(id, button) {
+        selectedPrompt = id;
+        for (const element of promptCandidateArea.querySelectorAll(".md-chip-button")) {
+            element.classList.remove("is-active");
+        }
+        button.classList.add("is-active");
+        promptOutputSection.classList.remove("md-hidden");
+        const selectedDefinition = promptDefinitions.find((definition) => definition.id === id);
+        if (selectedDefinition === null || selectedDefinition === void 0 ? void 0 : selectedDefinition.requiresCommitId) {
+            commitInputSection.classList.remove("md-hidden");
+            commitIdInput.focus();
+        }
+        else {
+            commitInputSection.classList.add("md-hidden");
+        }
+        updateOutput();
+    }
+    function buildPromptText() {
+        if (!selectedPrompt) {
+            return "";
+        }
+        const selectedDefinition = promptDefinitions.find((definition) => definition.id === selectedPrompt);
+        const label = selectedDefinition ? selectedDefinition.label : "";
+        const commitId = (commitIdInput.value || "").trim();
+        const body = selectedDefinition ? selectedDefinition.buildBody(commitId) : "";
+        if (!body || !label) {
+            return "";
+        }
+        return includeLabelPrefix.checked ? `[${label}] ${body}` : body;
+    }
+    function updateOutput() {
+        const text = buildPromptText();
+        promptOutput.textContent = text;
+    }
+    promptSearch.addEventListener("input", renderCandidates);
+    commitIdInput.addEventListener("input", updateOutput);
+    includeLabelPrefix.addEventListener("change", updateOutput);
+    renderCandidates();
+    updateOutput();
+}
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializePromptPage, { once: true });
+}
+else {
+    initializePromptPage();
 }
   </script>
 </body>
