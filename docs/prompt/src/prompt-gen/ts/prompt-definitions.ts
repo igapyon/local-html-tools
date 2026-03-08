@@ -33,6 +33,13 @@ const promptDefinitions: PromptDefinition[] = [
     buildBody: () => "出力はインラインコード形式で markdown テキストで出力してください。回答が ``` と ``` とで囲まれるイメージです。"
   },
   {
+    id: "extract-to-inline-code-request",
+    label: "351: 添付ファイル等の抽出結果をインラインコードで出力",
+    keywords: ["extract", "attachment", "text", "inline code", "markdown", "抽出", "添付ファイル", "テキスト", "インラインコード", "出力", "ちゅうしゅつ", "てんぷふぁいる", "てきすと", "しゅつりょく"],
+    requiresCommitId: false,
+    buildBody: () => "添付ファイルから、あるいは与えるテキストから 情報を抽出して、インラインコードの markdown テキストに出力してください。"
+  },
+  {
     id: "github-no-change-request",
     label: "503: GitHub 変更操作の禁止",
     keywords: ["github", "push", "pr", "comment", "変更", "操作", "変更しない", "禁止", "github操作", "へんこうそうさ", "きんし", "henkousousa", "kinshi", "ぎっとはぶ", "ぷっしゅ", "ぴーあーる", "こめんと"],
@@ -51,7 +58,7 @@ const promptDefinitions: PromptDefinition[] = [
     label: "301: 会話の引継テキストの生成",
     keywords: ["handover", "conversation", "引き継ぎ", "引継", "会話", "テキスト", "生成", "生成ai", "別のai", "かいわ", "ひきつぎ", "てきすと", "せいせい", "kaiwa", "hikitsugi", "tekisuto", "seisei", "はんどおーばー", "こんばーせーしょん", "えーあい"],
     requiresCommitId: false,
-    buildBody: () => "今までの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを想定したうえでなるべく詳細にそして引継先で緻密に再現できるような引き継ぎテキストを生成してください。"
+    buildBody: () => "今までの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを想定したうえでなるべく詳細にそして引継先で緻密に再現できるような引き継ぎテキストを markdown 形式で生成してください。"
   },
   {
     id: "spec-discussion-request",
@@ -135,6 +142,6 @@ const promptDefinitions: PromptDefinition[] = [
     label: "701: Single-file Web App の維持",
     keywords: ["single-file", "single file", "web app", "html", "css", "js", "cdn", "維持", "依存なし", "単一html", "single-file web app", "しんぐるふぁいる", "しんぐるふぁいるうぇぶあぷり", "たんいつhtml", "いぞんなし"],
     requiresCommitId: false,
-    buildBody: () => "原則として Single-file Web App であるようにしてください。ビルド後の html ファイルは、CDNや 別ファイルのcss/jsファイルを利用していないことを常に意識してください。"
+    buildBody: () => "このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDNや 別ファイルのcss/jsファイルを利用していないことを確認してください。"
   }
 ];
