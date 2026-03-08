@@ -3376,6 +3376,13 @@ const promptDefinitions = [
         buildBody: () => "ビルドは実施済みでしょうか？もし未実施であれば、完全なビルドを実施して欲しいです。"
     },
     {
+        id: "session-close-request",
+        label: "706: 作業終了時の引継確認",
+        keywords: ["session close", "wrap up", "handover", "todo", "todo.md", "作業終了", "終了", "引継", "伝達事項", "再開", "復帰", "さぎょうしゅうりょう", "しゅうりょう", "ひきつぎ", "でんたつじこう", "さいかい", "ふっき"],
+        requiresCommitId: false,
+        buildBody: () => "今回の作業はここまで。終わりにします。なお、次回に再開する時にスムーズに復帰できるように何か伝達事項はあるだろうか。もしそのようなものがあるのであれば、TODO.mdに 必要な情報を記入してもらえませんか。そして必要があれば、直近の作業出ないを実施したのかを実施済み引き継ぎ事項として TODO.md に記載して欲しいです。"
+    },
+    {
         id: "single-file-web-app-request",
         label: "701: Single-file Web App の維持",
         keywords: ["single-file", "single file", "web app", "html", "css", "js", "cdn", "維持", "依存なし", "単一html", "single-file web app", "しんぐるふぁいる", "しんぐるふぁいるうぇぶあぷり", "たんいつhtml", "いぞんなし"],
