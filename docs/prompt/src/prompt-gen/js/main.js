@@ -200,6 +200,18 @@ async function initializePromptPage() {
         button.appendChild(help);
         return button;
     }
+    function revealOutputSection(options) {
+        promptOutputSection.classList.remove("md-hidden");
+        if (!(options === null || options === void 0 ? void 0 : options.scrollIntoView)) {
+            return;
+        }
+        requestAnimationFrame(() => {
+            promptOutputSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        });
+    }
     function renderCandidates() {
         const query = (promptSearch.value || "").trim().toLowerCase();
         const queryChanged = query !== lastSearchQuery;
@@ -256,7 +268,9 @@ async function initializePromptPage() {
             else {
                 commitInputSection.classList.add("md-hidden");
             }
-            promptOutputSection.classList.remove("md-hidden");
+            revealOutputSection({
+                scrollIntoView: queryChanged && query.length > 0
+            });
             updateOutput();
         }
     }
@@ -266,7 +280,7 @@ async function initializePromptPage() {
             element.classList.remove("is-active");
         }
         button.classList.add("is-active");
-        promptOutputSection.classList.remove("md-hidden");
+        revealOutputSection({ scrollIntoView: true });
         const selectedDefinition = promptDefinitions.find((definition) => definition.id === id);
         if (selectedDefinition === null || selectedDefinition === void 0 ? void 0 : selectedDefinition.requiresCommitId) {
             commitInputSection.classList.remove("md-hidden");
