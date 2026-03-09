@@ -201,7 +201,7 @@ describe("prompt-gen main", () => {
     expect(activeButtons[0].querySelector(".md-chip-label").textContent).toContain("310: 直近の作業状況を確認");
   });
 
-  it("toggles X/S/P visibility in the menu and persists to localStorage", async () => {
+  it("toggles A/X/S/P visibility in the menu and persists to localStorage", async () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
@@ -209,18 +209,19 @@ describe("prompt-gen main", () => {
     const checkboxes = [...menuPanel.querySelectorAll("input[type='checkbox']")];
     const resetButton = menuPanel.querySelector(".md-menu-settings__reset");
 
-    expect(checkboxes).toHaveLength(3);
+    expect(checkboxes).toHaveLength(4);
 
-    promptSearch.value = "X701";
+    promptSearch.value = "A701";
     promptSearch.dispatchEvent(new Event("input"));
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
 
-    const xCheckbox = checkboxes[0];
-    xCheckbox.checked = false;
-    xCheckbox.dispatchEvent(new Event("change"));
+    const aCheckbox = checkboxes[0];
+    aCheckbox.checked = false;
+    aCheckbox.dispatchEvent(new Event("change"));
 
     expect(JSON.parse(window.localStorage.getItem("promptGenSeriesVisibility"))).toMatchObject({
-      showX: false,
+      showA: false,
+      showX: true,
       showS: true,
       showP: true
     });
