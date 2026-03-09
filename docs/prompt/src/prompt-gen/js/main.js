@@ -37,13 +37,15 @@ async function initializePromptPage() {
     const promptSearch = document.getElementById("promptSearch");
     const promptCandidateArea = document.getElementById("promptCandidateArea");
     const commitInputSection = document.getElementById("commitInputSection");
+    const subjectInputSection = document.getElementById("subjectInputSection");
     const promptOutputSection = document.getElementById("promptOutputSection");
     const promptOutputTitle = document.getElementById("promptOutputTitle");
     const promptOutputHelp = document.getElementById("promptOutputHelp");
     const commitIdInput = document.getElementById("commitId");
+    const subjectInput = document.getElementById("subjectInput");
     const includeLabelPrefix = document.getElementById("includeLabelPrefix");
     const promptOutput = document.getElementById("promptOutput");
-    if (!promptSearch || !commitIdInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+    if (!promptSearch || !commitIdInput || !subjectInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !subjectInputSection || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
         return;
     }
     function loadSeriesVisibilitySettings() {
@@ -107,6 +109,33 @@ async function initializePromptPage() {
     }
     applyLatinInputHints(promptSearch, "search");
     applyLatinInputHints(commitIdInput, "done");
+    const MAX_EMBED_INPUT_LENGTH = 1024;
+    function sanitizePromptVariableInput(value) {
+        const normalizedWhitespace = String(value || "")
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, " ")
+            .replace(/[\u200B-\u200D\u2060\uFEFF]/g, " ");
+        const trimmedValue = normalizedWhitespace.trim();
+        if (!trimmedValue) {
+            return "";
+        }
+        const truncatedValue = trimmedValue.slice(0, MAX_EMBED_INPUT_LENGTH);
+        const normalizedQuotes = truncatedValue.replace(/`/g, "'");
+        return `\`${normalizedQuotes}\``;
+    }
+    function syncInputSections(selectedDefinition) {
+        if (selectedDefinition === null || selectedDefinition === void 0 ? void 0 : selectedDefinition.requiresCommitId) {
+            commitInputSection.classList.remove("md-hidden");
+        }
+        else {
+            commitInputSection.classList.add("md-hidden");
+        }
+        if (selectedDefinition === null || selectedDefinition === void 0 ? void 0 : selectedDefinition.requiresSubject) {
+            subjectInputSection.classList.remove("md-hidden");
+        }
+        else {
+            subjectInputSection.classList.add("md-hidden");
+        }
+    }
     let selectedPrompt = "";
     let lastSearchQuery = "";
     const kanaToRomajiMap = new Map([
@@ -480,9 +509,10 @@ async function initializePromptPage() {
         promptCandidateArea.innerHTML = "";
         if (queryChanged) {
             selectedPrompt = "";
-            commitInputSection.classList.add("md-hidden");
+            syncInputSections(null);
             promptOutputSection.classList.add("md-hidden");
             commitIdInput.value = "";
+            subjectInput.value = "";
             promptOutput.textContent = "";
         }
         const { matchedDefinitions, prioritizedSingleDefinition } = searchPromptDefinitions(query, promptSearchIndexes, promptSearchIndexById);
@@ -512,10 +542,13 @@ async function initializePromptPage() {
         if (prioritizedSingleDefinition && selectedPrompt === prioritizedSingleDefinition.id) {
             const selectedDefinition = prioritizedSingleDefinition;
             if (selectedDefinition.requiresCommitId) {
-                commitInputSection.classList.remove("md-hidden");
+                syncInputSections(selectedDefinition);
+            }
+            else if (selectedDefinition.requiresSubject) {
+                syncInputSections(selectedDefinition);
             }
             else {
-                commitInputSection.classList.add("md-hidden");
+                syncInputSections(selectedDefinition);
             }
             revealOutputSection({
                 scrollIntoView: queryChanged && query.length > 0
@@ -531,15 +564,15 @@ async function initializePromptPage() {
         button.classList.add("is-active");
         revealOutputSection({ scrollIntoView: true });
         const selectedDefinition = visiblePromptDefinitions.find((definition) => definition.id === id);
+        syncInputSections(selectedDefinition || null);
         if (selectedDefinition === null || selectedDefinition === void 0 ? void 0 : selectedDefinition.requiresCommitId) {
-            commitInputSection.classList.remove("md-hidden");
             commitIdInput.focus();
         }
-        else {
-            commitInputSection.classList.add("md-hidden");
+        else if (selectedDefinition === null || selectedDefinition === void 0 ? void 0 : selectedDefinition.requiresSubject) {
+            subjectInput.focus();
         }
         updateOutput();
-        if ((options === null || options === void 0 ? void 0 : options.autoCopy) && selectedDefinition && !selectedDefinition.requiresCommitId) {
+        if ((options === null || options === void 0 ? void 0 : options.autoCopy) && selectedDefinition && !selectedDefinition.requiresCommitId && !selectedDefinition.requiresSubject) {
             await copyText(promptOutput.textContent || "");
         }
     }
@@ -549,8 +582,9 @@ async function initializePromptPage() {
             return "";
         }
         const label = selectedDefinition ? selectedDefinition.label : "";
-        const commitId = (commitIdInput.value || "").trim();
-        const body = selectedDefinition ? selectedDefinition.buildBody(commitId) : "";
+        const commitId = sanitizePromptVariableInput(commitIdInput.value || "");
+        const subject = sanitizePromptVariableInput(subjectInput.value || "");
+        const body = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
         if (!body || !label) {
             return "";
         }
@@ -628,6 +662,7 @@ async function initializePromptPage() {
     }
     promptSearch.addEventListener("input", renderCandidates);
     commitIdInput.addEventListener("input", updateOutput);
+    subjectInput.addEventListener("input", updateOutput);
     includeLabelPrefix.addEventListener("change", updateOutput);
     createSeriesVisibilityMenu();
     renderCandidates();

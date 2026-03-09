@@ -65,11 +65,13 @@ function mountPromptDom() {
     <input id="promptSearch" />
     <div id="promptCandidateArea"></div>
     <div id="commitInputSection" class="md-hidden"></div>
+    <div id="subjectInputSection" class="md-hidden"></div>
     <div id="promptOutputSection" class="md-hidden">
       <p id="promptOutputTitle">生成結果</p>
       <div id="promptOutputHelp"></div>
     </div>
     <input id="commitId" />
+    <input id="subjectInput" />
     <input id="includeLabelPrefix" type="checkbox" />
     <div id="promptOutput"></div>
   `;
@@ -93,6 +95,16 @@ function ensureLocalStorageMock() {
         backingStore.clear();
       }
     }
+  });
+}
+
+function setRawInputValue(element, value) {
+  Object.defineProperty(element, "value", {
+    configurable: true,
+    get() {
+      return value;
+    },
+    set() {}
   });
 }
 
@@ -135,7 +147,7 @@ describe("prompt-gen main", () => {
     commitId.value = "abc1234";
     commitId.dispatchEvent(new Event("input"));
 
-    expect(promptOutput.textContent).toContain("対象コミット abc1234 における変更内容について");
+    expect(promptOutput.textContent).toContain("対象コミット `abc1234` における変更内容について");
     expect(promptOutput.textContent).toContain("PRタイトルとPR本文");
   });
 
@@ -162,6 +174,100 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toBe(
       "[A701: Single-file Web App の維持] このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
     );
+  });
+
+  it("generates Washi Collage Whisper after subject input", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const subjectInput = document.getElementById("subjectInput");
+    const subjectInputSection = document.getElementById("subjectInputSection");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "A852";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
+    expect(subjectInputSection.classList.contains("md-hidden")).toBe(false);
+    expect(promptOutput.textContent).toBe("");
+
+    subjectInput.value = "a small fox";
+    subjectInput.dispatchEvent(new Event("input"));
+
+    expect(promptOutput.textContent).toContain("A simplified cute illustration of `a small fox`");
+    expect(promptOutput.textContent).toContain("Washi Collage Whisper");
+  });
+
+  it("sanitizes commit id by replacing backticks and truncating before embedding", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const commitId = document.getElementById("commitId");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "A501";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    commitId.value = `ab\`cd${"x".repeat(1100)}`;
+    commitId.dispatchEvent(new Event("input"));
+
+    const embeddedCommitIdMatch = promptOutput.textContent.match(/対象コミット (`[^`]*`) における変更内容/);
+    expect(embeddedCommitIdMatch).not.toBeNull();
+    expect(embeddedCommitIdMatch[1].startsWith("`ab'cd")).toBe(true);
+    expect(embeddedCommitIdMatch[1]).not.toContain("`cd");
+    expect(embeddedCommitIdMatch[1].length).toBe(1026);
+  });
+
+  it("sanitizes subject by replacing backticks and truncating before embedding", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const subjectInput = document.getElementById("subjectInput");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "A852";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    subjectInput.value = `small \`fox\`${"y".repeat(1100)}`;
+    subjectInput.dispatchEvent(new Event("input"));
+
+    const embeddedSubjectMatch = promptOutput.textContent.match(/A simplified cute illustration of (`[^`]*`), created by assembling/);
+    expect(embeddedSubjectMatch).not.toBeNull();
+    expect(embeddedSubjectMatch[1].startsWith("`small 'fox'")).toBe(true);
+    expect(embeddedSubjectMatch[1]).not.toContain("`fox");
+    expect(embeddedSubjectMatch[1].length).toBe(1026);
+  });
+
+  it("sanitizes commit id by converting control and invisible characters to spaces", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const commitId = document.getElementById("commitId");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "A501";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    setRawInputValue(commitId, "ab\tcd\nef\u0000gh\u200Biz");
+    commitId.dispatchEvent(new Event("input"));
+
+    expect(promptOutput.textContent).toContain("対象コミット `ab cd ef gh iz` における変更内容について");
+  });
+
+  it("sanitizes subject by converting control and invisible characters to spaces", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const subjectInput = document.getElementById("subjectInput");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "A852";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    setRawInputValue(subjectInput, "small\tfox\nwith\u200Bhat");
+    subjectInput.dispatchEvent(new Event("input"));
+
+    expect(promptOutput.textContent).toContain("A simplified cute illustration of `small fox with hat`");
   });
 
   it("clears selected state and generated output when search query changes", async () => {

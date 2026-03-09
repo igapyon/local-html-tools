@@ -633,6 +633,24 @@ Material Web ベースの開発なのですが、カスタムな Web Components�
 \`\`\``
     },
     {
+        id: "washi-collage-whisper-request",
+        label: "852: 和紙切絵作品",
+        keywords: ["washi collage whisper", "washi collage", "torn paper collage", "paper collage", "kozo paper", "handmade paper", "cute illustration", "image prompt", "illustration prompt", "和紙", "和紙コラージュ", "ちぎり絵", "手漉き和紙", "楮紙", "かわいいイラスト", "画像生成", "画像プロンプト", "いらすと", "わし", "ちぎりえ", "てすきわし"],
+        requiresCommitId: false,
+        requiresSubject: true,
+        buildBody: (_commitId, subject) => {
+            const normalizedSubject = String(subject || "").trim();
+            if (!normalizedSubject) {
+                return "";
+            }
+            return `# Washi Collage Whisper v20250501a
+
+A simplified cute illustration of ${normalizedSubject}, created by assembling a minimal number of large torn pieces of rich, muted pastel-colored handmade hand-scooped kozo paper (traditional Japanese mulberry paper). Each piece is separated by bold, rough torn edges with thick, visible, randomly oriented white fibers. The edges are soft, fuzzy, and deeply frayed, showing natural irregularities. Fibers vary in thickness-from very fine to slightly coarse-and in density and direction, creating an organic, handcrafted feel; some areas display extra-frayed, protruding fibers. Fiber color subtly shifts from pure white to off-white and warm beige.
+The paper pieces are tinted in deep, smoky pastel tones-darker and thicker than ordinary pastels-avoiding vivid hues yet holding enough chroma to stay vibrant and prevent washed-out effects against the translucent handmade paper.
+The overall texture is soft and fibrous, with bleeding fiber patterns radiating irregularly from the torn edges. Rendered in a flat 2-D style inspired by traditional Japanese torn-paper collage art, it features expansive colour fields, natural irregular edges, a warm and friendly mood, a simple unobtrusive background, and absolutely no strong shadows or dramatic lighting.`;
+        }
+    },
+    {
         id: "chat-partner-mikuku-request",
         label: "801: 会話相手: みくく",
         keywords: ["character", "persona", "chat partner", "roleplay", "mikuku", "みくく", "会話相手", "キャラクター", "話法", "口調", "初音ミク", "涼宮ハルヒ", "朝比奈みくる", "会話", "きゃらくたー", "かいわあいて", "かいわ", "わほう", "こうちょう", "はつねみく", "すずみやはるひ", "あさひなみくる"],
