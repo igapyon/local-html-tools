@@ -112,6 +112,34 @@ const aiSuggestPromptDefinitions = [
         buildBody: () => `現在の会話や決定事項について、どの話題や判断がどの前提や別の決定に依存しているかを Mermaid で記述してください。時系列よりも依存関係を重視し、後続の判断が何を前提にしているかが分かるように整理してください。`
     },
     {
+        id: "ai-suggest-mermaid-timeline-request",
+        label: "S603-501: Mermaid timeline で図解化(AI提案)",
+        keywords: ["S603-501", "mermaid timeline", "timeline diagram", "時系列図", "タイムライン化", "Mermaid timeline", "図解化", "じけいれつず", "たいむらいんか"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容を、まず時系列が読みやすい通常テキストとして整理し、そのあとに Mermaid timeline を出力してください。出来事、判断、変更点、節目が時系列で追えるようにし、日付や順序が不明確な箇所は推定せず不明と明示してください。`
+    },
+    {
+        id: "ai-suggest-mermaid-flowchart-request",
+        label: "S603-502: Mermaid flowchart で図解化(AI提案)",
+        keywords: ["S603-502", "mermaid flowchart", "flowchart", "フローチャート化", "手順図", "分岐図", "Mermaid flowchart", "図解化", "ふろーちゃーとか", "てじゅんず"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容を、まず手順や分岐が分かる通常テキストとして整理し、そのあとに Mermaid flowchart を出力してください。開始点、主要ステップ、分岐条件、終了条件が追えるようにし、処理順と判断分岐を混同しないように整理してください。`
+    },
+    {
+        id: "ai-suggest-mermaid-mindmap-request",
+        label: "S603-503: Mermaid mindmap で図解化(AI提案)",
+        keywords: ["S603-503", "mermaid mindmap", "mindmap", "マインドマップ化", "論点展開", "放射状整理", "Mermaid mindmap", "図解化", "まいんどまっぷか", "ろんてんてんかい"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容を、まず中心テーマと主要論点が分かる通常テキストとして整理し、そのあとに Mermaid mindmap を出力してください。中心テーマ、第1階層、第2階層の関係が自然に追えるようにし、細部を広げすぎずに主要な論点構造が見えるようにまとめてください。`
+    },
+    {
+        id: "ai-suggest-mermaid-concept-map-request",
+        label: "S603-504: Mermaid 風の概念マップとして図解化(AI提案)",
+        keywords: ["S603-504", "concept map", "mermaid concept map", "概念マップ化", "概念関係図", "relationship map", "Mermaid graph", "図解化", "がいねんまっぷか", "がいねんかんけいず"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容を、まず主要概念とその関係が分かる通常テキストとして整理し、そのあとに Mermaid flowchart または graph 記法で概念マップとして表現してください。中心概念、周辺概念、関係ラベルが分かるようにし、因果、依存、包含、対立などの関係を必要に応じて明示してください。`
+    },
+    {
         id: "ai-suggest-dot-causal-request",
         label: "S604-001: 現在の会話の因果関係を Graphviz DOT で記述(AI提案)",
         keywords: ["S604-001", "graphviz causal", "causal graph", "cause effect", "dot graph", "因果関係", "Graphviz", "DOT", "原因結果", "いんがかんけい", "げんいんけっか"],

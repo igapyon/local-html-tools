@@ -72,11 +72,13 @@ async function initializePromptPage() {
   const promptCandidateArea = document.getElementById("promptCandidateArea") as HTMLDivElement | null;
   const commitInputSection = document.getElementById("commitInputSection") as HTMLElement | null;
   const promptOutputSection = document.getElementById("promptOutputSection") as HTMLElement | null;
+  const promptOutputTitle = document.getElementById("promptOutputTitle") as HTMLElement | null;
+  const promptOutputHelp = document.getElementById("promptOutputHelp") as HTMLDivElement | null;
   const commitIdInput = document.getElementById("commitId") as HTMLInputElement | null;
   const includeLabelPrefix = document.getElementById("includeLabelPrefix") as HTMLInputElement | null;
   const promptOutput = document.getElementById("promptOutput") as HTMLElement | null;
 
-  if (!promptSearch || !commitIdInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !promptOutputSection) {
+  if (!promptSearch || !commitIdInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
     return;
   }
 
@@ -516,19 +518,32 @@ async function initializePromptPage() {
     label.textContent = definition.label;
     button.appendChild(label);
 
+    return button;
+  }
+
+  function getSelectedPromptDefinition() {
+    if (!selectedPrompt) {
+      return null;
+    }
+    return visiblePromptDefinitions.find((definition) => definition.id === selectedPrompt) || null;
+  }
+
+  function renderSelectedPromptHelp() {
+    const selectedDefinition = getSelectedPromptDefinition();
+    promptOutputHelp.innerHTML = "";
+
+    if (!selectedDefinition) {
+      promptOutputTitle.textContent = "生成結果";
+      return;
+    }
+
+    promptOutputTitle.textContent = selectedDefinition.label;
+
     const help = document.createElement("lht-help-tooltip");
     help.setAttribute("label", "キーワード");
-    help.setAttribute("placement", "bottom");
-    help.innerHTML = buildDisplayKeywords(definition).join(", ");
-    help.addEventListener("click", (event) => {
-      event.stopPropagation();
-    });
-    help.addEventListener("mousedown", (event) => {
-      event.stopPropagation();
-    });
-    button.appendChild(help);
-
-    return button;
+    help.setAttribute("placement", "right");
+    help.innerHTML = buildDisplayKeywords(selectedDefinition).join(", ");
+    promptOutputHelp.appendChild(help);
   }
 
   function revealOutputSection(options?: { scrollIntoView?: boolean }) {
@@ -660,10 +675,10 @@ async function initializePromptPage() {
   }
 
   function buildPromptText() {
-    if (!selectedPrompt) {
+    const selectedDefinition = getSelectedPromptDefinition();
+    if (!selectedDefinition) {
       return "";
     }
-    const selectedDefinition = visiblePromptDefinitions.find((definition) => definition.id === selectedPrompt);
     const label = selectedDefinition ? selectedDefinition.label : "";
     const commitId = (commitIdInput.value || "").trim();
     const body = selectedDefinition ? selectedDefinition.buildBody(commitId) : "";
@@ -676,6 +691,7 @@ async function initializePromptPage() {
   }
 
   function updateOutput() {
+    renderSelectedPromptHelp();
     const text = buildPromptText();
     promptOutput.textContent = text;
   }

@@ -38,10 +38,12 @@ async function initializePromptPage() {
     const promptCandidateArea = document.getElementById("promptCandidateArea");
     const commitInputSection = document.getElementById("commitInputSection");
     const promptOutputSection = document.getElementById("promptOutputSection");
+    const promptOutputTitle = document.getElementById("promptOutputTitle");
+    const promptOutputHelp = document.getElementById("promptOutputHelp");
     const commitIdInput = document.getElementById("commitId");
     const includeLabelPrefix = document.getElementById("includeLabelPrefix");
     const promptOutput = document.getElementById("promptOutput");
-    if (!promptSearch || !commitIdInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !promptOutputSection) {
+    if (!promptSearch || !commitIdInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
         return;
     }
     function loadSeriesVisibilitySettings() {
@@ -406,18 +408,27 @@ async function initializePromptPage() {
         label.className = "md-chip-label";
         label.textContent = definition.label;
         button.appendChild(label);
+        return button;
+    }
+    function getSelectedPromptDefinition() {
+        if (!selectedPrompt) {
+            return null;
+        }
+        return visiblePromptDefinitions.find((definition) => definition.id === selectedPrompt) || null;
+    }
+    function renderSelectedPromptHelp() {
+        const selectedDefinition = getSelectedPromptDefinition();
+        promptOutputHelp.innerHTML = "";
+        if (!selectedDefinition) {
+            promptOutputTitle.textContent = "生成結果";
+            return;
+        }
+        promptOutputTitle.textContent = selectedDefinition.label;
         const help = document.createElement("lht-help-tooltip");
         help.setAttribute("label", "キーワード");
-        help.setAttribute("placement", "bottom");
-        help.innerHTML = buildDisplayKeywords(definition).join(", ");
-        help.addEventListener("click", (event) => {
-            event.stopPropagation();
-        });
-        help.addEventListener("mousedown", (event) => {
-            event.stopPropagation();
-        });
-        button.appendChild(help);
-        return button;
+        help.setAttribute("placement", "right");
+        help.innerHTML = buildDisplayKeywords(selectedDefinition).join(", ");
+        promptOutputHelp.appendChild(help);
     }
     function revealOutputSection(options) {
         promptOutputSection.classList.remove("md-hidden");
@@ -533,10 +544,10 @@ async function initializePromptPage() {
         }
     }
     function buildPromptText() {
-        if (!selectedPrompt) {
+        const selectedDefinition = getSelectedPromptDefinition();
+        if (!selectedDefinition) {
             return "";
         }
-        const selectedDefinition = visiblePromptDefinitions.find((definition) => definition.id === selectedPrompt);
         const label = selectedDefinition ? selectedDefinition.label : "";
         const commitId = (commitIdInput.value || "").trim();
         const body = selectedDefinition ? selectedDefinition.buildBody(commitId) : "";
@@ -546,6 +557,7 @@ async function initializePromptPage() {
         return includeLabelPrefix.checked ? `[${label}] ${body}` : body;
     }
     function updateOutput() {
+        renderSelectedPromptHelp();
         const text = buildPromptText();
         promptOutput.textContent = text;
     }
