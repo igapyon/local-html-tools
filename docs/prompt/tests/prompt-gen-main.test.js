@@ -89,14 +89,14 @@ describe("prompt-gen main", () => {
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
     expect(commitInputSection.classList.contains("md-hidden")).toBe(true);
     expect(promptOutput.textContent).toBe(
-      "このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDNや 別ファイルのcss/jsファイルを利用していないことを確認してください。"
+      "このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
     );
 
     includeLabelPrefix.checked = true;
     includeLabelPrefix.dispatchEvent(new Event("change"));
 
     expect(promptOutput.textContent).toBe(
-      "[701: Single-file Web App の維持] このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDNや 別ファイルのcss/jsファイルを利用していないことを確認してください。"
+      "[701: Single-file Web App の維持] このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
     );
   });
 
