@@ -14,9 +14,11 @@ async function initializePromptPage() {
     }
     function applyLatinInputHints(field, enterKeyHint) {
         field.setAttribute("inputmode", "latin");
+        field.setAttribute("lang", "en");
         field.setAttribute("autocapitalize", "off");
         field.setAttribute("autocorrect", "off");
         field.setAttribute("spellcheck", "false");
+        field.style.imeMode = "inactive";
         if (enterKeyHint) {
             field.setAttribute("enterkeyhint", enterKeyHint);
         }
@@ -156,25 +158,38 @@ async function initializePromptPage() {
         }
         return Array.from(tokens);
     }
-    function buildExpandedTokens(definition) {
+    function buildExpandedTokensFromBaseTokens(labelTokens, keywordTokens) {
         const tokens = new Set();
-        for (const token of buildLabelTokens(definition)) {
+        for (const token of labelTokens) {
             for (const expanded of buildExpandedForms(token)) {
                 tokens.add(expanded);
             }
         }
-        for (const token of buildKeywordTokens(definition)) {
+        for (const token of keywordTokens) {
             for (const expanded of buildExpandedForms(token)) {
                 tokens.add(expanded);
             }
         }
-        for (const token of buildLabelTokens(definition)) {
+        for (const token of labelTokens) {
             tokens.delete(token);
         }
-        for (const token of buildKeywordTokens(definition)) {
+        for (const token of keywordTokens) {
             tokens.delete(token);
         }
         return Array.from(tokens);
+    }
+    function buildExpandedTokens(definition) {
+        return buildExpandedTokensFromBaseTokens(buildLabelTokens(definition), buildKeywordTokens(definition));
+    }
+    function buildSearchIndex(definition) {
+        const labelTokens = buildLabelTokens(definition);
+        const keywordTokens = buildKeywordTokens(definition);
+        return {
+            definition,
+            labelTokens,
+            keywordTokens,
+            expandedTokens: buildExpandedTokensFromBaseTokens(labelTokens, keywordTokens)
+        };
     }
     function matchesAllTerms(tokens, terms) {
         if (terms.length === 0) {
@@ -239,6 +254,44 @@ async function initializePromptPage() {
         }
         return merged;
     }
+    function searchPromptDefinitions(query, searchIndexes, searchIndexById) {
+        const terms = query ? query.split(/\s+/).filter(Boolean) : [];
+        const labelMatches = query
+            ? sortDefinitions(searchIndexes
+                .filter((searchIndex) => matchesAllTerms(searchIndex.labelTokens, terms))
+                .map((searchIndex) => searchIndex.definition))
+            : sortDefinitions(searchIndexes.map((searchIndex) => searchIndex.definition));
+        const keywordMatches = query
+            ? sortDefinitionsByScore(searchIndexes
+                .filter((searchIndex) => matchesAllTerms(searchIndex.keywordTokens, terms))
+                .map((searchIndex) => searchIndex.definition), terms, (definition) => {
+                const searchIndex = searchIndexById.get(definition.id);
+                return searchIndex ? searchIndex.keywordTokens : [];
+            })
+            : [];
+        const expandedMatches = query
+            ? sortDefinitionsByScore(searchIndexes
+                .filter((searchIndex) => matchesAllTerms(searchIndex.expandedTokens, terms))
+                .map((searchIndex) => searchIndex.definition), terms, (definition) => {
+                const searchIndex = searchIndexById.get(definition.id);
+                return searchIndex ? searchIndex.expandedTokens : [];
+            })
+            : [];
+        const matchedDefinitions = query
+            ? mergeDefinitionGroups([labelMatches, keywordMatches, expandedMatches])
+            : labelMatches;
+        const prioritizedSingleDefinition = labelMatches.length === 1
+            ? labelMatches[0]
+            : labelMatches.length === 0 && keywordMatches.length === 1
+                ? keywordMatches[0]
+                : labelMatches.length === 0 && keywordMatches.length === 0 && expandedMatches.length === 1
+                    ? expandedMatches[0]
+                    : null;
+        return {
+            matchedDefinitions,
+            prioritizedSingleDefinition
+        };
+    }
     function buildDisplayKeywords(definition) {
         const tokens = new Set();
         const label = (definition.label || "").trim();
@@ -255,6 +308,8 @@ async function initializePromptPage() {
         }
         return Array.from(tokens);
     }
+    const promptSearchIndexes = promptDefinitions.map(buildSearchIndex);
+    const promptSearchIndexById = new Map(promptSearchIndexes.map((searchIndex) => [searchIndex.definition.id, searchIndex]));
     function createCandidateButton(definition) {
         const button = document.createElement("button");
         button.type = "button";
@@ -335,19 +390,7 @@ async function initializePromptPage() {
             commitIdInput.value = "";
             promptOutput.textContent = "";
         }
-        const terms = query ? query.split(/\s+/).filter(Boolean) : [];
-        const labelMatches = query
-            ? sortDefinitions(promptDefinitions.filter((definition) => matchesAllTerms(buildLabelTokens(definition), terms)))
-            : sortDefinitions(promptDefinitions);
-        const keywordMatches = query
-            ? sortDefinitionsByScore(promptDefinitions.filter((definition) => matchesAllTerms(buildKeywordTokens(definition), terms)), terms, buildKeywordTokens)
-            : [];
-        const expandedMatches = query
-            ? sortDefinitionsByScore(promptDefinitions.filter((definition) => matchesAllTerms(buildExpandedTokens(definition), terms)), terms, buildExpandedTokens)
-            : [];
-        const matchedDefinitions = query
-            ? mergeDefinitionGroups([labelMatches, keywordMatches, expandedMatches])
-            : labelMatches;
+        const { matchedDefinitions, prioritizedSingleDefinition } = searchPromptDefinitions(query, promptSearchIndexes, promptSearchIndexById);
         if (matchedDefinitions.length === 0) {
             if (selectedPrompt) {
                 selectedPrompt = "";
@@ -357,13 +400,6 @@ async function initializePromptPage() {
             }
             return;
         }
-        const prioritizedSingleDefinition = labelMatches.length === 1
-            ? labelMatches[0]
-            : labelMatches.length === 0 && keywordMatches.length === 1
-                ? keywordMatches[0]
-                : labelMatches.length === 0 && keywordMatches.length === 0 && expandedMatches.length === 1
-                    ? expandedMatches[0]
-                    : null;
         if (prioritizedSingleDefinition) {
             selectedPrompt = prioritizedSingleDefinition.id;
         }
@@ -434,6 +470,9 @@ async function initializePromptPage() {
     includeLabelPrefix.addEventListener("change", updateOutput);
     renderCandidates();
     updateOutput();
+    requestAnimationFrame(() => {
+        promptSearch.focus();
+    });
 }
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initializePromptPage, { once: true });
