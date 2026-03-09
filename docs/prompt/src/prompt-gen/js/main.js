@@ -1,6 +1,7 @@
 async function initializePromptPage() {
     const SERIES_VISIBILITY_STORAGE_KEY = "promptGenSeriesVisibility";
     const defaultSeriesVisibilitySettings = {
+        showA: true,
         showX: true,
         showS: true,
         showP: true
@@ -55,6 +56,7 @@ async function initializePromptPage() {
             }
             const parsed = JSON.parse(raw);
             return {
+                showA: (parsed === null || parsed === void 0 ? void 0 : parsed.showA) !== false,
                 showX: (parsed === null || parsed === void 0 ? void 0 : parsed.showX) !== false,
                 showS: (parsed === null || parsed === void 0 ? void 0 : parsed.showS) !== false,
                 showP: (parsed === null || parsed === void 0 ? void 0 : parsed.showP) !== false
@@ -81,7 +83,7 @@ async function initializePromptPage() {
     let seriesVisibilitySettings = loadSeriesVisibilitySettings();
     function getVisiblePromptDefinitions() {
         return [
-            ...basePromptDefinitions,
+            ...(seriesVisibilitySettings.showA ? basePromptDefinitions : []),
             ...(seriesVisibilitySettings.showX ? expansionDefinitions : []),
             ...(seriesVisibilitySettings.showS ? suggestDefinitions : []),
             ...(seriesVisibilitySettings.showP ? popularDefinitions : [])
@@ -563,6 +565,7 @@ async function initializePromptPage() {
         section.appendChild(title);
         menuPanel.appendChild(section);
         const seriesOptions = [
+            { key: "showA", label: "A系列を表示", switchId: "menuShowASeries" },
             { key: "showX", label: "X系列を表示", switchId: "menuShowXSeries" },
             { key: "showS", label: "S系列を表示", switchId: "menuShowSSeries" },
             { key: "showP", label: "P系列を表示", switchId: "menuShowPSeries" }

@@ -72,7 +72,7 @@
 - 候補ボタンの文言や本文追加は `prompt-definitions.ts` を編集して反映する
 - 各定義は `id / label / keywords / requiresCommitId / buildBody()` を持つ
 - `main.ts` は検索、選択状態、入力欄表示、生成結果更新、スクロール制御を担当する
-- ハンバーガーメニューから `X / S / P` 系列の表示有無を切り替えられ、その設定は `localStorage` に保存される
+- ハンバーガーメニューから `A / X / S / P` 系列の表示有無を切り替えられ、その設定は `localStorage` に保存される
 - 検索は空欄で全候補表示、空白区切りで AND、各語の照合先は label / keywords / かな・カナ・ローマ字展開を含む
 
 ## 検索とキーワード
