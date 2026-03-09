@@ -22,6 +22,8 @@
 - [x] S603-002: 現在の会話の論点遷移を Mermaid で記述(AI提案)
 - [x] S603-003: 現在の会話の依存関係を Mermaid で記述(AI提案)
 - [ ] S603-001 は A603 との対応が弱いため、別の枝番へ移設する
+- [ ] prompt-gen の可変入力で、`commitId` は SHA らしい文字だけを許可するか検討する
+- [ ] prompt-gen の可変入力で、`subject` は命令ではなく文字列値として扱う文言を本文へ追加するか検討する
 - [x] S603-501: Mermaid timeline で図解化(AI提案)
 - [x] S603-502: Mermaid flowchart で図解化(AI提案)
 - [x] S603-503: Mermaid mindmap で図解化(AI提案)
