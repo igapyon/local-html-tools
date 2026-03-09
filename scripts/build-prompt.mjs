@@ -11,6 +11,9 @@ const TARGETS = [
     outHtml: "docs/prompt/prompt-gen.html",
     tsOrder: [
       "src/prompt-gen/ts/prompt-definitions.ts",
+      "src/prompt-gen/ts/prompt-definitions-ai-expansion.ts",
+      "src/prompt-gen/ts/prompt-definitions-ai-suggest.ts",
+      "src/prompt-gen/ts/prompt-definitions-popular.ts",
       "src/prompt-gen/ts/main.ts"
     ]
   }

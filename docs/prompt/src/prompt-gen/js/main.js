@@ -1,4 +1,35 @@
 async function initializePromptPage() {
+    const SERIES_VISIBILITY_STORAGE_KEY = "promptGenSeriesVisibility";
+    const defaultSeriesVisibilitySettings = {
+        showX: true,
+        showS: true,
+        showP: true
+    };
+    function decorateBasePromptDefinition(definition) {
+        const label = String(definition.label || "");
+        const labelMatch = label.match(/^(\d{3}):(.*)$/);
+        if (!labelMatch) {
+            return definition;
+        }
+        const labelCode = labelMatch[1];
+        const labelSuffix = labelMatch[2] || "";
+        const prefixedCode = `A${labelCode}`;
+        const prefixedLabel = `${prefixedCode}:${labelSuffix}`;
+        const nextKeywords = Array.isArray(definition.keywords) ? [...definition.keywords] : [];
+        if (!nextKeywords.includes(prefixedCode)) {
+            nextKeywords.unshift(prefixedCode);
+        }
+        return {
+            ...definition,
+            id: definition.id.startsWith("a-") ? definition.id : `a-${definition.id}`,
+            label: prefixedLabel,
+            keywords: nextKeywords
+        };
+    }
+    const basePromptDefinitions = promptDefinitions.map(decorateBasePromptDefinition);
+    const expansionDefinitions = Array.isArray(aiExpansionPromptDefinitions) ? aiExpansionPromptDefinitions : [];
+    const suggestDefinitions = Array.isArray(aiSuggestPromptDefinitions) ? aiSuggestPromptDefinitions : [];
+    const popularDefinitions = Array.isArray(popularPromptDefinitions) ? popularPromptDefinitions : [];
     if (window.customElements && window.customElements.whenDefined) {
         await window.customElements.whenDefined("lht-text-field-help");
     }
@@ -12,6 +43,53 @@ async function initializePromptPage() {
     if (!promptSearch || !commitIdInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !promptOutputSection) {
         return;
     }
+    function loadSeriesVisibilitySettings() {
+        try {
+            const storage = window.localStorage;
+            if (!storage || typeof storage.getItem !== "function") {
+                return { ...defaultSeriesVisibilitySettings };
+            }
+            const raw = storage.getItem(SERIES_VISIBILITY_STORAGE_KEY);
+            if (!raw) {
+                return { ...defaultSeriesVisibilitySettings };
+            }
+            const parsed = JSON.parse(raw);
+            return {
+                showX: (parsed === null || parsed === void 0 ? void 0 : parsed.showX) !== false,
+                showS: (parsed === null || parsed === void 0 ? void 0 : parsed.showS) !== false,
+                showP: (parsed === null || parsed === void 0 ? void 0 : parsed.showP) !== false
+            };
+        }
+        catch (_error) {
+            return { ...defaultSeriesVisibilitySettings };
+        }
+    }
+    function saveSeriesVisibilitySettings(settings) {
+        const storage = window.localStorage;
+        if (!storage || typeof storage.setItem !== "function") {
+            return;
+        }
+        storage.setItem(SERIES_VISIBILITY_STORAGE_KEY, JSON.stringify(settings));
+    }
+    function clearSeriesVisibilitySettings() {
+        const storage = window.localStorage;
+        if (!storage || typeof storage.removeItem !== "function") {
+            return;
+        }
+        storage.removeItem(SERIES_VISIBILITY_STORAGE_KEY);
+    }
+    let seriesVisibilitySettings = loadSeriesVisibilitySettings();
+    function getVisiblePromptDefinitions() {
+        return [
+            ...basePromptDefinitions,
+            ...(seriesVisibilitySettings.showX ? expansionDefinitions : []),
+            ...(seriesVisibilitySettings.showS ? suggestDefinitions : []),
+            ...(seriesVisibilitySettings.showP ? popularDefinitions : [])
+        ];
+    }
+    let visiblePromptDefinitions = [];
+    let promptSearchIndexes = [];
+    let promptSearchIndexById = new Map();
     function applyLatinInputHints(field, enterKeyHint) {
         field.setAttribute("inputmode", "latin");
         field.setAttribute("lang", "en");
@@ -308,8 +386,12 @@ async function initializePromptPage() {
         }
         return Array.from(tokens);
     }
-    const promptSearchIndexes = promptDefinitions.map(buildSearchIndex);
-    const promptSearchIndexById = new Map(promptSearchIndexes.map((searchIndex) => [searchIndex.definition.id, searchIndex]));
+    function rebuildVisiblePromptIndexes() {
+        visiblePromptDefinitions = getVisiblePromptDefinitions();
+        promptSearchIndexes = visiblePromptDefinitions.map(buildSearchIndex);
+        promptSearchIndexById = new Map(promptSearchIndexes.map((searchIndex) => [searchIndex.definition.id, searchIndex]));
+    }
+    rebuildVisiblePromptIndexes();
     function createCandidateButton(definition) {
         const button = document.createElement("button");
         button.type = "button";
@@ -435,7 +517,7 @@ async function initializePromptPage() {
         }
         button.classList.add("is-active");
         revealOutputSection({ scrollIntoView: true });
-        const selectedDefinition = promptDefinitions.find((definition) => definition.id === id);
+        const selectedDefinition = visiblePromptDefinitions.find((definition) => definition.id === id);
         if (selectedDefinition === null || selectedDefinition === void 0 ? void 0 : selectedDefinition.requiresCommitId) {
             commitInputSection.classList.remove("md-hidden");
             commitIdInput.focus();
@@ -452,7 +534,7 @@ async function initializePromptPage() {
         if (!selectedPrompt) {
             return "";
         }
-        const selectedDefinition = promptDefinitions.find((definition) => definition.id === selectedPrompt);
+        const selectedDefinition = visiblePromptDefinitions.find((definition) => definition.id === selectedPrompt);
         const label = selectedDefinition ? selectedDefinition.label : "";
         const commitId = (commitIdInput.value || "").trim();
         const body = selectedDefinition ? selectedDefinition.buildBody(commitId) : "";
@@ -465,9 +547,74 @@ async function initializePromptPage() {
         const text = buildPromptText();
         promptOutput.textContent = text;
     }
+    function createSeriesVisibilityMenu() {
+        const menuPanel = document.querySelector("lht-page-menu .md-menu-panel");
+        if (!menuPanel) {
+            return;
+        }
+        const separator = document.createElement("div");
+        separator.className = "md-menu-separator";
+        menuPanel.appendChild(separator);
+        const section = document.createElement("div");
+        section.className = "md-menu-settings";
+        const title = document.createElement("p");
+        title.className = "md-menu-settings__title";
+        title.textContent = "系列表示設定";
+        section.appendChild(title);
+        menuPanel.appendChild(section);
+        const seriesOptions = [
+            { key: "showX", label: "X系列を表示", switchId: "menuShowXSeries" },
+            { key: "showS", label: "S系列を表示", switchId: "menuShowSSeries" },
+            { key: "showP", label: "P系列を表示", switchId: "menuShowPSeries" }
+        ];
+        for (const option of seriesOptions) {
+            const switchHelp = document.createElement("lht-switch-help");
+            switchHelp.className = "md-menu-settings__switch";
+            switchHelp.setAttribute("switch-id", option.switchId);
+            switchHelp.setAttribute("label", option.label);
+            if (seriesVisibilitySettings[option.key]) {
+                switchHelp.setAttribute("checked", "");
+            }
+            section.appendChild(switchHelp);
+            const checkbox = switchHelp.querySelector("input, md-switch") ||
+                document.getElementById(option.switchId);
+            if (!checkbox) {
+                continue;
+            }
+            checkbox.addEventListener("change", () => {
+                seriesVisibilitySettings = {
+                    ...seriesVisibilitySettings,
+                    [option.key]: checkbox.checked
+                };
+                saveSeriesVisibilitySettings(seriesVisibilitySettings);
+                rebuildVisiblePromptIndexes();
+                renderCandidates();
+                updateOutput();
+            });
+        }
+        const resetButton = document.createElement("button");
+        resetButton.type = "button";
+        resetButton.className = "md-menu-settings__reset";
+        resetButton.innerHTML = '<svg viewBox="0 0 24 24" class="md-menu-settings__reset-icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#md-icon-trash" xlink:href="#md-icon-trash"></use></svg><span>設定を初期化</span>';
+        resetButton.addEventListener("click", () => {
+            clearSeriesVisibilitySettings();
+            seriesVisibilitySettings = { ...defaultSeriesVisibilitySettings };
+            for (const option of seriesOptions) {
+                const input = document.getElementById(option.switchId);
+                if (input) {
+                    input.checked = seriesVisibilitySettings[option.key];
+                }
+            }
+            rebuildVisiblePromptIndexes();
+            renderCandidates();
+            updateOutput();
+        });
+        section.appendChild(resetButton);
+    }
     promptSearch.addEventListener("input", renderCandidates);
     commitIdInput.addEventListener("input", updateOutput);
     includeLabelPrefix.addEventListener("change", updateOutput);
+    createSeriesVisibilityMenu();
     renderCandidates();
     updateOutput();
     requestAnimationFrame(() => {

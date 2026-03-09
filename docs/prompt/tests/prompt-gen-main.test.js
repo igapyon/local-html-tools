@@ -13,6 +13,18 @@ const promptDefinitionsCode = readFileSync(
   path.resolve(__dirname, "../src/prompt-gen/js/prompt-definitions.js"),
   "utf8"
 );
+const promptDefinitionsAiExpansionCode = readFileSync(
+  path.resolve(__dirname, "../src/prompt-gen/js/prompt-definitions-ai-expansion.js"),
+  "utf8"
+);
+const promptDefinitionsAiSuggestCode = readFileSync(
+  path.resolve(__dirname, "../src/prompt-gen/js/prompt-definitions-ai-suggest.js"),
+  "utf8"
+);
+const promptDefinitionsPopularCode = readFileSync(
+  path.resolve(__dirname, "../src/prompt-gen/js/prompt-definitions-popular.js"),
+  "utf8"
+);
 const mainCode = readFileSync(
   path.resolve(__dirname, "../src/prompt-gen/js/main.js"),
   "utf8"
@@ -20,12 +32,36 @@ const mainCode = readFileSync(
 
 function defineElementIfNeeded(tagName) {
   if (!customElements.get(tagName)) {
+    if (tagName === "lht-switch-help") {
+      customElements.define(tagName, class extends HTMLElement {
+        connectedCallback() {
+          if (this.dataset.initialized === "true") return;
+          this.dataset.initialized = "true";
+          const switchId = (this.getAttribute("switch-id") || "").trim();
+          const labelText = (this.getAttribute("label") || "").trim();
+          const isChecked = this.hasAttribute("checked");
+          this.textContent = "";
+          const label = document.createElement("label");
+          const input = document.createElement("input");
+          input.type = "checkbox";
+          input.id = switchId;
+          input.checked = isChecked;
+          const span = document.createElement("span");
+          span.textContent = labelText;
+          label.appendChild(input);
+          label.appendChild(span);
+          this.appendChild(label);
+        }
+      });
+      return;
+    }
     customElements.define(tagName, class extends HTMLElement {});
   }
 }
 
 function mountPromptDom() {
   document.body.innerHTML = `
+    <lht-page-menu><div class="md-menu-panel"></div></lht-page-menu>
     <input id="promptSearch" />
     <div id="promptCandidateArea"></div>
     <div id="commitInputSection" class="md-hidden"></div>
@@ -36,12 +72,36 @@ function mountPromptDom() {
   `;
 }
 
+function ensureLocalStorageMock() {
+  const backingStore = new Map();
+  Object.defineProperty(window, "localStorage", {
+    configurable: true,
+    value: {
+      getItem(key) {
+        return backingStore.has(key) ? backingStore.get(key) : null;
+      },
+      setItem(key, value) {
+        backingStore.set(String(key), String(value));
+      },
+      removeItem(key) {
+        backingStore.delete(String(key));
+      },
+      clear() {
+        backingStore.clear();
+      }
+    }
+  });
+}
+
 async function bootPromptPage() {
   defineElementIfNeeded("lht-text-field-help");
+  defineElementIfNeeded("lht-switch-help");
+  ensureLocalStorageMock();
+  window.localStorage.clear();
   mountPromptDom();
   const promptOutputSection = document.getElementById("promptOutputSection");
   promptOutputSection.scrollIntoView = () => {};
-  new Function(`${promptDefinitionsCode}\n${mainCode}`)();
+  new Function(`${promptDefinitionsCode}\n${promptDefinitionsAiExpansionCode}\n${promptDefinitionsAiSuggestCode}\n${promptDefinitionsPopularCode}\n${mainCode}`)();
   document.dispatchEvent(new Event("DOMContentLoaded"));
   await Promise.resolve();
   await Promise.resolve();
@@ -57,7 +117,7 @@ describe("prompt-gen main", () => {
     const promptOutputSection = document.getElementById("promptOutputSection");
     const promptOutput = document.getElementById("promptOutput");
 
-    promptSearch.value = "pull request";
+    promptSearch.value = "A501";
     promptSearch.dispatchEvent(new Event("input"));
 
     const buttons = [...document.querySelectorAll(".md-chip-button")];
@@ -83,7 +143,7 @@ describe("prompt-gen main", () => {
     const commitInputSection = document.getElementById("commitInputSection");
     const promptOutput = document.getElementById("promptOutput");
 
-    promptSearch.value = "single-file web app";
+    promptSearch.value = "A701";
     promptSearch.dispatchEvent(new Event("input"));
 
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
@@ -96,7 +156,7 @@ describe("prompt-gen main", () => {
     includeLabelPrefix.dispatchEvent(new Event("change"));
 
     expect(promptOutput.textContent).toBe(
-      "[701: Single-file Web App の維持] このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
+      "[A701: Single-file Web App の維持] このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
     );
   });
 
@@ -109,13 +169,13 @@ describe("prompt-gen main", () => {
     const commitInputSection = document.getElementById("commitInputSection");
     const promptOutputSection = document.getElementById("promptOutputSection");
 
-    promptSearch.value = "pull request";
+    promptSearch.value = "A501";
     promptSearch.dispatchEvent(new Event("input"));
     commitId.value = "abc1234";
     commitId.dispatchEvent(new Event("input"));
     expect(promptOutput.textContent).toContain("abc1234");
 
-    promptSearch.value = "spec";
+    promptSearch.value = "A703";
     promptSearch.dispatchEvent(new Event("input"));
 
     expect(commitId.value).toBe("");
@@ -139,5 +199,36 @@ describe("prompt-gen main", () => {
     const activeButtons = buttons.filter((button) => button.classList.contains("is-active"));
     expect(activeButtons).toHaveLength(1);
     expect(activeButtons[0].querySelector(".md-chip-label").textContent).toContain("310: 直近の作業状況を確認");
+  });
+
+  it("toggles X/S/P visibility in the menu and persists to localStorage", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const menuPanel = document.querySelector("lht-page-menu .md-menu-panel");
+    const checkboxes = [...menuPanel.querySelectorAll("input[type='checkbox']")];
+    const resetButton = menuPanel.querySelector(".md-menu-settings__reset");
+
+    expect(checkboxes).toHaveLength(3);
+
+    promptSearch.value = "X701";
+    promptSearch.dispatchEvent(new Event("input"));
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
+
+    const xCheckbox = checkboxes[0];
+    xCheckbox.checked = false;
+    xCheckbox.dispatchEvent(new Event("change"));
+
+    expect(JSON.parse(window.localStorage.getItem("promptGenSeriesVisibility"))).toMatchObject({
+      showX: false,
+      showS: true,
+      showP: true
+    });
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(0);
+
+    resetButton.dispatchEvent(new Event("click"));
+
+    expect(window.localStorage.getItem("promptGenSeriesVisibility")).toBe(null);
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
   });
 });

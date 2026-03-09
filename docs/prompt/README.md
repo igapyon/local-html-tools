@@ -9,6 +9,10 @@
 - [ルートREADME](../../README.md)
 - [LHT共通部品README](../../lht-cmn/README.md)
 - [prompt-gen 検索とキーワード設計](./prompt-gen-search-and-keywords.md)
+- [prompt-definitions-ai-expansion の役割](./prompt-definitions-ai-expansion.md)
+- [prompt-definitions-ai-suggest の役割](./prompt-definitions-ai-suggest.md)
+- [prompt-definitions-popular の役割](./prompt-definitions-popular.md)
+- [docs/prompt TODO](./TODO.md)
 
 ## 対象ファイル
 
@@ -18,12 +22,33 @@
   - `docs/prompt/prompt-gen-src.html`
   - `docs/prompt/src/prompt-gen/css/app.css`
   - `docs/prompt/src/prompt-gen/ts/prompt-definitions.ts`
+  - `docs/prompt/src/prompt-gen/ts/prompt-definitions-ai-expansion.ts`
+  - `docs/prompt/src/prompt-gen/ts/prompt-definitions-ai-suggest.ts`
+  - `docs/prompt/src/prompt-gen/ts/prompt-definitions-popular.ts`
   - `docs/prompt/src/prompt-gen/ts/main.ts`
 - テスト:
   - `docs/prompt/tests/prompt-gen-main.test.js`
 
 `prompt-gen.html` は直接編集せず、編集元を更新してビルドで反映します。
 候補ボタンの追加・変更・削除は `docs/prompt/src/prompt-gen/ts/prompt-definitions.ts` を変更対象とし、`prompt-gen.html` や生成済み `js` を直接編集しません。
+
+`docs/prompt/src/prompt-gen/ts/prompt-definitions-ai-expansion.ts` には、既存 `prompt-definitions.ts` の延長上にある新規候補を生成AI視点で展開した `X` 系列を配置します。これらは UI 上では他の候補と同列に検索・表示されますが、定義ファイルは既存系列と分離して管理します。
+
+`docs/prompt/src/prompt-gen/ts/prompt-definitions-ai-suggest.ts` には、既存系列の流れから自然に追加されそうな新規候補を生成AI視点で提案する `S` 系列を配置します。これらも UI 上では他の候補と同列に検索・表示されますが、既存系列や `X` 系列とは分離して管理します。
+
+`docs/prompt/src/prompt-gen/ts/prompt-definitions-popular.ts` には、世間で広く使われている定番プロンプトを整理した `P` 系列を配置します。これらも UI 上では他の候補と同列に検索・表示されますが、自分の実務正本である `A` 系列とは分けて管理します。
+
+### 系列の考え方
+
+- `A` 系列:
+  - 既存の基本系列です。人間にとって自然で簡潔な依頼文を中心に構成します。
+- `X` 系列:
+  - `A` 系列と目的感を大きく変えずに、生成AIが誤解しにくいように精密化した系列です。
+- `S` 系列:
+  - 既存系列の流れから自然に追加されそうな新規候補を、生成AI視点で提案する系列です。
+  - 既存 `A` 系列のどこから派生した提案かを示したい場合は、`S101-001` のような枝番形式を用います。
+- `P` 系列:
+  - 世間で広く使われている、普及度の高い定番プロンプトを整理する系列です。
 
 ## ビルド
 
@@ -47,6 +72,7 @@
 - 候補ボタンの文言や本文追加は `prompt-definitions.ts` を編集して反映する
 - 各定義は `id / label / keywords / requiresCommitId / buildBody()` を持つ
 - `main.ts` は検索、選択状態、入力欄表示、生成結果更新、スクロール制御を担当する
+- ハンバーガーメニューから `X / S / P` 系列の表示有無を切り替えられ、その設定は `localStorage` に保存される
 - 検索は空欄で全候補表示、空白区切りで AND、各語の照合先は label / keywords / かな・カナ・ローマ字展開を含む
 
 ## 検索とキーワード

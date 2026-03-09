@@ -1241,6 +1241,56 @@ md-icon-button.md-copy-button--surface {
   display: none;
 }
 
+.md-menu-separator {
+  height: 1px;
+  margin: 4px 0;
+  background: #ece6f4;
+}
+
+.md-menu-settings {
+  padding: 8px 14px 12px;
+  min-width: 220px;
+}
+
+.md-menu-settings__title {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #544863;
+}
+
+.md-menu-settings__switch {
+  display: block;
+}
+
+.md-menu-settings__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  appearance: none;
+  border: 1px solid #d8d1e3;
+  border-radius: 999px;
+  background: #f7f2fa;
+  color: #4a4458;
+  padding: 0.38rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.md-menu-settings__reset:hover {
+  background: #efe7f8;
+  border-color: #cfc3e3;
+  color: #352f41;
+}
+
+.md-menu-settings__reset-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
 @media (max-width: 720px) {
   body.md-page {
     padding: 14px;
@@ -1271,6 +1321,13 @@ md-icon-button.md-copy-button--surface {
       <symbol id="md-icon-copy" viewBox="0 0 24 24">
         <rect x="9" y="9" width="11" height="11" rx="2"/>
         <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-trash" viewBox="0 0 24 24">
+        <path d="M3 6h18"/>
+        <path d="M8 6V4h8v2"/>
+        <path d="M6 6l1 14h10l1-14"/>
+        <path d="M10 10v6"/>
+        <path d="M14 10v6"/>
       </symbol>
     </defs>
   </svg>
@@ -1330,6 +1387,9 @@ md-icon-button.md-copy-button--surface {
 
     <lht-toast id="toast"></lht-toast>
   </div>
+  
+  
+  
   
   
   <script>
@@ -4169,7 +4229,7 @@ End of prompt.`
     },
     {
         id: "dump-prompt-request",
-        label: "901: DumpPrompt",
+        label: "601: DumpPrompt",
         keywords: ["dump prompt", "dump", "prompt dump", "session dump", "jsonl", "mermaid", "readme", "markdown", "conversation log", "引継", "会話ダンプ", "セッションダンプ", "ログ出力", "ひきつぎ", "せっしょんだんぷ", "かいわだんぷ", "ろぐしゅつりょく", "まーめいど", "りーどみー", "まーくだうん", "だんぷぷろんぷと"],
         requiresCommitId: false,
         buildBody: () => `# DumpPrompt v20250701b
@@ -4243,7 +4303,7 @@ sequenceDiagram
     },
     {
         id: "full-dump-prompt-request",
-        label: "902: FullDumpPrompt",
+        label: "602: FullDumpPrompt",
         keywords: ["full dump prompt", "full dump", "complete dump", "jsonl", "full jsonl", "conversation log", "引継", "完全ダンプ", "完全jsonl", "会話ログ", "セッションログ", "ひきつぎ", "ふるだんぷ", "かんぜんだんぷ", "かんぜんじぇいそんえる", "かいわろぐ", "せっしょんろぐ"],
         requiresCommitId: false,
         buildBody: () => `# FullDumpPrompt v20250705b
@@ -4276,14 +4336,14 @@ and preceded by the suggested filename as a heading:
     },
     {
         id: "mermaid-current-conversation-request",
-        label: "903: 現在の会話を Mermaid で記述",
+        label: "603: 現在の会話を Mermaid で記述",
         keywords: ["mermaid", "sequence diagram", "diagram", "conversation", "current conversation", "会話", "現在の会話", "図", "記述", "まーめいど", "しーけんすだいあぐらむ", "かいわ", "げんざいのかいわ", "ず", "きじゅつ"],
         requiresCommitId: false,
         buildBody: () => "いまこのセッションで扱っている内容について、流れや関係が分かるように Mermaid 記法で整理して回答してください。必要に応じて適切な図の種類を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。"
     },
     {
         id: "graphviz-current-conversation-request",
-        label: "904: 現在の会話を Graphviz DOT で記述",
+        label: "604: 現在の会話を Graphviz DOT で記述",
         keywords: ["graphviz", "dot", "graphviz dot", "diagram", "graph", "conversation", "current conversation", "会話", "現在の会話", "図", "記述", "ぐらふびず", "どっと", "かいわ", "げんざいのかいわ", "ず", "きじゅつ"],
         requiresCommitId: false,
         buildBody: () => "いまこのセッションで扱っている内容について、流れや関係が分かるように Graphviz DOT 記法で整理して回答してください。必要に応じて適切なグラフ構造を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。"
@@ -4914,6 +4974,218 @@ product.name.trim();
 - 過剰変更になっていないか`
     },
     {
+        id: "reuse-evaluation-request",
+        label: "323: 他プロジェクト資産の転用可否判断",
+        keywords: ["reuse evaluation", "reuse", "adopt", "port", "import", "migration", "reference implementation", "reuse decision", "他プロジェクト", "転用", "流用", "活用", "移植", "取り込み", "採用", "不採用", "概念だけ", "単位", "依存関係", "整合性", "保守責任", "たんい", "てんよう", "りゅうよう", "いしょく", "とりこみ", "さいよう", "ふさいよう", "いぞんかんけい", "せいごうせい", "ほしゅせきにん"],
+        requiresCommitId: false,
+        buildBody: () => `# 他プロジェクト資産の転用に関する共通認識
+
+この作業では、他のプロジェクトから受け取ったソースコード、設計、UI、ロジック、モジュール、テスト、あるいは実装方針について、自分のプロジェクトへ活用可能かどうかを判断します。
+
+ここでいう「転用」とは、単にコードをそのままコピーすることだけを意味しません。  
+一部実装の移植、構造の参考、責務分割の参考、概念や設計方針の採用なども含みます。
+
+この作業の目的は、似ているものを安易に持ち込むことではありません。  
+目的は、他プロジェクトの資産を適切に見極め、自分のプロジェクトにとって本当に有益な形で活用することです。
+
+---
+
+# 目的
+
+目的は、既存資産を使って開発効率や品質を高めることです。  
+ただし、そのために自分のプロジェクトの構造や保守性を悪化させてはなりません。
+
+この作業では、次のような判断ができることを目指します。
+
+- そのまま転用できるか
+- 一部を調整すれば転用できるか
+- 実装は使えないが概念や設計だけ活用できるか
+- 相性が悪く、転用しないほうがよいか
+- どの単位で取り込むのが適切か
+- 取り込んだ後に保守可能か
+
+転用はそれ自体が目的ではありません。  
+保守性、理解しやすさ、整合性、内部品質を損なわずに価値を取り込むための手段として行います。
+
+---
+
+# 基本方針
+
+## 1. 見た目の類似ではなく、前提・責務・依存関係を見ます
+
+コードや UI が似て見えても、それだけで転用可能とは判断しません。  
+注目すべきは、その実装がどのような責務を持ち、どのような依存関係や前提条件のもとで成立しているかです。
+
+たとえば、関数ひとつに見えても、実際には周辺のデータ構造、状態管理、命名規約、共通ユーティリティ、UI フレームワークに強く依存している場合があります。  
+そのようなものは、単独で切り出しても成立しない可能性があります。
+
+## 2. 「何を転用したいのか」を先に明確にします
+
+転用可否を判断する前に、まず転用対象を明確にしてください。
+
+- コードそのものを使いたいのか
+- UI の見せ方を使いたいのか
+- ロジックを使いたいのか
+- モジュール分割の考え方を使いたいのか
+- データ構造や状態管理の方式を使いたいのか
+- テストの考え方を使いたいのか
+
+ここが曖昧なままでは、転用可否の判断も曖昧になります。
+
+## 3. 「どの単位で取り込むか」を重視します
+
+転用では、何を取り込むかと同じくらい、どの単位で取り込むかが重要です。  
+関数単位、モジュール単位、コンポーネント単位、画面単位、ライブラリ単位、あるいは概念だけの採用など、取り込み単位によって難易度も副作用も大きく変わります。
+
+小さければよいとは限りません。  
+小さすぎる単位では前提が欠けて成立しないことがありますし、大きすぎる単位では自分のプロジェクトへ異物を持ち込みすぎることがあります。
+
+目指すべきは、最小単位ではなく、自立していて説明可能な単位です。
+
+## 4. 自プロジェクトとの整合性を優先します
+
+転用元の実装が優れていても、自分のプロジェクトの責務分割、依存関係、命名規約、UI 方針、テスト方針と強く衝突する場合は、そのまま取り込むべきではありません。
+
+その場合は、実装そのものではなく、設計上の考え方や責務の切り方だけを参考にするほうがよいことがあります。
+
+## 5. 転用後の保守責任を持てるかを確認します
+
+一時的に動くことだけでは不十分です。  
+取り込んだ後に、自分たちがそのコードや構造を理解し、変更し、テストし、保守できるかを確認してください。
+
+保守責任を持てないものは、たとえ今すぐ使えそうでも、長期的には負債になりやすいです。
+
+## 6. 安易な取り込みを避け、必要なら不採用を選びます
+
+他プロジェクトの資産が使えそうに見えても、相性が悪い場合や、自プロジェクトの構造を壊す場合は、無理に取り込まないでください。  
+「使えそうだから使う」ではなく、「取り込んだあとも健全でいられるか」で判断してください。
+
+---
+
+# 転用可否を判断すべき観点
+
+次のような観点で判断してください。
+
+- 転用対象は何か
+- その資産の責務は何か
+- 入出力境界は明確か
+- どの依存関係に支えられているか
+- 自分のプロジェクトの構造と整合するか
+- どの単位で取り込むのが自然か
+- 一部だけ切り出しても成立するか
+- 保守責任を持てるか
+- ライセンスや利用条件に問題はないか
+- そのまま転用、調整して転用、概念のみ活用、不採用のどれが妥当か
+
+---
+
+# 転用してはいけないパターン
+
+次のような転用は避けます。
+
+- 見た目が似ているだけで、そのまま取り込む
+- 前提条件や依存関係を確認せずに切り出す
+- 自プロジェクトの流儀と整合しないまま持ち込む
+- 保守できないコードを一時しのぎで取り込む
+- 転用単位が不適切で、周辺前提なしでは成立しない断片を持ち込む
+- 自分の構造を改善するのではなく、異質な構造を追加して散らかす
+- 「概念だけ借りればよい」場面で、実装まで無理にコピーする
+
+---
+
+# 判断のための具体例
+
+## 例1: そのまま転用しやすいケース
+
+ある pure function が、明確な入力と出力だけで成立しており、外部依存もない場合、その関数は比較的そのまま転用しやすいです。
+
+\`\`\`javascript
+const normalized = normalizeBranchName(input);
+\`\`\`
+
+このような関数は、責務が明確で、自立していて、周辺前提に依存しにくいため、関数単位での転用候補になります。
+
+## 例2: 一部だけ切り出すと危険なケース
+
+ある UI コンポーネントが、一見独立しているように見えても、実際には共通状態管理、独自イベント、CSS 変数、共通ヘルパーに依存している場合があります。
+
+そのようなものは、コンポーネント単体ではなく、関連する責務全体を含めて見ないと転用可否を判断できません。
+
+## 例3: 実装ではなく概念だけ活用するケース
+
+他プロジェクトのモジュール分割や責務分離の考え方が優れていても、そのままの実装は自プロジェクトに合わないことがあります。
+
+このような場合は、コードをコピーするのではなく、
+
+- どこで責務を切っているか
+- どこを pure にしているか
+- どこで I/O 境界を作っているか
+
+といった設計上の考え方だけを採用するのが適切です。
+
+## 例4: 不採用が正しいケース
+
+依存しているフレームワーク、状態管理方式、命名規約、ビルド前提が自プロジェクトと大きく異なる場合、その資産は一見有用でも、取り込むことで構造が不揃いになります。
+
+このような場合は、無理に転用せず、不採用と判断することが正しいです。
+
+---
+
+# 実際の作業時の指示
+
+他プロジェクト資産の転用可否を検討する際は、次の順で判断します。
+
+1. まず、何を転用したいのかを明確にします  
+2. 次に、その資産の責務、依存関係、前提条件を整理します  
+3. 自プロジェクトとの整合性を確認します  
+4. どの単位で取り込むのが自然かを判断します  
+5. そのまま転用、調整して転用、概念のみ活用、不採用のどれが妥当かを判断します  
+6. 転用後に保守できるかを確認します  
+7. 自プロジェクトの構造を悪化させないと判断できる場合のみ採用します  
+
+---
+
+# 出力時の期待
+
+提案・生成・レビューを行う際は、単に「使えそう」「使えなさそう」と結論だけを書くのではなく、次の観点を説明してください。
+
+- 何を転用対象として見ているのか
+- それはどの責務を持つものか
+- どの前提や依存関係に支えられているのか
+- どの単位で取り込むのが妥当か
+- なぜその単位が適切だと判断したのか
+- 自プロジェクトとの整合性はどうか
+- そのまま転用、調整して転用、概念のみ活用、不採用のどれが妥当か
+- 不採用や概念のみ活用のほうがよい候補がある場合、その理由
+
+---
+
+この文章を前提として、他プロジェクトから受け取った資産の転用可否と転用単位を判断します。
+
+---
+
+# 他プロジェクト資産の転用可否判断（実行版）
+
+他プロジェクトから受け取ったソースコードや設計について、次を前提に判断します。
+
+- 見た目の類似ではなく、責務・依存関係・前提条件を見ます
+- まず何を転用したいのかを明確にします
+- どの単位で取り込むのが自然かを重視します
+- 自プロジェクトとの整合性を優先します
+- 保守責任を持てるものだけを採用します
+- そのまま転用、調整して転用、概念のみ活用、不採用を区別して判断します
+- 相性が悪いものは無理に取り込まず、不採用を選びます
+
+提案時には必ず以下を説明します。
+
+- 転用対象
+- 転用単位
+- 依存関係と前提条件
+- 自プロジェクトとの整合性
+- 採用形態
+- 不採用または概念のみ活用とする場合の理由`
+    },
+    {
         id: "single-file-web-app-request",
         label: "701: Single-file Web App の維持",
         keywords: ["single-file", "single file", "web app", "html", "css", "js", "cdn", "維持", "依存なし", "単一html", "single-file web app", "しんぐるふぁいる", "しんぐるふぁいるうぇぶあぷり", "うぇぶあぷり", "いじ", "いぞんなし", "たんいつえいちてぃーえむえる"],
@@ -4924,7 +5196,365 @@ product.name.trim();
   </script>
 
   <script>
+const aiExpansionPromptDefinitions = [
+    {
+        id: "ai-expansion-directory-markdown-check-request",
+        label: "X100: ディレクトリ内の内容を確認して把握(AI詳細)",
+        keywords: ["readme", "markdown", "directory", "contents check", "documentation survey", "ディレクトリ", "内容", "確認", "把握", "README確認", "md確認", "資料把握", "役割整理", "りーどみー", "でぃれくとり", "ないよう", "かくにん", "はあく", "しりょうはあく", "やくわりせいり"],
+        requiresCommitId: false,
+        buildBody: () => `README.md など、このディレクトリの内容を表す markdown (.md) を確認して内容を把握してください。単に存在を列挙するのではなく、各 markdown が何を説明しているのか、どれが正本に近いのか、今回の作業判断に直接効きそうなのはどれか、を意識して読み取ってください。必要に応じて、対応するソースコードや機能との関係も簡潔に押さえ、次に何を読むべきか判断できる程度に整理して把握してください。`
+    },
+    {
+        id: "ai-expansion-practical-index-request",
+        label: "X101: ディレクトリ内容整理 markdown を作成(AI詳細)",
+        keywords: ["index", "overview", "practical index", "reading order", "source mapping", "markdown", "documentation map", "実用的", "INDEX", "概要", "読む順番", "優先順位", "正本", "補助資料", "ソース対応", "資料整理", "じつようてき", "がいよう", "よむじゅんばん", "ゆうせんじゅんい", "せいほん", "ほじょしりょう", "そーすたいおう"],
+        requiresCommitId: false,
+        buildBody: () => `いま作業しているディレクトリに含まれるファイルについて、無理のない範囲で内容を調べて、それを整理した markdown (.md) ファイルを作成または更新してください。単なるファイル一覧ではなく、作業判断に使いやすいように、各資料の役割、正本か補助資料か、何に対応するか、どの順番で読むとよいかが分かるように整理してください。必要であれば、対応するソースコードや機能も簡潔に関連付けてください。既存の適切な対象ファイルがあればそれを更新または加筆し、妥当な対象ファイルがない場合は適切なファイル名の markdown ファイルを新規作成してそこに記述してください。これは次回に生成AIがこのディレクトリを開いた時の走査のコストを削減することについても期待される効果となっています。`
+    },
+    {
+        id: "ai-expansion-markdown-update-check-request",
+        label: "X102: markdown 更新漏れの確認(AI詳細)",
+        keywords: ["markdown", "md", "update", "doc", "docs", "documentation sync", "更新", "漏れ", "確認", "更新漏れ", "未更新", "正本更新", "追加すべき文書", "まーくだうん", "こうしん", "もれ", "かくにん", "こうしんもれ", "みこうしん", "せいほんこうしん"],
+        requiresCommitId: false,
+        buildBody: () => `実装の側に変更がおこなわれたことを前提に、これに対応する markdown (.md) に更新漏れがないか確認してください。単に「更新が必要そう」と述べるだけでなく、どの実装変更がどの markdown に対応するのか、既存の markdown の更新で足りるのか、新規の markdown を追加すべきなのか、を区別して整理してください。特に正本として扱うべき文書の更新漏れを優先して確認し、必要であれば更新候補のファイル名や追記すべき観点も示してください。`
+    },
+    {
+        id: "ai-expansion-conversation-handover-request",
+        label: "X301: セッションの引継テキストの生成(AI詳細)",
+        keywords: ["handover", "session", "conversation", "markdown", "session handover", "structured handover", "引き継ぎ", "引継", "セッション", "会話", "引継テキスト", "未完了事項", "次に見る点", "構造化引継", "せっしょん", "かいわ", "ひきつぎ", "みかんりょうじこう", "つぎにみるてん", "こうぞうかひきつぎ"],
+        requiresCommitId: false,
+        buildBody: () => `今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、状況を再現しやすい引き継ぎテキストを Markdown 形式で生成してください。特に、作業の目的、前提条件、決まったこと、未確定事項、未完了事項、次に見るべきファイルや論点、注意点を明確に区別して整理してください。可能であれば、受け手の生成AIがすぐに再開しやすい順番で並べてください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+    },
+    {
+        id: "ai-expansion-critical-review-request",
+        label: "X304: 批判的レビューの依頼(AI詳細)",
+        keywords: ["X304", "critical review", "findings first", "severity", "file reference", "批判的レビュー", "率直", "忖度しない", "迎合しない", "重大度順", "根拠付き", "ひはんてきれびゅー", "そんたくしない", "げいごうしない", "じゅうだいどじゅん", "こんきょつき"],
+        requiresCommitId: false,
+        buildBody: () => `これから批判的なレビューを実施してください。私は、迎合や忖度のない率直な指摘を求めています。私の意図に合わせて甘く評価したり、無理に肯定的にまとめたりしないでください。問題がある点、不適切な設計、弱い根拠、見落とし、回帰リスクがあれば、はっきり問題があると指摘してください。特に、バグ、仕様逸脱、回帰リスク、保守性低下、未テストの重要事項を優先して確認してください。指摘は重大度順に並べ、可能であればファイルや行、該当箇所を示し、なぜ問題なのかを根拠付きで説明してください。軽微な TYPO や表記ゆれも歓迎しますが、より重要な問題があればそちらを優先してください。`
+    },
+    {
+        id: "ai-expansion-hallucination-check-request",
+        label: "X305: 回答のハルシネーション有無を再確認(AI詳細)",
+        keywords: ["X305", "hallucination", "fact check", "claim review", "certainty", "回答再点検", "ハルシネーション", "事実主張", "確証", "不確実性", "うらどり", "かくしょう", "ふかくじつせい"],
+        requiresCommitId: false,
+        buildBody: () => `先程の回答をいったん前提にせず、そこに含まれる事実主張や判断をできるだけ個別に再点検して、ハルシネーションが含まれていないか再確認してください。確証が高いもの、不確実なもの、推測に留まるものを区別して説明してください。確証が弱い箇所は不確実であることを明示し、必要に応じて Web 検索や追加確認を行って裏どりしてください。もし誤りや疑わしい点があれば、どの部分が問題で、どの程度不確実なのかを明確に示してください。`
+    },
+    {
+        id: "ai-expansion-resource-handover-ok-request",
+        label: "X307: リソース受領中は OK のみ回答(AI詳細)",
+        keywords: ["X307", "OK only", "strict ok", "resource handover", "sentinel", "OKのみ", "厳密", "リソース受領", "合図まで", "応答制限", "おーけーのみ", "げんみつ", "おうとうせいげん"],
+        requiresCommitId: false,
+        buildBody: () => `これから複数のリソースの情報を渡します。一連のリソースの引き渡しが終わる明示的な合図があるまでは、毎回の応答は厳密に \`OK\` の1語のみにしてください。句読点、補足、言い換え、感想、要約、質問は付けないでください。内容を理解したとしても、合図があるまでは \`OK\` 以外を返さないでください。`
+    },
+    {
+        id: "ai-expansion-pr-request",
+        label: "X501: GitHub PR 文面の作成(AI詳細)",
+        keywords: ["X501", "pull request", "github pr", "pr body", "pr title", "change summary", "risk", "tests", "PR文面", "PRタイトル", "PR本文", "変更概要", "テスト", "リスク", "ぴーあーる", "へんこうがいよう", "りすく"],
+        requiresCommitId: true,
+        buildBody: (commitId) => commitId
+            ? `対象コミット ${commitId} における変更内容について、GitHub PR 用のタイトルと本文を Markdown 形式で作成してください。PR 本文には、少なくとも概要、主な変更点、テストまたは確認内容、必要であれば注意点やリスクを含めてください。変更内容に基づかない推測は避け、分からない点は断定しないでください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+            : ""
+    },
+    {
+        id: "ai-expansion-release-request",
+        label: "X502: GitHub Release 文面の作成(AI詳細)",
+        keywords: ["X502", "release notes", "github release", "release body", "release title", "release summary", "release文面", "release本文", "リリースノート", "変更概要", "利用者向け", "りりーすのーと", "りようしゃむけ"],
+        requiresCommitId: true,
+        buildBody: (commitId) => commitId
+            ? `${commitId} より後に行われた変更（${commitId} 自体の変更内容は除外する）について、GitHub Release 用のタイトルと本文を Markdown 形式で作成してください。利用者や読者が把握しやすいように、概要、主な変更点、必要であれば注意点や既知の制約を整理してください。変更内容に基づかない推測は避け、分からない点は断定しないでください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+            : ""
+    },
+    {
+        id: "ai-expansion-github-no-change-request",
+        label: "X503: GitHub 変更操作の禁止(AI詳細)",
+        keywords: ["X503", "github no change", "no push", "no pr", "local only", "GitHub操作禁止", "pushしない", "PR作成しない", "コメントしない", "ローカルのみ", "ぷっしゅしない", "ろーかるのみ"],
+        requiresCommitId: false,
+        buildBody: () => `GitHub 変更操作は行わないでください。GitHub への push、PR の作成、PR へのコメント、Issue への書き込み、Web UI を通じた変更など、リモート上の状態を変更する操作は禁止します。必要であればローカルでの調査、編集、ビルド、テストまでは行って構いませんが、GitHub 側に反映する行為は行わないでください。もし GitHub 側の変更が必要だと判断した場合でも、実施せず、その必要性だけを指摘してください。`
+    },
+    {
+        id: "ai-expansion-single-file-web-app-request",
+        label: "X701: Single-file Web App の維持(AI詳細)",
+        keywords: ["X701", "single-file web app", "single html", "bundle", "inline asset", "single-file", "単一HTML", "CDN禁止", "外部依存なし", "生成物確認", "たんいつえいちてぃーえむえる", "がいぶいぞんなし"],
+        requiresCommitId: false,
+        buildBody: () => `このアプリは原則として Single-file Web App を維持してください。変更に伴って、ビルド後の HTML が CDN や別ファイルの CSS / JS に依存していないかを確認してください。開発時に分割ソースを使うことは構いませんが、最終的な配布物では外部依存なしの単一 HTML として成立している必要があります。必要であれば、どの依存が残っているか、どこでインライン化が崩れているかも示してください。`
+    },
+    {
+        id: "ai-expansion-small-test-request",
+        label: "X702: 事象の再発防止テストを追加(AI詳細)",
+        keywords: ["X702", "small test", "regression test", "lightweight test", "testability", "再発防止", "小さいテスト", "既存基盤", "回帰検知", "さいはつぼうし", "けいりょうてすと"],
+        requiresCommitId: false,
+        buildBody: () => `今回の事象が再現したときにすぐに気づくように、できるだけ小さく単純な再発防止テストを検討してください。既存のテスト基盤で無理なく追加できるものを優先し、重い統合テストや新規基盤導入、大量のモック準備が必要なものは避けてください。もし追加が難しい場合は、なぜ難しいのか、どの依存や構造が障害になっているのかも説明してください。`
+    },
+    {
+        id: "ai-expansion-spec-discussion-request",
+        label: "X703: 仕様検討モードで進める(AI詳細)",
+        keywords: ["X703", "spec discussion", "spec mode", "no implementation", "task breakdown", "仕様検討", "実装しない", "論点整理", "未確定事項", "タスク分解", "しようけんとう", "ろんてんせいり"],
+        requiresCommitId: false,
+        buildBody: () => `今からの作業は仕様の検討です。コード変更、ファイル編集、ビルド、テスト実行などの実装作業は開始しないでください。その代わり、仕様論点、前提条件、未確定事項、判断材料、選択肢、実施候補のタスク分解を整理して提示してください。結論だけを急いで出すのではなく、何が決まっていて何が未決なのかが分かるようにまとめてください。まとまった仕様が実施事項に落としこめる場合には、TODO.md に書ける粒度の作業タスクへ分解してください。`
+    },
+    {
+        id: "ai-expansion-todo-cleanup-request",
+        label: "X704: TODO.md の完了項目を整理(AI詳細)",
+        keywords: ["X704", "todo cleanup", "completed todo", "close todo", "stale todo", "TODO整理", "完了項目整理", "クローズ済み", "不要TODO", "とぅーどぅーせいり", "かんりょうこうもくせいり"],
+        requiresCommitId: false,
+        buildBody: () => `TODO.md の項目について、すでに対応済みで完了しているもの、以前にクローズ済みで不要になっているものを整理してください。単に削除するのではなく、本当に完了したのか、関連する実装や記録と矛盾しないかも確認してください。もし完了と未完了の判断が曖昧な項目があれば、その旨も区別して示してください。`
+    },
+    {
+        id: "ai-expansion-build-check-request",
+        label: "X705: 完全ビルドの実施確認(AI詳細)",
+        keywords: ["X705", "full build", "build check", "build result", "build verification", "完全ビルド", "ビルド確認", "実施有無", "結果報告", "かんぜんびるど", "けっかほうこく"],
+        requiresCommitId: false,
+        buildBody: () => `まずビルドが実施済みか確認してください。未実施であれば、必要なビルドを実施してください。そのうえで、どのビルドを確認または実行したのか、成功したのか失敗したのか、失敗した場合はどこで失敗したのかを結果として報告してください。関連するビルドが複数ある場合は、完全性の観点でどこまで確認したかも明示してください。`
+    },
+    {
+        id: "ai-expansion-session-close-request",
+        label: "X706: 作業終了時の引継確認(AI詳細)",
+        keywords: ["X706", "session close", "wrap up", "handover", "restart guide", "作業終了", "引継確認", "再開ガイド", "伝達事項", "さぎょうしゅうりょう", "ひきつぎかくにん", "さいかいがいど"],
+        requiresCommitId: false,
+        buildBody: () => `今回の作業をここで終える前に、次回に再開するときに必要な伝達事項がないか確認してください。未完了事項、保留事項、注意点、次に見るべきファイルや論点、必要なら TODO.md へ残すべき内容を整理してください。単に「引き継ぎあり/なし」で終わらせず、次回の生成AIや人間が迷わず再開できるかという観点で確認してください。`
+    }
+];
+  </script>
+
+  <script>
+const aiSuggestPromptDefinitions = [
+    {
+        id: "ai-suggest-canonical-markdown-request",
+        label: "S101-001: このディレクトリの正本 markdown を特定(AI提案)",
+        keywords: ["S101-001", "source of truth", "canonical markdown", "canonical doc", "primary doc", "markdown", "正本", "正式", "一次情報", "主要文書", "基準文書", "canonical", "せいほん", "いちじじょうほう", "きじゅんぶんしょ"],
+        requiresCommitId: false,
+        buildBody: () => `いま作業しているディレクトリに含まれる markdown (.md) について、どれが正本として扱われるべきかを整理してください。README、仕様書、補助メモ、TODO などを同列に扱うのではなく、それぞれの役割を見極めたうえで、正本、補助資料、作業メモ、参考情報を区別して説明してください。正本と判断した理由、補助資料に留まる理由、競合や重複がある場合の扱いも示してください。必要であれば、対応するソースコードや機能との関係も簡潔に説明してください。`
+    },
+    {
+        id: "ai-suggest-reading-priority-request",
+        label: "S101-002: このディレクトリで先に読むべき markdown を絞り込む(AI提案)",
+        keywords: ["S101-002", "reading priority", "read first", "markdown shortlist", "priority docs", "先に読む", "優先順位", "読む順番", "絞り込み", "重要文書", "さきによむ", "ゆうせんじゅんい", "じゅうようぶんしょ"],
+        requiresCommitId: false,
+        buildBody: () => `いま作業しているディレクトリに含まれる markdown (.md) について、今回の作業判断に直接効きそうなものを優先順位つきで絞り込んでください。単なる一覧ではなく、まず読むべきもの、次に読むべきもの、余裕があれば読むものを区別し、それぞれの理由も簡潔に説明してください。必要であれば、どのソースコードや機能判断に効く文書なのかも添えてください。`
+    },
+    {
+        id: "ai-suggest-markdown-source-map-request",
+        label: "S101-003: markdown とソースコードの対応関係を整理(AI提案)",
+        keywords: ["S101-003", "source mapping", "doc to source", "markdown map", "code relation", "対応関係", "ソース対応", "文書対応", "関連ファイル", "たいおうかんけい", "そーすたいおう", "かんれんふぁいる"],
+        requiresCommitId: false,
+        buildBody: () => `いま作業しているディレクトリの markdown (.md) とソースコードについて、どの文書がどのファイルや機能に対応しているのかを整理してください。正本に近い文書、補助的な文書、実装と乖離していそうな文書があれば区別して示してください。必要であれば、作業開始時に先に参照すべき対応関係も提案してください。`
+    },
+    {
+        id: "ai-suggest-work-start-guide-request",
+        label: "S101-004: このディレクトリの作業開始ガイドを作る(AI提案)",
+        keywords: ["S101-004", "work start guide", "getting started", "onboarding", "directory guide", "作業開始", "開始ガイド", "最初に読む", "導入", "さぎょうかいし", "かいしがいど", "さいしょによむ"],
+        requiresCommitId: false,
+        buildBody: () => `いま作業しているディレクトリについて、次回の作業者や生成AIが迷わず入りやすいように、簡潔な作業開始ガイドを考えてください。最初に見るべき markdown、対応する主要ソース、注意すべき前提、今回の作業判断で外せない観点を整理してください。必要であれば、このガイドをどの markdown に置くのが自然かも提案してください。`
+    },
+    {
+        id: "ai-suggest-markdown-priority-update-request",
+        label: "S102-001: 実装変更に対して優先更新すべき markdown を洗い出す(AI提案)",
+        keywords: ["S102-001", "doc update priority", "markdown update", "priority update", "documentation sync", "優先更新", "更新優先", "未更新候補", "正本更新", "ゆうせんこうしん", "みこうしんこうほ"],
+        requiresCommitId: false,
+        buildBody: () => `実装変更がおこなわれたことを前提に、対応する markdown (.md) のうち、どれを優先して更新すべきかを整理してください。正本として扱うべき文書、利用者が最初に参照しそうな文書、将来の生成AIや作業者の判断に強く影響する文書を優先して示してください。必要であれば、既存文書の更新で足りるか、新規文書が必要かも区別してください。`
+    },
+    {
+        id: "ai-suggest-restart-first-check-request",
+        label: "S301-001: 次回再開時に最初に確認すべき事項を整理(AI提案)",
+        keywords: ["S301-001", "restart checklist", "resume work", "first checks", "handover start", "再開", "再開時", "最初に確認", "再開チェック", "さいかい", "さいしょにかくにん", "ちぇっくりすと"],
+        requiresCommitId: false,
+        buildBody: () => `次回この作業を再開するときに、最初に確認すべき事項を整理してください。未完了事項、前提条件、読み直すべき markdown、確認すべきソース、判断が揺れやすい論点を優先度つきで並べてください。引き継ぎ本文そのものではなく、再開直後の確認観点を短く強く整理することを重視してください。`
+    },
+    {
+        id: "ai-suggest-review-focus-request",
+        label: "S304-001: レビューで優先的に疑うべき観点を先に宣言(AI提案)",
+        keywords: ["S304-001", "review focus", "review checklist", "risk first", "critical review focus", "レビュー観点", "優先観点", "疑うべき点", "回帰リスク", "れびゅーかんてん", "かいきりすく"],
+        requiresCommitId: false,
+        buildBody: () => `これからレビューを行うにあたって、優先的に疑うべき観点を先に宣言してください。たとえば、仕様逸脱、回帰リスク、責務混在、依存関係の悪化、未テストなどのうち、今回特に重点的に見るべきものを整理してください。単なる一般論ではなく、今回の作業内容に照らしてどこを疑うのが効率的かを示してください。`
+    },
+    {
+        id: "ai-suggest-structuralization-target-request",
+        label: "S321-001: 構造化・共通化の対象候補を先に列挙(AI提案)",
+        keywords: ["S321-001", "structuralization target", "commonization target", "duplication scan", "refactor candidate", "構造化候補", "共通化候補", "重複候補", "対象列挙", "こうぞうかこうほ", "きょうつうかこうほ"],
+        requiresCommitId: false,
+        buildBody: () => `構造化・共通化を進める前に、対象候補を先に列挙してください。どこに知識やルールの重複がありそうか、どこが責務過大か、どこが依存関係の整理候補かを分けて示してください。まだ共通化するとは決めず、まず候補の洗い出しと優先順位づけに集中してください。`
+    },
+    {
+        id: "ai-suggest-structural-refactor-scope-request",
+        label: "S322-001: 構造改善リファクタリングの対象範囲を先に区切る(AI提案)",
+        keywords: ["S322-001", "refactor scope", "structural refactor scope", "scope cut", "planned refactor", "対象範囲", "範囲切り", "構造改善範囲", "今回だけ", "たいしょうはんい", "はんいぎり"],
+        requiresCommitId: false,
+        buildBody: () => `計画的な構造改善リファクタリングを行う前に、今回の対象範囲を先に区切ってください。何を今回の整理対象にするのか、何を今回は見送るのか、どこから先は機能変更や別タスクとして切り分けるべきかを明確にしてください。変更量を増やすこと自体が目的ではなく、範囲を意図的に制御することを重視してください。`
+    },
+    {
+        id: "ai-suggest-reuse-unit-request",
+        label: "S323-001: 他プロジェクト資産の転用単位候補を先に整理(AI提案)",
+        keywords: ["S323-001", "reuse unit", "import unit", "transfer unit", "reuse candidate", "転用単位", "取り込み単位", "流用候補", "再利用単位", "てんようたんい", "とりこみたんい"],
+        requiresCommitId: false,
+        buildBody: () => `他プロジェクト資産の転用可否を判断する前に、どの単位で取り込む候補があるかを先に整理してください。関数単位、モジュール単位、コンポーネント単位、画面単位、設計だけの採用などを区別し、それぞれが自立しているか、依存前提が強すぎないかを見てください。まだ採用可否の結論を急がず、まず転用単位の候補整理に集中してください。`
+    },
+    {
+        id: "ai-suggest-spec-issue-list-request",
+        label: "S703-001: 仕様検討時の論点一覧を先に作る(AI提案)",
+        keywords: ["S703-001", "spec issue list", "discussion points", "issue list", "spec checklist", "論点一覧", "仕様論点", "未確定事項", "判断材料", "ろんてんいちらん", "みかくていじこう"],
+        requiresCommitId: false,
+        buildBody: () => `仕様検討を始める前に、まず論点一覧を作ってください。決める必要があること、未確定事項、前提条件、判断材料、選択肢、後回しにしてよいことを分けて整理してください。結論を急ぐのではなく、何を議論すべきかが先に見える状態を作ることを目的にしてください。`
+    },
+    {
+        id: "ai-suggest-prompt-structure-dump-request",
+        label: "S601-001: 現在のプロンプト構成を一覧としてダンプ(AI提案)",
+        keywords: ["S601-001", "prompt structure", "prompt inventory", "dump prompt structure", "prompt map", "プロンプト構成", "一覧", "構成ダンプ", "候補一覧", "ぷろんぷとこうせい", "こうせいだんぷ"],
+        requiresCommitId: false,
+        buildBody: () => `現在の会話や作業で使われているプロンプト構成について、実行中の前提、作業モード、制約、補助的な観点を区別しながら一覧として整理してください。単なる全文ダンプではなく、どの種類の指示が現在効いているのかを把握しやすい形にまとめることを重視してください。`
+    },
+    {
+        id: "ai-suggest-full-restart-dump-request",
+        label: "S602-001: 現在の会話から再開用サマリをフルダンプ(AI提案)",
+        keywords: ["S602-001", "full dump", "restart summary", "resume dump", "full handover", "再開用サマリ", "フルダンプ", "完全引継", "会話要約", "さいかいようさまり", "ふるだんぷ"],
+        requiresCommitId: false,
+        buildBody: () => `現在の会話全体から、次回の再開に必要な情報を落とさないことを優先したフルダンプ形式のサマリを作成してください。決まったこと、未完了事項、保留事項、重要な理由づけ、次に見るべきファイルや論点を漏れなく整理してください。簡潔さよりも再開容易性と情報保持を重視してください。`
+    },
+    {
+        id: "ai-suggest-todo-decision-open-request",
+        label: "S603-001: 現在の会話から TODO / 決定事項 / 未解決事項を抽出(AI提案)",
+        keywords: ["S603-001", "todo decision open issues", "decision log", "open issues", "conversation extract", "TODO抽出", "決定事項", "未解決事項", "論点抽出", "けっていじこう", "みかいけつじこう"],
+        requiresCommitId: false,
+        buildBody: () => `現在の会話から、実作業に直結する情報として TODO、決定事項、未解決事項を抽出してください。雑多な要約ではなく、何が決まっていて、何がまだ決まっておらず、次に何をすべきかがすぐ分かる形で整理してください。必要であれば、項目ごとに簡潔な理由や背景も添えてください。`
+    },
+    {
+        id: "ai-suggest-mermaid-topic-flow-request",
+        label: "S603-002: 現在の会話の論点遷移を Mermaid で記述(AI提案)",
+        keywords: ["S603-002", "mermaid topic flow", "topic transition", "conversation flow", "mermaid flow", "論点遷移", "Mermaid", "会話フロー", "話題遷移", "ろんてんせんい", "かいわふろー"],
+        requiresCommitId: false,
+        buildBody: () => `現在の会話について、話題や論点がどの順に移り変わったかを Mermaid で記述してください。単なる発話順ではなく、どの論点からどの論点へ展開したのか、どこで重要な方針転換や新しい整理が入ったのかが分かるように表現してください。`
+    },
+    {
+        id: "ai-suggest-mermaid-dependency-request",
+        label: "S603-003: 現在の会話の依存関係を Mermaid で記述(AI提案)",
+        keywords: ["S603-003", "mermaid dependency", "dependency graph", "conversation dependency", "mermaid graph", "依存関係", "Mermaid図", "関係図", "依存図", "いぞんかんけい", "かんけいず"],
+        requiresCommitId: false,
+        buildBody: () => `現在の会話や決定事項について、どの話題や判断がどの前提や別の決定に依存しているかを Mermaid で記述してください。時系列よりも依存関係を重視し、後続の判断が何を前提にしているかが分かるように整理してください。`
+    },
+    {
+        id: "ai-suggest-dot-causal-request",
+        label: "S604-001: 現在の会話の因果関係を Graphviz DOT で記述(AI提案)",
+        keywords: ["S604-001", "graphviz causal", "causal graph", "cause effect", "dot graph", "因果関係", "Graphviz", "DOT", "原因結果", "いんがかんけい", "げんいんけっか"],
+        requiresCommitId: false,
+        buildBody: () => `現在の会話について、どの問題意識や判断がどの結論や次のアクションにつながったかを Graphviz DOT で記述してください。時系列だけでなく、原因と結果のつながりが見えるように整理し、必要であれば主要な節点に短い説明を添えてください。`
+    },
+    {
+        id: "ai-suggest-dot-decision-flow-request",
+        label: "S604-002: 現在の会話の意思決定フローを Graphviz DOT で記述(AI提案)",
+        keywords: ["S604-002", "graphviz decision flow", "decision flow", "decision graph", "dot decision", "意思決定フロー", "判断フロー", "Graphviz DOT", "決定フロー", "いしけっていふろー", "はんだんふろー"],
+        requiresCommitId: false,
+        buildBody: () => `現在の会話について、検討、選択、採用、見送りの流れが分かるように、意思決定フローを Graphviz DOT で記述してください。どの候補が出て、何が採用され、何が見送られ、どこで方針が定まったのかが追えるように整理してください。`
+    }
+];
+  </script>
+
+  <script>
+const popularPromptDefinitions = [
+    {
+        id: "popular-prerequisites-request",
+        label: "P901-001: 前提条件を抽出",
+        keywords: ["P901-001", "prerequisites", "assumptions", "preconditions", "premises", "前提条件", "前提", "前提抽出", "仮定", "ぜんていじょうけん", "かてい"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容から、暗黙の前提も含めて前提条件を抽出してください。何が成立している前提で話が進んでいるのか、どの前提が崩れると結論や作業方針に影響するのかが分かるように整理してください。必要に応じて、明示されている前提と暗黙の前提を分けて示してください。`
+    },
+    {
+        id: "popular-constraints-request",
+        label: "P901-002: 制約条件を抽出",
+        keywords: ["P901-002", "constraints", "limitations", "restrictions", "boundary conditions", "制約", "制約条件", "制限", "境界条件", "せいやくじょうけん", "せいげん"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容から、制約条件や守るべき境界を抽出してください。時間、コスト、依存関係、互換性、禁止事項、作業範囲など、結論や実装方針を縛る条件を整理し、重要度が高いものから分かるように示してください。前提条件と混ざりやすい場合は、その違いも区別して説明してください。`
+    },
+    {
+        id: "popular-risk-list-request",
+        label: "P902-001: 見落としリスクを列挙",
+        keywords: ["P902-001", "risk list", "oversight risk", "missed risk", "risk enumeration", "見落としリスク", "リスク列挙", "見落とし", "懸念点", "みおとしりすく", "けねんてん"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容について、見落としやすいリスクを列挙してください。仕様、運用、保守、依存関係、テスト、認識齟齬などの観点から、問題になりそうな点を幅広く洗い出してください。まだ重大度評価までは厳密にしなくてよいので、抜け漏れを減らすことを優先してください。`
+    },
+    {
+        id: "popular-risk-priority-request",
+        label: "P902-002: 見落としリスクを重大度順に整理",
+        keywords: ["P902-002", "risk priority", "severity order", "risk ranking", "prioritized risk", "重大度順", "優先リスク", "リスク順位", "危険度", "じゅうだいどじゅん", "ゆうせんりすく"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容について、見落としリスクを重大度順に整理してください。発生時の影響の大きさ、起こりやすさ、発見のしにくさを考慮し、どのリスクを先に潰すべきかが分かるように並べてください。可能であれば、各リスクの理由や対策候補も簡潔に添えてください。`
+    },
+    {
+        id: "popular-nontechnical-summary-request",
+        label: "P903-001: 非技術者向けに要約",
+        keywords: ["P903-001", "non-technical summary", "executive summary", "plain language", "for non engineers", "非技術者向け", "平易化", "やさしく要約", "一般向け", "ひぎじゅつしゃむけ", "へいいか"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容を、非技術者にも分かるように要約してください。専門用語や内部事情は必要最小限に抑え、何が起きているのか、なぜ重要なのか、どんな影響があるのかが伝わるように説明してください。技術的な正確さは保ちつつ、分かりやすさを優先してください。`
+    },
+    {
+        id: "popular-brief-nontechnical-summary-request",
+        label: "P903-002: 非技術者向けに短く要約",
+        keywords: ["P903-002", "short non-technical summary", "brief summary", "3 line summary", "plain brief", "短く要約", "短い要約", "三行要約", "非技術者向け要約", "みじかくようやく", "さんぎょうようやく"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容を、非技術者向けに短く要約してください。長い説明ではなく、重要なポイントがすぐ伝わるように、短い文章または短い箇条書きでまとめてください。専門用語はできるだけ避け、必要な場合は簡単に言い換えてください。`
+    },
+    {
+        id: "popular-comparison-table-request",
+        label: "P904-001: 選択肢比較表を作成",
+        keywords: ["P904-001", "comparison table", "option comparison", "tradeoff table", "decision table", "比較表", "選択肢比較", "比較一覧", "トレードオフ表", "ひかくひょう", "せんたくしひかく"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた選択肢について、比較表を作成してください。少なくとも各選択肢の特徴、メリット、デメリット、向いている場面が比較できるように整理してください。表形式または Markdown テーブルで、判断材料として使いやすい形にまとめてください。`
+    },
+    {
+        id: "popular-merit-demerit-table-request",
+        label: "P904-002: 選択肢のメリット・デメリット比較表を作成",
+        keywords: ["P904-002", "pros cons table", "merit demerit", "pros and cons", "tradeoff comparison", "メリット", "デメリット", "比較表", "賛否", "めりっと", "でめりっと"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた選択肢について、メリットとデメリットが見比べやすい比較表を作成してください。結論を急がず、各案の良い点と弱い点が対称に読める形で整理してください。必要に応じて、判断時に重視すべき観点も列として加えてください。`
+    },
+    {
+        id: "popular-audience-shift-request",
+        label: "P905-001: 対象読者を変えて説明",
+        keywords: ["P905-001", "change audience", "audience shift", "rewrite for audience", "different audience", "対象読者", "読者変更", "対象別説明", "読み手を変える", "たいしょうどくしゃ", "よみてをかえる"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容について、対象読者を変えて説明してください。元の内容の意味はできるだけ保ちつつ、読み手に合わせて前提知識、用語、説明の深さ、強調点を調整してください。必要であれば、元の対象読者と新しい対象読者の違いも簡潔に意識して書き分けてください。`
+    },
+    {
+        id: "popular-multi-audience-request",
+        label: "P905-002: 複数の対象読者向けに書き分ける",
+        keywords: ["P905-002", "multiple audiences", "rewrite for beginner and expert", "audience variants", "reader variants", "複数読者", "書き分け", "初学者向け", "管理者向け", "ふくすうどくしゃ", "かきわけ"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容について、複数の対象読者向けに書き分けてください。たとえば非技術者向け、初学者向け、実務担当者向けなど、対象ごとにどの情報を残し、どの用語を言い換え、どこを省略するかが分かるように整理してください。読み手ごとの差が伝わるように、見出しを分けて出力してください。`
+    }
+];
+  </script>
+
+  <script>
 async function initializePromptPage() {
+    const SERIES_VISIBILITY_STORAGE_KEY = "promptGenSeriesVisibility";
+    const defaultSeriesVisibilitySettings = {
+        showX: true,
+        showS: true,
+        showP: true
+    };
+    function decorateBasePromptDefinition(definition) {
+        const label = String(definition.label || "");
+        const labelMatch = label.match(/^(\d{3}):(.*)$/);
+        if (!labelMatch) {
+            return definition;
+        }
+        const labelCode = labelMatch[1];
+        const labelSuffix = labelMatch[2] || "";
+        const prefixedCode = `A${labelCode}`;
+        const prefixedLabel = `${prefixedCode}:${labelSuffix}`;
+        const nextKeywords = Array.isArray(definition.keywords) ? [...definition.keywords] : [];
+        if (!nextKeywords.includes(prefixedCode)) {
+            nextKeywords.unshift(prefixedCode);
+        }
+        return {
+            ...definition,
+            id: definition.id.startsWith("a-") ? definition.id : `a-${definition.id}`,
+            label: prefixedLabel,
+            keywords: nextKeywords
+        };
+    }
+    const basePromptDefinitions = promptDefinitions.map(decorateBasePromptDefinition);
+    const expansionDefinitions = Array.isArray(aiExpansionPromptDefinitions) ? aiExpansionPromptDefinitions : [];
+    const suggestDefinitions = Array.isArray(aiSuggestPromptDefinitions) ? aiSuggestPromptDefinitions : [];
+    const popularDefinitions = Array.isArray(popularPromptDefinitions) ? popularPromptDefinitions : [];
     if (window.customElements && window.customElements.whenDefined) {
         await window.customElements.whenDefined("lht-text-field-help");
     }
@@ -4938,6 +5568,53 @@ async function initializePromptPage() {
     if (!promptSearch || !commitIdInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !promptOutputSection) {
         return;
     }
+    function loadSeriesVisibilitySettings() {
+        try {
+            const storage = window.localStorage;
+            if (!storage || typeof storage.getItem !== "function") {
+                return { ...defaultSeriesVisibilitySettings };
+            }
+            const raw = storage.getItem(SERIES_VISIBILITY_STORAGE_KEY);
+            if (!raw) {
+                return { ...defaultSeriesVisibilitySettings };
+            }
+            const parsed = JSON.parse(raw);
+            return {
+                showX: (parsed === null || parsed === void 0 ? void 0 : parsed.showX) !== false,
+                showS: (parsed === null || parsed === void 0 ? void 0 : parsed.showS) !== false,
+                showP: (parsed === null || parsed === void 0 ? void 0 : parsed.showP) !== false
+            };
+        }
+        catch (_error) {
+            return { ...defaultSeriesVisibilitySettings };
+        }
+    }
+    function saveSeriesVisibilitySettings(settings) {
+        const storage = window.localStorage;
+        if (!storage || typeof storage.setItem !== "function") {
+            return;
+        }
+        storage.setItem(SERIES_VISIBILITY_STORAGE_KEY, JSON.stringify(settings));
+    }
+    function clearSeriesVisibilitySettings() {
+        const storage = window.localStorage;
+        if (!storage || typeof storage.removeItem !== "function") {
+            return;
+        }
+        storage.removeItem(SERIES_VISIBILITY_STORAGE_KEY);
+    }
+    let seriesVisibilitySettings = loadSeriesVisibilitySettings();
+    function getVisiblePromptDefinitions() {
+        return [
+            ...basePromptDefinitions,
+            ...(seriesVisibilitySettings.showX ? expansionDefinitions : []),
+            ...(seriesVisibilitySettings.showS ? suggestDefinitions : []),
+            ...(seriesVisibilitySettings.showP ? popularDefinitions : [])
+        ];
+    }
+    let visiblePromptDefinitions = [];
+    let promptSearchIndexes = [];
+    let promptSearchIndexById = new Map();
     function applyLatinInputHints(field, enterKeyHint) {
         field.setAttribute("inputmode", "latin");
         field.setAttribute("lang", "en");
@@ -5234,8 +5911,12 @@ async function initializePromptPage() {
         }
         return Array.from(tokens);
     }
-    const promptSearchIndexes = promptDefinitions.map(buildSearchIndex);
-    const promptSearchIndexById = new Map(promptSearchIndexes.map((searchIndex) => [searchIndex.definition.id, searchIndex]));
+    function rebuildVisiblePromptIndexes() {
+        visiblePromptDefinitions = getVisiblePromptDefinitions();
+        promptSearchIndexes = visiblePromptDefinitions.map(buildSearchIndex);
+        promptSearchIndexById = new Map(promptSearchIndexes.map((searchIndex) => [searchIndex.definition.id, searchIndex]));
+    }
+    rebuildVisiblePromptIndexes();
     function createCandidateButton(definition) {
         const button = document.createElement("button");
         button.type = "button";
@@ -5361,7 +6042,7 @@ async function initializePromptPage() {
         }
         button.classList.add("is-active");
         revealOutputSection({ scrollIntoView: true });
-        const selectedDefinition = promptDefinitions.find((definition) => definition.id === id);
+        const selectedDefinition = visiblePromptDefinitions.find((definition) => definition.id === id);
         if (selectedDefinition === null || selectedDefinition === void 0 ? void 0 : selectedDefinition.requiresCommitId) {
             commitInputSection.classList.remove("md-hidden");
             commitIdInput.focus();
@@ -5378,7 +6059,7 @@ async function initializePromptPage() {
         if (!selectedPrompt) {
             return "";
         }
-        const selectedDefinition = promptDefinitions.find((definition) => definition.id === selectedPrompt);
+        const selectedDefinition = visiblePromptDefinitions.find((definition) => definition.id === selectedPrompt);
         const label = selectedDefinition ? selectedDefinition.label : "";
         const commitId = (commitIdInput.value || "").trim();
         const body = selectedDefinition ? selectedDefinition.buildBody(commitId) : "";
@@ -5391,9 +6072,74 @@ async function initializePromptPage() {
         const text = buildPromptText();
         promptOutput.textContent = text;
     }
+    function createSeriesVisibilityMenu() {
+        const menuPanel = document.querySelector("lht-page-menu .md-menu-panel");
+        if (!menuPanel) {
+            return;
+        }
+        const separator = document.createElement("div");
+        separator.className = "md-menu-separator";
+        menuPanel.appendChild(separator);
+        const section = document.createElement("div");
+        section.className = "md-menu-settings";
+        const title = document.createElement("p");
+        title.className = "md-menu-settings__title";
+        title.textContent = "系列表示設定";
+        section.appendChild(title);
+        menuPanel.appendChild(section);
+        const seriesOptions = [
+            { key: "showX", label: "X系列を表示", switchId: "menuShowXSeries" },
+            { key: "showS", label: "S系列を表示", switchId: "menuShowSSeries" },
+            { key: "showP", label: "P系列を表示", switchId: "menuShowPSeries" }
+        ];
+        for (const option of seriesOptions) {
+            const switchHelp = document.createElement("lht-switch-help");
+            switchHelp.className = "md-menu-settings__switch";
+            switchHelp.setAttribute("switch-id", option.switchId);
+            switchHelp.setAttribute("label", option.label);
+            if (seriesVisibilitySettings[option.key]) {
+                switchHelp.setAttribute("checked", "");
+            }
+            section.appendChild(switchHelp);
+            const checkbox = switchHelp.querySelector("input, md-switch") ||
+                document.getElementById(option.switchId);
+            if (!checkbox) {
+                continue;
+            }
+            checkbox.addEventListener("change", () => {
+                seriesVisibilitySettings = {
+                    ...seriesVisibilitySettings,
+                    [option.key]: checkbox.checked
+                };
+                saveSeriesVisibilitySettings(seriesVisibilitySettings);
+                rebuildVisiblePromptIndexes();
+                renderCandidates();
+                updateOutput();
+            });
+        }
+        const resetButton = document.createElement("button");
+        resetButton.type = "button";
+        resetButton.className = "md-menu-settings__reset";
+        resetButton.innerHTML = '<svg viewBox="0 0 24 24" class="md-menu-settings__reset-icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#md-icon-trash" xlink:href="#md-icon-trash"></use></svg><span>設定を初期化</span>';
+        resetButton.addEventListener("click", () => {
+            clearSeriesVisibilitySettings();
+            seriesVisibilitySettings = { ...defaultSeriesVisibilitySettings };
+            for (const option of seriesOptions) {
+                const input = document.getElementById(option.switchId);
+                if (input) {
+                    input.checked = seriesVisibilitySettings[option.key];
+                }
+            }
+            rebuildVisiblePromptIndexes();
+            renderCandidates();
+            updateOutput();
+        });
+        section.appendChild(resetButton);
+    }
     promptSearch.addEventListener("input", renderCandidates);
     commitIdInput.addEventListener("input", updateOutput);
     includeLabelPrefix.addEventListener("change", updateOutput);
+    createSeriesVisibilityMenu();
     renderCandidates();
     updateOutput();
     requestAnimationFrame(() => {
