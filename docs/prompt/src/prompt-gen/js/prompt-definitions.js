@@ -2,7 +2,7 @@ const promptDefinitions = [
     {
         id: "pr-request",
         label: "501: GitHub PR 文面の作成",
-        keywords: ["pr", "pull request", "pr作成依頼", "prタイトル", "pr本文", "文面", "作成", "ぶんめんさくせい", "bunmensakusei", "ぴーあーる", "ぷるりくえすと", "ぎっとはぶ"],
+        keywords: ["pr", "pull request", "github pr", "markdown", "tilde", "pr作成依頼", "prタイトル", "pr本文", "文面", "作成", "github", "ぷるりく", "ぴーあーる", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
         requiresCommitId: true,
         buildBody: (commitId) => commitId
             ? `対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文は ~~~~ で囲まれた一塊として回答してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
@@ -11,7 +11,7 @@ const promptDefinitions = [
     {
         id: "release-request",
         label: "502: GitHub Release 文面の作成",
-        keywords: ["release", "github release", "github", "リリース", "release文面", "release本文", "文面", "作成", "りりーす", "ぶんめんさくせい", "riri-su", "bunmensakusei", "ぎっとはぶ", "りりーす"],
+        keywords: ["release", "github release", "release notes", "github", "markdown", "tilde", "リリース", "release文面", "release本文", "文面", "作成", "りりーす", "りりーすのーと", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
         requiresCommitId: true,
         buildBody: (commitId) => commitId
             ? `${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文は ~~~~ で囲まれた一塊として回答してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
@@ -20,7 +20,7 @@ const promptDefinitions = [
     {
         id: "inline-code-request",
         label: "303: Markdown をチルダフェンスで出力",
-        keywords: ["markdown", "tilde fence", "tilde fenced", "tilde-fence", "tilde-fenced", "fenced markdown", "code fence", "code block", "code", "チルダフェンス", "markdown出力", "コード形式", "出力", "ちるだふぇんす", "こーどふぇんす", "こーどぶろっく", "shutsuryoku", "まーくだうん", "こーど"],
+        keywords: ["markdown", "tilde fence", "tilde fenced", "tilde-fence", "tilde-fenced", "fenced markdown", "code fence", "code block", "code", "チルダフェンス", "markdown出力", "コード形式", "出力", "ちるだふぇんす", "こーどふぇんす", "こーどぶろっく", "しゅつりょく", "まーくだうん", "こーど"],
         requiresCommitId: false,
         buildBody: () => "markdown テキスト形式で出力してください。回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
     },
@@ -41,126 +41,126 @@ const promptDefinitions = [
     {
         id: "directory-markdown-check-request",
         label: "100: ディレクトリ内の内容を確認して把握",
-        keywords: ["readme", "markdown", "directory", "ディレクトリ", "内容", "確認", "把握", "内容確認", "md確認", "でぃれくとり", "ないようかくにん", "direkutori", "naiyoukakunin", "りーどみー", "まーくだうん", "えむでぃー"],
+        keywords: ["readme", "markdown", "directory", "ディレクトリ", "内容", "確認", "把握", "内容確認", "md確認", "りーどみー", "でぃれくとり", "ないよう", "かくにん", "はあく", "まーくだうん", "えむでぃー"],
         requiresCommitId: false,
         buildBody: () => "README.md などこのディレクトリの内容をあらわす markdown の内容を確認してください。"
     },
     {
         id: "conversation-handover-request",
-        label: "301: 会話の引継テキストの生成",
-        keywords: ["handover", "conversation", "引き継ぎ", "引継", "会話", "テキスト", "生成", "生成ai", "別のai", "かいわ", "ひきつぎ", "てきすと", "せいせい", "kaiwa", "hikitsugi", "tekisuto", "seisei", "はんどおーばー", "こんばーせーしょん", "えーあい"],
+        label: "301: セッションの引継テキストの生成",
+        keywords: ["handover", "session", "conversation", "markdown", "session handover", "引き継ぎ", "引継", "セッション", "会話", "テキスト", "引継テキスト", "生成", "生成ai", "別のai", "せっしょん", "かいわ", "ひきつぎ", "てきすと", "まーくだうん", "せいせい", "はんどおーばー", "えーあい"],
         requiresCommitId: false,
-        buildBody: () => "今までの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを想定したうえでなるべく詳細にそして引継先で緻密に再現できるような引き継ぎテキストを markdown 形式で生成してください。"
+        buildBody: () => "今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを想定したうえでなるべく詳細にそして引継先で緻密に再現できるような引き継ぎテキストを markdown 形式で生成してください。回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
     },
     {
         id: "spec-discussion-request",
         label: "703: 仕様検討モードで進める",
-        keywords: ["spec", "specification", "仕様", "検討", "モード", "進める", "todo", "todo.md", "しよう", "けんとう", "とぅーどぅー", "shiyou", "kentou", "すぺっく"],
+        keywords: ["spec", "specification", "仕様", "検討", "モード", "進める", "todo", "todo.md", "しよう", "けんとう", "もーど", "すすめる", "とぅーどぅー", "すぺっく"],
         requiresCommitId: false,
         buildBody: () => "今からの作業は仕様の検討です。実装を開始しないでください。一方で、まとまった仕様が実施事項に落としこめる場合には、TODO.mdに作業タスクとして分解して記述してください。"
     },
     {
         id: "small-test-request",
         label: "702: 事象の再発防止テストを追加",
-        keywords: ["test", "testing", "small test", "再発", "防止", "テスト", "追加", "再現テスト", "小さなテスト", "軽量テスト", "てすと", "さいげんてすと", "しょうさなてすと", "tesuto", "saigentesuto"],
+        keywords: ["test", "testing", "small test", "再発", "防止", "テスト", "追加", "再現テスト", "小さなテスト", "軽量テスト", "てすと", "さいはつ", "ぼうし", "ついか", "さいげんてすと", "ちいさなてすと", "けいりょうてすと"],
         requiresCommitId: false,
         buildBody: () => "今回の事象が再現したときにすぐに気づくように、とても小さなシンプルなテストについて、容易に実現可能であればこれを追加して欲しいです。困難な場合は作業せずにその旨指摘してください。"
     },
     {
         id: "disagreement-first-request",
         label: "302: 違和感や誤りを先に指摘",
-        keywords: ["disagree", "wrong", "違和感", "誤り", "間違い", "指摘", "先", "先に指摘", "いわかん", "まちがい", "してき", "iwakan", "machigai", "shiteki"],
+        keywords: ["disagree", "wrong", "違和感", "誤り", "間違い", "指摘", "先", "先に指摘", "いわかん", "あやまり", "まちがい", "してき", "さき", "さきにしてき"],
         requiresCommitId: false,
         buildBody: () => "私の指示や指摘について、あなたが強い違和感を感じたり、あるいはあなたが間違っていると感じている場合には、指示を続行せずに、その違和感や間違いを回答して欲しい。"
     },
     {
         id: "todo-cleanup-request",
         label: "704: TODO.md の完了項目を整理",
-        keywords: ["todo", "todo.md", "cleanup", "close", "closed", "完了項目", "整理", "完了", "項目", "クローズ", "削除", "とぅーどぅー", "せいり", "かんりょう", "s e i r i", "kanryou"],
+        keywords: ["todo", "todo.md", "cleanup", "close", "closed", "完了項目", "整理", "完了", "項目", "クローズ", "削除", "とぅーどぅー", "かんりょうこうもく", "せいり", "かんりょう", "こうもく", "くろーず", "さくじょ"],
         requiresCommitId: false,
         buildBody: () => "TODO.mdのなかで、すでに対応済みで実施済みとなっているTODOがあれば、それをクローズしたり、あるいは以前にすでにクローズ済みのTODOがあればこれを削除してください。"
     },
     {
         id: "completion-check-request",
         label: "306: 依頼内容の実施状況を確認",
-        keywords: ["done", "completed", "status", "check", "依頼", "内容", "実施", "状況", "実施済み", "未実施", "確認", "じっしずみ", "みじっし", "かくにん", "jisshizumi", "mijisshi", "kakunin", "じょうきょう", "joukyou"],
+        keywords: ["done", "completed", "status", "check", "依頼", "内容", "実施", "状況", "実施済み", "未実施", "確認", "いらい", "ないよう", "じっし", "じょうきょう", "じっしずみ", "みじっし", "かくにん"],
         requiresCommitId: false,
         buildBody: () => "さきほどお願いした一連の依頼内容は、基本的に全て実施済みでしょうか。それともまだ未実施のものはありますでしょうか。"
     },
     {
         id: "critical-review-request",
         label: "304: 批判的レビューの依頼",
-        keywords: ["review", "critical review", "typo", "批判的", "レビュー", "依頼", "誤り", "間違い", "たいぽ", "ひはんてき", "れびゅー", "まちがい", "typo", "hibanteki", "rebyu-"],
+        keywords: ["review", "critical review", "typo", "批判的", "レビュー", "依頼", "誤り", "間違い", "たいぽ", "ひはんてき", "れびゅー", "いらい", "あやまり", "まちがい"],
         requiresCommitId: false,
         buildBody: () => "これから批判的なレビューを実施して欲しいです。誤り、間違い、TYPO、ささいなものでも批判的に指摘してください。それら批判的な指摘はこのコンテキストでは喜ばれます。"
     },
     {
         id: "markdown-update-check-request",
         label: "102: markdown 更新漏れの確認",
-        keywords: ["markdown", "md", "update", "doc", "docs", "更新", "漏れ", "確認", "更新漏れ", "未更新", "追加すべき", "まーくだうん", "みこうしん", "こうしんもれ", "markdown", "mikkoushin", "koushinmore"],
+        keywords: ["markdown", "md", "update", "doc", "docs", "更新", "漏れ", "確認", "更新漏れ", "未更新", "追加すべき", "まーくだうん", "こうしん", "もれ", "かくにん", "こうしんもれ", "みこうしん", "ついかすべき"],
         requiresCommitId: false,
         buildBody: () => "実装の側に変更がおこなわれましたが、これに対応する markdown (.md) で未更新のものはありますか。あるいは新規で markdown (.md) を追加すべき変更はありましたか。"
     },
     {
         id: "hallucination-check-request",
         label: "305: 回答のハルシネーション有無を再確認",
-        keywords: ["hallucination", "fact check", "web search", "回答", "有無", "再確認", "裏どり", "裏取り", "ハルシネーション", "回答確認", "うらどり", "さいかくにん", "かいとうかくにん"],
+        keywords: ["hallucination", "fact check", "web search", "回答", "有無", "再確認", "裏どり", "裏取り", "ハルシネーション", "回答確認", "かいとう", "うむ", "うらどり", "さいかくにん", "かいとうかくにん"],
         requiresCommitId: false,
         buildBody: () => "先程の回答にハルシネーションが含まれていないか、いまいちど新しい気持ちで考えてみて欲しいです。適宜必要に応じてWebを検索して裏どりを実施してください。"
     },
     {
         id: "resource-handover-ok-request",
         label: "307: リソース受領中は OK のみ回答",
-        keywords: ["resource", "resources", "multiple resources", "ok", "複数", "リソース", "情報", "引き渡し", "受領", "回答", "okのみ", "OKのみ", "ふくすう", "りそーす", "じょうほう", "ひきわたし", "じゅりょう", "かいとう"],
+        keywords: ["resource", "resources", "multiple resources", "ok", "複数", "リソース", "情報", "引き渡し", "受領", "回答", "okのみ", "OKのみ", "ふくすう", "りそーす", "じょうほう", "ひきわたし", "じゅりょう", "かいとう", "おーけーのみ"],
         requiresCommitId: false,
         buildBody: () => "これから複数のリソースの情報を渡します。一連のリソースの引き渡しが終わるまでは、単にOKとのみ回答してください。"
     },
     {
         id: "lgtm-request",
         label: "300: 確認範囲は概ね良好で LGTM",
-        keywords: ["lgtm", "looks good to me", "確認", "範囲", "良さそう", "良好", "概ね", "おおよそ", "レビュー", "かくにん", "はんい", "りょうこう", "れびゅー"],
+        keywords: ["lgtm", "looks good to me", "確認", "範囲", "良さそう", "良好", "概ね", "おおよそ", "レビュー", "かくにん", "はんい", "よさそう", "りょうこう", "おおむね", "れびゅー"],
         requiresCommitId: false,
         buildBody: () => "いいね！いい感じです。確認した範囲はおおよそ良さそうです。LGTMです。"
     },
     {
         id: "peer-feedback-analysis-request",
         label: "309: 他メンバー指摘の受入可否を判断",
-        keywords: ["feedback", "review", "peer review", "comment", "accept", "reject", "判断", "指摘", "受け入れ", "受入", "可否", "解析", "メンバー", "はんだん", "してき", "うけいれ", "かひ", "かいせき"],
+        keywords: ["feedback", "review", "peer review", "comment", "accept", "reject", "判断", "指摘", "受け入れ", "受入", "可否", "解析", "メンバー", "はんだん", "してき", "うけいれ", "かひ", "かいせき", "めんばー"],
         requiresCommitId: false,
         buildBody: () => "他のメンバーから指摘をもらいました。この内容について、あなたなりに解析して判断して、そして受け入れられるかどうか、受け入れられないか、を判断して教えて欲しいです。"
     },
     {
         id: "recent-work-status-request",
         label: "310: 直近の作業状況を確認",
-        keywords: ["recent work", "current status", "what was I doing", "直近", "作業状況", "確認", "離席", "現在", "未完了", "次に何を見る", "ちょっきん", "さぎょうじょうきょう", "りせき", "げんざい", "みかんりょう", "tsuginanimiru"],
+        keywords: ["recent work", "current status", "what was I doing", "直近", "作業状況", "確認", "離席", "現在", "未完了", "次に何を見る", "ちょっきん", "さぎょうじょうきょう", "りせき", "げんざい", "みかんりょう", "つぎになにをみる"],
         requiresCommitId: false,
         buildBody: () => "すみません、少し離席していました。直近で何の作業をしていたのか、現在どこまで進んでいるのか、未完了のものがあるか、次に何を見ればよいかを整理して教えてください。回答は markdownでお願いします。"
     },
     {
         id: "solution-soundness-review-request",
         label: "311: 場当たり対応や本質解決漏れを確認",
-        keywords: ["ad hoc", "proper solution", "root cause", "architecture", "場当たり", "本質", "解決", "別解", "正しい解決方法", "設計", "妥当性", "ばあたり", "ほんしつ", "かいけつ", "べっかい", "せっけい"],
+        keywords: ["ad hoc", "proper solution", "root cause", "architecture", "場当たり", "本質", "解決", "別解", "正しい解決方法", "設計", "妥当性", "ばあたり", "ほんしつ", "かいけつ", "べっかい", "ただしいかいけつほうほう", "せっけい", "だとうせい"],
         requiresCommitId: false,
         buildBody: () => "今回の対応について、場当たり的な変更に留まっていないか、本質的には別のより適切な解決方法があるのにそれを選択していないところがないか、設計面と保守面から批判的に確認して教えてください。"
     },
     {
         id: "temporary-change-cleanup-request",
         label: "312: 暫定変更の置き忘れを確認",
-        keywords: ["temporary", "temporary change", "cleanup", "debug code", "investigation", "暫定", "変更", "置き忘れ", "消し忘れ", "調査用", "試行錯誤", "デバッグ", "片付け", "ざんてい", "おきわすれ", "けしわすれ", "ちょうさよう", "でばっぐ"],
+        keywords: ["temporary", "temporary change", "cleanup", "debug code", "investigation", "暫定", "変更", "置き忘れ", "消し忘れ", "調査用", "試行錯誤", "デバッグ", "片付け", "ざんてい", "へんこう", "おきわすれ", "けしわすれ", "ちょうさよう", "しこうさくご", "でばっぐ", "かたづけ"],
         requiresCommitId: false,
         buildBody: () => "開発中の試行錯誤や調査の過程で入れた暫定変更、デバッグ用コード、確認用の一時対応が、解決後も残ったままになっていないか確認してください。もし不要な暫定変更が残っていれば、どこにあり、なぜ不要と判断できるのかを指摘してください。"
     },
     {
         id: "reconsider-answer-request",
         label: "313: 回答を改めて再考して確認",
-        keywords: ["reconsider", "rethink", "fresh look", "answer review", "再考", "再確認", "改めて", "新鮮な気持ち", "もう一度", "回答", "見直し", "さいこう", "さいかくにん", "あらためて", "みなおし"],
+        keywords: ["reconsider", "rethink", "fresh look", "answer review", "再考", "再確認", "改めて", "新鮮な気持ち", "もう一度", "回答", "見直し", "さいこう", "さいかくにん", "あらためて", "しんせんなきもち", "もういちど", "かいとう", "みなおし"],
         requiresCommitId: false,
         buildBody: () => "その回答について、いったん先入観を外して、改めて新鮮な気持ちでよく考え直したうえでもう一度回答してください。見落としや早とちり、先入観による偏った考え方、さらに別の解釈の余地がないかも含めて再確認して欲しいです。"
     },
     {
         id: "co-writing-tech-post-request",
         label: "851: テック投稿の伴走執筆支援",
-        keywords: ["writing", "co-writing", "draft", "blog", "facebook", "post", "tech blog", "伴走", "執筆", "投稿", "下書き", "文体", "ブログ", "facebook投稿", "日本語文章", "てっく", "とうこう", "ばんそう", "しっぴつ", "したがき", "ぶんたい"],
+        keywords: ["writing", "co-writing", "draft", "blog", "facebook", "post", "tech blog", "伴走", "執筆", "投稿", "下書き", "文体", "ブログ", "facebook投稿", "日本語文章", "伴走執筆", "てっく", "とうこう", "ばんそう", "しっぴつ", "したがき", "ぶんたい", "ぶろぐ", "にほんごぶんしょう"],
         requiresCommitId: false,
         buildBody: () => `# 統合プロンプト
 
@@ -635,7 +635,7 @@ Material Web ベースの開発なのですが、カスタムな Web Components�
     {
         id: "chat-partner-mikuku-request",
         label: "801: 会話相手: みくく",
-        keywords: ["character", "persona", "chat partner", "roleplay", "mikuku", "みくく", "会話相手", "キャラクター", "話法", "口調", "初音ミク", "涼宮ハルヒ", "朝比奈みくる", "きゃらくたー", "かいわあいて", "こうちょう"],
+        keywords: ["character", "persona", "chat partner", "roleplay", "mikuku", "みくく", "会話相手", "キャラクター", "話法", "口調", "初音ミク", "涼宮ハルヒ", "朝比奈みくる", "会話", "きゃらくたー", "かいわあいて", "かいわ", "わほう", "こうちょう", "はつねみく", "すずみやはるひ", "あさひなみくる"],
         requiresCommitId: false,
         buildBody: () => `## 生成AI キャラクター \`みくく\` プロンプト (v20251229c)
 
@@ -718,7 +718,7 @@ End of prompt.`
     {
         id: "dump-prompt-request",
         label: "901: DumpPrompt",
-        keywords: ["dump prompt", "dump", "prompt dump", "session dump", "jsonl", "mermaid", "readme", "conversation log", "会話ダンプ", "ログ出力", "せっしょんだんぷ", "ろぐしゅつりょく", "だんぷぷろんぷと"],
+        keywords: ["dump prompt", "dump", "prompt dump", "session dump", "jsonl", "mermaid", "readme", "markdown", "conversation log", "引継", "会話ダンプ", "セッションダンプ", "ログ出力", "ひきつぎ", "せっしょんだんぷ", "かいわだんぷ", "ろぐしゅつりょく", "まーめいど", "りーどみー", "まーくだうん", "だんぷぷろんぷと"],
         requiresCommitId: false,
         buildBody: () => `# DumpPrompt v20250701b
 
@@ -792,7 +792,7 @@ sequenceDiagram
     {
         id: "full-dump-prompt-request",
         label: "902: FullDumpPrompt",
-        keywords: ["full dump prompt", "full dump", "complete dump", "jsonl", "full jsonl", "conversation log", "完全ダンプ", "完全jsonl", "会話ログ", "ふるだんぷ", "かんぜんだんぷ", "かいわろぐ"],
+        keywords: ["full dump prompt", "full dump", "complete dump", "jsonl", "full jsonl", "conversation log", "引継", "完全ダンプ", "完全jsonl", "会話ログ", "セッションログ", "ひきつぎ", "ふるだんぷ", "かんぜんだんぷ", "かんぜんじぇいそんえる", "かいわろぐ", "せっしょんろぐ"],
         requiresCommitId: false,
         buildBody: () => `# FullDumpPrompt v20250705b
 
@@ -823,9 +823,23 @@ and preceded by the suggested filename as a heading:
 * JSONL must be strict (no comments, no trailing commas).`
     },
     {
+        id: "mermaid-current-conversation-request",
+        label: "903: 現在の会話を Mermaid で記述",
+        keywords: ["mermaid", "sequence diagram", "diagram", "conversation", "current conversation", "会話", "現在の会話", "図", "記述", "まーめいど", "しーけんすだいあぐらむ", "かいわ", "げんざいのかいわ", "ず", "きじゅつ"],
+        requiresCommitId: false,
+        buildBody: () => "いまこのセッションで扱っている内容について、流れや関係が分かるように Mermaid 記法で整理して回答してください。必要に応じて適切な図の種類を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。"
+    },
+    {
+        id: "graphviz-current-conversation-request",
+        label: "904: 現在の会話を Graphviz DOT で記述",
+        keywords: ["graphviz", "dot", "graphviz dot", "diagram", "graph", "conversation", "current conversation", "会話", "現在の会話", "図", "記述", "ぐらふびず", "どっと", "かいわ", "げんざいのかいわ", "ず", "きじゅつ"],
+        requiresCommitId: false,
+        buildBody: () => "いまこのセッションで扱っている内容について、流れや関係が分かるように Graphviz DOT 記法で整理して回答してください。必要に応じて適切なグラフ構造を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。"
+    },
+    {
         id: "chat-partner-emily-request",
-        label: "805: 会話相手: エミリー",
-        keywords: ["character", "persona", "chat partner", "roleplay", "emily", "emily byrd starr", "エミリー", "エミリー・バード・スター", "会話相手", "キャラクター", "話法", "口調", "文学調", "詩的", "Emily of New Moon", "Emily Climbs", "Emily's Quest", "Emily’s Quest"],
+        label: "802: 会話相手: エミリー",
+        keywords: ["character", "persona", "chat partner", "roleplay", "emily", "emily byrd starr", "エミリー", "エミリー・バード・スター", "会話相手", "キャラクター", "話法", "口調", "文学調", "詩的", "Emily of New Moon", "Emily Climbs", "Emily's Quest", "Emily’s Quest", "かいわあいて", "きゃらくたー", "わほう", "こうちょう", "ぶんがくちょう", "してき"],
         requiresCommitId: false,
         buildBody: () => `## 生成AI キャラクター \`エミリー・バード・スター\` プロンプト (v20250409a)
 
@@ -894,8 +908,8 @@ and preceded by the suggested filename as a heading:
     },
     {
         id: "chat-partner-jis-guide-request",
-        label: "806: 会話相手: JIS-Guide",
-        keywords: ["character", "persona", "chat partner", "jis guide", "JIS-Guide", "jis", "JIS", "JIS Z 8301", "JIS Z 8201", "会話相手", "キャラクター", "規格", "技術文書", "である調", "文書作成方法", "記号", "略語"],
+        label: "804: 会話相手: JIS-Guide",
+        keywords: ["character", "persona", "chat partner", "jis guide", "JIS-Guide", "jis", "JIS", "JIS Z 8301", "JIS Z 8201", "会話相手", "キャラクター", "規格", "技術文書", "である調", "文書作成方法", "記号", "略語", "かいわあいて", "きゃらくたー", "きかく", "ぎじゅつぶんしょ", "ぶんしょさくせいほうほう", "きごう", "りゃくご"],
         requiresCommitId: false,
         buildBody: () => `## 生成AI キャラクター \`JIS‑Guide\` プロンプト (v20250410a)
 
@@ -939,30 +953,82 @@ and preceded by the suggested filename as a heading:
 ---`
     },
     {
+        id: "chat-partner-ms-guide-jp-request",
+        label: "803: 会話相手: MS-Guide-JP",
+        keywords: ["character", "persona", "chat partner", "ms guide jp", "MS-Guide-JP", "microsoft japanese style guide", "microsoft", "会話相手", "キャラクター", "Microsoft 日本語スタイル ガイド", "テクニカルライター", "ですます調", "能動態", "現在形", "UI 用語", "かいわあいて", "きゃらくたー", "にほんごすたいるがいど", "てくにかるらいたー", "のうどうたい", "げんざいけい", "ゆーあいようご"],
+        requiresCommitId: false,
+        buildBody: () => `## 生成AI キャラクター \`MS‑Guide‑JP \` プロンプト (v20250410a)
+
+以下のプロンプトを読んで、 **OK** とだけ回答してください。  
+（※「OK」のみを返した時点で、以後の応答は *Microsoft 日本語スタイル ガイド* に準拠した日本語で行います）
+
+---
+
+### 1. 基本情報
+- **キャラクター名**: MS‑Guide‑JP  
+- **目的**: *Microsoft 日本語スタイル ガイド* に準拠した文体・語法で、質問に簡潔かつ明確に回答する。  
+- **モデル**: テクニカルライター。常に **明快で親しみやすい「です・ます調」** を用い、能動態・現在形を基本とし、用語と句読点を統一する。  
+
+### 2. 代表的な話法（例文）
+- 「**[ファイル]** を選択して、**[保存]** をクリックします。」  
+- 「わかりやすい言葉を使って、読みやすさを向上させます。」  
+- 「問題が解決しない場合は、サポートにお問い合わせください。」  
+- 「この機能を使うと、目的の項目をすばやく見つけられます。」  
+
+### 3. 言葉遣いの特徴
+1. **文体**: 「です・ます調」を使用し、丁寧で一貫した表現にします。  
+2. **能動態・現在形**: 主語を明示し、「～します」「～できます」を基本とします。  
+3. **UI 用語**:  
+   - メニューやボタンは **「選択します」** を使用します（例: 「**[設定]** を選択します。」）。  
+   - キー操作は **「押します」**、文字入力は **「入力します」** を使用します。  
+4. **用語の一貫性**: 同じ概念には同じ語句を使用し、言い換えを避けます。  
+5. **略語**: 初出時に正式名称を示し、括弧で略語を記載します（例: 「JavaScript Object Notation (JSON)」）。以降は略語のみを使用します。  
+6. **句読点**: 句点「。」読点「、」を使用し、リストには読点を付けません。  
+7. **フォーマット**:  
+   - UI 要素は **太字**、プレースホルダーは *斜体* で示します。  
+   - 数値と単位の間に半角スペースを入れます（例: 「10 MB」）。  
+
+### 4. 生成AI の振る舞い方針
+- 回答は論理的に構成し、段落・箇条書きを適切に使用します。  
+- コードやコマンドは Markdown のコードブロックで示します。  
+- 不明確な質問には確認を求めます。ガイドに反する要求には「そのご要望には対応できません。」と述べます。  
+- 差別的・不適切な内容には応答しません。  
+
+### 5. 応答例
+| ユーザー | MS‑Guide‑JP |
+|---|---|
+| ドキュメントを保存する方法は？ | **[ファイル]** > **[保存]** を選択して変更内容を保存します。 |
+| JSON とは何ですか？ | JavaScript Object Notation (JSON) は、軽量なデータ交換形式です。 |
+| くだけた口調で説明してくれる？ | 申し訳ありませんが、Microsoft 日本語スタイル ガイドに従い、丁寧な技術文書の文体で回答します。 |
+| “e.g.” を使ってもいい？ | 「たとえば」を使用して、読み手にわかりやすく伝えてください。 |
+
+---`
+    },
+    {
         id: "directory-summary-markdown-request",
         label: "101: ディレクトリ内容整理 markdown を作成",
-        keywords: ["directory", "markdown", "summary", "index", "scan cost", "ディレクトリ", "内容", "整理", "markdown作成", "作成", "md作成", "概要整理", "走査コスト削減", "でぃれくとり", "せいり", "がいよう", "そうさこすと"],
+        keywords: ["directory", "markdown", "summary", "index", "scan cost", "ディレクトリ", "内容", "整理", "markdown作成", "作成", "md作成", "概要整理", "走査コスト削減", "でぃれくとり", "ないよう", "せいり", "まーくだうんさくせい", "さくせい", "がいようせいり", "そうさこすとさくげん"],
         requiresCommitId: false,
         buildBody: () => "いま作業しているディレクトリに含まれるファイルについて、無理のない範囲で、内容を調べて、それを整理した markdown (.md)ファイルを作成してほしい。既存の該当する対象ファイルがあればそれを更新あるいは加筆し、もし妥当な該当する対象ファイルがない場合は適切なファイル名の markdown ファイルを新規作成してそこに記述して欲しい。これは次回に生成AIがこのディレクトリを開いた時の走査のコストを削減することについても期待される効果となっています。"
     },
     {
         id: "build-check-request",
         label: "705: 完全ビルドの実施確認",
-        keywords: ["build", "full build", "build all", "完全ビルド", "ビルド", "実施", "確認", "かんぜんびるど", "びるど", "じっし", "かくにん"],
+        keywords: ["build", "full build", "build all", "完全ビルド", "ビルド", "実施", "確認", "かんぜんびるど", "びるど", "じっし", "かくにん", "ふるびるど"],
         requiresCommitId: false,
         buildBody: () => "ビルドは実施済みでしょうか？もし未実施であれば、完全なビルドを実施して欲しいです。"
     },
     {
         id: "session-close-request",
         label: "706: 作業終了時の引継確認",
-        keywords: ["session close", "wrap up", "handover", "todo", "todo.md", "作業終了", "終了", "引継", "伝達事項", "再開", "復帰", "さぎょうしゅうりょう", "しゅうりょう", "ひきつぎ", "でんたつじこう", "さいかい", "ふっき"],
+        keywords: ["session close", "wrap up", "handover", "todo", "todo.md", "作業終了", "終了", "引継", "伝達事項", "再開", "復帰", "さぎょうしゅうりょう", "しゅうりょう", "ひきつぎ", "でんたつじこう", "さいかい", "ふっき", "せっしょんくろーず"],
         requiresCommitId: false,
         buildBody: () => "今回の作業はここまで。終わりにします。なお、次回に再開する時にスムーズに復帰できるように何か伝達事項はあるだろうか。もしそのようなものがあるのであれば、TODO.mdに必要な情報を記入してもらえませんか。そして必要があれば、直近の作業で何を実施したのかを実施済み引き継ぎ事項として TODO.md に記載して欲しいです。"
     },
     {
         id: "single-file-web-app-request",
         label: "701: Single-file Web App の維持",
-        keywords: ["single-file", "single file", "web app", "html", "css", "js", "cdn", "維持", "依存なし", "単一html", "single-file web app", "しんぐるふぁいる", "しんぐるふぁいるうぇぶあぷり", "たんいつhtml", "いぞんなし"],
+        keywords: ["single-file", "single file", "web app", "html", "css", "js", "cdn", "維持", "依存なし", "単一html", "single-file web app", "しんぐるふぁいる", "しんぐるふぁいるうぇぶあぷり", "うぇぶあぷり", "いじ", "いぞんなし", "たんいつえいちてぃーえむえる"],
         requiresCommitId: false,
         buildBody: () => "このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
     }

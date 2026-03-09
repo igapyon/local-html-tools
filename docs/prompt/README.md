@@ -8,6 +8,7 @@
 
 - [ルートREADME](../../README.md)
 - [LHT共通部品README](../../lht-cmn/README.md)
+- [prompt-gen 検索とキーワード設計](./prompt-gen-search-and-keywords.md)
 
 ## 対象ファイル
 
@@ -47,6 +48,11 @@
 - 各定義は `id / label / keywords / requiresCommitId / buildBody()` を持つ
 - `main.ts` は検索、選択状態、入力欄表示、生成結果更新、スクロール制御を担当する
 - 検索は空欄で全候補表示、空白区切りで AND、各語の照合先は label / keywords / かな・カナ・ローマ字展開を含む
+
+## 検索とキーワード
+
+- 検索ボックスの挙動と `keywords` の設計方針は [prompt-gen 検索とキーワード設計](./prompt-gen-search-and-keywords.md) を参照する
+- `prompt-definitions.ts` の更新時は、候補本文だけでなく検索性もあわせて見直す
 
 ## 運用方針
 
