@@ -202,6 +202,56 @@ md-icon-button.md-copy-button--surface {
   display: none;
 }
 
+.md-menu-separator {
+  height: 1px;
+  margin: 4px 0;
+  background: #ece6f4;
+}
+
+.md-menu-settings {
+  padding: 8px 14px 12px;
+  min-width: 220px;
+}
+
+.md-menu-settings__title {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #544863;
+}
+
+.md-menu-settings__switch {
+  display: block;
+}
+
+.md-menu-settings__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  appearance: none;
+  border: 1px solid #d8d1e3;
+  border-radius: 999px;
+  background: #f7f2fa;
+  color: #4a4458;
+  padding: 0.38rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.md-menu-settings__reset:hover {
+  background: #efe7f8;
+  border-color: #cfc3e3;
+  color: #352f41;
+}
+
+.md-menu-settings__reset-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
 @media (max-width: 720px) {
   body.md-page {
     padding: 14px;
