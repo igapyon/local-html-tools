@@ -92,7 +92,10 @@ limitations under the License.
     </section>
 
     <section id="promptOutputSection" class="md-section md-stack-md md-hidden">
-      <p class="md-output-title">生成結果</p>
+      <div class="md-output-header">
+        <p id="promptOutputTitle" class="md-output-title">生成結果</p>
+        <div id="promptOutputHelp" class="md-output-help"></div>
+      </div>
       <lht-command-block command-id="promptOutput"></lht-command-block>
       <lht-switch-help
         switch-id="includeLabelPrefix"

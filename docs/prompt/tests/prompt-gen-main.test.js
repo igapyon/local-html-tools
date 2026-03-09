@@ -65,7 +65,10 @@ function mountPromptDom() {
     <input id="promptSearch" />
     <div id="promptCandidateArea"></div>
     <div id="commitInputSection" class="md-hidden"></div>
-    <div id="promptOutputSection" class="md-hidden"></div>
+    <div id="promptOutputSection" class="md-hidden">
+      <p id="promptOutputTitle">生成結果</p>
+      <div id="promptOutputHelp"></div>
+    </div>
     <input id="commitId" />
     <input id="includeLabelPrefix" type="checkbox" />
     <div id="promptOutput"></div>
@@ -96,6 +99,7 @@ function ensureLocalStorageMock() {
 async function bootPromptPage() {
   defineElementIfNeeded("lht-text-field-help");
   defineElementIfNeeded("lht-switch-help");
+  defineElementIfNeeded("lht-help-tooltip");
   ensureLocalStorageMock();
   window.localStorage.clear();
   mountPromptDom();
@@ -199,6 +203,27 @@ describe("prompt-gen main", () => {
     const activeButtons = buttons.filter((button) => button.classList.contains("is-active"));
     expect(activeButtons).toHaveLength(1);
     expect(activeButtons[0].querySelector(".md-chip-label").textContent).toContain("310: 直近の作業状況を確認");
+  });
+
+  it("shows help only beside the selected output label, not on candidate buttons", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptOutputTitle = document.getElementById("promptOutputTitle");
+    const promptOutputHelp = document.getElementById("promptOutputHelp");
+
+    promptSearch.value = "A301";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    const buttons = [...document.querySelectorAll(".md-chip-button")];
+    expect(buttons).toHaveLength(1);
+    expect(buttons[0].querySelector("lht-help-tooltip")).toBeNull();
+    expect(promptOutputTitle.textContent).toContain("A301");
+
+    const help = promptOutputHelp.querySelector("lht-help-tooltip");
+    expect(help).not.toBeNull();
+    expect(help.getAttribute("label")).toBe("キーワード");
+    expect(help.textContent).toContain("A301");
   });
 
   it("toggles A/X/S/P visibility in the menu and persists to localStorage", async () => {

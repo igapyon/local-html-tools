@@ -90,7 +90,6 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   appearance: none;
   border: 1px solid #d8d1e3;
   border-radius: 999px;
@@ -127,22 +126,9 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
   align-items: center;
 }
 
-.md-chip-button lht-help-tooltip {
-  flex: 0 0 auto;
-}
-
 .md-chip-button:hover,
 .md-chip-button:focus-within {
   z-index: 10;
-}
-
-.md-chip-button lht-help-tooltip:hover,
-.md-chip-button lht-help-tooltip:focus-within {
-  z-index: 20;
-}
-
-.md-chip-button lht-help-tooltip .md-tooltip-content {
-  z-index: 400;
 }
 
 .md-output-title {
@@ -150,6 +136,22 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
   font-size: 1.02rem;
   font-weight: 700;
   color: #27364b;
+}
+
+.md-output-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.md-output-help {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+}
+
+.md-output-help lht-help-tooltip {
+  flex: 0 0 auto;
 }
 
 .md-code-block {
