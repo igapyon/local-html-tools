@@ -140,6 +140,7 @@ async function initializePromptPage() {
     let selectedPrompt = "";
     let lastSearchQuery = "";
     let pendingInitialPromptCode = "";
+    let suppressSearchResetOnce = false;
     const kanaToRomajiMap = new Map([
         ["きゃ", "kya"], ["きゅ", "kyu"], ["きょ", "kyo"],
         ["しゃ", "sha"], ["しゅ", "shu"], ["しょ", "sho"],
@@ -519,12 +520,17 @@ async function initializePromptPage() {
         lastSearchQuery = query;
         promptCandidateArea.innerHTML = "";
         if (queryChanged) {
-            selectedPrompt = "";
-            syncInputSections(null);
-            promptOutputSection.classList.add("md-hidden");
-            commitIdInput.value = "";
-            subjectInput.value = "";
-            promptOutput.textContent = "";
+            if (suppressSearchResetOnce) {
+                suppressSearchResetOnce = false;
+            }
+            else {
+                selectedPrompt = "";
+                syncInputSections(null);
+                promptOutputSection.classList.add("md-hidden");
+                commitIdInput.value = "";
+                subjectInput.value = "";
+                promptOutput.textContent = "";
+            }
         }
         const { definitionMatchGrades, matchedDefinitions, prioritizedSingleDefinition } = searchPromptDefinitions(query, promptSearchIndexes, promptSearchIndexById);
         if (pendingInitialPromptCode) {
@@ -576,6 +582,14 @@ async function initializePromptPage() {
         button.classList.add("is-active");
         revealOutputSection();
         const selectedDefinition = visiblePromptDefinitions.find((definition) => definition.id === id);
+        if (selectedDefinition && !(promptSearch.value || "").trim()) {
+            const searchSeed = getDefinitionSearchSeed(selectedDefinition);
+            if (searchSeed) {
+                suppressSearchResetOnce = true;
+                promptSearch.value = searchSeed;
+                promptSearch.dispatchEvent(new Event("input"));
+            }
+        }
         syncInputSections(selectedDefinition || null);
         if (selectedDefinition === null || selectedDefinition === void 0 ? void 0 : selectedDefinition.requiresCommitId) {
             commitIdInput.focus();
@@ -605,6 +619,11 @@ async function initializePromptPage() {
     function getDefinitionLabelCode(definition) {
         const label = String((definition === null || definition === void 0 ? void 0 : definition.label) || "");
         const match = label.match(/^([^:]+):/);
+        return match ? match[1] : "";
+    }
+    function getDefinitionSearchSeed(definition) {
+        const labelCode = getDefinitionLabelCode(definition);
+        const match = labelCode.match(/^[A-Z](\d+)/);
         return match ? match[1] : "";
     }
     function buildShareLink() {
