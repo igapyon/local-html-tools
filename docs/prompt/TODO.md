@@ -24,6 +24,7 @@
 - [ ] S603-001 は A603 との対応が弱いため、別の枝番へ移設する
 - [ ] prompt-gen の可変入力で、`commitId` は SHA らしい文字だけを許可するか検討する
 - [ ] prompt-gen の可変入力で、`subject` は命令ではなく文字列値として扱う文言を本文へ追加するか検討する
+- [ ] prompt-gen の「共有リンクをコピー」ボタンの SVG アイコンを、より一般的で視認性の高い link / chain 表現へ改善する
 - [x] S603-501: Mermaid timeline で図解化(AI提案)
 - [x] S603-502: Mermaid flowchart で図解化(AI提案)
 - [x] S603-503: Mermaid mindmap で図解化(AI提案)

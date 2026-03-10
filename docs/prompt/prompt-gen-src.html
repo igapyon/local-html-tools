@@ -39,6 +39,10 @@ limitations under the License.
         <rect x="9" y="9" width="11" height="11" rx="2"/>
         <rect x="4" y="4" width="11" height="11" rx="2"/>
       </symbol>
+      <symbol id="md-icon-link" viewBox="0 0 24 24">
+        <path d="M9.88 14.12a3 3 0 0 1 0-4.24l2-2a3 3 0 1 1 4.24 4.24l-.71.71"/>
+        <path d="M14.12 9.88a3 3 0 0 1 0 4.24l-2 2a3 3 0 1 1-4.24-4.24l.71-.71"/>
+      </symbol>
       <symbol id="md-icon-trash" viewBox="0 0 24 24">
         <path d="M3 6h18"/>
         <path d="M8 6V4h8v2"/>
@@ -109,12 +113,20 @@ limitations under the License.
         <div id="promptOutputHelp" class="md-output-help"></div>
       </div>
       <lht-command-block command-id="promptOutput"></lht-command-block>
-      <lht-switch-help
-        switch-id="includeLabelPrefix"
-        label="ラベル名を先頭に含める"
-        help-label="ラベル名を先頭に含める説明">
-        ON の場合は `[ボタンラベル] 本文` の形式で出力します。OFF の場合は本文のみを出力します。
-      </lht-switch-help>
+      <div class="md-output-options">
+        <lht-switch-help
+          switch-id="includeLabelPrefix"
+          label="ラベル名を先頭に含める"
+          help-label="ラベル名を先頭に含める説明">
+          ON の場合は `[ボタンラベル] 本文` の形式で出力します。OFF の場合は本文のみを出力します。
+        </lht-switch-help>
+        <button id="copyShareLinkButton" type="button" class="md-secondary-button">
+          <svg viewBox="0 0 24 24" class="md-secondary-button__icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <use href="#md-icon-link" xlink:href="#md-icon-link"></use>
+          </svg>
+          <span>共有リンクをコピー</span>
+        </button>
+      </div>
     </section>
 
     <lht-toast id="toast"></lht-toast>

@@ -73,6 +73,7 @@ function mountPromptDom() {
     <input id="commitId" />
     <input id="subjectInput" />
     <input id="includeLabelPrefix" type="checkbox" />
+    <button id="copyShareLinkButton" type="button"></button>
     <div id="promptOutput"></div>
   `;
 }
@@ -108,12 +109,13 @@ function setRawInputValue(element, value) {
   });
 }
 
-async function bootPromptPage() {
+async function bootPromptPage(urlSearch = "") {
   defineElementIfNeeded("lht-text-field-help");
   defineElementIfNeeded("lht-switch-help");
   defineElementIfNeeded("lht-help-tooltip");
   ensureLocalStorageMock();
   window.localStorage.clear();
+  window.history.replaceState({}, "", urlSearch ? `/${urlSearch.startsWith("?") ? urlSearch : `?${urlSearch}`}` : "/");
   mountPromptDom();
   const promptOutputSection = document.getElementById("promptOutputSection");
   promptOutputSection.scrollIntoView = () => {};
@@ -123,7 +125,71 @@ async function bootPromptPage() {
   await Promise.resolve();
 }
 
+function ensureClipboardMock() {
+  let copiedText = "";
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: {
+      async writeText(text) {
+        copiedText = String(text);
+      }
+    }
+  });
+  return () => copiedText;
+}
+
 describe("prompt-gen main", () => {
+  it("copies a share link with q and subject parameters", async () => {
+    const getCopiedText = ensureClipboardMock();
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const subjectInput = document.getElementById("subjectInput");
+    const copyShareLinkButton = document.getElementById("copyShareLinkButton");
+
+    promptSearch.value = "A852";
+    promptSearch.dispatchEvent(new Event("input"));
+    subjectInput.value = "a small fox";
+    subjectInput.dispatchEvent(new Event("input"));
+    copyShareLinkButton.click();
+    await Promise.resolve();
+
+    expect(getCopiedText()).toBe("http://localhost:3000/?q=A852&subject=a+small+fox");
+  });
+
+  it("applies q query parameter to the search field on load", async () => {
+    await bootPromptPage("?q=A852");
+
+    const promptSearch = document.getElementById("promptSearch");
+    const subjectInputSection = document.getElementById("subjectInputSection");
+    const buttons = [...document.querySelectorAll(".md-chip-button")];
+
+    expect(promptSearch.value).toBe("A852");
+    expect(buttons).toHaveLength(1);
+    expect(buttons[0].querySelector(".md-chip-label").textContent).toContain("和紙切絵作品");
+    expect(subjectInputSection.classList.contains("md-hidden")).toBe(false);
+  });
+
+  it("applies subject query parameter and generates output on load", async () => {
+    await bootPromptPage("?q=A852&subject=a%20small%20fox");
+
+    const subjectInput = document.getElementById("subjectInput");
+    const promptOutput = document.getElementById("promptOutput");
+
+    expect(subjectInput.value).toBe("a small fox");
+    expect(promptOutput.textContent).toContain("A simplified cute illustration of `a small fox`");
+  });
+
+  it("applies commit query parameter and generates output on load", async () => {
+    await bootPromptPage("?q=A501&commit=abc1234");
+
+    const commitId = document.getElementById("commitId");
+    const promptOutput = document.getElementById("promptOutput");
+
+    expect(commitId.value).toBe("abc1234");
+    expect(promptOutput.textContent).toContain("対象コミット `abc1234` における変更内容について");
+  });
+
   it("generates PR prompt text after unique match and commit id input", async () => {
     await bootPromptPage();
 
