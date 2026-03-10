@@ -110,4 +110,9 @@
 
 - ビルド後の `docs/prompt/prompt-gen.html` は CDN や別ファイルの CSS / JS に依存しない single-file web app を維持する
 - 画面側 UI は原則 `lht-*` を利用し、Material Web 直接利用は `lht-cmn` 内部へ寄せる
+- この一連のプロンプトでは、作業結果のうち継続利用価値があるものは markdown (`.md`) ファイルに反映する
+- 妥当な既存 markdown ファイルがある場合は、それを更新または追記する
+- 妥当な既存 markdown ファイルがない場合のみ、新規の markdown ファイルを作成する
+- 正本、補助資料、作業メモの役割を見極め、役割に合った markdown へ反映する
+- 無意味に markdown ファイルを増やさず、既存文書との整合を優先する
 - 変更後は必要に応じて `npm run build:prompt` と関連テストを実行する

@@ -14,7 +14,7 @@ const promptDefinitions: PromptDefinition[] = [
     keywords: ["pr", "pull request", "github pr", "markdown", "tilde", "pr作成依頼", "prタイトル", "pr本文", "文面", "作成", "github", "ぷるりく", "ぴーあーる", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
     requiresCommitId: true,
     buildBody: (commitId: string) => commitId
-      ? `対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文は ~~~~ で囲まれた一塊として回答してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+      ? appendMarkdownFenceInstruction(`対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文を出力してください。`)
       : ""
   },
   {
@@ -23,7 +23,7 @@ const promptDefinitions: PromptDefinition[] = [
     keywords: ["release", "github release", "release notes", "github", "markdown", "tilde", "リリース", "release文面", "release本文", "文面", "作成", "りりーす", "りりーすのーと", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
     requiresCommitId: true,
     buildBody: (commitId: string) => commitId
-      ? `${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文は ~~~~ で囲まれた一塊として回答してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+      ? appendMarkdownFenceInstruction(`${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文を作成してください。`)
       : ""
   },
   {
@@ -31,49 +31,49 @@ const promptDefinitions: PromptDefinition[] = [
     label: "303: Markdown をチルダフェンスで出力",
     keywords: ["markdown", "tilde fence", "tilde fenced", "tilde-fence", "tilde-fenced", "fenced markdown", "code fence", "code block", "code", "チルダフェンス", "markdown出力", "コード形式", "出力", "ちるだふぇんす", "こーどふぇんす", "こーどぶろっく", "しゅつりょく", "まーくだうん", "こーど"],
     requiresCommitId: false,
-    buildBody: () => "markdown テキスト形式で出力してください。回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+    buildBody: () => appendMarkdownFenceInstruction("markdown テキスト形式で出力してください。")
   },
   {
     id: "extract-to-inline-code-request",
     label: "351: 添付ファイル等の抽出結果をチルダフェンスで出力",
     keywords: ["extract", "attachment", "text", "tilde fence", "tilde fenced", "tilde-fence", "tilde-fenced", "fenced markdown", "code fence", "code block", "markdown", "抽出", "添付ファイル", "テキスト", "チルダフェンス", "出力", "ちゅうしゅつ", "てんぷふぁいる", "てきすと", "ちるだふぇんす", "こーどふぇんす", "こーどぶろっく", "しゅつりょく"],
     requiresCommitId: false,
-    buildBody: () => "添付ファイルから、あるいは与えるテキストから情報を抽出して、markdown テキスト形式で出力してください。回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+    buildBody: () => appendMarkdownFenceInstruction("添付ファイルから、あるいは与えるテキストから情報を抽出して、markdown テキスト形式で出力してください。")
   },
   {
     id: "excel-like-text-to-markdown-request",
     label: "352: Excel貼り付けをMarkdown化",
     keywords: ["excel", "spreadsheet", "sheet", "table", "markdown", "excel to markdown", "excel貼り付け", "excelシート", "表", "表変換", "markdown化", "スプレッドシート", "えくせる", "しーと", "ひょう", "まーくだうんか", "すぷれっどしーと"],
     requiresCommitId: false,
-    buildBody: () => "これから与えるテキストは、Excel シートをコピーして得られた内容である可能性が高いものとして扱ってください。その前提で、行と列、見出し、注記、空欄、表のまとまりをできるだけ読み取り、Markdown 形式へ変換してください。\n\nまずは Excel の表構造を推定し、表として表現するのが自然な部分は Markdown の表として整形してください。表ではなく見出し、注記、備考、補足説明として扱うほうが自然な部分は、Markdown の見出しや箇条書きとして整理してください。内容を勝手に補完したり、元にない値を追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。\n\n単なるプレーンテキスト化ではなく、「Excel シートを人が Markdown へ移したらどう整理するか」を意識して、読みやすく整形してください。ただし、元の構造を不必要に作り変えすぎないでください。\n\n回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+    buildBody: () => appendMarkdownFenceInstruction("これから与えるテキストは、Excel シートをコピーして得られた内容である可能性が高いものとして扱ってください。その前提で、行と列、見出し、注記、空欄、表のまとまりをできるだけ読み取り、Markdown 形式へ変換してください。\n\nまずは Excel の表構造を推定し、表として表現するのが自然な部分は Markdown の表として整形してください。表ではなく見出し、注記、備考、補足説明として扱うほうが自然な部分は、Markdown の見出しや箇条書きとして整理してください。内容を勝手に補完したり、元にない値を追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。\n\n単なるプレーンテキスト化ではなく、「Excel シートを人が Markdown へ移したらどう整理するか」を意識して、読みやすく整形してください。ただし、元の構造を不必要に作り変えすぎないでください。")
   },
   {
     id: "word-attachment-to-markdown-request",
     label: "353: Word添付ファイルをMarkdown化",
     keywords: ["word", "doc", "docx", "document", "markdown", "word to markdown", "word添付", "word文書", "ワード", "文書", "段落", "見出し", "markdown化", "わーど", "ぶんしょ", "だんらく", "みだし", "まーくだうんか"],
     requiresCommitId: false,
-    buildBody: () => "これから与える内容は、Word の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、注記、備考、補足説明などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。\n\nまずは Word 文書の構造を推定し、見出しとして扱うのが自然な部分は Markdown の見出しとして整理してください。箇条書き、段落、表、注記は、それぞれ Markdown で自然な形式へ変換してください。単なるプレーンテキスト化ではなく、「Word 文書を人が Markdown 文書へ移したらどう整理するか」を意識して、読みやすく整形してください。\n\n内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。元の文書構造を尊重しつつ、Markdown として保守しやすい形へ整えてください。\n\n回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+    buildBody: () => appendMarkdownFenceInstruction("これから与える内容は、Word の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、注記、備考、補足説明などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。\n\nまずは Word 文書の構造を推定し、見出しとして扱うのが自然な部分は Markdown の見出しとして整理してください。箇条書き、段落、表、注記は、それぞれ Markdown で自然な形式へ変換してください。単なるプレーンテキスト化ではなく、「Word 文書を人が Markdown 文書へ移したらどう整理するか」を意識して、読みやすく整形してください。\n\n内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。元の文書構造を尊重しつつ、Markdown として保守しやすい形へ整えてください。")
   },
   {
     id: "pdf-attachment-to-markdown-request",
     label: "354: PDF添付ファイルをMarkdown化",
     keywords: ["pdf", "document", "markdown", "pdf to markdown", "pdf添付", "pdf文書", "PDF", "文書", "見出し", "段組み", "ページ番号", "ヘッダー", "フッター", "markdown化", "ぴーでぃーえふ", "ぶんしょ", "みだし", "だんぐみ", "ぺーじばんごう", "へっだー", "ふったー", "まーくだうんか"],
     requiresCommitId: false,
-    buildBody: () => "これから与える内容は、PDF の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、図表説明、注記、備考などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。\n\nPDF では見た目上の改行や段組み、ページ番号、ヘッダー、フッター、脚注などがノイズとして混ざることがあるため、単なる行単位の転記ではなく、文書として自然な読み順を推定して整理してください。表として扱うのが自然な部分は Markdown の表として整形し、見出しや本文、箇条書き、注記は Markdown として自然な形式へ整理してください。\n\n内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。PDF 由来のレイアウトノイズは落として構いませんが、意味のある内容は失わないようにしてください。\n\n回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+    buildBody: () => appendMarkdownFenceInstruction("これから与える内容は、PDF の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、図表説明、注記、備考などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。\n\nPDF では見た目上の改行や段組み、ページ番号、ヘッダー、フッター、脚注などがノイズとして混ざることがあるため、単なる行単位の転記ではなく、文書として自然な読み順を推定して整理してください。表として扱うのが自然な部分は Markdown の表として整形し、見出しや本文、箇条書き、注記は Markdown として自然な形式へ整理してください。\n\n内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。PDF 由来のレイアウトノイズは落として構いませんが、意味のある内容は失わないようにしてください。")
   },
   {
     id: "image-attachment-to-markdown-description-request",
     label: "355: 画像添付ファイルをMarkdownで記述",
     keywords: ["image", "image attachment", "picture", "screenshot", "diagram", "illustration", "markdown", "image to markdown", "画像", "画像添付", "スクリーンショット", "図", "絵", "図解", "内容記述", "markdown記述", "がぞう", "すくりーんしょっと", "ず", "え", "ずかい", "きじゅつ", "まーくだうんきじゅつ"],
     requiresCommitId: false,
-    buildBody: () => "これから与える添付ファイルは、画像ファイルとして扱ってください。その画像に写っている内容を観察し、Markdown 形式で記述してください。\n\n画像内に文字、見出し、箇条書き、表、注記があれば、できるだけ読み取って Markdown として整理してください。文字以外にも、絵、図、矢印、囲み、人物、物体、配置関係などに意味がある場合は、その内容や関係が分かるように Markdown で補足してください。\n\n画像内の内容が文書とは限らず、絵や図、写真、模式図、スクリーンショット、手書きメモである可能性も考慮してください。文字情報だけに限定せず、「画像として何が表現されているか」を記述してください。\n\n内容を勝手に補完したり、元にない情報を断定的に追加したりしてはいけません。何が写っているか判断しきれない箇所、文字として判読できない箇所、意味が特定できない要素は、推測で埋めず、不明・判読困難・識別困難などと明示してください。\n\n単なる OCR の羅列ではなく、画像に含まれる情報を人が Markdown 文書として記録するならどう整理するかを意識して、読みやすく整形してください。\n\n回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+    buildBody: () => appendMarkdownFenceInstruction("これから与える添付ファイルは、画像ファイルとして扱ってください。その画像に写っている内容を観察し、Markdown 形式で記述してください。\n\n画像内に文字、見出し、箇条書き、表、注記があれば、できるだけ読み取って Markdown として整理してください。文字以外にも、絵、図、矢印、囲み、人物、物体、配置関係などに意味がある場合は、その内容や関係が分かるように Markdown で補足してください。\n\n画像内の内容が文書とは限らず、絵や図、写真、模式図、スクリーンショット、手書きメモである可能性も考慮してください。文字情報だけに限定せず、「画像として何が表現されているか」を記述してください。\n\n内容を勝手に補完したり、元にない情報を断定的に追加したりしてはいけません。何が写っているか判断しきれない箇所、文字として判読できない箇所、意味が特定できない要素は、推測で埋めず、不明・判読困難・識別困難などと明示してください。\n\n単なる OCR の羅列ではなく、画像に含まれる情報を人が Markdown 文書として記録するならどう整理するかを意識して、読みやすく整形してください。")
   },
   {
     id: "multiple-sources-to-consistent-markdown-request",
     label: "356: 複数情報を整合させてMarkdown化",
     keywords: ["multiple sources", "multiple markdown", "merge markdown", "consistent markdown", "integrate markdown", "markdown", "複数情報", "複数markdown", "統合", "整合", "矛盾整理", "表現ゆれ", "markdown統合", "markdown化", "ふくすうじょうほう", "とうごう", "せいごう", "むじゅんせいり", "ひょうげんゆれ", "まーくだうんとうごう", "まーくだうんか"],
     requiresCommitId: false,
-    buildBody: () => "これから複数の情報を渡します。主に markdown 形式の資料である可能性が高いものとして扱ってください。これらの内容を突き合わせ、重複、矛盾、表現ゆれ、粒度差をできるだけ整理したうえで、整合性のある一つの markdown 文書としてまとめてください。\n\n単に各資料を順番に連結するのではなく、内容の意味を見て統合してください。重複する説明はまとめ、表現が揺れている箇所は文脈上もっとも自然な形へ寄せてください。資料間で矛盾している箇所がある場合は、勝手に断定せず、その矛盾が分かる形で整理してください。判断に十分な根拠がない場合は、無理に一つへ決め打ちしないでください。\n\n元の情報に含まれていない新しい事実を補完してはいけません。ただし、見出しの再配置、段落の整理、箇条書き化、順序調整など、読みやすくするための再構成は行って構いません。必要に応じて、見出し、箇条書き、表を用いて、保守しやすい markdown として整理してください。\n\nもし入力が完全には整合しない場合は、統合結果に加えて、未解決の矛盾点や解釈が分かれうる点が分かるように残してください。\n\n回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+    buildBody: () => appendMarkdownFenceInstruction("これから複数の情報を渡します。主に markdown 形式の資料である可能性が高いものとして扱ってください。これらの内容を突き合わせ、重複、矛盾、表現ゆれ、粒度差をできるだけ整理したうえで、整合性のある一つの markdown 文書としてまとめてください。\n\n単に各資料を順番に連結するのではなく、内容の意味を見て統合してください。重複する説明はまとめ、表現が揺れている箇所は文脈上もっとも自然な形へ寄せてください。資料間で矛盾している箇所がある場合は、勝手に断定せず、その矛盾が分かる形で整理してください。判断に十分な根拠がない場合は、無理に一つへ決め打ちしないでください。\n\n元の情報に含まれていない新しい事実を補完してはいけません。ただし、見出しの再配置、段落の整理、箇条書き化、順序調整など、読みやすくするための再構成は行って構いません。必要に応じて、見出し、箇条書き、表を用いて、保守しやすい markdown として整理してください。\n\nもし入力が完全には整合しない場合は、統合結果に加えて、未解決の矛盾点や解釈が分かれうる点が分かるように残してください。")
   },
   {
     id: "github-no-change-request",
@@ -94,14 +94,14 @@ const promptDefinitions: PromptDefinition[] = [
     label: "301: セッションの引継テキストの生成",
     keywords: ["handover", "session", "conversation", "markdown", "session handover", "引き継ぎ", "引継", "セッション", "会話", "テキスト", "引継テキスト", "生成", "生成ai", "別のai", "せっしょん", "かいわ", "ひきつぎ", "てきすと", "まーくだうん", "せいせい", "はんどおーばー", "えーあい"],
     requiresCommitId: false,
-    buildBody: () => "今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、引継先で状況を再現しやすいよう、重要な前提、判断、未完了事項、次に見るべき点を漏れなく整理した引き継ぎテキストを Markdown 形式で生成してください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+    buildBody: () => appendMarkdownFenceInstruction("今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、引継先で状況を再現しやすいよう、重要な前提、判断、未完了事項、次に見るべき点を漏れなく整理した引き継ぎテキストを Markdown 形式で生成してください。")
   },
   {
     id: "spec-discussion-request",
     label: "703: 仕様検討モードで進める",
     keywords: ["spec", "specification", "仕様", "検討", "モード", "進める", "todo", "todo.md", "しよう", "けんとう", "もーど", "すすめる", "とぅーどぅー", "すぺっく"],
     requiresCommitId: false,
-    buildBody: () => "今からの作業は仕様の検討です。コード変更、ファイル編集、ビルド、テスト実行などの実装作業は開始しないでください。その代わり、仕様論点、未確定事項、判断材料、実施候補のタスク分解を整理して提示してください。まとまった仕様が実施事項に落としこめる場合には、TODO.md に作業タスクとして分解して記述してください。"
+    buildBody: () => `今からの作業は仕様の検討です。コード変更、ファイル編集、ビルド、テスト実行などの実装作業は開始しないでください。その代わり、仕様論点、未確定事項、判断材料、実施候補のタスク分解を整理して提示してください。\n\n${getTodoReflectionInstruction()}`
   },
   {
     id: "small-test-request",
@@ -122,14 +122,14 @@ const promptDefinitions: PromptDefinition[] = [
     label: "704: TODO.md の完了項目を整理",
     keywords: ["todo", "todo.md", "cleanup", "close", "closed", "完了項目", "整理", "完了", "項目", "クローズ", "削除", "とぅーどぅー", "かんりょうこうもく", "せいり", "かんりょう", "こうもく", "くろーず", "さくじょ"],
     requiresCommitId: false,
-    buildBody: () => "TODO.md のなかで、すでに対応済みの TODO があれば、それをクローズしてください。以前にすでにクローズ済みで不要になっている TODO があれば削除してください。"
+    buildBody: () => `TODO.md のなかで、すでに対応済みの TODO があれば、それをクローズしてください。以前にすでにクローズ済みで不要になっている TODO があれば削除してください。\n\n${getTodoReflectionInstruction()}`
   },
   {
     id: "completion-check-request",
     label: "306: 依頼内容の実施状況を確認",
     keywords: ["done", "completed", "status", "check", "依頼", "内容", "実施", "状況", "実施済み", "未実施", "確認", "いらい", "ないよう", "じっし", "じょうきょう", "じっしずみ", "みじっし", "かくにん"],
     requiresCommitId: false,
-    buildBody: () => "さきほどお願いした一連の依頼内容は、基本的に全て実施済みでしょうか。それともまだ未実施のものはありますでしょうか。"
+    buildBody: () => `さきほどお願いした一連の依頼内容は、基本的に全て実施済みでしょうか。それともまだ未実施のものはありますでしょうか。\n\n${getTodoReflectionInstruction()}`
   },
   {
     id: "critical-review-request",
@@ -143,7 +143,7 @@ const promptDefinitions: PromptDefinition[] = [
     label: "102: markdown 更新漏れの確認",
     keywords: ["markdown", "md", "update", "doc", "docs", "更新", "漏れ", "確認", "更新漏れ", "未更新", "追加すべき", "まーくだうん", "こうしん", "もれ", "かくにん", "こうしんもれ", "みこうしん", "ついかすべき"],
     requiresCommitId: false,
-    buildBody: () => "実装の側に変更がおこなわれましたが、これに対応する markdown (.md) で未更新のものはありますか。あるいは新規で markdown (.md) を追加すべき変更はありましたか。"
+    buildBody: () => `実装の側に変更がおこなわれましたが、これに対応する markdown (.md) で未更新のものはありますか。あるいは新規で markdown (.md) を追加すべき変更はありましたか。\n\n${getTodoReflectionInstruction()}`
   },
   {
     id: "hallucination-check-request",
@@ -977,14 +977,14 @@ and preceded by the suggested filename as a heading:
     label: "603: 現在の会話を Mermaid で記述",
     keywords: ["mermaid", "sequence diagram", "diagram", "conversation", "current conversation", "会話", "現在の会話", "図", "記述", "まーめいど", "しーけんすだいあぐらむ", "かいわ", "げんざいのかいわ", "ず", "きじゅつ"],
     requiresCommitId: false,
-    buildBody: () => "いまこのセッションで扱っている内容について、流れや関係が分かるように Mermaid 記法で整理して回答してください。必要に応じて適切な図の種類を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。"
+    buildBody: () => appendMarkdownFenceInstruction("いまこのセッションで扱っている内容について、流れや関係が分かるように Mermaid 記法で整理して回答してください。必要に応じて適切な図の種類を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。")
   },
   {
     id: "graphviz-current-conversation-request",
     label: "604: 現在の会話を Graphviz DOT で記述",
     keywords: ["graphviz", "dot", "graphviz dot", "diagram", "graph", "conversation", "current conversation", "会話", "現在の会話", "図", "記述", "ぐらふびず", "どっと", "かいわ", "げんざいのかいわ", "ず", "きじゅつ"],
     requiresCommitId: false,
-    buildBody: () => "いまこのセッションで扱っている内容について、流れや関係が分かるように Graphviz DOT 記法で整理して回答してください。必要に応じて適切なグラフ構造を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。"
+    buildBody: () => appendMarkdownFenceInstruction("いまこのセッションで扱っている内容について、流れや関係が分かるように Graphviz DOT 記法で整理して回答してください。必要に応じて適切なグラフ構造を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。")
   },
   {
     id: "chat-partner-emily-request",

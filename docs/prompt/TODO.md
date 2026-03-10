@@ -25,6 +25,8 @@
 - [ ] prompt-gen の可変入力で、`commitId` は SHA らしい文字だけを許可するか検討する
 - [ ] prompt-gen の可変入力で、`subject` は命令ではなく文字列値として扱う文言を本文へ追加するか検討する
 - [ ] prompt-gen の「共有リンクをコピー」ボタンの SVG アイコンを、より一般的で視認性の高い link / chain 表現へ改善する
+- [ ] prompt-gen で、ユーザーが作成したプロンプト定義 JSON を読み込み、`localStorage` に保存して、検索結果や候補表示などの挙動へ反映できるようにする。あわせて、`localStorage` 上のユーザー定義プロンプトを削除する機能を提供する
+- [ ] TODO.md で、完了済みの TODO 記述を適切なタイミングで削除する運用にする
 - [x] S603-501: Mermaid timeline で図解化(AI提案)
 - [x] S603-502: Mermaid flowchart で図解化(AI提案)
 - [x] S603-503: Mermaid mindmap で図解化(AI提案)

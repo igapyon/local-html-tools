@@ -95,7 +95,7 @@ const popularPromptDefinitions = [
         label: "P1204-004: Markdown 表形式で出力",
         keywords: ["P1204-004", "markdown table", "table output", "markdown format", "tabular output", "Markdown表", "表形式", "表出力", "まーくだうんひょう", "ひょうけいしき"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容を Markdown の表形式で出力してください。比較、分類、一覧化に向くように列を整理し、表だけで主要な情報が読み取れるようにまとめてください。必要に応じて、列名や並び順も読みやすさを優先して調整してください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容を Markdown の表形式で出力してください。比較、分類、一覧化に向くように列を整理し、表だけで主要な情報が読み取れるようにまとめてください。必要に応じて、列名や並び順も読みやすさを優先して調整してください。")
     },
     {
         id: "popular-recommendation-request",
@@ -1138,21 +1138,21 @@ const popularPromptDefinitions = [
         label: "P1603-001: タイムライン化",
         keywords: ["P1603-001", "timeline", "timeline format", "chronological order", "event timeline", "mermaid timeline", "タイムライン化", "時系列化", "時系列整理", "じけいれつか", "たいむらいんか"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容をタイムライン化してください。まず通常の Markdown テキストで、日付または順序が分かる時系列一覧を整理してください。そのうえで、可能であれば Mermaid timeline も併記してください。出来事、判断、変更点、節目が追えるようにし、順序が不明確なものは推定せずに不明と明示してください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容をタイムライン化してください。まず通常の Markdown テキストで、日付または順序が分かる時系列一覧を整理してください。そのうえで、可能であれば Mermaid timeline も併記してください。出来事、判断、変更点、節目が追えるようにし、順序が不明確なものは推定せずに不明と明示してください。")
     },
     {
         id: "popular-flowchart-request-structured",
         label: "P1604-001: フローチャート化",
         keywords: ["P1604-001", "flowchart", "flow chart", "mermaid flowchart", "process flow", "decision flow", "フローチャート化", "手順図化", "分岐図", "ふろーちゃーとか", "てじゅんずか"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容をフローチャート化してください。まず通常の Markdown テキストで、主要な手順、分岐条件、例外分岐、終了条件が分かるように整理してください。そのうえで、可能であれば Mermaid flowchart も併記してください。処理順と分岐条件を混同せず、読み手が流れを追いやすい構成にしてください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容をフローチャート化してください。まず通常の Markdown テキストで、主要な手順、分岐条件、例外分岐、終了条件が分かるように整理してください。そのうえで、可能であれば Mermaid flowchart も併記してください。処理順と分岐条件を混同せず、読み手が流れを追いやすい構成にしてください。")
     },
     {
         id: "popular-mindmap-request-structured",
         label: "P1605-001: マインドマップ化",
         keywords: ["P1605-001", "mindmap", "mind map", "mermaid mindmap", "topic expansion", "brainstorm map", "マインドマップ化", "論点展開", "放射状整理", "まいんどまっぷか", "ろんてんてんかい"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容をマインドマップ化してください。まず通常の Markdown テキストで、中心テーマ、第1階層の論点、第2階層以下の補足が分かるように入れ子構造で整理してください。そのうえで、可能であれば Mermaid mindmap も併記してください。広げすぎて散漫にならないよう、中心テーマから主要論点が自然に追える構成を優先してください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容をマインドマップ化してください。まず通常の Markdown テキストで、中心テーマ、第1階層の論点、第2階層以下の補足が分かるように入れ子構造で整理してください。そのうえで、可能であれば Mermaid mindmap も併記してください。広げすぎて散漫にならないよう、中心テーマから主要論点が自然に追える構成を優先してください。")
     },
     {
         id: "popular-reading-support-summary",
