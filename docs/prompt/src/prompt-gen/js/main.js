@@ -44,8 +44,9 @@ async function initializePromptPage() {
     const commitIdInput = document.getElementById("commitId");
     const subjectInput = document.getElementById("subjectInput");
     const includeLabelPrefix = document.getElementById("includeLabelPrefix");
+    const copyShareLinkButton = document.getElementById("copyShareLinkButton");
     const promptOutput = document.getElementById("promptOutput");
-    if (!promptSearch || !commitIdInput || !subjectInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !subjectInputSection || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+    if (!promptSearch || !commitIdInput || !subjectInput || !includeLabelPrefix || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !commitInputSection || !subjectInputSection || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
         return;
     }
     function loadSeriesVisibilitySettings() {
@@ -590,6 +591,23 @@ async function initializePromptPage() {
         }
         return includeLabelPrefix.checked ? `[${label}] ${body}` : body;
     }
+    function buildShareLink() {
+        const url = new URL(window.location.href);
+        url.search = "";
+        const query = (promptSearch.value || "").trim();
+        const subject = subjectInput.value || "";
+        const commitId = commitIdInput.value || "";
+        if (query) {
+            url.searchParams.set("q", query);
+        }
+        if (subject) {
+            url.searchParams.set("subject", subject);
+        }
+        if (commitId) {
+            url.searchParams.set("commit", commitId);
+        }
+        return url.toString();
+    }
     function updateOutput() {
         renderSelectedPromptHelp();
         const text = buildPromptText();
@@ -664,8 +682,32 @@ async function initializePromptPage() {
     commitIdInput.addEventListener("input", updateOutput);
     subjectInput.addEventListener("input", updateOutput);
     includeLabelPrefix.addEventListener("change", updateOutput);
+    copyShareLinkButton.addEventListener("click", () => {
+        void copyText(buildShareLink());
+    });
+    let initialQuery = "";
+    let initialSubject = "";
+    let initialCommitId = "";
+    try {
+        const url = new URL(window.location.href);
+        initialQuery = (url.searchParams.get("q") || "").trim();
+        initialSubject = url.searchParams.get("subject") || "";
+        initialCommitId = url.searchParams.get("commit") || "";
+        if (initialQuery) {
+            promptSearch.value = initialQuery;
+        }
+    }
+    catch (_error) {
+        // Ignore invalid or unavailable location values.
+    }
     createSeriesVisibilityMenu();
     renderCandidates();
+    if (initialSubject) {
+        subjectInput.value = initialSubject;
+    }
+    if (initialCommitId) {
+        commitIdInput.value = initialCommitId;
+    }
     updateOutput();
     requestAnimationFrame(() => {
         promptSearch.focus();

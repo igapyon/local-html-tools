@@ -1193,6 +1193,43 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
   flex: 0 0 auto;
 }
 
+.md-output-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.md-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  appearance: none;
+  border: 1px solid #d0d7e5;
+  border-radius: 999px;
+  background: #f8fbff;
+  color: #28405f;
+  padding: 0.42rem 0.72rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+.md-secondary-button:hover {
+  background: #eef6ff;
+  border-color: #b7c9df;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(40, 64, 95, 0.10);
+}
+
+.md-secondary-button__icon {
+  width: 1.08rem;
+  height: 1.08rem;
+  flex: 0 0 auto;
+}
+
 .md-code-block {
   position: relative;
   margin-top: 0.5rem;
@@ -1331,6 +1368,10 @@ md-icon-button.md-copy-button--surface {
         <rect x="9" y="9" width="11" height="11" rx="2"/>
         <rect x="4" y="4" width="11" height="11" rx="2"/>
       </symbol>
+      <symbol id="md-icon-link" viewBox="0 0 24 24">
+        <path d="M9.88 14.12a3 3 0 0 1 0-4.24l2-2a3 3 0 1 1 4.24 4.24l-.71.71"/>
+        <path d="M14.12 9.88a3 3 0 0 1 0 4.24l-2 2a3 3 0 1 1-4.24-4.24l.71-.71"/>
+      </symbol>
       <symbol id="md-icon-trash" viewBox="0 0 24 24">
         <path d="M3 6h18"/>
         <path d="M8 6V4h8v2"/>
@@ -1401,12 +1442,20 @@ md-icon-button.md-copy-button--surface {
         <div id="promptOutputHelp" class="md-output-help"></div>
       </div>
       <lht-command-block command-id="promptOutput"></lht-command-block>
-      <lht-switch-help
-        switch-id="includeLabelPrefix"
-        label="ラベル名を先頭に含める"
-        help-label="ラベル名を先頭に含める説明">
-        ON の場合は `[ボタンラベル] 本文` の形式で出力します。OFF の場合は本文のみを出力します。
-      </lht-switch-help>
+      <div class="md-output-options">
+        <lht-switch-help
+          switch-id="includeLabelPrefix"
+          label="ラベル名を先頭に含める"
+          help-label="ラベル名を先頭に含める説明">
+          ON の場合は `[ボタンラベル] 本文` の形式で出力します。OFF の場合は本文のみを出力します。
+        </lht-switch-help>
+        <button id="copyShareLinkButton" type="button" class="md-secondary-button">
+          <svg viewBox="0 0 24 24" class="md-secondary-button__icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <use href="#md-icon-link" xlink:href="#md-icon-link"></use>
+          </svg>
+          <span>共有リンクをコピー</span>
+        </button>
+      </div>
     </section>
 
     <lht-toast id="toast"></lht-toast>
@@ -6703,8 +6752,9 @@ async function initializePromptPage() {
     const commitIdInput = document.getElementById("commitId");
     const subjectInput = document.getElementById("subjectInput");
     const includeLabelPrefix = document.getElementById("includeLabelPrefix");
+    const copyShareLinkButton = document.getElementById("copyShareLinkButton");
     const promptOutput = document.getElementById("promptOutput");
-    if (!promptSearch || !commitIdInput || !subjectInput || !includeLabelPrefix || !promptOutput || !promptCandidateArea || !commitInputSection || !subjectInputSection || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+    if (!promptSearch || !commitIdInput || !subjectInput || !includeLabelPrefix || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !commitInputSection || !subjectInputSection || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
         return;
     }
     function loadSeriesVisibilitySettings() {
@@ -7249,6 +7299,23 @@ async function initializePromptPage() {
         }
         return includeLabelPrefix.checked ? `[${label}] ${body}` : body;
     }
+    function buildShareLink() {
+        const url = new URL(window.location.href);
+        url.search = "";
+        const query = (promptSearch.value || "").trim();
+        const subject = subjectInput.value || "";
+        const commitId = commitIdInput.value || "";
+        if (query) {
+            url.searchParams.set("q", query);
+        }
+        if (subject) {
+            url.searchParams.set("subject", subject);
+        }
+        if (commitId) {
+            url.searchParams.set("commit", commitId);
+        }
+        return url.toString();
+    }
     function updateOutput() {
         renderSelectedPromptHelp();
         const text = buildPromptText();
@@ -7323,8 +7390,32 @@ async function initializePromptPage() {
     commitIdInput.addEventListener("input", updateOutput);
     subjectInput.addEventListener("input", updateOutput);
     includeLabelPrefix.addEventListener("change", updateOutput);
+    copyShareLinkButton.addEventListener("click", () => {
+        void copyText(buildShareLink());
+    });
+    let initialQuery = "";
+    let initialSubject = "";
+    let initialCommitId = "";
+    try {
+        const url = new URL(window.location.href);
+        initialQuery = (url.searchParams.get("q") || "").trim();
+        initialSubject = url.searchParams.get("subject") || "";
+        initialCommitId = url.searchParams.get("commit") || "";
+        if (initialQuery) {
+            promptSearch.value = initialQuery;
+        }
+    }
+    catch (_error) {
+        // Ignore invalid or unavailable location values.
+    }
     createSeriesVisibilityMenu();
     renderCandidates();
+    if (initialSubject) {
+        subjectInput.value = initialSubject;
+    }
+    if (initialCommitId) {
+        commitIdInput.value = initialCommitId;
+    }
     updateOutput();
     requestAnimationFrame(() => {
         promptSearch.focus();
