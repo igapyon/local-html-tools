@@ -139,22 +139,27 @@ function ensureClipboardMock() {
 }
 
 describe("prompt-gen main", () => {
-  it("copies a share link with q and subject parameters", async () => {
+  it("copies a share link with q, id, and subject parameters", async () => {
     const getCopiedText = ensureClipboardMock();
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
     const subjectInput = document.getElementById("subjectInput");
     const copyShareLinkButton = document.getElementById("copyShareLinkButton");
+    const buttons = [...document.querySelectorAll(".md-chip-button")];
 
-    promptSearch.value = "A852";
+    promptSearch.value = "和";
     promptSearch.dispatchEvent(new Event("input"));
+    const targetButton = buttons.find((button) =>
+      button.querySelector(".md-chip-label").textContent.includes("A852: 和紙切絵作品")
+    );
+    targetButton.click();
     subjectInput.value = "a small fox";
     subjectInput.dispatchEvent(new Event("input"));
     copyShareLinkButton.click();
     await Promise.resolve();
 
-    expect(getCopiedText()).toBe("http://localhost:3000/?q=A852&subject=a+small+fox");
+    expect(getCopiedText()).toBe("http://localhost:3000/?q=%E5%92%8C&id=A852&subject=a+small+fox");
   });
 
   it("applies q query parameter to the search field on load", async () => {
@@ -178,6 +183,21 @@ describe("prompt-gen main", () => {
 
     expect(subjectInput.value).toBe("a small fox");
     expect(promptOutput.textContent).toContain("A simplified cute illustration of `a small fox`");
+  });
+
+  it("applies id query parameter to restore a selected prompt among multiple matches", async () => {
+    await bootPromptPage("?q=%E5%92%8C&id=A852&subject=%E3%81%B6%E3%81%A9%E3%81%86");
+
+    const activeButton = document.querySelector(".md-chip-button.is-active");
+    const subjectInput = document.getElementById("subjectInput");
+    const promptOutputTitle = document.getElementById("promptOutputTitle");
+    const promptOutput = document.getElementById("promptOutput");
+
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(3);
+    expect(activeButton.querySelector(".md-chip-label").textContent).toContain("A852: 和紙切絵作品");
+    expect(subjectInput.value).toBe("ぶどう");
+    expect(promptOutputTitle.textContent).toContain("A852: 和紙切絵作品");
+    expect(promptOutput.textContent).toContain("A simplified cute illustration of `ぶどう`");
   });
 
   it("applies commit query parameter and generates output on load", async () => {

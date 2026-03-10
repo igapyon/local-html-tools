@@ -186,6 +186,7 @@ async function initializePromptPage() {
 
   let selectedPrompt = "";
   let lastSearchQuery = "";
+  let pendingInitialPromptCode = "";
 
   const kanaToRomajiMap = new Map<string, string>([
     ["きゃ", "kya"], ["きゅ", "kyu"], ["きょ", "kyo"],
@@ -644,6 +645,16 @@ async function initializePromptPage() {
       prioritizedSingleDefinition
     } = searchPromptDefinitions(query, promptSearchIndexes, promptSearchIndexById);
 
+    if (pendingInitialPromptCode) {
+      const pendingDefinition = matchedDefinitions.find((definition) =>
+        getDefinitionLabelCode(definition) === pendingInitialPromptCode
+      );
+      if (pendingDefinition) {
+        selectedPrompt = pendingDefinition.id;
+      }
+      pendingInitialPromptCode = "";
+    }
+
     if (matchedDefinitions.length === 0) {
       if (selectedPrompt) {
         selectedPrompt = "";
@@ -665,23 +676,21 @@ async function initializePromptPage() {
 
     for (const definition of matchedDefinitions) {
       const button = createCandidateButton(definition);
-      if (prioritizedSingleDefinition && selectedPrompt === definition.id) {
+      if (selectedPrompt === definition.id) {
         button.classList.add("is-active");
       }
       promptCandidateArea.appendChild(button);
     }
 
-    if (prioritizedSingleDefinition && selectedPrompt === prioritizedSingleDefinition.id) {
-      const selectedDefinition = prioritizedSingleDefinition;
-      if (selectedDefinition.requiresCommitId) {
-        syncInputSections(selectedDefinition);
-      } else if (selectedDefinition.requiresSubject) {
-        syncInputSections(selectedDefinition);
-      } else {
-        syncInputSections(selectedDefinition);
+    const selectedDefinition = matchedDefinitions.find((definition) => definition.id === selectedPrompt) || null;
+    if (selectedDefinition) {
+      const selectedButton = promptCandidateArea.querySelector(`[data-prompt-id="${selectedDefinition.id}"]`);
+      if (selectedButton) {
+        selectedButton.classList.add("is-active");
       }
+      syncInputSections(selectedDefinition);
       revealOutputSection({
-        scrollIntoView: queryChanged && query.length > 0
+        scrollIntoView: queryChanged && query.length > 0 && !!prioritizedSingleDefinition
       });
       updateOutput();
     }
@@ -728,6 +737,12 @@ async function initializePromptPage() {
     return includeLabelPrefix.checked ? `[${label}] ${body}` : body;
   }
 
+  function getDefinitionLabelCode(definition: PromptDefinition | null) {
+    const label = String(definition?.label || "");
+    const match = label.match(/^([^:]+):/);
+    return match ? match[1] : "";
+  }
+
   function buildShareLink() {
     const url = new URL(window.location.href);
     url.search = "";
@@ -735,9 +750,14 @@ async function initializePromptPage() {
     const query = (promptSearch.value || "").trim();
     const subject = subjectInput.value || "";
     const commitId = commitIdInput.value || "";
+    const selectedDefinition = getSelectedPromptDefinition();
+    const selectedDefinitionCode = getDefinitionLabelCode(selectedDefinition);
 
     if (query) {
       url.searchParams.set("q", query);
+    }
+    if (selectedDefinitionCode) {
+      url.searchParams.set("id", selectedDefinitionCode);
     }
     if (subject) {
       url.searchParams.set("subject", subject);
@@ -839,11 +859,13 @@ async function initializePromptPage() {
   });
 
   let initialQuery = "";
+  let initialPromptCode = "";
   let initialSubject = "";
   let initialCommitId = "";
   try {
     const url = new URL(window.location.href);
     initialQuery = (url.searchParams.get("q") || "").trim();
+    initialPromptCode = (url.searchParams.get("id") || "").trim();
     initialSubject = url.searchParams.get("subject") || "";
     initialCommitId = url.searchParams.get("commit") || "";
     if (initialQuery) {
@@ -854,6 +876,9 @@ async function initializePromptPage() {
   }
 
   createSeriesVisibilityMenu();
+  if (initialPromptCode) {
+    pendingInitialPromptCode = initialPromptCode;
+  }
   renderCandidates();
   if (initialSubject) {
     subjectInput.value = initialSubject;
