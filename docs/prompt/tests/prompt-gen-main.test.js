@@ -139,6 +139,41 @@ function ensureClipboardMock() {
 }
 
 describe("prompt-gen main", () => {
+  it("applies strong class to label matches", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    promptSearch.value = "A852";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    const button = document.querySelector(".md-chip-button");
+    expect(button.classList.contains("md-chip-button--strong")).toBe(true);
+  });
+
+  it("applies medium class to keyword matches", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    promptSearch.value = "washi collage";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    const button = document.querySelector(".md-chip-button");
+    expect(button.querySelector(".md-chip-label").textContent).toContain("A852: 和紙切絵作品");
+    expect(button.classList.contains("md-chip-button--medium")).toBe(true);
+  });
+
+  it("applies weak class to expanded matches", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    promptSearch.value = "ワシ";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    const button = document.querySelector(".md-chip-button");
+    expect(button.querySelector(".md-chip-label").textContent).toContain("A852: 和紙切絵作品");
+    expect(button.classList.contains("md-chip-button--weak")).toBe(true);
+  });
+
   it("copies a share link with q, id, and subject parameters", async () => {
     const getCopiedText = ensureClipboardMock();
     await bootPromptPage();

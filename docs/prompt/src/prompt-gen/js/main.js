@@ -393,6 +393,21 @@ async function initializePromptPage() {
         const matchedDefinitions = query
             ? mergeDefinitionGroups([labelMatches, keywordMatches, expandedMatches])
             : labelMatches;
+        const definitionMatchGrades = new Map();
+        for (const definition of expandedMatches) {
+            definitionMatchGrades.set(definition.id, "weak");
+        }
+        for (const definition of keywordMatches) {
+            definitionMatchGrades.set(definition.id, "medium");
+        }
+        for (const definition of labelMatches) {
+            definitionMatchGrades.set(definition.id, "strong");
+        }
+        if (!query) {
+            for (const definition of matchedDefinitions) {
+                definitionMatchGrades.set(definition.id, "medium");
+            }
+        }
         const prioritizedSingleDefinition = labelMatches.length === 1
             ? labelMatches[0]
             : labelMatches.length === 0 && keywordMatches.length === 1
@@ -401,6 +416,7 @@ async function initializePromptPage() {
                     ? expandedMatches[0]
                     : null;
         return {
+            definitionMatchGrades,
             matchedDefinitions,
             prioritizedSingleDefinition
         };
@@ -427,11 +443,13 @@ async function initializePromptPage() {
         promptSearchIndexById = new Map(promptSearchIndexes.map((searchIndex) => [searchIndex.definition.id, searchIndex]));
     }
     rebuildVisiblePromptIndexes();
-    function createCandidateButton(definition) {
+    function createCandidateButton(definition, grade) {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "md-chip-button";
         button.dataset.promptId = definition.id;
+        button.dataset.matchGrade = grade;
+        button.classList.add(`md-chip-button--${grade}`);
         button.addEventListener("click", () => {
             void selectPrompt(definition.id, button, { autoCopy: true });
         });
@@ -461,17 +479,8 @@ async function initializePromptPage() {
         help.innerHTML = buildDisplayKeywords(selectedDefinition).join(", ");
         promptOutputHelp.appendChild(help);
     }
-    function revealOutputSection(options) {
+    function revealOutputSection() {
         promptOutputSection.classList.remove("md-hidden");
-        if (!(options === null || options === void 0 ? void 0 : options.scrollIntoView)) {
-            return;
-        }
-        requestAnimationFrame(() => {
-            promptOutputSection.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        });
     }
     async function copyText(text) {
         if (!text) {
@@ -517,7 +526,7 @@ async function initializePromptPage() {
             subjectInput.value = "";
             promptOutput.textContent = "";
         }
-        const { matchedDefinitions, prioritizedSingleDefinition } = searchPromptDefinitions(query, promptSearchIndexes, promptSearchIndexById);
+        const { definitionMatchGrades, matchedDefinitions, prioritizedSingleDefinition } = searchPromptDefinitions(query, promptSearchIndexes, promptSearchIndexById);
         if (pendingInitialPromptCode) {
             const pendingDefinition = matchedDefinitions.find((definition) => getDefinitionLabelCode(definition) === pendingInitialPromptCode);
             if (pendingDefinition) {
@@ -542,7 +551,7 @@ async function initializePromptPage() {
             selectedPrompt = "";
         }
         for (const definition of matchedDefinitions) {
-            const button = createCandidateButton(definition);
+            const button = createCandidateButton(definition, definitionMatchGrades.get(definition.id) || "weak");
             if (selectedPrompt === definition.id) {
                 button.classList.add("is-active");
             }
@@ -555,9 +564,7 @@ async function initializePromptPage() {
                 selectedButton.classList.add("is-active");
             }
             syncInputSections(selectedDefinition);
-            revealOutputSection({
-                scrollIntoView: queryChanged && query.length > 0 && !!prioritizedSingleDefinition
-            });
+            revealOutputSection();
             updateOutput();
         }
     }
@@ -567,7 +574,7 @@ async function initializePromptPage() {
             element.classList.remove("is-active");
         }
         button.classList.add("is-active");
-        revealOutputSection({ scrollIntoView: true });
+        revealOutputSection();
         const selectedDefinition = visiblePromptDefinitions.find((definition) => definition.id === id);
         syncInputSections(selectedDefinition || null);
         if (selectedDefinition === null || selectedDefinition === void 0 ? void 0 : selectedDefinition.requiresCommitId) {
