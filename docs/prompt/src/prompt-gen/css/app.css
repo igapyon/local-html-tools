@@ -106,6 +106,21 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
   isolation: isolate;
 }
 
+.md-chip-button--strong {
+  padding: 0.48rem 1.12rem;
+  font-size: 1.02rem;
+}
+
+.md-chip-button--medium {
+  padding: 0.36rem 0.96rem;
+  font-size: 0.91rem;
+}
+
+.md-chip-button--weak {
+  padding: 0.26rem 0.78rem;
+  font-size: 0.8rem;
+}
+
 .md-chip-button:hover {
   background: #efe7f8;
   border-color: #cfc3e3;
