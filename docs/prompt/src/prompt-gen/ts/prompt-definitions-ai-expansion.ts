@@ -18,14 +18,14 @@ const aiExpansionPromptDefinitions = [
     label: "X102: markdown 更新漏れの確認(AI詳細)",
     keywords: ["markdown", "md", "update", "doc", "docs", "documentation sync", "更新", "漏れ", "確認", "更新漏れ", "未更新", "正本更新", "追加すべき文書", "まーくだうん", "こうしん", "もれ", "かくにん", "こうしんもれ", "みこうしん", "せいほんこうしん"],
     requiresCommitId: false,
-    buildBody: () => `実装の側に変更がおこなわれたことを前提に、これに対応する markdown (.md) に更新漏れがないか確認してください。単に「更新が必要そう」と述べるだけでなく、どの実装変更がどの markdown に対応するのか、既存の markdown の更新で足りるのか、新規の markdown を追加すべきなのか、を区別して整理してください。特に正本として扱うべき文書の更新漏れを優先して確認し、必要であれば更新候補のファイル名や追記すべき観点も示してください。`
+    buildBody: () => `実装の側に変更がおこなわれたことを前提に、これに対応する markdown (.md) に更新漏れがないか確認してください。単に「更新が必要そう」と述べるだけでなく、どの実装変更がどの markdown に対応するのか、既存の markdown の更新で足りるのか、新規の markdown を追加すべきなのか、を区別して整理してください。特に正本として扱うべき文書の更新漏れを優先して確認し、必要であれば更新候補のファイル名や追記すべき観点も示してください。\n\n${getTodoReflectionInstruction()}`
   },
   {
     id: "ai-expansion-conversation-handover-request",
     label: "X301: セッションの引継テキストの生成(AI詳細)",
     keywords: ["handover", "session", "conversation", "markdown", "session handover", "structured handover", "引き継ぎ", "引継", "セッション", "会話", "引継テキスト", "未完了事項", "次に見る点", "構造化引継", "せっしょん", "かいわ", "ひきつぎ", "みかんりょうじこう", "つぎにみるてん", "こうぞうかひきつぎ"],
     requiresCommitId: false,
-    buildBody: () => `今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、状況を再現しやすい引き継ぎテキストを Markdown 形式で生成してください。特に、作業の目的、前提条件、決まったこと、未確定事項、未完了事項、次に見るべきファイルや論点、注意点を明確に区別して整理してください。可能であれば、受け手の生成AIがすぐに再開しやすい順番で並べてください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+    buildBody: () => appendMarkdownFenceInstruction("今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、状況を再現しやすい引き継ぎテキストを Markdown 形式で生成してください。特に、作業の目的、前提条件、決まったこと、未確定事項、未完了事項、次に見るべきファイルや論点、注意点を明確に区別して整理してください。可能であれば、受け手の生成AIがすぐに再開しやすい順番で並べてください。")
   },
   {
     id: "ai-expansion-critical-review-request",
@@ -54,7 +54,7 @@ const aiExpansionPromptDefinitions = [
     keywords: ["X501", "pull request", "github pr", "pr body", "pr title", "change summary", "risk", "tests", "PR文面", "PRタイトル", "PR本文", "変更概要", "テスト", "リスク", "ぴーあーる", "へんこうがいよう", "りすく"],
     requiresCommitId: true,
     buildBody: (commitId: string) => commitId
-      ? `対象コミット ${commitId} における変更内容について、GitHub PR 用のタイトルと本文を Markdown 形式で作成してください。PR 本文には、少なくとも概要、主な変更点、テストまたは確認内容、必要であれば注意点やリスクを含めてください。変更内容に基づかない推測は避け、分からない点は断定しないでください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+      ? appendMarkdownFenceInstruction(`対象コミット ${commitId} における変更内容について、GitHub PR 用のタイトルと本文を Markdown 形式で作成してください。PR 本文には、少なくとも概要、主な変更点、テストまたは確認内容、必要であれば注意点やリスクを含めてください。変更内容に基づかない推測は避け、分からない点は断定しないでください。`)
       : ""
   },
   {
@@ -63,7 +63,7 @@ const aiExpansionPromptDefinitions = [
     keywords: ["X502", "release notes", "github release", "release body", "release title", "release summary", "release文面", "release本文", "リリースノート", "変更概要", "利用者向け", "りりーすのーと", "りようしゃむけ"],
     requiresCommitId: true,
     buildBody: (commitId: string) => commitId
-      ? `${commitId} より後に行われた変更（${commitId} 自体の変更内容は除外する）について、GitHub Release 用のタイトルと本文を Markdown 形式で作成してください。利用者や読者が把握しやすいように、概要、主な変更点、必要であれば注意点や既知の制約を整理してください。変更内容に基づかない推測は避け、分からない点は断定しないでください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+      ? appendMarkdownFenceInstruction(`${commitId} より後に行われた変更（${commitId} 自体の変更内容は除外する）について、GitHub Release 用のタイトルと本文を Markdown 形式で作成してください。利用者や読者が把握しやすいように、概要、主な変更点、必要であれば注意点や既知の制約を整理してください。変更内容に基づかない推測は避け、分からない点は断定しないでください。`)
       : ""
   },
   {

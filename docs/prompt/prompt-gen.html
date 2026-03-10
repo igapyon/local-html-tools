@@ -1480,6 +1480,7 @@ md-icon-button.md-copy-button--surface {
   
   
   
+  
   <script>
 (()=>{function s(o,e,t,r){var i=arguments.length,n=i<3?e:r===null?r=Object.getOwnPropertyDescriptor(e,t):r,a;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")n=Reflect.decorate(o,e,t,r);else for(var d=o.length-1;d>=0;d--)(a=o[d])&&(n=(i<3?a(n):i>3?a(e,t,n):a(e,t))||n);return i>3&&n&&Object.defineProperty(e,t,n),n}var E=o=>(e,t)=>{t!==void 0?t.addInitializer(()=>{customElements.define(o,e)}):customElements.define(o,e)};var Qe=globalThis,et=Qe.ShadowRoot&&(Qe.ShadyCSS===void 0||Qe.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,Bt=Symbol(),$r=new WeakMap,Ne=class{constructor(e,t,r){if(this._$cssResult$=!0,r!==Bt)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o,t=this.t;if(et&&e===void 0){let r=t!==void 0&&t.length===1;r&&(e=$r.get(t)),e===void 0&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),r&&$r.set(t,e))}return e}toString(){return this.cssText}},Tr=o=>new Ne(typeof o=="string"?o:o+"",void 0,Bt),g=(o,...e)=>{let t=o.length===1?o[0]:e.reduce((r,i,n)=>r+(a=>{if(a._$cssResult$===!0)return a.cssText;if(typeof a=="number")return a;throw Error("Value passed to 'css' function must be a 'css' function result: "+a+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+o[n+1],o[0]);return new Ne(t,o,Bt)},Sr=(o,e)=>{if(et)o.adoptedStyleSheets=e.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(let t of e){let r=document.createElement("style"),i=Qe.litNonce;i!==void 0&&r.setAttribute("nonce",i),r.textContent=t.cssText,o.appendChild(r)}},Ft=et?o=>o:o=>o instanceof CSSStyleSheet?(e=>{let t="";for(let r of e.cssRules)t+=r.cssText;return Tr(t)})(o):o;var{is:Io,defineProperty:ko,getOwnPropertyDescriptor:Oo,getOwnPropertyNames:Ro,getOwnPropertySymbols:Po,getPrototypeOf:Lo}=Object,ce=globalThis,Ir=ce.trustedTypes,Do=Ir?Ir.emptyScript:"",zo=ce.reactiveElementPolyfillSupport,Be=(o,e)=>o,Fe={toAttribute(o,e){switch(e){case Boolean:o=o?Do:null;break;case Object:case Array:o=o==null?o:JSON.stringify(o)}return o},fromAttribute(o,e){let t=o;switch(e){case Boolean:t=o!==null;break;case Number:t=o===null?null:Number(o);break;case Object:case Array:try{t=JSON.parse(o)}catch{t=null}}return t}},tt=(o,e)=>!Io(o,e),kr={attribute:!0,type:String,converter:Fe,reflect:!1,useDefault:!1,hasChanged:tt};Symbol.metadata??(Symbol.metadata=Symbol("metadata")),ce.litPropertyMetadata??(ce.litPropertyMetadata=new WeakMap);var re=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??(this.l=[])).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=kr){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){let r=Symbol(),i=this.getPropertyDescriptor(e,r,t);i!==void 0&&ko(this.prototype,e,i)}}static getPropertyDescriptor(e,t,r){let{get:i,set:n}=Oo(this.prototype,e)??{get(){return this[t]},set(a){this[t]=a}};return{get:i,set(a){let d=i?.call(this);n?.call(this,a),this.requestUpdate(e,d,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??kr}static _$Ei(){if(this.hasOwnProperty(Be("elementProperties")))return;let e=Lo(this);e.finalize(),e.l!==void 0&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(Be("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(Be("properties"))){let t=this.properties,r=[...Ro(t),...Po(t)];for(let i of r)this.createProperty(i,t[i])}let e=this[Symbol.metadata];if(e!==null){let t=litPropertyMetadata.get(e);if(t!==void 0)for(let[r,i]of t)this.elementProperties.set(r,i)}this._$Eh=new Map;for(let[t,r]of this.elementProperties){let i=this._$Eu(t,r);i!==void 0&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){let t=[];if(Array.isArray(e)){let r=new Set(e.flat(1/0).reverse());for(let i of r)t.unshift(Ft(i))}else e!==void 0&&t.push(Ft(e));return t}static _$Eu(e,t){let r=t.attribute;return r===!1?void 0:typeof r=="string"?r:typeof e=="string"?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??(this._$EO=new Set)).add(e),this.renderRoot!==void 0&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){let e=new Map,t=this.constructor.elementProperties;for(let r of t.keys())this.hasOwnProperty(r)&&(e.set(r,this[r]),delete this[r]);e.size>0&&(this._$Ep=e)}createRenderRoot(){let e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return Sr(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,r){this._$AK(e,r)}_$ET(e,t){let r=this.constructor.elementProperties.get(e),i=this.constructor._$Eu(e,r);if(i!==void 0&&r.reflect===!0){let n=(r.converter?.toAttribute!==void 0?r.converter:Fe).toAttribute(t,r.type);this._$Em=e,n==null?this.removeAttribute(i):this.setAttribute(i,n),this._$Em=null}}_$AK(e,t){let r=this.constructor,i=r._$Eh.get(e);if(i!==void 0&&this._$Em!==i){let n=r.getPropertyOptions(i),a=typeof n.converter=="function"?{fromAttribute:n.converter}:n.converter?.fromAttribute!==void 0?n.converter:Fe;this._$Em=i;let d=a.fromAttribute(t,n.type);this[i]=d??this._$Ej?.get(i)??d,this._$Em=null}}requestUpdate(e,t,r,i=!1,n){if(e!==void 0){let a=this.constructor;if(i===!1&&(n=this[e]),r??(r=a.getPropertyOptions(e)),!((r.hasChanged??tt)(n,t)||r.useDefault&&r.reflect&&n===this._$Ej?.get(e)&&!this.hasAttribute(a._$Eu(e,r))))return;this.C(e,t,r)}this.isUpdatePending===!1&&(this._$ES=this._$EP())}C(e,t,{useDefault:r,reflect:i,wrapped:n},a){r&&!(this._$Ej??(this._$Ej=new Map)).has(e)&&(this._$Ej.set(e,a??t??this[e]),n!==!0||a!==void 0)||(this._$AL.has(e)||(this.hasUpdated||r||(t=void 0),this._$AL.set(e,t)),i===!0&&this._$Em!==e&&(this._$Eq??(this._$Eq=new Set)).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}let e=this.scheduleUpdate();return e!=null&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??(this.renderRoot=this.createRenderRoot()),this._$Ep){for(let[i,n]of this._$Ep)this[i]=n;this._$Ep=void 0}let r=this.constructor.elementProperties;if(r.size>0)for(let[i,n]of r){let{wrapped:a}=n,d=this[i];a!==!0||this._$AL.has(i)||d===void 0||this.C(i,void 0,n,d)}}let e=!1,t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(r=>r.hostUpdate?.()),this.update(t)):this._$EM()}catch(r){throw e=!1,this._$EM(),r}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&(this._$Eq=this._$Eq.forEach(t=>this._$ET(t,this[t]))),this._$EM()}updated(e){}firstUpdated(e){}};re.elementStyles=[],re.shadowRootOptions={mode:"open"},re[Be("elementProperties")]=new Map,re[Be("finalized")]=new Map,zo?.({ReactiveElement:re}),(ce.reactiveElementVersions??(ce.reactiveElementVersions=[])).push("2.1.2");var Mo={attribute:!0,type:String,converter:Fe,reflect:!1,hasChanged:tt},No=(o=Mo,e,t)=>{let{kind:r,metadata:i}=t,n=globalThis.litPropertyMetadata.get(i);if(n===void 0&&globalThis.litPropertyMetadata.set(i,n=new Map),r==="setter"&&((o=Object.create(o)).wrapped=!0),n.set(t.name,o),r==="accessor"){let{name:a}=t;return{set(d){let c=e.get.call(this);e.set.call(this,d),this.requestUpdate(a,c,o,!0,d)},init(d){return d!==void 0&&this.C(a,void 0,o,d),d}}}if(r==="setter"){let{name:a}=t;return function(d){let c=this[a];e.call(this,d),this.requestUpdate(a,c,o,!0,d)}}throw Error("Unsupported decorator location: "+r)};function l(o){return(e,t)=>typeof t=="object"?No(o,e,t):((r,i,n)=>{let a=i.hasOwnProperty(n);return i.constructor.createProperty(n,r),a?Object.getOwnPropertyDescriptor(i,n):void 0})(o,e,t)}function k(o){return l({...o,state:!0,attribute:!1})}var Q=(o,e,t)=>(t.configurable=!0,t.enumerable=!0,Reflect.decorate&&typeof e!="object"&&Object.defineProperty(o,e,t),t);function S(o,e){return(t,r,i)=>{let n=a=>a.renderRoot?.querySelector(o)??null;if(e){let{get:a,set:d}=typeof r=="object"?t:i??(()=>{let c=Symbol();return{get(){return this[c]},set(h){this[c]=h}}})();return Q(t,r,{get(){let c=a.call(this);return c===void 0&&(c=n(this),(c!==null||this.hasUpdated)&&d.call(this,c)),c}})}return Q(t,r,{get(){return n(this)}})}}var Bo;function Or(o){return(e,t)=>Q(e,t,{get(){return(this.renderRoot??Bo??(Bo=document.createDocumentFragment())).querySelectorAll(o)}})}function N(o){return(e,t)=>{let{slot:r,selector:i}=o??{},n="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){let a=this.renderRoot?.querySelector(n),d=a?.assignedElements(o)??[];return i===void 0?d:d.filter(c=>c.matches(i))}})}}function rt(o){return(e,t)=>{let{slot:r}=o??{},i="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){return this.renderRoot?.querySelector(i)?.assignedNodes(o)??[]}})}}var qe=globalThis,Rr=o=>o,ot=qe.trustedTypes,Pr=ot?ot.createPolicy("lit-html",{createHTML:o=>o}):void 0,qt="$lit$",oe=`lit$${Math.random().toFixed(9).slice(2)}$`,Vt="?"+oe,Fo=`<${Vt}>`,_e=document,Ve=()=>_e.createComment(""),He=o=>o===null||typeof o!="object"&&typeof o!="function",Ht=Array.isArray,Br=o=>Ht(o)||typeof o?.[Symbol.iterator]=="function",Ut=`[ 	
 \f\r]`,Ue=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,Lr=/-->/g,Dr=/>/g,ye=RegExp(`>|${Ut}(?:([^\\s"'>=/]+)(${Ut}*=${Ut}*(?:[^ 	
@@ -3598,6 +3599,18 @@ if (!customElements.get("lht-page-menu")) {
   </script>
 
   <script>
+function getMarkdownFenceInstruction() {
+    return "回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。";
+}
+function appendMarkdownFenceInstruction(body) {
+    return `${body}\n\n${getMarkdownFenceInstruction()}`;
+}
+function getTodoReflectionInstruction() {
+    return "必要に応じて、今回の作業結果を TODO.md に反映してください。関連する既存の TODO があれば補強・更新し、該当する記述がなければ新規の TODO を追加してください。";
+}
+  </script>
+
+  <script>
 const promptDefinitions = [
     {
         id: "pr-request",
@@ -3605,7 +3618,7 @@ const promptDefinitions = [
         keywords: ["pr", "pull request", "github pr", "markdown", "tilde", "pr作成依頼", "prタイトル", "pr本文", "文面", "作成", "github", "ぷるりく", "ぴーあーる", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
         requiresCommitId: true,
         buildBody: (commitId) => commitId
-            ? `対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文は ~~~~ で囲まれた一塊として回答してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+            ? appendMarkdownFenceInstruction(`対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文を出力してください。`)
             : ""
     },
     {
@@ -3614,7 +3627,7 @@ const promptDefinitions = [
         keywords: ["release", "github release", "release notes", "github", "markdown", "tilde", "リリース", "release文面", "release本文", "文面", "作成", "りりーす", "りりーすのーと", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
         requiresCommitId: true,
         buildBody: (commitId) => commitId
-            ? `${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文は ~~~~ で囲まれた一塊として回答してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+            ? appendMarkdownFenceInstruction(`${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文を作成してください。`)
             : ""
     },
     {
@@ -3622,49 +3635,49 @@ const promptDefinitions = [
         label: "303: Markdown をチルダフェンスで出力",
         keywords: ["markdown", "tilde fence", "tilde fenced", "tilde-fence", "tilde-fenced", "fenced markdown", "code fence", "code block", "code", "チルダフェンス", "markdown出力", "コード形式", "出力", "ちるだふぇんす", "こーどふぇんす", "こーどぶろっく", "しゅつりょく", "まーくだうん", "こーど"],
         requiresCommitId: false,
-        buildBody: () => "markdown テキスト形式で出力してください。回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+        buildBody: () => appendMarkdownFenceInstruction("markdown テキスト形式で出力してください。")
     },
     {
         id: "extract-to-inline-code-request",
         label: "351: 添付ファイル等の抽出結果をチルダフェンスで出力",
         keywords: ["extract", "attachment", "text", "tilde fence", "tilde fenced", "tilde-fence", "tilde-fenced", "fenced markdown", "code fence", "code block", "markdown", "抽出", "添付ファイル", "テキスト", "チルダフェンス", "出力", "ちゅうしゅつ", "てんぷふぁいる", "てきすと", "ちるだふぇんす", "こーどふぇんす", "こーどぶろっく", "しゅつりょく"],
         requiresCommitId: false,
-        buildBody: () => "添付ファイルから、あるいは与えるテキストから情報を抽出して、markdown テキスト形式で出力してください。回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+        buildBody: () => appendMarkdownFenceInstruction("添付ファイルから、あるいは与えるテキストから情報を抽出して、markdown テキスト形式で出力してください。")
     },
     {
         id: "excel-like-text-to-markdown-request",
         label: "352: Excel貼り付けをMarkdown化",
         keywords: ["excel", "spreadsheet", "sheet", "table", "markdown", "excel to markdown", "excel貼り付け", "excelシート", "表", "表変換", "markdown化", "スプレッドシート", "えくせる", "しーと", "ひょう", "まーくだうんか", "すぷれっどしーと"],
         requiresCommitId: false,
-        buildBody: () => "これから与えるテキストは、Excel シートをコピーして得られた内容である可能性が高いものとして扱ってください。その前提で、行と列、見出し、注記、空欄、表のまとまりをできるだけ読み取り、Markdown 形式へ変換してください。\n\nまずは Excel の表構造を推定し、表として表現するのが自然な部分は Markdown の表として整形してください。表ではなく見出し、注記、備考、補足説明として扱うほうが自然な部分は、Markdown の見出しや箇条書きとして整理してください。内容を勝手に補完したり、元にない値を追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。\n\n単なるプレーンテキスト化ではなく、「Excel シートを人が Markdown へ移したらどう整理するか」を意識して、読みやすく整形してください。ただし、元の構造を不必要に作り変えすぎないでください。\n\n回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+        buildBody: () => appendMarkdownFenceInstruction("これから与えるテキストは、Excel シートをコピーして得られた内容である可能性が高いものとして扱ってください。その前提で、行と列、見出し、注記、空欄、表のまとまりをできるだけ読み取り、Markdown 形式へ変換してください。\n\nまずは Excel の表構造を推定し、表として表現するのが自然な部分は Markdown の表として整形してください。表ではなく見出し、注記、備考、補足説明として扱うほうが自然な部分は、Markdown の見出しや箇条書きとして整理してください。内容を勝手に補完したり、元にない値を追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。\n\n単なるプレーンテキスト化ではなく、「Excel シートを人が Markdown へ移したらどう整理するか」を意識して、読みやすく整形してください。ただし、元の構造を不必要に作り変えすぎないでください。")
     },
     {
         id: "word-attachment-to-markdown-request",
         label: "353: Word添付ファイルをMarkdown化",
         keywords: ["word", "doc", "docx", "document", "markdown", "word to markdown", "word添付", "word文書", "ワード", "文書", "段落", "見出し", "markdown化", "わーど", "ぶんしょ", "だんらく", "みだし", "まーくだうんか"],
         requiresCommitId: false,
-        buildBody: () => "これから与える内容は、Word の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、注記、備考、補足説明などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。\n\nまずは Word 文書の構造を推定し、見出しとして扱うのが自然な部分は Markdown の見出しとして整理してください。箇条書き、段落、表、注記は、それぞれ Markdown で自然な形式へ変換してください。単なるプレーンテキスト化ではなく、「Word 文書を人が Markdown 文書へ移したらどう整理するか」を意識して、読みやすく整形してください。\n\n内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。元の文書構造を尊重しつつ、Markdown として保守しやすい形へ整えてください。\n\n回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+        buildBody: () => appendMarkdownFenceInstruction("これから与える内容は、Word の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、注記、備考、補足説明などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。\n\nまずは Word 文書の構造を推定し、見出しとして扱うのが自然な部分は Markdown の見出しとして整理してください。箇条書き、段落、表、注記は、それぞれ Markdown で自然な形式へ変換してください。単なるプレーンテキスト化ではなく、「Word 文書を人が Markdown 文書へ移したらどう整理するか」を意識して、読みやすく整形してください。\n\n内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。元の文書構造を尊重しつつ、Markdown として保守しやすい形へ整えてください。")
     },
     {
         id: "pdf-attachment-to-markdown-request",
         label: "354: PDF添付ファイルをMarkdown化",
         keywords: ["pdf", "document", "markdown", "pdf to markdown", "pdf添付", "pdf文書", "PDF", "文書", "見出し", "段組み", "ページ番号", "ヘッダー", "フッター", "markdown化", "ぴーでぃーえふ", "ぶんしょ", "みだし", "だんぐみ", "ぺーじばんごう", "へっだー", "ふったー", "まーくだうんか"],
         requiresCommitId: false,
-        buildBody: () => "これから与える内容は、PDF の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、図表説明、注記、備考などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。\n\nPDF では見た目上の改行や段組み、ページ番号、ヘッダー、フッター、脚注などがノイズとして混ざることがあるため、単なる行単位の転記ではなく、文書として自然な読み順を推定して整理してください。表として扱うのが自然な部分は Markdown の表として整形し、見出しや本文、箇条書き、注記は Markdown として自然な形式へ整理してください。\n\n内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。PDF 由来のレイアウトノイズは落として構いませんが、意味のある内容は失わないようにしてください。\n\n回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+        buildBody: () => appendMarkdownFenceInstruction("これから与える内容は、PDF の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、図表説明、注記、備考などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。\n\nPDF では見た目上の改行や段組み、ページ番号、ヘッダー、フッター、脚注などがノイズとして混ざることがあるため、単なる行単位の転記ではなく、文書として自然な読み順を推定して整理してください。表として扱うのが自然な部分は Markdown の表として整形し、見出しや本文、箇条書き、注記は Markdown として自然な形式へ整理してください。\n\n内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。PDF 由来のレイアウトノイズは落として構いませんが、意味のある内容は失わないようにしてください。")
     },
     {
         id: "image-attachment-to-markdown-description-request",
         label: "355: 画像添付ファイルをMarkdownで記述",
         keywords: ["image", "image attachment", "picture", "screenshot", "diagram", "illustration", "markdown", "image to markdown", "画像", "画像添付", "スクリーンショット", "図", "絵", "図解", "内容記述", "markdown記述", "がぞう", "すくりーんしょっと", "ず", "え", "ずかい", "きじゅつ", "まーくだうんきじゅつ"],
         requiresCommitId: false,
-        buildBody: () => "これから与える添付ファイルは、画像ファイルとして扱ってください。その画像に写っている内容を観察し、Markdown 形式で記述してください。\n\n画像内に文字、見出し、箇条書き、表、注記があれば、できるだけ読み取って Markdown として整理してください。文字以外にも、絵、図、矢印、囲み、人物、物体、配置関係などに意味がある場合は、その内容や関係が分かるように Markdown で補足してください。\n\n画像内の内容が文書とは限らず、絵や図、写真、模式図、スクリーンショット、手書きメモである可能性も考慮してください。文字情報だけに限定せず、「画像として何が表現されているか」を記述してください。\n\n内容を勝手に補完したり、元にない情報を断定的に追加したりしてはいけません。何が写っているか判断しきれない箇所、文字として判読できない箇所、意味が特定できない要素は、推測で埋めず、不明・判読困難・識別困難などと明示してください。\n\n単なる OCR の羅列ではなく、画像に含まれる情報を人が Markdown 文書として記録するならどう整理するかを意識して、読みやすく整形してください。\n\n回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+        buildBody: () => appendMarkdownFenceInstruction("これから与える添付ファイルは、画像ファイルとして扱ってください。その画像に写っている内容を観察し、Markdown 形式で記述してください。\n\n画像内に文字、見出し、箇条書き、表、注記があれば、できるだけ読み取って Markdown として整理してください。文字以外にも、絵、図、矢印、囲み、人物、物体、配置関係などに意味がある場合は、その内容や関係が分かるように Markdown で補足してください。\n\n画像内の内容が文書とは限らず、絵や図、写真、模式図、スクリーンショット、手書きメモである可能性も考慮してください。文字情報だけに限定せず、「画像として何が表現されているか」を記述してください。\n\n内容を勝手に補完したり、元にない情報を断定的に追加したりしてはいけません。何が写っているか判断しきれない箇所、文字として判読できない箇所、意味が特定できない要素は、推測で埋めず、不明・判読困難・識別困難などと明示してください。\n\n単なる OCR の羅列ではなく、画像に含まれる情報を人が Markdown 文書として記録するならどう整理するかを意識して、読みやすく整形してください。")
     },
     {
         id: "multiple-sources-to-consistent-markdown-request",
         label: "356: 複数情報を整合させてMarkdown化",
         keywords: ["multiple sources", "multiple markdown", "merge markdown", "consistent markdown", "integrate markdown", "markdown", "複数情報", "複数markdown", "統合", "整合", "矛盾整理", "表現ゆれ", "markdown統合", "markdown化", "ふくすうじょうほう", "とうごう", "せいごう", "むじゅんせいり", "ひょうげんゆれ", "まーくだうんとうごう", "まーくだうんか"],
         requiresCommitId: false,
-        buildBody: () => "これから複数の情報を渡します。主に markdown 形式の資料である可能性が高いものとして扱ってください。これらの内容を突き合わせ、重複、矛盾、表現ゆれ、粒度差をできるだけ整理したうえで、整合性のある一つの markdown 文書としてまとめてください。\n\n単に各資料を順番に連結するのではなく、内容の意味を見て統合してください。重複する説明はまとめ、表現が揺れている箇所は文脈上もっとも自然な形へ寄せてください。資料間で矛盾している箇所がある場合は、勝手に断定せず、その矛盾が分かる形で整理してください。判断に十分な根拠がない場合は、無理に一つへ決め打ちしないでください。\n\n元の情報に含まれていない新しい事実を補完してはいけません。ただし、見出しの再配置、段落の整理、箇条書き化、順序調整など、読みやすくするための再構成は行って構いません。必要に応じて、見出し、箇条書き、表を用いて、保守しやすい markdown として整理してください。\n\nもし入力が完全には整合しない場合は、統合結果に加えて、未解決の矛盾点や解釈が分かれうる点が分かるように残してください。\n\n回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+        buildBody: () => appendMarkdownFenceInstruction("これから複数の情報を渡します。主に markdown 形式の資料である可能性が高いものとして扱ってください。これらの内容を突き合わせ、重複、矛盾、表現ゆれ、粒度差をできるだけ整理したうえで、整合性のある一つの markdown 文書としてまとめてください。\n\n単に各資料を順番に連結するのではなく、内容の意味を見て統合してください。重複する説明はまとめ、表現が揺れている箇所は文脈上もっとも自然な形へ寄せてください。資料間で矛盾している箇所がある場合は、勝手に断定せず、その矛盾が分かる形で整理してください。判断に十分な根拠がない場合は、無理に一つへ決め打ちしないでください。\n\n元の情報に含まれていない新しい事実を補完してはいけません。ただし、見出しの再配置、段落の整理、箇条書き化、順序調整など、読みやすくするための再構成は行って構いません。必要に応じて、見出し、箇条書き、表を用いて、保守しやすい markdown として整理してください。\n\nもし入力が完全には整合しない場合は、統合結果に加えて、未解決の矛盾点や解釈が分かれうる点が分かるように残してください。")
     },
     {
         id: "github-no-change-request",
@@ -3685,14 +3698,14 @@ const promptDefinitions = [
         label: "301: セッションの引継テキストの生成",
         keywords: ["handover", "session", "conversation", "markdown", "session handover", "引き継ぎ", "引継", "セッション", "会話", "テキスト", "引継テキスト", "生成", "生成ai", "別のai", "せっしょん", "かいわ", "ひきつぎ", "てきすと", "まーくだうん", "せいせい", "はんどおーばー", "えーあい"],
         requiresCommitId: false,
-        buildBody: () => "今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、引継先で状況を再現しやすいよう、重要な前提、判断、未完了事項、次に見るべき点を漏れなく整理した引き継ぎテキストを Markdown 形式で生成してください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。"
+        buildBody: () => appendMarkdownFenceInstruction("今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、引継先で状況を再現しやすいよう、重要な前提、判断、未完了事項、次に見るべき点を漏れなく整理した引き継ぎテキストを Markdown 形式で生成してください。")
     },
     {
         id: "spec-discussion-request",
         label: "703: 仕様検討モードで進める",
         keywords: ["spec", "specification", "仕様", "検討", "モード", "進める", "todo", "todo.md", "しよう", "けんとう", "もーど", "すすめる", "とぅーどぅー", "すぺっく"],
         requiresCommitId: false,
-        buildBody: () => "今からの作業は仕様の検討です。コード変更、ファイル編集、ビルド、テスト実行などの実装作業は開始しないでください。その代わり、仕様論点、未確定事項、判断材料、実施候補のタスク分解を整理して提示してください。まとまった仕様が実施事項に落としこめる場合には、TODO.md に作業タスクとして分解して記述してください。"
+        buildBody: () => `今からの作業は仕様の検討です。コード変更、ファイル編集、ビルド、テスト実行などの実装作業は開始しないでください。その代わり、仕様論点、未確定事項、判断材料、実施候補のタスク分解を整理して提示してください。\n\n${getTodoReflectionInstruction()}`
     },
     {
         id: "small-test-request",
@@ -3713,14 +3726,14 @@ const promptDefinitions = [
         label: "704: TODO.md の完了項目を整理",
         keywords: ["todo", "todo.md", "cleanup", "close", "closed", "完了項目", "整理", "完了", "項目", "クローズ", "削除", "とぅーどぅー", "かんりょうこうもく", "せいり", "かんりょう", "こうもく", "くろーず", "さくじょ"],
         requiresCommitId: false,
-        buildBody: () => "TODO.md のなかで、すでに対応済みの TODO があれば、それをクローズしてください。以前にすでにクローズ済みで不要になっている TODO があれば削除してください。"
+        buildBody: () => `TODO.md のなかで、すでに対応済みの TODO があれば、それをクローズしてください。以前にすでにクローズ済みで不要になっている TODO があれば削除してください。\n\n${getTodoReflectionInstruction()}`
     },
     {
         id: "completion-check-request",
         label: "306: 依頼内容の実施状況を確認",
         keywords: ["done", "completed", "status", "check", "依頼", "内容", "実施", "状況", "実施済み", "未実施", "確認", "いらい", "ないよう", "じっし", "じょうきょう", "じっしずみ", "みじっし", "かくにん"],
         requiresCommitId: false,
-        buildBody: () => "さきほどお願いした一連の依頼内容は、基本的に全て実施済みでしょうか。それともまだ未実施のものはありますでしょうか。"
+        buildBody: () => `さきほどお願いした一連の依頼内容は、基本的に全て実施済みでしょうか。それともまだ未実施のものはありますでしょうか。\n\n${getTodoReflectionInstruction()}`
     },
     {
         id: "critical-review-request",
@@ -3734,7 +3747,7 @@ const promptDefinitions = [
         label: "102: markdown 更新漏れの確認",
         keywords: ["markdown", "md", "update", "doc", "docs", "更新", "漏れ", "確認", "更新漏れ", "未更新", "追加すべき", "まーくだうん", "こうしん", "もれ", "かくにん", "こうしんもれ", "みこうしん", "ついかすべき"],
         requiresCommitId: false,
-        buildBody: () => "実装の側に変更がおこなわれましたが、これに対応する markdown (.md) で未更新のものはありますか。あるいは新規で markdown (.md) を追加すべき変更はありましたか。"
+        buildBody: () => `実装の側に変更がおこなわれましたが、これに対応する markdown (.md) で未更新のものはありますか。あるいは新規で markdown (.md) を追加すべき変更はありましたか。\n\n${getTodoReflectionInstruction()}`
     },
     {
         id: "hallucination-check-request",
@@ -4567,14 +4580,14 @@ and preceded by the suggested filename as a heading:
         label: "603: 現在の会話を Mermaid で記述",
         keywords: ["mermaid", "sequence diagram", "diagram", "conversation", "current conversation", "会話", "現在の会話", "図", "記述", "まーめいど", "しーけんすだいあぐらむ", "かいわ", "げんざいのかいわ", "ず", "きじゅつ"],
         requiresCommitId: false,
-        buildBody: () => "いまこのセッションで扱っている内容について、流れや関係が分かるように Mermaid 記法で整理して回答してください。必要に応じて適切な図の種類を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。"
+        buildBody: () => appendMarkdownFenceInstruction("いまこのセッションで扱っている内容について、流れや関係が分かるように Mermaid 記法で整理して回答してください。必要に応じて適切な図の種類を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。")
     },
     {
         id: "graphviz-current-conversation-request",
         label: "604: 現在の会話を Graphviz DOT で記述",
         keywords: ["graphviz", "dot", "graphviz dot", "diagram", "graph", "conversation", "current conversation", "会話", "現在の会話", "図", "記述", "ぐらふびず", "どっと", "かいわ", "げんざいのかいわ", "ず", "きじゅつ"],
         requiresCommitId: false,
-        buildBody: () => "いまこのセッションで扱っている内容について、流れや関係が分かるように Graphviz DOT 記法で整理して回答してください。必要に応じて適切なグラフ構造を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。"
+        buildBody: () => appendMarkdownFenceInstruction("いまこのセッションで扱っている内容について、流れや関係が分かるように Graphviz DOT 記法で整理して回答してください。必要に応じて適切なグラフ構造を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。")
     },
     {
         id: "chat-partner-emily-request",
@@ -5466,14 +5479,14 @@ const aiExpansionPromptDefinitions = [
         label: "X102: markdown 更新漏れの確認(AI詳細)",
         keywords: ["markdown", "md", "update", "doc", "docs", "documentation sync", "更新", "漏れ", "確認", "更新漏れ", "未更新", "正本更新", "追加すべき文書", "まーくだうん", "こうしん", "もれ", "かくにん", "こうしんもれ", "みこうしん", "せいほんこうしん"],
         requiresCommitId: false,
-        buildBody: () => `実装の側に変更がおこなわれたことを前提に、これに対応する markdown (.md) に更新漏れがないか確認してください。単に「更新が必要そう」と述べるだけでなく、どの実装変更がどの markdown に対応するのか、既存の markdown の更新で足りるのか、新規の markdown を追加すべきなのか、を区別して整理してください。特に正本として扱うべき文書の更新漏れを優先して確認し、必要であれば更新候補のファイル名や追記すべき観点も示してください。`
+        buildBody: () => `実装の側に変更がおこなわれたことを前提に、これに対応する markdown (.md) に更新漏れがないか確認してください。単に「更新が必要そう」と述べるだけでなく、どの実装変更がどの markdown に対応するのか、既存の markdown の更新で足りるのか、新規の markdown を追加すべきなのか、を区別して整理してください。特に正本として扱うべき文書の更新漏れを優先して確認し、必要であれば更新候補のファイル名や追記すべき観点も示してください。\n\n${getTodoReflectionInstruction()}`
     },
     {
         id: "ai-expansion-conversation-handover-request",
         label: "X301: セッションの引継テキストの生成(AI詳細)",
         keywords: ["handover", "session", "conversation", "markdown", "session handover", "structured handover", "引き継ぎ", "引継", "セッション", "会話", "引継テキスト", "未完了事項", "次に見る点", "構造化引継", "せっしょん", "かいわ", "ひきつぎ", "みかんりょうじこう", "つぎにみるてん", "こうぞうかひきつぎ"],
         requiresCommitId: false,
-        buildBody: () => `今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、状況を再現しやすい引き継ぎテキストを Markdown 形式で生成してください。特に、作業の目的、前提条件、決まったこと、未確定事項、未完了事項、次に見るべきファイルや論点、注意点を明確に区別して整理してください。可能であれば、受け手の生成AIがすぐに再開しやすい順番で並べてください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+        buildBody: () => appendMarkdownFenceInstruction("今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、状況を再現しやすい引き継ぎテキストを Markdown 形式で生成してください。特に、作業の目的、前提条件、決まったこと、未確定事項、未完了事項、次に見るべきファイルや論点、注意点を明確に区別して整理してください。可能であれば、受け手の生成AIがすぐに再開しやすい順番で並べてください。")
     },
     {
         id: "ai-expansion-critical-review-request",
@@ -5502,7 +5515,7 @@ const aiExpansionPromptDefinitions = [
         keywords: ["X501", "pull request", "github pr", "pr body", "pr title", "change summary", "risk", "tests", "PR文面", "PRタイトル", "PR本文", "変更概要", "テスト", "リスク", "ぴーあーる", "へんこうがいよう", "りすく"],
         requiresCommitId: true,
         buildBody: (commitId) => commitId
-            ? `対象コミット ${commitId} における変更内容について、GitHub PR 用のタイトルと本文を Markdown 形式で作成してください。PR 本文には、少なくとも概要、主な変更点、テストまたは確認内容、必要であれば注意点やリスクを含めてください。変更内容に基づかない推測は避け、分からない点は断定しないでください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+            ? appendMarkdownFenceInstruction(`対象コミット ${commitId} における変更内容について、GitHub PR 用のタイトルと本文を Markdown 形式で作成してください。PR 本文には、少なくとも概要、主な変更点、テストまたは確認内容、必要であれば注意点やリスクを含めてください。変更内容に基づかない推測は避け、分からない点は断定しないでください。`)
             : ""
     },
     {
@@ -5511,7 +5524,7 @@ const aiExpansionPromptDefinitions = [
         keywords: ["X502", "release notes", "github release", "release body", "release title", "release summary", "release文面", "release本文", "リリースノート", "変更概要", "利用者向け", "りりーすのーと", "りようしゃむけ"],
         requiresCommitId: true,
         buildBody: (commitId) => commitId
-            ? `${commitId} より後に行われた変更（${commitId} 自体の変更内容は除外する）について、GitHub Release 用のタイトルと本文を Markdown 形式で作成してください。利用者や読者が把握しやすいように、概要、主な変更点、必要であれば注意点や既知の制約を整理してください。変更内容に基づかない推測は避け、分からない点は断定しないでください。回答は ~~~~ で囲まれた一塊として出力してください。Markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。`
+            ? appendMarkdownFenceInstruction(`${commitId} より後に行われた変更（${commitId} 自体の変更内容は除外する）について、GitHub Release 用のタイトルと本文を Markdown 形式で作成してください。利用者や読者が把握しやすいように、概要、主な変更点、必要であれば注意点や既知の制約を整理してください。変更内容に基づかない推測は避け、分からない点は断定しないでください。`)
             : ""
     },
     {
@@ -5671,42 +5684,42 @@ const aiSuggestPromptDefinitions = [
         label: "S603-002: 現在の会話の論点遷移を Mermaid で記述(AI提案)",
         keywords: ["S603-002", "mermaid topic flow", "topic transition", "conversation flow", "mermaid flow", "論点遷移", "Mermaid", "会話フロー", "話題遷移", "ろんてんせんい", "かいわふろー"],
         requiresCommitId: false,
-        buildBody: () => `現在の会話について、話題や論点がどの順に移り変わったかを Mermaid で記述してください。単なる発話順ではなく、どの論点からどの論点へ展開したのか、どこで重要な方針転換や新しい整理が入ったのかが分かるように表現してください。`
+        buildBody: () => appendMarkdownFenceInstruction("現在の会話について、話題や論点がどの順に移り変わったかを Mermaid で記述してください。単なる発話順ではなく、どの論点からどの論点へ展開したのか、どこで重要な方針転換や新しい整理が入ったのかが分かるように表現してください。")
     },
     {
         id: "ai-suggest-mermaid-dependency-request",
         label: "S603-003: 現在の会話の依存関係を Mermaid で記述(AI提案)",
         keywords: ["S603-003", "mermaid dependency", "dependency graph", "conversation dependency", "mermaid graph", "依存関係", "Mermaid図", "関係図", "依存図", "いぞんかんけい", "かんけいず"],
         requiresCommitId: false,
-        buildBody: () => `現在の会話や決定事項について、どの話題や判断がどの前提や別の決定に依存しているかを Mermaid で記述してください。時系列よりも依存関係を重視し、後続の判断が何を前提にしているかが分かるように整理してください。`
+        buildBody: () => appendMarkdownFenceInstruction("現在の会話や決定事項について、どの話題や判断がどの前提や別の決定に依存しているかを Mermaid で記述してください。時系列よりも依存関係を重視し、後続の判断が何を前提にしているかが分かるように整理してください。")
     },
     {
         id: "ai-suggest-mermaid-timeline-request",
         label: "S603-501: Mermaid timeline で図解化(AI提案)",
         keywords: ["S603-501", "mermaid timeline", "timeline diagram", "時系列図", "タイムライン化", "Mermaid timeline", "図解化", "じけいれつず", "たいむらいんか"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容を、まず時系列が読みやすい通常テキストとして整理し、そのあとに Mermaid timeline を出力してください。出来事、判断、変更点、節目が時系列で追えるようにし、日付や順序が不明確な箇所は推定せず不明と明示してください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容を、まず時系列が読みやすい通常テキストとして整理し、そのあとに Mermaid timeline を出力してください。出来事、判断、変更点、節目が時系列で追えるようにし、日付や順序が不明確な箇所は推定せず不明と明示してください。")
     },
     {
         id: "ai-suggest-mermaid-flowchart-request",
         label: "S603-502: Mermaid flowchart で図解化(AI提案)",
         keywords: ["S603-502", "mermaid flowchart", "flowchart", "フローチャート化", "手順図", "分岐図", "Mermaid flowchart", "図解化", "ふろーちゃーとか", "てじゅんず"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容を、まず手順や分岐が分かる通常テキストとして整理し、そのあとに Mermaid flowchart を出力してください。開始点、主要ステップ、分岐条件、終了条件が追えるようにし、処理順と判断分岐を混同しないように整理してください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容を、まず手順や分岐が分かる通常テキストとして整理し、そのあとに Mermaid flowchart を出力してください。開始点、主要ステップ、分岐条件、終了条件が追えるようにし、処理順と判断分岐を混同しないように整理してください。")
     },
     {
         id: "ai-suggest-mermaid-mindmap-request",
         label: "S603-503: Mermaid mindmap で図解化(AI提案)",
         keywords: ["S603-503", "mermaid mindmap", "mindmap", "マインドマップ化", "論点展開", "放射状整理", "Mermaid mindmap", "図解化", "まいんどまっぷか", "ろんてんてんかい"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容を、まず中心テーマと主要論点が分かる通常テキストとして整理し、そのあとに Mermaid mindmap を出力してください。中心テーマ、第1階層、第2階層の関係が自然に追えるようにし、細部を広げすぎずに主要な論点構造が見えるようにまとめてください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容を、まず中心テーマと主要論点が分かる通常テキストとして整理し、そのあとに Mermaid mindmap を出力してください。中心テーマ、第1階層、第2階層の関係が自然に追えるようにし、細部を広げすぎずに主要な論点構造が見えるようにまとめてください。")
     },
     {
         id: "ai-suggest-mermaid-concept-map-request",
         label: "S603-504: Mermaid 風の概念マップとして図解化(AI提案)",
         keywords: ["S603-504", "concept map", "mermaid concept map", "概念マップ化", "概念関係図", "relationship map", "Mermaid graph", "図解化", "がいねんまっぷか", "がいねんかんけいず"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容を、まず主要概念とその関係が分かる通常テキストとして整理し、そのあとに Mermaid flowchart または graph 記法で概念マップとして表現してください。中心概念、周辺概念、関係ラベルが分かるようにし、因果、依存、包含、対立などの関係を必要に応じて明示してください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容を、まず主要概念とその関係が分かる通常テキストとして整理し、そのあとに Mermaid flowchart または graph 記法で概念マップとして表現してください。中心概念、周辺概念、関係ラベルが分かるようにし、因果、依存、包含、対立などの関係を必要に応じて明示してください。")
     },
     {
         id: "ai-suggest-dot-causal-request",
@@ -5823,7 +5836,7 @@ const popularPromptDefinitions = [
         label: "P1204-004: Markdown 表形式で出力",
         keywords: ["P1204-004", "markdown table", "table output", "markdown format", "tabular output", "Markdown表", "表形式", "表出力", "まーくだうんひょう", "ひょうけいしき"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容を Markdown の表形式で出力してください。比較、分類、一覧化に向くように列を整理し、表だけで主要な情報が読み取れるようにまとめてください。必要に応じて、列名や並び順も読みやすさを優先して調整してください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容を Markdown の表形式で出力してください。比較、分類、一覧化に向くように列を整理し、表だけで主要な情報が読み取れるようにまとめてください。必要に応じて、列名や並び順も読みやすさを優先して調整してください。")
     },
     {
         id: "popular-recommendation-request",
@@ -6866,21 +6879,21 @@ const popularPromptDefinitions = [
         label: "P1603-001: タイムライン化",
         keywords: ["P1603-001", "timeline", "timeline format", "chronological order", "event timeline", "mermaid timeline", "タイムライン化", "時系列化", "時系列整理", "じけいれつか", "たいむらいんか"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容をタイムライン化してください。まず通常の Markdown テキストで、日付または順序が分かる時系列一覧を整理してください。そのうえで、可能であれば Mermaid timeline も併記してください。出来事、判断、変更点、節目が追えるようにし、順序が不明確なものは推定せずに不明と明示してください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容をタイムライン化してください。まず通常の Markdown テキストで、日付または順序が分かる時系列一覧を整理してください。そのうえで、可能であれば Mermaid timeline も併記してください。出来事、判断、変更点、節目が追えるようにし、順序が不明確なものは推定せずに不明と明示してください。")
     },
     {
         id: "popular-flowchart-request-structured",
         label: "P1604-001: フローチャート化",
         keywords: ["P1604-001", "flowchart", "flow chart", "mermaid flowchart", "process flow", "decision flow", "フローチャート化", "手順図化", "分岐図", "ふろーちゃーとか", "てじゅんずか"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容をフローチャート化してください。まず通常の Markdown テキストで、主要な手順、分岐条件、例外分岐、終了条件が分かるように整理してください。そのうえで、可能であれば Mermaid flowchart も併記してください。処理順と分岐条件を混同せず、読み手が流れを追いやすい構成にしてください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容をフローチャート化してください。まず通常の Markdown テキストで、主要な手順、分岐条件、例外分岐、終了条件が分かるように整理してください。そのうえで、可能であれば Mermaid flowchart も併記してください。処理順と分岐条件を混同せず、読み手が流れを追いやすい構成にしてください。")
     },
     {
         id: "popular-mindmap-request-structured",
         label: "P1605-001: マインドマップ化",
         keywords: ["P1605-001", "mindmap", "mind map", "mermaid mindmap", "topic expansion", "brainstorm map", "マインドマップ化", "論点展開", "放射状整理", "まいんどまっぷか", "ろんてんてんかい"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容をマインドマップ化してください。まず通常の Markdown テキストで、中心テーマ、第1階層の論点、第2階層以下の補足が分かるように入れ子構造で整理してください。そのうえで、可能であれば Mermaid mindmap も併記してください。広げすぎて散漫にならないよう、中心テーマから主要論点が自然に追える構成を優先してください。`
+        buildBody: () => appendMarkdownFenceInstruction("与えられた内容をマインドマップ化してください。まず通常の Markdown テキストで、中心テーマ、第1階層の論点、第2階層以下の補足が分かるように入れ子構造で整理してください。そのうえで、可能であれば Mermaid mindmap も併記してください。広げすぎて散漫にならないよう、中心テーマから主要論点が自然に追える構成を優先してください。")
     },
     {
         id: "popular-reading-support-summary",

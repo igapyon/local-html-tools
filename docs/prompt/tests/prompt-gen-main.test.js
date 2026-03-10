@@ -9,6 +9,10 @@ import { describe, expect, it } from "vitest";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const promptMarkdownUtilCode = readFileSync(
+  path.resolve(__dirname, "../src/prompt-gen/js/prompt-markdown-util.js"),
+  "utf8"
+);
 const promptDefinitionsCode = readFileSync(
   path.resolve(__dirname, "../src/prompt-gen/js/prompt-definitions.js"),
   "utf8"
@@ -119,7 +123,7 @@ async function bootPromptPage(urlSearch = "") {
   mountPromptDom();
   const promptOutputSection = document.getElementById("promptOutputSection");
   promptOutputSection.scrollIntoView = () => {};
-  new Function(`${promptDefinitionsCode}\n${promptDefinitionsAiExpansionCode}\n${promptDefinitionsAiSuggestCode}\n${promptDefinitionsPopularCode}\n${mainCode}`)();
+  new Function(`${promptMarkdownUtilCode}\n${promptDefinitionsCode}\n${promptDefinitionsAiExpansionCode}\n${promptDefinitionsAiSuggestCode}\n${promptDefinitionsPopularCode}\n${mainCode}`)();
   document.dispatchEvent(new Event("DOMContentLoaded"));
   await Promise.resolve();
   await Promise.resolve();
