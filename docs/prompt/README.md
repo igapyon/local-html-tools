@@ -12,6 +12,7 @@
 - [prompt-definitions-ai-expansion の役割](./prompt-definitions-ai-expansion.md)
 - [prompt-definitions-ai-suggest の役割](./prompt-definitions-ai-suggest.md)
 - [prompt-definitions-popular の役割](./prompt-definitions-popular.md)
+- [prompt-definitions-popular 再編案](./prompt-definitions-popular-reorganization.md)
 - [docs/prompt TODO](./TODO.md)
 
 ## 対象ファイル
@@ -55,12 +56,12 @@
 - `S603-5xx`:
   - Mermaid を使った図解化を、生成AI視点の派生提案として扱う系列です。
   - `Mermaid timeline`、`Mermaid flowchart`、`Mermaid mindmap` など、構造化テキストから図へ落とし込みやすい表現を提案する用途を想定します。
-- `P973` 以降:
+- `P1601` 以降:
   - 図解化を、世間的にも再利用しやすい定番プロンプトとして整理する系列です。
   - `図解化テキスト化`、`図解化描画指示`、`概念マップ化`、`タイムライン化`、`フローチャート化`、`マインドマップ化` などを含みます。
 - 使い分けの目安:
   - AIに「こういう派生もありそう」と提案させたい場合は `S603-5xx`
-  - 定番候補として安定運用したい場合は `P973` 以降
+  - 定番候補として安定運用したい場合は `P1601` 以降
 
 ## ビルド
 
@@ -83,9 +84,12 @@
 - `prompt-definitions.ts` に候補ボタン定義を集約する
 - 候補ボタンの文言や本文追加は `prompt-definitions.ts` を編集して反映する
 - 各定義は `id / label / keywords / requiresCommitId / buildBody()` を持つ
-- `main.ts` は検索、選択状態、入力欄表示、生成結果更新、スクロール制御を担当する
+- `main.ts` は検索、選択状態、入力欄表示、生成結果更新、共有リンク生成を担当する
 - ハンバーガーメニューから `A / X / S / P` 系列の表示有無を切り替えられ、その設定は `localStorage` に保存される
 - 検索は空欄で全候補表示、空白区切りで AND、各語の照合先は label / keywords / かな・カナ・ローマ字展開を含む
+- 検索欄が空欄の状態で候補ボタンをクリックした場合は、その候補の系列番号から親番号だけを検索欄へ補完する
+  - 例: `A321` -> `321`
+  - 例: `P1004-003` -> `1004`
 
 ### 入力値制約
 

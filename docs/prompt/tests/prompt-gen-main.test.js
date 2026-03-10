@@ -235,6 +235,45 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("A simplified cute illustration of `ぶどう`");
   });
 
+  it("fills the empty search field with the parent numeric code when a candidate is clicked", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptOutputTitle = document.getElementById("promptOutputTitle");
+
+    promptSearch.value = "";
+    promptSearch.dispatchEvent(new Event("input"));
+    const a321Button = [...document.querySelectorAll(".md-chip-button")].find((button) =>
+      button.querySelector(".md-chip-label").textContent.includes("A321:")
+    );
+    a321Button.click();
+    expect(promptSearch.value).toBe("321");
+    expect([...document.querySelectorAll(".md-chip-button")].every((button) =>
+      button.querySelector(".md-chip-label").textContent.includes("321")
+    )).toBe(true);
+    expect(promptOutputTitle.textContent).toContain("A321:");
+
+    promptSearch.value = "";
+    promptSearch.dispatchEvent(new Event("input"));
+    const p1004Button = [...document.querySelectorAll(".md-chip-button")].find((button) =>
+      button.querySelector(".md-chip-label").textContent.includes("P1004-003:")
+    );
+    p1004Button.click();
+    expect(promptSearch.value).toBe("1004");
+    expect([...document.querySelectorAll(".md-chip-button")].every((button) =>
+      button.querySelector(".md-chip-label").textContent.includes("1004")
+    )).toBe(true);
+    expect(promptOutputTitle.textContent).toContain("P1004-003:");
+
+    promptSearch.value = "A5";
+    promptSearch.dispatchEvent(new Event("input"));
+    const a501Button = [...document.querySelectorAll(".md-chip-button")].find((button) =>
+      button.querySelector(".md-chip-label").textContent.includes("A501:")
+    );
+    a501Button.click();
+    expect(promptSearch.value).toBe("A5");
+  });
+
   it("applies commit query parameter and generates output on load", async () => {
     await bootPromptPage("?q=A501&commit=abc1234");
 
