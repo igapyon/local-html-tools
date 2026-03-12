@@ -4,8 +4,31 @@ type PromptDefinition = {
   keywords: string[];
   requiresCommitId: boolean;
   requiresSubject?: boolean;
+  subjectLabel?: string;
+  subjectPlaceholder?: string;
+  subjectHelpText?: string;
+  subjectDefaultValue?: string;
   buildBody: (commitId: string, subject?: string) => string;
 };
+
+function unwrapPromptVariable(value: string): string {
+  const normalized = String(value || "").trim();
+  const match = normalized.match(/^`([\s\S]*)`$/);
+  return match ? match[1] : normalized;
+}
+
+function normalizeRelativeDocPath(value: string): string {
+  const unwrapped = unwrapPromptVariable(value)
+    .replace(/\\/g, "/")
+    .replace(/^\/+/, "")
+    .replace(/^\.\/+/, "")
+    .replace(/\/{2,}/g, "/")
+    .trim();
+  if (!unwrapped || unwrapped === "." || unwrapped.includes("..")) {
+    return "";
+  }
+  return unwrapped.replace(/\/+$/, "");
+}
 
 const promptDefinitions: PromptDefinition[] = [
   {
@@ -88,6 +111,268 @@ const promptDefinitions: PromptDefinition[] = [
     keywords: ["readme", "markdown", "directory", "ディレクトリ", "内容", "確認", "把握", "内容確認", "md確認", "りーどみー", "でぃれくとり", "ないよう", "かくにん", "はあく", "まーくだうん", "えむでぃー"],
     requiresCommitId: false,
     buildBody: () => "README.md などこのディレクトリの内容をあらわす markdown の内容を確認してください。"
+  },
+  {
+    id: "llm-docs-workflow-init-request",
+    label: "A150: LLM開発用 docs ワークフロー初期化",
+    keywords: ["A150", "llm workflow", "docs workflow", "docs initialization", "docs bootstrap", "documentation scaffold", "markdown workflow", "persistent memory", "repo docs", "context", "architecture", "plan", "todo", "state", "session", "rules", "docs path", "doc root", "LLM開発", "docs初期化", "文書初期化", "markdown運用", "永続メモリ", "開発文書", "どきゅめんとぱす", "こんてきすと", "あーきてくちゃ", "とぅーどぅー", "せっしょん", "るーるず"],
+    requiresCommitId: false,
+    requiresSubject: true,
+    subjectLabel: "docs ルート相対パス",
+    subjectPlaceholder: "例: docs / llm-docs / project-memory/docs",
+    subjectHelpText: "LLM 用ドキュメントを配置する相対パスを入力します。既定値は docs です。先頭スラッシュや .. を含むパスは避けてください。",
+    subjectDefaultValue: "docs",
+    buildBody: (_commitId, subject) => {
+      const docsPath = normalizeRelativeDocPath(subject || "docs");
+      if (!docsPath) {
+        return "";
+      }
+      const docsRoot = `/${docsPath}`;
+      return `# LLM Workflow Initialization Prompt
+
+You are assisting in initializing a repository that uses a **Markdown-based workflow for LLM-assisted development**.
+
+This workflow treats Markdown documents as the **persistent knowledge and task memory** of the project.  
+All planning, reasoning, and task tracking should be reflected in the documentation.
+
+Your task is to **create or update a \`${docsRoot}\` directory** with a structured documentation system and follow the rules below.
+
+---
+
+# Objectives
+
+1. Ensure the repository contains the following documentation files:
+
+\`${docsRoot}\`
+- \`CONTEXT.md\`
+- \`ARCHITECTURE.md\`
+- \`PLAN.md\`
+- \`TODO.md\`
+- \`STATE.md\`
+- \`SESSION.md\`
+- \`RULES.md\`
+
+2. If a file **does not exist**, create it with an appropriate template.
+
+3. If a file **already exists**:
+- preserve useful content
+- update structure if necessary
+- avoid deleting meaningful information
+
+4. Keep documents **structured, concise, and easy for both humans and LLMs to read**.
+
+---
+
+# Concept of This Workflow
+
+The \`${docsRoot}\` directory acts as the **persistent memory layer** for development.
+
+Human instructions -> update markdown -> perform work.
+
+Markdown documents store:
+
+- project context
+- architecture
+- plans
+- task queues
+- current understanding
+- session focus
+- development rules
+
+This allows future LLM sessions to quickly understand the repository.
+
+---
+
+# File Roles
+
+## CONTEXT.md
+Stable project background information.
+
+Include:
+- project purpose
+- high-level goals
+- technology stack
+- constraints
+- development philosophy
+
+---
+
+## ARCHITECTURE.md
+High-level structure of the system.
+
+Include:
+- major components
+- module responsibilities
+- dependencies
+- system relationships
+
+Example structure:
+
+\`\`\`
+# Architecture
+
+## System Overview
+
+## Core Modules
+module -> responsibility
+
+## External Dependencies
+\`\`\`
+
+---
+
+## PLAN.md
+Long-term direction and milestones.
+
+Example:
+
+\`\`\`
+# Project Plan
+
+## Goals
+
+## Milestones
+
+## Future Work
+\`\`\`
+
+This file should change infrequently.
+
+---
+
+## TODO.md
+Active task queue.
+
+Example:
+
+\`\`\`
+# Task List
+
+## Current Tasks
+
+- [ ] example task
+
+## Backlog
+
+- [ ] future work
+\`\`\`
+
+Tasks should be checked off as they are completed.
+
+---
+
+## STATE.md
+Current understanding of the system.
+
+Use this file to record:
+
+- discoveries
+- known problems
+- recent architectural decisions
+- investigation results
+
+Example:
+
+\`\`\`
+# Current State
+
+## Overview
+
+## Known Issues
+
+## Recent Changes
+\`\`\`
+
+---
+
+## SESSION.md
+Short-term working memory for the current development session.
+
+Example:
+
+\`\`\`
+# Current Session
+
+## Focus
+
+## Next Step
+
+## Notes
+\`\`\`
+
+This file may change frequently during development.
+
+---
+
+## RULES.md
+Development and editing principles.
+
+Example structure:
+
+\`\`\`
+# Development Rules
+
+## General Principles
+- prefer minimal changes
+- follow existing coding style
+- keep documentation updated
+
+## Documentation Guidelines
+- preserve document structure
+- prefer small edits instead of rewrites
+- update affected sections only
+\`\`\`
+
+---
+
+# Editing Guidelines
+
+When modifying documentation:
+
+- preserve headings and structure
+- prefer incremental edits
+- avoid rewriting entire documents unnecessarily
+- keep information concise and structured
+- maintain consistency across documents
+
+---
+
+# Workflow Loop
+
+When performing development work:
+
+1. Read the following files first:
+
+   CONTEXT.md  
+   ARCHITECTURE.md  
+   STATE.md  
+   TODO.md  
+   SESSION.md  
+
+2. Understand the current system state.
+
+3. If a new task is required, update **TODO.md** first.
+
+4. Record current work focus in **SESSION.md**.
+
+5. Perform implementation or analysis.
+
+6. After completing work:
+   - update TODO.md
+   - update STATE.md if new understanding emerged
+   - update SESSION.md
+
+7. If architecture changes, update **ARCHITECTURE.md**.
+
+---
+
+# Final Step
+
+After creating or updating the documentation system:
+
+1. Summarize the \`${docsRoot}\` structure.
+2. Explain briefly how future LLM sessions should use these documents.`;
+    }
   },
   {
     id: "conversation-handover-request",

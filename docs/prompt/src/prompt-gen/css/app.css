@@ -234,6 +234,12 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
   right: 0.5rem;
 }
 
+.md-copy-button--bottom-right {
+  top: auto;
+  right: 0.5rem;
+  bottom: 0.5rem;
+}
+
 md-icon-button.md-copy-button {
   width: 32px;
   height: 32px;
