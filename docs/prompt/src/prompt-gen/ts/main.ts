@@ -4,6 +4,10 @@ type PromptDefinition = {
   keywords: string[];
   requiresCommitId: boolean;
   requiresSubject?: boolean;
+  subjectLabel?: string;
+  subjectPlaceholder?: string;
+  subjectHelpText?: string;
+  subjectDefaultValue?: string;
   buildBody: (commitId: string, subject?: string) => string;
 };
 
@@ -75,11 +79,13 @@ async function initializePromptPage() {
   const promptCandidateArea = document.getElementById("promptCandidateArea") as HTMLDivElement | null;
   const commitInputSection = document.getElementById("commitInputSection") as HTMLElement | null;
   const subjectInputSection = document.getElementById("subjectInputSection") as HTMLElement | null;
+  let subjectInputFieldHost = document.getElementById("subjectInputField") as HTMLElement | null;
   const promptOutputSection = document.getElementById("promptOutputSection") as HTMLElement | null;
   const promptOutputTitle = document.getElementById("promptOutputTitle") as HTMLElement | null;
   const promptOutputHelp = document.getElementById("promptOutputHelp") as HTMLDivElement | null;
+  const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink") as HTMLAnchorElement | null;
   const commitIdInput = document.getElementById("commitId") as HTMLInputElement | null;
-  const subjectInput = document.getElementById("subjectInput") as HTMLInputElement | null;
+  let subjectInput = document.getElementById("subjectInput") as HTMLInputElement | null;
   const includeLabelPrefix = document.getElementById("includeLabelPrefix") as HTMLInputElement | null;
   const copyShareLinkButton = document.getElementById("copyShareLinkButton") as HTMLButtonElement | null;
   const promptOutput = document.getElementById("promptOutput") as HTMLElement | null;
@@ -157,6 +163,11 @@ async function initializePromptPage() {
   applyLatinInputHints(commitIdInput, "done");
 
   const MAX_EMBED_INPUT_LENGTH = 1024;
+  const defaultSubjectFieldConfig = {
+    label: "subject",
+    placeholder: "例: a small fox",
+    helpText: "プロンプト内の [subject] に差し込む対象を入力します。英語でも日本語でも構いません。"
+  };
 
   function sanitizePromptVariableInput(value: string) {
     const normalizedWhitespace = String(value || "")
@@ -170,6 +181,64 @@ async function initializePromptPage() {
     const truncatedValue = trimmedValue.slice(0, MAX_EMBED_INPUT_LENGTH);
     const normalizedQuotes = truncatedValue.replace(/`/g, "'");
     return `\`${normalizedQuotes}\``;
+  }
+
+  function getSubjectFieldConfig(definition: PromptDefinition | null) {
+    return {
+      label: definition?.subjectLabel || defaultSubjectFieldConfig.label,
+      placeholder: definition?.subjectPlaceholder || defaultSubjectFieldConfig.placeholder,
+      helpText: definition?.subjectHelpText || defaultSubjectFieldConfig.helpText
+    };
+  }
+
+  function handleSubjectInput() {
+    updateOutput();
+  }
+
+  function refreshSubjectInputReference() {
+    subjectInput = document.getElementById("subjectInput") as HTMLInputElement | null;
+    if (subjectInput) {
+      subjectInput.addEventListener("input", handleSubjectInput);
+    }
+  }
+
+  function renderSubjectInputField(definition: PromptDefinition | null) {
+    const config = getSubjectFieldConfig(definition);
+    const currentValue = subjectInput?.value || "";
+
+    if (subjectInputFieldHost && subjectInputFieldHost.parentElement) {
+      const nextField = document.createElement("lht-text-field-help");
+      nextField.id = "subjectInputField";
+      nextField.setAttribute("field-id", "subjectInput");
+      nextField.setAttribute("label", config.label);
+      nextField.setAttribute("placeholder", config.placeholder);
+      nextField.setAttribute("help-text", config.helpText);
+      nextField.setAttribute("required", "");
+      subjectInputFieldHost.replaceWith(nextField);
+      subjectInputFieldHost = nextField;
+    } else if (subjectInput) {
+      subjectInput.setAttribute("aria-label", config.label);
+      subjectInput.setAttribute("placeholder", config.placeholder);
+      subjectInput.setAttribute("title", config.helpText);
+    }
+
+    refreshSubjectInputReference();
+    if (subjectInput) {
+      subjectInput.value = currentValue;
+    }
+  }
+
+  function applyDefaultSubjectValue(selectedDefinition: PromptDefinition | null) {
+    if (!selectedDefinition?.requiresSubject || !subjectInput) {
+      return;
+    }
+    if ((subjectInput.value || "").trim()) {
+      return;
+    }
+    if (!selectedDefinition.subjectDefaultValue) {
+      return;
+    }
+    subjectInput.value = selectedDefinition.subjectDefaultValue;
   }
 
   function syncInputSections(selectedDefinition: PromptDefinition | null) {
@@ -588,6 +657,7 @@ async function initializePromptPage() {
   function renderSelectedPromptHelp() {
     const selectedDefinition = getSelectedPromptDefinition();
     promptOutputHelp.innerHTML = "";
+    gitPseudoSquashLink?.classList.add("md-hidden");
 
     if (!selectedDefinition) {
       promptOutputTitle.textContent = "生成結果";
@@ -595,6 +665,9 @@ async function initializePromptPage() {
     }
 
     promptOutputTitle.textContent = selectedDefinition.label;
+    if (getDefinitionLabelCode(selectedDefinition) === "A501") {
+      gitPseudoSquashLink?.classList.remove("md-hidden");
+    }
 
     const help = document.createElement("lht-help-tooltip");
     help.setAttribute("label", "キーワード");
@@ -652,7 +725,9 @@ async function initializePromptPage() {
         syncInputSections(null);
         promptOutputSection.classList.add("md-hidden");
         commitIdInput.value = "";
-        subjectInput.value = "";
+        if (subjectInput) {
+          subjectInput.value = "";
+        }
         promptOutput.textContent = "";
       }
     }
@@ -706,7 +781,9 @@ async function initializePromptPage() {
       if (selectedButton) {
         selectedButton.classList.add("is-active");
       }
+      renderSubjectInputField(selectedDefinition);
       syncInputSections(selectedDefinition);
+      applyDefaultSubjectValue(selectedDefinition);
       revealOutputSection();
       updateOutput();
     }
@@ -731,6 +808,8 @@ async function initializePromptPage() {
       }
     }
     syncInputSections(selectedDefinition || null);
+    renderSubjectInputField(selectedDefinition || null);
+    applyDefaultSubjectValue(selectedDefinition || null);
     if (selectedDefinition?.requiresCommitId) {
       commitIdInput.focus();
     } else if (selectedDefinition?.requiresSubject) {
@@ -882,7 +961,7 @@ async function initializePromptPage() {
 
   promptSearch.addEventListener("input", renderCandidates);
   commitIdInput.addEventListener("input", updateOutput);
-  subjectInput.addEventListener("input", updateOutput);
+  renderSubjectInputField(null);
   includeLabelPrefix.addEventListener("change", updateOutput);
   copyShareLinkButton.addEventListener("click", () => {
     void copyText(buildShareLink());

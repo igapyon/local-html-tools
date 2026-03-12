@@ -78,6 +78,7 @@ function mountPromptDom() {
     <input id="subjectInput" />
     <input id="includeLabelPrefix" type="checkbox" />
     <button id="copyShareLinkButton" type="button"></button>
+    <a id="gitPseudoSquashLink" class="md-hidden" href="https://igapyon.github.io/local-html-tools/git/git-pseudo-squash.html"></a>
     <div id="promptOutput"></div>
   `;
 }
@@ -224,6 +225,30 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("A simplified cute illustration of `a small fox`");
   });
 
+  it("uses docs as the default docs path for A150", async () => {
+    await bootPromptPage("?q=A150");
+
+    const subjectInput = document.getElementById("subjectInput");
+    const promptOutput = document.getElementById("promptOutput");
+
+    expect(subjectInput.value).toBe("docs");
+    expect(promptOutput.textContent).toContain("create or update a `/docs` directory");
+    expect(promptOutput.textContent).toContain("The `/docs` directory acts as the **persistent memory layer**");
+  });
+
+  it("updates A150 output when the docs path input changes", async () => {
+    await bootPromptPage("?q=A150");
+
+    const subjectInput = document.getElementById("subjectInput");
+    const promptOutput = document.getElementById("promptOutput");
+
+    subjectInput.value = "project-memory/docs";
+    subjectInput.dispatchEvent(new Event("input"));
+
+    expect(promptOutput.textContent).toContain("create or update a `/project-memory/docs` directory");
+    expect(promptOutput.textContent).toContain("Summarize the `/project-memory/docs` structure.");
+  });
+
   it("applies id query parameter to restore a selected prompt among multiple matches", async () => {
     await bootPromptPage("?q=%E5%92%8C&id=A852&subject=%E3%81%B6%E3%81%A9%E3%81%86");
 
@@ -313,6 +338,24 @@ describe("prompt-gen main", () => {
 
     expect(promptOutput.textContent).toContain("対象コミット `abc1234` における変更内容について");
     expect(promptOutput.textContent).toContain("PRタイトルとPR本文");
+  });
+
+  it("shows Git pseudo-squash link only for A501", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink");
+
+    promptSearch.value = "A501";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    expect(gitPseudoSquashLink.classList.contains("md-hidden")).toBe(false);
+    expect(gitPseudoSquashLink.getAttribute("href")).toBe("https://igapyon.github.io/local-html-tools/git/git-pseudo-squash.html");
+
+    promptSearch.value = "A701";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    expect(gitPseudoSquashLink.classList.contains("md-hidden")).toBe(true);
   });
 
   it("adds label prefix for fixed prompt when switch is enabled", async () => {

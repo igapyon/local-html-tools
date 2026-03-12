@@ -123,3 +123,9 @@
 - `requiresCommitId` が `true` の候補は、commit ID 未入力の可能性があるため自動コピーしない
 - コピー成功時は `コピーしました`、失敗時は `コピーに失敗しました` の toast を表示する
 - Clipboard API が使えない環境では、`textarea` を一時生成して `execCommand("copy")` にフォールバックする
+
+## A501 の特記事項
+
+- `A501: GitHub PR 文面の作成` を選択したときだけ、出力オプション行に `Git pseudo-squash で整理` の外部リンクを表示する
+- リンク先は `https://igapyon.github.io/local-html-tools/git/git-pseudo-squash.html` 固定とする
+- この導線は他ページからの連携前提でも使うため、A501 向けのリンク先パスは不用意に変更しない
