@@ -12,6 +12,17 @@
 - [PromptツールREADME](docs/prompt/README.md)
 - [Musicビルドプロセス](docs/music/BUILD_PROCESS.md)
 
+## LLM開発ドキュメント
+
+- `llmdocs/` は LLM支援開発向けの継続的な記憶レイヤーです
+- 初回確認の導線:
+  - [Project Context](llmdocs/CONTEXT.md)
+  - [Architecture](llmdocs/ARCHITECTURE.md)
+  - [Current State](llmdocs/STATE.md)
+  - [Task List](llmdocs/TODO.md)
+  - [Current Session](llmdocs/SESSION.md)
+- 運用ルールは [Development Rules](llmdocs/RULES.md) を参照してください
+
 ## 前提条件
 
 - FFmpeg向けツールで生成されたコマンドを実行するには、お使いのコンピュータに [FFmpeg](https://ffmpeg.org/) がインストールされている必要があります。

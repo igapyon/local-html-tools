@@ -8,6 +8,59 @@
   - Material Web は `lht-cmn` 内部で優先利用する
   - 実運用の共通スタイルは `lht-cmn/css/components.css` に集約する
 
+### `lht-cmn` の役割
+
+`lht-cmn` は、単なる共通 CSS 置き場ではなく、`local-html-tools` 全体の UI 公開層を担うコンポーネント基盤である。各画面は原則として `lht-*` を利用し、Material Web の採用有無や細かな DOM 構造の違いを画面側へ漏らさない。
+
+- **公開 UI 層の統一**: 画面側が参照する UI API を `lht-*` に固定し、個別画面で `md-*` を直接組み立てる設計を避ける
+- **内部実装の吸収**: `md-*` 優先 + fallback、または完全自前実装のどちらかで内部を構成し、依存の違いを `lht-cmn` 側で吸収する
+- **共通ルールの集約**: ラベル、ヘルプ表示、必須表示、コピー導線、トースト、エラー表示、レスポンシブ時の振る舞いなどを横断的に統一する
+- **保守境界の明確化**: 画面固有のレイアウト調整は各アプリ側、再利用可能な DOM 生成・アクセシビリティ・状態制御は `lht-cmn` 側が担当する
+
+### `lht-cmn` の構成責務
+
+- `lht-cmn/js/components.js`
+  - `lht-*` Web Components の正本実装
+  - 公開属性、公開メソッド、公開イベントの契約を保持する
+  - Material Web 依存の吸収と fallback の提供を担う
+- `lht-cmn/css/components.css`
+  - 共通コンポーネントの見た目と状態表現の正本
+  - pre-upgrade flash 抑止、tooltip 幅制御、共通レイアウトルールなどを保持する
+- `lht-cmn/catalog/index.html`
+  - 実表示と利用例を並べて確認するカタログ
+  - UI の実装・レビュー・横展開時の参照先として使う
+- `lht-cmn/vendor/*`
+  - 必要な vendor アセットの配置場所
+  - 単一 HTML 配布方針に合わせ、外部 CDN 依存を避けるための基盤となる
+
+### 画面側との責務分担
+
+- **画面側が持つ責務**
+  - ツール固有の入力項目、業務ロジック、生成ロジック
+  - 画面固有の配置や余白など、局所的なレイアウト調整
+  - `field-id` など既存 JS 互換を保つための公開 ID 設計
+- **`lht-cmn` が持つ責務**
+  - 共通 UI パーツの DOM 構築
+  - Material / fallback 差異の吸収
+  - `active`、`show()`、`hide()` など表示制御 API の標準化
+  - `role`、`aria-live`、`aria-hidden` などアクセシビリティ契約の標準化
+
+### `lht-cmn` を使う理由
+
+- 各ページで重複していた UI 実装を削減できる
+- 画面間の見た目と操作感を揃えやすい
+- 共通部品単位でレビューできるため、修正影響の把握がしやすい
+- 生成 AI を含む変更作業で、個別画面ごとの独自実装を増やさずに済む
+- 単一 HTML 生成を維持しつつ、開発時の再利用性と変更容易性を確保できる
+
+### 代表的な共通コンポーネント
+
+- **入力系**: `lht-text-field-help`, `lht-select-help`, `lht-switch-help`
+- **補助UI系**: `lht-help-tooltip`, `lht-page-menu`, `lht-page-hero`
+- **出力系**: `lht-command-block`, `lht-preview-output`
+- **操作補助系**: `lht-file-select`, `lht-input-mode-toggle`
+- **状態表示系**: `lht-loading-overlay`, `lht-toast`, `lht-error-alert`
+
 ## Material Design 実装ガイド
 
 本プロジェクトでは、外部CSSに依存せず Material Design 系の見た目と操作感を再現する。画面側は原則 `lht-*` を利用し、`md-*` は `lht-cmn` 内部実装として扱う。詳細ルールやコンポーネント仕様は `lht-cmn/README.md` を参照する。
