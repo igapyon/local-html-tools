@@ -1,0 +1,22 @@
+# Task List
+
+## 現在のタスク
+
+- [ ] toast、error、ファイル選択、プレビュー、コマンドブロック UI がまだ重複しているアプリに対して、`lht-cmn` コンポーネント展開を継続する。
+- [ ] 狭幅画面でのはみ出し問題の残件を確認し、個別パッチの前に共有 `lht` ルールで修正する。
+- [ ] 既存のルート [`TODO.md`](/Users/igapyon/Documents/git/local-html-tools/TODO.md) バックログから、次に着手すべき最優先実装対象を明確化する。
+
+## 最近完了した項目
+
+- [x] `llmdocs/` を初期化し、プロジェクト文脈、アーキテクチャ、計画、タスクキュー、状態、セッションメモ、運用ルールを整備した。
+
+## バックログ
+
+- [ ] Material Web vendor bundle の参照先を `lht-cmn/` 周辺へ整理し、構成を正規化する。
+- [ ] `lht-text-field-help` の trailing action API を、現状の暫定 `clearable` を超えて正式化する。
+- [ ] 圧縮補助、EXIF 確認、ネットワーク/プロセス調査補助、カレンダ系ユーティリティなど、バックログ上のツールを追加または再設計する。
+
+## メモ
+
+- 権威ある長文のバックログは、引き続きリポジトリルートの [`TODO.md`](/Users/igapyon/Documents/git/local-html-tools/TODO.md) に存在する。
+- 具体的な作業を始める前に、ここへアクティブなタスクを追加または調整する。

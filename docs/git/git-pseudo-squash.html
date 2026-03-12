@@ -5352,6 +5352,16 @@ if (!customElements.get("lht-page-menu")) {
       return /^(?:pr\s*テキスト|pr\s*text|pr\s*本文)\s*[:：]?$/.test(headingText);
     }
 
+    function isPrTitleLabelLine(line) {
+      const normalized = String(line || "").trim().toLowerCase();
+      return /^(?:pr\s*タイトル|pr\s*title|タイトル|title)\s*[:：]\s*$/.test(normalized);
+    }
+
+    function isPrTextLabelLine(line) {
+      const normalized = String(line || "").trim().toLowerCase();
+      return /^(?:pr\s*テキスト|pr\s*text|pr\s*本文)\s*[:：]\s*$/.test(normalized);
+    }
+
     function isTildeFenceStartLine(line) {
       return /^~~~+(?:[a-z0-9_-]+)?\s*$/i.test(String(line || "").trim());
     }
@@ -5367,7 +5377,7 @@ if (!customElements.get("lht-page-menu")) {
       const original = String(commitMessageField.value || "");
       let lines = original.replace(/\r\n?/g, "\n").split("\n");
 
-      // 先頭は「空行 / PRタイトル見出し / チルダフェンス開始」が
+      // 先頭は「空行 / PRタイトル見出し / PRタイトル: / PR本文: / チルダフェンス開始」が
       // 混在しやすいため、順不同で連続除去する。
       let changed = true;
       let removedPrTitleHeading = false;
@@ -5383,6 +5393,17 @@ if (!customElements.get("lht-page-menu")) {
         if (lines.length > 0 && isPrTitleHeadingLine(lines[0])) {
           lines.shift();
           removedPrTitleHeading = true;
+          changed = true;
+          continue;
+        }
+        if (lines.length > 0 && isPrTitleLabelLine(lines[0])) {
+          lines.shift();
+          removedPrTitleHeading = true;
+          changed = true;
+          continue;
+        }
+        if (lines.length > 0 && isPrTextLabelLine(lines[0])) {
+          lines.shift();
           changed = true;
           continue;
         }
@@ -5402,13 +5423,13 @@ if (!customElements.get("lht-page-menu")) {
         }
       }
 
-      // 「## PRテキスト」「## PR本文」見出しは、見出し行自体を除去する。
+      // 「## PRテキスト」「## PR本文」見出しや「PR本文:」行は、行自体を除去する。
       // 見出し直後の空行もスキップする。
       {
         const rewritten = [];
         let i = 0;
         while (i < lines.length) {
-          if (!isPrTextHeadingLine(lines[i])) {
+          if (!isPrTextHeadingLine(lines[i]) && !isPrTextLabelLine(lines[i])) {
             rewritten.push(lines[i]);
             i += 1;
             continue;

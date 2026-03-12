@@ -194,6 +194,32 @@ prompt-gen の GitHub 導線追加と git-pseudo-squash の PR整形を簡素化
     expect(rebaseCmd.textContent).not.toContain("git switch tiga0309iaq");
   });
 
+  it("normalizes label-style PR text by removing PRタイトル: and PR本文: lines", () => {
+    bootGitPseudoSquashPage();
+
+    const commitMessage = document.getElementById("commitMessage");
+    const rebaseCmd = document.getElementById("rebaseCmd");
+    commitMessage.value = `PRタイトル:
+
+\`prompt-gen の GitHub 導線追加\`
+
+PR本文:
+
+変更内容です。
+補足です。`;
+
+    window.__gitPseudoSquashTest.normalizeCommitMessageForPr();
+
+    expect(commitMessage.value).toBe(`prompt-gen の GitHub 導線追加
+
+変更内容です。
+補足です。`);
+    expect(rebaseCmd.textContent).toContain("prompt-gen の GitHub 導線追加");
+    expect(rebaseCmd.textContent).toContain("変更内容です。");
+    expect(rebaseCmd.textContent).not.toContain("PRタイトル:");
+    expect(rebaseCmd.textContent).not.toContain("PR本文:");
+  });
+
   it("generates PowerShell rebase command with here-string and no git switch in current branch mode", () => {
     bootGitPseudoSquashPage();
 
