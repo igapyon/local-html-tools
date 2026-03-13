@@ -149,6 +149,10 @@
   max-width: 100%;
 }
 
+.md-entry-base-box .md-ref-value {
+  margin-left: 0;
+}
+
 .md-entry-title {
   margin: 0;
   display: inline-flex;
@@ -293,12 +297,36 @@
   color: #6d28d9;
 }
 
+.md-head-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: #e7f8f5;
+  color: #0f766e;
+  line-height: 1;
+}
+
 .md-ref-value {
-  font-size: 0.89rem;
+  font-size: 0.96rem;
   font-weight: 500;
   color: #475569;
   white-space: nowrap;
   margin-left: 1.25rem;
+}
+
+.md-ref-value-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.md-ref-value-row .md-ref-value {
+  margin-left: 0;
 }
 
 .md-work-row-list {
