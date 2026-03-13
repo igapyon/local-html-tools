@@ -1182,6 +1182,14 @@ lht-index-card-link {
   gap: 0.35rem;
 }
 
+.md-entry-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
 .md-entry-base-box {
   flex: 0 0 auto;
   min-width: 250px;
@@ -1244,6 +1252,89 @@ lht-index-card-link {
   color: #64748b;
   cursor: pointer;
   flex: 0 0 auto;
+}
+
+.md-entry-memo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  border: 1px solid #d6deea;
+  background: #f8fafc;
+  color: #64748b;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.md-entry-memo-btn:hover {
+  background: #eef2f7;
+}
+
+.md-entry-memo-btn .md-button__icon {
+  width: 0.92rem;
+  height: 0.92rem;
+}
+
+.md-entry-copy-dir-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  border: 1px solid #d6deea;
+  background: #f8fafc;
+  color: #64748b;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.md-entry-copy-dir-btn:hover {
+  background: #eef2f7;
+}
+
+.md-entry-copy-dir-btn .md-button__icon {
+  width: 0.92rem;
+  height: 0.92rem;
+}
+
+.md-entry-memo-preview {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 18ch;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: #f8fafc;
+  border: 1px solid #d6deea;
+  color: #64748b;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.md-entry-memo-preview::after {
+  content: attr(data-full-text);
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 0.45rem);
+  display: none;
+  max-width: min(40ch, 70vw);
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  white-space: normal;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+  z-index: 10;
+}
+
+.md-entry-memo-preview:hover::after {
+  display: block;
 }
 
 .md-entry-link-btn:hover {
@@ -1420,6 +1511,10 @@ lht-index-card-link {
   box-sizing: border-box;
   display: grid;
   gap: 1rem;
+}
+
+.md-dialog__surface--compact {
+  width: min(640px, calc(100vw - 3rem));
 }
 
 .md-dialog__header,
@@ -1618,6 +1713,31 @@ lht-index-card-link {
             </svg>
             <span>追加</span>
           </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="memoDialog" class="md-dialog">
+      <form method="dialog" class="md-dialog__surface md-dialog__surface--compact" id="memoForm">
+        <div class="md-dialog__header">
+          <div>
+            <h2 class="md-dialog__title">リポジトリ情報</h2>
+            <p class="md-dialog__subtitle">このリポジトリと基準ブランチの組み合わせ向け情報を入力します。</p>
+          </div>
+          <button id="closeMemoDialogBtn" type="button" class="md-button md-button--surface md-button--compact">閉じる</button>
+        </div>
+
+        <div class="md-dialog__body md-stack-md">
+          <div class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="memoText" label="メモ" placeholder="必要なメモを入力" help-text="保存は全文、一覧表示は先頭 16 文字までです。長い内容は hover で全文を確認できます。"></lht-text-field-help>
+          </div>
+          <div class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="gitCurrentDirectory" label="git カレントディレクトリ" placeholder="例: /path/to/repo" help-text="この作業を行うローカルの git カレントディレクトリを記録します。"></lht-text-field-help>
+          </div>
+        </div>
+
+        <div class="md-dialog__footer">
+          <button id="saveMemoBtn" type="button" class="md-button md-button--primary">保存</button>
         </div>
       </form>
     </dialog>
@@ -3746,10 +3866,13 @@ if (!customElements.get("lht-page-menu")) {
   <script>
     const STORAGE_KEY = "gitWorkList.entries";
     const RECENT_ACTIONS_KEY = "gitWorkList.recentActions";
+    const MEMO_STORAGE_KEY = "gitWorkList.memos";
     let entries = [];
     let recentActions = [];
+    let memos = {};
     let editingId = "";
     let dialogMode = "create";
+    let editingMemoKey = "";
 
     function readText(id) {
       const field = document.getElementById(id);
@@ -3846,6 +3969,9 @@ if (!customElements.get("lht-page-menu")) {
       if (kind === "open-external") {
         return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5"></path><path d="M10 14 19 5"></path><path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"></path></svg>';
       }
+      if (kind === "copy-directory") {
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><rect x="13" y="3" width="8" height="8" rx="2"></rect><path d="M15.5 7h3"></path><path d="M17 5.5v3"></path></svg>';
+      }
       return "";
     }
 
@@ -3910,6 +4036,55 @@ if (!customElements.get("lht-page-menu")) {
       localStorage.setItem(RECENT_ACTIONS_KEY, JSON.stringify(recentActions));
     }
 
+    function buildMemoKey(repoUrl, baseBranch) {
+      return `${normalizeRepoUrl(repoUrl)}::${String(baseBranch || "").trim()}`;
+    }
+
+    function normalizeMemos(rawMemos) {
+      if (!rawMemos || typeof rawMemos !== "object" || Array.isArray(rawMemos)) {
+        return {};
+      }
+      const nextMemos = {};
+      Object.entries(rawMemos).forEach(([key, value]) => {
+        const normalizedKey = String(key || "").trim();
+        if (!normalizedKey) return;
+        if (typeof value === "string") {
+          const normalizedMemo = value.trim();
+          if (normalizedMemo) {
+            nextMemos[normalizedKey] = {
+              memo: normalizedMemo,
+              gitCurrentDir: ""
+            };
+          }
+          return;
+        }
+        if (!value || typeof value !== "object" || Array.isArray(value)) return;
+        const normalizedMemo = String(value.memo || "").trim();
+        const normalizedGitCurrentDir = String(value.gitCurrentDir || "").trim();
+        if (normalizedMemo || normalizedGitCurrentDir) {
+          nextMemos[normalizedKey] = {
+            memo: normalizedMemo,
+            gitCurrentDir: normalizedGitCurrentDir
+          };
+        }
+      });
+      return nextMemos;
+    }
+
+    function loadMemos() {
+      try {
+        const raw = localStorage.getItem(MEMO_STORAGE_KEY);
+        if (!raw) return {};
+        return normalizeMemos(JSON.parse(raw));
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function saveMemos() {
+      localStorage.setItem(MEMO_STORAGE_KEY, JSON.stringify(memos));
+    }
+
     function normalizeScope(value) {
       return value === "local" ? "local" : "remote";
     }
@@ -3957,6 +4132,7 @@ if (!customElements.get("lht-page-menu")) {
       const groupedMap = new Map();
       visibleEntries.forEach((entry) => {
         const key = buildGroupKey(entry);
+        const memoKey = buildMemoKey(entry.repoUrl, entry.baseBranch);
         const existing = groupedMap.get(key);
         if (existing) {
           existing.entries.push(entry);
@@ -3969,6 +4145,9 @@ if (!customElements.get("lht-page-menu")) {
           baseBranch: entry.baseBranch,
           baseScope: entry.baseScope,
           remoteName: entry.remoteName,
+          memoKey,
+          memo: String(memos[memoKey]?.memo || "").trim(),
+          gitCurrentDir: String(memos[memoKey]?.gitCurrentDir || "").trim(),
           entries: [entry]
         });
       });
@@ -3999,11 +4178,16 @@ if (!customElements.get("lht-page-menu")) {
 
     function buildPseudoSquashUrl(entry) {
       const params = new URLSearchParams();
+      const memoKey = buildMemoKey(entry.repoUrl, entry.baseBranch);
+      const memoText = String(memos[memoKey]?.memo || "").trim();
       params.set("repoUrl", entry.repoUrl);
       params.set("baseBranch", entry.baseBranch);
       params.set("baseScope", entry.baseScope);
       params.set("workBranch", entry.compareBranch);
       params.set("remoteName", entry.remoteName);
+      if (memoText) {
+        params.set("defaultCommitMessage", memoText);
+      }
       if (entry.compareUseHead) {
         params.set("useHeadWork", "1");
       }
@@ -4158,11 +4342,17 @@ if (!customElements.get("lht-page-menu")) {
     }
 
     function renderGroup(group) {
+      const memoPreview = group.memo.length > 16 ? `${group.memo.slice(0, 16)}...` : group.memo;
       return `
         <article class="md-entry-card md-entry-group" data-group-key="${escapeHtml(group.key)}">
           <div class="md-entry-head">
             <div class="md-entry-title-wrap">
-              <h3 class="md-entry-title">${escapeHtml(group.displayName)}</h3>
+              <div class="md-entry-title-row">
+                <h3 class="md-entry-title">${escapeHtml(group.displayName)}</h3>
+                <button type="button" class="md-entry-memo-btn" data-action="edit-memo" data-memo-key="${escapeHtml(group.memoKey)}" data-repo-url="${escapeHtml(group.repoUrl)}" data-base-branch="${escapeHtml(group.baseBranch)}" aria-label="メモを編集" title="メモを編集">${getButtonIconSvg("edit")}</button>
+                ${group.memo ? `<span class="md-entry-memo-preview" data-full-text="${escapeHtml(group.memo)}">${escapeHtml(memoPreview)}</span>` : ""}
+                ${group.gitCurrentDir ? `<button type="button" class="md-entry-copy-dir-btn" data-action="copy-git-current-dir" data-git-current-dir="${escapeHtml(group.gitCurrentDir)}" aria-label="git カレントディレクトリをコピー" title="${escapeHtml(group.gitCurrentDir)}">${getButtonIconSvg("copy-directory")}</button>` : ""}
+              </div>
               <div class="md-entry-url-row">
                 <div class="md-entry-url">${escapeHtml(group.repoUrl)}</div>
                 ${isOpenableExternalUrl(group.repoUrl) ? `<button type="button" class="md-entry-link-btn" data-action="open-repo-url" data-repo-url="${escapeHtml(group.repoUrl)}" title="URL を開く" aria-label="URL を開く">${getButtonIconSvg("open-external")}</button>` : ""}
@@ -4181,6 +4371,76 @@ if (!customElements.get("lht-page-menu")) {
           </div>
         </article>
       `;
+    }
+
+    function getMemoDialog() {
+      return document.getElementById("memoDialog");
+    }
+
+    function openMemoDialog(repoUrl, baseBranch) {
+      editingMemoKey = buildMemoKey(repoUrl, baseBranch);
+      const memoField = document.getElementById("memoText");
+      if (memoField) {
+        memoField.value = String(memos[editingMemoKey]?.memo || "");
+      }
+      const gitCurrentDirectoryField = document.getElementById("gitCurrentDirectory");
+      if (gitCurrentDirectoryField) {
+        gitCurrentDirectoryField.value = String(memos[editingMemoKey]?.gitCurrentDir || "");
+      }
+      const dialog = getMemoDialog();
+      if (!dialog) return;
+      if (typeof dialog.showModal === "function") {
+        dialog.showModal();
+      }
+    }
+
+    function closeMemoDialog() {
+      const dialog = getMemoDialog();
+      if (!dialog) return;
+      if (dialog.open && typeof dialog.close === "function") {
+        dialog.close();
+      }
+      editingMemoKey = "";
+    }
+
+    function saveMemo() {
+      if (!editingMemoKey) return;
+      const memoField = document.getElementById("memoText");
+      const memoText = memoField ? String(memoField.value || "").trim() : "";
+      const gitCurrentDirectoryField = document.getElementById("gitCurrentDirectory");
+      const gitCurrentDir = gitCurrentDirectoryField ? String(gitCurrentDirectoryField.value || "").trim() : "";
+      if (memoText || gitCurrentDir) {
+        memos[editingMemoKey] = {
+          memo: memoText,
+          gitCurrentDir
+        };
+      } else {
+        delete memos[editingMemoKey];
+      }
+      saveMemos();
+      renderEntries();
+      closeMemoDialog();
+      showToast("メモを保存しました");
+    }
+
+    async function copyTextToClipboard(text) {
+      const normalizedText = String(text || "");
+      if (!normalizedText) return false;
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        try {
+          await navigator.clipboard.writeText(normalizedText);
+          return true;
+        } catch (_) {
+          // fallback below
+        }
+      }
+      const temp = document.createElement("textarea");
+      temp.value = normalizedText;
+      document.body.appendChild(temp);
+      temp.select();
+      const copied = document.execCommand("copy");
+      document.body.removeChild(temp);
+      return !!copied;
     }
 
     function renderWorkRow(entry) {
@@ -4277,6 +4537,18 @@ if (!customElements.get("lht-page-menu")) {
       const button = event.target.closest("[data-action]");
       if (!button) return;
       const action = button.getAttribute("data-action");
+      if (action === "edit-memo") {
+        openMemoDialog(button.getAttribute("data-repo-url"), button.getAttribute("data-base-branch"));
+        return;
+      }
+      if (action === "copy-git-current-dir") {
+        const gitCurrentDir = button.getAttribute("data-git-current-dir");
+        const copied = await copyTextToClipboard(gitCurrentDir);
+        if (copied) {
+          showToast("git カレントディレクトリをコピーしました");
+        }
+        return;
+      }
       if (action === "open-repo-url") {
         const repoUrl = button.getAttribute("data-repo-url");
         if (!isOpenableExternalUrl(repoUrl)) return;
@@ -4344,11 +4616,29 @@ if (!customElements.get("lht-page-menu")) {
         });
         dialog.dataset.boundOutsideClose = "true";
       }
+      const closeMemoButton = document.getElementById("closeMemoDialogBtn");
+      if (closeMemoButton) {
+        closeMemoButton.addEventListener("click", closeMemoDialog);
+      }
+      const saveMemoButton = document.getElementById("saveMemoBtn");
+      if (saveMemoButton) {
+        saveMemoButton.addEventListener("click", saveMemo);
+      }
+      const memoDialog = getMemoDialog();
+      if (memoDialog && !memoDialog.dataset.boundOutsideClose) {
+        memoDialog.addEventListener("click", (event) => {
+          if (event.target === memoDialog) {
+            closeMemoDialog();
+          }
+        });
+        memoDialog.dataset.boundOutsideClose = "true";
+      }
     }
 
     function bootstrap() {
       entries = loadEntries();
       recentActions = loadRecentActions();
+      memos = loadMemos();
       resetForm();
       setupEvents();
       renderEntries();

@@ -104,6 +104,31 @@ limitations under the License.
       </form>
     </dialog>
 
+    <dialog id="memoDialog" class="md-dialog">
+      <form method="dialog" class="md-dialog__surface md-dialog__surface--compact" id="memoForm">
+        <div class="md-dialog__header">
+          <div>
+            <h2 class="md-dialog__title">リポジトリ情報</h2>
+            <p class="md-dialog__subtitle">このリポジトリと基準ブランチの組み合わせ向け情報を入力します。</p>
+          </div>
+          <button id="closeMemoDialogBtn" type="button" class="md-button md-button--surface md-button--compact">閉じる</button>
+        </div>
+
+        <div class="md-dialog__body md-stack-md">
+          <div class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="memoText" label="メモ" placeholder="必要なメモを入力" help-text="保存は全文、一覧表示は先頭 16 文字までです。長い内容は hover で全文を確認できます。"></lht-text-field-help>
+          </div>
+          <div class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="gitCurrentDirectory" label="git カレントディレクトリ" placeholder="例: /path/to/repo" help-text="この作業を行うローカルの git カレントディレクトリを記録します。"></lht-text-field-help>
+          </div>
+        </div>
+
+        <div class="md-dialog__footer">
+          <button id="saveMemoBtn" type="button" class="md-button md-button--primary">保存</button>
+        </div>
+      </form>
+    </dialog>
+
     <lht-toast id="toast"></lht-toast>
   </div>
 

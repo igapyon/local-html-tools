@@ -143,6 +143,14 @@
   gap: 0.35rem;
 }
 
+.md-entry-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
 .md-entry-base-box {
   flex: 0 0 auto;
   min-width: 250px;
@@ -205,6 +213,89 @@
   color: #64748b;
   cursor: pointer;
   flex: 0 0 auto;
+}
+
+.md-entry-memo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  border: 1px solid #d6deea;
+  background: #f8fafc;
+  color: #64748b;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.md-entry-memo-btn:hover {
+  background: #eef2f7;
+}
+
+.md-entry-memo-btn .md-button__icon {
+  width: 0.92rem;
+  height: 0.92rem;
+}
+
+.md-entry-copy-dir-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  border: 1px solid #d6deea;
+  background: #f8fafc;
+  color: #64748b;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.md-entry-copy-dir-btn:hover {
+  background: #eef2f7;
+}
+
+.md-entry-copy-dir-btn .md-button__icon {
+  width: 0.92rem;
+  height: 0.92rem;
+}
+
+.md-entry-memo-preview {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 18ch;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: #f8fafc;
+  border: 1px solid #d6deea;
+  color: #64748b;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.md-entry-memo-preview::after {
+  content: attr(data-full-text);
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 0.45rem);
+  display: none;
+  max-width: min(40ch, 70vw);
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  white-space: normal;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+  z-index: 10;
+}
+
+.md-entry-memo-preview:hover::after {
+  display: block;
 }
 
 .md-entry-link-btn:hover {
@@ -381,6 +472,10 @@
   box-sizing: border-box;
   display: grid;
   gap: 1rem;
+}
+
+.md-dialog__surface--compact {
+  width: min(640px, calc(100vw - 3rem));
 }
 
 .md-dialog__header,
