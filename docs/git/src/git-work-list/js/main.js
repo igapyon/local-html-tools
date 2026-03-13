@@ -438,13 +438,16 @@
     }
 
     function renderWorkRow(entry) {
-      const workRef = entry.compareUseHead ? "HEAD" : buildRef(entry.compareBranch, entry.compareScope, entry.remoteName);
+      const workRef = buildRef(entry.compareBranch, entry.compareScope, entry.remoteName);
       return `
         <section class="md-work-row" data-entry-id="${escapeHtml(entry.id)}">
           <div class="md-work-row__main">
             <div class="md-ref-box md-ref-box--work">
               <div class="md-ref-label">${entry.locked ? `<span class="md-entry-lock-icon" aria-label="ロック中">${getButtonIconSvg("lock")}</span>` : ""}作業 <span class="md-scope-badge" data-scope="${escapeHtml(entry.compareScope)}">${escapeHtml(entry.compareScope)}</span></div>
-              <div class="md-ref-value">${escapeHtml(workRef)}</div>
+              <div class="md-ref-value-row">
+                <div class="md-ref-value">${escapeHtml(workRef)}</div>
+                ${entry.compareUseHead ? '<span class="md-head-badge">HEAD</span>' : ""}
+              </div>
             </div>
           </div>
           <div class="md-entry-actions md-work-row__actions">
