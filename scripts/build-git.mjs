@@ -63,6 +63,21 @@ const TARGETS = [
       "../../lht-cmn/js/components.js",
       "src/git-pseudo-squash/js/main.js"
     ]
+  },
+  {
+    id: "git-work-branch-list",
+    baseDir: "docs/git",
+    srcHtml: "docs/git/git-work-branch-list-src.html",
+    outHtml: "docs/git/git-work-branch-list.html",
+    cssOrder: [
+      "../../lht-cmn/css/components.css",
+      "src/git-work-branch-list/css/app.css"
+    ],
+    jsOrder: [
+      "../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js",
+      "../../lht-cmn/js/components.js",
+      "src/git-work-branch-list/js/main.js"
+    ]
   }
 ];
 

@@ -8,13 +8,19 @@
 
 ## 最近完了した項目
 
+- [x] 複数リポジトリと複数ブランチの作業状況を一覧管理できる Git ツール `git-work-branch-list` を追加した。
 - [x] `llmdocs/` を初期化し、プロジェクト文脈、アーキテクチャ、計画、タスクキュー、状態、セッションメモ、運用ルールを整備した。
+- [x] `git-work-branch-list` から `git-branch-diff` へ遷移し、`baseBranch` / `baseScope` / `branchWork` / `scopeWork` / `remoteName` を URL 引数で引き渡せるようにした。
+- [x] `git-branch-diff` から `git-work-branch-list` へ現在条件を保存して戻る導線を追加した。
+- [x] `git-work-branch-list` から `git-pseudo-squash` へ遷移する `まとめる` 導線を追加した。
+- [x] `git-pseudo-squash` から `git-work-branch-list` へ現在条件を保存して戻る導線を追加した。
 
 ## バックログ
 
 - [ ] Material Web vendor bundle の参照先を `lht-cmn/` 周辺へ整理し、構成を正規化する。
 - [ ] `lht-text-field-help` の trailing action API を、現状の暫定 `clearable` を超えて正式化する。
 - [ ] 圧縮補助、EXIF 確認、ネットワーク/プロセス調査補助、カレンダ系ユーティリティなど、バックログ上のツールを追加または再設計する。
+- [ ] `git-branch-diff` の URL 引数対応で `diffMode` / `useTripleDot` / `useStat200` / `lockOrigin` を後続対応する。
 
 ## メモ
 

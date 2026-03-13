@@ -24,6 +24,8 @@
   - 2 ブランチ間の差分コマンド（`git diff` 系）を生成します。
 - `docs/git/git-pseudo-squash.html`
   - `git reset --soft` と再コミットで履歴をまとめる「pseudo-squash」手順のコマンドを段階ごとに生成します。
+- `docs/git/git-work-branch-list.html`
+  - 複数リポジトリと複数ブランチの組み合わせを一覧で管理し、比較用 `git diff` コマンドも確認できます。
 
 ## 使い方
 
@@ -38,6 +40,10 @@
 - `docs/git/git-pseudo-squash-src.html`
 - `docs/git/src/git-pseudo-squash/css/app.css`
 - `docs/git/src/git-pseudo-squash/js/main.js`
+- `git-work-branch-list` の編集元:
+- `docs/git/git-work-branch-list-src.html`
+- `docs/git/src/git-work-branch-list/css/app.css`
+- `docs/git/src/git-work-branch-list/js/main.js`
 - `git-config-setup` の編集元:
 - `docs/git/git-config-setup-src.html`
 - `docs/git/src/git-config-setup/css/app.css`

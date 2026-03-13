@@ -18,8 +18,7 @@ limitations under the License.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Git pseudo-squash コマンドジェネレータ</title>
-
+  <title>Git 作業ブランチ一覧</title>
   
   
   
@@ -1038,1724 +1037,430 @@ lht-index-card-link {
   overflow: hidden;
 }
 
-    /* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
-    :root {
-      --md-danger: #b3261e;
-      --md-state-layer: rgba(98, 0, 238, 0.12);
-      --md-sys-color-background: #f6f4f8;
-      --md-sys-color-focus-ring: rgba(98, 0, 238, 0.35);
-      --md-sys-color-on-primary: #ffffff;
-      --md-sys-color-on-secondary: #ffffff;
-      --md-sys-color-on-surface: #1c1b1f;
-      --md-sys-color-on-surface-variant: #49454f;
-      --md-sys-color-on-tertiary: #FFFFFF;
-      --md-sys-color-on-tertiary-container: #3d2e5a;
-      --md-sys-color-outline: #c8c5d0;
-      --md-sys-color-primary: #6200ee;
-      --md-sys-color-secondary: #6200ee;
-      --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
-      --md-sys-color-state-layer: rgba(98, 0, 238, 0.08);
-      --md-sys-color-surface: #ffffff;
-      --md-sys-color-surface-variant: #f4f1f7;
-      --md-sys-color-tertiary: #7D5260;
-      --md-sys-color-tertiary-container: #f3e8fd;
-      --md-typography-body-medium: 1rem;
-      --md-typography-body-small: 0.875rem;
-      --md-typography-headline-large: 1.85rem;
-      --md-typography-title-medium: 1.1rem;
-      --md-typography-title-small: 1.05rem;
-      --status-later: #ff9800;
-      --status-ok: #4caf50;
-      --status-todo: #00bcd4;
-    }
-
-    /* local-html-tools MD3 Core Spec v1.0.2 (2026-02-08) */
-    .md-page {
-      background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; min-height: 100vh;
-      overflow-x: clip;
-    }
-
-    .md-shell {
-      max-width: 980px; margin: 0 auto;
-    }
-
-    .md-card {
-      background: var(--md-sys-color-surface);
-      border-radius: 18px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 30px rgba(0, 0, 0, 0.06);
-      border: 1px solid #e9e3f0;
-      padding: 28px;
-    }
-
-    .md-headline {
-      font-size: 1.8rem; font-weight: 700; margin-bottom: 0.75rem;
-    }
-
-    .md-subtitle {
-      color: var(--md-sys-color-on-surface-variant); font-size: 0.95rem;
-    }
-
-    .md-section {
-      margin-top: 28px;
-    }
-
-    .md-section-title {
-      font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
-    }
-
-    .md-grid {
-      display: grid; gap: 16px;
-    }
-
-    .md-label {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.35rem;
-      font-weight: 600;
-      color: var(--md-sys-color-on-surface);
-      margin-bottom: 0.35rem;
-    }
-
-    .md-required {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.15rem 0.4rem;
-      border-radius: 999px;
-      font-size: 0.54rem;
-      font-weight: 600;
-      background: #ECEAF1;
-      color: #49454F;
-    }
-
-    .md-input, .md-textarea {
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid var(--md-sys-color-outline);
-      background: var(--md-sys-color-surface);
-      padding: 0.75rem;
-      font-size: 0.95rem;
-      color: var(--md-sys-color-on-surface);
-      transition: border-color 150ms ease, box-shadow 150ms ease;
-    }
-
-    .md-textarea {
-      min-height: 6.5rem;
-    }
-
-    .md-input:focus, .md-textarea:focus {
-      outline: none;
-      border-color: var(--md-sys-color-primary);
-      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
-    }
-
-    .md-field-block {
-      margin-bottom: 1rem;
-    }
-
-    .md-button {
-      border-radius: 999px;
-      padding: 0.6rem 1.2rem;
-      font: inherit;
-      font-weight: 600;
-      font-size: 0.95rem;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
-    }
-
-    .md-button--primary {
-      background: var(--md-sys-color-primary);
-      color: var(--md-sys-color-on-primary);
-      box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
-    }
-
-    .md-button--primary:hover {
-      background: #4f00c9;
-    }
-
-    .md-icon-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f0edf5;
-      color: #3f3b46;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-    }
-
-    .md-tooltip-group {
-      position: relative; display: inline-flex; align-items: center;
-    }
-
-    .md-tooltip-content {
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      margin-top: 0.5rem;
-      display: none;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 150ms ease;
-      z-index: 50;
-      width: 20rem;
-      max-width: 90vw;
-    }
-
-    .md-tooltip-group:hover .md-tooltip-content,
-    .md-tooltip-group:focus-within .md-tooltip-content {
-      display: block;
-      opacity: 1;
-    }
-
-    .md-tooltip {
-      background: #2b2831;
-      color: #f7f4fb;
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
-      font-size: 0.8125rem;
-      font-weight: 400;
-      line-height: 1.35;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .md-info-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 9999px;
-      background: transparent;
-      color: #4a4458;
-      margin-left: 0.2rem;
-    }
-
-    .md-info-icon {
-      width: 18px; height: 18px;
-    }
-
-    .md-code-block {
-      position: relative; margin-top: 0.5rem;
-    }
-
-    .md-code {
-      display: block;
-      padding: 0.75rem;
-      padding-right: 2.5rem;
-      border-radius: 12px;
-      overflow-x: auto;
-      white-space: pre;
-      background: var(--md-sys-color-surface-variant);
-      border: 1px solid #e5e0ec;
-      color: #1f1b2d;
-      min-height: 2.5rem;
-    }
-    .md-code--dual-copy {
-      padding-bottom: 2.5rem;
-    }
-
-    .md-copy-button {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      width: 32px;
-      height: 32px;
-      border-radius: 16px;
-      background: #f7f2fa;
-      border: none;
-      cursor: pointer;
-    }
-    .md-copy-button--bottom-right {
-      top: auto;
-      right: 0.5rem;
-      bottom: 0.5rem;
-    }
-
-    .md-snackbar {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #2b2831;
-      color: #f7f4fb;
-      padding: 0.6rem 1rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      font-size: 0.85rem;
-    }
-
-    .md-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      padding: 2px 10px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      background: rgba(98, 0, 238, 0.12);
-      color: var(--md-sys-color-primary);
-      margin-left: 6px;
-    }
-
-    .md-section-wrap {
-      display: grid; gap: 1.75rem;
-    }
-
-    .md-section-card {
-      padding: 1.25rem 1.25rem 1.5rem;
-      border-radius: 24px;
-      background: var(--md-sys-color-surface);
-      border: 1px solid #ece7f3;
-      box-shadow: 0 2px 10px rgba(41, 35, 58, 0.06);
-    }
-
-    .md-section-subtitle {
-      font-size: var(--md-typography-body-small);
-      color: #6a6675;
-      margin-bottom: 1rem;
-    }
-
-    .md-section-title--spaced {
-      margin-top: 1rem;
-    }
-
-    .md-grid-3 {
-      grid-template-columns: repeat(1, minmax(0, 1fr));
-    }
-
-    .md-card-head {
-      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
-    }
-
-    .md-card-title {
-      font-size: var(--md-typography-title-small); font-weight: 600; color: #2f2a35;
-    }
-
-    .md-card-arrow {
-      color: #8f8a98; font-size: 1.2rem;
-    }
-
-    .md-card-desc {
-      margin-top: 0.5rem;
-      font-size: var(--md-typography-body-small);
-      color: #5f5a6b;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .md-info-chip:focus-visible {
-      box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring);
-    }
-
-    .md-tooltip--wide {
-      width: min(32rem, 90vw);
-    }
-
-    .md-tooltip--rich {
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .md-menu-button {
-      position: absolute; top: 16px; right: 16px;
-    }
-
-    .md-menu-panel {
-      position: absolute;
-      top: 56px;
-      right: 16px;
-      background: var(--md-sys-color-surface);
-      border: 1px solid #e6e1ee;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-      padding: 4px 0;
-      min-width: 160px;
-      z-index: 20;
-    }
-
-    .md-menu-link {
-      display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface);
-    }
-
-    .md-menu-link:hover {
-      background: #f2edf8;
-    }
-
-    .md-headline__icon {
-      margin-right: 0.5rem;
-    }
-
-    .md-section-title--lg {
-      font-size: 1.1rem;
-    }
-
-    .md-input, .md-select, .md-textarea {
-      display: block;
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid var(--md-sys-color-outline);
-      background: var(--md-sys-color-surface);
-      padding: 0.75rem;
-      font-size: 0.95rem;
-      color: var(--md-sys-color-on-surface);
-      transition: border-color 150ms ease, box-shadow 150ms ease;
-      box-sizing: border-box;
-    }
-
-    .md-input:focus, .md-select:focus, .md-textarea:focus {
-      outline: none;
-      border-color: var(--md-sys-color-primary);
-      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
-    }
-
-    .md-icon-btn:hover {
-      background: #e6e1ee;
-    }
-
-    .md-icon-btn--small {
-      width: 32px; height: 32px; border-radius: 16px;
-    }
-
-    .md-icon-btn--surface {
-      background: #f7f2fa;
-    }
-
-    .md-snackbar.md-visible {
-      opacity: 1; pointer-events: auto;
-    }
-
-    .md-hidden {
-      display: none;
-    }
-
-        .md-sr-only {
-          position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
-        }
-        .md-preview .md-sr-only { display: none !important; }
-
-    .md-stack-sm > * + * {
-      margin-top: 0.75rem;
-    }
-
-    .md-radio-row { display: flex; align-items: flex-start; gap: 0.5rem; }
-    .md-radio {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.95rem;
-      color: #3f3b46;
-    }
-
-    .md-radio input {
-      accent-color: var(--md-sys-color-primary);
-    }
-
-    .md-switch-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-size: 0.95rem;
-      color: var(--md-sys-color-on-surface);
-    }
-
-    .md-switch {
-      position: relative;
-      width: 44px;
-      min-width: 44px;
-      flex: 0 0 44px;
-      height: 24px;
-      background: #f0ebf7;
-      border-radius: 9999px;
-      display: inline-flex;
-      align-items: center;
-      padding: 2px;
-      transition: background 150ms ease, box-shadow 150ms ease;
-      box-shadow: inset 0 0 0 1px #cfc7dc;
-    }
-
-    .md-switch::after {
-      content: "";
-      width: 20px;
-      height: 20px;
-      border-radius: 9999px;
-      background: #ffffff;
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      transition: transform 150ms ease, background 150ms ease;
-    }
-
-    .md-switch-input {
-      position: absolute; opacity: 0; pointer-events: none;
-    }
-
-    .md-switch-input:checked + .md-switch {
-      background: rgba(98, 0, 238, 0.32);
-      box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.6);
-    }
-
-    .md-switch-input:checked + .md-switch::after {
-      transform: translateX(20px);
-      background: #ffffff;
-    }
-
-    .md-tab-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      border-bottom: 1px solid #e6e1ee;
-      margin-bottom: 1rem;
-    }
-
-    .md-tab-button {
-      border: 1px solid #e6e1ee;
-      border-bottom: none;
-      background: #f3f1f7;
-      padding: 0.4rem 0.9rem;
-      margin-bottom: -1px;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #3f3b46;
-    }
-
-    .md-tab-button[aria-selected="true"] {
-      background: #ffffff;
-      border-color: #c8c5d0;
-      color: #1c1b1f;
-    }
-
-    .md-tab-panel {
-      border: 1px solid #e6e1ee;
-      border-top: none;
-      padding: 1rem;
-      background: #ffffff;
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
-      margin-bottom: 1rem;
-    }
-
-    .md-label--row {
-      margin-bottom: 0.5rem;
-    }
-
-    .md-input, .md-select {
-      display: block;
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid var(--md-sys-color-outline);
-      background: var(--md-sys-color-surface);
-      padding: 0.75rem;
-      font-size: 0.95rem;
-      color: var(--md-sys-color-on-surface);
-      transition: border-color 150ms ease, box-shadow 150ms ease;
-      box-sizing: border-box;
-    }
-
-    .md-input:focus, .md-select:focus {
-      outline: none;
-      border-color: var(--md-sys-color-primary);
-      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
-    }
-
-    .md-form-grid {
-      display: grid; gap: 0.75rem;
-    }
-
-    .md-button--tonal {
-      background: #f0edf5;
-      color: #3f3b46;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-    }
-
-    .md-button--tonal:hover {
-      background: #e6e1ee;
-    }
-
-    .md-chip-row {
-      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;
-    }
-
-    .md-tooltip--narrow {
-      width: 18rem;
-    }
-
-    .md-surface-card {
-      max-width: 48rem; margin: 0 auto; padding: 24px; position: relative;
-    }
-
-    .md-choice {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      padding: 0.25rem 0;
-    }
-
-    .md-input {
-      width: 100%;
-      padding: 0.65rem 0.75rem;
-      border-radius: 12px;
-      border: 1px solid var(--md-sys-color-outline);
-      background: var(--md-sys-color-surface);
-      font-size: 1rem;
-      color: var(--md-sys-color-on-surface);
-      transition: border-color 150ms ease, box-shadow 150ms ease;
-    }
-
-    .md-input:focus {
-      outline: none;
-      border-color: var(--md-sys-color-primary);
-      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
-    }
-
-    .md-button:hover {
-      box-shadow: 0 4px 10px rgba(98, 0, 238, 0.35);
-    }
-
-    .md-button:active {
-      opacity: 0.7;
-    }
-
-    .md-button--surface {
-      background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); border: 1px solid var(--md-sys-color-outline);
-    }
-
-    .md-button--compact {
-      padding: 0.38rem 0.75rem;
-      font-size: 0.82rem;
-      font-weight: 500;
-      line-height: 1.2;
-    }
-
-    .md-button--with-icon {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    .md-inline-action {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2rem;
-    }
-
-    .md-button--secondary {
-      background: var(--md-sys-color-secondary); color: var(--md-sys-color-on-secondary); margin-bottom: 10px;
-    }
-
-    .md-button-row {
-      display: flex; gap: 15px; height: clamp(120px, 20vh, 220px); margin-bottom: 10px;
-    }
-
-    .md-bottom-actions {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-
-    .md-bottom-actions__field {
-      flex: 1 1 420px;
-      min-width: min(100%, 320px);
-    }
-
-    .md-button--hero {
-      font-size: clamp(1.2rem, 4vw, 1.6rem);
-    }
-
-    .md-field {
-      position: relative; min-width: 200px;
-    }
-
-    .md-field__label {
-      position: absolute;
-      top: -9px;
-      left: 12px;
-      padding: 0 6px;
-      background: var(--md-sys-color-surface);
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--md-sys-color-on-surface-variant);
-      letter-spacing: 0.02em;
-    }
-
-    .md-field .md-select {
-      appearance: none;
-      border-radius: 12px;
-      border: 1px solid var(--md-sys-color-outline);
-      background: var(--md-sys-color-surface);
-      padding: 0.8rem 2.2rem 0.8rem 0.9rem;
-      font-size: 0.9rem;
-      color: var(--md-sys-color-on-surface);
-      min-width: 200px;
-      line-height: 1.2;
-      background-image: linear-gradient(45deg, transparent 50%, #6c6775 50%), linear-gradient(135deg, #6c6775 50%, transparent 50%);
-      background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
-      background-size: 6px 6px, 6px 6px;
-      background-repeat: no-repeat;
-    }
-
-    .md-field .md-select:focus {
-      outline: none; border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
-    }
-
-    .md-stack-md > * + * {
-      margin-top: 0.75rem;
-    }
-
-    .md-grid-2 {
-      grid-template-columns: repeat(1, minmax(0, 1fr));
-    }
-
-    .md-form-row {
-      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
-    }
-
-    .md-form-row--nowrap {
-      flex-wrap: nowrap;
-    }
-
-    .md-label--muted {
-      color: #3f3b46;
-    }
-
-    .md-label--block {
-      margin-bottom: 0.5rem;
-    }
-
-    .md-snackbar-host {
-      position: fixed;
-      right: 1.25rem;
-      bottom: 1.25rem;
-      padding: 0.5rem 1rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 200ms ease;
-    }
-
-    .md-snackbar-host.md-visible {
-      opacity: 1; pointer-events: auto;
-    }
-
-    .md-button:disabled {
-      background: #e6e1ee;
-      color: #9a94a7;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .md-textarea:focus {
-      outline: none;
-      border-color: var(--md-sys-color-primary);
-      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
-    }
-
-    .md-input-block {
-      margin-bottom: 1rem;
-    }
-
-    .md-section-title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .md-output-wrap {
-      position: relative;
-    }
-
-    .md-output {
-      background: var(--md-sys-color-surface-variant);
-    }
-
-    .md-stack-lg > * + * {
-      margin-top: 1.5rem;
-    }
-
-    .md-form-row--start {
-      align-items: flex-start;
-    }
-
-    .md-input:disabled, .md-select:disabled {
-      background: #f3f0f7;
-    }
-
-    .md-choice-card {
-      border: 1px solid #e2dcec;
-      border-radius: 16px;
-      padding: 1rem;
-      background: #ffffff;
-    }
-
-    .md-choice-card--muted {
-      background: #f7f3fb;
-    }
-
-    .md-choice-row {
-      display: flex; align-items: center; gap: 0.75rem;
-    }
-
-    .md-choice-row input {
-      margin: 0;
-    }
-
-    .md-choice-sub {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #6a6675;
-    }
-
-    .md-choice-sub small {
-      font-size: 0.75rem; color: #7b7784;
-    }
-
-    .md-chip--primary {
-      background: #e2d9f7;
-      color: #4a1e9e;
-    }
-
-    .md-chip--warn {
-      background: #f7ece1;
-      color: #8a4b0f;
-    }
-
-    .md-field-stack {
-      display: flex; flex-direction: column; align-items: stretch; gap: 0.5rem;
-    }
-
-    .md-label--full {
-      width: 100%;
-    }
-
-    .md-switch-row {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; color: var(--md-sys-color-on-surface); font-size: 0.95rem;
-    }
-
-    .md-input-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex: 1 1 16rem;
-      min-width: 12rem;
-    }
-
-    .md-input-wrap .md-input {
-      flex: 1 1 auto;
-      min-width: 0;
-      padding-right: 0.75rem;
-    }
-
-    .md-input-action {
-      position: static;
-      flex: 0 0 auto;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-    }
-
-    .md-field-stack .md-input, .md-field-stack .md-select {
-      flex: 0 0 auto;
-    }
-
-    .md-field--dropdown {
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23635b75' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      background-size: 1rem 1rem;
-      padding-right: 2.25rem;
-    }
-
-    .md-select--inline {
-      flex: 1 1 18rem; min-width: 14rem;
-    }
-
-    .md-input.md-disabled, .md-select.md-disabled {
-      background: #f3f0f7;
-    }
-
-    .md-choice-inline {
-      display: flex; flex-wrap: wrap; gap: 1.25rem; row-gap: 0.5rem;
-    }
-
-    .md-choice-text {
-      font-size: 0.9rem; color: #4a4458;
-    }
-
-
-
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    body { font-family: "Roboto", "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif; font-size: 1rem; line-height: 1.5; }
-    button { border: none; cursor: pointer; background: transparent; }
-    a { text-decoration: none; color: inherit; }
-
-    .md-page {
-      background-color: var(--md-sys-color-background);
-      color: var(--md-sys-color-on-surface);
-      padding: 24px;
-      overflow-x: clip;
-    }
-    .md-surface-card { max-width: 48rem; margin: 0 auto; padding: 24px; position: relative; }
-
-    .md-card {
-      background: var(--md-sys-color-surface);
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
-      border: 1px solid #ece7f3;
-    }
-
-    .md-menu-button { position: absolute; top: 16px; right: 16px; }
-    .md-menu-panel {
-      position: absolute;
-      top: 48px;
-      right: 16px;
-      background: var(--md-sys-color-surface);
-      border: 1px solid #e6e1ee;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-      padding: 4px 0;
-      min-width: 160px;
-    }
-    .md-menu-link { display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface); }
-    .menu-link:hover { background: #f2edf8; }
-
-    .md-headline {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.5rem;
-      padding-right: 2.5rem;
-      margin-bottom: 1.5rem;
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-    .md-headline__icon { margin-right: 0.5rem; }
-
-    .md-section { margin-bottom: 1rem; }
-    .md-stack-md > * + * { margin-top: 0.75rem; }
-    .md-stack-sm > * + * { margin-top: 0.5rem; }
-
-    .md-form-grid { display: grid; gap: 1rem; align-items: center; }
-    @media (min-width: 768px) {
-      .md-form-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    .md-form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
-    .md-form-row--nowrap { flex-wrap: nowrap; }
-    .md-field-stack { display: flex; flex-direction: column; align-items: stretch; gap: 0.5rem; }
-    .md-label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.18rem; font-weight: 600; color: var(--md-sys-color-on-surface); }
-    .md-label--muted { color: #3f3b46; }
-    .md-label--block { margin-bottom: 0.5rem; }
-    .md-label--full { width: 100%; }
-
-    .md-switch-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; color: var(--md-sys-color-on-surface); font-size: 0.95rem; }
-
-    .md-section-title { font-size: 1rem; font-weight: 600; color: #3f3b46; }
-
-    .md-flow-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; }
-    .md-title-info-row { display: inline-flex; align-items: center; gap: 0.08rem; }
-    .md-title-info-row .md-section-title { margin: 0; }
-    .md-title-info-row .md-info-chip { margin-left: 0; }
-    .md-title-action-btn { margin-left: 0.35rem; }
-    .md-title-action-icon { margin-left: 0.25rem; }
-    .md-flow-divider { display: flex; justify-content: center; padding: 0.5rem 0; }
-
-    .md-diff-dialog {
-      width: min(780px, calc(100vw - 2rem));
-      border: 1px solid #ddd7e8;
-      border-radius: 14px;
-      padding: 0;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
-      background: #ffffff;
-    }
-    .md-diff-dialog::backdrop {
-      background: rgba(17, 24, 39, 0.45);
-    }
-    .md-diff-dialog__head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      padding: 0.75rem 0.9rem;
-      border-bottom: 1px solid #ece7f3;
-    }
-    .md-diff-dialog__title {
-      margin: 0;
-      font-size: 0.98rem;
-      font-weight: 700;
-      color: #2b2635;
-    }
-    .md-diff-dialog__content {
-      display: grid;
-      gap: 0.75rem;
-      padding: 0.85rem 0.9rem 1rem;
-    }
-    .md-diff-block {
-      border: 1px solid #ebe6f2;
-      border-radius: 10px;
-      background: #faf8fd;
-      overflow: hidden;
-    }
-    .md-diff-block__label {
-      padding: 0.4rem 0.6rem;
-      font-size: 0.76rem;
-      font-weight: 700;
-      color: #554c66;
-      border-bottom: 1px solid #ebe6f2;
-      background: #f0ecf7;
-    }
-    .md-diff-block__text {
-      margin: 0;
-      padding: 0.6rem;
-      max-height: 220px;
-      overflow: auto;
-      white-space: pre;
-      word-break: normal;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.82rem;
-      line-height: 1.45;
-      color: #2c2736;
-      background: #ffffff;
-    }
-    .md-diff-line {
-      display: block;
-      padding: 0 0.15rem;
-      border-radius: 4px;
-    }
-    .md-diff-line--before {
-      background: #ffe8ea;
-      color: #8a1f2b;
-    }
-    .md-diff-line--after {
-      background: #e7f8ed;
-      color: #1f6a36;
-    }
-
-    .md-step-icon { width: 3.5rem; height: 3.5rem; }
-    .md-flow-strip { width: 100%; max-width: 36rem; height: 2.5rem; }
-
-    .md-code-block { position: relative; margin-top: 1rem; }
-    .md-code {
-      display: block;
-      padding: 0.75rem;
-      padding-right: 2.5rem;
-      border-radius: 12px;
-      overflow-x: auto;
-      white-space: pre;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      background: var(--md-sys-color-surface-variant);
-      border: 1px solid #e5e0ec;
-      color: #1f1b2d;
-    }
-    .md-code--dual-copy { padding-bottom: 2.5rem; }
-    .md-copy-button { position: absolute; top: 0.5rem; right: 0.5rem; }
-    .md-copy-button--bottom-right { top: auto; right: 0.5rem; bottom: 0.5rem; }
-    md-icon-button.md-copy-button {
-      width: 32px;
-      height: 32px;
-      border-radius: 16px;
-      --md-icon-button-icon-size: 16px;
-      --md-icon-button-icon-color: #3f3b46;
-      --md-icon-button-state-layer-shape: 16px;
-      --md-icon-button-hover-state-layer-color: #3f3b46;
-      --md-icon-button-hover-state-layer-opacity: 0.08;
-      --md-icon-button-pressed-state-layer-color: #3f3b46;
-      --md-icon-button-pressed-state-layer-opacity: 0.12;
-      background: #f7f2fa;
-    }
-    md-icon-button.md-copy-button--surface {
-      background: #f7f2fa;
-    }
-
-    .md-icon-20 { width: 20px; height: 20px; }
-
-    .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
-    .md-tooltip-content {
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      margin-top: 0.5rem;
-      display: none;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 150ms ease;
-      z-index: 50;
-      width: 20rem;
-      max-width: min(20rem, calc(100vw - 2rem));
-    }
-    .md-tooltip-group:hover .md-tooltip-content,
-    .md-tooltip-group:focus-within .md-tooltip-content {
-      display: block;
-      opacity: 1;
-    }
-    .md-tooltip--wide {
-      width: min(24rem, calc(100vw - 2rem));
-      max-width: calc(100vw - 2rem);
-    }
-
-    .md-icon-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #f0edf5;
-      color: #3f3b46;
-      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-    }
-    .md-icon-btn:hover { background: #e6e1ee; }
-    .md-icon-btn:focus-visible {
-      outline: none;
-      box-shadow:
-        0 0 0 2px #f6f4f8,
-        0 0 0 4px rgba(108, 62, 234, 0.65);
-    }
-    .md-icon-btn--small { width: 32px; height: 32px; border-radius: 16px; }
-    .md-icon-btn--surface { background: #f7f2fa; }
-
-    .md-tooltip {
-      background: #2b2831;
-      color: #f7f4fb;
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
-      font-size: 0.8125rem;
-      font-weight: 400;
-      line-height: 1.35;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      letter-spacing: 0.01em;
-    }
-    .md-tooltip--rich { border: 1px solid rgba(255, 255, 255, 0.08); }
-
-    .md-info-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 9999px;
-      background: transparent;
-      color: #4a4458;
-      margin-left: 0.2rem;
-    }
-    .md-info-icon { width: 18px; height: 18px; }
-    .md-inline-icon { width: 20px; height: 20px; display: inline-block; }
-    .md-icon-small { width: 16px; height: 16px; }
-
-    .md-switch {
-      position: relative;
-      width: 44px;
-      min-width: 44px;
-      flex: 0 0 44px;
-      height: 24px;
-      background: #f0ebf7;
-      border-radius: 9999px;
-      display: inline-flex;
-      align-items: center;
-      padding: 2px;
-      transition: background 150ms ease, box-shadow 150ms ease;
-      box-shadow: inset 0 0 0 1px #cfc7dc;
-    }
-    .md-switch::after {
-      content: "";
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #ffffff;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      transform: translateX(0);
-      transition: transform 150ms ease;
-    }
-    .md-switch-input { position: absolute; opacity: 0; pointer-events: none; }
-    .md-switch-input:checked + .md-switch {
-      background: #8b5cf6;
-      box-shadow: inset 0 0 0 1px #7c3aed;
-    }
-    .md-switch-input:checked + .md-switch::after { transform: translateX(20px); background: #ffffff; }
-    .md-switch-help-row { display: inline-flex; align-items: center; gap: 0.1rem; }
-    .md-label .md-info-chip,
-    .md-switch-label .md-info-chip { margin-left: 0; }
-
-    .md-input-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex: 1 1 16rem;
-      min-width: 12rem;
-    }
-    .md-input-wrap .md-input {
-      flex: 1 1 auto;
-      min-width: 0;
-      padding-right: 0.75rem;
-    }
-    .md-input-action {
-      position: static;
-      flex: 0 0 auto;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-    }
-
-    .md-snackbar {
-      background: #2b2831;
-      color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-      letter-spacing: 0.01em;
-    }
-
-    .md-input,
-    .md-select,
-    .md-textarea {
-      width: 100%;
-      background: #ffffff;
-      border: 1px solid var(--md-sys-color-outline);
-      border-radius: 12px;
-      padding: 0.625rem 0.75rem;
-      font: inherit;
-      color: var(--md-sys-color-on-surface);
-      transition: border-color 150ms ease, box-shadow 150ms ease;
-    }
-    .md-input {
-      flex: 1 1 16rem;
-      min-width: 12rem;
-      height: 2.75rem;
-      min-height: 2.75rem;
-      line-height: 1.2;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-    .md-field-stack .md-input,
-    .md-field-stack .md-select {
-      flex: 0 0 auto;
-    }
-    .md-field--dropdown {
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23635b75' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      background-size: 1rem 1rem;
-      padding-right: 2.25rem;
-    }
-    .md-input:focus,
-    .md-select:focus,
-    .md-textarea:focus {
-      outline: none;
-      border-color: var(--md-sys-color-primary);
-      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.18);
-    }
-
-    .md-hidden { display: none; }
-    .md-disabled { background-color: #f3f0f7; }
-
-    .md-snackbar-host {
-      position: fixed;
-      right: 1.25rem;
-      bottom: 1.25rem;
-      padding: 0.5rem 1rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 200ms ease;
-    }
-    .md-snackbar-host.md-visible { opacity: 1; pointer-events: auto; }
-    #toast {
-      --md-snackbar-container-color: #2b2831;
-      --md-snackbar-supporting-text-color: #ffffff;
-      --md-snackbar-supporting-text-size: 0.85rem;
-    }
-
-    .md-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
-
-    md-outlined-text-field.md-outlined-field {
-      flex: 1 1 16rem;
-      min-width: 12rem;
-      width: 100%;
-      position: relative;
-      color-scheme: light;
-      border-radius: 12px;
-      --md-outlined-text-field-container-shape: 12px;
-      --md-outlined-field-container-shape: 12px;
-      --md-outlined-text-field-top-space: 10px;
-      --md-outlined-text-field-bottom-space: 10px;
-      --md-outlined-field-top-space: 10px;
-      --md-outlined-field-bottom-space: 10px;
-      --md-outlined-text-field-content-space: 12px;
-      --md-outlined-text-field-leading-space: 12px;
-      --md-outlined-text-field-trailing-space: 12px;
-      --md-outlined-text-field-outline-color: #bdb7c8;
-      --md-outlined-field-outline-color: #bdb7c8;
-      --md-outlined-text-field-hover-outline-color: #b1aac0;
-      --md-outlined-field-hover-outline-color: #b1aac0;
-      --md-outlined-text-field-focus-outline-color: #6c3eea;
-      --md-outlined-field-focus-outline-color: #6c3eea;
-      --md-outlined-text-field-focus-outline-width: 1.5px;
-      --md-outlined-field-focus-outline-width: 1.5px;
-      --md-outlined-text-field-focus-state-layer-color: #6c3eea;
-      --md-outlined-field-focus-state-layer-color: #6c3eea;
-      --md-outlined-text-field-focus-state-layer-opacity: 0;
-      --md-outlined-field-focus-state-layer-opacity: 0;
-      --md-outlined-text-field-error-focus-outline-width: 1px;
-      --md-outlined-field-error-focus-outline-width: 1px;
-      --md-outlined-text-field-caret-color: #6c3eea;
-      --md-outlined-field-caret-color: #6c3eea;
-      transition: none;
-    }
-
-    md-outlined-text-field.md-outlined-field::part(outline) {
-      transition: filter 160ms ease;
-    }
-
-    md-outlined-text-field.md-outlined-field:focus-within::part(outline) {
-      filter: drop-shadow(0 0 4px rgba(108, 62, 234, 0.26)) drop-shadow(0 0 12px rgba(108, 62, 234, 0.22));
-    }
-
-    md-outlined-text-field.md-outlined-field::part(container) {
-      transition: box-shadow 160ms ease;
-    }
-
-    md-outlined-text-field.md-outlined-field:focus-within::part(container) {
-      box-shadow: 0 0 0 2px rgba(108, 62, 234, 0.12), 0 0 14px rgba(108, 62, 234, 0.18);
-    }
-
-    .md-input-wrap--inline {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      width: 100%;
-    }
-
-    .md-input-action--inline {
-      flex: 0 0 auto;
-    }
-
-    md-outlined-text-field.md-disabled {
-      opacity: 0.68;
-    }
-
-    md-outlined-select.md-outlined-field {
-      flex: 1 1 16rem;
-      min-width: 12rem;
-      width: 100%;
-      position: relative;
-      color-scheme: light;
-      border-radius: 12px;
-      --md-outlined-select-text-field-container-shape: 12px;
-      --md-outlined-select-text-field-top-space: 10px;
-      --md-outlined-select-text-field-bottom-space: 10px;
-      --md-outlined-select-text-field-content-space: 12px;
-      --md-outlined-select-text-field-leading-space: 12px;
-      --md-outlined-select-text-field-trailing-space: 12px;
-      --md-outlined-field-container-shape: 12px;
-      --md-outlined-field-top-space: 10px;
-      --md-outlined-field-bottom-space: 10px;
-      --md-outlined-field-content-space: 12px;
-      --md-outlined-field-leading-space: 12px;
-      --md-outlined-field-trailing-space: 12px;
-      --md-outlined-select-text-field-outline-color: #bdb7c8;
-      --md-outlined-field-outline-color: #bdb7c8;
-      --md-outlined-select-text-field-hover-outline-color: #b1aac0;
-      --md-outlined-field-hover-outline-color: #b1aac0;
-      --md-outlined-select-text-field-focus-outline-color: #6c3eea;
-      --md-outlined-field-focus-outline-color: #6c3eea;
-      --md-outlined-select-text-field-focus-outline-width: 1.5px;
-      --md-outlined-field-focus-outline-width: 1.5px;
-      --md-outlined-select-text-field-focus-state-layer-color: #6c3eea;
-      --md-outlined-field-focus-state-layer-color: #6c3eea;
-      --md-outlined-select-text-field-focus-state-layer-opacity: 0;
-      --md-outlined-field-focus-state-layer-opacity: 0;
-      --md-menu-container-color: #f7f4fb;
-      --md-menu-container-shape: 12px;
-      --md-menu-top-space: 8px;
-      --md-menu-bottom-space: 8px;
-      --md-menu-item-one-line-container-height: 44px;
-      --md-menu-item-top-space: 8px;
-      --md-menu-item-bottom-space: 8px;
-      --md-menu-item-label-text-color: #2f2a38;
-      --md-menu-item-selected-container-color: transparent;
-      --md-menu-item-selected-label-text-color: #2f2a38;
-      --md-menu-item-hover-state-layer-color: #e9e1f6;
-      --md-menu-item-hover-state-layer-opacity: 1;
-      --md-menu-item-pressed-state-layer-color: #e2d8f4;
-      --md-menu-item-pressed-state-layer-opacity: 1;
-      --md-focus-ring-color: #9b86d6;
-      --md-focus-ring-width: 2px;
-      --md-focus-ring-active-width: 3px;
-      transition: none;
-    }
-
-    md-outlined-select.md-outlined-field::part(outline) {
-      transition: filter 160ms ease;
-    }
-
-    md-outlined-select.md-outlined-field:focus-within::part(outline) {
-      filter: drop-shadow(0 0 4px rgba(108, 62, 234, 0.26)) drop-shadow(0 0 12px rgba(108, 62, 234, 0.22));
-    }
-
-    md-outlined-select.md-outlined-field::part(container) {
-      transition: box-shadow 160ms ease;
-    }
-
-    md-outlined-select.md-outlined-field:focus-within::part(container) {
-      box-shadow: 0 0 0 2px rgba(108, 62, 234, 0.12), 0 0 14px rgba(108, 62, 234, 0.18);
-    }
-
-    #baseBranchMenu {
-      --md-menu-container-color: #f7f4fb;
-      --md-menu-container-shape: 12px;
-      --md-menu-item-one-line-container-height: 44px;
-      --md-menu-item-top-space: 8px;
-      --md-menu-item-bottom-space: 8px;
-      --md-menu-item-selected-container-color: #eee8f8;
-      --md-focus-ring-color: #9b86d6;
-      --md-focus-ring-width: 2px;
-      --md-focus-ring-active-width: 3px;
-      max-height: 320px;
-    }
-
-    #baseBranchMenu md-menu-item {
-      --md-focus-ring-color: #9b86d6;
-      --md-focus-ring-width: 2px;
-      --md-focus-ring-active-width: 3px;
-      --md-menu-item-label-text-color: #2f2a38;
-    }
-
-    #baseBranchMenu md-menu-item[data-active="true"] {
-      --md-menu-item-container-color: #ece4fa;
-      --md-menu-item-label-text-color: #241d35;
-    }
-
-    @media (max-width: 640px) {
-      .md-form-row--nowrap { flex-wrap: wrap; }
-      .md-tooltip-content {
-        left: auto;
-        right: 0;
-        transform: none;
-        width: min(20rem, calc(100vw - 2rem));
-        max-width: calc(100vw - 2rem);
-      }
-      .md-tooltip--wide {
-        width: min(24rem, calc(100vw - 2rem));
-        max-width: calc(100vw - 2rem);
-      }
-    }
+/* local-html-tools Git work branch list */
+:root {
+  --git-board-accent: #0f766e;
+  --git-board-accent-soft: #d7f4ef;
+  --git-board-border: #d8dce8;
+  --git-board-surface: #fbfcff;
+  --git-board-text-subtle: #5b6475;
+}
+
+.md-card {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.md-stack-md {
+  display: grid;
+  gap: 1rem;
+}
+
+.md-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.md-panel-actions,
+.md-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.md-form-actions {
+  justify-content: flex-start;
+}
+
+.md-panel-actions {
+  justify-content: flex-end;
+}
+
+.md-form-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.md-form-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.md-form-grid-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.md-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  padding: 0.52rem 1.02rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.md-button__icon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.md-button:hover {
+  box-shadow: 0 4px 10px rgba(98, 0, 238, 0.35);
+}
+
+.md-button:active {
+  opacity: 0.7;
+}
+
+.md-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.md-button--compact {
+  padding: 0.34rem 0.68rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.md-button--compact .md-button__icon {
+  width: 0.92rem;
+  height: 0.92rem;
+}
+
+.md-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: var(--git-board-accent-soft);
+  color: #0f3d39;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.md-entry-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.md-entry-card {
+  border: 1px solid var(--git-board-border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--git-board-surface) 0%, #ffffff 100%);
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.05);
+  padding: 1rem;
+}
+
+.md-entry-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.md-entry-title-wrap {
+  min-width: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.md-entry-title {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.35;
+}
+
+.md-entry-url {
+  color: var(--git-board-text-subtle);
+  font-size: 0.875rem;
+  word-break: break-all;
+}
+
+.md-entry-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.md-entry-meta {
+  margin-top: 0.8rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.md-ref-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.md-ref-box {
+  border-radius: 14px;
+  background: #f5f7fb;
+  border: 1px solid #e4e8f1;
+  padding: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: nowrap;
+}
+
+.md-ref-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: nowrap;
+  font-size: 0.82rem;
+  color: var(--git-board-text-subtle);
+  font-weight: 700;
+  white-space: nowrap;
+  width: auto;
+  max-width: 100%;
+}
+
+.md-scope-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.22rem 0.55rem;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.md-scope-badge[data-scope="remote"] {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.md-scope-badge[data-scope="local"] {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.md-ref-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  white-space: nowrap;
+  margin-left: 1.25rem;
+}
+
+.md-empty-state {
+  border: 1px dashed #c7cfdd;
+  border-radius: 18px;
+  background: #fafbfe;
+  padding: 1.1rem;
+  color: var(--git-board-text-subtle);
+}
+
+.md-dialog {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.md-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(2px);
+}
+
+.md-dialog__surface {
+  width: min(1040px, calc(100vw - 3rem));
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  border: 1px solid #ddd6e7;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+  padding: 1.1rem;
+  box-sizing: border-box;
+  display: grid;
+  gap: 1rem;
+}
+
+.md-dialog__header,
+.md-dialog__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.md-dialog__title {
+  margin: 0;
+  font-size: 1.12rem;
+}
+
+.md-dialog__subtitle {
+  margin: 0.2rem 0 0;
+  color: var(--git-board-text-subtle);
+  font-size: 0.92rem;
+}
+
+.md-dialog__body {
+  padding-top: 0.2rem;
+}
+
+.md-button--surface {
+  background: #eef2f7;
+  color: #334155;
+  border: 1px solid #d6deea;
+}
+
+.md-button--surface:hover {
+  background: #e5ebf5;
+}
+
+.md-button--danger {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.md-button--danger:hover {
+  background: #fee2e2;
+}
+
+.md-button--primary {
+  background: var(--md-sys-color-primary, #6200ee);
+  color: var(--md-sys-color-on-primary, #ffffff);
+  box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
+}
+
+.md-button--primary:hover {
+  background: #4f00c9;
+}
+
+@media (max-width: 900px) {
+  .md-form-grid-4,
+  .md-form-grid-2,
+  .md-form-grid-1,
+  .md-ref-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .md-panel-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .md-card {
+    padding: 18px;
+  }
+
+  .md-entry-card {
+    padding: 0.9rem;
+  }
+
+  .md-dialog__surface {
+    width: calc(100vw - 1.5rem);
+    max-height: calc(100vh - 1rem);
+    padding: 0.9rem;
+  }
+}
   </style>
 </head>
 <body class="md-page">
-  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
-    <defs>
-      <symbol id="md-icon-menu" viewBox="0 0 24 24">
-        <path d="M4 6h16"/>
-        <path d="M4 12h16"/>
-        <path d="M4 18h16"/>
-      </symbol>
-      <symbol id="md-icon-copy" viewBox="0 0 24 24">
-        <rect x="9" y="9" width="11" height="11" rx="2"/>
-        <rect x="4" y="4" width="11" height="11" rx="2"/>
-      </symbol>
-      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
-        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
-        <path d="M20 4v6h-6"/>
-      </symbol>
-      <symbol id="md-icon-trash" viewBox="0 0 24 24">
-        <path d="M4 7h16"/>
-        <path d="M10 11v6"/>
-        <path d="M14 11v6"/>
-        <path d="M6 7l1 12h10l1-12"/>
-        <path d="M9 7V5h6v2"/>
-      </symbol>
-      <symbol id="md-icon-open-in-new" viewBox="0 0 24 24">
-        <path d="M14 5h5v5"/>
-        <path d="M10 14 19 5"/>
-        <path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"/>
-      </symbol>
-      <symbol id="md-icon-auto-fix" viewBox="0 0 24 24">
-        <path d="m6 4 .8 2.2L9 7l-2.2.8L6 10l-.8-2.2L3 7l2.2-.8L6 4"/>
-        <path d="m16 11 1.1 3 2.9 1.1-2.9 1.1L16 19l-1.1-2.9L12 15l2.9-1.1L16 11"/>
-        <path d="M10 19h8"/>
-      </symbol>
-    </defs>
-  </svg>
   <div class="md-surface-card md-card">
     <lht-page-hero
-      title="Git pseudo-squash コマンドジェネレータ"
-      subtitle="履歴を1コミットにまとめるコマンドを生成します。"
-      icon="🧩"
-      help-label="Git pseudo-squash の説明"
+      title="Git 作業ブランチ一覧"
+      subtitle="複数リポジトリと複数ブランチの作業状況を一覧管理します。"
+      icon="🗂️"
+      help-label="Git 作業ブランチ一覧の説明"
       help-wide
       menu-home-href="../index.html"
       menu-home-label="トップへ戻る">
-      reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。<br><br>
-      運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。
+      リポジトリURL、基準ブランチ、作業ブランチ、ローカル/リモートの扱いをまとめて保存し、一覧で管理します。<br><br>
+      複数リポジトリ・複数ブランチを並行で扱うときの「今どの組み合わせを見ていたか」を忘れにくくするためのローカル専用メモ兼一覧ツールです。
     </lht-page-hero>
 
-    <section id="baseBlock" class="md-section md-stack-md">
-      <div class="md-stack-md">
-        <div class="md-form-row md-form-row--nowrap">
-          <lht-text-field-help field-id="squashBaseBranch" label="基点ブランチ" required autocomplete="on" placeholder="例: devel" value="devel" help-text="基点は git 作業の差分の起点として利用されます。git 作業をどこが基点なのか確認しましょう。基点が違うと差分がずれるため要確認です。設定の順番を揃えると意図した差分になりやすいです。"></lht-text-field-help>
-          <md-menu id="baseBranchMenu" anchor="squashBaseBranch" positioning="popover" quick no-navigation-wrap></md-menu>
-          <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="clearBaseBranchHistory()" title="基点ブランチ履歴をクリア" aria-label="基点ブランチ履歴をクリア">
-            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <use href="#md-icon-trash" xlink:href="#md-icon-trash"></use>
+    <section class="md-section md-stack-md">
+      <div class="md-panel-header">
+        <div class="md-panel-actions">
+          <button id="openCreateDialogBtn" type="button" class="md-button md-button--primary">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14"></path>
+              <path d="M5 12h14"></path>
             </svg>
+            <span>追加</span>
           </button>
         </div>
-        <div class="md-form-row md-form-row--nowrap">
-          <div class="md-input-wrap md-input-wrap--inline">
-            <lht-text-field-help field-id="workBranch" label="作業ブランチ" required placeholder="例: tiga0129a" field-class="md-outlined-field" help-text="これから作業するブランチ名です。未作成なら作成先として使います。生成コマンドにそのまま反映されます。"></lht-text-field-help>
-            <button type="button" class="md-icon-btn md-icon-btn--small md-input-action--inline" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
-              <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <use href="#md-icon-refresh" xlink:href="#md-icon-refresh"></use>
-              </svg>
-            </button>
+      </div>
+
+      <div id="emptyGuide" class="md-empty-state" hidden>まだ登録がありません。追加ボタンから登録してください。</div>
+
+      <div id="entriesList" class="md-entry-list" aria-live="polite"></div>
+    </section>
+
+    <dialog id="entryDialog" class="md-dialog">
+      <form method="dialog" class="md-dialog__surface" id="entryForm">
+        <div class="md-dialog__header">
+          <div>
+            <h2 id="entryDialogTitle" class="md-dialog__title">登録</h2>
+            <p class="md-dialog__subtitle">リポジトリ URL と作業対象ブランチを入力します。</p>
+          </div>
+          <button id="closeDialogBtn" type="button" class="md-button md-button--surface md-button--compact">閉じる</button>
+        </div>
+
+        <div class="md-dialog__body md-stack-md">
+          <div class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" required placeholder="例: https://github.com/igapyon/local-html-tools" help-text="リポジトリを識別する URL や clone URL を入力します。HTTPS / SSH / ローカルパスのどれでも構いません。表示名は URL の末尾から自動で組み立てます。"></lht-text-field-help>
+          </div>
+
+          <div class="md-form-grid md-form-grid-4">
+            <lht-text-field-help field-id="baseBranch" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。"></lht-text-field-help>
+            <lht-select-help field-id="baseScope" label="基準の扱い" help-text="基準ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
+              <script type="application/json" slot="options">[
+                { "value": "remote", "label": "リモート", "selected": true },
+                { "value": "local", "label": "ローカル" }
+              ]</script>
+            </lht-select-help>
+            <lht-text-field-help field-id="compareBranch" label="作業ブランチ" required placeholder="例: feature" help-text="いま確認したい作業対象ブランチです。"></lht-text-field-help>
+            <lht-select-help field-id="compareScope" label="作業の扱い" help-text="作業ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
+              <script type="application/json" slot="options">[
+                { "value": "remote", "label": "リモート", "selected": true },
+                { "value": "local", "label": "ローカル" }
+              ]</script>
+            </lht-select-help>
+          </div>
+
+          <div class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="remoteName" label="リモート名" placeholder="例: origin" value="origin" help-text="remote 扱いのブランチ参照に使うリモート名です。通常は origin です。"></lht-text-field-help>
           </div>
         </div>
-      </div>
-      <div class="md-switch-row">
-        <lht-switch-help switch-id="shellEnvPowerShell" label="PowerShell" help-label="PowerShell の説明" help-wide>
-          Windows PowerShell 用のコマンドを出力するかどうかを切り替えます。
-          スイッチがオフの場合は macOS / Linux の bash / zsh 向けのコマンドを出力します。
-          ご利用の環境に従って切り替えてください。
-          なお Windows コマンドプロンプトには対応していません。
-        </lht-switch-help>
-        <lht-switch-help switch-id="lockOrigin" label="リモート + origin と作業" help-label="リモート + origin と作業の説明" checked on-change="toggleOriginLock">
-          一連の作業を リモート + origin と連携して作業するかどうかを切り替えます。よくある利用方法が リモート + origin の組み合わせだと考えています。
-          ローカルの中で完結して作業する場合や、リモートの名称を変更したい場合は、このスイッチを OFF にして個別に値を設定してください。
-        </lht-switch-help>
-        <span class="md-inline-action">
-          <button type="button" class="md-button md-button--surface md-button--compact md-button--with-icon" onclick="clearUiPreferences()" title="設定をクリア" aria-label="設定をクリア">
-            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <use href="#md-icon-trash" xlink:href="#md-icon-trash"></use>
+
+        <div class="md-dialog__footer">
+          <button id="saveEntryBtn" type="button" class="md-button md-button--primary">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14"></path>
+              <path d="M5 12h14"></path>
             </svg>
-            <span>設定をクリア</span>
+            <span>追加</span>
           </button>
-          <lht-help-tooltip label="設定をクリアの説明">ローカルに保存されているこのツールの設定をクリアします。</lht-help-tooltip>
-        </span>
-      </div>
-      <div id="baseRemoteRow" class="md-form-grid md-form-grid-2">
-        <div class="md-form-row">
-          <lht-select-help field-id="squashBaseScope" label="基点の参照先" value="remote" help-text="基点ブランチをリモートから参照するか、ローカルで参照するかを指定します。ふだんは最新のリモート状態で切りたいので、リモート基点を選ぶケースが多いです。">
-            <script type="application/json" slot="options">[
-              { "value": "remote", "label": "リモート", "selected": true },
-              { "value": "local", "label": "ローカル" }
-            ]</script>
-          </lht-select-help>
         </div>
-        <div class="md-form-row">
-          <lht-text-field-help field-id="baseRemote" label="基点リモート" placeholder="例: origin" value="origin" help-text="基点ブランチを参照するリモート名です（例: origin）。「作業開始」と「まとめる予定の作業 (diff)」の基準になります。リモート基点を選ぶ場合は、最新の origin/devel などを参照する想定です。"></lht-text-field-help>
-        </div>
-      </div>
-    </section>
-    <div id="extraOptions" class="md-section md-stack-md">
-      <div id="squashRemoteRow">
-        <lht-text-field-help field-id="squashRemote" label="squashリモート" placeholder="例: origin" value="origin" help-text="squash 作業で使う fetch / push のリモート名です。通常は origin です。「作業をまとめる（squash）」のコマンドに反映されます。基点のリモートと同じにしておくと混乱しにくいです。"></lht-text-field-help>
-      </div>
-    </div>
-
-    <section id="commonFields" class="md-section md-stack-md">
-
-      <div class="md-flow-row">
-        <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-          <circle cx="18" cy="32" r="5" fill="#93C5FD"/>
-          <path d="M24 32H34" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
-          <path d="M34 32C40 32 42 26 46 24" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
-          <path d="M34 32C40 32 42 38 46 40" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="48" cy="22" r="4" fill="#A78BFA"/>
-          <circle cx="48" cy="42" r="4" fill="#34D399"/>
-        </svg>
-        <span class="md-title-info-row">
-          <p class="md-section-title">作業開始 (基準ブランチから作成)</p>
-          <lht-help-tooltip label="作業開始の説明">
-            基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
-          </lht-help-tooltip>
-        </span>
-      </div>
-      <lht-command-block command-id="createBranchCmd"></lht-command-block>
-
-      <div class="md-flow-divider">
-        <svg aria-hidden="true" viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-          <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
-          <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
-          <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
-          <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
-          <path d="M40 32h26" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
-          <path d="M116 32h70" stroke="#C4B5FD" stroke-width="4" stroke-linecap="round"/>
-          <path d="M236 32h26" stroke="#A7F3D0" stroke-width="4" stroke-linecap="round"/>
-          <path d="M312 32h70" stroke="#F9A8D4" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
-        </svg>
-      </div>
-      <div class="md-flow-row">
-        <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-          <circle cx="20" cy="22" r="4" fill="#93C5FD"/>
-          <circle cx="20" cy="42" r="4" fill="#FCA5A5"/>
-          <path d="M24 22H34" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
-          <path d="M24 42H34" stroke="#FCA5A5" stroke-width="3" stroke-linecap="round"/>
-          <path d="M34 22C40 22 42 28 46 32" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
-          <path d="M34 42C40 42 42 36 46 32" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="50" cy="32" r="5" fill="#86EFAC"/>
-        </svg>
-        <span class="md-title-info-row">
-          <p class="md-section-title">作業をまとめる (squash)</p>
-          <lht-help-tooltip label="作業をまとめるの説明">
-            ローカルの複数のコミットを1つにまとめます。
-            reset --soft で履歴だけ戻し、変更は残したまま1コミット化します。
-          </lht-help-tooltip>
-          <button type="button" class="md-button md-button--surface md-button--compact md-button--with-icon md-title-action-btn" onclick="normalizeCommitMessageForPr()" title="コミットメッセージをPRテキスト向けに整形" aria-label="コミットメッセージをPRテキスト向けに整形">
-            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <use href="#md-icon-auto-fix" xlink:href="#md-icon-auto-fix"></use>
-            </svg>
-            <span>PR整形</span>
-          </button>
-          <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface md-title-action-icon" onclick="openNormalizeDiffDialog()" title="整形差分を表示" aria-label="整形差分を表示">
-            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"></circle>
-              <path d="M12 10v6"></path>
-              <circle cx="12" cy="7.5" r="0.9" fill="currentColor" stroke="none"></circle>
-            </svg>
-          </button>
-          <a class="md-button md-button--surface md-button--compact md-button--with-icon md-title-action-btn" href="https://igapyon.github.io/local-html-tools/prompt/prompt-gen.html?q=A501&id=A501" target="_blank" rel="noopener noreferrer" title="生成AIで整理" aria-label="生成AIで整理">
-            <span>生成AIで整理</span>
-            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <use href="#md-icon-open-in-new" xlink:href="#md-icon-open-in-new"></use>
-            </svg>
-          </a>
-        </span>
-      </div>
-      <div class="md-form-row">
-        <lht-text-field-help field-id="commitMessage" label="コミットメッセージ" type="textarea" rows="12" required placeholder="コミットの内容を表す一文&#10;&#10;コミットの内容の説明" help-text="まとめ後の1コミットの説明文です。複数行入力が可能で、内容は一時ファイルに書き込んで git commit -F で渡されます。macOS / Linux は mktemp + ヒアドキュメント、Windows は PowerShell の New-TemporaryFile で対応します。ヒアドキュメント経由で渡すため、シェルのクォート解析の影響を受けにくくしています。あとで読んで何をおこなったのかわかる内容にしましょう。"></lht-text-field-help>
-      </div>
-    </section>
-
-    <div class="md-section md-stack-sm">
-      <div class="md-form-row">
-        <span class="md-switch-help-row">
-          <lht-switch-help switch-id="useCurrentBranch" label="現在ブランチで作業" help-label="現在ブランチで作業の説明" checked on-change="toggleCurrentBranch">
-            現在チェックアウト中のブランチを作業ブランチとして扱います。チェックを外すと、作業ブランチ名で switch するコマンドが含まれます。
-          </lht-switch-help>
-        </span>
-      </div>
-    </div>
-
-    <lht-command-block command-id="rebaseCmd" copy-buttons="dual"></lht-command-block>
-
-    <div class="md-flow-divider">
-      <svg aria-hidden="true" viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
-        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
-        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
-        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
-        <path d="M40 32h26" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
-        <path d="M116 32h70" stroke="#C4B5FD" stroke-width="4" stroke-linecap="round"/>
-        <path d="M236 32h26" stroke="#A7F3D0" stroke-width="4" stroke-linecap="round"/>
-        <path d="M312 32h70" stroke="#F9A8D4" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
-      </svg>
-    </div>
-    <div class="md-flow-row">
-      <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-        <path d="M22 40h20" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
-        <path d="M32 18v18" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
-        <path d="M26 24l6-6 6 6" stroke="#A78BFA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <rect x="18" y="42" width="28" height="8" rx="4" fill="#D9F5F0"/>
-        <circle cx="46" cy="24" r="5" fill="#86EFAC"/>
-      </svg>
-      <span class="md-title-info-row">
-        <p class="md-section-title">リモートに反映 (push)</p>
-        <lht-help-tooltip label="リモートに反映の説明">
-          コミットをまとめた後、リモートに push するときに利用するコマンドです。
-          push --force-with-lease オプションで push の実施後に、リモートと同期（pull）し、ブランチを -done サフィックスでリネームします。
-          ローカルでコミットが1つにまとまっているため、GitHubのPRではsquashせず通常のmergeで完了できるのが嬉しいです。
-        </lht-help-tooltip>
-      </span>
-    </div>
-    <lht-command-block command-id="pushCmd"></lht-command-block>
-
-    <div class="md-flow-divider">
-      <svg aria-hidden="true" viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
-        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
-        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
-        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
-        <path d="M40 32h26" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
-        <path d="M116 32h70" stroke="#C4B5FD" stroke-width="4" stroke-linecap="round"/>
-        <path d="M236 32h26" stroke="#A7F3D0" stroke-width="4" stroke-linecap="round"/>
-        <path d="M312 32h70" stroke="#F9A8D4" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
-      </svg>
-    </div>
-    <div class="md-flow-row">
-      <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-        <path d="M16 22h32" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
-        <path d="M16 32h26" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
-        <path d="M16 42h20" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
-        <circle cx="48" cy="22" r="4" fill="#93C5FD"/>
-        <circle cx="42" cy="32" r="4" fill="#A78BFA"/>
-        <circle cx="36" cy="42" r="4" fill="#34D399"/>
-      </svg>
-      <span class="md-title-info-row">
-        <p class="md-section-title">まとめる予定の作業 (diff)</p>
-        <lht-help-tooltip label="まとめる予定の作業の説明">
-          基点ブランチと作業ブランチの差分を表示するコマンドです。squash 後に1コミットへまとめる内容の目安になります。
-        </lht-help-tooltip>
-      </span>
-    </div>
-    <lht-command-block command-id="plannedDiffCmd"></lht-command-block>
-
-    <div class="md-bottom-actions">
-      <div class="md-bottom-actions__field">
-        <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" placeholder="例: https://github.com/igapyon/local-html-tools" help-text="Git 作業ブランチ一覧へ戻すときの保存先識別に使います。"></lht-text-field-help>
-      </div>
-      <button id="saveToWorkBranchListBtn" type="button" class="md-button md-button--primary md-button--with-icon">
-        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4 7h16"></path>
-          <path d="M4 12h16"></path>
-          <path d="M4 17h16"></path>
-        </svg>
-        <span>一覧</span>
-      </button>
-    </div>
+      </form>
+    </dialog>
 
     <lht-toast id="toast"></lht-toast>
-
-    <dialog id="normalizeDiffDialog" class="md-diff-dialog">
-      <div class="md-diff-dialog__head">
-        <h3 class="md-diff-dialog__title">PR整形の差分</h3>
-        <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="closeNormalizeDiffDialog()" title="閉じる" aria-label="閉じる">
-          <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M6 6l12 12"></path>
-            <path d="M18 6l-12 12"></path>
-          </svg>
-        </button>
-      </div>
-      <div class="md-diff-dialog__content">
-        <div class="md-diff-block">
-          <div class="md-diff-block__label">Before</div>
-          <pre id="normalizeDiffBefore" class="md-diff-block__text"></pre>
-        </div>
-        <div class="md-diff-block">
-          <div class="md-diff-block__label">After</div>
-          <pre id="normalizeDiffAfter" class="md-diff-block__text"></pre>
-        </div>
-      </div>
-    </dialog>
   </div>
 
   
@@ -4877,383 +3582,27 @@ if (!customElements.get("lht-page-menu")) {
   </script>
 
   <script>
-    function quoteIfNeeded(value, shell = "posix") {
-      if (!value) return value;
-      if (!/[^\w@%+=:,./-]/.test(value)) {
-        return value;
-      }
-      if (shell === "powershell") {
-        const escaped = value.replace(/'/g, "''");
-        return `'${escaped}'`;
-      }
-      const escaped = value.replace(/'/g, "'\\''");
-      return `'${escaped}'`;
+    const STORAGE_KEY = "gitWorkBranchList.entries";
+    let entries = [];
+    let editingId = "";
+    let dialogMode = "create";
+
+    function readText(id) {
+      const field = document.getElementById(id);
+      return field ? String(field.value || "").trim() : "";
     }
 
-    function convertTimeToThreeChars(hours, minutes) {
-      const s1 = String.fromCharCode(97 + hours);
-      const s2 = String.fromCharCode(97 + Math.floor(minutes / 26));
-      const s3 = String.fromCharCode(97 + (minutes % 26));
-      return s1 + s2 + s3;
+    function setText(id, value) {
+      const field = document.getElementById(id);
+      if (!field) return;
+      field.value = value == null ? "" : String(value);
     }
 
-    function getUseCurrentBranchSelected() {
-      const useCurrentBranch = document.getElementById("useCurrentBranch");
-      if (!useCurrentBranch) return true;
-      if ("selected" in useCurrentBranch) {
-        return !!useCurrentBranch.selected;
-      }
-      return !!useCurrentBranch.checked;
-    }
-
-    function setUseCurrentBranchSelected(value) {
-      const useCurrentBranch = document.getElementById("useCurrentBranch");
-      if (!useCurrentBranch) return;
-      if ("selected" in useCurrentBranch) {
-        useCurrentBranch.selected = !!value;
-        return;
-      }
-      useCurrentBranch.checked = !!value;
-    }
-
-    function getSwitchSelected(id, fallbackValue = false) {
-      const switchElement = document.getElementById(id);
-      if (!switchElement) return !!fallbackValue;
-      if ("selected" in switchElement) {
-        return !!switchElement.selected;
-      }
-      return !!switchElement.checked;
-    }
-
-    function setSwitchSelected(id, value) {
-      const switchElement = document.getElementById(id);
-      if (!switchElement) return;
-      if ("selected" in switchElement) {
-        switchElement.selected = !!value;
-        return;
-      }
-      switchElement.checked = !!value;
-    }
-
-    function isShellEnvPowerShell() {
-      return getSwitchSelected("shellEnvPowerShell", false);
-    }
-
-    function isLockOriginEnabled() {
-      return getSwitchSelected("lockOrigin", true);
-    }
-
-    function toggleCurrentBranch() {
-      const useCurrent = getUseCurrentBranchSelected();
-      const workBranch = document.getElementById("workBranch");
-      if (workBranch) {
-        // 編集は常に可能にする（現在のブランチ使用時も入力は保持）
-        workBranch.classList.remove("md-disabled");
-      }
-      saveUiPreferences();
-      regenerateAllCommands();
-    }
-
-    function updateBaseScope() {
-      const scope = document.getElementById("squashBaseScope");
-      const baseRemote = document.getElementById("baseRemote");
-      const lockOriginEnabled = isLockOriginEnabled();
-      const baseRemoteRow = document.getElementById("baseRemoteRow");
-      if (scope && baseRemote) {
-        const disableRemote = scope.value !== "remote" || lockOriginEnabled;
-        baseRemote.disabled = disableRemote;
-        baseRemote.classList.toggle("md-disabled", disableRemote);
-      }
-      if (scope && lockOriginEnabled) {
-        baseRemote.value = "origin";
-      }
-      const squashRemote = document.getElementById("squashRemote");
-      const squashRemoteRow = document.getElementById("squashRemoteRow");
-      if (squashRemote) {
-        const disableRemoteName = lockOriginEnabled;
-        squashRemote.disabled = disableRemoteName;
-        squashRemote.classList.toggle("md-disabled", disableRemoteName);
-        if (disableRemoteName) {
-          squashRemote.value = "origin";
-        }
-      }
-      if (baseRemoteRow) {
-        baseRemoteRow.classList.toggle("md-hidden", lockOriginEnabled);
-      }
-      if (squashRemoteRow) {
-        squashRemoteRow.classList.toggle("md-hidden", lockOriginEnabled);
-      }
-      regenerateAllCommands();
-    }
-
-    function toggleOriginLock() {
-      const isLocked = isLockOriginEnabled();
-      if (!isLocked) {
-        const baseRemote = document.getElementById("baseRemote");
-        const squashRemote = document.getElementById("squashRemote");
-        const storedBaseRemote = getStoredString(UI_BASE_REMOTE_STORAGE_KEY);
-        const storedSquashRemote = getStoredString(UI_SQUASH_REMOTE_STORAGE_KEY);
-        if (baseRemote && storedBaseRemote) {
-          baseRemote.value = storedBaseRemote;
-        }
-        if (squashRemote && storedSquashRemote) {
-          squashRemote.value = storedSquashRemote;
-        }
-      }
-      updateBaseScope();
-      saveUiPreferences();
-    }
-
-    function regenerateAllCommands() {
-      generateCreateBranchCommand({ silent: true });
-      generateRebaseCommand({ silent: true });
-      generatePushCommand({ silent: true });
-      generatePlannedDiffCommand({ silent: true });
-    }
-
-    function setDefaultWorkBranch() {
-      const input = document.getElementById("workBranch");
-      if (!input || input.value.trim()) return;
-      const now = new Date();
-      const pad = (num) => String(num).padStart(2, "0");
-      const mm = pad(now.getMonth() + 1);
-      const dd = pad(now.getDate());
-      const hh = now.getHours();
-      const min = now.getMinutes();
-      const timeStr = convertTimeToThreeChars(hh, min);
-      input.value = `tiga${mm}${dd}${timeStr}`;
-      regenerateAllCommands();
-    }
-
-    function updateWorkBranchWithCurrentTime() {
-      const input = document.getElementById("workBranch");
-      if (!input) return;
-      const now = new Date();
-      const pad = (num) => String(num).padStart(2, "0");
-      const mm = pad(now.getMonth() + 1);
-      const dd = pad(now.getDate());
-      const hh = now.getHours();
-      const min = now.getMinutes();
-      const timeStr = convertTimeToThreeChars(hh, min);
-      input.value = `tiga${mm}${dd}${timeStr}`;
-      regenerateAllCommands();
-    }
-
-    function generateRebaseCommand(options = {}) {
-      const silent = options && options.silent === true;
-      const squashScope = document.getElementById("squashBaseScope")?.value || "remote";
-      const baseRemote = document.getElementById("baseRemote")?.value.trim() || "origin";
-      const squashBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
-      let base = "";
-      const workBranch = document.getElementById("workBranch").value.trim();
-      const useCurrent = getUseCurrentBranchSelected();
-      const commitMessage = document.getElementById("commitMessage").value.trim();
-      const squashRemote = document.getElementById("squashRemote").value.trim() || "origin";
-      const shellEnv = isShellEnvPowerShell() ? "powershell" : "posix";
-
-      if (!squashBranch) {
-        if (!silent) alert("基点ブランチを入力してください。");
-        document.getElementById("rebaseCmd").textContent = "";
-        return;
-      }
-      if (squashScope === "remote") {
-        base = `${baseRemote}/${squashBranch}`;
-      } else {
-        base = squashBranch;
-      }
-      if (!base) {
-        if (!silent) alert("基点（親）を入力してください。");
-        document.getElementById("rebaseCmd").textContent = "";
-        return;
-      }
-      if (!useCurrent && !workBranch) {
-        if (!silent) alert("作業ブランチ名を入力してください。");
-        document.getElementById("rebaseCmd").textContent = "";
-        return;
-      }
-      if (!commitMessage) {
-        if (!silent) alert("コミットメッセージを入力してください。");
-        document.getElementById("rebaseCmd").textContent = "";
-        return;
-      }
-      const lines = [];
-      lines.push(`git fetch ${quoteIfNeeded(squashRemote, shellEnv)}`);
-      if (!useCurrent) {
-        lines.push(`git switch ${quoteIfNeeded(workBranch, shellEnv)}`);
-      }
-      lines.push(`git reset --soft ${quoteIfNeeded(base, shellEnv)}`);
-      if (shellEnv === "powershell") {
-        lines.push(`$CommitMsgFile = New-TemporaryFile`);
-        lines.push(`@'`);
-        lines.push(commitMessage);
-        lines.push(`'@ | Set-Content -Path $CommitMsgFile -Encoding UTF8`);
-        lines.push(`git commit -F $CommitMsgFile`);
-        lines.push(`Remove-Item $CommitMsgFile`);
-      } else {
-        lines.push(`COMMIT_MSG_FILE=$(mktemp)`);
-        lines.push(`cat > "$COMMIT_MSG_FILE" <<'EOF'`);
-        lines.push(commitMessage);
-        lines.push("EOF");
-        lines.push(`git commit -F "$COMMIT_MSG_FILE"`);
-        lines.push(`rm "$COMMIT_MSG_FILE"`);
-      }
-      lines.push(`git status -sb`);
-
-      document.getElementById("rebaseCmd").textContent = lines.join("\n");
-    }
-
-    function generatePushCommand(options = {}) {
-      const silent = options && options.silent === true;
-      const output = document.getElementById("pushCmd");
-      if (!output) return;
-
-      const workBranch = document.getElementById("workBranch").value.trim();
-      const useCurrent = getUseCurrentBranchSelected();
-      const squashRemote = document.getElementById("squashRemote").value.trim() || "origin";
-      const shellEnv = isShellEnvPowerShell() ? "powershell" : "posix";
-
-      if (!useCurrent && !workBranch) {
-        if (!silent) alert("push する場合は作業ブランチ名を入力してください。");
-        output.textContent = "";
-        return;
-      }
-
-      const lines = [];
-      if (useCurrent) {
-        lines.push(`git push --force-with-lease ${quoteIfNeeded(squashRemote, shellEnv)} HEAD`);
-      } else {
-        lines.push(`git push --force-with-lease ${quoteIfNeeded(squashRemote, shellEnv)} ${quoteIfNeeded(workBranch, shellEnv)}`);
-      }
-      lines.push(`git pull`);
-      if (useCurrent) {
-        lines.push(`git branch -m "$(git branch --show-current)" "$(git branch --show-current)-done"`);
-      } else {
-        lines.push(`git branch -m ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(`${workBranch}-done`, shellEnv)}`);
-      }
-      lines.push(`git status -sb`);
-      output.textContent = lines.join("\n");
-    }
-
-    function generatePlannedDiffCommand(options = {}) {
-      const silent = options && options.silent === true;
-      const squashScope = document.getElementById("squashBaseScope")?.value || "remote";
-      const baseRemote = document.getElementById("baseRemote")?.value.trim() || "origin";
-      const squashBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
-      const workBranch = document.getElementById("workBranch").value.trim();
-      const useCurrent = getUseCurrentBranchSelected();
-      const shellEnv = isShellEnvPowerShell() ? "powershell" : "posix";
-
-      const output = document.getElementById("plannedDiffCmd");
-      if (!output) return;
-
-      if (!squashBranch) {
-        if (!silent) alert("基点ブランチを入力してください。");
-        output.textContent = "";
-        return;
-      }
-      const base = squashScope === "remote" ? `${baseRemote}/${squashBranch}` : squashBranch;
-      if (!useCurrent && !workBranch) {
-        if (!silent) alert("作業ブランチ名を入力してください。");
-        output.textContent = "";
-        return;
-      }
-      const target = useCurrent ? "HEAD" : workBranch;
-      const lines = [];
-      if (squashScope === "remote") {
-        lines.push(`git fetch ${quoteIfNeeded(baseRemote, shellEnv)}`);
-      }
-      lines.push(`git diff ${quoteIfNeeded(base, shellEnv)}..${quoteIfNeeded(target, shellEnv)}`);
-      if (shellEnv === "powershell") {
-        lines.push(`Write-Host ("## Base branch commit ID: " + (git rev-parse ${quoteIfNeeded(base, shellEnv)}))`);
-      } else {
-        lines.push(`echo "## Base branch commit ID: $(git rev-parse ${quoteIfNeeded(base, shellEnv)})"`);
-      }
-      lines.push(`git status -sb`);
-      output.textContent = lines.join("\n");
-    }
-
-    function generateCreateBranchCommand(options = {}) {
-      const silent = options && options.silent === true;
-      const workBranch = document.getElementById("workBranch").value.trim();
-      const scope = document.getElementById("squashBaseScope").value;
-      const remote = document.getElementById("baseRemote").value.trim() || "origin";
-      const baseBranch = document.getElementById("squashBaseBranch").value.trim();
-      const shellEnv = isShellEnvPowerShell() ? "powershell" : "posix";
-
-      if (!workBranch) {
-        if (!silent) alert("作業ブランチ名を入力してください。");
-        document.getElementById("createBranchCmd").textContent = "";
-        return;
-      }
-      if (!baseBranch) {
-        if (!silent) alert("基点ブランチを入力してください。");
-        document.getElementById("createBranchCmd").textContent = "";
-        return;
-      }
-      const lines = [];
-      if (scope === "remote") {
-        lines.push(`git fetch ${quoteIfNeeded(remote, shellEnv)}`);
-        lines.push(`git switch -c ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(remote, shellEnv)}/${quoteIfNeeded(baseBranch, shellEnv)}`);
-        lines.push(`git status -sb`);
-      } else {
-        lines.push(`git switch -c ${quoteIfNeeded(workBranch, shellEnv)} ${quoteIfNeeded(baseBranch, shellEnv)}`);
-        lines.push(`git status -sb`);
-      }
-      document.getElementById("createBranchCmd").textContent = lines.join("\n");
-    }
-
-    function setupCreateBranchAutoUpdate() {
-      const ids = ["squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "shellEnvPowerShell", "lockOrigin"];
-      const handler = () => regenerateAllCommands();
-      ids.forEach((id) => {
-        const element = document.getElementById(id);
-        if (!element) return;
-        element.addEventListener("input", handler);
-        element.addEventListener("change", handler);
-      });
-      const squashBaseScope = document.getElementById("squashBaseScope");
-      if (squashBaseScope) {
-        squashBaseScope.addEventListener("change", updateBaseScope);
-      }
-    }
-
-    function setupRebaseAutoUpdate() {
-      const inputIds = ["repoUrl", "squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "commitMessage"];
-      const changeIds = ["useCurrentBranch", "shellEnvPowerShell", "lockOrigin"];
-      const handler = () => regenerateAllCommands();
-      inputIds.forEach((id) => {
-        const element = document.getElementById(id);
-        if (!element) return;
-        element.addEventListener("input", handler);
-        element.addEventListener("change", handler);
-      });
-      changeIds.forEach((id) => {
-        const element = document.getElementById(id);
-        if (!element) return;
-        element.addEventListener("change", handler);
-      });
-    }
-
-    function setupWorkBranchListButton() {
-      const button = document.getElementById("saveToWorkBranchListBtn");
-      if (!button) return;
-      button.addEventListener("click", saveToWorkBranchListAndOpen);
-    }
-
-    function copyToClipboard(id) {
-      const element = document.getElementById(id);
-      if (!element) return;
-      const text = element.tagName === "TEXTAREA" || element.tagName === "INPUT"
-        ? element.value
-        : element.textContent;
-      if (!text) return;
-      const temp = document.createElement("textarea");
-      temp.value = text;
-      document.body.appendChild(temp);
-      temp.select();
-      document.execCommand("copy");
-      document.body.removeChild(temp);
-      showToast("コピーしました");
+    function readSelectValue(id, fallbackValue) {
+      const field = document.getElementById(id);
+      if (!field) return fallbackValue;
+      const value = String(field.value || "").trim();
+      return value || fallbackValue;
     }
 
     function showToast(message) {
@@ -5262,90 +3611,8 @@ if (!customElements.get("lht-page-menu")) {
       toast.show(message, 2200);
     }
 
-    function summarizeTextDiffForToast(beforeText, afterText) {
-      const before = String(beforeText || "");
-      const after = String(afterText || "");
-      if (before === after) {
-        return "変更なし";
-      }
-
-      let start = 0;
-      const minLen = Math.min(before.length, after.length);
-      while (start < minLen && before[start] === after[start]) {
-        start += 1;
-      }
-
-      let endBefore = before.length - 1;
-      let endAfter = after.length - 1;
-      while (endBefore >= start && endAfter >= start && before[endBefore] === after[endAfter]) {
-        endBefore -= 1;
-        endAfter -= 1;
-      }
-
-      const changedBefore = before.slice(start, endBefore + 1).replace(/\s+/g, " ").trim();
-      const changedAfter = after.slice(start, endAfter + 1).replace(/\s+/g, " ").trim();
-      const compactBefore = changedBefore.length > 16 ? `${changedBefore.slice(0, 16)}...` : changedBefore;
-      const compactAfter = changedAfter.length > 16 ? `${changedAfter.slice(0, 16)}...` : changedAfter;
-
-      if (!compactBefore && compactAfter) {
-        return `追加: ${compactAfter}`;
-      }
-      if (compactBefore && !compactAfter) {
-        return `削除: ${compactBefore}`;
-      }
-      return `${compactBefore} → ${compactAfter}`;
-    }
-
-    function buildLineDiffHighlightData(beforeText, afterText) {
-      const beforeLines = String(beforeText || "").replace(/\r\n?/g, "\n").split("\n");
-      const afterLines = String(afterText || "").replace(/\r\n?/g, "\n").split("\n");
-      const n = beforeLines.length;
-      const m = afterLines.length;
-      const dp = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
-
-      for (let i = n - 1; i >= 0; i -= 1) {
-        for (let j = m - 1; j >= 0; j -= 1) {
-          if (beforeLines[i] === afterLines[j]) {
-            dp[i][j] = dp[i + 1][j + 1] + 1;
-          } else {
-            dp[i][j] = Math.max(dp[i + 1][j], dp[i][j + 1]);
-          }
-        }
-      }
-
-      const beforeHighlighted = [];
-      const afterHighlighted = [];
-      let i = 0;
-      let j = 0;
-      while (i < n && j < m) {
-        if (beforeLines[i] === afterLines[j]) {
-          beforeHighlighted.push({ text: beforeLines[i], changed: false });
-          afterHighlighted.push({ text: afterLines[j], changed: false });
-          i += 1;
-          j += 1;
-          continue;
-        }
-        if (dp[i + 1][j] >= dp[i][j + 1]) {
-          beforeHighlighted.push({ text: beforeLines[i], changed: true });
-          i += 1;
-        } else {
-          afterHighlighted.push({ text: afterLines[j], changed: true });
-          j += 1;
-        }
-      }
-      while (i < n) {
-        beforeHighlighted.push({ text: beforeLines[i], changed: true });
-        i += 1;
-      }
-      while (j < m) {
-        afterHighlighted.push({ text: afterLines[j], changed: true });
-        j += 1;
-      }
-
-      return {
-        beforeHighlighted,
-        afterHighlighted
-      };
+    function getDialog() {
+      return document.getElementById("entryDialog");
     }
 
     function escapeHtml(text) {
@@ -5357,920 +3624,367 @@ if (!customElements.get("lht-page-menu")) {
         .replace(/'/g, "&#39;");
     }
 
-    function renderDiffHighlightHtml(lines, changedClass) {
-      if (!lines || lines.length === 0) {
-        return '<span class="md-diff-line">(空)</span>';
+    function getButtonIconSvg(kind) {
+      if (kind === "add") {
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>';
       }
-      return lines.map((line) => {
-        const cssClass = line.changed ? `md-diff-line ${changedClass}` : "md-diff-line";
-        const safeText = escapeHtml(line.text);
-        return `<span class="${cssClass}">${safeText || "&nbsp;"}</span>`;
-      }).join("");
+      if (kind === "branch-diff") {
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h8"></path><path d="M11 3l4 4-4 4"></path><path d="M17 17H9"></path><path d="M13 13l-4 4 4 4"></path></svg>';
+      }
+      if (kind === "pseudo-squash") {
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12"></path><path d="M6 12h12"></path><path d="M6 17h12"></path><path d="M9 7v10"></path></svg>';
+      }
+      if (kind === "edit") {
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg>';
+      }
+      if (kind === "delete") {
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>';
+      }
+      return "";
     }
 
-    function isPrTitleHeadingLine(line) {
-      const normalized = String(line || "").trim();
-      if (!/^#{1,6}\s*/.test(normalized)) {
+    function setButtonContent(button, label, iconKind) {
+      if (!button) return;
+      button.innerHTML = `${getButtonIconSvg(iconKind)}<span>${escapeHtml(label)}</span>`;
+    }
+
+    function loadEntries() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+          .map((entry) => normalizeEntry(entry))
+          .filter((entry) => entry.repoUrl && entry.baseBranch && entry.compareBranch);
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function saveEntries() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function normalizeScope(value) {
+      return value === "local" ? "local" : "remote";
+    }
+
+    function normalizeEntry(raw) {
+      return {
+        id: raw?.id ? String(raw.id) : createId(),
+        repoUrl: String(raw?.repoUrl || "").trim(),
+        baseBranch: String(raw?.baseBranch || "").trim(),
+        baseScope: normalizeScope(raw?.baseScope),
+        compareBranch: String(raw?.compareBranch || "").trim(),
+        compareScope: normalizeScope(raw?.compareScope),
+        remoteName: String(raw?.remoteName || "origin").trim() || "origin",
+        updatedAt: Number(raw?.updatedAt || Date.now())
+      };
+    }
+
+    function createId() {
+      return `entry-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    }
+
+    function extractRepoName(repoUrl) {
+      const trimmed = String(repoUrl || "").trim().replace(/\/+$/, "");
+      if (!trimmed) return "(名称未設定)";
+      const normalized = trimmed.replace(/\.git$/i, "");
+      const parts = normalized.split(/[/:]/).filter(Boolean);
+      return parts[parts.length - 1] || normalized;
+    }
+
+    function buildDisplayName(entry) {
+      return extractRepoName(entry.repoUrl);
+    }
+
+    function buildRef(branch, scope, remoteName) {
+      return scope === "remote" ? `${remoteName}/${branch}` : branch;
+    }
+
+    function buildBranchDiffUrl(entry) {
+      const params = new URLSearchParams();
+      params.set("repoUrl", entry.repoUrl);
+      params.set("baseBranch", entry.baseBranch);
+      params.set("baseScope", entry.baseScope);
+      params.set("branchWork", entry.compareBranch);
+      params.set("scopeWork", entry.compareScope);
+      params.set("remoteName", entry.remoteName);
+      return `git-branch-diff.html?${params.toString()}`;
+    }
+
+    function buildPseudoSquashUrl(entry) {
+      const params = new URLSearchParams();
+      params.set("repoUrl", entry.repoUrl);
+      params.set("baseBranch", entry.baseBranch);
+      params.set("baseScope", entry.baseScope);
+      params.set("branchWork", entry.compareBranch);
+      params.set("remoteName", entry.remoteName);
+      return `git-pseudo-squash.html?${params.toString()}`;
+    }
+
+    function openBranchDiff(entry) {
+      window.location.href = buildBranchDiffUrl(entry);
+    }
+
+    function openPseudoSquash(entry) {
+      window.location.href = buildPseudoSquashUrl(entry);
+    }
+
+    function readFormEntry() {
+      return normalizeEntry({
+        id: editingId || createId(),
+        repoUrl: readText("repoUrl"),
+        baseBranch: readText("baseBranch"),
+        baseScope: readSelectValue("baseScope", "remote"),
+        compareBranch: readText("compareBranch"),
+        compareScope: readSelectValue("compareScope", "remote"),
+        remoteName: readText("remoteName") || "origin",
+        updatedAt: Date.now()
+      });
+    }
+
+    function validateEntry(entry) {
+      if (!entry.repoUrl) {
+        alert("リポジトリ URL を入力してください。");
         return false;
       }
-      const titleText = normalized.replace(/^#{1,6}\s*/, "").trim().toLowerCase();
-      return /^(?:pr\s*タイトル|pr\s*title|タイトル|title)\s*[:：]?$/.test(titleText);
-    }
-
-    function isPrTextHeadingLine(line) {
-      const normalized = String(line || "").trim();
-      if (!/^#{1,6}\s*/.test(normalized)) {
+      if (!entry.baseBranch) {
+        alert("基準ブランチを入力してください。");
         return false;
       }
-      const headingText = normalized.replace(/^#{1,6}\s*/, "").trim().toLowerCase();
-      return /^(?:pr\s*テキスト|pr\s*text|pr\s*本文)\s*[:：]?$/.test(headingText);
+      if (!entry.compareBranch) {
+        alert("比較ブランチを入力してください。");
+        return false;
+      }
+      return true;
     }
 
-    function isPrTitleLabelLine(line) {
-      const normalized = String(line || "").trim().toLowerCase();
-      return /^(?:pr\s*タイトル|pr\s*title|タイトル|title)\s*[:：]\s*$/.test(normalized);
+    function resetForm() {
+      editingId = "";
+      dialogMode = "create";
+      setText("repoUrl", "");
+      setText("baseBranch", "");
+      setText("compareBranch", "");
+      setText("remoteName", "origin");
+      const baseScope = document.getElementById("baseScope");
+      const compareScope = document.getElementById("compareScope");
+      if (baseScope) baseScope.value = "remote";
+      if (compareScope) compareScope.value = "remote";
+      const saveButton = document.getElementById("saveEntryBtn");
+      setButtonContent(saveButton, "追加", "add");
+      const titleNode = document.getElementById("entryDialogTitle");
+      if (titleNode) {
+        titleNode.textContent = "登録";
+      }
     }
 
-    function isPrTextLabelLine(line) {
-      const normalized = String(line || "").trim().toLowerCase();
-      return /^(?:pr\s*テキスト|pr\s*text|pr\s*本文)\s*[:：]\s*$/.test(normalized);
+    function populateForm(entry) {
+      editingId = entry.id;
+      dialogMode = "edit";
+      setText("repoUrl", entry.repoUrl);
+      setText("baseBranch", entry.baseBranch);
+      setText("compareBranch", entry.compareBranch);
+      setText("remoteName", entry.remoteName);
+      const baseScope = document.getElementById("baseScope");
+      const compareScope = document.getElementById("compareScope");
+      if (baseScope) baseScope.value = entry.baseScope;
+      if (compareScope) compareScope.value = entry.compareScope;
+      const saveButton = document.getElementById("saveEntryBtn");
+      setButtonContent(saveButton, "更新", "edit");
+      const titleNode = document.getElementById("entryDialogTitle");
+      if (titleNode) {
+        titleNode.textContent = "更新";
+      }
     }
 
-    function isTildeFenceStartLine(line) {
-      return /^~~~+(?:[a-z0-9_-]+)?\s*$/i.test(String(line || "").trim());
+    function openCreateDialog() {
+      resetForm();
+      openEntryDialog();
     }
 
-    function isTildeFenceEndLine(line) {
-      return /^~~~+\s*$/.test(String(line || "").trim());
+    function openEditDialog(entry) {
+      populateForm(entry);
+      openEntryDialog();
     }
 
-    function normalizeCommitMessageForPr() {
-      const commitMessageField = document.getElementById("commitMessage");
-      if (!commitMessageField) return;
-
-      const original = String(commitMessageField.value || "");
-      let lines = original.replace(/\r\n?/g, "\n").split("\n");
-
-      // 先頭は「空行 / PRタイトル見出し / PRタイトル: / PR本文: / チルダフェンス開始」が
-      // 混在しやすいため、順不同で連続除去する。
-      let changed = true;
-      let removedPrTitleHeading = false;
-      while (changed) {
-        changed = false;
-        while (lines.length > 0 && lines[0].trim() === "") {
-          lines.shift();
-          changed = true;
-        }
-        if (lines.length > 0) {
-          lines[0] = lines[0].replace(/^\uFEFF/, "");
-        }
-        if (lines.length > 0 && isPrTitleHeadingLine(lines[0])) {
-          lines.shift();
-          removedPrTitleHeading = true;
-          changed = true;
-          continue;
-        }
-        if (lines.length > 0 && isPrTitleLabelLine(lines[0])) {
-          lines.shift();
-          removedPrTitleHeading = true;
-          changed = true;
-          continue;
-        }
-        if (lines.length > 0 && isPrTextLabelLine(lines[0])) {
-          lines.shift();
-          changed = true;
-          continue;
-        }
-        if (lines.length > 0 && isTildeFenceStartLine(lines[0])) {
-          lines.shift();
-          changed = true;
-        }
-      }
-
-      if (removedPrTitleHeading) {
-        const firstNonEmptyIndex = lines.findIndex((line) => line.trim() !== "");
-        if (firstNonEmptyIndex >= 0) {
-          const line = lines[firstNonEmptyIndex];
-          if (/^\s*`.*`\s*$/.test(line)) {
-            lines[firstNonEmptyIndex] = line.replace(/^\s*`+/, "").replace(/`+\s*$/, "");
-          }
-        }
-      }
-
-      // 「## PRテキスト」「## PR本文」見出しや「PR本文:」行は、行自体を除去する。
-      // 見出し直後の空行もスキップする。
-      {
-        const rewritten = [];
-        let i = 0;
-        while (i < lines.length) {
-          if (!isPrTextHeadingLine(lines[i]) && !isPrTextLabelLine(lines[i])) {
-            rewritten.push(lines[i]);
-            i += 1;
-            continue;
-          }
-
-          // 見出し行を除去し、直後の空行をスキップ。
-          i += 1;
-          while (i < lines.length && lines[i].trim() === "") {
-            i += 1;
-          }
-        }
-        lines = rewritten;
-      }
-
-      while (lines.length > 0 && lines[lines.length - 1].trim() === "") {
-        lines.pop();
-      }
-
-      if (lines.length > 0 && isTildeFenceEndLine(lines[lines.length - 1])) {
-        lines.pop();
-      }
-
-      let normalized = lines.join("\n").trim();
-      // 先頭文が「`<40桁コミットID>` の ...」で始まる場合は導入句を除去する。
-      // 例: `3caa...fe8c0` の変更は〜 → 変更は〜
-      normalized = normalized.replace(
-        /^[\s\u3000\uFEFF]*[`'"\u2018\u2019\u201C\u201D「」『』]*\s*[0-9a-f]{40}\s*[`'"\u2018\u2019\u201C\u201D「」『』]*\s*の[\s\u3000]*/gim,
-        ""
-      );
-      normalized = normalized.trim();
-      lastNormalizeBefore = original;
-      lastNormalizeAfter = normalized;
-      commitMessageField.value = normalized;
-      regenerateAllCommands();
-      const summary = summarizeTextDiffForToast(original, normalized);
-      showToast(`コミットメッセージを整形: ${summary}`);
-    }
-
-    function openNormalizeDiffDialog() {
-      const dialog = document.getElementById("normalizeDiffDialog");
-      const beforeNode = document.getElementById("normalizeDiffBefore");
-      const afterNode = document.getElementById("normalizeDiffAfter");
-      if (!dialog || !beforeNode || !afterNode) return;
-
-      const commitMessageField = document.getElementById("commitMessage");
-      const currentValue = commitMessageField ? String(commitMessageField.value || "") : "";
-      const beforeText = lastNormalizeBefore || currentValue;
-      const afterText = lastNormalizeAfter || currentValue;
-      const diffData = buildLineDiffHighlightData(beforeText, afterText);
-      beforeNode.innerHTML = renderDiffHighlightHtml(diffData.beforeHighlighted, "md-diff-line--before");
-      afterNode.innerHTML = renderDiffHighlightHtml(diffData.afterHighlighted, "md-diff-line--after");
-
-      if (!dialog.dataset.boundOutsideClose) {
-        dialog.addEventListener("click", (event) => {
-          if (event.target === dialog) {
-            dialog.close();
-          }
-        });
-        dialog.dataset.boundOutsideClose = "true";
-      }
-
+    function openEntryDialog() {
+      const dialog = getDialog();
+      if (!dialog) return;
       if (typeof dialog.showModal === "function") {
         dialog.showModal();
-      } else {
-        showToast("このブラウザではダイアログ表示に対応していません");
       }
     }
 
-    function closeNormalizeDiffDialog() {
-      const dialog = document.getElementById("normalizeDiffDialog");
+    function closeEntryDialog() {
+      const dialog = getDialog();
       if (!dialog) return;
       if (dialog.open && typeof dialog.close === "function") {
         dialog.close();
       }
     }
 
-    function setupCodeSelectAll() {
-      document.querySelectorAll("code.selectable-code").forEach((el) => {
-        el.addEventListener("click", () => {
-          const range = document.createRange();
-          range.selectNodeContents(el);
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(range);
-        });
-      });
-    }
-
-    const BASE_BRANCH_STORAGE_KEY = "gitPseudoSquash.squashBaseBranch";
-    const BASE_BRANCH_HISTORY_STORAGE_KEY = "gitPseudoSquash.squashBaseBranchHistory";
-    const BASE_BRANCH_HISTORY_MAX = 12;
-    const BASE_BRANCH_DEFAULT_SUGGESTIONS = [
-      "main",
-      "master",
-      "devel",
-      "devel-tiga",
-      "develop",
-      "development",
-      "release",
-      "staging",
-      "production",
-      "prod",
-      "canary",
-      "working",
-      "experimental",
-      "prototype",
-      "proto",
-      "archive",
-      "legacy",
-      "gh-pages",
-      "stable"
-    ];
-    const UI_SHELL_ENV_POWERSHELL_STORAGE_KEY = "gitPseudoSquash.ui.shellEnvPowerShell";
-    const UI_LOCK_ORIGIN_STORAGE_KEY = "gitPseudoSquash.ui.lockOrigin";
-    const UI_SQUASH_BASE_SCOPE_STORAGE_KEY = "gitPseudoSquash.ui.squashBaseScope";
-    const UI_BASE_REMOTE_STORAGE_KEY = "gitPseudoSquash.ui.baseRemote";
-    const UI_SQUASH_REMOTE_STORAGE_KEY = "gitPseudoSquash.ui.squashRemote";
-    const UI_USE_CURRENT_BRANCH_STORAGE_KEY = "gitPseudoSquash.ui.useCurrentBranch";
-    const WORK_BRANCH_LIST_STORAGE_KEY = "gitWorkBranchList.entries";
-    let baseBranchDefaultSuggestions = [];
-    let baseBranchCurrentSuggestions = [];
-    let baseBranchActiveIndex = -1;
-    let baseBranchActiveValue = "";
-    let suppressBaseBranchFocusOpen = false;
-    let lastNormalizeBefore = "";
-    let lastNormalizeAfter = "";
-
-    function getStoredString(key) {
-      try {
-        const value = localStorage.getItem(key);
-        if (value == null) return "";
-        return String(value);
-      } catch (_) {
-        return "";
-      }
-    }
-
-    function getStoredBoolean(key) {
-      const raw = getStoredString(key);
-      if (!raw) return null;
-      if (raw === "true") return true;
-      if (raw === "false") return false;
-      return null;
-    }
-
-    function setStoredValue(key, value) {
-      try {
-        localStorage.setItem(key, String(value));
-      } catch (_) {
-        // localStorage が使えない環境では保存機能を無効化
-      }
-    }
-
-    function readCurrentQueryParams() {
-      return new URLSearchParams(window.location.search || "");
-    }
-
-    function applyQueryParams() {
-      const params = readCurrentQueryParams();
-      const repoUrl = String(params.get("repoUrl") || "").trim();
-      const baseBranch = String(params.get("baseBranch") || "").trim();
-      const branchWork = String(params.get("branchWork") || "").trim();
-      const baseScope = String(params.get("baseScope") || "").trim();
-      const remoteName = String(params.get("remoteName") || "").trim();
-      const repoUrlField = document.getElementById("repoUrl");
-      const baseBranchField = document.getElementById("squashBaseBranch");
-      const workBranchField = document.getElementById("workBranch");
-      const baseScopeField = document.getElementById("squashBaseScope");
-      const baseRemoteField = document.getElementById("baseRemote");
-      const squashRemoteField = document.getElementById("squashRemote");
-      const lockOriginField = document.getElementById("lockOrigin");
-      if (repoUrl && repoUrlField) {
-        repoUrlField.value = repoUrl;
-      }
-      if (baseBranch && baseBranchField) {
-        baseBranchField.value = baseBranch;
-      }
-      if (branchWork && workBranchField) {
-        workBranchField.value = branchWork;
-      }
-      if ((baseScope === "remote" || baseScope === "local") && baseScopeField) {
-        baseScopeField.value = baseScope;
-      }
-      if (remoteName) {
-        if (baseRemoteField) {
-          baseRemoteField.value = remoteName;
-        }
-        if (squashRemoteField) {
-          squashRemoteField.value = remoteName;
-        }
-        if (lockOriginField && remoteName !== "origin") {
-          setSwitchSelected("lockOrigin", false);
-        }
-      }
-    }
-
-    function createWorkBranchListEntryId() {
-      return `entry-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    }
-
-    function normalizeWorkBranchListScope(value) {
-      return value === "local" ? "local" : "remote";
-    }
-
-    function normalizeWorkBranchListEntry(raw) {
-      return {
-        id: raw?.id ? String(raw.id) : createWorkBranchListEntryId(),
-        repoUrl: String(raw?.repoUrl || "").trim(),
-        baseBranch: String(raw?.baseBranch || "").trim(),
-        baseScope: normalizeWorkBranchListScope(raw?.baseScope),
-        compareBranch: String(raw?.compareBranch || "").trim(),
-        compareScope: normalizeWorkBranchListScope(raw?.compareScope),
-        remoteName: String(raw?.remoteName || "origin").trim() || "origin",
-        updatedAt: Number(raw?.updatedAt || Date.now())
-      };
-    }
-
-    function loadWorkBranchListEntries() {
-      try {
-        const raw = localStorage.getItem(WORK_BRANCH_LIST_STORAGE_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return [];
-        return parsed.map((entry) => normalizeWorkBranchListEntry(entry));
-      } catch (_) {
-        return [];
-      }
-    }
-
-    function saveWorkBranchListEntries(entries) {
-      try {
-        localStorage.setItem(WORK_BRANCH_LIST_STORAGE_KEY, JSON.stringify(entries));
-      } catch (_) {
-        // localStorage が使えない環境では保存機能を無効化
-      }
-    }
-
-    function navigateTo(url) {
-      if (typeof window.__LHT_NAVIGATE__ === "function") {
-        window.__LHT_NAVIGATE__(url);
+    function updateEmptyGuide(visibleCount) {
+      const guide = document.getElementById("emptyGuide");
+      if (!guide) return;
+      if (entries.length === 0) {
+        guide.hidden = false;
+        guide.textContent = "まだ登録がありません。追加ボタンから登録してください。";
         return;
       }
-      if (window.location && typeof window.location.assign === "function") {
-        window.location.assign(url);
-        return;
-      }
-      window.location.href = url;
+      guide.hidden = true;
     }
 
-    function saveToWorkBranchListAndOpen() {
-      const repoUrlField = document.getElementById("repoUrl");
-      const repoUrl = repoUrlField ? String(repoUrlField.value || "").trim() : "";
-      if (!repoUrl) {
-        alert("リポジトリ URL を入力してください。");
-        if (repoUrlField && typeof repoUrlField.focus === "function") {
-          repoUrlField.focus();
-        }
+    function renderEntries() {
+      const list = document.getElementById("entriesList");
+      if (!list) return;
+      const visibleEntries = entries
+        .slice()
+        .sort((a, b) => b.updatedAt - a.updatedAt);
+
+      updateEmptyGuide(visibleEntries.length);
+
+      if (visibleEntries.length === 0) {
+        list.innerHTML = `<div class="md-empty-state">一致する項目がありません。</div>`;
         return;
       }
 
-      const baseBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
-      const compareBranch = document.getElementById("workBranch")?.value.trim() || "";
-      if (!baseBranch || !compareBranch) {
-        alert("基点ブランチと作業ブランチを入力してください。");
-        return;
-      }
+      list.innerHTML = visibleEntries.map((entry) => {
+        return `
+          <article class="md-entry-card" data-entry-id="${escapeHtml(entry.id)}">
+            <div class="md-entry-head">
+              <div class="md-entry-title-wrap">
+                <h3 class="md-entry-title">${escapeHtml(buildDisplayName(entry))}</h3>
+                <div class="md-entry-url">${escapeHtml(entry.repoUrl)}</div>
+              </div>
+              <div class="md-entry-actions">
+                <button type="button" class="md-button md-button--surface" data-action="open-branch-diff">${getButtonIconSvg("branch-diff")}<span>比較</span></button>
+                <button type="button" class="md-button md-button--surface" data-action="open-pseudo-squash">${getButtonIconSvg("pseudo-squash")}<span>まとめる</span></button>
+                <button type="button" class="md-button md-button--surface" data-action="edit-entry">${getButtonIconSvg("edit")}<span>変更</span></button>
+                <button type="button" class="md-button md-button--danger" data-action="delete-entry">${getButtonIconSvg("delete")}<span>削除</span></button>
+              </div>
+            </div>
+            <div class="md-entry-meta">
+              <div class="md-ref-grid">
+                <section class="md-ref-box">
+                  <div class="md-ref-label">基準 <span class="md-scope-badge" data-scope="${escapeHtml(entry.baseScope)}">${escapeHtml(entry.baseScope)}</span></div>
+                  <div class="md-ref-value">${escapeHtml(buildRef(entry.baseBranch, entry.baseScope, entry.remoteName))}</div>
+                </section>
+                <section class="md-ref-box">
+                  <div class="md-ref-label">作業 <span class="md-scope-badge" data-scope="${escapeHtml(entry.compareScope)}">${escapeHtml(entry.compareScope)}</span></div>
+                  <div class="md-ref-value">${escapeHtml(buildRef(entry.compareBranch, entry.compareScope, entry.remoteName))}</div>
+                </section>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
 
-      const baseScope = document.getElementById("squashBaseScope")?.value === "local" ? "local" : "remote";
-      const lockOriginEnabled = isLockOriginEnabled();
-      const baseRemote = document.getElementById("baseRemote")?.value.trim() || "origin";
-      const squashRemote = document.getElementById("squashRemote")?.value.trim() || "origin";
-      const remoteName = lockOriginEnabled ? "origin" : (baseRemote || squashRemote || "origin");
-      const entries = loadWorkBranchListEntries();
-      const existingIndex = entries.findIndex((entry) => (
-        entry.repoUrl === repoUrl &&
-        entry.baseBranch === baseBranch &&
-        entry.compareBranch === compareBranch
-      ));
-      const nextEntry = normalizeWorkBranchListEntry({
-        id: existingIndex >= 0 ? entries[existingIndex].id : createWorkBranchListEntryId(),
-        repoUrl,
-        baseBranch,
-        baseScope,
-        compareBranch,
-        compareScope: "local",
-        remoteName,
-        updatedAt: Date.now()
-      });
+    function saveCurrentEntry() {
+      const entry = readFormEntry();
+      if (!validateEntry(entry)) return;
 
+      const existingIndex = entries.findIndex((item) => item.id === entry.id);
       if (existingIndex >= 0) {
-        entries.splice(existingIndex, 1, nextEntry);
+        entries.splice(existingIndex, 1, entry);
+        showToast("一覧を更新しました");
       } else {
-        entries.push(nextEntry);
+        entries.push(entry);
+        showToast("一覧に追加しました");
       }
-      saveWorkBranchListEntries(entries);
-      showToast(existingIndex >= 0 ? "Git 作業ブランチ一覧を更新しました" : "Git 作業ブランチ一覧へ追加しました");
-      navigateTo("git-work-branch-list.html");
+      saveEntries();
+      renderEntries();
+      closeEntryDialog();
+      resetForm();
     }
 
-    function loadPersistedUiPreferences() {
-      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
-      const lockOrigin = document.getElementById("lockOrigin");
-      const squashBaseScope = document.getElementById("squashBaseScope");
-      const baseRemote = document.getElementById("baseRemote");
-      const squashRemote = document.getElementById("squashRemote");
-      const useCurrentBranch = document.getElementById("useCurrentBranch");
-
-      const shellEnvValue = getStoredBoolean(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY);
-      const lockOriginValue = getStoredBoolean(UI_LOCK_ORIGIN_STORAGE_KEY);
-      const useCurrentBranchValue = getStoredBoolean(UI_USE_CURRENT_BRANCH_STORAGE_KEY);
-      const scopeValue = getStoredString(UI_SQUASH_BASE_SCOPE_STORAGE_KEY);
-      const baseRemoteValue = getStoredString(UI_BASE_REMOTE_STORAGE_KEY);
-      const squashRemoteValue = getStoredString(UI_SQUASH_REMOTE_STORAGE_KEY);
-
-      if (shellEnvPowerShell && shellEnvValue !== null) {
-        setSwitchSelected("shellEnvPowerShell", shellEnvValue);
-      }
-      if (lockOrigin && lockOriginValue !== null) {
-        setSwitchSelected("lockOrigin", lockOriginValue);
-      }
-      if (useCurrentBranch && useCurrentBranchValue !== null) {
-        setUseCurrentBranchSelected(useCurrentBranchValue);
-      }
-      if (squashBaseScope && (scopeValue === "remote" || scopeValue === "local")) {
-        squashBaseScope.value = scopeValue;
-      }
-      if (baseRemote && baseRemoteValue) {
-        baseRemote.value = baseRemoteValue;
-      }
-      if (squashRemote && squashRemoteValue) {
-        squashRemote.value = squashRemoteValue;
-      }
-    }
-
-    function saveUiPreferences() {
-      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
-      const lockOrigin = document.getElementById("lockOrigin");
-      const squashBaseScope = document.getElementById("squashBaseScope");
-      const baseRemote = document.getElementById("baseRemote");
-      const squashRemote = document.getElementById("squashRemote");
-      const useCurrentBranch = document.getElementById("useCurrentBranch");
-
-      if (shellEnvPowerShell) {
-        setStoredValue(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY, isShellEnvPowerShell());
-      }
-      if (lockOrigin) {
-        setStoredValue(UI_LOCK_ORIGIN_STORAGE_KEY, isLockOriginEnabled());
-      }
-      if (squashBaseScope) {
-        setStoredValue(UI_SQUASH_BASE_SCOPE_STORAGE_KEY, squashBaseScope.value);
-      }
-      if (useCurrentBranch) {
-        setStoredValue(UI_USE_CURRENT_BRANCH_STORAGE_KEY, getUseCurrentBranchSelected());
-      }
-
-      // lockOrigin ON 時は origin を強制表示するため、ユーザーのリモート入力値は保持する。
-      const isLockOrigin = isLockOriginEnabled();
-      if (!isLockOrigin && baseRemote) {
-        setStoredValue(UI_BASE_REMOTE_STORAGE_KEY, baseRemote.value.trim());
-      }
-      if (!isLockOrigin && squashRemote) {
-        setStoredValue(UI_SQUASH_REMOTE_STORAGE_KEY, squashRemote.value.trim());
-      }
-    }
-
-    function setupUiPreferencePersistence() {
-      const ids = ["shellEnvPowerShell", "lockOrigin", "squashBaseScope", "baseRemote", "squashRemote", "useCurrentBranch"];
-      const persist = () => saveUiPreferences();
-      ids.forEach((id) => {
-        const element = document.getElementById(id);
-        if (!element) return;
-        element.addEventListener("input", persist);
-        element.addEventListener("change", persist);
-      });
-    }
-
-    function clearUiPreferences() {
-      const confirmed = confirm("ローカルに保存されているこのツールの設定をクリアします。よろしいですか？");
-      if (!confirmed) return;
-
-      try {
-        localStorage.removeItem(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY);
-        localStorage.removeItem(UI_LOCK_ORIGIN_STORAGE_KEY);
-        localStorage.removeItem(UI_SQUASH_BASE_SCOPE_STORAGE_KEY);
-        localStorage.removeItem(UI_BASE_REMOTE_STORAGE_KEY);
-        localStorage.removeItem(UI_SQUASH_REMOTE_STORAGE_KEY);
-        localStorage.removeItem(UI_USE_CURRENT_BRANCH_STORAGE_KEY);
-        localStorage.removeItem(BASE_BRANCH_HISTORY_STORAGE_KEY);
-        localStorage.setItem(BASE_BRANCH_STORAGE_KEY, "devel");
-      } catch (_) {
-        showToast("設定のクリアに失敗しました");
+    function deleteEntry(entryId) {
+      const target = entries.find((entry) => entry.id === entryId);
+      if (!target) return;
+      if (!window.confirm(`"${buildDisplayName(target)}" を削除しますか？`)) {
         return;
       }
-
-      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
-      const lockOrigin = document.getElementById("lockOrigin");
-      const squashBaseScope = document.getElementById("squashBaseScope");
-      const baseRemote = document.getElementById("baseRemote");
-      const squashRemote = document.getElementById("squashRemote");
-      const useCurrentBranch = document.getElementById("useCurrentBranch");
-      const squashBaseBranch = document.getElementById("squashBaseBranch");
-      const workBranch = document.getElementById("workBranch");
-      const commitMessage = document.getElementById("commitMessage");
-
-      if (shellEnvPowerShell) setSwitchSelected("shellEnvPowerShell", false);
-      if (lockOrigin) setSwitchSelected("lockOrigin", true);
-      if (squashBaseScope) squashBaseScope.value = "remote";
-      if (baseRemote) baseRemote.value = "origin";
-      if (squashRemote) squashRemote.value = "origin";
-      if (useCurrentBranch) setUseCurrentBranchSelected(true);
-      if (squashBaseBranch) squashBaseBranch.value = "devel";
-      if (workBranch) workBranch.value = "";
-      if (commitMessage) commitMessage.value = "";
-      setDefaultWorkBranch();
-      renderBaseBranchSuggestions();
-
-      updateBaseScope();
-      toggleCurrentBranch();
-      regenerateAllCommands();
-      showToast("設定をクリアしました");
+      entries = entries.filter((entry) => entry.id !== entryId);
+      saveEntries();
+      renderEntries();
+      if (editingId === entryId) {
+        resetForm();
+      }
+      showToast("一覧から削除しました");
     }
 
-    function uniqueBranchNames(values) {
-      const seen = new Set();
-      const uniqueValues = [];
-      values.forEach((value) => {
-        if (!value || seen.has(value)) return;
-        seen.add(value);
-        uniqueValues.push(value);
-      });
-      return uniqueValues;
-    }
+    async function handleListClick(event) {
+      const button = event.target.closest("[data-action]");
+      if (!button) return;
+      const card = button.closest("[data-entry-id]");
+      if (!card) return;
+      const entryId = card.getAttribute("data-entry-id");
+      const entry = entries.find((item) => item.id === entryId);
+      if (!entry) return;
 
-    function getStoredBaseBranchHistory() {
-      try {
-        const raw = localStorage.getItem(BASE_BRANCH_HISTORY_STORAGE_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return [];
-        const normalized = parsed
-          .map((value) => (typeof value === "string" ? value.trim() : ""))
-          .filter((value) => value.length > 0);
-        return uniqueBranchNames(normalized).slice(0, BASE_BRANCH_HISTORY_MAX);
-      } catch (_) {
-        return [];
-      }
-    }
-
-    function saveBaseBranchHistory(values) {
-      try {
-        localStorage.setItem(BASE_BRANCH_HISTORY_STORAGE_KEY, JSON.stringify(values));
-      } catch (_) {
-        // localStorage が使えない環境では保存機能を無効化
-      }
-    }
-
-    function renderBaseBranchSuggestions(options = {}) {
-      const keepActive = options.keepActive === true;
-      const menu = document.getElementById("baseBranchMenu");
-      if (!menu) return;
-      const history = getStoredBaseBranchHistory();
-      const merged = uniqueBranchNames([...history, ...baseBranchDefaultSuggestions]).slice(0, BASE_BRANCH_HISTORY_MAX);
-      const input = document.getElementById("squashBaseBranch");
-      const query = (input?.value || "").trim().toLowerCase();
-      const startsWith = [];
-      const contains = [];
-      merged.forEach((branch) => {
-        const lower = branch.toLowerCase();
-        if (!query || lower.startsWith(query)) {
-          startsWith.push(branch);
-        } else if (lower.includes(query)) {
-          contains.push(branch);
-        }
-      });
-      const suggestions = [...startsWith, ...contains];
-      baseBranchCurrentSuggestions = suggestions;
-      if (keepActive && baseBranchActiveValue) {
-        baseBranchActiveIndex = suggestions.indexOf(baseBranchActiveValue);
-      } else {
-        baseBranchActiveIndex = -1;
-      }
-      if (baseBranchActiveIndex < 0) {
-        baseBranchActiveValue = "";
-      }
-
-      menu.textContent = "";
-      suggestions.forEach((branch, index) => {
-        const item = document.createElement("md-menu-item");
-        item.textContent = branch;
-        item.dataset.value = branch;
-        item.selected = index === baseBranchActiveIndex;
-        item.dataset.active = index === baseBranchActiveIndex ? "true" : "false";
-        menu.appendChild(item);
-      });
-
-      if (suggestions.length === 0) {
-        menu.close();
-      }
-    }
-
-    function setBaseBranchActiveSuggestion(nextIndex) {
-      const menu = document.getElementById("baseBranchMenu");
-      if (!menu) return;
-      if (!Array.isArray(baseBranchCurrentSuggestions) || baseBranchCurrentSuggestions.length === 0) {
-        baseBranchActiveIndex = -1;
-        baseBranchActiveValue = "";
+      const action = button.getAttribute("data-action");
+      if (action === "open-branch-diff") {
+        openBranchDiff(entry);
         return;
       }
-      const max = baseBranchCurrentSuggestions.length - 1;
-      const clamped = Math.max(0, Math.min(nextIndex, max));
-      baseBranchActiveIndex = clamped;
-      baseBranchActiveValue = baseBranchCurrentSuggestions[clamped] || "";
-      const items = Array.from(menu.querySelectorAll("md-menu-item"));
-      items.forEach((item, index) => {
-        item.selected = index === clamped;
-        item.dataset.active = index === clamped ? "true" : "false";
-      });
-      const activeItem = items[clamped];
-      if (activeItem && typeof activeItem.focus === "function") {
-        activeItem.focus();
-      }
-      ensureBaseBranchActiveVisible(menu, activeItem);
-    }
-
-    function ensureBaseBranchActiveVisible(menu, activeItem) {
-      if (!menu || !activeItem) return;
-      const scrollContainer = menu.shadowRoot?.querySelector?.(".items");
-      if (!scrollContainer) {
-        if (typeof activeItem.scrollIntoView === "function") {
-          activeItem.scrollIntoView({ block: "nearest" });
-        }
+      if (action === "open-pseudo-squash") {
+        openPseudoSquash(entry);
         return;
       }
-      const activeIndex = baseBranchActiveIndex;
-      if (activeIndex < 0) return;
-      const itemHeight = Math.max(1, Math.round(activeItem.getBoundingClientRect().height || 44));
-      const itemTop = activeIndex * itemHeight;
-      const itemBottom = itemTop + itemHeight;
-      const visibleTop = scrollContainer.scrollTop;
-      const visibleBottom = visibleTop + scrollContainer.clientHeight;
-
-      if (itemTop < visibleTop) {
-        scrollContainer.scrollTop = itemTop;
-      } else if (itemBottom > visibleBottom) {
-        scrollContainer.scrollTop = itemBottom - scrollContainer.clientHeight;
+      if (action === "edit-entry") {
+        openEditDialog(entry);
+        return;
+      }
+      if (action === "delete-entry") {
+        deleteEntry(entryId);
+        return;
       }
     }
 
-    function setupBaseBranchSuggestions() {
-      baseBranchDefaultSuggestions = uniqueBranchNames(BASE_BRANCH_DEFAULT_SUGGESTIONS);
-      renderBaseBranchSuggestions();
-    }
-
-    function setupBaseBranchCombobox() {
-      const input = document.getElementById("squashBaseBranch");
-      const menu = document.getElementById("baseBranchMenu");
-      if (!input || !menu) return;
-      menu.anchorElement = input;
-      menu.defaultFocus = "none";
-      let closeTimer = null;
-
-      const applySelection = (value) => {
-        const selected = (value || "").trim();
-        if (!selected) return;
-        input.value = selected;
-        rememberBaseBranch(selected);
-        regenerateAllCommands();
-        baseBranchActiveIndex = -1;
-        baseBranchActiveValue = "";
-        suppressBaseBranchFocusOpen = true;
-        closeMenu();
-        input.focus({ preventScroll: true });
-      };
-
-      const openMenu = (options = {}) => {
-        renderBaseBranchSuggestions(options);
-        if (menu.children.length > 0) {
-          menu.show();
-        }
-      };
-
-      const closeMenu = () => {
-        menu.close();
-      };
-
-      input.addEventListener("focus", () => {
-        if (suppressBaseBranchFocusOpen) {
-          suppressBaseBranchFocusOpen = false;
-          return;
-        }
-        if (closeTimer) {
-          clearTimeout(closeTimer);
-          closeTimer = null;
-        }
-        closeMenu();
-      });
-
-      input.addEventListener("input", () => {
-        renderBaseBranchSuggestions();
-        if (baseBranchCurrentSuggestions.length > 0) {
-          menu.show();
-        } else {
-          closeMenu();
-        }
-      });
-
-      input.addEventListener("keydown", (event) => {
-        if (event.key === "ArrowDown") {
-          event.preventDefault();
-          openMenu({ keepActive: true });
-          if (baseBranchCurrentSuggestions.length === 0) return;
-          const nextIndex = baseBranchActiveIndex < 0
-            ? 0
-            : (baseBranchActiveIndex + 1) % baseBranchCurrentSuggestions.length;
-          setBaseBranchActiveSuggestion(nextIndex);
-        } else if (event.key === "ArrowUp") {
-          event.preventDefault();
-          openMenu({ keepActive: true });
-          if (baseBranchCurrentSuggestions.length === 0) return;
-          const nextIndex = baseBranchActiveIndex < 0
-            ? baseBranchCurrentSuggestions.length - 1
-            : (baseBranchActiveIndex - 1 + baseBranchCurrentSuggestions.length) % baseBranchCurrentSuggestions.length;
-          setBaseBranchActiveSuggestion(nextIndex);
-        } else if (event.key === "Enter") {
-          if (menu.open && baseBranchActiveIndex >= 0) {
-            event.preventDefault();
-            applySelection(baseBranchCurrentSuggestions[baseBranchActiveIndex]);
-          }
-        } else if (event.key === "Tab") {
-          baseBranchActiveIndex = -1;
-          baseBranchActiveValue = "";
-          closeMenu();
-        } else if (event.key === "Escape") {
-          baseBranchActiveIndex = -1;
-          baseBranchActiveValue = "";
-          closeMenu();
-        }
-      });
-
-      input.addEventListener("blur", () => {
-        closeTimer = setTimeout(() => {
-          closeMenu();
-          closeTimer = null;
-        }, 140);
-      });
-
-      document.addEventListener("pointerdown", (event) => {
-        const path = event.composedPath();
-        const insideInput = path.includes(input);
-        const insideMenu = path.includes(menu);
-        if (!insideInput && !insideMenu) {
-          closeMenu();
-        }
-      });
-
-      menu.addEventListener("focusin", () => {
-        if (!closeTimer) return;
-        clearTimeout(closeTimer);
-        closeTimer = null;
-      });
-
-      menu.addEventListener("close-menu", (event) => {
-        const initiator = event.detail && event.detail.initiator ? event.detail.initiator : null;
-        if (!initiator) return;
-        const value = (
-          initiator.dataset?.value ||
-          initiator.getAttribute?.("headline") ||
-          initiator.textContent ||
-          ""
-        ).trim();
-        applySelection(value);
-      });
-
-      menu.addEventListener("keydown", (event) => {
-        if (event.key === "ArrowDown") {
-          event.preventDefault();
-          if (baseBranchCurrentSuggestions.length === 0) return;
-          const nextIndex = baseBranchActiveIndex < 0
-            ? 0
-            : (baseBranchActiveIndex + 1) % baseBranchCurrentSuggestions.length;
-          setBaseBranchActiveSuggestion(nextIndex);
-        } else if (event.key === "ArrowUp") {
-          event.preventDefault();
-          if (baseBranchCurrentSuggestions.length === 0) return;
-          const nextIndex = baseBranchActiveIndex < 0
-            ? baseBranchCurrentSuggestions.length - 1
-            : (baseBranchActiveIndex - 1 + baseBranchCurrentSuggestions.length) % baseBranchCurrentSuggestions.length;
-          setBaseBranchActiveSuggestion(nextIndex);
-        } else if (event.key === "Enter") {
-          if (baseBranchActiveIndex >= 0) {
-            event.preventDefault();
-            applySelection(baseBranchCurrentSuggestions[baseBranchActiveIndex]);
-          }
-        } else if (event.key === "Tab" || event.key === "Escape") {
-          baseBranchActiveIndex = -1;
-          baseBranchActiveValue = "";
-          closeMenu();
-        }
-      });
-    }
-
-    function rememberBaseBranch(value) {
-      const branch = value.trim();
-      if (!branch) return;
-      try {
-        localStorage.setItem(BASE_BRANCH_STORAGE_KEY, branch);
-      } catch (_) {
-        // localStorage が使えない環境では保存機能を無効化
+    function setupEvents() {
+      const openCreateButton = document.getElementById("openCreateDialogBtn");
+      if (openCreateButton) {
+        openCreateButton.addEventListener("click", openCreateDialog);
       }
-      const history = getStoredBaseBranchHistory();
-      const next = [branch, ...history.filter((entry) => entry !== branch)].slice(0, BASE_BRANCH_HISTORY_MAX);
-      saveBaseBranchHistory(next);
-      renderBaseBranchSuggestions();
-    }
-
-    function loadPersistedBaseBranch() {
-      const input = document.getElementById("squashBaseBranch");
-      if (!input) return;
-      try {
-        const stored = localStorage.getItem(BASE_BRANCH_STORAGE_KEY);
-        const history = getStoredBaseBranchHistory();
-        const restored = stored && stored.trim() ? stored.trim() : (history[0] || "");
-        if (restored) {
-          input.value = restored;
-          if (!history.includes(restored)) {
-            saveBaseBranchHistory([restored, ...history].slice(0, BASE_BRANCH_HISTORY_MAX));
-          }
-        }
-      } catch (_) {
-        // localStorage が使えない環境では保存機能を無効化
+      const saveButton = document.getElementById("saveEntryBtn");
+      if (saveButton) {
+        saveButton.addEventListener("click", saveCurrentEntry);
       }
-      renderBaseBranchSuggestions();
-    }
-
-    function setupBaseBranchPersistence() {
-      const input = document.getElementById("squashBaseBranch");
-      if (!input) return;
-      const persist = () => {
-        rememberBaseBranch(input.value);
-      };
-      input.addEventListener("change", persist);
-    }
-
-    function clearBaseBranchHistory() {
-      const menu = document.getElementById("baseBranchMenu");
-      try {
-        localStorage.removeItem(BASE_BRANCH_HISTORY_STORAGE_KEY);
-        localStorage.removeItem(BASE_BRANCH_STORAGE_KEY);
-        renderBaseBranchSuggestions();
-        if (menu) menu.close();
-        showToast("基点ブランチ履歴をクリアしました");
-      } catch (_) {
-        showToast("履歴のクリアに失敗しました");
+      const closeButton = document.getElementById("closeDialogBtn");
+      if (closeButton) {
+        closeButton.addEventListener("click", closeEntryDialog);
+      }
+      const entriesList = document.getElementById("entriesList");
+      if (entriesList) {
+        entriesList.addEventListener("click", (event) => {
+          handleListClick(event);
+        });
+      }
+      const dialog = getDialog();
+      if (dialog && !dialog.dataset.boundOutsideClose) {
+        dialog.addEventListener("click", (event) => {
+          if (event.target === dialog) {
+            closeEntryDialog();
+          }
+        });
+        dialog.dataset.boundOutsideClose = "true";
       }
     }
 
-    function setupFieldSupportingTextHints() {
-      const fieldIds = ["squashBaseBranch", "workBranch", "squashBaseScope", "baseRemote", "squashRemote", "commitMessage"];
-      fieldIds.forEach((id) => {
-        const field = document.getElementById(id);
-        if (!field) return;
-        const helpText = (field.getAttribute("data-help-text") || "").trim();
-        if (!helpText) return;
-        let blurHideTimer = null;
-
-        const show = () => {
-          if (blurHideTimer) {
-            clearTimeout(blurHideTimer);
-            blurHideTimer = null;
-          }
-          field.supportingText = helpText;
-        };
-        const hide = () => {
-          if (blurHideTimer) {
-            clearTimeout(blurHideTimer);
-          }
-          // blur の即時反映でクリックが取りこぼされるケースを避けるため、非表示は少し遅延させる。
-          blurHideTimer = setTimeout(() => {
-            field.supportingText = "";
-            blurHideTimer = null;
-          }, 120);
-        };
-
-        field.addEventListener("focus", show);
-        field.addEventListener("blur", hide);
-      });
+    function bootstrap() {
+      entries = loadEntries();
+      resetForm();
+      setupEvents();
+      renderEntries();
     }
 
-    applyQueryParams();
-    setupBaseBranchSuggestions();
-    setupBaseBranchCombobox();
-    loadPersistedBaseBranch();
-    loadPersistedUiPreferences();
-    updateBaseScope();
-    toggleCurrentBranch();
-    setDefaultWorkBranch();
-    setupBaseBranchPersistence();
-    setupUiPreferencePersistence();
-    setupCreateBranchAutoUpdate();
-    generateCreateBranchCommand({ silent: true });
-    setupRebaseAutoUpdate();
-    generateRebaseCommand({ silent: true });
-    generatePushCommand({ silent: true });
-    generatePlannedDiffCommand({ silent: true });
-    setupFieldSupportingTextHints();
-    setupWorkBranchListButton();
-    setupCodeSelectAll();
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", bootstrap);
+    } else {
+      bootstrap();
+    }
   </script>
 </body>
 </html>

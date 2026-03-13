@@ -16,6 +16,7 @@ const mainCode = readFileSync(
 
 function mountDom() {
   document.body.innerHTML = `
+    <input id="repoUrl" value="" />
     <input id="branchA" value="feature-a" />
     <input id="branchB" value="feature-b" />
     <input id="scopeA" type="checkbox" checked />
@@ -33,19 +34,47 @@ function mountDom() {
     <div id="statWidthBlock" class="md-hidden"></div>
     <div id="diffCmd"></div>
     <div id="toast"></div>
+    <button id="saveToWorkBranchListBtn" type="button">save</button>
   `;
 
   const toast = document.getElementById("toast");
   toast.show = vi.fn();
 }
 
+function installLocalStorageMock() {
+  const store = new Map();
+  const localStorageMock = {
+    getItem: vi.fn((key) => (store.has(key) ? store.get(key) : null)),
+    setItem: vi.fn((key, value) => {
+      store.set(String(key), String(value));
+    }),
+    removeItem: vi.fn((key) => {
+      store.delete(String(key));
+    }),
+    clear: vi.fn(() => {
+      store.clear();
+    })
+  };
+  Object.defineProperty(window, "localStorage", {
+    value: localStorageMock,
+    configurable: true
+  });
+  Object.defineProperty(globalThis, "localStorage", {
+    value: localStorageMock,
+    configurable: true
+  });
+}
+
 function bootPage() {
   mountDom();
+  window.history.replaceState({}, "", "/docs/git/git-branch-diff.html");
   const instrumentedCode = `${mainCode}
 window.__gitBranchDiffTest = {
   generateCommands,
   updateRemoteState,
-  updateStatWidthState
+  updateStatWidthState,
+  applyQueryParams,
+  saveToWorkBranchListAndOpen
 };`;
   new Function(instrumentedCode)();
   document.dispatchEvent(new Event("DOMContentLoaded"));
@@ -53,9 +82,13 @@ window.__gitBranchDiffTest = {
 
 describe("git-branch-diff main", () => {
   beforeEach(() => {
+    installLocalStorageMock();
+    localStorage.clear();
     document.body.innerHTML = "";
     window.__gitBranchDiffTest = undefined;
     window.alert = vi.fn();
+    window.__LHT_NAVIGATE__ = vi.fn();
+    window.history.replaceState({}, "", "/docs/git/git-branch-diff.html");
   });
 
   it("generates fetch and remote diff commands by default", () => {
@@ -95,5 +128,123 @@ describe("git-branch-diff main", () => {
     expect(document.getElementById("diffCmd").textContent).toBe(
       "git fetch upstream\ngit diff upstream/feature-a..upstream/feature-b"
     );
+  });
+
+  it("applies supported URL params and regenerates commands", () => {
+    mountDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-branch-diff.html?baseBranch=devel&baseScope=remote&branchWork=feature%2Flogin&scopeWork=local&remoteName=upstream"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitBranchDiffTest = {
+  generateCommands,
+  updateRemoteState,
+  updateStatWidthState,
+  applyQueryParams,
+  saveToWorkBranchListAndOpen
+};`;
+    new Function(instrumentedCode)();
+    document.dispatchEvent(new Event("DOMContentLoaded"));
+
+    expect(document.getElementById("branchA").value).toBe("devel");
+    expect(document.getElementById("branchB").value).toBe("feature/login");
+    expect(document.getElementById("repoUrl").value).toBe("");
+    expect(document.getElementById("scopeA").checked).toBe(true);
+    expect(document.getElementById("scopeB").checked).toBe(false);
+    expect(document.getElementById("lockOrigin").checked).toBe(false);
+    expect(document.getElementById("remoteName").value).toBe("upstream");
+    expect(document.getElementById("diffCmd").textContent).toBe(
+      "git fetch upstream\ngit diff upstream/devel..feature/login"
+    );
+  });
+
+  it("adds current form state to git-work-branch-list and navigates back", () => {
+    mountDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-branch-diff.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitBranchDiffTest = {
+  generateCommands,
+  updateRemoteState,
+  updateStatWidthState,
+  applyQueryParams,
+  saveToWorkBranchListAndOpen
+};`;
+    new Function(instrumentedCode)();
+    document.dispatchEvent(new Event("DOMContentLoaded"));
+
+    document.getElementById("repoUrl").value = "https://example.com/repo-a";
+    document.getElementById("branchA").value = "devel";
+    document.getElementById("branchB").value = "feature/login";
+    document.getElementById("scopeA").checked = true;
+    document.getElementById("scopeB").checked = false;
+    document.getElementById("lockOrigin").checked = false;
+    document.getElementById("remoteName").value = "upstream";
+
+    window.__gitBranchDiffTest.saveToWorkBranchListAndOpen();
+
+    const savedEntries = JSON.parse(localStorage.setItem.mock.calls.at(-1)[1]);
+    expect(savedEntries).toHaveLength(1);
+    expect(savedEntries[0].repoUrl).toBe("https://example.com/repo-a");
+    expect(savedEntries[0].baseBranch).toBe("devel");
+    expect(savedEntries[0].compareBranch).toBe("feature/login");
+    expect(savedEntries[0].baseScope).toBe("remote");
+    expect(savedEntries[0].compareScope).toBe("local");
+    expect(savedEntries[0].remoteName).toBe("upstream");
+    expect(window.__LHT_NAVIGATE__).toHaveBeenCalledWith("git-work-branch-list.html");
+  });
+
+  it("updates an existing work-branch-list entry when repoUrl and branch names match", () => {
+    localStorage.setItem("gitWorkBranchList.entries", JSON.stringify([
+      {
+        id: "existing-id",
+        repoUrl: "https://example.com/repo-a",
+        baseBranch: "devel",
+        baseScope: "local",
+        compareBranch: "feature/login",
+        compareScope: "remote",
+        remoteName: "origin",
+        updatedAt: 1
+      }
+    ]));
+
+    mountDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-branch-diff.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitBranchDiffTest = {
+  generateCommands,
+  updateRemoteState,
+  updateStatWidthState,
+  applyQueryParams,
+  saveToWorkBranchListAndOpen
+};`;
+    new Function(instrumentedCode)();
+    document.dispatchEvent(new Event("DOMContentLoaded"));
+
+    expect(document.getElementById("repoUrl").value).toBe("https://example.com/repo-a");
+    document.getElementById("branchA").value = "devel";
+    document.getElementById("branchB").value = "feature/login";
+    document.getElementById("scopeA").checked = true;
+    document.getElementById("scopeB").checked = false;
+    document.getElementById("lockOrigin").checked = false;
+    document.getElementById("remoteName").value = "upstream";
+
+    window.__gitBranchDiffTest.saveToWorkBranchListAndOpen();
+
+    const savedEntries = JSON.parse(localStorage.setItem.mock.calls.at(-1)[1]);
+    expect(savedEntries).toHaveLength(1);
+    expect(savedEntries[0].id).toBe("existing-id");
+    expect(savedEntries[0].baseScope).toBe("remote");
+    expect(savedEntries[0].compareScope).toBe("local");
+    expect(savedEntries[0].remoteName).toBe("upstream");
   });
 });
