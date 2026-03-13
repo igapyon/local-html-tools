@@ -104,6 +104,20 @@ limitations under the License.
 
     <lht-command-block command-id="diffCmd"></lht-command-block>
 
+    <div class="md-section md-actions-row">
+      <div class="md-actions-row__field">
+        <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" placeholder="例: https://github.com/igapyon/local-html-tools" help-text="Git 作業ブランチ一覧へ戻すときの保存先識別に使います。`git-work-branch-list` から遷移した場合は自動入力されます。"></lht-text-field-help>
+      </div>
+      <button id="saveToWorkBranchListBtn" type="button" class="md-button md-button--primary">
+        <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7h16"></path>
+          <path d="M4 12h16"></path>
+          <path d="M4 17h16"></path>
+        </svg>
+        <span>一覧</span>
+      </button>
+    </div>
+
     <lht-toast id="toast"></lht-toast>
   </div>
 

@@ -16,6 +16,7 @@ const mainCode = readFileSync(
 
 function mountGitPseudoSquashDom() {
   document.body.innerHTML = `
+    <input id="repoUrl" value="" data-help-text="help" />
     <input id="squashBaseBranch" value="devel" data-help-text="help" />
     <div id="baseBranchMenu"></div>
     <input id="workBranch" value="tiga0309iaq" data-help-text="help" />
@@ -35,6 +36,7 @@ function mountGitPseudoSquashDom() {
     <div id="rebaseCmd"></div>
     <div id="pushCmd"></div>
     <div id="plannedDiffCmd"></div>
+    <button id="saveToWorkBranchListBtn" type="button">save</button>
     <div id="toast"></div>
     <dialog id="normalizeDiffDialog"></dialog>
     <div id="normalizeDiffBefore"></div>
@@ -88,13 +90,16 @@ function installLocalStorageMock() {
 
 function bootGitPseudoSquashPage() {
   mountGitPseudoSquashDom();
+  window.history.replaceState({}, "", "/docs/git/git-pseudo-squash.html");
   const instrumentedCode = `${mainCode}
 window.__gitPseudoSquashTest = {
   normalizeCommitMessageForPr,
   regenerateAllCommands,
   getUseCurrentBranchSelected,
   toggleOriginLock,
-  clearUiPreferences
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams
 };`;
   new Function(instrumentedCode)();
 }
@@ -106,6 +111,9 @@ describe("git-pseudo-squash main", () => {
     document.body.innerHTML = "";
     window.__gitPseudoSquashTest = undefined;
     window.confirm = vi.fn(() => true);
+    window.alert = vi.fn();
+    window.__LHT_NAVIGATE__ = vi.fn();
+    window.history.replaceState({}, "", "/docs/git/git-pseudo-squash.html");
   });
 
   it("does not include git switch in rebase command when current branch mode is enabled", () => {
@@ -316,5 +324,66 @@ PR本文:
     expect(localStorage.removeItem).toHaveBeenCalledWith("gitPseudoSquash.ui.useCurrentBranch");
     expect(localStorage.removeItem).toHaveBeenCalledWith("gitPseudoSquash.squashBaseBranchHistory");
     expect(localStorage.setItem).toHaveBeenCalledWith("gitPseudoSquash.squashBaseBranch", "devel");
+  });
+
+  it("adds current pseudo-squash settings to git-work-branch-list and navigates back", () => {
+    bootGitPseudoSquashPage();
+
+    document.getElementById("repoUrl").value = "https://example.com/repo-a";
+    document.getElementById("squashBaseBranch").value = "devel";
+    document.getElementById("workBranch").value = "feature-a";
+    document.getElementById("squashBaseScope").value = "remote";
+    document.getElementById("lockOrigin").checked = false;
+    document.getElementById("baseRemote").value = "upstream";
+
+    window.__gitPseudoSquashTest.saveToWorkBranchListAndOpen();
+
+    const savedEntries = JSON.parse(localStorage.setItem.mock.calls.at(-1)[1]);
+    expect(savedEntries).toHaveLength(1);
+    expect(savedEntries[0].repoUrl).toBe("https://example.com/repo-a");
+    expect(savedEntries[0].baseBranch).toBe("devel");
+    expect(savedEntries[0].compareBranch).toBe("feature-a");
+    expect(savedEntries[0].baseScope).toBe("remote");
+    expect(savedEntries[0].compareScope).toBe("local");
+    expect(savedEntries[0].remoteName).toBe("upstream");
+    expect(window.__LHT_NAVIGATE__).toHaveBeenCalledWith("git-work-branch-list.html");
+  });
+
+  it("applies repo, branch, scope, and remote from URL params", () => {
+    mountGitPseudoSquashDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&baseScope=remote&branchWork=feature-a&remoteName=upstream"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitPseudoSquashTest = {
+  normalizeCommitMessageForPr,
+  regenerateAllCommands,
+  getUseCurrentBranchSelected,
+  toggleOriginLock,
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams
+};`;
+    new Function(instrumentedCode)();
+
+    expect(document.getElementById("repoUrl").value).toBe("https://example.com/repo-a");
+    expect(document.getElementById("squashBaseBranch").value).toBe("devel");
+    expect(document.getElementById("workBranch").value).toBe("feature-a");
+    expect(document.getElementById("squashBaseScope").value).toBe("remote");
+    expect(document.getElementById("lockOrigin").checked).toBe(false);
+    expect(document.getElementById("baseRemote").value).toBe("upstream");
+    expect(document.getElementById("squashRemote").value).toBe("upstream");
+  });
+
+  it("requires repoUrl only when saving to git-work-branch-list", () => {
+    bootGitPseudoSquashPage();
+
+    document.getElementById("repoUrl").value = "";
+    window.__gitPseudoSquashTest.saveToWorkBranchListAndOpen();
+
+    expect(window.alert).toHaveBeenCalledWith("リポジトリ URL を入力してください。");
+    expect(window.__LHT_NAVIGATE__).not.toHaveBeenCalled();
   });
 });

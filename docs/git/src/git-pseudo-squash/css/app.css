@@ -618,6 +618,20 @@
       display: flex; gap: 15px; height: clamp(120px, 20vh, 220px); margin-bottom: 10px;
     }
 
+    .md-bottom-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .md-bottom-actions__field {
+      flex: 1 1 420px;
+      min-width: min(100%, 320px);
+    }
+
     .md-button--hero {
       font-size: clamp(1.2rem, 4vw, 1.6rem);
     }

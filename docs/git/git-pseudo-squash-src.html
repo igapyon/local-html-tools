@@ -293,6 +293,20 @@ limitations under the License.
     </div>
     <lht-command-block command-id="plannedDiffCmd"></lht-command-block>
 
+    <div class="md-bottom-actions">
+      <div class="md-bottom-actions__field">
+        <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" placeholder="例: https://github.com/igapyon/local-html-tools" help-text="Git 作業ブランチ一覧へ戻すときの保存先識別に使います。"></lht-text-field-help>
+      </div>
+      <button id="saveToWorkBranchListBtn" type="button" class="md-button md-button--primary md-button--with-icon">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 7h16"></path>
+          <path d="M4 12h16"></path>
+          <path d="M4 17h16"></path>
+        </svg>
+        <span>一覧</span>
+      </button>
+    </div>
+
     <lht-toast id="toast"></lht-toast>
 
     <dialog id="normalizeDiffDialog" class="md-diff-dialog">
