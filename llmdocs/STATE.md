@@ -25,14 +25,17 @@
 
 ## 最近の変更
 
-- `docs/git/git-work-branch-list.html` を追加し、複数リポジトリと複数ブランチの組み合わせを一覧管理できるようにした。
+- `docs/git/git-work-list.html` を追加し、複数リポジトリと複数ブランチの組み合わせを一覧管理できるようにした。
 - 一覧項目ごとにリポジトリ URL、基準ブランチ、作業ブランチ、local / remote の扱い、リモート名を `localStorage` に保存できる。
-- 一覧カードから `git-branch-diff.html` へ遷移する導線を追加し、送信側では `baseBranch` / `baseScope` / `branchWork` / `scopeWork` / `remoteName` を URL に積むようにした。
-- 一覧カードから `git-pseudo-squash.html` へ遷移する `まとめる` 導線を追加し、`repoUrl` / `baseBranch` / `baseScope` / `branchWork` / `remoteName` を URL に積んで初期反映するようにした。
+- 一覧カードから `git-branch-diff.html` へ遷移する導線を追加し、送信側では `baseBranch` / `baseScope` / `workBranch` / `workScope` / `remoteName` を URL に積むようにした。
+- 一覧カードから `git-pseudo-squash.html` へ遷移する `squash` 導線を追加し、`repoUrl` / `baseBranch` / `baseScope` / `workBranch` / `remoteName` を URL に積んで初期反映するようにした。
 - `git-branch-diff` 側は上記 5 パラメータを受け取り、妥当な値だけフォームへ反映したうえでコマンドを自動再生成する。`remoteName` が `origin` 以外なら `origin 固定` を自動解除する。
-- `git-branch-diff` に `repoUrl` 入力欄を追加し、`git-work-branch-list` へ戻る保存導線では `repoUrl` とブランチ名一致時は更新、なければ追加する。
+- `git-branch-diff` に `HEAD` スイッチを追加し、ON のときは作業側を `HEAD` 固定として比較ブランチ入力を隠すようにした。`git-work-list` には `HEAD` 文字列を保存せず、作業ブランチ名と `compareUseHead` フラグを分けて保持する。
+- `git-branch-diff` に `repoUrl` 入力欄を追加し、`git-work-list` へ戻る保存導線では `repoUrl` とブランチ名一致時は更新、なければ追加する。
+- `git-pseudo-squash` からは比較コマンドの表示を外し、フッターの `比較` ボタンから `git-branch-diff` へ移動する構成にした。`現在ブランチで作業` が ON のときも作業ブランチ名は保持したまま、`useHeadWork=1` で HEAD 比較状態を渡す。
+- `git-work-list` の表示は 1 エントリ 1 カードではなく、`repoUrl + 基準ブランチ表示` 単位の親カードにまとめ、その下へ作業ブランチごとの子行を並べる構成に整理した。データの一意性は従来どおり `repoUrl + baseBranch + compareBranch` を前提とする。
 - Git ツール README、ルート README、`docs/index` に新規ツールへの導線を追加した。
-- `git-work-branch-list` 用のテストを追加し、Git 関連テストとビルドが通ることを確認した。
+- `git-work-list` 用のテストを追加し、Git 関連テストとビルドが通ることを確認した。
 
 ## 調査結果
 

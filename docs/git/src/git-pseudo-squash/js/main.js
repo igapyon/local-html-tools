@@ -11,6 +11,27 @@
       return `'${escaped}'`;
     }
 
+    function normalizeRepoUrl(repoUrl) {
+      const trimmed = String(repoUrl || "").trim();
+      if (!trimmed) return "";
+      try {
+        const parsed = new URL(trimmed);
+        if (parsed.hostname === "github.com") {
+          const segments = parsed.pathname.split("/").filter(Boolean);
+          if (segments.length >= 4 && segments[2] === "pull") {
+            return `${parsed.origin}/${segments[0]}/${segments[1]}`;
+          }
+        }
+      } catch (_) {
+        // URL として解釈できないものはそのまま扱う
+      }
+      return trimmed.replace(/\/+$/, "");
+    }
+
+    function isOpenableExternalUrl(url) {
+      return /^https?:\/\//i.test(String(url || "").trim());
+    }
+
     function convertTimeToThreeChars(hours, minutes) {
       const s1 = String.fromCharCode(97 + hours);
       const s2 = String.fromCharCode(97 + Math.floor(minutes / 26));
@@ -75,6 +96,14 @@
       regenerateAllCommands();
     }
 
+    function updateRepoUrlLockState(locked) {
+      const repoUrlField = document.getElementById("repoUrl");
+      if (!repoUrlField) return;
+      repoUrlField.readOnly = !!locked;
+      repoUrlField.classList.toggle("md-disabled", !!locked);
+      repoUrlField.setAttribute("aria-readonly", locked ? "true" : "false");
+    }
+
     function updateBaseScope() {
       const scope = document.getElementById("squashBaseScope");
       const baseRemote = document.getElementById("baseRemote");
@@ -129,7 +158,6 @@
       generateCreateBranchCommand({ silent: true });
       generateRebaseCommand({ silent: true });
       generatePushCommand({ silent: true });
-      generatePlannedDiffCommand({ silent: true });
     }
 
     function setDefaultWorkBranch() {
@@ -255,44 +283,6 @@
       output.textContent = lines.join("\n");
     }
 
-    function generatePlannedDiffCommand(options = {}) {
-      const silent = options && options.silent === true;
-      const squashScope = document.getElementById("squashBaseScope")?.value || "remote";
-      const baseRemote = document.getElementById("baseRemote")?.value.trim() || "origin";
-      const squashBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
-      const workBranch = document.getElementById("workBranch").value.trim();
-      const useCurrent = getUseCurrentBranchSelected();
-      const shellEnv = isShellEnvPowerShell() ? "powershell" : "posix";
-
-      const output = document.getElementById("plannedDiffCmd");
-      if (!output) return;
-
-      if (!squashBranch) {
-        if (!silent) alert("基点ブランチを入力してください。");
-        output.textContent = "";
-        return;
-      }
-      const base = squashScope === "remote" ? `${baseRemote}/${squashBranch}` : squashBranch;
-      if (!useCurrent && !workBranch) {
-        if (!silent) alert("作業ブランチ名を入力してください。");
-        output.textContent = "";
-        return;
-      }
-      const target = useCurrent ? "HEAD" : workBranch;
-      const lines = [];
-      if (squashScope === "remote") {
-        lines.push(`git fetch ${quoteIfNeeded(baseRemote, shellEnv)}`);
-      }
-      lines.push(`git diff ${quoteIfNeeded(base, shellEnv)}..${quoteIfNeeded(target, shellEnv)}`);
-      if (shellEnv === "powershell") {
-        lines.push(`Write-Host ("## Base branch commit ID: " + (git rev-parse ${quoteIfNeeded(base, shellEnv)}))`);
-      } else {
-        lines.push(`echo "## Base branch commit ID: $(git rev-parse ${quoteIfNeeded(base, shellEnv)})"`);
-      }
-      lines.push(`git status -sb`);
-      output.textContent = lines.join("\n");
-    }
-
     function generateCreateBranchCommand(options = {}) {
       const silent = options && options.silent === true;
       const workBranch = document.getElementById("workBranch").value.trim();
@@ -359,6 +349,12 @@
       const button = document.getElementById("saveToWorkBranchListBtn");
       if (!button) return;
       button.addEventListener("click", saveToWorkBranchListAndOpen);
+    }
+
+    function setupBranchDiffButton() {
+      const button = document.getElementById("openBranchDiffBtn");
+      if (!button) return;
+      button.addEventListener("click", openBranchDiffFromPlannedDiff);
     }
 
     function copyToClipboard(id) {
@@ -703,7 +699,8 @@
     const UI_BASE_REMOTE_STORAGE_KEY = "gitPseudoSquash.ui.baseRemote";
     const UI_SQUASH_REMOTE_STORAGE_KEY = "gitPseudoSquash.ui.squashRemote";
     const UI_USE_CURRENT_BRANCH_STORAGE_KEY = "gitPseudoSquash.ui.useCurrentBranch";
-    const WORK_BRANCH_LIST_STORAGE_KEY = "gitWorkBranchList.entries";
+    const WORK_LIST_STORAGE_KEY = "gitWorkList.entries";
+    const RECENT_ACTIONS_KEY = "gitWorkList.recentActions";
     let baseBranchDefaultSuggestions = [];
     let baseBranchCurrentSuggestions = [];
     let baseBranchActiveIndex = -1;
@@ -746,9 +743,11 @@
       const params = readCurrentQueryParams();
       const repoUrl = String(params.get("repoUrl") || "").trim();
       const baseBranch = String(params.get("baseBranch") || "").trim();
-      const branchWork = String(params.get("branchWork") || "").trim();
+      const workBranch = String(params.get("workBranch") || "").trim();
       const baseScope = String(params.get("baseScope") || "").trim();
       const remoteName = String(params.get("remoteName") || "").trim();
+      const useHeadWork = String(params.get("useHeadWork") || "").trim();
+      const useCurrentBranch = String(params.get("useCurrentBranch") || "").trim();
       const repoUrlField = document.getElementById("repoUrl");
       const baseBranchField = document.getElementById("squashBaseBranch");
       const workBranchField = document.getElementById("workBranch");
@@ -758,12 +757,18 @@
       const lockOriginField = document.getElementById("lockOrigin");
       if (repoUrl && repoUrlField) {
         repoUrlField.value = repoUrl;
+        updateRepoUrlLockState(true);
+      } else {
+        updateRepoUrlLockState(false);
       }
       if (baseBranch && baseBranchField) {
         baseBranchField.value = baseBranch;
       }
-      if (branchWork && workBranchField) {
-        workBranchField.value = branchWork;
+      if (workBranch && workBranchField) {
+        workBranchField.value = workBranch;
+      }
+      if (useHeadWork === "1" || useHeadWork === "true" || useCurrentBranch === "1" || useCurrentBranch === "true") {
+        setUseCurrentBranchSelected(true);
       }
       if ((baseScope === "remote" || baseScope === "local") && baseScopeField) {
         baseScopeField.value = baseScope;
@@ -792,19 +797,67 @@
     function normalizeWorkBranchListEntry(raw) {
       return {
         id: raw?.id ? String(raw.id) : createWorkBranchListEntryId(),
-        repoUrl: String(raw?.repoUrl || "").trim(),
+        repoUrl: normalizeRepoUrl(raw?.repoUrl),
         baseBranch: String(raw?.baseBranch || "").trim(),
         baseScope: normalizeWorkBranchListScope(raw?.baseScope),
         compareBranch: String(raw?.compareBranch || "").trim(),
         compareScope: normalizeWorkBranchListScope(raw?.compareScope),
+        compareUseHead: raw?.compareUseHead === true,
+        locked: raw?.locked === true,
         remoteName: String(raw?.remoteName || "origin").trim() || "origin",
+        createdAt: Number(raw?.createdAt || raw?.updatedAt || Date.now()),
         updatedAt: Number(raw?.updatedAt || Date.now())
+      };
+    }
+
+    function createEmptyRecentActions() {
+      return {
+        "pseudo-squash": [],
+        "branch-diff": []
+      };
+    }
+
+    function normalizeRecentActions(rawRecentActions) {
+      const empty = createEmptyRecentActions();
+      const normalizeToolEntries = (value) => (
+        Array.isArray(value)
+          ? value.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 100)
+          : []
+      );
+      if (!rawRecentActions || typeof rawRecentActions !== "object" || Array.isArray(rawRecentActions)) {
+        return empty;
+      }
+      return {
+        "pseudo-squash": normalizeToolEntries(rawRecentActions["pseudo-squash"]),
+        "branch-diff": normalizeToolEntries(rawRecentActions["branch-diff"])
+      };
+    }
+
+    function loadRecentActions() {
+      try {
+        const raw = localStorage.getItem(RECENT_ACTIONS_KEY);
+        if (!raw) return createEmptyRecentActions();
+        return normalizeRecentActions(JSON.parse(raw));
+      } catch (_) {
+        return createEmptyRecentActions();
+      }
+    }
+
+    function saveRecentActions(actions) {
+      localStorage.setItem(RECENT_ACTIONS_KEY, JSON.stringify(actions));
+    }
+
+    function updateRecentActions(currentRecentActions, entryId, tool) {
+      const normalized = normalizeRecentActions(currentRecentActions);
+      return {
+        ...normalized,
+        [tool]: [entryId, ...normalized[tool].filter((item) => item !== entryId)].slice(0, 100)
       };
     }
 
     function loadWorkBranchListEntries() {
       try {
-        const raw = localStorage.getItem(WORK_BRANCH_LIST_STORAGE_KEY);
+        const raw = localStorage.getItem(WORK_LIST_STORAGE_KEY);
         if (!raw) return [];
         const parsed = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
@@ -816,7 +869,7 @@
 
     function saveWorkBranchListEntries(entries) {
       try {
-        localStorage.setItem(WORK_BRANCH_LIST_STORAGE_KEY, JSON.stringify(entries));
+      localStorage.setItem(WORK_LIST_STORAGE_KEY, JSON.stringify(entries));
       } catch (_) {
         // localStorage が使えない環境では保存機能を無効化
       }
@@ -836,7 +889,7 @@
 
     function saveToWorkBranchListAndOpen() {
       const repoUrlField = document.getElementById("repoUrl");
-      const repoUrl = repoUrlField ? String(repoUrlField.value || "").trim() : "";
+      const repoUrl = repoUrlField ? normalizeRepoUrl(repoUrlField.value) : "";
       if (!repoUrl) {
         alert("リポジトリ URL を入力してください。");
         if (repoUrlField && typeof repoUrlField.focus === "function") {
@@ -870,7 +923,10 @@
         baseScope,
         compareBranch,
         compareScope: "local",
+        compareUseHead: getUseCurrentBranchSelected(),
+        locked: existingIndex >= 0 ? entries[existingIndex].locked === true : false,
         remoteName,
+        createdAt: existingIndex >= 0 ? entries[existingIndex].createdAt : Date.now(),
         updatedAt: Date.now()
       });
 
@@ -880,8 +936,53 @@
         entries.push(nextEntry);
       }
       saveWorkBranchListEntries(entries);
-      showToast(existingIndex >= 0 ? "Git 作業ブランチ一覧を更新しました" : "Git 作業ブランチ一覧へ追加しました");
-      navigateTo("git-work-branch-list.html");
+      saveRecentActions(updateRecentActions(loadRecentActions(), nextEntry.id, "pseudo-squash"));
+      showToast(existingIndex >= 0 ? "Git 作業一覧を更新しました" : "Git 作業一覧へ追加しました");
+      navigateTo("git-work-list.html");
+    }
+
+    function openRepoUrl() {
+      const repoUrl = document.getElementById("repoUrl")?.value.trim() || "";
+      if (!isOpenableExternalUrl(repoUrl)) return;
+      window.open(repoUrl, "_blank", "noopener,noreferrer");
+    }
+
+    function buildBranchDiffUrlFromPlannedDiff() {
+      const repoUrl = document.getElementById("repoUrl")?.value.trim() || "";
+      const baseBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
+      const baseScope = document.getElementById("squashBaseScope")?.value === "local" ? "local" : "remote";
+      const workBranchInput = document.getElementById("workBranch")?.value.trim() || "";
+      const useCurrent = getUseCurrentBranchSelected();
+
+      if (!baseBranch) {
+        alert("基点ブランチを入力してください。");
+        return "";
+      }
+      if (!workBranchInput) {
+        alert("作業ブランチ名を入力してください。");
+        return "";
+      }
+
+      const baseRemote = document.getElementById("baseRemote")?.value.trim() || "origin";
+      const params = new URLSearchParams();
+      if (repoUrl) {
+        params.set("repoUrl", repoUrl);
+      }
+      params.set("baseBranch", baseBranch);
+      params.set("baseScope", baseScope);
+      params.set("workBranch", workBranchInput);
+      params.set("workScope", "local");
+      if (useCurrent) {
+        params.set("useHeadWork", "1");
+      }
+      params.set("remoteName", isLockOriginEnabled() ? "origin" : baseRemote);
+      return `git-branch-diff.html?${params.toString()}`;
+    }
+
+    function openBranchDiffFromPlannedDiff() {
+      const url = buildBranchDiffUrlFromPlannedDiff();
+      if (!url) return;
+      navigateTo(url);
     }
 
     function loadPersistedUiPreferences() {
@@ -1373,6 +1474,12 @@
       });
     }
 
+    function setupOpenRepoUrlButton() {
+      const button = document.getElementById("openRepoUrlBtn");
+      if (!button) return;
+      button.addEventListener("click", openRepoUrl);
+    }
+
     applyQueryParams();
     setupBaseBranchSuggestions();
     setupBaseBranchCombobox();
@@ -1388,7 +1495,8 @@
     setupRebaseAutoUpdate();
     generateRebaseCommand({ silent: true });
     generatePushCommand({ silent: true });
-    generatePlannedDiffCommand({ silent: true });
     setupFieldSupportingTextHints();
     setupWorkBranchListButton();
+    setupBranchDiffButton();
+    setupOpenRepoUrlButton();
     setupCodeSelectAll();

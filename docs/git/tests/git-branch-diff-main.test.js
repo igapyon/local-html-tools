@@ -18,9 +18,11 @@ function mountDom() {
   document.body.innerHTML = `
     <input id="repoUrl" value="" />
     <input id="branchA" value="feature-a" />
+    <div id="branchBRow"></div>
     <input id="branchB" value="feature-b" />
     <input id="scopeA" type="checkbox" checked />
     <input id="scopeB" type="checkbox" checked />
+    <input id="useHeadWork" type="checkbox" />
     <input id="lockOrigin" type="checkbox" checked />
     <div id="remoteNameBlock" class="md-hidden"></div>
     <input id="remoteName" value="origin" />
@@ -35,6 +37,8 @@ function mountDom() {
     <div id="diffCmd"></div>
     <div id="toast"></div>
     <button id="saveToWorkBranchListBtn" type="button">save</button>
+    <button id="openGitHubCompareBtn" type="button" disabled>github-compare</button>
+    <button id="openRepoUrlBtn" type="button">open</button>
   `;
 
   const toast = document.getElementById("toast");
@@ -65,6 +69,11 @@ function installLocalStorageMock() {
   });
 }
 
+function getSavedJsonByKey(key) {
+  const call = localStorage.setItem.mock.calls.findLast(([savedKey]) => savedKey === key);
+  return call ? JSON.parse(call[1]) : null;
+}
+
 function bootPage() {
   mountDom();
   window.history.replaceState({}, "", "/docs/git/git-branch-diff.html");
@@ -74,7 +83,10 @@ window.__gitBranchDiffTest = {
   updateRemoteState,
   updateStatWidthState,
   applyQueryParams,
-  saveToWorkBranchListAndOpen
+  saveToWorkBranchListAndOpen,
+  updateWorkHeadState,
+  buildGitHubCompareUrl,
+  updateGitHubCompareButtonState
 };`;
   new Function(instrumentedCode)();
   document.dispatchEvent(new Event("DOMContentLoaded"));
@@ -88,6 +100,7 @@ describe("git-branch-diff main", () => {
     window.__gitBranchDiffTest = undefined;
     window.alert = vi.fn();
     window.__LHT_NAVIGATE__ = vi.fn();
+    window.open = vi.fn();
     window.history.replaceState({}, "", "/docs/git/git-branch-diff.html");
   });
 
@@ -130,12 +143,25 @@ describe("git-branch-diff main", () => {
     );
   });
 
+  it("uses HEAD as work side when HEAD switch is enabled", () => {
+    bootPage();
+
+    document.getElementById("useHeadWork").checked = true;
+    window.__gitBranchDiffTest.updateWorkHeadState();
+    window.__gitBranchDiffTest.generateCommands({ silent: true });
+
+    expect(document.getElementById("branchBRow").classList.contains("md-hidden")).toBe(true);
+    expect(document.getElementById("diffCmd").textContent).toBe(
+      "git fetch origin\ngit diff origin/feature-a..HEAD"
+    );
+  });
+
   it("applies supported URL params and regenerates commands", () => {
     mountDom();
     window.history.replaceState(
       {},
       "",
-      "/docs/git/git-branch-diff.html?baseBranch=devel&baseScope=remote&branchWork=feature%2Flogin&scopeWork=local&remoteName=upstream"
+      "/docs/git/git-branch-diff.html?baseBranch=devel&baseScope=remote&workBranch=feature-work&workScope=local&remoteName=upstream&useHeadWork=1"
     );
     const instrumentedCode = `${mainCode}
 window.__gitBranchDiffTest = {
@@ -149,18 +175,21 @@ window.__gitBranchDiffTest = {
     document.dispatchEvent(new Event("DOMContentLoaded"));
 
     expect(document.getElementById("branchA").value).toBe("devel");
-    expect(document.getElementById("branchB").value).toBe("feature/login");
+    expect(document.getElementById("branchB").value).toBe("feature-work");
+    expect(document.getElementById("branchBRow").classList.contains("md-hidden")).toBe(true);
+    expect(document.getElementById("useHeadWork").checked).toBe(true);
     expect(document.getElementById("repoUrl").value).toBe("");
+    expect(document.getElementById("repoUrl").readOnly).toBe(false);
     expect(document.getElementById("scopeA").checked).toBe(true);
     expect(document.getElementById("scopeB").checked).toBe(false);
     expect(document.getElementById("lockOrigin").checked).toBe(false);
     expect(document.getElementById("remoteName").value).toBe("upstream");
     expect(document.getElementById("diffCmd").textContent).toBe(
-      "git fetch upstream\ngit diff upstream/devel..feature/login"
+      "git fetch upstream\ngit diff upstream/devel..HEAD"
     );
   });
 
-  it("adds current form state to git-work-branch-list and navigates back", () => {
+  it("adds current form state to git-work-list and navigates back", () => {
     mountDom();
     window.history.replaceState(
       {},
@@ -188,19 +217,144 @@ window.__gitBranchDiffTest = {
 
     window.__gitBranchDiffTest.saveToWorkBranchListAndOpen();
 
-    const savedEntries = JSON.parse(localStorage.setItem.mock.calls.at(-1)[1]);
+    const savedEntries = getSavedJsonByKey("gitWorkList.entries");
     expect(savedEntries).toHaveLength(1);
     expect(savedEntries[0].repoUrl).toBe("https://example.com/repo-a");
     expect(savedEntries[0].baseBranch).toBe("devel");
     expect(savedEntries[0].compareBranch).toBe("feature/login");
     expect(savedEntries[0].baseScope).toBe("remote");
     expect(savedEntries[0].compareScope).toBe("local");
+    expect(savedEntries[0].compareUseHead).toBe(false);
     expect(savedEntries[0].remoteName).toBe("upstream");
-    expect(window.__LHT_NAVIGATE__).toHaveBeenCalledWith("git-work-branch-list.html");
+    expect(getSavedJsonByKey("gitWorkList.recentActions")).toEqual({
+      "branch-diff": [savedEntries[0].id],
+      "pseudo-squash": []
+    });
+    expect(window.__LHT_NAVIGATE__).toHaveBeenCalledWith("git-work-list.html");
+  });
+
+  it("locks repoUrl when it is supplied by URL params", () => {
+    mountDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-branch-diff.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitBranchDiffTest = {
+  generateCommands,
+  updateRemoteState,
+  updateStatWidthState,
+  applyQueryParams,
+  saveToWorkBranchListAndOpen
+};`;
+    new Function(instrumentedCode)();
+    document.dispatchEvent(new Event("DOMContentLoaded"));
+
+    expect(document.getElementById("repoUrl").value).toBe("https://example.com/repo-a");
+    expect(document.getElementById("repoUrl").readOnly).toBe(true);
+  });
+
+  it("opens repoUrl in a new tab from the URL action button", () => {
+    bootPage();
+
+    document.getElementById("repoUrl").value = "https://example.com/repo-a";
+    document.getElementById("openRepoUrlBtn").click();
+
+    expect(window.open).toHaveBeenCalledWith("https://example.com/repo-a", "_blank", "noopener,noreferrer");
+  });
+
+  it("saves HEAD comparison as a flag while keeping the work branch name", () => {
+    mountDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-branch-diff.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&workBranch=feature/login&useHeadWork=1"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitBranchDiffTest = {
+  generateCommands,
+  updateRemoteState,
+  updateStatWidthState,
+  applyQueryParams,
+  saveToWorkBranchListAndOpen
+};`;
+    new Function(instrumentedCode)();
+    document.dispatchEvent(new Event("DOMContentLoaded"));
+
+    document.getElementById("repoUrl").value = "https://example.com/repo-a";
+    document.getElementById("branchA").value = "devel";
+    document.getElementById("branchB").value = "feature/login";
+
+    window.__gitBranchDiffTest.saveToWorkBranchListAndOpen();
+
+    const savedEntries = getSavedJsonByKey("gitWorkList.entries");
+    expect(savedEntries[0].compareBranch).toBe("feature/login");
+    expect(savedEntries[0].compareUseHead).toBe(true);
+  });
+
+  it("enables GitHub compare for GitHub-compatible remote comparisons", () => {
+    bootPage();
+
+    document.getElementById("repoUrl").value = "https://ghe.example.com/team/repo-a";
+    document.getElementById("branchA").value = "devel";
+    document.getElementById("branchB").value = "feature/login";
+    document.getElementById("scopeA").checked = true;
+    document.getElementById("scopeB").checked = true;
+    document.getElementById("lockOrigin").checked = true;
+
+    window.__gitBranchDiffTest.generateCommands({ silent: true });
+
+    expect(window.__gitBranchDiffTest.buildGitHubCompareUrl()).toBe(
+      "https://ghe.example.com/team/repo-a/compare/devel...feature%2Flogin"
+    );
+    expect(document.getElementById("openGitHubCompareBtn").disabled).toBe(false);
+
+    document.getElementById("openGitHubCompareBtn").click();
+    expect(window.open).toHaveBeenCalledWith(
+      "https://ghe.example.com/team/repo-a/compare/devel...feature%2Flogin",
+      "_blank",
+      "noopener,noreferrer"
+    );
+  });
+
+  it("normalizes GitHub-style pull URL and enables GitHub compare", () => {
+    bootPage();
+
+    document.getElementById("repoUrl").value = "https://ghe.example.com/team/repo-a/pull/191";
+    window.__gitBranchDiffTest.generateCommands({ silent: true });
+
+    expect(window.__gitBranchDiffTest.buildGitHubCompareUrl()).toBe(
+      "https://ghe.example.com/team/repo-a/compare/feature-a...feature-b"
+    );
+    expect(document.getElementById("openGitHubCompareBtn").disabled).toBe(false);
+  });
+
+  it("disables GitHub compare when comparison conditions are not compatible", () => {
+    bootPage();
+
+    document.getElementById("repoUrl").value = "https://ghe.example.com/team/repo-a";
+    document.getElementById("scopeB").checked = false;
+    window.__gitBranchDiffTest.generateCommands({ silent: true });
+    expect(document.getElementById("openGitHubCompareBtn").disabled).toBe(true);
+
+    document.getElementById("scopeB").checked = true;
+    document.getElementById("useHeadWork").checked = true;
+    window.__gitBranchDiffTest.updateWorkHeadState();
+    window.__gitBranchDiffTest.generateCommands({ silent: true });
+    expect(document.getElementById("openGitHubCompareBtn").disabled).toBe(true);
+
+    document.getElementById("useHeadWork").checked = false;
+    window.__gitBranchDiffTest.updateWorkHeadState();
+    document.getElementById("lockOrigin").checked = false;
+    document.getElementById("remoteName").value = "upstream";
+    window.__gitBranchDiffTest.updateRemoteState();
+    window.__gitBranchDiffTest.generateCommands({ silent: true });
+    expect(document.getElementById("openGitHubCompareBtn").disabled).toBe(true);
   });
 
   it("updates an existing work-branch-list entry when repoUrl and branch names match", () => {
-    localStorage.setItem("gitWorkBranchList.entries", JSON.stringify([
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
       {
         id: "existing-id",
         repoUrl: "https://example.com/repo-a",
@@ -208,6 +362,7 @@ window.__gitBranchDiffTest = {
         baseScope: "local",
         compareBranch: "feature/login",
         compareScope: "remote",
+        locked: true,
         remoteName: "origin",
         updatedAt: 1
       }
@@ -240,11 +395,17 @@ window.__gitBranchDiffTest = {
 
     window.__gitBranchDiffTest.saveToWorkBranchListAndOpen();
 
-    const savedEntries = JSON.parse(localStorage.setItem.mock.calls.at(-1)[1]);
+    const savedEntries = getSavedJsonByKey("gitWorkList.entries");
     expect(savedEntries).toHaveLength(1);
     expect(savedEntries[0].id).toBe("existing-id");
     expect(savedEntries[0].baseScope).toBe("remote");
     expect(savedEntries[0].compareScope).toBe("local");
+    expect(savedEntries[0].locked).toBe(true);
+    expect(savedEntries[0].createdAt).toBe(1);
     expect(savedEntries[0].remoteName).toBe("upstream");
+    expect(getSavedJsonByKey("gitWorkList.recentActions")).toEqual({
+      "branch-diff": ["existing-id"],
+      "pseudo-squash": []
+    });
   });
 });

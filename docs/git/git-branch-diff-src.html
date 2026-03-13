@@ -60,7 +60,7 @@ limitations under the License.
         <lht-switch-help switch-id="scopeA" label="リモートとして扱う" on-change="updateRemoteState"></lht-switch-help>
       </div>
 
-      <div class="md-form-row md-form-row--nowrap">
+      <div id="branchBRow" class="md-form-row md-form-row--nowrap">
         <lht-text-field-help field-id="branchB" label="比較ブランチ" required placeholder="例: devel" help-text="比較対象のブランチです。2つのブランチ差分を表示します。例: devel / feature123。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-text-field-help>
         <lht-switch-help switch-id="scopeB" label="リモートとして扱う" on-change="updateRemoteState"></lht-switch-help>
       </div>
@@ -68,6 +68,9 @@ limitations under the License.
 
     <div class="md-section md-stack-md">
       <div class="md-choice-inline md-choice-text">
+        <lht-switch-help switch-id="useHeadWork" label="HEAD" on-change="updateWorkHeadState">
+          作業側の比較対象に `HEAD` を使います。
+        </lht-switch-help>
         <lht-switch-help switch-id="lockOrigin" label="リモート名は origin 固定" help-label="リモート名は origin 固定の説明" checked on-change="updateRemoteState">
           origin 固定で使う場合にオンにします。オフにすると任意のリモート名を入力できます。
           ふだんは origin を使うケースが多いです。
@@ -105,9 +108,6 @@ limitations under the License.
     <lht-command-block command-id="diffCmd"></lht-command-block>
 
     <div class="md-section md-actions-row">
-      <div class="md-actions-row__field">
-        <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" placeholder="例: https://github.com/igapyon/local-html-tools" help-text="Git 作業ブランチ一覧へ戻すときの保存先識別に使います。`git-work-branch-list` から遷移した場合は自動入力されます。"></lht-text-field-help>
-      </div>
       <button id="saveToWorkBranchListBtn" type="button" class="md-button md-button--primary">
         <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 7h16"></path>
@@ -115,6 +115,25 @@ limitations under the License.
           <path d="M4 17h16"></path>
         </svg>
         <span>一覧</span>
+      </button>
+      <div class="md-actions-row__field">
+        <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" placeholder="例: https://github.com/igapyon/local-html-tools" help-text="Git 作業一覧へ戻すときの保存先識別に使います。`git-work-list` から遷移した場合は自動入力されます。"></lht-text-field-help>
+      </div>
+      <button id="openGitHubCompareBtn" type="button" class="md-button md-button--compact md-button--surface" title="GitHub 比較を開く" aria-label="GitHub 比較を開く" disabled>
+        <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 7h10"></path>
+          <path d="M7 12h5"></path>
+          <path d="M7 17h10"></path>
+          <path d="M17 4l3 3-3 3"></path>
+        </svg>
+        <span>GitHub比較</span>
+      </button>
+      <button id="openRepoUrlBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" title="URL を開く" aria-label="URL を開く">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 5h5v5"></path>
+          <path d="M10 14 19 5"></path>
+          <path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"></path>
+        </svg>
       </button>
     </div>
 

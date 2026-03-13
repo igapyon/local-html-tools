@@ -18,24 +18,23 @@ limitations under the License.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Git 作業ブランチ一覧</title>
+  <title>Git 作業一覧</title>
   <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
-  <link rel="stylesheet" href="src/git-work-branch-list/css/app.css" />
+  <link rel="stylesheet" href="src/git-work-list/css/app.css" />
   <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
   <script src="../../lht-cmn/js/components.js" defer></script>
 </head>
 <body class="md-page">
   <div class="md-surface-card md-card">
     <lht-page-hero
-      title="Git 作業ブランチ一覧"
-      subtitle="複数リポジトリと複数ブランチの作業状況を一覧管理します。"
+      title="Git 作業一覧"
       icon="🗂️"
-      help-label="Git 作業ブランチ一覧の説明"
+      help-label="Git 作業一覧の説明"
       help-wide
       menu-home-href="../index.html"
       menu-home-label="トップへ戻る">
-      リポジトリURL、基準ブランチ、作業ブランチ、ローカル/リモートの扱いをまとめて保存し、一覧で管理します。<br><br>
-      複数リポジトリ・複数ブランチを並行で扱うときの「今どの組み合わせを見ていたか」を忘れにくくするためのローカル専用メモ兼一覧ツールです。
+      リポジトリ URL、基準ブランチ、作業ブランチ、ローカル/リモートの扱いをまとめて保存し、一覧で管理します。<br><br>
+      複数リポジトリ・複数作業を並行で扱うときの「今どの組み合わせを見ていたか」を忘れにくくするためのローカル専用メモ兼一覧ツールです。
     </lht-page-hero>
 
     <section class="md-section md-stack-md">
@@ -82,8 +81,8 @@ limitations under the License.
             <lht-text-field-help field-id="compareBranch" label="作業ブランチ" required placeholder="例: feature" help-text="いま確認したい作業対象ブランチです。"></lht-text-field-help>
             <lht-select-help field-id="compareScope" label="作業の扱い" help-text="作業ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
               <script type="application/json" slot="options">[
-                { "value": "remote", "label": "リモート", "selected": true },
-                { "value": "local", "label": "ローカル" }
+                { "value": "remote", "label": "リモート" },
+                { "value": "local", "label": "ローカル", "selected": true }
               ]</script>
             </lht-select-help>
           </div>
@@ -108,6 +107,6 @@ limitations under the License.
     <lht-toast id="toast"></lht-toast>
   </div>
 
-  <script src="src/git-work-branch-list/js/main.js"></script>
+  <script src="src/git-work-list/js/main.js"></script>
 </body>
 </html>

@@ -18,7 +18,7 @@ limitations under the License.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Git 作業ブランチ一覧</title>
+  <title>Git 作業一覧</title>
   
   
   
@@ -1099,10 +1099,13 @@ lht-index-card-link {
   justify-content: center;
   gap: 0.45rem;
   border-radius: 999px;
-  padding: 0.52rem 1.02rem;
+  padding: 0.38rem 1.02rem;
+  min-height: 2.55rem;
   font-weight: 600;
   font-size: 0.9rem;
+  line-height: 1;
   border: none;
+  box-sizing: border-box;
   background: transparent;
   cursor: pointer;
   transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
@@ -1179,16 +1182,73 @@ lht-index-card-link {
   gap: 0.35rem;
 }
 
+.md-entry-base-box {
+  flex: 0 0 auto;
+  min-width: 250px;
+  max-width: 100%;
+}
+
 .md-entry-title {
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   font-size: 1.02rem;
   line-height: 1.35;
+}
+
+.md-entry-lock-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  color: #6d28d9;
+}
+
+.md-entry-lock-icon .md-button__icon {
+  width: 1rem;
+  height: 1rem;
 }
 
 .md-entry-url {
   color: var(--git-board-text-subtle);
   font-size: 0.875rem;
   word-break: break-all;
+}
+
+.md-entry-url-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.md-entry-url-row .md-entry-url {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.md-entry-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  border: 1px solid #d6deea;
+  background: #f8fafc;
+  color: #64748b;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.md-entry-link-btn:hover {
+  background: #eef2f7;
+}
+
+.md-entry-link-btn .md-button__icon {
+  width: 0.92rem;
+  height: 0.92rem;
 }
 
 .md-entry-actions {
@@ -1199,9 +1259,19 @@ lht-index-card-link {
 }
 
 .md-entry-meta {
-  margin-top: 0.8rem;
+  margin-top: 0.55rem;
   display: grid;
   gap: 0.75rem;
+}
+
+.md-entry-group .md-entry-meta {
+  margin-top: 0.45rem;
+}
+
+.md-entry-divider {
+  height: 1px;
+  background: #e5e7ef;
+  margin: 0.05rem 0 0.15rem;
 }
 
 .md-ref-grid {
@@ -1210,15 +1280,23 @@ lht-index-card-link {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.md-ref-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .md-ref-box {
   border-radius: 14px;
   background: #f5f7fb;
   border: 1px solid #e4e8f1;
-  padding: 0.8rem;
+  padding: 0.62rem 0.8rem;
   display: flex;
   align-items: center;
   gap: 0.9rem;
   flex-wrap: nowrap;
+}
+
+.md-ref-box--work {
+  min-height: 100%;
 }
 
 .md-ref-label {
@@ -1255,11 +1333,32 @@ lht-index-card-link {
 }
 
 .md-ref-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1f2937;
+  font-size: 0.89rem;
+  font-weight: 500;
+  color: #475569;
   white-space: nowrap;
   margin-left: 1.25rem;
+}
+
+.md-work-row-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.md-work-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.15rem 0;
+}
+
+.md-work-row__main {
+  min-width: 0;
+}
+
+.md-work-row__actions {
+  justify-content: flex-end;
 }
 
 .md-empty-state {
@@ -1339,6 +1438,16 @@ lht-index-card-link {
   background: #fee2e2;
 }
 
+.md-button--lock-active {
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #c4b5fd;
+}
+
+.md-button--lock-active:hover {
+  background: #e9ddff;
+}
+
 .md-button--primary {
   background: var(--md-sys-color-primary, #6200ee);
   color: var(--md-sys-color-on-primary, #ffffff);
@@ -1347,6 +1456,20 @@ lht-index-card-link {
 
 .md-button--primary:hover {
   background: #4f00c9;
+}
+
+.md-button--secondary {
+  background: #e0f2fe;
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+
+.md-button--secondary:hover {
+  background: #d0ebfb;
+}
+
+.md-disabled {
+  background-color: #f3f0f7;
 }
 
 @media (max-width: 900px) {
@@ -1358,6 +1481,18 @@ lht-index-card-link {
   }
 
   .md-panel-actions {
+    justify-content: flex-start;
+  }
+
+  .md-entry-base-box {
+    min-width: 0;
+  }
+
+  .md-work-row {
+    grid-template-columns: 1fr;
+  }
+
+  .md-work-row__actions {
     justify-content: flex-start;
   }
 }
@@ -1382,15 +1517,14 @@ lht-index-card-link {
 <body class="md-page">
   <div class="md-surface-card md-card">
     <lht-page-hero
-      title="Git 作業ブランチ一覧"
-      subtitle="複数リポジトリと複数ブランチの作業状況を一覧管理します。"
+      title="Git 作業一覧"
       icon="🗂️"
-      help-label="Git 作業ブランチ一覧の説明"
+      help-label="Git 作業一覧の説明"
       help-wide
       menu-home-href="../index.html"
       menu-home-label="トップへ戻る">
-      リポジトリURL、基準ブランチ、作業ブランチ、ローカル/リモートの扱いをまとめて保存し、一覧で管理します。<br><br>
-      複数リポジトリ・複数ブランチを並行で扱うときの「今どの組み合わせを見ていたか」を忘れにくくするためのローカル専用メモ兼一覧ツールです。
+      リポジトリ URL、基準ブランチ、作業ブランチ、ローカル/リモートの扱いをまとめて保存し、一覧で管理します。<br><br>
+      複数リポジトリ・複数作業を並行で扱うときの「今どの組み合わせを見ていたか」を忘れにくくするためのローカル専用メモ兼一覧ツールです。
     </lht-page-hero>
 
     <section class="md-section md-stack-md">
@@ -1437,8 +1571,8 @@ lht-index-card-link {
             <lht-text-field-help field-id="compareBranch" label="作業ブランチ" required placeholder="例: feature" help-text="いま確認したい作業対象ブランチです。"></lht-text-field-help>
             <lht-select-help field-id="compareScope" label="作業の扱い" help-text="作業ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
               <script type="application/json" slot="options">[
-                { "value": "remote", "label": "リモート", "selected": true },
-                { "value": "local", "label": "ローカル" }
+                { "value": "remote", "label": "リモート" },
+                { "value": "local", "label": "ローカル", "selected": true }
               ]</script>
             </lht-select-help>
           </div>
@@ -3582,8 +3716,10 @@ if (!customElements.get("lht-page-menu")) {
   </script>
 
   <script>
-    const STORAGE_KEY = "gitWorkBranchList.entries";
+    const STORAGE_KEY = "gitWorkList.entries";
+    const RECENT_ACTIONS_KEY = "gitWorkList.recentActions";
     let entries = [];
+    let recentActions = [];
     let editingId = "";
     let dialogMode = "create";
 
@@ -3592,10 +3728,35 @@ if (!customElements.get("lht-page-menu")) {
       return field ? String(field.value || "").trim() : "";
     }
 
+    function normalizeRepoUrl(repoUrl) {
+      const trimmed = String(repoUrl || "").trim();
+      if (!trimmed) return "";
+      try {
+        const parsed = new URL(trimmed);
+        if (parsed.hostname === "github.com") {
+          const segments = parsed.pathname.split("/").filter(Boolean);
+          if (segments.length >= 4 && segments[2] === "pull") {
+            return `${parsed.origin}/${segments[0]}/${segments[1]}`;
+          }
+        }
+      } catch (_) {
+        // URL として解釈できないものはそのまま扱う
+      }
+      return trimmed.replace(/\/+$/, "");
+    }
+
     function setText(id, value) {
       const field = document.getElementById(id);
       if (!field) return;
       field.value = value == null ? "" : String(value);
+    }
+
+    function updateRepoUrlLockState(locked) {
+      const field = document.getElementById("repoUrl");
+      if (!field) return;
+      field.readOnly = !!locked;
+      field.classList.toggle("md-disabled", !!locked);
+      field.setAttribute("aria-readonly", locked ? "true" : "false");
     }
 
     function readSelectValue(id, fallbackValue) {
@@ -3609,6 +3770,14 @@ if (!customElements.get("lht-page-menu")) {
       const toast = document.getElementById("toast");
       if (!toast || typeof toast.show !== "function") return;
       toast.show(message, 2200);
+    }
+
+    function updatePrimaryActionsState() {
+      const openCreateButton = document.getElementById("openCreateDialogBtn");
+      if (openCreateButton) {
+        openCreateButton.classList.toggle("md-button--primary", entries.length === 0);
+        openCreateButton.classList.toggle("md-button--surface", entries.length > 0);
+      }
     }
 
     function getDialog() {
@@ -3640,6 +3809,15 @@ if (!customElements.get("lht-page-menu")) {
       if (kind === "delete") {
         return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>';
       }
+      if (kind === "lock") {
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 1 1 8 0v3"></path></svg>';
+      }
+      if (kind === "unlock") {
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 7.2-2.4"></path></svg>';
+      }
+      if (kind === "open-external") {
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5"></path><path d="M10 14 19 5"></path><path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"></path></svg>';
+      }
       return "";
     }
 
@@ -3662,8 +3840,46 @@ if (!customElements.get("lht-page-menu")) {
       }
     }
 
+    function createEmptyRecentActions() {
+      return {
+        "pseudo-squash": [],
+        "branch-diff": []
+      };
+    }
+
+    function normalizeRecentActions(rawRecentActions) {
+      const empty = createEmptyRecentActions();
+      const normalizeToolEntries = (value) => (
+        Array.isArray(value)
+          ? value.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 100)
+          : []
+      );
+      if (!rawRecentActions || typeof rawRecentActions !== "object" || Array.isArray(rawRecentActions)) {
+        return empty;
+      }
+      return {
+        "pseudo-squash": normalizeToolEntries(rawRecentActions["pseudo-squash"]),
+        "branch-diff": normalizeToolEntries(rawRecentActions["branch-diff"])
+      };
+    }
+
+    function loadRecentActions() {
+      try {
+        const raw = localStorage.getItem(RECENT_ACTIONS_KEY);
+        if (!raw) return createEmptyRecentActions();
+        const parsed = JSON.parse(raw);
+        return normalizeRecentActions(parsed);
+      } catch (_) {
+        return createEmptyRecentActions();
+      }
+    }
+
     function saveEntries() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function saveRecentActions() {
+      localStorage.setItem(RECENT_ACTIONS_KEY, JSON.stringify(recentActions));
     }
 
     function normalizeScope(value) {
@@ -3673,12 +3889,15 @@ if (!customElements.get("lht-page-menu")) {
     function normalizeEntry(raw) {
       return {
         id: raw?.id ? String(raw.id) : createId(),
-        repoUrl: String(raw?.repoUrl || "").trim(),
+        repoUrl: normalizeRepoUrl(raw?.repoUrl),
         baseBranch: String(raw?.baseBranch || "").trim(),
         baseScope: normalizeScope(raw?.baseScope),
         compareBranch: String(raw?.compareBranch || "").trim(),
         compareScope: normalizeScope(raw?.compareScope),
+        compareUseHead: raw?.compareUseHead === true,
+        locked: raw?.locked === true,
         remoteName: String(raw?.remoteName || "origin").trim() || "origin",
+        createdAt: Number(raw?.createdAt || raw?.updatedAt || Date.now()),
         updatedAt: Number(raw?.updatedAt || Date.now())
       };
     }
@@ -3699,6 +3918,39 @@ if (!customElements.get("lht-page-menu")) {
       return extractRepoName(entry.repoUrl);
     }
 
+    function buildGroupKey(entry) {
+      return [
+        entry.repoUrl,
+        buildRef(entry.baseBranch, entry.baseScope, entry.remoteName)
+      ].join("::");
+    }
+
+    function groupEntriesByBase(visibleEntries) {
+      const groupedMap = new Map();
+      visibleEntries.forEach((entry) => {
+        const key = buildGroupKey(entry);
+        const existing = groupedMap.get(key);
+        if (existing) {
+          existing.entries.push(entry);
+          return;
+        }
+        groupedMap.set(key, {
+          key,
+          repoUrl: entry.repoUrl,
+          displayName: buildDisplayName(entry),
+          baseBranch: entry.baseBranch,
+          baseScope: entry.baseScope,
+          remoteName: entry.remoteName,
+          entries: [entry]
+        });
+      });
+      return Array.from(groupedMap.values());
+    }
+
+    function isOpenableExternalUrl(url) {
+      return /^https?:\/\//i.test(String(url || "").trim());
+    }
+
     function buildRef(branch, scope, remoteName) {
       return scope === "remote" ? `${remoteName}/${branch}` : branch;
     }
@@ -3708,9 +3960,12 @@ if (!customElements.get("lht-page-menu")) {
       params.set("repoUrl", entry.repoUrl);
       params.set("baseBranch", entry.baseBranch);
       params.set("baseScope", entry.baseScope);
-      params.set("branchWork", entry.compareBranch);
-      params.set("scopeWork", entry.compareScope);
+      params.set("workBranch", entry.compareBranch);
+      params.set("workScope", entry.compareScope);
       params.set("remoteName", entry.remoteName);
+      if (entry.compareUseHead) {
+        params.set("useHeadWork", "1");
+      }
       return `git-branch-diff.html?${params.toString()}`;
     }
 
@@ -3719,9 +3974,36 @@ if (!customElements.get("lht-page-menu")) {
       params.set("repoUrl", entry.repoUrl);
       params.set("baseBranch", entry.baseBranch);
       params.set("baseScope", entry.baseScope);
-      params.set("branchWork", entry.compareBranch);
+      params.set("workBranch", entry.compareBranch);
       params.set("remoteName", entry.remoteName);
+      if (entry.compareUseHead) {
+        params.set("useHeadWork", "1");
+      }
       return `git-pseudo-squash.html?${params.toString()}`;
+    }
+
+    function updateRecentActions(currentRecentActions, entryId, tool) {
+      const normalized = normalizeRecentActions(currentRecentActions);
+      const nextToolEntries = [
+        entryId,
+        ...normalized[tool].filter((item) => item !== entryId)
+      ].slice(0, 100);
+      return {
+        ...normalized,
+        [tool]: nextToolEntries
+      };
+    }
+
+    function getToolButtonClass(entryId, tool) {
+      const toolEntries = recentActions[tool] || [];
+      if (toolEntries[0] === entryId) return "md-button--primary";
+      if (toolEntries[1] === entryId) return "md-button--secondary";
+      return "md-button--surface";
+    }
+
+    function markToolUsed(entryId, tool) {
+      recentActions = updateRecentActions(recentActions, entryId, tool);
+      saveRecentActions();
     }
 
     function openBranchDiff(entry) {
@@ -3732,15 +4014,24 @@ if (!customElements.get("lht-page-menu")) {
       window.location.href = buildPseudoSquashUrl(entry);
     }
 
+    function openRepoUrl(entry) {
+      if (!isOpenableExternalUrl(entry.repoUrl)) return;
+      window.open(entry.repoUrl, "_blank", "noopener,noreferrer");
+    }
+
     function readFormEntry() {
+      const existingEntry = entries.find((item) => item.id === editingId);
       return normalizeEntry({
         id: editingId || createId(),
-        repoUrl: readText("repoUrl"),
+        repoUrl: normalizeRepoUrl(readText("repoUrl")),
         baseBranch: readText("baseBranch"),
         baseScope: readSelectValue("baseScope", "remote"),
         compareBranch: readText("compareBranch"),
-        compareScope: readSelectValue("compareScope", "remote"),
+        compareScope: readSelectValue("compareScope", "local"),
+        compareUseHead: false,
+        locked: existingEntry?.locked === true,
         remoteName: readText("remoteName") || "origin",
+        createdAt: existingEntry?.createdAt || Date.now(),
         updatedAt: Date.now()
       });
     }
@@ -3765,13 +4056,14 @@ if (!customElements.get("lht-page-menu")) {
       editingId = "";
       dialogMode = "create";
       setText("repoUrl", "");
+      updateRepoUrlLockState(false);
       setText("baseBranch", "");
       setText("compareBranch", "");
       setText("remoteName", "origin");
       const baseScope = document.getElementById("baseScope");
       const compareScope = document.getElementById("compareScope");
       if (baseScope) baseScope.value = "remote";
-      if (compareScope) compareScope.value = "remote";
+      if (compareScope) compareScope.value = "local";
       const saveButton = document.getElementById("saveEntryBtn");
       setButtonContent(saveButton, "追加", "add");
       const titleNode = document.getElementById("entryDialogTitle");
@@ -3784,6 +4076,7 @@ if (!customElements.get("lht-page-menu")) {
       editingId = entry.id;
       dialogMode = "edit";
       setText("repoUrl", entry.repoUrl);
+      updateRepoUrlLockState(!!entry.repoUrl);
       setText("baseBranch", entry.baseBranch);
       setText("compareBranch", entry.compareBranch);
       setText("remoteName", entry.remoteName);
@@ -3836,50 +4129,70 @@ if (!customElements.get("lht-page-menu")) {
       guide.hidden = true;
     }
 
+    function renderGroup(group) {
+      return `
+        <article class="md-entry-card md-entry-group" data-group-key="${escapeHtml(group.key)}">
+          <div class="md-entry-head">
+            <div class="md-entry-title-wrap">
+              <h3 class="md-entry-title">${escapeHtml(group.displayName)}</h3>
+              <div class="md-entry-url-row">
+                <div class="md-entry-url">${escapeHtml(group.repoUrl)}</div>
+                ${isOpenableExternalUrl(group.repoUrl) ? `<button type="button" class="md-entry-link-btn" data-action="open-repo-url" data-repo-url="${escapeHtml(group.repoUrl)}" title="URL を開く" aria-label="URL を開く">${getButtonIconSvg("open-external")}</button>` : ""}
+              </div>
+            </div>
+            <section class="md-ref-box md-entry-base-box">
+              <div class="md-ref-label">基準 <span class="md-scope-badge" data-scope="${escapeHtml(group.baseScope)}">${escapeHtml(group.baseScope)}</span></div>
+              <div class="md-ref-value">${escapeHtml(buildRef(group.baseBranch, group.baseScope, group.remoteName))}</div>
+            </section>
+          </div>
+          <div class="md-entry-meta">
+            <div class="md-entry-divider" aria-hidden="true"></div>
+            <div class="md-work-row-list">
+              ${group.entries.map((entry) => renderWorkRow(entry)).join("")}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderWorkRow(entry) {
+      const workRef = entry.compareUseHead ? "HEAD" : buildRef(entry.compareBranch, entry.compareScope, entry.remoteName);
+      return `
+        <section class="md-work-row" data-entry-id="${escapeHtml(entry.id)}">
+          <div class="md-work-row__main">
+            <div class="md-ref-box md-ref-box--work">
+              <div class="md-ref-label">${entry.locked ? `<span class="md-entry-lock-icon" aria-label="ロック中">${getButtonIconSvg("lock")}</span>` : ""}作業 <span class="md-scope-badge" data-scope="${escapeHtml(entry.compareScope)}">${escapeHtml(entry.compareScope)}</span></div>
+              <div class="md-ref-value">${escapeHtml(workRef)}</div>
+            </div>
+          </div>
+          <div class="md-entry-actions md-work-row__actions">
+            <button type="button" class="md-button ${getToolButtonClass(entry.id, "pseudo-squash")}" data-action="open-pseudo-squash">${getButtonIconSvg("pseudo-squash")}<span>squash</span></button>
+            <button type="button" class="md-button ${getToolButtonClass(entry.id, "branch-diff")}" data-action="open-branch-diff">${getButtonIconSvg("branch-diff")}<span>比較</span></button>
+            <button type="button" class="md-button md-button--surface" data-action="edit-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("edit")}<span>変更</span></button>
+            <button type="button" class="md-button md-button--danger" data-action="delete-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("delete")}<span>削除</span></button>
+            <button type="button" class="md-button ${entry.locked ? "md-button--lock-active" : "md-button--surface"}" data-action="toggle-lock">${getButtonIconSvg(entry.locked ? "lock" : "unlock")}<span>${entry.locked ? "解除" : "ロック"}</span></button>
+          </div>
+        </section>
+      `;
+    }
+
     function renderEntries() {
       const list = document.getElementById("entriesList");
       if (!list) return;
       const visibleEntries = entries
         .slice()
-        .sort((a, b) => b.updatedAt - a.updatedAt);
+        .sort((left, right) => Number(right.createdAt || 0) - Number(left.createdAt || 0));
+      const visibleGroups = groupEntriesByBase(visibleEntries);
 
       updateEmptyGuide(visibleEntries.length);
+      updatePrimaryActionsState();
 
       if (visibleEntries.length === 0) {
-        list.innerHTML = `<div class="md-empty-state">一致する項目がありません。</div>`;
+        list.innerHTML = "";
         return;
       }
 
-      list.innerHTML = visibleEntries.map((entry) => {
-        return `
-          <article class="md-entry-card" data-entry-id="${escapeHtml(entry.id)}">
-            <div class="md-entry-head">
-              <div class="md-entry-title-wrap">
-                <h3 class="md-entry-title">${escapeHtml(buildDisplayName(entry))}</h3>
-                <div class="md-entry-url">${escapeHtml(entry.repoUrl)}</div>
-              </div>
-              <div class="md-entry-actions">
-                <button type="button" class="md-button md-button--surface" data-action="open-branch-diff">${getButtonIconSvg("branch-diff")}<span>比較</span></button>
-                <button type="button" class="md-button md-button--surface" data-action="open-pseudo-squash">${getButtonIconSvg("pseudo-squash")}<span>まとめる</span></button>
-                <button type="button" class="md-button md-button--surface" data-action="edit-entry">${getButtonIconSvg("edit")}<span>変更</span></button>
-                <button type="button" class="md-button md-button--danger" data-action="delete-entry">${getButtonIconSvg("delete")}<span>削除</span></button>
-              </div>
-            </div>
-            <div class="md-entry-meta">
-              <div class="md-ref-grid">
-                <section class="md-ref-box">
-                  <div class="md-ref-label">基準 <span class="md-scope-badge" data-scope="${escapeHtml(entry.baseScope)}">${escapeHtml(entry.baseScope)}</span></div>
-                  <div class="md-ref-value">${escapeHtml(buildRef(entry.baseBranch, entry.baseScope, entry.remoteName))}</div>
-                </section>
-                <section class="md-ref-box">
-                  <div class="md-ref-label">作業 <span class="md-scope-badge" data-scope="${escapeHtml(entry.compareScope)}">${escapeHtml(entry.compareScope)}</span></div>
-                  <div class="md-ref-value">${escapeHtml(buildRef(entry.compareBranch, entry.compareScope, entry.remoteName))}</div>
-                </section>
-              </div>
-            </div>
-          </article>
-        `;
-      }).join("");
+      list.innerHTML = visibleGroups.map((group) => renderGroup(group)).join("");
     }
 
     function saveCurrentEntry() {
@@ -3903,7 +4216,8 @@ if (!customElements.get("lht-page-menu")) {
     function deleteEntry(entryId) {
       const target = entries.find((entry) => entry.id === entryId);
       if (!target) return;
-      if (!window.confirm(`"${buildDisplayName(target)}" を削除しますか？`)) {
+      if (target.locked) {
+        showToast("ロック中のため削除できません");
         return;
       }
       entries = entries.filter((entry) => entry.id !== entryId);
@@ -3915,31 +4229,59 @@ if (!customElements.get("lht-page-menu")) {
       showToast("一覧から削除しました");
     }
 
+    function toggleEntryLock(entryId) {
+      const target = entries.find((entry) => entry.id === entryId);
+      if (!target) return;
+      target.locked = !target.locked;
+      saveEntries();
+      renderEntries();
+      if (editingId === entryId && target.locked) {
+        closeEntryDialog();
+        resetForm();
+      }
+      showToast(target.locked ? "ロックしました" : "ロックを解除しました");
+    }
+
     async function handleListClick(event) {
       const button = event.target.closest("[data-action]");
       if (!button) return;
+      const action = button.getAttribute("data-action");
+      if (action === "open-repo-url") {
+        const repoUrl = button.getAttribute("data-repo-url");
+        if (!isOpenableExternalUrl(repoUrl)) return;
+        window.open(repoUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
       const card = button.closest("[data-entry-id]");
       if (!card) return;
       const entryId = card.getAttribute("data-entry-id");
       const entry = entries.find((item) => item.id === entryId);
       if (!entry) return;
 
-      const action = button.getAttribute("data-action");
       if (action === "open-branch-diff") {
+        markToolUsed(entryId, "branch-diff");
         openBranchDiff(entry);
         return;
       }
       if (action === "open-pseudo-squash") {
+        markToolUsed(entryId, "pseudo-squash");
         openPseudoSquash(entry);
         return;
       }
       if (action === "edit-entry") {
+        if (entry.locked) {
+          showToast("ロック中のため変更できません");
+          return;
+        }
         openEditDialog(entry);
         return;
       }
       if (action === "delete-entry") {
         deleteEntry(entryId);
         return;
+      }
+      if (action === "toggle-lock") {
+        toggleEntryLock(entryId);
       }
     }
 
@@ -3975,6 +4317,7 @@ if (!customElements.get("lht-page-menu")) {
 
     function bootstrap() {
       entries = loadEntries();
+      recentActions = loadRecentActions();
       resetForm();
       setupEvents();
       renderEntries();
