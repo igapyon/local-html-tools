@@ -342,7 +342,7 @@ Git補助ツールです。
 - コマンドから入るのではなく、まずユースケース（やりたいこと）を明確化し、流れに沿って必要なコマンドを並べる方針です。
 - **git-pseudo-squash.html**: reset --soft で疑似的に1コミット化するコマンドを生成します。複数行のコミットメッセージに対応し、内容は一時ファイルに書き込んで git commit -F で渡します。
 - **git-branch-diff.html**: ブランチ差分コマンドを生成します。
-- **git-work-branch-list.html**: 複数リポジトリと複数ブランチの組み合わせを一覧管理し、比較用 `git diff` コマンドも確認できます。
+- **git-work-list.html**: 複数リポジトリと複数作業の組み合わせを一覧管理し、比較や squash への導線もまとめて扱えます。
 - **git-config-setup.html**: Gitのユーザー名とメールアドレスを設定するコマンドを生成します。
 - **git-config-advanced-setup.html**: core.autocrlfやpush.defaultなどの詳細設定をコマンドで生成します。
 

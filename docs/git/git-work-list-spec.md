@@ -1,6 +1,6 @@
-# git-work-branch-list
+# git-work-list
 
-対象ファイル: `docs/git/git-work-branch-list.html`
+対象ファイル: `docs/git/git-work-list.html`
 
 ## 概要
 
@@ -30,8 +30,8 @@
 - 初期版で引き渡す URL パラメータ名
   - `baseBranch`
   - `baseScope`
-  - `branchWork`
-  - `scopeWork`
+  - `workBranch`
+  - `workScope`
   - `remoteName`
 - 初期版では未対応とする項目
   - `diffMode`

@@ -65,18 +65,18 @@ const TARGETS = [
     ]
   },
   {
-    id: "git-work-branch-list",
+    id: "git-work-list",
     baseDir: "docs/git",
-    srcHtml: "docs/git/git-work-branch-list-src.html",
-    outHtml: "docs/git/git-work-branch-list.html",
+    srcHtml: "docs/git/git-work-list-src.html",
+    outHtml: "docs/git/git-work-list.html",
     cssOrder: [
       "../../lht-cmn/css/components.css",
-      "src/git-work-branch-list/css/app.css"
+      "src/git-work-list/css/app.css"
     ],
     jsOrder: [
       "../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js",
       "../../lht-cmn/js/components.js",
-      "src/git-work-branch-list/js/main.js"
+      "src/git-work-list/js/main.js"
     ]
   }
 ];

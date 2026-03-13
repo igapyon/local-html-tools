@@ -210,7 +210,7 @@ limitations under the License.
         </span>
       </div>
       <div class="md-form-row">
-        <lht-text-field-help field-id="commitMessage" label="コミットメッセージ" type="textarea" rows="12" required placeholder="コミットの内容を表す一文&#10;&#10;コミットの内容の説明" help-text="まとめ後の1コミットの説明文です。複数行入力が可能で、内容は一時ファイルに書き込んで git commit -F で渡されます。macOS / Linux は mktemp + ヒアドキュメント、Windows は PowerShell の New-TemporaryFile で対応します。ヒアドキュメント経由で渡すため、シェルのクォート解析の影響を受けにくくしています。あとで読んで何をおこなったのかわかる内容にしましょう。"></lht-text-field-help>
+        <lht-text-field-help field-id="commitMessage" label="コミットメッセージ" type="textarea" rows="6" required placeholder="コミットの内容を表す一文&#10;&#10;コミットの内容の説明" help-text="まとめ後の1コミットの説明文です。複数行入力が可能で、内容は一時ファイルに書き込んで git commit -F で渡されます。macOS / Linux は mktemp + ヒアドキュメント、Windows は PowerShell の New-TemporaryFile で対応します。ヒアドキュメント経由で渡すため、シェルのクォート解析の影響を受けにくくしています。あとで読んで何をおこなったのかわかる内容にしましょう。"></lht-text-field-help>
       </div>
     </section>
 
@@ -260,43 +260,25 @@ limitations under the License.
     </div>
     <lht-command-block command-id="pushCmd"></lht-command-block>
 
-    <div class="md-flow-divider">
-      <svg aria-hidden="true" viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
-        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
-        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
-        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
-        <path d="M40 32h26" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
-        <path d="M116 32h70" stroke="#C4B5FD" stroke-width="4" stroke-linecap="round"/>
-        <path d="M236 32h26" stroke="#A7F3D0" stroke-width="4" stroke-linecap="round"/>
-        <path d="M312 32h70" stroke="#F9A8D4" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="384" cy="32" r="6" fill="#86EFAC"/>
-      </svg>
-    </div>
-    <div class="md-flow-row">
+    <div class="md-flow-row md-footer-flow">
       <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-        <path d="M16 22h32" stroke="#93C5FD" stroke-width="3" stroke-linecap="round"/>
-        <path d="M16 32h26" stroke="#A78BFA" stroke-width="3" stroke-linecap="round"/>
-        <path d="M16 42h20" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
-        <circle cx="48" cy="22" r="4" fill="#93C5FD"/>
-        <circle cx="42" cy="32" r="4" fill="#A78BFA"/>
-        <circle cx="36" cy="42" r="4" fill="#34D399"/>
+        <path d="M18 46h28" stroke="#93C5FD" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M32 18v20" stroke="#A78BFA" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M24 26l8-8 8 8" stroke="#A78BFA" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="46" cy="24" r="5" fill="#86EFAC"/>
+        <rect x="18" y="42" width="28" height="8" rx="4" fill="#BFDBFE"/>
       </svg>
       <span class="md-title-info-row">
-        <p class="md-section-title">まとめる予定の作業 (diff)</p>
-        <lht-help-tooltip label="まとめる予定の作業の説明">
-          基点ブランチと作業ブランチの差分を表示するコマンドです。squash 後に1コミットへまとめる内容の目安になります。
+        <p class="md-section-title">一覧連携</p>
+        <lht-help-tooltip label="一覧連携の説明">
+          ここでは、この作業内容を `Git 作業一覧` に保存したり、比較専用の画面へ移動したりできます。
+          squash の実行手順そのものではなく、作業管理と画面遷移のための補助エリアです。
         </lht-help-tooltip>
       </span>
     </div>
-    <lht-command-block command-id="plannedDiffCmd"></lht-command-block>
 
     <div class="md-bottom-actions">
-      <div class="md-bottom-actions__field">
-        <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" placeholder="例: https://github.com/igapyon/local-html-tools" help-text="Git 作業ブランチ一覧へ戻すときの保存先識別に使います。"></lht-text-field-help>
-      </div>
       <button id="saveToWorkBranchListBtn" type="button" class="md-button md-button--primary md-button--with-icon">
         <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M4 7h16"></path>
@@ -304,6 +286,25 @@ limitations under the License.
           <path d="M4 17h16"></path>
         </svg>
         <span>一覧</span>
+      </button>
+      <button id="openBranchDiffBtn" type="button" class="md-button md-button--surface md-button--with-icon">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 7h8"></path>
+          <path d="M11 3l4 4-4 4"></path>
+          <path d="M17 17H9"></path>
+          <path d="M13 13l-4 4 4 4"></path>
+        </svg>
+        <span>比較</span>
+      </button>
+      <div class="md-bottom-actions__field">
+        <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" placeholder="例: https://github.com/igapyon/local-html-tools" help-text="Git 作業一覧へ戻すときの保存先識別に使います。"></lht-text-field-help>
+      </div>
+      <button id="openRepoUrlBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" title="URL を開く" aria-label="URL を開く">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 5h5v5"></path>
+          <path d="M10 14 19 5"></path>
+          <path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"></path>
+        </svg>
       </button>
     </div>
 
