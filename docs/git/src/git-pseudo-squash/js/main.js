@@ -744,6 +744,7 @@
       const repoUrl = String(params.get("repoUrl") || "").trim();
       const baseBranch = String(params.get("baseBranch") || "").trim();
       const workBranch = String(params.get("workBranch") || "").trim();
+      const defaultCommitMessage = String(params.get("defaultCommitMessage") || "").trim();
       const baseScope = String(params.get("baseScope") || "").trim();
       const remoteName = String(params.get("remoteName") || "").trim();
       const useHeadWork = String(params.get("useHeadWork") || "").trim();
@@ -751,6 +752,7 @@
       const repoUrlField = document.getElementById("repoUrl");
       const baseBranchField = document.getElementById("squashBaseBranch");
       const workBranchField = document.getElementById("workBranch");
+      const commitMessageField = document.getElementById("commitMessage");
       const baseScopeField = document.getElementById("squashBaseScope");
       const baseRemoteField = document.getElementById("baseRemote");
       const squashRemoteField = document.getElementById("squashRemote");
@@ -766,6 +768,9 @@
       }
       if (workBranch && workBranchField) {
         workBranchField.value = workBranch;
+      }
+      if (defaultCommitMessage && commitMessageField && !String(commitMessageField.value || "").trim()) {
+        commitMessageField.value = defaultCommitMessage;
       }
       if (useHeadWork === "1" || useHeadWork === "true" || useCurrentBranch === "1" || useCurrentBranch === "true") {
         setUseCurrentBranchSelected(true);

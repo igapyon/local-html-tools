@@ -31,11 +31,16 @@ function mountDom() {
     <input id="remoteName" value="origin" />
     <button id="closeDialogBtn" type="button">close</button>
     <button id="saveEntryBtn" type="button">save</button>
+    <input id="memoText" value="" />
+    <input id="gitCurrentDirectory" value="" />
+    <button id="closeMemoDialogBtn" type="button">close memo</button>
+    <button id="saveMemoBtn" type="button">save memo</button>
     <div id="entriesList"></div>
     <div id="emptyGuide" hidden></div>
     <div id="toast"></div>
     <div id="entryDialogTitle"></div>
     <dialog id="entryDialog"></dialog>
+    <dialog id="memoDialog"></dialog>
   `;
 
   const toast = document.getElementById("toast");
@@ -46,6 +51,13 @@ function mountDom() {
   });
   dialog.close = vi.fn(() => {
     dialog.open = false;
+  });
+  const memoDialog = document.getElementById("memoDialog");
+  memoDialog.showModal = vi.fn(() => {
+    memoDialog.open = true;
+  });
+  memoDialog.close = vi.fn(() => {
+    memoDialog.open = false;
   });
 }
 
@@ -87,6 +99,8 @@ window.__gitWorkListTest = {
   buildPseudoSquashUrl,
   openCreateDialog,
   openEditDialog,
+  openMemoDialog,
+  saveMemo,
   saveCurrentEntry,
   renderEntries,
   loadEntries,
@@ -105,6 +119,10 @@ describe("git-work-list main", () => {
     window.alert = vi.fn();
     window.confirm = vi.fn(() => true);
     window.open = vi.fn();
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: vi.fn().mockResolvedValue(undefined) },
+      configurable: true
+    });
   });
 
   it("saves an entry from the form and renders it to the list", () => {
@@ -198,6 +216,12 @@ describe("git-work-list main", () => {
   });
 
   it("builds git-pseudo-squash URL params from an entry", () => {
+    localStorage.setItem("gitWorkList.memos", JSON.stringify({
+      "https://example.com/repo-a::devel": {
+        memo: "default memo",
+        gitCurrentDir: "/tmp/repo-a"
+      }
+    }));
     bootPage();
 
     expect(window.__gitWorkListTest.buildPseudoSquashUrl({
@@ -208,7 +232,7 @@ describe("git-work-list main", () => {
       compareScope: "local",
       compareUseHead: true,
       remoteName: "origin"
-    })).toBe("git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&baseScope=remote&workBranch=feature%2Flogin&remoteName=origin&useHeadWork=1");
+    })).toBe("git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&baseScope=remote&workBranch=feature%2Flogin&remoteName=origin&defaultCommitMessage=default+memo&useHeadWork=1");
   });
 
   it("renders stored entries in reverse created order", () => {
@@ -538,5 +562,107 @@ describe("git-work-list main", () => {
     openButton.click();
 
     expect(window.open).toHaveBeenCalledWith("https://example.com/repo-a", "_blank", "noopener,noreferrer");
+  });
+
+  it("saves memo by repoUrl and baseBranch and renders preview", () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "a",
+        repoUrl: "https://example.com/repo-a",
+        baseBranch: "main",
+        baseScope: "remote",
+        compareBranch: "feature-a",
+        compareScope: "remote",
+        remoteName: "origin"
+      }
+    ]));
+
+    bootPage();
+    window.__gitWorkListTest.openMemoDialog("https://example.com/repo-a", "main");
+    document.getElementById("memoText").value = "this is a long memo text";
+    document.getElementById("gitCurrentDirectory").value = "/tmp/repo-a";
+    window.__gitWorkListTest.saveMemo();
+
+    const savedMemos = getSavedJsonByKey("gitWorkList.memos");
+    expect(savedMemos).toEqual({
+      "https://example.com/repo-a::main": {
+        memo: "this is a long memo text",
+        gitCurrentDir: "/tmp/repo-a"
+      }
+    });
+    const preview = document.querySelector(".md-entry-memo-preview");
+    expect(preview.textContent).toBe("this is a long m...");
+    expect(preview.getAttribute("data-full-text")).toBe("this is a long memo text");
+  });
+
+  it("loads legacy string memos and opens current directory field", () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "a",
+        repoUrl: "https://example.com/repo-a",
+        baseBranch: "main",
+        baseScope: "remote",
+        compareBranch: "feature-a",
+        compareScope: "remote",
+        remoteName: "origin"
+      }
+    ]));
+    localStorage.setItem("gitWorkList.memos", JSON.stringify({
+      "https://example.com/repo-a::main": "legacy memo"
+    }));
+
+    bootPage();
+    window.__gitWorkListTest.openMemoDialog("https://example.com/repo-a", "main");
+
+    expect(document.getElementById("memoText").value).toBe("legacy memo");
+    expect(document.getElementById("gitCurrentDirectory").value).toBe("");
+  });
+
+  it("shows memo button without preview when memo is empty", () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "a",
+        repoUrl: "https://example.com/repo-a",
+        baseBranch: "main",
+        baseScope: "remote",
+        compareBranch: "feature-a",
+        compareScope: "remote",
+        remoteName: "origin"
+      }
+    ]));
+
+    bootPage();
+
+    expect(document.querySelector(".md-entry-memo-btn")).not.toBeNull();
+    expect(document.querySelector(".md-entry-memo-preview")).toBeNull();
+  });
+
+  it("copies git current directory from the parent card action", async () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "a",
+        repoUrl: "https://example.com/repo-a",
+        baseBranch: "main",
+        baseScope: "remote",
+        compareBranch: "feature-a",
+        compareScope: "remote",
+        remoteName: "origin"
+      }
+    ]));
+    localStorage.setItem("gitWorkList.memos", JSON.stringify({
+      "https://example.com/repo-a::main": {
+        memo: "memo",
+        gitCurrentDir: "/tmp/repo-a"
+      }
+    }));
+
+    bootPage();
+
+    const copyButton = document.querySelector('[data-action="copy-git-current-dir"]');
+    expect(copyButton).not.toBeNull();
+    copyButton.click();
+
+    await Promise.resolve();
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith("/tmp/repo-a");
   });
 });

@@ -399,7 +399,7 @@ PR本文:
     window.history.replaceState(
       {},
       "",
-      "/docs/git/git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&baseScope=remote&workBranch=feature-a&remoteName=upstream"
+      "/docs/git/git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&baseScope=remote&workBranch=feature-a&remoteName=upstream&defaultCommitMessage=hello+memo"
     );
     const instrumentedCode = `${mainCode}
 window.__gitPseudoSquashTest = {
@@ -418,6 +418,7 @@ window.__gitPseudoSquashTest = {
     expect(document.getElementById("repoUrl").readOnly).toBe(true);
     expect(document.getElementById("squashBaseBranch").value).toBe("devel");
     expect(document.getElementById("workBranch").value).toBe("feature-a");
+    expect(document.getElementById("commitMessage").value).toBe("hello memo");
     expect(document.getElementById("squashBaseScope").value).toBe("remote");
     expect(document.getElementById("lockOrigin").checked).toBe(false);
     expect(document.getElementById("baseRemote").value).toBe("upstream");
