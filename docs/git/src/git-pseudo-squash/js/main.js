@@ -749,6 +749,7 @@
       const remoteName = String(params.get("remoteName") || "").trim();
       const useHeadWork = String(params.get("useHeadWork") || "").trim();
       const useCurrentBranch = String(params.get("useCurrentBranch") || "").trim();
+      const hasUseCurrentBranchParam = params.has("useCurrentBranch") || params.has("useHeadWork");
       const repoUrlField = document.getElementById("repoUrl");
       const baseBranchField = document.getElementById("squashBaseBranch");
       const workBranchField = document.getElementById("workBranch");
@@ -772,8 +773,14 @@
       if (defaultCommitMessage && commitMessageField && !String(commitMessageField.value || "").trim()) {
         commitMessageField.value = defaultCommitMessage;
       }
-      if (useHeadWork === "1" || useHeadWork === "true" || useCurrentBranch === "1" || useCurrentBranch === "true") {
-        setUseCurrentBranchSelected(true);
+      if (hasUseCurrentBranchParam) {
+        const useCurrentBranchEnabled = (
+          useHeadWork === "1" ||
+          useHeadWork === "true" ||
+          useCurrentBranch === "1" ||
+          useCurrentBranch === "true"
+        );
+        setUseCurrentBranchSelected(useCurrentBranchEnabled);
       }
       if ((baseScope === "remote" || baseScope === "local") && baseScopeField) {
         baseScopeField.value = baseScope;
@@ -991,6 +998,8 @@
     }
 
     function loadPersistedUiPreferences() {
+      const params = readCurrentQueryParams();
+      const hasUseCurrentBranchParam = params.has("useCurrentBranch") || params.has("useHeadWork");
       const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
       const lockOrigin = document.getElementById("lockOrigin");
       const squashBaseScope = document.getElementById("squashBaseScope");
@@ -1011,7 +1020,7 @@
       if (lockOrigin && lockOriginValue !== null) {
         setSwitchSelected("lockOrigin", lockOriginValue);
       }
-      if (useCurrentBranch && useCurrentBranchValue !== null) {
+      if (!hasUseCurrentBranchParam && useCurrentBranch && useCurrentBranchValue !== null) {
         setUseCurrentBranchSelected(useCurrentBranchValue);
       }
       if (squashBaseScope && (scopeValue === "remote" || scopeValue === "local")) {

@@ -449,6 +449,54 @@ window.__gitPseudoSquashTest = {
     expect(window.__gitPseudoSquashTest.getUseCurrentBranchSelected()).toBe(true);
   });
 
+  it("turns off current-branch mode when useCurrentBranch=false is passed from the list", () => {
+    mountGitPseudoSquashDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-pseudo-squash.html?baseBranch=devel&workBranch=feature-a&useCurrentBranch=false"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitPseudoSquashTest = {
+  normalizeCommitMessageForPr,
+  regenerateAllCommands,
+  getUseCurrentBranchSelected,
+  toggleOriginLock,
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams,
+  buildBranchDiffUrlFromPlannedDiff
+};`;
+    new Function(instrumentedCode)();
+
+    expect(window.__gitPseudoSquashTest.getUseCurrentBranchSelected()).toBe(false);
+  });
+
+  it("prioritizes query useCurrentBranch=false over persisted current-branch preference", () => {
+    installLocalStorageMock();
+    localStorage.setItem("gitPseudoSquash.ui.useCurrentBranch", "true");
+    mountGitPseudoSquashDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-pseudo-squash.html?baseBranch=devel&workBranch=feature-a&useCurrentBranch=false"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitPseudoSquashTest = {
+  normalizeCommitMessageForPr,
+  regenerateAllCommands,
+  getUseCurrentBranchSelected,
+  toggleOriginLock,
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams,
+  buildBranchDiffUrlFromPlannedDiff
+};`;
+    new Function(instrumentedCode)();
+
+    expect(window.__gitPseudoSquashTest.getUseCurrentBranchSelected()).toBe(false);
+  });
+
   it("builds branch-diff URL with HEAD when current branch mode is enabled", () => {
     bootGitPseudoSquashPage();
 

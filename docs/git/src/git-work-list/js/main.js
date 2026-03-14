@@ -407,11 +407,9 @@
       params.set("baseScope", entry.baseScope);
       params.set("workBranch", entry.compareBranch);
       params.set("remoteName", entry.remoteName);
+      params.set("useCurrentBranch", entry.compareUseHead ? "true" : "false");
       if (memoText) {
         params.set("defaultCommitMessage", memoText);
-      }
-      if (entry.compareUseHead) {
-        params.set("useHeadWork", "1");
       }
       return `git-pseudo-squash.html?${params.toString()}`;
     }

@@ -232,8 +232,22 @@ describe("git-work-list main", () => {
       compareScope: "local",
       compareUseHead: true,
       remoteName: "origin"
-    })).toBe("git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&baseScope=remote&workBranch=feature%2Flogin&remoteName=origin&defaultCommitMessage=default+memo&useHeadWork=1");
+    })).toBe("git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&baseScope=remote&workBranch=feature%2Flogin&remoteName=origin&useCurrentBranch=true&defaultCommitMessage=default+memo");
   });
+
+  it("builds git-pseudo-squash URL params with current-branch mode off", () => {
+    bootPage();
+
+    expect(window.__gitWorkListTest.buildPseudoSquashUrl({
+      repoUrl: "https://example.com/repo-a",
+      baseBranch: "devel",
+      baseScope: "remote",
+      compareBranch: "feature/login",
+      compareScope: "local",
+      compareUseHead: false,
+      remoteName: "origin"
+    })).toBe("git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&baseScope=remote&workBranch=feature%2Flogin&remoteName=origin&useCurrentBranch=false");
+    });
 
   it("renders stored entries in reverse created order", () => {
     localStorage.setItem("gitWorkList.entries", JSON.stringify([
@@ -267,7 +281,7 @@ describe("git-work-list main", () => {
     expect(entriesHtml).toContain("repo-b");
     expect(entriesHtml.indexOf("repo-b")).toBeLessThan(entriesHtml.indexOf("repo-a"));
     expect(entriesHtml).toContain("比較");
-    expect(entriesHtml).toContain("squash");
+    expect(entriesHtml).toContain("Squash");
     expect(entriesHtml).toContain("ロック");
   });
 
