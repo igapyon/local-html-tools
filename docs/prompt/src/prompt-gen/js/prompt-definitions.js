@@ -473,8 +473,8 @@ After creating or updating the documentation system:
     },
     {
         id: "co-writing-tech-post-request",
-        label: "851: テック投稿の伴走執筆支援",
-        keywords: ["writing", "co-writing", "draft", "blog", "facebook", "post", "tech blog", "伴走", "執筆", "投稿", "下書き", "文体", "ブログ", "facebook投稿", "日本語文章", "伴走執筆", "てっく", "とうこう", "ばんそう", "しっぴつ", "したがき", "ぶんたい", "ぶろぐ", "にほんごぶんしょう"],
+        label: "851: いがぴょんのテック投稿執筆支援",
+        keywords: ["writing", "co-writing", "draft", "blog", "facebook", "post", "tech blog", "伴走", "執筆", "投稿", "下書き", "文体", "ブログ", "facebook投稿", "日本語文章", "伴走執筆", "igapyon", "いがぴょん", "伊賀", "てっく", "とうこう", "ばんそう", "しっぴつ", "したがき", "ぶんたい", "ぶろぐ", "にほんごぶんしょう"],
         requiresCommitId: false,
         buildBody: () => `# 統合プロンプト
 
@@ -960,9 +960,67 @@ Material Web ベースの開発なのですが、カスタムな Web Components�
             return `# Washi Collage Whisper v20250501a
 
 A simplified cute illustration of ${normalizedSubject}, created by assembling a minimal number of large torn pieces of rich, muted pastel-colored handmade hand-scooped kozo paper (traditional Japanese mulberry paper). Each piece is separated by bold, rough torn edges with thick, visible, randomly oriented white fibers. The edges are soft, fuzzy, and deeply frayed, showing natural irregularities. Fibers vary in thickness-from very fine to slightly coarse-and in density and direction, creating an organic, handcrafted feel; some areas display extra-frayed, protruding fibers. Fiber color subtly shifts from pure white to off-white and warm beige.
-The paper pieces are tinted in deep, smoky pastel tones-darker and thicker than ordinary pastels-avoiding vivid hues yet holding enough chroma to stay vibrant and prevent washed-out effects against the translucent handmade paper.
-The overall texture is soft and fibrous, with bleeding fiber patterns radiating irregularly from the torn edges. Rendered in a flat 2-D style inspired by traditional Japanese torn-paper collage art, it features expansive colour fields, natural irregular edges, a warm and friendly mood, a simple unobtrusive background, and absolutely no strong shadows or dramatic lighting.`;
+      The paper pieces are tinted in deep, smoky pastel tones-darker and thicker than ordinary pastels-avoiding vivid hues yet holding enough chroma to stay vibrant and prevent washed-out effects against the translucent handmade paper.
+      The overall texture is soft and fibrous, with bleeding fiber patterns radiating irregularly from the torn edges. Rendered in a flat 2-D style inspired by traditional Japanese torn-paper collage art, it features expansive colour fields, natural irregular edges, a warm and friendly mood, a simple unobtrusive background, and absolutely no strong shadows or dramatic lighting.`;
         }
+    },
+    {
+        id: "rabbit-prompt-request",
+        label: "853: うさぎプロンプト",
+        keywords: ["rabbit", "bunny", "netherland dwarf", "rabbit prompt", "animal prompt", "photo-realistic rabbit", "うさぎ", "兎", "ネザーランドドワーフ", "ラビット", "画像生成", "画像プロンプト", "ばにー", "ねざーらんどどわーふ"],
+        requiresCommitId: false,
+        buildBody: () => `うさぎプロンプト-v20250426a
+
+Netherland Dwarf rabbit:
+An adorable Netherland Dwarf rabbit with silky, warm fawn-tan fur and a tiny white muzzle, its glossy dark eyes looking forward.
+
+eye:
+a glossy, almond-shaped orb tilted slightly upward toward the right.
+The surface is deep charcoal-black with a subtle navy sheen; no distinct pupil is visible, giving the appearance of a single, dark mirror. A crisp, elongated catch-light sits along the upper-right rim of the cornea, bright white with a faint cyan fringe, suggesting daylight reflecting off a nearby window. Fine, short tan lashes trace the eyelid edge, which is lined by a narrow band of pale peach-cream skin. Surrounding the eye, ultra-soft fawn-colored fur transitions from warm golden tones near the brow to lighter beige toward the cheek, each hair rendered in sharp macro detail. Lighting is soft and diffuse, coming from the front-right, creating tiny specular highlights on the moist eye surface while leaving the lower-left quadrant in gentle shadow. isolating every strand of fur and the glass-like shine of the eye.
+
+nose area:
+muzzle: a tiny, soft, upside-down-triangle nose in warm pinkish-tan with a faint vertical crease separating two oval nostrils that flare gently as it sniffs. The velvety texture of the nose is slightly moist, catching a subtle highlight from soft daylight. Surrounding the nose, ultra-fine fawn-golden guard hairs blend into creamy beige fur on the upper lip and chin, every strand rendered in sharp detail. A handful of delicate, translucent white whiskers curve outward from black pin-prick follicles on either side of the nose.
+
+vibrissae:
+dozens of gossamer-thin filaments sprouting in paired rows from tiny, dark follicles on each side of the pink-tan nose and upper lip. Each whisker is silky white to translucent silver, tapering from at the base to hair-fine tips.
+The whiskers splay gracefully outward and slightly downward, some gently curving forward in elegant arcs, others crossing and overlapping.
+The surrounding fawn-golden fur is rendered in plush detail, contrasting with the smooth, glistening whisker shafts.
+
+torso: filling most of the frame. The coat is an ultra-dense, plush carpet of short guard hairs and downy underfur. Overall hue is a warm fawn-tan that shifts subtly with the light: golden honey highlights on the crown of the back, soft caramel mid-tones along the flanks, and a whisper of pale cream where the fur curves under the belly. Producing a fine, velvety sheen and gentle color gradient from bright amber to muted beige. No distinct markings-only a barely perceptible darker dorsal band running spine-wise, lending natural depth. The texture reads as velour: every strand stands upright yet bends slightly at the tips, giving a pillowy look that invites touch.
+
+A baby Netherland Dwarf rabbit, warm fawn-tan coat with a hint of red,
+rounded cheeks and a slightly elongated muzzle, medium-sized almond eyes with a gentle white reflection,
+fine plush fur rendered softly (not hyper-macro), indoor ambient light from the right,
+shallow depth of field, light motion blur on whiskers, plain warm backdrop,
+no cage, no humans, photo-realistic, cozy atmosphere.
+
+medium-sized almond eyes, very long ears. A gently tapered muzzle, compact yet soft body around 1 kg, warm fawn-tan coat with subtle reddish hue,
+
+Neck
+• Short, slender neck that blends smoothly into the shoulders.
+• Fur around the nape is warm caramel-orange; the throat is soft ivory-white, forming a natural collar.
+• Individual hairs have a delicate luster, hinting at a silky texture.
+
+Chest & Shoulders
+• Shoulders are rounded and compact, covered in dense orange fur that fluffs outward.
+• Chest is petite yet plump; the white fur from the throat spreads in a crescent shape across the upper chest.
+
+Back & Torso
+• Back fur is honey-orange with subtle gradients toward deeper tones near the spine.
+• Coat appears short but plush, catching light to reveal fine highlights.
+• Body is compact and almost spherical, gentle curves suggesting the ribcage beneath.
+
+Belly
+• Underside transitions to creamy white, seamlessly fading from the orange flanks.
+• Belly fur is slightly longer and fluffier, creating a cushioned look.
+
+Forelegs
+• Tiny, delicate forelegs tucked under the chest.
+• Covered in short orange fur; ivory claws peek out subtly at the tips.
+
+Hind Legs & Tail
+• Muscular yet rounded hind legs, fur matching the back but lightening toward the ankles.
+• Tail is a small puff ball-white on the underside, with a hint of orange on top-nestled close to the body.`
     },
     {
         id: "chat-partner-mikuku-request",

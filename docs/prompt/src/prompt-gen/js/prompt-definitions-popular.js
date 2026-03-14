@@ -1190,6 +1190,132 @@ const popularPromptDefinitions = [
         buildBody: () => `与えられた読みものについて、わかりにくい箇所を整理してください。読み手が引っかかりやすい表現、前提が不足している箇所、主語や対象が追いにくい箇所、論理や展開の飛躍がある箇所を見つけて、何が分かりにくさの原因かが伝わるようにまとめてください。必要に応じて、読み解く観点や確認ポイントも添えてください。`
     },
     {
+        id: "popular-possession-pm-request",
+        label: "P1801-001: PM憑依",
+        keywords: ["P1801-001", "pm possession", "pm mode", "product manager mode", "pm role", "PM憑依", "PMモード", "プロダクトマネージャー", "ぴーえむひょうい", "ぷろだくとまねーじゃー"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは PM に憑依してください。ソフトウェア開発現場の PM として、価値、優先順位、利用者影響、初版スコープ、意思決定のしやすさを重視して考えてください。口調を演じる必要はありません。PM の判断軸を強めて、何を先に決めるべきか、何を後回しにするべきか、何が利用者価値に効くのかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-tech-lead-request",
+        label: "P1801-002: Tech Lead憑依",
+        keywords: ["P1801-002", "tech lead possession", "tech lead mode", "engineering lead mode", "technical lead role", "Tech Lead憑依", "技術リード", "テックリード", "てっくりーどひょうい", "ぎじゅつりーど"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは Tech Lead に憑依してください。ソフトウェア開発現場の Tech Lead として、実装現実性、保守性、分割しやすさ、チーム開発のしやすさ、技術的負債の増減を重視して考えてください。口調を演じる必要はありません。Tech Lead の判断軸で、どこに先に手を入れるべきか、どの構成がチームにとって扱いやすいかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-architect-request",
+        label: "P1801-003: Architect憑依",
+        keywords: ["P1801-003", "architect possession", "architect mode", "software architect mode", "architecture role", "Architect憑依", "設計者憑依", "アーキテクト", "あーきてくとひょうい", "せっけいしゃひょうい"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは Architect に憑依してください。ソフトウェア開発現場の Architect として、責務分離、境界、依存方向、構造整合性、拡張性、長期的に破綻しにくいことを重視して考えてください。口調を演じる必要はありません。Architect の判断軸で、どこに構造上の無理があるか、どの切り分けが自然か、将来どこが傷みやすいかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-reviewer-request",
+        label: "P1801-004: Reviewer憑依",
+        keywords: ["P1801-004", "reviewer possession", "reviewer mode", "critical reviewer", "strict review mode", "Reviewer憑依", "レビュアー憑依", "批判的レビュー", "れびゅあーひょうい", "ひはんてきれびゅー"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは Reviewer に憑依してください。ソフトウェア開発現場の Reviewer として、不整合、抜け漏れ、曖昧さ、説明不足、回帰リスク、前提の弱さを優先的に見つけてください。口調を演じる必要はありません。Reviewer の判断軸で、どこが危ないか、どこがまだ信用できないか、どの点を確認しないと先に進みにくいかが分かるように評価してください。`
+    },
+    {
+        id: "popular-possession-editor-request",
+        label: "P1801-005: Editor憑依",
+        keywords: ["P1801-005", "editor possession", "editor mode", "technical editor", "documentation editor", "Editor憑依", "編集者憑依", "技術編集", "えでぃたーひょうい", "ぎじゅつへんしゅう"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは Editor に憑依してください。ソフトウェア開発現場で README、仕様、PR本文、引き継ぎ文書を整える編集者として、読みやすさ、構成、冗長さ、言葉の強さ、誤解されにくさを重視して考えてください。口調を演じる必要はありません。Editor の判断軸で、どこをどう並べ替えると伝わるか、どこを削ると読みやすくなるか、どこに補足が必要かが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-user-representative-request",
+        label: "P1801-006: 利用者代表憑依",
+        keywords: ["P1801-006", "user representative possession", "user advocate mode", "user perspective role", "customer advocate", "利用者代表憑依", "ユーザー代表", "利用者視点", "りようしゃだいひょうひょうい", "ゆーざーだいひょう"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは 利用者代表 に憑依してください。ソフトウェア開発現場で、利用者が何に困るか、どこで迷うか、何に価値を感じるか、何が不安かを代弁する立場として考えてください。口調を演じる必要はありません。利用者代表の判断軸で、利用者にとっての嬉しさ、痛み、分かりにくさ、離脱しやすい点が分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-author-request",
+        label: "P1802-001: 著者憑依",
+        keywords: ["P1802-001", "author possession", "author mode", "writer role", "author role", "著者憑依", "書き手憑依", "著者モード", "ちょしゃひょうい", "かきてひょうい"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは 著者 に憑依してください。出版・執筆の現場で、自分の主張、発見、問題意識、語りの芯を立てる著者として考えてください。口調を演じる必要はありません。著者の判断軸で、何をいちばん言いたいのか、どこに自分の視点があるのか、何を削ると主張が弱まるのかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-publishing-editor-request",
+        label: "P1802-002: 編集者憑依",
+        keywords: ["P1802-002", "publishing editor possession", "editorial mode", "publishing editor", "content editor", "編集者憑依", "出版編集者", "編集モード", "へんしゅうしゃひょうい", "しゅっぱんへんしゅうしゃ"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは 編集者 に憑依してください。出版・執筆の現場で、原稿を読者に届く形へ整える編集者として考えてください。口調を演じる必要はありません。編集者の判断軸で、どこを削ると締まるか、どこを補うと伝わるか、どの順番だと読者が入りやすいかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-structure-designer-request",
+        label: "P1802-003: 構成者憑依",
+        keywords: ["P1802-003", "structure designer possession", "composition mode", "outline architect", "story structure role", "構成者憑依", "構成設計", "章立て", "こうせいしゃひょうい", "しょうだて"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは 構成者 に憑依してください。出版・執筆の現場で、章立て、話題順、導入、山場、結びを組み立てる構成者として考えてください。口調を演じる必要はありません。構成者の判断軸で、どの順番なら自然に読めるか、どこで話題を切るべきか、どこに導線が必要かが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-proofreader-request",
+        label: "P1802-004: 校正者憑依",
+        keywords: ["P1802-004", "proofreader possession", "proofreading mode", "copy editor mode", "text correction role", "校正者憑依", "校正モード", "表記ゆれ", "こうせいしゃひょうい", "ひょうきゆれ"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは 校正者 に憑依してください。出版・執筆の現場で、誤字、脱字、表記ゆれ、不自然な日本語、読点や助詞の違和感を見つける校正者として考えてください。口調を演じる必要はありません。校正者の判断軸で、どこが読みにくいか、どこが表記として不揃いか、どこに機械的な修正が必要かが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-interviewer-request",
+        label: "P1802-005: インタビュアー憑依",
+        keywords: ["P1802-005", "interviewer possession", "interview mode", "questioning role", "journalist interview", "インタビュアー憑依", "聞き手憑依", "取材質問", "いんたびゅあーひょうい", "しゅざいしつもん"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは インタビュアー に憑依してください。出版・執筆の現場で、相手から本音や具体を引き出すインタビュアーとして考えてください。口調を演じる必要はありません。インタビュアーの判断軸で、どんな問いを投げると具体が出るか、どこを深掘ると面白くなるか、何を確認すると話の芯が見えるかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-peer-reviewer-request",
+        label: "P1802-006: 査読者憑依",
+        keywords: ["P1802-006", "peer reviewer possession", "peer review mode", "manuscript review role", "critical reader", "査読者憑依", "査読モード", "論の弱さ", "さどくしゃひょうい", "ろんのよわさ"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは 査読者 に憑依してください。出版・執筆の現場で、論の弱さ、根拠不足、飛躍、説明不足、主張と事実の混同を見抜く査読者として考えてください。口調を演じる必要はありません。査読者の判断軸で、どこがまだ信用しにくいか、どの主張に裏付けが足りないか、どこを補強すると文章の説得力が上がるかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-illustrator-request",
+        label: "P1803-001: イラストレーター憑依",
+        keywords: ["P1803-001", "illustrator possession", "illustrator mode", "visual concept artist", "image maker role", "イラストレーター憑依", "挿絵担当", "図版発想", "いらすとれーたーひょうい", "さしえたんとう"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは イラストレーター に憑依してください。出版・誌面づくりの現場で、文章の内容を視覚モチーフへ落とし込むイラストレーターとして考えてください。口調を演じる必要はありません。イラストレーターの判断軸で、何を絵にすると伝わるか、どんな比喩やモチーフが効くか、どの絵柄や構図が内容に合うかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-art-director-request",
+        label: "P1803-002: アートディレクター憑依",
+        keywords: ["P1803-002", "art director possession", "art direction mode", "visual direction role", "creative direction", "アートディレクター憑依", "アート方向性", "ビジュアル方針", "あーとでぃれくたーひょうい", "びじゅあるほうしん"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは アートディレクター に憑依してください。出版・誌面づくりの現場で、全体の見た目の方向性を決めるアートディレクターとして考えてください。口調を演じる必要はありません。アートディレクターの判断軸で、どんなトーンが合うか、どこを主役に見せるか、写真・図版・文字のバランスをどう取るかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-layout-designer-request",
+        label: "P1803-003: レイアウト担当憑依",
+        keywords: ["P1803-003", "layout designer possession", "layout mode", "page layout role", "layout planning", "レイアウト担当憑依", "誌面レイアウト", "ページ設計", "れいあうとたんとうひょうい", "しめんれいあうと"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは レイアウト担当 に憑依してください。出版・誌面づくりの現場で、文字量、余白、視線誘導、図版配置を整えるレイアウト担当として考えてください。口調を演じる必要はありません。レイアウト担当の判断軸で、どこに視線を集めるべきか、どの順番で読ませるべきか、どこが詰まりすぎているかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-book-designer-request",
+        label: "P1803-004: 装丁家憑依",
+        keywords: ["P1803-004", "book designer possession", "cover designer mode", "book design role", "jacket design", "装丁家憑依", "装丁", "ブックデザイン", "そうていかひょうい", "ぶっくでざいん"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは 装丁家 に憑依してください。出版の現場で、書籍や冊子の外観全体を設計する装丁家として考えてください。口調を演じる必要はありません。装丁家の判断軸で、表紙・背・全体の印象をどう設計すると内容と噛み合うか、どの雰囲気なら手に取りたくなるかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-cover-designer-request",
+        label: "P1803-005: 表紙デザイナー憑依",
+        keywords: ["P1803-005", "cover designer possession", "cover design mode", "book cover role", "cover concept", "表紙デザイナー憑依", "表紙設計", "カバー案", "ひょうしでざいなーひょうい", "かばーあん"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは 表紙デザイナー に憑依してください。出版の現場で、ひと目で内容や雰囲気を伝える表紙を考える表紙デザイナーとして考えてください。口調を演じる必要はありません。表紙デザイナーの判断軸で、タイトルの見せ方、色、モチーフ、余白、第一印象をどう設計すると効くかが分かるように整理してください。`
+    },
+    {
+        id: "popular-possession-page-designer-request",
+        label: "P1803-006: 誌面設計者憑依",
+        keywords: ["P1803-006", "page designer possession", "editorial design mode", "spread design role", "magazine design", "誌面設計者憑依", "誌面設計", "見開き設計", "しめんせっけいしゃひょうい", "みひらきせっけい"],
+        requiresCommitId: false,
+        buildBody: () => `ここでは 誌面設計者 に憑依してください。出版・誌面づくりの現場で、見開き全体の情報設計を組み立てる誌面設計者として考えてください。口調を演じる必要はありません。誌面設計者の判断軸で、どの情報を主役にし、どこに補足を置き、どこで視線を休ませるかが分かるように整理してください。`
+    },
+    {
         id: "popular-legal-risk-check",
         label: "P1002-001: 法令違反リスクを確認する",
         keywords: ["P1002-001", "legal risk", "law violation risk", "compliance risk", "regulatory risk", "法令違反", "法令リスク", "法的リスク", "ほうれいいはん", "ほうてきりすく"],
