@@ -37,6 +37,7 @@
 - [lht-cmn] `lht-text-field-help` の trailing action を正式設計する。現在は `prompt-gen` 向けに `clearable` を暫定追加しているが、`lht-cmn` チームの更新版を受領したら、slot / action API を含めてちゃんとした実装へ置き換える
 - [lht-cmn][git-work-list] Material Web の `md-outlined-text-field` / `md-outlined-select` が DevTools で `translateY(NaNpx) scale(NaN)` 警告を出す件を調査し、非表示時初期化の回避または fallback 利用へ寄せる方針を決める
 - [prompt-gen][仕様検討] JSON から追加ボタン定義を投入し、`localStorage` に保存して再表示できる仕組みを初版スコープで整理する
+- [prompt-gen][導線整理] `生成AIで整理` ボタンは外部 URL 扱いではなく `local-html-tools` 内部導線として扱えるよう、遷移方式と UI 表現を見直す
 - [prompt-gen][仕様検討] 初版は「固定文面ボタンのみ追加可能」とし、`commitId` 差し込みや任意ロジックは対象外と明記する
 - [prompt-gen][仕様検討] 追加ボタン定義の JSON schema を固定する（初版: `id` / `label` / `keywords` / `body`。`requiresCommitId` は常に `false` 扱い）
 - [prompt-gen][仕様検討] JSON schema の妥当性チェック方針を決める（必須項目欠落・重複 `id`・不正 JSON の扱い）

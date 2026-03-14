@@ -78,7 +78,7 @@ function mountPromptDom() {
     <input id="subjectInput" />
     <input id="includeLabelPrefix" type="checkbox" />
     <button id="copyShareLinkButton" type="button"></button>
-    <a id="gitPseudoSquashLink" class="md-hidden" href="https://igapyon.github.io/local-html-tools/git/git-pseudo-squash.html"></a>
+    <a id="gitPseudoSquashLink" class="md-hidden" href="../git/git-work-list.html"></a>
     <div id="promptOutput"></div>
   `;
 }
@@ -350,7 +350,7 @@ describe("prompt-gen main", () => {
     promptSearch.dispatchEvent(new Event("input"));
 
     expect(gitPseudoSquashLink.classList.contains("md-hidden")).toBe(false);
-    expect(gitPseudoSquashLink.getAttribute("href")).toBe("https://igapyon.github.io/local-html-tools/git/git-pseudo-squash.html");
+    expect(gitPseudoSquashLink.getAttribute("href")).toBe("../git/git-work-list.html");
 
     promptSearch.value = "A701";
     promptSearch.dispatchEvent(new Event("input"));

@@ -189,6 +189,7 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
   font-size: 0.8rem;
   font-weight: 600;
   line-height: 1.1;
+  text-decoration: none;
   cursor: pointer;
   transition: background 150ms ease, border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
 }
