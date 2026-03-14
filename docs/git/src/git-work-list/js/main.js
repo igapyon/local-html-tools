@@ -1,6 +1,7 @@
     const STORAGE_KEY = "gitWorkList.entries";
     const RECENT_ACTIONS_KEY = "gitWorkList.recentActions";
     const MEMO_STORAGE_KEY = "gitWorkList.memos";
+    const EXPORT_VERSION = 1;
     let entries = [];
     let recentActions = [];
     let memos = {};
@@ -217,6 +218,93 @@
 
     function saveMemos() {
       localStorage.setItem(MEMO_STORAGE_KEY, JSON.stringify(memos));
+    }
+
+    function createExportPayload() {
+      return {
+        version: EXPORT_VERSION,
+        exportedAt: new Date().toISOString(),
+        entries,
+        memos
+      };
+    }
+
+    function buildExportFilename() {
+      const now = new Date();
+      const yyyy = String(now.getFullYear());
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mi = String(now.getMinutes()).padStart(2, "0");
+      const ss = String(now.getSeconds()).padStart(2, "0");
+      return `git-work-list-export-${yyyy}${mm}${dd}-${hh}${mi}${ss}.json`;
+    }
+
+    function downloadTextFile(text, filename, contentType) {
+      const blob = new Blob([text], { type: contentType });
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+      }, 0);
+    }
+
+    function exportEntriesAndMemos() {
+      const payload = createExportPayload();
+      downloadTextFile(
+        `${JSON.stringify(payload, null, 2)}\n`,
+        buildExportFilename(),
+        "application/json;charset=utf-8"
+      );
+      showToast("一覧を JSON でエクスポートしました");
+    }
+
+    function normalizeImportedPayload(rawPayload) {
+      if (!rawPayload || typeof rawPayload !== "object" || Array.isArray(rawPayload)) {
+        return null;
+      }
+      if (Number(rawPayload.version) !== EXPORT_VERSION) {
+        return null;
+      }
+      if (typeof rawPayload.exportedAt !== "string" || !rawPayload.exportedAt.trim()) {
+        return null;
+      }
+      if (!Array.isArray(rawPayload.entries)) {
+        return null;
+      }
+      return {
+        entries: rawPayload.entries
+          .map((entry) => normalizeEntry(entry))
+          .filter((entry) => entry.repoUrl && entry.baseBranch && entry.compareBranch),
+        memos: normalizeMemos(rawPayload.memos || {})
+      };
+    }
+
+    async function importEntriesAndMemosFromFile(file) {
+      if (!file) return;
+      try {
+        const rawText = await file.text();
+        const parsed = JSON.parse(rawText);
+        const normalized = normalizeImportedPayload(parsed);
+        if (!normalized) {
+          showToast("JSON の読み込みに失敗しました");
+          return;
+        }
+        entries = normalized.entries;
+        memos = normalized.memos;
+        saveEntries();
+        saveMemos();
+        renderEntries();
+        updatePrimaryActionsState();
+        showToast("一覧を JSON から取り込みました");
+      } catch (_) {
+        showToast("JSON の読み込みに失敗しました");
+      }
     }
 
     function normalizeScope(value) {
@@ -611,7 +699,7 @@
             </div>
           </div>
           <div class="md-entry-actions md-work-row__actions">
-            <button type="button" class="md-button ${getToolButtonClass(entry.id, "pseudo-squash")}" data-action="open-pseudo-squash">${getButtonIconSvg("pseudo-squash")}<span>squash</span></button>
+            <button type="button" class="md-button ${getToolButtonClass(entry.id, "pseudo-squash")}" data-action="open-pseudo-squash">${getButtonIconSvg("pseudo-squash")}<span>Squash</span></button>
             <button type="button" class="md-button ${getToolButtonClass(entry.id, "branch-diff")}" data-action="open-branch-diff">${getButtonIconSvg("branch-diff")}<span>比較</span></button>
             <button type="button" class="md-button md-button--surface" data-action="edit-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("edit")}<span>変更</span></button>
             <button type="button" class="md-button md-button--danger" data-action="delete-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("delete")}<span>削除</span></button>
@@ -746,6 +834,25 @@
       const openCreateButton = document.getElementById("openCreateDialogBtn");
       if (openCreateButton) {
         openCreateButton.addEventListener("click", openCreateDialog);
+      }
+      const exportEntriesButton = document.getElementById("exportEntriesBtn");
+      if (exportEntriesButton) {
+        exportEntriesButton.addEventListener("click", exportEntriesAndMemos);
+      }
+      const importEntriesButton = document.getElementById("importEntriesBtn");
+      const importEntriesInput = document.getElementById("importEntriesInput");
+      if (importEntriesButton && importEntriesInput) {
+        importEntriesButton.addEventListener("click", () => {
+          importEntriesInput.value = "";
+          importEntriesInput.click();
+        });
+        importEntriesInput.addEventListener("change", async () => {
+          const file = importEntriesInput.files && importEntriesInput.files[0]
+            ? importEntriesInput.files[0]
+            : null;
+          await importEntriesAndMemosFromFile(file);
+          importEntriesInput.value = "";
+        });
       }
       const saveButton = document.getElementById("saveEntryBtn");
       if (saveButton) {
