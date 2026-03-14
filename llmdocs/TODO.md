@@ -4,6 +4,7 @@
 
 - [ ] toast、error、ファイル選択、プレビュー、コマンドブロック UI がまだ重複しているアプリに対して、`lht-cmn` コンポーネント展開を継続する。
 - [ ] 狭幅画面でのはみ出し問題の残件を確認し、個別パッチの前に共有 `lht` ルールで修正する。
+- [ ] `git-work-list` で Material Web の `md-outlined-text-field` / `md-outlined-select` が `translateY(NaNpx) scale(NaN)` 警告を出す件を切り分け、無視継続か初期化タイミング修正かを判断する。
 - [ ] 既存のルート [`TODO.md`](/Users/igapyon/Documents/git/local-html-tools/TODO.md) バックログから、次に着手すべき最優先実装対象を明確化する。
 
 ## 最近完了した項目
