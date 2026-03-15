@@ -55,17 +55,26 @@ async function initializePromptPage() {
     const promptOutputTitle = document.getElementById("promptOutputTitle");
     const promptOutputHelp = document.getElementById("promptOutputHelp");
     const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink");
-    const includeLabelPrefix = document.getElementById("includeLabelPrefix");
     const outputTone = document.getElementById("outputTone") ||
         (await waitForElementById("outputTone"));
     const selfReview = document.getElementById("selfReview") ||
         (await waitForElementById("selfReview"));
+    const misleadingExpressionReview = document.getElementById("misleadingExpressionReview") ||
+        (await waitForElementById("misleadingExpressionReview"));
+    const considerationRiskReview = document.getElementById("considerationRiskReview") ||
+        (await waitForElementById("considerationRiskReview"));
+    const discomfortRiskReview = document.getElementById("discomfortRiskReview") ||
+        (await waitForElementById("discomfortRiskReview"));
+    const aggressiveExpressionReview = document.getElementById("aggressiveExpressionReview") ||
+        (await waitForElementById("aggressiveExpressionReview"));
+    const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview") ||
+        (await waitForElementById("sensitiveExpressionReview"));
     const hallucinationGuard = document.getElementById("hallucinationGuard") ||
         (await waitForElementById("hallucinationGuard"));
     const outputMarkdown = document.getElementById("outputMarkdown");
     const copyShareLinkButton = document.getElementById("copyShareLinkButton");
     const promptOutput = document.getElementById("promptOutput");
-    if (!promptSearch || !includeLabelPrefix || !outputTone || !selfReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+    if (!promptSearch || !outputTone || !selfReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
         return;
     }
     function loadSeriesVisibilitySettings() {
@@ -616,7 +625,12 @@ async function initializePromptPage() {
             hallucinationGuardLevel: (hallucinationGuard.value || "none"),
             outputMarkdownEnabled: outputMarkdown.checked,
             outputTone: (outputTone.value || "unspecified"),
-            selfReview: (selfReview.value || "unspecified")
+            selfReview: (selfReview.value || "unspecified"),
+            misleadingExpressionReview: (misleadingExpressionReview.value || "unspecified"),
+            considerationRiskReview: (considerationRiskReview.value || "unspecified"),
+            discomfortRiskReview: (discomfortRiskReview.value || "unspecified"),
+            aggressiveExpressionReview: (aggressiveExpressionReview.value || "unspecified"),
+            sensitiveExpressionReview: (sensitiveExpressionReview.value || "unspecified")
         };
     }
     function inferPromptOutputOptionDefaults(definition) {
@@ -625,7 +639,12 @@ async function initializePromptPage() {
                 hallucinationGuard: "none",
                 outputMarkdown: false,
                 outputTone: "unspecified",
-                selfReview: "unspecified"
+                selfReview: "unspecified",
+                misleadingExpressionReview: "unspecified",
+                considerationRiskReview: "unspecified",
+                discomfortRiskReview: "unspecified",
+                aggressiveExpressionReview: "unspecified",
+                sensitiveExpressionReview: "unspecified"
             };
         }
         const cached = promptOutputOptionDefaultsById.get(definition.id);
@@ -641,7 +660,12 @@ async function initializePromptPage() {
                         : "none",
                 outputMarkdown: definition.outputMarkdown === true,
                 outputTone: "unspecified",
-                selfReview: "unspecified"
+                selfReview: "unspecified",
+                misleadingExpressionReview: "unspecified",
+                considerationRiskReview: "unspecified",
+                discomfortRiskReview: "unspecified",
+                aggressiveExpressionReview: "unspecified",
+                sensitiveExpressionReview: "unspecified"
             };
             promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
             return explicitDefaults;
@@ -651,7 +675,12 @@ async function initializePromptPage() {
             hallucinationGuardLevel: "high",
             outputMarkdownEnabled: true,
             outputTone: "unspecified",
-            selfReview: "unspecified"
+            selfReview: "unspecified",
+            misleadingExpressionReview: "unspecified",
+            considerationRiskReview: "unspecified",
+            discomfortRiskReview: "unspecified",
+            aggressiveExpressionReview: "unspecified",
+            sensitiveExpressionReview: "unspecified"
         });
         const argsForInference = {};
         for (const argumentDefinition of getSelectedPromptArguments(definition)) {
@@ -665,7 +694,12 @@ async function initializePromptPage() {
             hallucinationGuard: instructionProfile.hallucinationGuardMode,
             outputMarkdown: instructionProfile.outputMarkdown,
             outputTone: instructionProfile.outputTone,
-            selfReview: instructionProfile.selfReview
+            selfReview: instructionProfile.selfReview,
+            misleadingExpressionReview: instructionProfile.misleadingExpressionReview,
+            considerationRiskReview: instructionProfile.considerationRiskReview,
+            discomfortRiskReview: instructionProfile.discomfortRiskReview,
+            aggressiveExpressionReview: instructionProfile.aggressiveExpressionReview,
+            sensitiveExpressionReview: instructionProfile.sensitiveExpressionReview
         };
         promptOutputOptionDefaultsById.set(definition.id, defaults);
         return defaults;
@@ -676,6 +710,11 @@ async function initializePromptPage() {
         outputMarkdown.checked = defaults.outputMarkdown;
         outputTone.value = defaults.outputTone;
         selfReview.value = defaults.selfReview;
+        misleadingExpressionReview.value = defaults.misleadingExpressionReview;
+        considerationRiskReview.value = defaults.considerationRiskReview;
+        discomfortRiskReview.value = defaults.discomfortRiskReview;
+        aggressiveExpressionReview.value = defaults.aggressiveExpressionReview;
+        sensitiveExpressionReview.value = defaults.sensitiveExpressionReview;
     }
     function renderSelectedPromptHelp() {
         const selectedDefinition = getSelectedPromptDefinition();
@@ -827,7 +866,6 @@ async function initializePromptPage() {
         if (!selectedDefinition) {
             return "";
         }
-        const label = selectedDefinition ? selectedDefinition.label : "";
         const argumentValues = getPromptArgumentValues();
         const commitId = sanitizePromptVariableInput(argumentValues.commitId || "");
         const subject = sanitizePromptVariableInput(argumentValues.subject || "");
@@ -836,17 +874,21 @@ async function initializePromptPage() {
             hallucinationGuardLevel: "high",
             outputMarkdownEnabled: true,
             outputTone: "unspecified",
-            selfReview: "unspecified"
+            selfReview: "unspecified",
+            misleadingExpressionReview: "unspecified",
+            considerationRiskReview: "unspecified",
+            discomfortRiskReview: "unspecified",
+            aggressiveExpressionReview: "unspecified",
+            sensitiveExpressionReview: "unspecified"
         });
         const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
         setPromptOutputOptions(currentOptions);
         const instructionProfile = inferPromptOutputInstructionProfile(rawBody);
         const body = appendPromptOutputInstructions(stripPromptOutputInstructions(rawBody), currentOptions, instructionProfile.hallucinationGuardMode || "high");
-        if (!body || !label) {
+        if (!body) {
             return "";
         }
-        const normalizedBody = body.trim().replace(/\n{3,}/g, "\n\n");
-        return includeLabelPrefix.checked ? `[${label}] ${normalizedBody}` : normalizedBody;
+        return body.trim().replace(/\n{3,}/g, "\n\n");
     }
     function getDefinitionLabelCode(definition) {
         const label = String((definition === null || definition === void 0 ? void 0 : definition.label) || "");
@@ -950,9 +992,13 @@ async function initializePromptPage() {
         section.appendChild(resetButton);
     }
     promptSearch.addEventListener("input", renderCandidates);
-    includeLabelPrefix.addEventListener("change", updateOutput);
     outputTone.addEventListener("change", updateOutput);
     selfReview.addEventListener("change", updateOutput);
+    misleadingExpressionReview.addEventListener("change", updateOutput);
+    considerationRiskReview.addEventListener("change", updateOutput);
+    discomfortRiskReview.addEventListener("change", updateOutput);
+    aggressiveExpressionReview.addEventListener("change", updateOutput);
+    sensitiveExpressionReview.addEventListener("change", updateOutput);
     hallucinationGuard.addEventListener("change", updateOutput);
     outputMarkdown.addEventListener("change", updateOutput);
     copyShareLinkButton.addEventListener("click", () => {

@@ -29,6 +29,11 @@ type PromptOutputOptionDefaults = {
   outputMarkdown: boolean;
   outputTone: "unspecified" | "desumasu" | "dearu";
   selfReview: "unspecified" | "internal" | "report";
+  misleadingExpressionReview: "unspecified" | "internal" | "report";
+  considerationRiskReview: "unspecified" | "internal" | "report";
+  discomfortRiskReview: "unspecified" | "internal" | "report";
+  aggressiveExpressionReview: "unspecified" | "internal" | "report";
+  sensitiveExpressionReview: "unspecified" | "internal" | "report";
 };
 
 type PromptSearchIndex = {
@@ -117,13 +122,27 @@ async function initializePromptPage() {
   const promptOutputTitle = document.getElementById("promptOutputTitle") as HTMLElement | null;
   const promptOutputHelp = document.getElementById("promptOutputHelp") as HTMLDivElement | null;
   const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink") as HTMLAnchorElement | null;
-  const includeLabelPrefix = document.getElementById("includeLabelPrefix") as HTMLInputElement | null;
   const outputTone =
     (document.getElementById("outputTone") as HTMLSelectElement | null) ||
     (await waitForElementById<HTMLSelectElement>("outputTone"));
   const selfReview =
     (document.getElementById("selfReview") as HTMLSelectElement | null) ||
     (await waitForElementById<HTMLSelectElement>("selfReview"));
+  const misleadingExpressionReview =
+    (document.getElementById("misleadingExpressionReview") as HTMLSelectElement | null) ||
+    (await waitForElementById<HTMLSelectElement>("misleadingExpressionReview"));
+  const considerationRiskReview =
+    (document.getElementById("considerationRiskReview") as HTMLSelectElement | null) ||
+    (await waitForElementById<HTMLSelectElement>("considerationRiskReview"));
+  const discomfortRiskReview =
+    (document.getElementById("discomfortRiskReview") as HTMLSelectElement | null) ||
+    (await waitForElementById<HTMLSelectElement>("discomfortRiskReview"));
+  const aggressiveExpressionReview =
+    (document.getElementById("aggressiveExpressionReview") as HTMLSelectElement | null) ||
+    (await waitForElementById<HTMLSelectElement>("aggressiveExpressionReview"));
+  const sensitiveExpressionReview =
+    (document.getElementById("sensitiveExpressionReview") as HTMLSelectElement | null) ||
+    (await waitForElementById<HTMLSelectElement>("sensitiveExpressionReview"));
   const hallucinationGuard =
     (document.getElementById("hallucinationGuard") as HTMLSelectElement | null) ||
     (await waitForElementById<HTMLSelectElement>("hallucinationGuard"));
@@ -131,7 +150,7 @@ async function initializePromptPage() {
   const copyShareLinkButton = document.getElementById("copyShareLinkButton") as HTMLButtonElement | null;
   const promptOutput = document.getElementById("promptOutput") as HTMLElement | null;
 
-  if (!promptSearch || !includeLabelPrefix || !outputTone || !selfReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+  if (!promptSearch || !outputTone || !selfReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
     return;
   }
 
@@ -780,7 +799,12 @@ async function initializePromptPage() {
       hallucinationGuardLevel: ((hallucinationGuard.value || "none") as "none" | "low" | "high"),
       outputMarkdownEnabled: outputMarkdown.checked,
       outputTone: ((outputTone.value || "unspecified") as "unspecified" | "desumasu" | "dearu"),
-      selfReview: ((selfReview.value || "unspecified") as "unspecified" | "internal" | "report")
+      selfReview: ((selfReview.value || "unspecified") as "unspecified" | "internal" | "report"),
+      misleadingExpressionReview: ((misleadingExpressionReview.value || "unspecified") as "unspecified" | "internal" | "report"),
+      considerationRiskReview: ((considerationRiskReview.value || "unspecified") as "unspecified" | "internal" | "report"),
+      discomfortRiskReview: ((discomfortRiskReview.value || "unspecified") as "unspecified" | "internal" | "report"),
+      aggressiveExpressionReview: ((aggressiveExpressionReview.value || "unspecified") as "unspecified" | "internal" | "report"),
+      sensitiveExpressionReview: ((sensitiveExpressionReview.value || "unspecified") as "unspecified" | "internal" | "report")
     };
   }
 
@@ -790,7 +814,12 @@ async function initializePromptPage() {
         hallucinationGuard: "none",
         outputMarkdown: false,
         outputTone: "unspecified",
-        selfReview: "unspecified"
+        selfReview: "unspecified",
+        misleadingExpressionReview: "unspecified",
+        considerationRiskReview: "unspecified",
+        discomfortRiskReview: "unspecified",
+        aggressiveExpressionReview: "unspecified",
+        sensitiveExpressionReview: "unspecified"
       };
     }
 
@@ -808,7 +837,12 @@ async function initializePromptPage() {
             : "none",
         outputMarkdown: definition.outputMarkdown === true,
         outputTone: "unspecified",
-        selfReview: "unspecified"
+        selfReview: "unspecified",
+        misleadingExpressionReview: "unspecified",
+        considerationRiskReview: "unspecified",
+        discomfortRiskReview: "unspecified",
+        aggressiveExpressionReview: "unspecified",
+        sensitiveExpressionReview: "unspecified"
       };
       promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
       return explicitDefaults;
@@ -819,7 +853,12 @@ async function initializePromptPage() {
       hallucinationGuardLevel: "high",
       outputMarkdownEnabled: true,
       outputTone: "unspecified",
-      selfReview: "unspecified"
+      selfReview: "unspecified",
+      misleadingExpressionReview: "unspecified",
+      considerationRiskReview: "unspecified",
+      discomfortRiskReview: "unspecified",
+      aggressiveExpressionReview: "unspecified",
+      sensitiveExpressionReview: "unspecified"
     });
     const argsForInference: Record<string, string> = {};
     for (const argumentDefinition of getSelectedPromptArguments(definition)) {
@@ -837,7 +876,12 @@ async function initializePromptPage() {
       hallucinationGuard: instructionProfile.hallucinationGuardMode,
       outputMarkdown: instructionProfile.outputMarkdown,
       outputTone: instructionProfile.outputTone,
-      selfReview: instructionProfile.selfReview
+      selfReview: instructionProfile.selfReview,
+      misleadingExpressionReview: instructionProfile.misleadingExpressionReview,
+      considerationRiskReview: instructionProfile.considerationRiskReview,
+      discomfortRiskReview: instructionProfile.discomfortRiskReview,
+      aggressiveExpressionReview: instructionProfile.aggressiveExpressionReview,
+      sensitiveExpressionReview: instructionProfile.sensitiveExpressionReview
     };
     promptOutputOptionDefaultsById.set(definition.id, defaults);
     return defaults;
@@ -849,6 +893,11 @@ async function initializePromptPage() {
     outputMarkdown.checked = defaults.outputMarkdown;
     outputTone.value = defaults.outputTone;
     selfReview.value = defaults.selfReview;
+    misleadingExpressionReview.value = defaults.misleadingExpressionReview;
+    considerationRiskReview.value = defaults.considerationRiskReview;
+    discomfortRiskReview.value = defaults.discomfortRiskReview;
+    aggressiveExpressionReview.value = defaults.aggressiveExpressionReview;
+    sensitiveExpressionReview.value = defaults.sensitiveExpressionReview;
   }
 
   function renderSelectedPromptHelp() {
@@ -1024,7 +1073,6 @@ async function initializePromptPage() {
     if (!selectedDefinition) {
       return "";
     }
-    const label = selectedDefinition ? selectedDefinition.label : "";
     const argumentValues = getPromptArgumentValues();
     const commitId = sanitizePromptVariableInput(argumentValues.commitId || "");
     const subject = sanitizePromptVariableInput(argumentValues.subject || "");
@@ -1033,7 +1081,12 @@ async function initializePromptPage() {
       hallucinationGuardLevel: "high",
       outputMarkdownEnabled: true,
       outputTone: "unspecified",
-      selfReview: "unspecified"
+      selfReview: "unspecified",
+      misleadingExpressionReview: "unspecified",
+      considerationRiskReview: "unspecified",
+      discomfortRiskReview: "unspecified",
+      aggressiveExpressionReview: "unspecified",
+      sensitiveExpressionReview: "unspecified"
     });
     const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
     setPromptOutputOptions(currentOptions);
@@ -1044,12 +1097,11 @@ async function initializePromptPage() {
       instructionProfile.hallucinationGuardMode || "high"
     );
 
-    if (!body || !label) {
+    if (!body) {
       return "";
     }
 
-    const normalizedBody = body.trim().replace(/\n{3,}/g, "\n\n");
-    return includeLabelPrefix.checked ? `[${label}] ${normalizedBody}` : normalizedBody;
+    return body.trim().replace(/\n{3,}/g, "\n\n");
   }
 
   function getDefinitionLabelCode(definition: PromptDefinition | null) {
@@ -1171,9 +1223,13 @@ async function initializePromptPage() {
   }
 
   promptSearch.addEventListener("input", renderCandidates);
-  includeLabelPrefix.addEventListener("change", updateOutput);
   outputTone.addEventListener("change", updateOutput);
   selfReview.addEventListener("change", updateOutput);
+  misleadingExpressionReview.addEventListener("change", updateOutput);
+  considerationRiskReview.addEventListener("change", updateOutput);
+  discomfortRiskReview.addEventListener("change", updateOutput);
+  aggressiveExpressionReview.addEventListener("change", updateOutput);
+  sensitiveExpressionReview.addEventListener("change", updateOutput);
   hallucinationGuard.addEventListener("change", updateOutput);
   outputMarkdown.addEventListener("change", updateOutput);
   copyShareLinkButton.addEventListener("click", () => {

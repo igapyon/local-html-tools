@@ -1556,10 +1556,10 @@ md-icon-button.md-copy-button--surface {
       <lht-command-block command-id="promptOutput" copy-buttons="dual"></lht-command-block>
       <div class="md-output-options">
         <lht-switch-help
-          switch-id="includeLabelPrefix"
-          label="ラベル名を先頭に含める"
-          help-label="ラベル名を先頭に含める説明">
-          ON の場合は `[ボタンラベル] 本文` の形式で出力します。OFF の場合は本文のみを出力します。
+          switch-id="outputMarkdown"
+          label="Markdown出力"
+          help-label="Markdown出力の説明">
+          ON の場合は、最終回答を Markdown として出力し、外側を `~~~~` で囲む指定を含めます。
         </lht-switch-help>
         <lht-select-help
           class="md-output-options__select md-output-options__select--compact"
@@ -1572,6 +1572,15 @@ md-icon-button.md-copy-button--surface {
         </lht-select-help>
         <lht-select-help
           class="md-output-options__select md-output-options__select--compact"
+          field-id="hallucinationGuard"
+          label="幻想防止"
+          help-text="幻想防止の強さを選択します。無指定 / 弱 / 強 の3段階です。">
+          <option value="none">無指定</option>
+          <option value="low">弱</option>
+          <option value="high">強</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
           field-id="selfReview"
           label="自己レビュー"
           help-text="第三者レビューア視点での見直し方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
@@ -1581,19 +1590,49 @@ md-icon-button.md-copy-button--surface {
         </lht-select-help>
         <lht-select-help
           class="md-output-options__select md-output-options__select--compact"
-          field-id="hallucinationGuard"
-          label="幻想防止"
-          help-text="幻想防止の強さを選択します。なし / 弱 / 強 の3段階です。">
-          <option value="none">なし</option>
-          <option value="low">弱</option>
-          <option value="high">強</option>
+          field-id="misleadingExpressionReview"
+          label="誤解表現"
+          help-text="誤解を招く表現がないかを見直す方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
         </lht-select-help>
-        <lht-switch-help
-          switch-id="outputMarkdown"
-          label="Markdown出力"
-          help-label="Markdown出力の説明">
-          ON の場合は、最終回答を Markdown として出力し、外側を `~~~~` で囲む指定を含めます。
-        </lht-switch-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="considerationRiskReview"
+          label="配慮不足"
+          help-text="配慮不足リスクがないかを見直す方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="discomfortRiskReview"
+          label="不快感"
+          help-text="不快感リスクがないかを見直す方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="aggressiveExpressionReview"
+          label="攻撃性"
+          help-text="攻撃的な表現がないかを見直す方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="sensitiveExpressionReview"
+          label="センシティブ"
+          help-text="センシティブな表現がないかを見直す方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
       </div>
     </section>
 
@@ -3743,18 +3782,73 @@ const reportedSelfReviewInstruction = `○回答案を作成したあと、第�
 - 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
 - 最終回答の末尾に \`自己レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
 - 自己レビューの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalMisleadingExpressionReviewInstruction = `○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。
+- 読み手が別の意味に受け取りそうな表現、主語や対象が曖昧な表現、断定が強すぎる表現があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedMisleadingExpressionReviewInstruction = `○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。
+- 読み手が別の意味に受け取りそうな表現、主語や対象が曖昧な表現、断定が強すぎる表現があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`誤解表現レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalConsiderationRiskReviewInstruction = `○回答案を作成したあと、配慮不足リスクがないかを観点として見直してください。
+- 相手や状況への配慮が不足して見える表現、断定的すぎる言い回し、受け手への負荷が高い表現があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedConsiderationRiskReviewInstruction = `○回答案を作成したあと、配慮不足リスクがないかを観点として見直してください。
+- 相手や状況への配慮が不足して見える表現、断定的すぎる言い回し、受け手への負荷が高い表現があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`配慮不足レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalDiscomfortRiskReviewInstruction = `○回答案を作成したあと、不快感リスクがないかを観点として見直してください。
+- 読み手に不快感を与えやすい表現、不要にきつい語調、印象を悪くしやすい言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedDiscomfortRiskReviewInstruction = `○回答案を作成したあと、不快感リスクがないかを観点として見直してください。
+- 読み手に不快感を与えやすい表現、不要にきつい語調、印象を悪くしやすい言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`不快感レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalAggressiveExpressionReviewInstruction = `○回答案を作成したあと、攻撃的な表現がないかを観点として見直してください。
+- 相手を責めるように読める表現、強すぎる否定、対立を unnecessary に強める言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedAggressiveExpressionReviewInstruction = `○回答案を作成したあと、攻撃的な表現がないかを観点として見直してください。
+- 相手を責めるように読める表現、強すぎる否定、対立を unnecessary に強める言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`攻撃性レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalSensitiveExpressionReviewInstruction = `○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。
+- 読み手によっては慎重な扱いが必要な表現、センシティブな話題への不用意な言及、配慮不足に見える言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedSensitiveExpressionReviewInstruction = `○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。
+- 読み手によっては慎重な扱いが必要な表現、センシティブな話題への不用意な言及、配慮不足に見える言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`センシティブ表現レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
 let currentPromptOutputOptions = {
     hallucinationGuardLevel: "high",
     outputMarkdownEnabled: true,
     outputTone: "unspecified",
-    selfReview: "unspecified"
+    selfReview: "unspecified",
+    misleadingExpressionReview: "unspecified",
+    considerationRiskReview: "unspecified",
+    discomfortRiskReview: "unspecified",
+    aggressiveExpressionReview: "unspecified",
+    sensitiveExpressionReview: "unspecified"
 };
 function setPromptOutputOptions(options) {
     currentPromptOutputOptions = {
         hallucinationGuardLevel: options.hallucinationGuardLevel || "none",
         outputMarkdownEnabled: options.outputMarkdownEnabled !== false,
         outputTone: options.outputTone || "unspecified",
-        selfReview: options.selfReview || "unspecified"
+        selfReview: options.selfReview || "unspecified",
+        misleadingExpressionReview: options.misleadingExpressionReview || "unspecified",
+        considerationRiskReview: options.considerationRiskReview || "unspecified",
+        discomfortRiskReview: options.discomfortRiskReview || "unspecified",
+        aggressiveExpressionReview: options.aggressiveExpressionReview || "unspecified",
+        sensitiveExpressionReview: options.sensitiveExpressionReview || "unspecified"
     };
 }
 function getPromptOutputInstructionTemplates() {
@@ -3765,7 +3859,17 @@ function getPromptOutputInstructionTemplates() {
         desumasuToneInstruction,
         dearuToneInstruction,
         internalSelfReviewInstruction,
-        reportedSelfReviewInstruction
+        reportedSelfReviewInstruction,
+        internalMisleadingExpressionReviewInstruction,
+        reportedMisleadingExpressionReviewInstruction,
+        internalConsiderationRiskReviewInstruction,
+        reportedConsiderationRiskReviewInstruction,
+        internalDiscomfortRiskReviewInstruction,
+        reportedDiscomfortRiskReviewInstruction,
+        internalAggressiveExpressionReviewInstruction,
+        reportedAggressiveExpressionReviewInstruction,
+        internalSensitiveExpressionReviewInstruction,
+        reportedSensitiveExpressionReviewInstruction
     };
 }
 function trimTrailingPromptSeparators(value) {
@@ -3790,6 +3894,31 @@ function inferPromptOutputInstructionProfile(body) {
             ? "report"
             : normalizedBody.includes(templates.internalSelfReviewInstruction)
                 ? "internal"
+                : "unspecified",
+        misleadingExpressionReview: normalizedBody.includes(templates.reportedMisleadingExpressionReviewInstruction)
+            ? "report"
+            : normalizedBody.includes(templates.internalMisleadingExpressionReviewInstruction)
+                ? "internal"
+                : "unspecified",
+        considerationRiskReview: normalizedBody.includes(templates.reportedConsiderationRiskReviewInstruction)
+            ? "report"
+            : normalizedBody.includes(templates.internalConsiderationRiskReviewInstruction)
+                ? "internal"
+                : "unspecified",
+        discomfortRiskReview: normalizedBody.includes(templates.reportedDiscomfortRiskReviewInstruction)
+            ? "report"
+            : normalizedBody.includes(templates.internalDiscomfortRiskReviewInstruction)
+                ? "internal"
+                : "unspecified",
+        aggressiveExpressionReview: normalizedBody.includes(templates.reportedAggressiveExpressionReviewInstruction)
+            ? "report"
+            : normalizedBody.includes(templates.internalAggressiveExpressionReviewInstruction)
+                ? "internal"
+                : "unspecified",
+        sensitiveExpressionReview: normalizedBody.includes(templates.reportedSensitiveExpressionReviewInstruction)
+            ? "report"
+            : normalizedBody.includes(templates.internalSensitiveExpressionReviewInstruction)
+                ? "internal"
                 : "unspecified"
     };
 }
@@ -3800,13 +3929,23 @@ function stripPromptOutputInstructions(body) {
     while (changed) {
         changed = false;
         for (const template of [
+            templates.reportedSensitiveExpressionReviewInstruction,
+            templates.internalSensitiveExpressionReviewInstruction,
+            templates.reportedAggressiveExpressionReviewInstruction,
+            templates.internalAggressiveExpressionReviewInstruction,
+            templates.reportedDiscomfortRiskReviewInstruction,
+            templates.internalDiscomfortRiskReviewInstruction,
+            templates.reportedConsiderationRiskReviewInstruction,
+            templates.internalConsiderationRiskReviewInstruction,
+            templates.reportedMisleadingExpressionReviewInstruction,
+            templates.internalMisleadingExpressionReviewInstruction,
             templates.reportedSelfReviewInstruction,
             templates.internalSelfReviewInstruction,
+            templates.strictHallucinationPreventionInstruction,
+            templates.softHallucinationPreventionInstruction,
             templates.dearuToneInstruction,
             templates.desumasuToneInstruction,
             templates.markdownFenceInstruction,
-            templates.strictHallucinationPreventionInstruction,
-            templates.softHallucinationPreventionInstruction
         ]) {
             if (!template || !normalizedBody.endsWith(template)) {
                 continue;
@@ -3823,11 +3962,6 @@ function appendPromptOutputInstructions(body, options, hallucinationGuardMode = 
         return "";
     }
     const segments = [normalizedBody];
-    if (options.hallucinationGuardLevel !== "none") {
-        segments.push((options.hallucinationGuardLevel || hallucinationGuardMode) === "low"
-            ? softHallucinationPreventionInstruction
-            : strictHallucinationPreventionInstruction);
-    }
     if (options.outputMarkdownEnabled) {
         segments.push(markdownFenceInstruction);
     }
@@ -3837,11 +3971,46 @@ function appendPromptOutputInstructions(body, options, hallucinationGuardMode = 
     else if (options.outputTone === "dearu") {
         segments.push(dearuToneInstruction);
     }
+    if (options.hallucinationGuardLevel !== "none") {
+        segments.push((options.hallucinationGuardLevel || hallucinationGuardMode) === "low"
+            ? softHallucinationPreventionInstruction
+            : strictHallucinationPreventionInstruction);
+    }
     if (options.selfReview === "internal") {
         segments.push(internalSelfReviewInstruction);
     }
     else if (options.selfReview === "report") {
         segments.push(reportedSelfReviewInstruction);
+    }
+    if (options.misleadingExpressionReview === "internal") {
+        segments.push(internalMisleadingExpressionReviewInstruction);
+    }
+    else if (options.misleadingExpressionReview === "report") {
+        segments.push(reportedMisleadingExpressionReviewInstruction);
+    }
+    if (options.considerationRiskReview === "internal") {
+        segments.push(internalConsiderationRiskReviewInstruction);
+    }
+    else if (options.considerationRiskReview === "report") {
+        segments.push(reportedConsiderationRiskReviewInstruction);
+    }
+    if (options.discomfortRiskReview === "internal") {
+        segments.push(internalDiscomfortRiskReviewInstruction);
+    }
+    else if (options.discomfortRiskReview === "report") {
+        segments.push(reportedDiscomfortRiskReviewInstruction);
+    }
+    if (options.aggressiveExpressionReview === "internal") {
+        segments.push(internalAggressiveExpressionReviewInstruction);
+    }
+    else if (options.aggressiveExpressionReview === "report") {
+        segments.push(reportedAggressiveExpressionReviewInstruction);
+    }
+    if (options.sensitiveExpressionReview === "internal") {
+        segments.push(internalSensitiveExpressionReviewInstruction);
+    }
+    else if (options.sensitiveExpressionReview === "report") {
+        segments.push(reportedSensitiveExpressionReviewInstruction);
     }
     return segments.join("\n\n");
 }
@@ -8545,17 +8714,26 @@ async function initializePromptPage() {
     const promptOutputTitle = document.getElementById("promptOutputTitle");
     const promptOutputHelp = document.getElementById("promptOutputHelp");
     const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink");
-    const includeLabelPrefix = document.getElementById("includeLabelPrefix");
     const outputTone = document.getElementById("outputTone") ||
         (await waitForElementById("outputTone"));
     const selfReview = document.getElementById("selfReview") ||
         (await waitForElementById("selfReview"));
+    const misleadingExpressionReview = document.getElementById("misleadingExpressionReview") ||
+        (await waitForElementById("misleadingExpressionReview"));
+    const considerationRiskReview = document.getElementById("considerationRiskReview") ||
+        (await waitForElementById("considerationRiskReview"));
+    const discomfortRiskReview = document.getElementById("discomfortRiskReview") ||
+        (await waitForElementById("discomfortRiskReview"));
+    const aggressiveExpressionReview = document.getElementById("aggressiveExpressionReview") ||
+        (await waitForElementById("aggressiveExpressionReview"));
+    const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview") ||
+        (await waitForElementById("sensitiveExpressionReview"));
     const hallucinationGuard = document.getElementById("hallucinationGuard") ||
         (await waitForElementById("hallucinationGuard"));
     const outputMarkdown = document.getElementById("outputMarkdown");
     const copyShareLinkButton = document.getElementById("copyShareLinkButton");
     const promptOutput = document.getElementById("promptOutput");
-    if (!promptSearch || !includeLabelPrefix || !outputTone || !selfReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+    if (!promptSearch || !outputTone || !selfReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
         return;
     }
     function loadSeriesVisibilitySettings() {
@@ -9106,7 +9284,12 @@ async function initializePromptPage() {
             hallucinationGuardLevel: (hallucinationGuard.value || "none"),
             outputMarkdownEnabled: outputMarkdown.checked,
             outputTone: (outputTone.value || "unspecified"),
-            selfReview: (selfReview.value || "unspecified")
+            selfReview: (selfReview.value || "unspecified"),
+            misleadingExpressionReview: (misleadingExpressionReview.value || "unspecified"),
+            considerationRiskReview: (considerationRiskReview.value || "unspecified"),
+            discomfortRiskReview: (discomfortRiskReview.value || "unspecified"),
+            aggressiveExpressionReview: (aggressiveExpressionReview.value || "unspecified"),
+            sensitiveExpressionReview: (sensitiveExpressionReview.value || "unspecified")
         };
     }
     function inferPromptOutputOptionDefaults(definition) {
@@ -9115,7 +9298,12 @@ async function initializePromptPage() {
                 hallucinationGuard: "none",
                 outputMarkdown: false,
                 outputTone: "unspecified",
-                selfReview: "unspecified"
+                selfReview: "unspecified",
+                misleadingExpressionReview: "unspecified",
+                considerationRiskReview: "unspecified",
+                discomfortRiskReview: "unspecified",
+                aggressiveExpressionReview: "unspecified",
+                sensitiveExpressionReview: "unspecified"
             };
         }
         const cached = promptOutputOptionDefaultsById.get(definition.id);
@@ -9131,7 +9319,12 @@ async function initializePromptPage() {
                         : "none",
                 outputMarkdown: definition.outputMarkdown === true,
                 outputTone: "unspecified",
-                selfReview: "unspecified"
+                selfReview: "unspecified",
+                misleadingExpressionReview: "unspecified",
+                considerationRiskReview: "unspecified",
+                discomfortRiskReview: "unspecified",
+                aggressiveExpressionReview: "unspecified",
+                sensitiveExpressionReview: "unspecified"
             };
             promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
             return explicitDefaults;
@@ -9141,7 +9334,12 @@ async function initializePromptPage() {
             hallucinationGuardLevel: "high",
             outputMarkdownEnabled: true,
             outputTone: "unspecified",
-            selfReview: "unspecified"
+            selfReview: "unspecified",
+            misleadingExpressionReview: "unspecified",
+            considerationRiskReview: "unspecified",
+            discomfortRiskReview: "unspecified",
+            aggressiveExpressionReview: "unspecified",
+            sensitiveExpressionReview: "unspecified"
         });
         const argsForInference = {};
         for (const argumentDefinition of getSelectedPromptArguments(definition)) {
@@ -9155,7 +9353,12 @@ async function initializePromptPage() {
             hallucinationGuard: instructionProfile.hallucinationGuardMode,
             outputMarkdown: instructionProfile.outputMarkdown,
             outputTone: instructionProfile.outputTone,
-            selfReview: instructionProfile.selfReview
+            selfReview: instructionProfile.selfReview,
+            misleadingExpressionReview: instructionProfile.misleadingExpressionReview,
+            considerationRiskReview: instructionProfile.considerationRiskReview,
+            discomfortRiskReview: instructionProfile.discomfortRiskReview,
+            aggressiveExpressionReview: instructionProfile.aggressiveExpressionReview,
+            sensitiveExpressionReview: instructionProfile.sensitiveExpressionReview
         };
         promptOutputOptionDefaultsById.set(definition.id, defaults);
         return defaults;
@@ -9166,6 +9369,11 @@ async function initializePromptPage() {
         outputMarkdown.checked = defaults.outputMarkdown;
         outputTone.value = defaults.outputTone;
         selfReview.value = defaults.selfReview;
+        misleadingExpressionReview.value = defaults.misleadingExpressionReview;
+        considerationRiskReview.value = defaults.considerationRiskReview;
+        discomfortRiskReview.value = defaults.discomfortRiskReview;
+        aggressiveExpressionReview.value = defaults.aggressiveExpressionReview;
+        sensitiveExpressionReview.value = defaults.sensitiveExpressionReview;
     }
     function renderSelectedPromptHelp() {
         const selectedDefinition = getSelectedPromptDefinition();
@@ -9317,7 +9525,6 @@ async function initializePromptPage() {
         if (!selectedDefinition) {
             return "";
         }
-        const label = selectedDefinition ? selectedDefinition.label : "";
         const argumentValues = getPromptArgumentValues();
         const commitId = sanitizePromptVariableInput(argumentValues.commitId || "");
         const subject = sanitizePromptVariableInput(argumentValues.subject || "");
@@ -9326,17 +9533,21 @@ async function initializePromptPage() {
             hallucinationGuardLevel: "high",
             outputMarkdownEnabled: true,
             outputTone: "unspecified",
-            selfReview: "unspecified"
+            selfReview: "unspecified",
+            misleadingExpressionReview: "unspecified",
+            considerationRiskReview: "unspecified",
+            discomfortRiskReview: "unspecified",
+            aggressiveExpressionReview: "unspecified",
+            sensitiveExpressionReview: "unspecified"
         });
         const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
         setPromptOutputOptions(currentOptions);
         const instructionProfile = inferPromptOutputInstructionProfile(rawBody);
         const body = appendPromptOutputInstructions(stripPromptOutputInstructions(rawBody), currentOptions, instructionProfile.hallucinationGuardMode || "high");
-        if (!body || !label) {
+        if (!body) {
             return "";
         }
-        const normalizedBody = body.trim().replace(/\n{3,}/g, "\n\n");
-        return includeLabelPrefix.checked ? `[${label}] ${normalizedBody}` : normalizedBody;
+        return body.trim().replace(/\n{3,}/g, "\n\n");
     }
     function getDefinitionLabelCode(definition) {
         const label = String((definition === null || definition === void 0 ? void 0 : definition.label) || "");
@@ -9440,9 +9651,13 @@ async function initializePromptPage() {
         section.appendChild(resetButton);
     }
     promptSearch.addEventListener("input", renderCandidates);
-    includeLabelPrefix.addEventListener("change", updateOutput);
     outputTone.addEventListener("change", updateOutput);
     selfReview.addEventListener("change", updateOutput);
+    misleadingExpressionReview.addEventListener("change", updateOutput);
+    considerationRiskReview.addEventListener("change", updateOutput);
+    discomfortRiskReview.addEventListener("change", updateOutput);
+    aggressiveExpressionReview.addEventListener("change", updateOutput);
+    sensitiveExpressionReview.addEventListener("change", updateOutput);
     hallucinationGuard.addEventListener("change", updateOutput);
     outputMarkdown.addEventListener("change", updateOutput);
     copyShareLinkButton.addEventListener("click", () => {

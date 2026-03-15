@@ -126,10 +126,10 @@ limitations under the License.
       <lht-command-block command-id="promptOutput" copy-buttons="dual"></lht-command-block>
       <div class="md-output-options">
         <lht-switch-help
-          switch-id="includeLabelPrefix"
-          label="ラベル名を先頭に含める"
-          help-label="ラベル名を先頭に含める説明">
-          ON の場合は `[ボタンラベル] 本文` の形式で出力します。OFF の場合は本文のみを出力します。
+          switch-id="outputMarkdown"
+          label="Markdown出力"
+          help-label="Markdown出力の説明">
+          ON の場合は、最終回答を Markdown として出力し、外側を `~~~~` で囲む指定を含めます。
         </lht-switch-help>
         <lht-select-help
           class="md-output-options__select md-output-options__select--compact"
@@ -142,6 +142,15 @@ limitations under the License.
         </lht-select-help>
         <lht-select-help
           class="md-output-options__select md-output-options__select--compact"
+          field-id="hallucinationGuard"
+          label="幻想防止"
+          help-text="幻想防止の強さを選択します。無指定 / 弱 / 強 の3段階です。">
+          <option value="none">無指定</option>
+          <option value="low">弱</option>
+          <option value="high">強</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
           field-id="selfReview"
           label="自己レビュー"
           help-text="第三者レビューア視点での見直し方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
@@ -151,19 +160,49 @@ limitations under the License.
         </lht-select-help>
         <lht-select-help
           class="md-output-options__select md-output-options__select--compact"
-          field-id="hallucinationGuard"
-          label="幻想防止"
-          help-text="幻想防止の強さを選択します。なし / 弱 / 強 の3段階です。">
-          <option value="none">なし</option>
-          <option value="low">弱</option>
-          <option value="high">強</option>
+          field-id="misleadingExpressionReview"
+          label="誤解表現"
+          help-text="誤解を招く表現がないかを見直す方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
         </lht-select-help>
-        <lht-switch-help
-          switch-id="outputMarkdown"
-          label="Markdown出力"
-          help-label="Markdown出力の説明">
-          ON の場合は、最終回答を Markdown として出力し、外側を `~~~~` で囲む指定を含めます。
-        </lht-switch-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="considerationRiskReview"
+          label="配慮不足"
+          help-text="配慮不足リスクがないかを見直す方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="discomfortRiskReview"
+          label="不快感"
+          help-text="不快感リスクがないかを見直す方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="aggressiveExpressionReview"
+          label="攻撃性"
+          help-text="攻撃的な表現がないかを見直す方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="sensitiveExpressionReview"
+          label="センシティブ"
+          help-text="センシティブな表現がないかを見直す方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
       </div>
     </section>
 
