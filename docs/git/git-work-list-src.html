@@ -1,0 +1,164 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git 作業一覧</title>
+  <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
+  <link rel="stylesheet" href="src/git-work-list/css/app.css" />
+  <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+</head>
+<body class="md-page">
+  <div class="md-surface-card md-card">
+    <lht-page-hero
+      title="Git 作業一覧"
+      icon="🗂️"
+      help-label="Git 作業一覧の説明"
+      help-wide
+      menu-home-href="../index.html"
+      menu-home-label="トップへ戻る">
+      リポジトリ URL、基準ブランチ、作業ブランチ、ローカル/リモートの扱いをまとめて保存し、一覧で管理します。<br><br>
+      複数リポジトリ・複数作業を並行で扱うときの「今どの組み合わせを見ていたか」を忘れにくくするためのローカル専用メモ兼一覧ツールです。
+    </lht-page-hero>
+
+    <section class="md-section md-stack-md">
+      <div class="md-panel-header">
+        <div class="md-panel-actions">
+          <button id="openCreateDialogBtn" type="button" class="md-button md-button--primary">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14"></path>
+              <path d="M5 12h14"></path>
+            </svg>
+            <span>追加</span>
+          </button>
+          <button id="exportEntriesBtn" type="button" class="md-button md-button--surface">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v12"></path>
+              <path d="m7 10 5 5 5-5"></path>
+              <path d="M5 21h14"></path>
+            </svg>
+            <span>Export</span>
+          </button>
+          <button id="importEntriesBtn" type="button" class="md-button md-button--surface">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21V9"></path>
+              <path d="m7 14 5-5 5 5"></path>
+              <path d="M5 3h14"></path>
+            </svg>
+            <span>Import</span>
+          </button>
+          <input id="importEntriesInput" type="file" accept="application/json,.json" class="md-hidden" />
+        </div>
+      </div>
+
+      <div id="emptyGuide" class="md-empty-state" hidden>まだ登録がありません。追加ボタンから登録してください。</div>
+
+      <div id="entriesList" class="md-entry-list" aria-live="polite"></div>
+    </section>
+
+    <dialog id="entryDialog" class="md-dialog">
+      <form method="dialog" class="md-dialog__surface" id="entryForm">
+        <div class="md-dialog__header">
+          <div>
+            <h2 id="entryDialogTitle" class="md-dialog__title">登録</h2>
+            <p class="md-dialog__subtitle">リポジトリ URL と作業対象ブランチを入力します。</p>
+          </div>
+          <button id="closeDialogBtn" type="button" class="md-button md-button--surface md-button--compact">閉じる</button>
+        </div>
+
+        <div class="md-dialog__body md-stack-md">
+          <div class="md-form-grid md-form-grid-1">
+            <lht-select-help field-id="entryType" label="種別" help-text="Git 連携を使う通常登録か、URL とメモだけを管理する登録かを選びます。">
+              <script type="application/json" slot="options">[
+                { "value": "git", "label": "Git連携あり", "selected": true },
+                { "value": "url", "label": "URLのみ" }
+              ]</script>
+            </lht-select-help>
+          </div>
+
+          <div class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" required placeholder="例: https://github.com/igapyon/local-html-tools" help-text="リポジトリを識別する URL や clone URL を入力します。HTTPS / SSH / ローカルパスのどれでも構いません。表示名は URL の末尾から自動で組み立てます。"></lht-text-field-help>
+          </div>
+
+          <div id="gitFields" class="md-form-grid md-form-grid-4">
+            <lht-text-field-help field-id="baseBranch" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。"></lht-text-field-help>
+            <lht-select-help field-id="baseScope" label="基準の扱い" help-text="基準ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
+              <script type="application/json" slot="options">[
+                { "value": "remote", "label": "リモート", "selected": true },
+                { "value": "local", "label": "ローカル" }
+              ]</script>
+            </lht-select-help>
+            <lht-text-field-help field-id="compareBranch" label="作業ブランチ" required placeholder="例: feature" help-text="いま確認したい作業対象ブランチです。"></lht-text-field-help>
+            <lht-select-help field-id="compareScope" label="作業の扱い" help-text="作業ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
+              <script type="application/json" slot="options">[
+                { "value": "remote", "label": "リモート" },
+                { "value": "local", "label": "ローカル", "selected": true }
+              ]</script>
+            </lht-select-help>
+          </div>
+
+          <div id="gitRemoteField" class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="remoteName" label="リモート名" placeholder="例: origin" value="origin" help-text="remote 扱いのブランチ参照に使うリモート名です。通常は origin です。"></lht-text-field-help>
+          </div>
+        </div>
+
+        <div class="md-dialog__footer">
+          <button id="saveEntryBtn" type="button" class="md-button md-button--primary">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14"></path>
+              <path d="M5 12h14"></path>
+            </svg>
+            <span>追加</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="memoDialog" class="md-dialog">
+      <form method="dialog" class="md-dialog__surface md-dialog__surface--compact" id="memoForm">
+        <div class="md-dialog__header">
+          <div>
+            <h2 class="md-dialog__title">リポジトリ情報</h2>
+            <p class="md-dialog__subtitle">このリポジトリと基準ブランチの組み合わせ向け情報を入力します。</p>
+          </div>
+          <button id="closeMemoDialogBtn" type="button" class="md-button md-button--surface md-button--compact">閉じる</button>
+        </div>
+
+        <div class="md-dialog__body md-stack-md">
+          <div class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="memoText" label="メモ" placeholder="必要なメモを入力" help-text="保存は全文、一覧表示は先頭 16 文字までです。長い内容は hover で全文を確認できます。"></lht-text-field-help>
+          </div>
+          <div class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="gitCurrentDirectory" label="git カレントディレクトリ" placeholder="例: /path/to/repo" help-text="この作業を行うローカルの git カレントディレクトリを記録します。"></lht-text-field-help>
+          </div>
+        </div>
+
+        <div class="md-dialog__footer">
+          <button id="copyGitStatusCommandBtn" type="button" class="md-button md-button--secondary">cd + git status</button>
+          <button id="saveMemoBtn" type="button" class="md-button md-button--primary">保存</button>
+        </div>
+      </form>
+    </dialog>
+
+    <lht-toast id="toast"></lht-toast>
+  </div>
+
+  <script src="src/git-work-list/js/main.js"></script>
+</body>
+</html>

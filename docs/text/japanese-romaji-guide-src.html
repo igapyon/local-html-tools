@@ -1,0 +1,1156 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>日本語ローマ字（旅券・ヘボン・訓令・日本式）</title>
+  <link rel="stylesheet" href="../../lht-cmn/css/components.css">
+  <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+  <style>
+    /* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
+    :root {
+      --md-danger: #b3261e;
+      --md-state-layer: rgba(98, 0, 238, 0.12);
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-focus-ring: rgba(98, 0, 238, 0.35);
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-on-secondary: #00332c;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-on-tertiary: #FFFFFF;
+      --md-sys-color-on-tertiary-container: #3d2e5a;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-secondary: #03dac6;
+      --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
+      --md-sys-color-state-layer: rgba(98, 0, 238, 0.08);
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-tertiary: #7D5260;
+      --md-sys-color-tertiary-container: #f3e8fd;
+      --md-typography-body-medium: 1rem;
+      --md-typography-body-small: 0.875rem;
+      --md-typography-headline-large: 1.85rem;
+      --md-typography-title-medium: 1.1rem;
+      --md-typography-title-small: 1.05rem;
+      --status-later: #ff9800;
+      --status-ok: #4caf50;
+      --status-todo: #00bcd4;
+    }
+
+    /* local-html-tools MD3 Core Spec v1.0.2 (2026-02-08) */
+    .md-page {
+      background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; min-height: 100vh;
+    }
+
+    .md-shell {
+      max-width: 980px; margin: 0 auto;
+    }
+
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 18px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 30px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e9e3f0;
+      padding: 28px;
+      position: relative;
+    }
+
+    .md-headline {
+      font-size: 1.8rem; font-weight: 700; margin-bottom: 0.75rem;
+      padding-right: 84px;
+    }
+
+    .md-subtitle {
+      color: var(--md-sys-color-on-surface-variant); font-size: 0.95rem;
+    }
+
+    .md-section {
+      margin-top: 28px;
+    }
+
+    .md-section-title {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
+    }
+
+    .md-grid {
+      display: grid; gap: 16px;
+    }
+
+    .md-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+      margin-bottom: 0.35rem;
+    }
+
+    .md-input, .md-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .md-textarea {
+      min-height: 6.5rem;
+    }
+
+    .md-input:focus, .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    /* Screen-specific */
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: var(--md-sys-color-background);
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .md-grid-two {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .md-textarea {
+      min-height: 8rem;
+      resize: vertical;
+    }
+
+    .md-check-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .md-control-flow {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+
+    .md-control-flow-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-width: 0;
+    }
+
+    .md-control-flow-item .md-label {
+      margin: 0;
+      white-space: nowrap;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+
+    .md-control-flow-item .md-input {
+      width: auto;
+      min-width: 16rem;
+      flex: 0 1 24rem;
+    }
+
+    .md-headline {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      line-height: 1.2;
+    }
+
+    .md-headline__icon {
+      margin-right: 0.1rem;
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .md-tooltip-group {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: 20rem;
+      max-width: 90vw;
+    }
+
+    .md-tooltip-group:hover .md-tooltip-content {
+      opacity: 1;
+    }
+
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: transparent;
+      color: #4a4458;
+      margin-left: 0.2rem;
+    }
+
+    .md-info-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .md-tooltip-content--wide {
+      width: min(34rem, 90vw);
+      left: 0;
+      transform: none;
+    }
+
+    .md-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    .md-check input {
+      accent-color: var(--md-sys-color-primary);
+    }
+
+    .md-switch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .md-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #f0ebf7;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: inset 0 0 0 1px #cfc7dc;
+    }
+
+    .md-switch::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: #ffffff;
+      position: absolute;
+      top: 50%;
+      left: 2px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transform: translate(0, -50%);
+      transition: transform 150ms ease, background 150ms ease;
+    }
+
+    .md-switch-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .md-switch-input:checked + .md-switch {
+      background: rgba(98, 0, 238, 0.32);
+      box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.6);
+    }
+
+    .md-switch-input:checked + .md-switch::after {
+      transform: translate(20px, -50%);
+      background: #ffffff;
+    }
+
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      border: none;
+      background: #f0edf5;
+      color: #3f3b46;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .md-menu-button {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 30;
+    }
+
+    .md-menu-panel {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 35;
+    }
+
+    .md-menu-link {
+      display: block;
+      padding: 8px 16px;
+      color: var(--md-sys-color-on-surface);
+      text-decoration: none;
+    }
+
+    .md-menu-link:hover {
+      background: #f2edf8;
+    }
+
+    .md-hidden {
+      display: none;
+    }
+
+    .md-result-card {
+      border-radius: 12px;
+      border: 1px solid #e5e0ec;
+      background: var(--md-sys-color-surface-variant);
+      padding: 0.8rem;
+    }
+
+    .md-result-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #3f3b46;
+      margin-bottom: 0.3rem;
+    }
+
+    .md-result {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "Menlo", "Consolas", monospace;
+      font-size: 0.94rem;
+    }
+
+    .md-table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 680px;
+    }
+
+    th, td {
+      border: 1px solid #e4deeb;
+      padding: 0.45rem 0.55rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f3eef8;
+      font-weight: 700;
+    }
+
+    .md-note {
+      margin-top: 0.75rem;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .md-preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 0.5rem;
+    }
+
+    .md-preset-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      align-items: flex-start;
+    }
+
+    .md-preset-button {
+      border: 1px solid #d8d1e2;
+      background: #f7f3fc;
+      color: #2f2a35;
+      border-radius: 999px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .md-preset-button:hover {
+      background: #efe8f9;
+    }
+
+    .md-preset-hint {
+      font-size: 0.74rem;
+      color: #6b6474;
+      margin-left: 0.25rem;
+      font-family: "Menlo", "Consolas", monospace;
+    }
+
+    .md-guide-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .md-guide-card {
+      border: 1px solid #e4deeb;
+      border-radius: 12px;
+      background: #fbf8ff;
+      padding: 0.75rem;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .md-guide-label {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: #ece4fb;
+      color: #402a70;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.1rem 0.45rem;
+      margin-right: 0.35rem;
+    }
+
+    .md-list {
+      margin: 0.5rem 0 0;
+      padding-left: 1.1rem;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .md-inline-select-row {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+    }
+
+    .md-inline-select-row .md-label {
+      margin: 0;
+      flex: 0 0 auto;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .md-inline-select-row .md-input {
+      flex: 1 1 20rem;
+      min-width: 14rem;
+    }
+
+    .md-appendix-divider {
+      border: 0;
+      border-top: 1px solid #e1dce8;
+      margin: 0.4rem 0 0;
+    }
+
+    .md-inline-preset-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.9rem;
+      flex-wrap: nowrap;
+      margin-top: 0.8rem;
+    }
+
+    .md-inline-preset-row .md-label {
+      margin: 0.4rem 0 0;
+      flex: 0 0 10.5rem;
+      min-width: 10.5rem;
+      white-space: nowrap;
+    }
+
+    .md-inline-preset-row .md-preset-row {
+      margin-top: 0;
+    }
+
+    .md-accordion {
+      margin-top: 0.8rem;
+      border: 1px solid #e3ddeb;
+      border-radius: 12px;
+      background: #fbf8ff;
+      padding: 0.55rem 0.75rem 0.75rem;
+    }
+
+    .md-accordion > summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+      list-style: none;
+      outline: none;
+    }
+
+    .md-accordion > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .md-accordion > summary::before {
+      content: "▸";
+      display: inline-block;
+      margin-right: 0.5rem;
+      color: #5b5467;
+      transition: transform 150ms ease;
+    }
+
+    .md-accordion[open] > summary::before {
+      transform: rotate(90deg);
+    }
+
+    .md-result-card--recommended {
+      border-color: #a78bfa;
+      box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.25);
+      background: #f7f1ff;
+    }
+
+    .md-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 0.35rem;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.06rem 0.4rem;
+      background: #e9defb;
+      color: #51348a;
+    }
+
+    .md-badge[hidden] {
+      display: none !important;
+    }
+
+    @media (min-width: 800px) {
+      .md-grid-two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .md-guide-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 799px) {
+      .md-page {
+        padding: 12px;
+      }
+
+      .md-card {
+        padding: 20px;
+      }
+
+      .md-inline-select-row .md-label {
+        flex: 1 1 100%;
+        min-width: 0;
+        white-space: normal;
+      }
+
+      .md-inline-preset-row {
+        flex-wrap: wrap;
+      }
+
+      .md-inline-preset-row .md-label {
+        flex: 1 1 100%;
+        min-width: 0;
+        margin-top: 0;
+      }
+
+      .md-control-flow {
+        align-items: stretch;
+      }
+
+      .md-control-flow-item {
+        width: 100%;
+      }
+
+      .md-control-flow-item .md-input {
+        min-width: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="md-page">
+    <div class="md-shell">
+      <section class="md-card">
+        <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+
+        <h1 class="md-headline">
+          <span aria-hidden="true" class="md-headline__icon">🔤</span>
+          <span>日本語ローマ字メモ（旅券・ヘボン・訓令・日本式）</span>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip" aria-label="説明"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip md-tooltip-content--wide">旅券ローマ字を中心に、ヘボン式・訓令式・日本式を比較し、用途に応じた判断を支援するページです。<br>主に名前表記の検討を想定した簡易変換です。<br>旅券ローマ字は「ヘボン式をベースにした実務上の長音運用を切替できる比較モード」として扱っています。</span>
+          </span>
+        </h1>
+        <p class="md-subtitle">
+          旅券ローマ字（実務寄り）を中心に、近い方式のヘボン式、理論寄りの訓令式・日本式を並べて確認するためのページです。
+        </p>
+
+        <section class="md-section">
+          <lht-text-field-help
+            field-id="sourceText"
+            type="textarea"
+            rows="3"
+            label="かな入力（ひらがな / カタカナ）"
+            placeholder="さとう たろう&#10;しんじゅく&#10;ちゃづけ"
+            help-text="ひらがな・カタカナの入力を比較ローマ字へ変換します。"
+          ></lht-text-field-help>
+          <div class="md-control-flow">
+            <div class="md-control-flow-item">
+              <lht-select-help
+                field-id="useCaseSelect"
+                label="用途"
+                help-text="氏名・地名・学校学習・方式比較の用途に応じて推奨モードを切り替えます。"
+              >
+                <script type="application/json" slot="options">
+                  [
+                    { "value": "passport_name", "label": "氏名（旅券・本人確認）", "selected": true },
+                    { "value": "station_place", "label": "地名・駅名（案内表示）" },
+                    { "value": "school_learning", "label": "学校学習（2025年以降）" },
+                    { "value": "linguistics_compare", "label": "方式比較（理論検討）" }
+                  ]
+                </script>
+              </lht-select-help>
+            </div>
+            <div class="md-control-flow-item">
+              <lht-select-help
+                field-id="optPassportLongVowelStyle"
+                label="長音"
+                help-text="旅券ローマ字の長音運用を切り替えます（簡略/保持/OH）。"
+              >
+                <script type="application/json" slot="options">
+                  [
+                    { "value": "simplify", "label": "簡略（SATOU → SATO）", "selected": true },
+                    { "value": "keep", "label": "保持（SATOU のまま）" },
+                    { "value": "oh", "label": "OH表記（SATOU → SATOH）" }
+                  ]
+                </script>
+              </lht-select-help>
+            </div>
+            <div class="md-control-flow-item">
+              <lht-switch-help switch-id="optUppercase" label="大文字出力" checked></lht-switch-help>
+            </div>
+          </div>
+        </section>
+
+        <section class="md-section">
+          <h2 class="md-section-title">変換結果</h2>
+          <div class="md-grid md-grid-two">
+            <div class="md-result-card" data-mode="passport">
+              <div class="md-result-label">旅券ローマ字（簡易）<span class="md-badge" id="badgePassport" hidden>推奨</span></div>
+              <pre class="md-result" id="resultPassport"></pre>
+            </div>
+            <div class="md-result-card" data-mode="hepburn">
+              <div class="md-result-label">ヘボン式<span class="md-badge" id="badgeHepburn" hidden>推奨</span></div>
+              <pre class="md-result" id="resultHepburn"></pre>
+            </div>
+            <div class="md-result-card" data-mode="kunrei">
+              <div class="md-result-label">訓令式<span class="md-badge" id="badgeKunrei" hidden>推奨</span></div>
+              <pre class="md-result" id="resultKunrei"></pre>
+            </div>
+            <div class="md-result-card" data-mode="nihon">
+              <div class="md-result-label">日本式（理論寄り）<span class="md-badge" id="badgeNihon" hidden>推奨</span></div>
+              <pre class="md-result" id="resultNihon"></pre>
+            </div>
+          </div>
+          <p class="md-note">
+            注: 本ページは比較・検討を目的にした簡易実装です。長音・撥音・慣用綴りは用途ごとに運用差があるため、正式運用時は必ず最新の公式規則・実務運用に照らして確認してください。
+          </p>
+          <details class="md-accordion">
+            <summary>実名寄りプリセット</summary>
+            <div class="md-inline-preset-row">
+              <div class="md-preset-row">
+                <div class="md-preset-item">
+                  <button class="md-preset-button js-preset" type="button" data-text="おおの" data-style="oh">OHNO系（おおの）</button>
+                  <span class="md-preset-hint">旅券目安: OHNO</span>
+                </div>
+                <div class="md-preset-item">
+                  <button class="md-preset-button js-preset" type="button" data-text="さとう" data-style="simplify">SATO系（さとう）</button>
+                  <span class="md-preset-hint">旅券目安: SATO</span>
+                </div>
+                <div class="md-preset-item">
+                  <button class="md-preset-button js-preset" type="button" data-text="こうの">KOHNO系（こうの）</button>
+                  <span class="md-preset-hint">旅券目安: 長音設定に依存（KOHNO / KONO）</span>
+                </div>
+                <div class="md-preset-item">
+                  <button class="md-preset-button js-preset" type="button" data-text="しんよう" data-style="simplify">SHIN'YO / SHIN'YOU</button>
+                  <span class="md-preset-hint">旅券目安: SHIN'YO</span>
+                </div>
+                <div class="md-preset-item">
+                  <button class="md-preset-button js-preset" type="button" data-text="まつもと りょう\nおおた にっき" data-style="simplify">複数行サンプル</button>
+                  <span class="md-preset-hint">旅券目安: MATSUMOTO RYO / OTA NIKKI</span>
+                </div>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <hr class="md-appendix-divider" />
+
+        <section class="md-section">
+          <h2 class="md-section-title">Appendix</h2>
+          <details class="md-accordion">
+            <summary>ローマ字の3層モデル（なぜ OSAKA / OHNO が起きるか）</summary>
+            <div class="md-guide-grid">
+              <div class="md-guide-card">
+                <span class="md-guide-label">規範（方式）</span>
+                ヘボン式・訓令式・日本式のような「基準ルール」。
+              </div>
+              <div class="md-guide-card">
+                <span class="md-guide-label">実務運用</span>
+                旅券や標識のように、読みやすさ・実務都合で長音省略や慣例を使う層。
+              </div>
+              <div class="md-guide-card">
+                <span class="md-guide-label">慣用（固有名詞）</span>
+                人名・地名・組織名で定着した綴り。規範より慣用が優先される場合がある層。
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <details class="md-accordion md-section">
+          <summary>代表的な違い（例）</summary>
+          <div class="md-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>かな</th>
+                  <th>旅券ローマ字（簡易）</th>
+                  <th>ヘボン式</th>
+                  <th>訓令式</th>
+                  <th>日本式（理論寄り）</th>
+                  <th>違いの理由ラベル</th>
+                </tr>
+              </thead>
+              <tbody id="sampleTableBody"></tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="md-accordion md-section">
+          <summary>未対応・注意（誤用防止）</summary>
+          <ul class="md-list">
+            <li>助詞読み（は/へ/を）の文脈判定は未対応です。入力どおりの仮名を変換します。</li>
+            <li>外来音の細かな拗音（例: ティ / ファ / ヴァ など）は厳密対応していません。</li>
+            <li>固有名詞の慣用綴り（例: OHNO, TOKYO など）は、最終的に本人・組織・公式表記を優先してください。</li>
+            <li>組織独自ルール（自治体、鉄道会社、学校、企業）には未対応です。提出先の規程を必ず確認してください。</li>
+          </ul>
+        </details>
+
+        <details class="md-accordion md-section">
+          <summary>学校指導の注釈</summary>
+          <p class="md-note">
+            〜2025年12月21日まで: 学校では「訓令式を主、ヘボン式も併せて指導」
+          </p>
+          <p class="md-note">
+            2025年12月22日以降: 国の基準（内閣告示）がヘボン式ベースに改定され、学校もヘボン式中心へ移行中
+          </p>
+          <p class="md-note">
+            参考: <a href="https://www.mext.go.jp/b_menu/daijin/detail/mext_00614.html" target="_blank" rel="noopener noreferrer">文科相会見（2025-08-26）</a> /
+            <a href="https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/roma/index2.html" target="_blank" rel="noopener noreferrer">文化庁（2025-12-22 内閣告示）</a> /
+            <a href="https://www.mext.go.jp/b_menu/daijin/detail/mext_00653.html" target="_blank" rel="noopener noreferrer">文科相会見（2025-12-16）</a>
+          </p>
+        </details>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", async function () {
+      if (window.customElements && typeof window.customElements.whenDefined === "function") {
+        await Promise.all([
+          window.customElements.whenDefined("lht-text-field-help"),
+          window.customElements.whenDefined("lht-select-help"),
+          window.customElements.whenDefined("lht-switch-help")
+        ]);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+
+      const sourceText = document.getElementById("sourceText");
+      const optUppercase = document.getElementById("optUppercase");
+      const optPassportLongVowelStyle = document.getElementById("optPassportLongVowelStyle");
+      const resultPassport = document.getElementById("resultPassport");
+      const resultHepburn = document.getElementById("resultHepburn");
+      const resultKunrei = document.getElementById("resultKunrei");
+      const resultNihon = document.getElementById("resultNihon");
+      const sampleTableBody = document.getElementById("sampleTableBody");
+      const presetButtons = document.querySelectorAll(".js-preset");
+      const useCaseSelect = document.getElementById("useCaseSelect");
+      const resultCards = document.querySelectorAll(".md-result-card[data-mode]");
+      const badges = {
+        passport: document.getElementById("badgePassport"),
+        hepburn: document.getElementById("badgeHepburn"),
+        kunrei: document.getElementById("badgeKunrei"),
+        nihon: document.getElementById("badgeNihon")
+      };
+
+      if (!sourceText || !optUppercase || !optPassportLongVowelStyle || !useCaseSelect) {
+        return;
+      }
+
+      const baseMap = {
+        "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
+        "か": "ka", "き": "ki", "く": "ku", "け": "ke", "こ": "ko",
+        "さ": "sa", "す": "su", "せ": "se", "そ": "so",
+        "た": "ta", "て": "te", "と": "to",
+        "な": "na", "に": "ni", "ぬ": "nu", "ね": "ne", "の": "no",
+        "は": "ha", "ひ": "hi", "へ": "he", "ほ": "ho",
+        "ま": "ma", "み": "mi", "む": "mu", "め": "me", "も": "mo",
+        "や": "ya", "ゆ": "yu", "よ": "yo",
+        "ら": "ra", "り": "ri", "る": "ru", "れ": "re", "ろ": "ro",
+        "わ": "wa", "ゐ": "wi", "ゑ": "we", "を": "o",
+        "が": "ga", "ぎ": "gi", "ぐ": "gu", "げ": "ge", "ご": "go",
+        "ざ": "za", "ず": "zu", "ぜ": "ze", "ぞ": "zo",
+        "だ": "da", "で": "de", "ど": "do",
+        "ば": "ba", "び": "bi", "ぶ": "bu", "べ": "be", "ぼ": "bo",
+        "ぱ": "pa", "ぴ": "pi", "ぷ": "pu", "ぺ": "pe", "ぽ": "po",
+        "ぁ": "a", "ぃ": "i", "ぅ": "u", "ぇ": "e", "ぉ": "o",
+        "ゎ": "wa", "ゔ": "vu"
+      };
+
+      const modeMaps = {
+        passport: {
+          ...baseMap,
+          "し": "shi", "ち": "chi", "つ": "tsu", "ふ": "fu", "じ": "ji", "ぢ": "ji", "づ": "zu"
+        },
+        hepburn: {
+          ...baseMap,
+          "し": "shi", "ち": "chi", "つ": "tsu", "ふ": "fu", "じ": "ji", "ぢ": "ji", "づ": "zu"
+        },
+        kunrei: {
+          ...baseMap,
+          "し": "si", "ち": "ti", "つ": "tu", "ふ": "hu", "じ": "zi", "ぢ": "zi", "づ": "zu", "を": "wo"
+        },
+        nihon: {
+          ...baseMap,
+          "し": "si", "ち": "ti", "つ": "tu", "ふ": "hu", "じ": "zi", "ぢ": "di", "づ": "du", "を": "wo"
+        }
+      };
+
+      const yoonMaps = {
+        passport: {
+          "きゃ": "kya", "きゅ": "kyu", "きょ": "kyo",
+          "しゃ": "sha", "しゅ": "shu", "しょ": "sho",
+          "ちゃ": "cha", "ちゅ": "chu", "ちょ": "cho",
+          "にゃ": "nya", "にゅ": "nyu", "にょ": "nyo",
+          "ひゃ": "hya", "ひゅ": "hyu", "ひょ": "hyo",
+          "みゃ": "mya", "みゅ": "myu", "みょ": "myo",
+          "りゃ": "rya", "りゅ": "ryu", "りょ": "ryo",
+          "ぎゃ": "gya", "ぎゅ": "gyu", "ぎょ": "gyo",
+          "じゃ": "ja", "じゅ": "ju", "じょ": "jo",
+          "ぢゃ": "ja", "ぢゅ": "ju", "ぢょ": "jo",
+          "びゃ": "bya", "びゅ": "byu", "びょ": "byo",
+          "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo"
+        },
+        hepburn: {
+          "きゃ": "kya", "きゅ": "kyu", "きょ": "kyo",
+          "しゃ": "sha", "しゅ": "shu", "しょ": "sho",
+          "ちゃ": "cha", "ちゅ": "chu", "ちょ": "cho",
+          "にゃ": "nya", "にゅ": "nyu", "にょ": "nyo",
+          "ひゃ": "hya", "ひゅ": "hyu", "ひょ": "hyo",
+          "みゃ": "mya", "みゅ": "myu", "みょ": "myo",
+          "りゃ": "rya", "りゅ": "ryu", "りょ": "ryo",
+          "ぎゃ": "gya", "ぎゅ": "gyu", "ぎょ": "gyo",
+          "じゃ": "ja", "じゅ": "ju", "じょ": "jo",
+          "ぢゃ": "ja", "ぢゅ": "ju", "ぢょ": "jo",
+          "びゃ": "bya", "びゅ": "byu", "びょ": "byo",
+          "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo"
+        },
+        kunrei: {
+          "きゃ": "kya", "きゅ": "kyu", "きょ": "kyo",
+          "しゃ": "sya", "しゅ": "syu", "しょ": "syo",
+          "ちゃ": "tya", "ちゅ": "tyu", "ちょ": "tyo",
+          "にゃ": "nya", "にゅ": "nyu", "にょ": "nyo",
+          "ひゃ": "hya", "ひゅ": "hyu", "ひょ": "hyo",
+          "みゃ": "mya", "みゅ": "myu", "みょ": "myo",
+          "りゃ": "rya", "りゅ": "ryu", "りょ": "ryo",
+          "じゃ": "zya", "じゅ": "zyu", "じょ": "zyo",
+          "ぢゃ": "zya", "ぢゅ": "zyu", "ぢょ": "zyo",
+          "ぎゃ": "gya", "ぎゅ": "gyu", "ぎょ": "gyo",
+          "びゃ": "bya", "びゅ": "byu", "びょ": "byo",
+          "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo"
+        },
+        nihon: {
+          "きゃ": "kya", "きゅ": "kyu", "きょ": "kyo",
+          "しゃ": "sya", "しゅ": "syu", "しょ": "syo",
+          "ちゃ": "tya", "ちゅ": "tyu", "ちょ": "tyo",
+          "にゃ": "nya", "にゅ": "nyu", "にょ": "nyo",
+          "ひゃ": "hya", "ひゅ": "hyu", "ひょ": "hyo",
+          "みゃ": "mya", "みゅ": "myu", "みょ": "myo",
+          "りゃ": "rya", "りゅ": "ryu", "りょ": "ryo",
+          "じゃ": "zya", "じゅ": "zyu", "じょ": "zyo",
+          "ぢゃ": "dya", "ぢゅ": "dyu", "ぢょ": "dyo",
+          "ぎゃ": "gya", "ぎゅ": "gyu", "ぎょ": "gyo",
+          "びゃ": "bya", "びゅ": "byu", "びょ": "byo",
+          "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo"
+        }
+      };
+
+      const sampleItems = [
+        { kana: "しんじゅく", reason: "し/じ: 発音重視（shi/ji）と体系重視（si/zi）の差" },
+        { kana: "ちゃづけ", reason: "ちゃ/ちゅ/ちょ: cha系と tya系の差" },
+        { kana: "はっぴょう", reason: "促音: 子音重ねの規則差（発音寄り/体系寄り）" },
+        { kana: "さとう", reason: "長音運用: 実務簡略（ou->o）か保持か" },
+        { kana: "おおの", reason: "長音運用: OH表記（OHNO）など慣用差" },
+        { kana: "しんよう", reason: "ん + y: SHIN'YO（旅券簡略）と SHIN'YOU（長音保持）の差" },
+        { kana: "を", reason: "方式差: ヘボン系 o / 訓令・日本式 wo" }
+      ];
+
+      const useCaseConfig = {
+        passport_name: {
+          recommendedMode: "passport",
+          longVowelStyle: "simplify"
+        },
+        station_place: {
+          recommendedMode: "hepburn",
+          longVowelStyle: "simplify"
+        },
+        school_learning: {
+          recommendedMode: "hepburn",
+          longVowelStyle: "keep"
+        },
+        linguistics_compare: {
+          recommendedMode: "nihon",
+          longVowelStyle: "keep"
+        }
+      };
+
+      function toHiragana(text) {
+        return text.replace(/[\u30a1-\u30f6]/g, function (match) {
+          return String.fromCharCode(match.charCodeAt(0) - 0x60);
+        });
+      }
+
+      function getNextSyllableRomaji(text, index, mode) {
+        if (index >= text.length) {
+          return "";
+        }
+        const yoon = text.slice(index, index + 2);
+        if (yoonMaps[mode][yoon]) {
+          return yoonMaps[mode][yoon];
+        }
+        return modeMaps[mode][text[index]] || "";
+      }
+
+      function simplifyPassportLongVowels(value) {
+        return value
+          .replace(/ou/g, "o")
+          .replace(/oo/g, "o");
+      }
+
+      function toPassportOhStyle(value) {
+        return value
+          .replace(/ou/g, "oh")
+          .replace(/oo/g, "oh");
+      }
+
+      function setRecommendedMode(mode) {
+        resultCards.forEach(function (card) {
+          card.classList.toggle("md-result-card--recommended", card.getAttribute("data-mode") === mode);
+        });
+        Object.keys(badges).forEach(function (key) {
+          badges[key].hidden = key !== mode;
+        });
+      }
+
+      function applyUseCaseRecommendation() {
+        const useCase = useCaseSelect.value;
+        const config = useCaseConfig[useCase];
+        if (!config) {
+          return;
+        }
+        optPassportLongVowelStyle.value = config.longVowelStyle;
+        setRecommendedMode(config.recommendedMode);
+      }
+
+      function convertKana(text, mode) {
+        const normalized = toHiragana(text);
+        let out = "";
+        let i = 0;
+        while (i < normalized.length) {
+          const ch = normalized[i];
+          const two = normalized.slice(i, i + 2);
+
+          if (ch === "っ") {
+            const next = getNextSyllableRomaji(normalized, i + 1, mode);
+            if (/^ch/.test(next)) {
+              out += "t";
+            } else if (/^[bcdfghjklmnpqrstvwxyz]/.test(next)) {
+              out += next[0];
+            }
+            i += 1;
+            continue;
+          }
+
+          if (ch === "ん") {
+            const next = getNextSyllableRomaji(normalized, i + 1, mode);
+            if (/^[aiueoy]/.test(next)) {
+              out += "n'";
+            } else if ((mode === "passport" || mode === "hepburn") && /^[bmp]/.test(next)) {
+              out += "m";
+            } else {
+              out += "n";
+            }
+            i += 1;
+            continue;
+          }
+
+          if (ch === "ー") {
+            const lastVowel = out.match(/[aiueo](?!.*[aiueo])/);
+            if (lastVowel) {
+              out += lastVowel[0];
+            }
+            i += 1;
+            continue;
+          }
+
+          if (yoonMaps[mode][two]) {
+            out += yoonMaps[mode][two];
+            i += 2;
+            continue;
+          }
+
+          const one = modeMaps[mode][ch];
+          if (one) {
+            out += one;
+          } else {
+            out += ch;
+          }
+          i += 1;
+        }
+
+        if (mode === "passport") {
+          const style = optPassportLongVowelStyle.value;
+          if (style === "simplify") {
+            out = simplifyPassportLongVowels(out);
+          } else if (style === "oh") {
+            out = toPassportOhStyle(out);
+          }
+        }
+        return optUppercase.checked ? out.toUpperCase() : out;
+      }
+
+      function updateResults() {
+        const src = sourceText.value || "";
+        resultPassport.textContent = convertKana(src, "passport");
+        resultHepburn.textContent = convertKana(src, "hepburn");
+        resultKunrei.textContent = convertKana(src, "kunrei");
+        resultNihon.textContent = convertKana(src, "nihon");
+      }
+
+      function rebuildSampleTable() {
+        sampleTableBody.innerHTML = sampleItems.map(function (item) {
+          return "<tr>" +
+            "<td>" + item.kana + "</td>" +
+            "<td>" + convertKana(item.kana, "passport") + "</td>" +
+            "<td>" + convertKana(item.kana, "hepburn") + "</td>" +
+            "<td>" + convertKana(item.kana, "kunrei") + "</td>" +
+            "<td>" + convertKana(item.kana, "nihon") + "</td>" +
+            "<td>" + item.reason + "</td>" +
+            "</tr>";
+        }).join("");
+      }
+
+      function updateAll() {
+        updateResults();
+        rebuildSampleTable();
+      }
+
+      sourceText.addEventListener("input", updateResults);
+      optUppercase.addEventListener("change", updateAll);
+      optUppercase.addEventListener("input", updateAll);
+      optPassportLongVowelStyle.addEventListener("change", updateAll);
+      optPassportLongVowelStyle.addEventListener("input", updateAll);
+      useCaseSelect.addEventListener("change", function () {
+        applyUseCaseRecommendation();
+        updateAll();
+      });
+      useCaseSelect.addEventListener("input", function () {
+        applyUseCaseRecommendation();
+        updateAll();
+      });
+      presetButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          const presetText = (button.getAttribute("data-text") || "").replace(/\\n/g, "\n");
+          sourceText.value = presetText;
+          const presetStyle = button.getAttribute("data-style");
+          if (presetStyle === "simplify" || presetStyle === "keep" || presetStyle === "oh") {
+            optPassportLongVowelStyle.value = presetStyle;
+          }
+          updateAll();
+          sourceText.focus();
+        });
+      });
+
+      applyUseCaseRecommendation();
+      updateAll();
+    });
+  </script>
+</body>
+</html>

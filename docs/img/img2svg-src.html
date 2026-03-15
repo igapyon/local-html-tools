@@ -1,0 +1,2575 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>画像 → SVG 変換</title>
+  <link rel="stylesheet" href="../../lht-cmn/css/components.css">
+  <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+  <style>
+    /* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
+    :root {
+      --md-danger: #b3261e;
+      --md-state-layer: rgba(98, 0, 238, 0.12);
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-focus-ring: rgba(98, 0, 238, 0.35);
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-on-secondary: #00332c;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-on-tertiary: #FFFFFF;
+      --md-sys-color-on-tertiary-container: #3d2e5a;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-secondary: #03dac6;
+      --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
+      --md-sys-color-state-layer: rgba(98, 0, 238, 0.08);
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-tertiary: #7D5260;
+      --md-sys-color-tertiary-container: #f3e8fd;
+      --md-typography-body-medium: 1rem;
+      --md-typography-body-small: 0.875rem;
+      --md-typography-headline-large: 1.85rem;
+      --md-typography-title-medium: 1.1rem;
+      --md-typography-title-small: 1.05rem;
+      --status-later: #ff9800;
+      --status-ok: #4caf50;
+      --status-todo: #00bcd4;
+    }
+
+    /* local-html-tools MD3 Core Spec v1.0.2 (2026-02-08) */
+    .md-page {
+      background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; min-height: 100vh;
+    }
+    
+    .md-shell {
+      max-width: 980px; margin: 0 auto;
+    }
+    
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 18px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 30px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e9e3f0;
+      padding: 28px;
+    }
+    
+    .md-headline {
+      font-size: 1.8rem; font-weight: 700; margin-bottom: 0.75rem;
+    }
+    
+    .md-subtitle {
+      color: var(--md-sys-color-on-surface-variant); font-size: 0.95rem;
+    }
+    
+    .md-section {
+      margin-top: 28px;
+    }
+    
+    .md-section-title {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
+    }
+    
+    .md-grid {
+      display: grid; gap: 16px;
+    }
+    
+    .md-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+      margin-bottom: 0.35rem;
+    }
+    
+    .md-required {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.15rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.54rem;
+      font-weight: 600;
+      background: #ECEAF1;
+      color: #49454F;
+    }
+    
+    .md-input, .md-textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    
+    .md-textarea {
+      min-height: 6.5rem;
+    }
+    
+    .md-input:focus, .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-field-block {
+      margin-bottom: 1rem;
+    }
+    
+    .md-button {
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+    
+    .md-button--primary {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
+    }
+    
+    .md-button--primary:hover {
+      background: #4f00c9;
+    }
+    
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    
+    .md-tooltip-group {
+      position: relative; display: inline-flex; align-items: center;
+    }
+    
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: 20rem;
+      max-width: 90vw;
+    }
+    
+    .md-tooltip-group:hover .md-tooltip-content {
+      opacity: 1;
+    }
+    
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: transparent;
+      color: #4a4458;
+      margin-left: 0.2rem;
+    }
+    
+    .md-info-icon {
+      width: 18px; height: 18px;
+    }
+    
+    .md-code-block {
+      position: relative; margin-top: 0.5rem;
+    }
+    
+    .md-code {
+      display: block;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      white-space: pre;
+      background: var(--md-sys-color-surface-variant);
+      border: 1px solid #e5e0ec;
+      color: #1f1b2d;
+      min-height: 2.5rem;
+    }
+    
+    .md-copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      background: #f7f2fa;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .md-snackbar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #2b2831;
+      color: #f7f4fb;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      font-size: 0.85rem;
+    }
+    
+    .md-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(98, 0, 238, 0.12);
+      color: var(--md-sys-color-primary);
+      margin-left: 6px;
+    }
+    
+    .md-section-wrap {
+      display: grid; gap: 1.75rem;
+    }
+    
+    .md-section-card {
+      padding: 1.25rem 1.25rem 1.5rem;
+      border-radius: 24px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #ece7f3;
+      box-shadow: 0 2px 10px rgba(41, 35, 58, 0.06);
+    }
+    
+    .md-section-subtitle {
+      font-size: var(--md-typography-body-small);
+      color: #6a6675;
+      margin-bottom: 1rem;
+    }
+    
+    .md-section-title--spaced {
+      margin-top: 1rem;
+    }
+    
+    .md-grid-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    
+    .md-card-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    }
+    
+    .md-card-title {
+      font-size: var(--md-typography-title-small); font-weight: 600; color: #2f2a35;
+    }
+    
+    .md-card-arrow {
+      color: #8f8a98; font-size: 1.2rem;
+    }
+    
+    .md-card-desc {
+      margin-top: 0.5rem;
+      font-size: var(--md-typography-body-small);
+      color: #5f5a6b;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .md-info-chip:focus-visible {
+      box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring);
+    }
+    
+    .md-tooltip--wide {
+      width: min(32rem, 90vw);
+    }
+    
+    .md-tooltip--rich {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .md-menu-button {
+      position: absolute; top: 16px; right: 16px;
+    }
+    
+    .md-menu-panel {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 20;
+    }
+    
+    .md-menu-link {
+      display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface);
+    }
+    
+    .md-menu-link:hover {
+      background: #f2edf8;
+    }
+    
+    .md-headline__icon {
+      margin-right: 0.5rem;
+    }
+    
+    .md-section-title--lg {
+      font-size: 1.1rem;
+    }
+    
+    .md-input, .md-select, .md-textarea {
+      display: block;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+      box-sizing: border-box;
+    }
+    
+    .md-input:focus, .md-select:focus, .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-icon-btn:hover {
+      background: #e6e1ee;
+    }
+    
+    .md-icon-btn--small {
+      width: 32px; height: 32px; border-radius: 16px;
+    }
+    
+    .md-icon-btn--surface {
+      background: #f7f2fa;
+    }
+    
+    .md-snackbar.md-visible {
+      opacity: 1; pointer-events: auto;
+    }
+    
+    .md-hidden {
+      display: none;
+    }
+    
+        .md-sr-only {
+          position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
+        }
+        .md-preview .md-sr-only { display: none !important; }
+    
+    .md-stack-sm > * + * {
+      margin-top: 0.75rem;
+    }
+    
+    .md-radio-row { display: flex; align-items: flex-start; gap: 0.5rem; }
+    .md-radio {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: #3f3b46;
+    }
+    
+    .md-radio input {
+      accent-color: var(--md-sys-color-primary);
+    }
+    
+    .md-switch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+    }
+    
+    .md-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #f0ebf7;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: inset 0 0 0 1px #cfc7dc;
+    }
+    
+    .md-switch::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: #ffffff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 150ms ease, background 150ms ease;
+    }
+    
+    .md-switch-input {
+      position: absolute; opacity: 0; pointer-events: none;
+    }
+    
+    .md-switch-input:checked + .md-switch {
+      background: rgba(98, 0, 238, 0.32);
+      box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.6);
+    }
+    
+    .md-switch-input:checked + .md-switch::after {
+      transform: translateX(20px);
+      background: #ffffff;
+    }
+    
+    .md-tab-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border-bottom: 1px solid #e6e1ee;
+      margin-bottom: 1rem;
+    }
+    
+    .md-tab-button {
+      border: 1px solid #e6e1ee;
+      border-bottom: none;
+      background: #f3f1f7;
+      padding: 0.4rem 0.9rem;
+      margin-bottom: -1px;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #3f3b46;
+    }
+    
+    .md-tab-button[aria-selected="true"] {
+      background: #ffffff;
+      border-color: #c8c5d0;
+      color: #1c1b1f;
+    }
+    
+    .md-tab-panel {
+      border: 1px solid #e6e1ee;
+      border-top: none;
+      padding: 1rem;
+      background: #ffffff;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      margin-bottom: 1rem;
+    }
+    
+    .md-label--row {
+      margin-bottom: 0.5rem;
+    }
+    
+    .md-input, .md-select {
+      display: block;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+      box-sizing: border-box;
+    }
+    
+    .md-input:focus, .md-select:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-form-grid {
+      display: grid; gap: 0.75rem;
+    }
+    
+    .md-button--tonal {
+      background: #f0edf5;
+      color: #3f3b46;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    
+    .md-button--tonal:hover {
+      background: #e6e1ee;
+    }
+    
+    .md-chip-row {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;
+    }
+    
+    .md-tooltip--narrow {
+      width: 18rem;
+    }
+    
+    .md-surface-card {
+      max-width: 48rem; margin: 0 auto; padding: 24px; position: relative;
+    }
+    
+    .md-choice {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.25rem 0;
+    }
+    
+    .md-input {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      font-size: 1rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    
+    .md-input:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-button:hover {
+      box-shadow: 0 4px 10px rgba(98, 0, 238, 0.35);
+    }
+    
+    .md-button:active {
+      opacity: 0.7;
+    }
+    
+    .md-button--surface {
+      background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); border: 1px solid var(--md-sys-color-outline);
+    }
+    
+    .md-button--secondary {
+      background: var(--md-sys-color-secondary); color: var(--md-sys-color-on-secondary); margin-bottom: 10px;
+    }
+    
+    .md-button-row {
+      display: flex; gap: 15px; height: clamp(120px, 20vh, 220px); margin-bottom: 10px;
+    }
+    
+    .md-button--hero {
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
+    }
+    
+    .md-field {
+      position: relative; min-width: 200px;
+    }
+    
+    .md-field__label {
+      position: absolute;
+      top: -9px;
+      left: 12px;
+      padding: 0 6px;
+      background: var(--md-sys-color-surface);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+      letter-spacing: 0.02em;
+    }
+    
+    .md-field .md-select {
+      appearance: none;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.8rem 2.2rem 0.8rem 0.9rem;
+      font-size: 0.9rem;
+      color: var(--md-sys-color-on-surface);
+      min-width: 200px;
+      line-height: 1.2;
+      background-image: linear-gradient(45deg, transparent 50%, #6c6775 50%), linear-gradient(135deg, #6c6775 50%, transparent 50%);
+      background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+    
+    .md-field .md-select:focus {
+      outline: none; border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-stack-md > * + * {
+      margin-top: 0.75rem;
+    }
+    
+    .md-grid-2 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    
+    .md-form-row {
+      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+    }
+    
+    .md-form-row--nowrap {
+      flex-wrap: nowrap;
+    }
+    
+    .md-label--muted {
+      color: #3f3b46;
+    }
+    
+    .md-label--block {
+      margin-bottom: 0.5rem;
+    }
+    
+    .md-snackbar-host {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      padding: 0.5rem 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+    
+    .md-snackbar-host.md-visible {
+      opacity: 1; pointer-events: auto;
+    }
+    
+    .md-button:disabled {
+      background: #e6e1ee;
+      color: #9a94a7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    
+    .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-input-block {
+      margin-bottom: 1rem;
+    }
+    
+    .md-section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    
+    .md-output-wrap {
+      position: relative;
+    }
+    
+    .md-output {
+      background: var(--md-sys-color-surface-variant);
+    }
+    
+    .md-stack-lg > * + * {
+      margin-top: 1.5rem;
+    }
+    
+    .md-form-row--start {
+      align-items: flex-start;
+    }
+    
+    .md-input:disabled, .md-select:disabled {
+      background: #f3f0f7;
+    }
+    
+    .md-choice-card {
+      border: 1px solid #e2dcec;
+      border-radius: 16px;
+      padding: 1rem;
+      background: #ffffff;
+    }
+    
+    .md-choice-card--muted {
+      background: #f7f3fb;
+    }
+    
+    .md-choice-row {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    
+    .md-choice-row input {
+      margin: 0;
+    }
+    
+    .md-choice-sub {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #6a6675;
+    }
+    
+    .md-choice-sub small {
+      font-size: 0.75rem; color: #7b7784;
+    }
+    
+    .md-chip--primary {
+      background: #e2d9f7;
+      color: #4a1e9e;
+    }
+    
+    .md-chip--warn {
+      background: #f7ece1;
+      color: #8a4b0f;
+    }
+    
+    .md-field-stack {
+      display: flex; flex-direction: column; align-items: stretch; gap: 0.5rem;
+    }
+    
+    .md-label--full {
+      width: 100%;
+    }
+    
+    .md-switch-row {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; color: var(--md-sys-color-on-surface); font-size: 0.95rem;
+    }
+    
+    .md-input-wrap {
+      position: relative;
+      flex: 1 1 16rem;
+      min-width: 12rem;
+    }
+    
+    .md-input-wrap .md-input {
+      padding-right: 3rem;
+    }
+    
+    .md-input-action {
+      position: absolute;
+      top: 50%;
+      right: -0.5rem;
+      transform: translateY(-50%);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    }
+    
+    .md-field-stack .md-input, .md-field-stack .md-select {
+      flex: 0 0 auto;
+    }
+    
+    .md-field--dropdown {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23635b75' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem 1rem;
+      padding-right: 2.25rem;
+    }
+    
+    .md-select--inline {
+      flex: 1 1 18rem; min-width: 14rem;
+    }
+    
+    .md-input.md-disabled, .md-select.md-disabled {
+      background: #f3f0f7;
+    }
+    
+    .md-choice-inline {
+      display: flex; flex-wrap: wrap; gap: 1.25rem; row-gap: 0.5rem;
+    }
+    
+    .md-choice-text {
+      font-size: 0.9rem; color: #4a4458;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: "Roboto", "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif; font-size: 1rem; line-height: 1.5; }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; background: transparent; cursor: pointer; font: inherit; }
+
+    .md-page { background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; }
+    .md-surface-card { max-width: 48rem; margin: 0 auto; padding: 24px; position: relative; }
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid #ece7f3;
+    }
+
+    .md-menu-button { position: absolute; top: 16px; right: 16px; }
+    .md-menu-panel {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 20;
+    }
+    .md-menu-link { display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface); }
+    .md-menu-link:hover { background: #f2edf8; }
+
+    .md-headline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      padding-right: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .md-headline__icon { margin-right: 0.5rem; }
+
+    .md-section { margin-bottom: 1.25rem; }
+    .md-grid { display: grid; gap: 1rem; }
+    @media (min-width: 768px) {
+      .md-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    .md-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+      margin-bottom: 0.35rem;
+    }
+    .md-input,
+    .md-select {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      font-size: 1rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .md-input:focus,
+    .md-select:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-actions { display: flex; gap: 0.75rem; }
+    .md-button {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      transition: box-shadow 150ms ease, transform 150ms ease, background 150ms ease;
+    }
+    .md-button--primary {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 2px 6px rgba(98, 0, 238, 0.3);
+    }
+    .md-button--primary:hover { box-shadow: 0 4px 10px rgba(98, 0, 238, 0.35); }
+    .md-button--secondary {
+      background: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-primary);
+      border: 1px solid #ded7e6;
+    }
+    .md-button:disabled {
+      background: #e6e1ee;
+      color: #9a94a7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .md-row-between { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .md-muted { color: #6a6675; font-size: 0.75rem; }
+
+    .md-preview {
+      border: 2px dashed #ddd6e8;
+      border-radius: 16px;
+      background: var(--md-sys-color-surface-variant);
+      height: 20rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .md-preview__empty { color: #8f8a98; font-size: 0.875rem; }
+
+    .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: min(24rem, 90vw);
+    }
+    .md-tooltip-group:hover .md-tooltip-content { opacity: 1; }
+    .md-tooltip {
+      display: block;
+      min-width: 12rem;
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.5;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: normal;
+      word-break: break-word;
+    }
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: #f0edf5;
+      color: #4a4458;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .md-icon-btn:hover { background: #e6e1ee; }
+    .md-icon-20 { width: 20px; height: 20px; }
+
+    .md-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      backdrop-filter: blur(4px);
+    }
+    .md-dialog {
+      background: var(--md-sys-color-surface);
+      padding: 1.5rem 2rem;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    .md-spinner {
+      width: 40px;
+      height: 40px;
+      border-radius: 9999px;
+      border: 3px solid #d7cfee;
+      border-top-color: var(--md-sys-color-primary);
+      animation: spin 1s linear infinite;
+    }
+
+    .hidden { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+  <style>
+    #preview svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
+  <div class="md-surface-card md-card">
+    <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+
+    <h1 class="md-headline">
+      <span aria-hidden="true" class="md-headline__icon">🖼️</span>
+      <span>画像 → SVG 変換</span>
+      <span class="md-tooltip-group">
+        <span class="md-info-chip">?</span>
+        <span class="md-tooltip-content">
+          <span class="md-tooltip">
+            画像ファイルをSVGに変換します。これは困難なことを実現するツールです。アイコン・ロゴのようなものはよく再現できますが、イラスト・写真などは技術的な理由から再現度が高くないことをあらかじめご承知ください。
+          </span>
+        </span>
+      </span>
+    </h1>
+
+    <div class="md-section">
+      <label class="md-label">
+        <span>画像ファイル（PNG/JPEG/WebP/GIF）</span>
+        <span class="md-required">REQUIRED</span>
+      </label>
+      <lht-file-select
+        input-id="file"
+        button-id="fileSelectBtn"
+        file-name-id="fileNameText"
+        accept="image/*"
+        button-label="ファイルを選択"
+        placeholder="未選択"
+      ></lht-file-select>
+    </div>
+
+    <div class="md-grid md-grid-2 md-section">
+      <div>
+        <lht-select-help field-id="preset" label="プリセット" help-text="用途に応じた推奨値を選択します。" value="illustration">
+          <script type="application/json" slot="options">
+            [
+              { "value": "icon", "label": "アイコン・ロゴ（軽量・鋭利）" },
+              { "value": "illustration", "label": "イラスト（なめらか・曲線）", "selected": true },
+              { "value": "photo", "label": "写真（芸術的・油絵風）" },
+              { "value": "pixelart", "label": "ドット絵（ピクセル完全再現）" }
+            ]
+          </script>
+        </lht-select-help>
+      </div>
+
+      <div>
+        <lht-text-field-help field-id="colors" type="number" min="2" max="64" value="12" label="色数" help-text="使用する色の数（2〜64）。多いほど詳細ですが重くなります。"></lht-text-field-help>
+      </div>
+
+      <div>
+        <lht-text-field-help field-id="ltres" type="number" min="0" max="10" step="0.1" value="1.0" label="輪郭の精度 (ltres)" help-text="低いほど元の形に忠実、高いほどノイズを無視します。"></lht-text-field-help>
+      </div>
+
+      <div>
+        <lht-text-field-help field-id="qtres" type="number" min="0.1" max="10" step="0.1" value="0.1" label="曲線の精度 (qtres)" help-text="低いほど滑らかな曲線、高いほど直線的な描画になります。"></lht-text-field-help>
+      </div>
+    </div>
+
+    <div class="md-grid md-grid-2 md-section">
+      <div>
+        <lht-text-field-help field-id="scalePercent" type="number" min="10" max="100" value="100" label="縮小率（前処理）" help-text="小さくしてからトレースすることで、パスの数を減らします（10〜100%）。"></lht-text-field-help>
+      </div>
+      <div>
+        <lht-text-field-help field-id="blurPx" type="number" min="0" max="5" step="0.5" value="0" label="ぼかし（前処理）" help-text="0以上の値で細かいノイズをならします（0〜5px）。"></lht-text-field-help>
+      </div>
+    </div>
+
+    <div class="md-actions md-section">
+      <button id="convert" disabled class="md-button md-button--primary">
+        SVGに変換する
+      </button>
+    </div>
+
+    <div class="md-row-between md-section">
+      <span>プレビュー</span>
+      <span id="fileInfo" class="md-muted"></span>
+    </div>
+    <div id="preview" class="md-preview">
+      <p class="md-preview__empty">ここに変換後の画像が表示されます</p>
+    </div>
+
+    <div class="md-actions md-section" style="margin-top: 1.5rem;">
+      <button id="download" disabled class="md-button md-button--secondary">
+        SVGをダウンロード
+      </button>
+    </div>
+  </div>
+
+  <div id="loading" class="md-overlay hidden">
+    <div class="md-dialog md-card">
+      <div class="md-spinner"></div>
+      <p>ベクター変換中...</p>
+    </div>
+  </div>
+
+  <script>
+/*
+	imagetracer.js version 1.2.6
+	Simple raster image tracer and vectorizer written in JavaScript.
+	andras@jankovics.net
+*/
+
+/*
+
+The Unlicense / PUBLIC DOMAIN
+
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to http://unlicense.org/
+
+*/
+
+(function(){ 'use strict';
+
+function ImageTracer(){
+	var _this = this;
+
+	this.versionnumber = '1.2.6',
+	
+	////////////////////////////////////////////////////////////
+	//
+	//  API
+	//
+	////////////////////////////////////////////////////////////
+	
+	// Loading an image from a URL, tracing when loaded,
+	// then executing callback with the scaled svg string as argument
+	this.imageToSVG = function( url, callback, options ){
+		options = _this.checkoptions(options);
+		// loading image, tracing and callback
+		_this.loadImage(
+			url,
+			function(canvas){
+				callback(
+					_this.imagedataToSVG( _this.getImgdata(canvas), options )
+				);
+			},
+			options
+		);
+	},// End of imageToSVG()
+	
+	// Tracing imagedata, then returning the scaled svg string
+	this.imagedataToSVG = function( imgd, options ){
+		options = _this.checkoptions(options);
+		// tracing imagedata
+		var td = _this.imagedataToTracedata( imgd, options );
+		// returning SVG string
+		return _this.getsvgstring(td, options);
+	},// End of imagedataToSVG()
+	
+	// Loading an image from a URL, tracing when loaded,
+	// then executing callback with tracedata as argument
+	this.imageToTracedata = function( url, callback, options ){
+		options = _this.checkoptions(options);
+		// loading image, tracing and callback
+		_this.loadImage(
+				url,
+				function(canvas){
+					callback(
+						_this.imagedataToTracedata( _this.getImgdata(canvas), options )
+					);
+				},
+				options
+		);
+	},// End of imageToTracedata()
+	
+	// Tracing imagedata, then returning tracedata (layers with paths, palette, image size)
+	this.imagedataToTracedata = function( imgd, options ){
+		options = _this.checkoptions(options);
+		
+		// 1. Color quantization
+		var ii = _this.colorquantization( imgd, options );
+		
+		if(options.layering === 0){// Sequential layering
+			
+			// create tracedata object
+			var tracedata = {
+				layers : [],
+				palette : ii.palette,
+				width : ii.array[0].length-2,
+				height : ii.array.length-2
+			};
+			
+			// Loop to trace each color layer
+			for(var colornum=0; colornum<ii.palette.length; colornum++){
+				
+				// layeringstep -> pathscan -> internodes -> batchtracepaths
+				var tracedlayer =
+					_this.batchtracepaths(
+							
+						_this.internodes(
+								
+							_this.pathscan(
+								_this.layeringstep( ii, colornum ),
+								options.pathomit
+							),
+							
+							options
+							
+						),
+						
+						options.ltres,
+						options.qtres
+						
+					);
+				
+				// adding traced layer
+				tracedata.layers.push(tracedlayer);
+				
+			}// End of color loop
+			
+		}else{// Parallel layering
+			// 2. Layer separation and edge detection
+			var ls = _this.layering( ii );
+			
+			// Optional edge node visualization
+			if(options.layercontainerid){ _this.drawLayers( ls, _this.specpalette, options.scale, options.layercontainerid ); }
+			
+			// 3. Batch pathscan
+			var bps = _this.batchpathscan( ls, options.pathomit );
+			
+			// 4. Batch interpollation
+			var bis = _this.batchinternodes( bps, options );
+			
+			// 5. Batch tracing and creating tracedata object
+			var tracedata = {
+				layers : _this.batchtracelayers( bis, options.ltres, options.qtres ),
+				palette : ii.palette,
+				width : imgd.width,
+				height : imgd.height
+			};
+			
+		}// End of parallel layering
+		
+		// return tracedata
+		return tracedata;
+		
+	},// End of imagedataToTracedata()
+	
+	this.optionpresets = {
+		'default': {
+			
+			// Tracing
+			corsenabled : false,
+			ltres : 1,
+			qtres : 1,
+			pathomit : 8,
+			rightangleenhance : true,
+			
+			// Color quantization
+			colorsampling : 2,
+			numberofcolors : 16,
+			mincolorratio : 0,
+			colorquantcycles : 3,
+			
+			// Layering method
+			layering : 0,
+			
+			// SVG rendering
+			strokewidth : 1,
+			linefilter : false,
+			scale : 1,
+			roundcoords : 1,
+			viewbox : false,
+			desc : false,
+			lcpr : 0,
+			qcpr : 0,
+			
+			// Blur
+			blurradius : 0,
+			blurdelta : 20
+			
+		},
+		'posterized1': { colorsampling:0, numberofcolors:2 },
+		'posterized2': { numberofcolors:4, blurradius:5 },
+		'curvy': { ltres:0.01, linefilter:true, rightangleenhance:false },
+		'sharp': { qtres:0.01, linefilter:false },
+		'detailed': { pathomit:0, roundcoords:2, ltres:0.5, qtres:0.5, numberofcolors:64 },
+		'smoothed': { blurradius:5, blurdelta: 64 },
+		'grayscale': { colorsampling:0, colorquantcycles:1, numberofcolors:7 },
+		'fixedpalette': { colorsampling:0, colorquantcycles:1, numberofcolors:27 },
+		'randomsampling1': { colorsampling:1, numberofcolors:8 },
+		'randomsampling2': { colorsampling:1, numberofcolors:64 },
+		'artistic1': { colorsampling:0, colorquantcycles:1, pathomit:0, blurradius:5, blurdelta: 64, ltres:0.01, linefilter:true, numberofcolors:16, strokewidth:2 },
+		'artistic2': { qtres:0.01, colorsampling:0, colorquantcycles:1, numberofcolors:4, strokewidth:0 },
+		'artistic3': { qtres:10, ltres:10, numberofcolors:8 },
+		'artistic4': { qtres:10, ltres:10, numberofcolors:64, blurradius:5, blurdelta: 256, strokewidth:2 },
+		'posterized3': { ltres: 1, qtres: 1, pathomit: 20, rightangleenhance: true, colorsampling: 0, numberofcolors: 3,
+			mincolorratio: 0, colorquantcycles: 3, blurradius: 3, blurdelta: 20, strokewidth: 0, linefilter: false,
+			roundcoords: 1, pal: [ { r: 0, g: 0, b: 100, a: 255 }, { r: 255, g: 255, b: 255, a: 255 } ] }
+	},// End of optionpresets
+	
+	// creating options object, setting defaults for missing values
+	this.checkoptions = function(options){
+		options = options || {};
+		// Option preset
+		if(typeof options === 'string'){
+			options = options.toLowerCase();
+			if( _this.optionpresets[options] ){ options = _this.optionpresets[options]; }else{ options = {}; }
+		}
+		// Defaults
+		var ok = Object.keys(_this.optionpresets['default']);
+		for(var k=0; k<ok.length; k++){
+			if(!options.hasOwnProperty(ok[k])){ options[ok[k]] = _this.optionpresets['default'][ok[k]]; }
+		}
+		// options.pal is not defined here, the custom palette should be added externally: options.pal = [ { 'r':0, 'g':0, 'b':0, 'a':255 }, {...}, ... ];
+		// options.layercontainerid is not defined here, can be added externally: options.layercontainerid = 'mydiv'; ... <div id="mydiv"></div>
+		return options;
+	},// End of checkoptions()
+	
+	////////////////////////////////////////////////////////////
+	//
+	//  Vectorizing functions
+	//
+	////////////////////////////////////////////////////////////
+	
+	// 1. Color quantization
+	// Using a form of k-means clustering repeatead options.colorquantcycles times. http://en.wikipedia.org/wiki/Color_quantization
+	this.colorquantization = function( imgd, options ){
+		var arr = [], idx=0, cd,cdl,ci, paletteacc = [], pixelnum = imgd.width * imgd.height, i, j, k, cnt, palette;
+		
+		// imgd.data must be RGBA, not just RGB
+		if( imgd.data.length < pixelnum * 4 ){
+			var newimgddata = new Uint8ClampedArray(pixelnum * 4);
+			for(var pxcnt = 0; pxcnt < pixelnum ; pxcnt++){
+				newimgddata[pxcnt*4  ] = imgd.data[pxcnt*3  ];
+				newimgddata[pxcnt*4+1] = imgd.data[pxcnt*3+1];
+				newimgddata[pxcnt*4+2] = imgd.data[pxcnt*3+2];
+				newimgddata[pxcnt*4+3] = 255;
+			}
+			imgd.data = newimgddata;
+		}// End of RGBA imgd.data check
+		
+		// Filling arr (color index array) with -1
+		for( j=0; j<imgd.height+2; j++ ){ arr[j]=[]; for(i=0; i<imgd.width+2 ; i++){ arr[j][i] = -1; } }
+		
+		// Use custom palette if pal is defined or sample / generate custom length palette
+		if(options.pal){
+			palette = options.pal;
+		}else if(options.colorsampling === 0){
+			palette = _this.generatepalette(options.numberofcolors);
+		}else if(options.colorsampling === 1){
+			palette = _this.samplepalette( options.numberofcolors, imgd );
+		}else{
+			palette = _this.samplepalette2( options.numberofcolors, imgd );
+		}
+		
+		// Selective Gaussian blur preprocessing
+		if( options.blurradius > 0 ){ imgd = _this.blur( imgd, options.blurradius, options.blurdelta ); }
+		
+		// Repeat clustering step options.colorquantcycles times
+		for( cnt=0; cnt < options.colorquantcycles; cnt++ ){
+			
+			// Average colors from the second iteration
+			if(cnt>0){
+				// averaging paletteacc for palette
+				for( k=0; k < palette.length; k++ ){
+					
+					// averaging
+					if( paletteacc[k].n > 0 ){
+						palette[k] = {  r: Math.floor( paletteacc[k].r / paletteacc[k].n ),
+										g: Math.floor( paletteacc[k].g / paletteacc[k].n ),
+										b: Math.floor( paletteacc[k].b / paletteacc[k].n ),
+										a:  Math.floor( paletteacc[k].a / paletteacc[k].n ) };
+					}
+					
+					// Randomizing a color, if there are too few pixels and there will be a new cycle
+					if( ( paletteacc[k].n/pixelnum < options.mincolorratio ) && ( cnt < options.colorquantcycles-1 ) ){
+						palette[k] = {  r: Math.floor(Math.random()*255),
+										g: Math.floor(Math.random()*255),
+										b: Math.floor(Math.random()*255),
+										a: Math.floor(Math.random()*255) };
+					}
+					
+				}// End of palette loop
+			}// End of Average colors from the second iteration
+			
+			// Reseting palette accumulator for averaging
+			for( i=0; i < palette.length; i++ ){ paletteacc[i] = { r:0, g:0, b:0, a:0, n:0 }; }
+			
+			// loop through all pixels
+			for( j=0; j < imgd.height; j++ ){
+				for( i=0; i < imgd.width; i++ ){
+					
+					// pixel index
+					idx = (j*imgd.width+i)*4;
+					
+					// find closest color from palette by measuring (rectilinear) color distance between this pixel and all palette colors
+					ci=0; cdl = 1024; // 4 * 256 is the maximum RGBA distance
+					for( k=0; k<palette.length; k++ ){
+						
+						// In my experience, https://en.wikipedia.org/wiki/Rectilinear_distance works better than https://en.wikipedia.org/wiki/Euclidean_distance
+						cd = Math.abs(palette[k].r-imgd.data[idx]) + Math.abs(palette[k].g-imgd.data[idx+1]) + Math.abs(palette[k].b-imgd.data[idx+2]) + Math.abs(palette[k].a-imgd.data[idx+3]);
+						
+						// Remember this color if this is the closest yet
+						if(cd<cdl){ cdl = cd; ci = k; }
+						
+					}// End of palette loop
+					
+					// add to palettacc
+					paletteacc[ci].r += imgd.data[idx  ];
+					paletteacc[ci].g += imgd.data[idx+1];
+					paletteacc[ci].b += imgd.data[idx+2];
+					paletteacc[ci].a += imgd.data[idx+3];
+					paletteacc[ci].n++;
+					
+					// update the indexed color array
+					arr[j+1][i+1] = ci;
+					
+				}// End of i loop
+			}// End of j loop
+			
+		}// End of Repeat clustering step options.colorquantcycles times
+		
+		return { array:arr, palette:palette };
+		
+	},// End of colorquantization()
+	
+	// Sampling a palette from imagedata
+	this.samplepalette = function( numberofcolors, imgd ){
+		var idx, palette=[];
+		for(var i=0; i<numberofcolors; i++){
+			idx = Math.floor( Math.random() * imgd.data.length / 4 ) * 4;
+			palette.push({ r:imgd.data[idx  ], g:imgd.data[idx+1], b:imgd.data[idx+2], a:imgd.data[idx+3] });
+		}
+		return palette;
+	},// End of samplepalette()
+	
+	// Deterministic sampling a palette from imagedata: rectangular grid
+	this.samplepalette2 = function( numberofcolors, imgd ){
+		var idx, palette=[], ni = Math.ceil(Math.sqrt(numberofcolors)), nj = Math.ceil(numberofcolors/ni),
+			vx = imgd.width / (ni+1), vy = imgd.height / (nj+1);
+		for(var j=0; j<nj; j++){
+			for(var i=0; i<ni; i++){
+				if(palette.length === numberofcolors){
+					break;
+				}else{
+					idx = Math.floor( ((j+1)*vy) * imgd.width + ((i+1)*vx) ) * 4;
+					palette.push( { r:imgd.data[idx], g:imgd.data[idx+1], b:imgd.data[idx+2], a:imgd.data[idx+3] } );
+				}
+			}
+		}
+		return palette;
+	},// End of samplepalette2()
+	
+	// Generating a palette with numberofcolors
+	this.generatepalette = function(numberofcolors){
+		var palette = [], rcnt, gcnt, bcnt;
+		if(numberofcolors<8){
+			
+			// Grayscale
+			var graystep = Math.floor(255/(numberofcolors-1));
+			for(var i=0; i<numberofcolors; i++){ palette.push({ r:i*graystep, g:i*graystep, b:i*graystep, a:255 }); }
+			
+		}else{
+			
+			// RGB color cube
+			var colorqnum = Math.floor(Math.pow(numberofcolors, 1/3)), // Number of points on each edge on the RGB color cube
+				colorstep = Math.floor(255/(colorqnum-1)), // distance between points
+				rndnum = numberofcolors - colorqnum*colorqnum*colorqnum; // number of random colors
+			
+			for(rcnt=0; rcnt<colorqnum; rcnt++){
+				for(gcnt=0; gcnt<colorqnum; gcnt++){
+					for(bcnt=0; bcnt<colorqnum; bcnt++){
+						palette.push( { r:rcnt*colorstep, g:gcnt*colorstep, b:bcnt*colorstep, a:255 } );
+					}// End of blue loop
+				}// End of green loop
+			}// End of red loop
+			
+			// Rest is random
+			for(rcnt=0; rcnt<rndnum; rcnt++){ palette.push({ r:Math.floor(Math.random()*255), g:Math.floor(Math.random()*255), b:Math.floor(Math.random()*255), a:Math.floor(Math.random()*255) }); }
+
+		}// End of numberofcolors check
+		
+		return palette;
+	},// End of generatepalette()
+		
+	// 2. Layer separation and edge detection
+	// Edge node types ( ▓: this layer or 1; ░: not this layer or 0 )
+	// 12  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓
+	// 48  ░░  ░░  ░░  ░░  ░▓  ░▓  ░▓  ░▓  ▓░  ▓░  ▓░  ▓░  ▓▓  ▓▓  ▓▓  ▓▓
+	//     0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+	this.layering = function(ii){
+		// Creating layers for each indexed color in arr
+		var layers = [], val=0, ah = ii.array.length, aw = ii.array[0].length, n1,n2,n3,n4,n5,n6,n7,n8, i, j, k;
+		
+		// Create layers
+		for(k=0; k<ii.palette.length; k++){
+			layers[k] = [];
+			for(j=0; j<ah; j++){
+				layers[k][j] = [];
+				for(i=0; i<aw; i++){
+					layers[k][j][i]=0;
+				}
+			}
+		}
+		
+		// Looping through all pixels and calculating edge node type
+		for(j=1; j<ah-1; j++){
+			for(i=1; i<aw-1; i++){
+				
+				// This pixel's indexed color
+				val = ii.array[j][i];
+				
+				// Are neighbor pixel colors the same?
+				n1 = ii.array[j-1][i-1]===val ? 1 : 0;
+				n2 = ii.array[j-1][i  ]===val ? 1 : 0;
+				n3 = ii.array[j-1][i+1]===val ? 1 : 0;
+				n4 = ii.array[j  ][i-1]===val ? 1 : 0;
+				n5 = ii.array[j  ][i+1]===val ? 1 : 0;
+				n6 = ii.array[j+1][i-1]===val ? 1 : 0;
+				n7 = ii.array[j+1][i  ]===val ? 1 : 0;
+				n8 = ii.array[j+1][i+1]===val ? 1 : 0;
+				
+				// this pixel's type and looking back on previous pixels
+				layers[val][j+1][i+1] = 1 + n5 * 2 + n8 * 4 + n7 * 8 ;
+				if(!n4){ layers[val][j+1][i  ] = 0 + 2 + n7 * 4 + n6 * 8 ; }
+				if(!n2){ layers[val][j  ][i+1] = 0 + n3*2 + n5 * 4 + 8 ; }
+				if(!n1){ layers[val][j  ][i  ] = 0 + n2*2 + 4 + n4 * 8 ; }
+				
+			}// End of i loop
+		}// End of j loop
+		
+		return layers;
+	},// End of layering()
+	
+	// 2. Layer separation and edge detection
+	// Edge node types ( ▓: this layer or 1; ░: not this layer or 0 )
+	// 12  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓
+	// 48  ░░  ░░  ░░  ░░  ░▓  ░▓  ░▓  ░▓  ▓░  ▓░  ▓░  ▓░  ▓▓  ▓▓  ▓▓  ▓▓
+	//     0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+	this.layeringstep = function(ii,cnum){
+		// Creating layers for each indexed color in arr
+		var layer = [], val=0, ah = ii.array.length, aw = ii.array[0].length, n1,n2,n3,n4,n5,n6,n7,n8, i, j, k;
+		
+		// Create layer
+		for(j=0; j<ah; j++){
+			layer[j] = [];
+			for(i=0; i<aw; i++){
+				layer[j][i]=0;
+			}
+		}
+		
+		// Looping through all pixels and calculating edge node type
+		for(j=1; j<ah; j++){
+			for(i=1; i<aw; i++){
+				layer[j][i] =
+					( ii.array[j-1][i-1]===cnum ? 1 : 0 ) +
+					( ii.array[j-1][i]===cnum ? 2 : 0 ) +
+					( ii.array[j][i-1]===cnum ? 8 : 0 ) +
+					( ii.array[j][i]===cnum ? 4 : 0 )
+				;
+			}// End of i loop
+		}// End of j loop
+			
+		return layer;
+	},// End of layeringstep()
+	
+	// Point in polygon test
+	this.pointinpoly = function( p, pa ){
+		var isin=false;
+
+		for(var i=0,j=pa.length-1; i<pa.length; j=i++){
+			isin =
+				( ((pa[i].y > p.y) !== (pa[j].y > p.y)) && (p.x < (pa[j].x - pa[i].x) * (p.y - pa[i].y) / (pa[j].y - pa[i].y) + pa[i].x) )
+				? !isin : isin;
+		}
+
+		return isin;
+	},
+	
+	// Lookup tables for pathscan
+	// pathscan_combined_lookup[ arr[py][px] ][ dir ] = [nextarrpypx, nextdir, deltapx, deltapy];
+	this.pathscan_combined_lookup = [
+		[[-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1]],// arr[py][px]===0 is invalid
+		[[ 0, 1, 0,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 2,-1, 0]],
+		[[-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 1, 0,-1], [ 0, 0, 1, 0]],
+		[[ 0, 0, 1, 0], [-1,-1,-1,-1], [ 0, 2,-1, 0], [-1,-1,-1,-1]],
+		
+		[[-1,-1,-1,-1], [ 0, 0, 1, 0], [ 0, 3, 0, 1], [-1,-1,-1,-1]],
+		[[13, 3, 0, 1], [13, 2,-1, 0], [ 7, 1, 0,-1], [ 7, 0, 1, 0]],
+		[[-1,-1,-1,-1], [ 0, 1, 0,-1], [-1,-1,-1,-1], [ 0, 3, 0, 1]],
+		[[ 0, 3, 0, 1], [ 0, 2,-1, 0], [-1,-1,-1,-1], [-1,-1,-1,-1]],
+		
+		[[ 0, 3, 0, 1], [ 0, 2,-1, 0], [-1,-1,-1,-1], [-1,-1,-1,-1]],
+		[[-1,-1,-1,-1], [ 0, 1, 0,-1], [-1,-1,-1,-1], [ 0, 3, 0, 1]],
+		[[11, 1, 0,-1], [14, 0, 1, 0], [14, 3, 0, 1], [11, 2,-1, 0]],
+		[[-1,-1,-1,-1], [ 0, 0, 1, 0], [ 0, 3, 0, 1], [-1,-1,-1,-1]],
+		
+		[[ 0, 0, 1, 0], [-1,-1,-1,-1], [ 0, 2,-1, 0], [-1,-1,-1,-1]],
+		[[-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 1, 0,-1], [ 0, 0, 1, 0]],
+		[[ 0, 1, 0,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 2,-1, 0]],
+		[[-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1]]// arr[py][px]===15 is invalid
+	],
+
+	// 3. Walking through an edge node array, discarding edge node types 0 and 15 and creating paths from the rest.
+	// Walk directions (dir): 0 > ; 1 ^ ; 2 < ; 3 v 
+	this.pathscan = function( arr, pathomit ){
+		var paths=[], pacnt=0, pcnt=0, px=0, py=0, w = arr[0].length, h = arr.length,
+			dir=0, pathfinished=true, holepath=false, lookuprow;
+		
+		for(var j=0; j<h; j++){
+			for(var i=0; i<w; i++){
+				if( (arr[j][i] == 4) || ( arr[j][i] == 11) ){ // Other values are not valid
+					
+					// Init
+					px = i; py = j;
+					paths[pacnt] = {};
+					paths[pacnt].points = [];
+					paths[pacnt].boundingbox = [px,py,px,py];
+					paths[pacnt].holechildren = [];
+					pathfinished = false;
+					pcnt=0;
+					holepath = (arr[j][i]==11);
+					dir = 1;
+
+					// Path points loop
+					while(!pathfinished){
+						
+						// New path point
+						paths[pacnt].points[pcnt] = {};
+						paths[pacnt].points[pcnt].x = px-1;
+						paths[pacnt].points[pcnt].y = py-1;
+						paths[pacnt].points[pcnt].t = arr[py][px];
+						
+						// Bounding box
+						if( (px-1) < paths[pacnt].boundingbox[0] ){ paths[pacnt].boundingbox[0] = px-1; }
+						if( (px-1) > paths[pacnt].boundingbox[2] ){ paths[pacnt].boundingbox[2] = px-1; }
+						if( (py-1) < paths[pacnt].boundingbox[1] ){ paths[pacnt].boundingbox[1] = py-1; }
+						if( (py-1) > paths[pacnt].boundingbox[3] ){ paths[pacnt].boundingbox[3] = py-1; }
+						
+						// Next: look up the replacement, direction and coordinate changes = clear this cell, turn if required, walk forward
+						lookuprow = _this.pathscan_combined_lookup[ arr[py][px] ][ dir ];
+						arr[py][px] = lookuprow[0]; dir = lookuprow[1]; px += lookuprow[2]; py += lookuprow[3];
+
+						// Close path
+						if( (px-1 === paths[pacnt].points[0].x ) && ( py-1 === paths[pacnt].points[0].y ) ){
+							pathfinished = true;
+							
+							// Discarding paths shorter than pathomit
+							if( paths[pacnt].points.length < pathomit ){
+								paths.pop();
+							}else{
+							
+								paths[pacnt].isholepath = holepath ? true : false;
+								
+								// Finding the parent shape for this hole
+								if(holepath){
+									
+									var parentidx = 0, parentbbox = [-1,-1,w+1,h+1];
+									for(var parentcnt=0; parentcnt < pacnt; parentcnt++){
+										if( (!paths[parentcnt].isholepath) &&
+											_this.boundingboxincludes( paths[parentcnt].boundingbox , paths[pacnt].boundingbox ) &&
+											_this.boundingboxincludes( parentbbox , paths[parentcnt].boundingbox ) &&
+											_this.pointinpoly( paths[pacnt].points[0], paths[parentcnt].points )
+										){
+											parentidx = parentcnt;
+											parentbbox = paths[parentcnt].boundingbox;
+										}
+									}
+									
+									paths[parentidx].holechildren.push( pacnt );
+									
+								}// End of holepath parent finding
+								
+								pacnt++;
+							
+							}
+							
+						}// End of Close path
+						
+						pcnt++;
+						
+					}// End of Path points loop
+					
+				}// End of Follow path
+				
+			}// End of i loop
+		}// End of j loop
+		
+		return paths;
+	},// End of pathscan()
+	
+	this.boundingboxincludes = function( parentbbox, childbbox ){
+		return ( ( parentbbox[0] < childbbox[0] ) && ( parentbbox[1] < childbbox[1] ) && ( parentbbox[2] > childbbox[2] ) && ( parentbbox[3] > childbbox[3] ) );
+	},// End of boundingboxincludes()
+	
+	// 3. Batch pathscan
+	this.batchpathscan = function( layers, pathomit ){
+		var bpaths = [];
+		for(var k in layers){
+			if(!layers.hasOwnProperty(k)){ continue; }
+			bpaths[k] = _this.pathscan( layers[k], pathomit );
+		}
+		return bpaths;
+	},
+	
+	// 4. interpollating between path points for nodes with 8 directions ( East, SouthEast, S, SW, W, NW, N, NE )
+	this.internodes = function( paths, options ){
+		var ins = [], palen=0, nextidx=0, nextidx2=0, previdx=0, previdx2=0, pacnt, pcnt;
+		
+		// paths loop
+		for(pacnt=0; pacnt<paths.length; pacnt++){
+			
+			ins[pacnt] = {};
+			ins[pacnt].points = [];
+			ins[pacnt].boundingbox = paths[pacnt].boundingbox;
+			ins[pacnt].holechildren = paths[pacnt].holechildren;
+			ins[pacnt].isholepath = paths[pacnt].isholepath;
+			palen = paths[pacnt].points.length;
+			
+			// pathpoints loop
+			for(pcnt=0; pcnt<palen; pcnt++){
+			
+				// next and previous point indexes
+				nextidx = (pcnt+1)%palen; nextidx2 = (pcnt+2)%palen; previdx = (pcnt-1+palen)%palen; previdx2 = (pcnt-2+palen)%palen;
+				
+				// right angle enhance
+				if( options.rightangleenhance && _this.testrightangle( paths[pacnt], previdx2, previdx, pcnt, nextidx, nextidx2 ) ){
+					
+					// Fix previous direction
+					if(ins[pacnt].points.length > 0){
+						ins[pacnt].points[ ins[pacnt].points.length-1 ].linesegment = _this.getdirection(
+								ins[pacnt].points[ ins[pacnt].points.length-1 ].x,
+								ins[pacnt].points[ ins[pacnt].points.length-1 ].y,
+								paths[pacnt].points[pcnt].x,
+								paths[pacnt].points[pcnt].y
+							);
+					}
+					
+					// This corner point
+					ins[pacnt].points.push({
+						x : paths[pacnt].points[pcnt].x,
+						y : paths[pacnt].points[pcnt].y,
+						linesegment : _this.getdirection(
+								paths[pacnt].points[pcnt].x,
+								paths[pacnt].points[pcnt].y,
+								(( paths[pacnt].points[pcnt].x + paths[pacnt].points[nextidx].x ) /2),
+								(( paths[pacnt].points[pcnt].y + paths[pacnt].points[nextidx].y ) /2)
+							)
+					});
+					
+				}// End of right angle enhance
+				
+				// interpolate between two path points
+				ins[pacnt].points.push({
+					x : (( paths[pacnt].points[pcnt].x + paths[pacnt].points[nextidx].x ) /2),
+					y : (( paths[pacnt].points[pcnt].y + paths[pacnt].points[nextidx].y ) /2),
+					linesegment : _this.getdirection(
+							(( paths[pacnt].points[pcnt].x + paths[pacnt].points[nextidx].x ) /2),
+							(( paths[pacnt].points[pcnt].y + paths[pacnt].points[nextidx].y ) /2),
+							(( paths[pacnt].points[nextidx].x + paths[pacnt].points[nextidx2].x ) /2),
+							(( paths[pacnt].points[nextidx].y + paths[pacnt].points[nextidx2].y ) /2)
+						)
+				});
+				
+			}// End of pathpoints loop
+						
+		}// End of paths loop
+		
+		return ins;
+	},// End of internodes()
+	
+	this.testrightangle = function( path, idx1, idx2, idx3, idx4, idx5 ){
+		return ( (( path.points[idx3].x === path.points[idx1].x) &&
+				  ( path.points[idx3].x === path.points[idx2].x) &&
+				  ( path.points[idx3].y === path.points[idx4].y) &&
+				  ( path.points[idx3].y === path.points[idx5].y)
+				 ) ||
+				 (( path.points[idx3].y === path.points[idx1].y) &&
+				  ( path.points[idx3].y === path.points[idx2].y) &&
+				  ( path.points[idx3].x === path.points[idx4].x) &&
+				  ( path.points[idx3].x === path.points[idx5].x)
+				 )
+		);
+	},// End of testrightangle()
+	
+	this.getdirection = function( x1, y1, x2, y2 ){
+		var val = 8;
+		if(x1 < x2){
+			if     (y1 < y2){ val = 1; }// SouthEast
+			else if(y1 > y2){ val = 7; }// NE
+			else            { val = 0; }// E
+		}else if(x1 > x2){
+			if     (y1 < y2){ val = 3; }// SW
+			else if(y1 > y2){ val = 5; }// NW
+			else            { val = 4; }// W
+		}else{
+			if     (y1 < y2){ val = 2; }// S
+			else if(y1 > y2){ val = 6; }// N
+			else            { val = 8; }// center, this should not happen
+		}
+		return val;
+	},// End of getdirection()
+	
+	// 4. Batch interpollation
+	this.batchinternodes = function( bpaths, options ){
+		var binternodes = [];
+		for (var k in bpaths) {
+			if(!bpaths.hasOwnProperty(k)){ continue; }
+			binternodes[k] = _this.internodes(bpaths[k], options);
+		}
+		return binternodes;
+	},
+	
+	// 5. tracepath() : recursively trying to fit straight and quadratic spline segments on the 8 direction internode path
+	
+	// 5.1. Find sequences of points with only 2 segment types
+	// 5.2. Fit a straight line on the sequence
+	// 5.3. If the straight line fails (distance error > ltres), find the point with the biggest error
+	// 5.4. Fit a quadratic spline through errorpoint (project this to get controlpoint), then measure errors on every point in the sequence
+	// 5.5. If the spline fails (distance error > qtres), find the point with the biggest error, set splitpoint = fitting point
+	// 5.6. Split sequence and recursively apply 5.2. - 5.6. to startpoint-splitpoint and splitpoint-endpoint sequences
+	
+	this.tracepath = function( path, ltres, qtres ){
+		var pcnt=0, segtype1, segtype2, seqend, smp = {};
+		smp.segments = [];
+		smp.boundingbox = path.boundingbox;
+		smp.holechildren = path.holechildren;
+		smp.isholepath = path.isholepath;
+		
+		while(pcnt < path.points.length){
+			// 5.1. Find sequences of points with only 2 segment types
+			segtype1 = path.points[pcnt].linesegment; segtype2 = -1; seqend=pcnt+1;
+			while(
+				((path.points[seqend].linesegment === segtype1) || (path.points[seqend].linesegment === segtype2) || (segtype2 === -1))
+				&& (seqend < path.points.length-1) ){
+				
+				if((path.points[seqend].linesegment!==segtype1) && (segtype2===-1)){ segtype2 = path.points[seqend].linesegment; }
+				seqend++;
+				
+			}
+			if(seqend === path.points.length-1){ seqend = 0; }
+
+			// 5.2. - 5.6. Split sequence and recursively apply 5.2. - 5.6. to startpoint-splitpoint and splitpoint-endpoint sequences
+			smp.segments = smp.segments.concat( _this.fitseq(path, ltres, qtres, pcnt, seqend) );
+			
+			// forward pcnt;
+			if(seqend>0){ pcnt = seqend; }else{ pcnt = path.points.length; }
+			
+		}// End of pcnt loop
+		
+		return smp;
+	},// End of tracepath()
+		
+	// 5.2. - 5.6. recursively fitting a straight or quadratic line segment on this sequence of path nodes,
+	// called from tracepath()
+	this.fitseq = function( path, ltres, qtres, seqstart, seqend ){
+		// return if invalid seqend
+		if( (seqend>path.points.length) || (seqend<0) ){ return []; }
+		// variables
+		var errorpoint=seqstart, errorval=0, curvepass=true, px, py, dist2;
+		var tl = (seqend-seqstart); if(tl<0){ tl += path.points.length; }
+		var vx = (path.points[seqend].x-path.points[seqstart].x) / tl,
+			vy = (path.points[seqend].y-path.points[seqstart].y) / tl;
+		
+		// 5.2. Fit a straight line on the sequence
+		var pcnt = (seqstart+1) % path.points.length, pl;
+		while(pcnt != seqend){
+			pl = pcnt-seqstart; if(pl<0){ pl += path.points.length; }
+			px = path.points[seqstart].x + vx * pl; py = path.points[seqstart].y + vy * pl;
+			dist2 = (path.points[pcnt].x-px)*(path.points[pcnt].x-px) + (path.points[pcnt].y-py)*(path.points[pcnt].y-py);
+			if(dist2>ltres){curvepass=false;}
+			if(dist2>errorval){ errorpoint=pcnt; errorval=dist2; }
+			pcnt = (pcnt+1)%path.points.length;
+		}
+		// return straight line if fits
+		if(curvepass){ return [{ type:'L', x1:path.points[seqstart].x, y1:path.points[seqstart].y, x2:path.points[seqend].x, y2:path.points[seqend].y }]; }
+		
+		// 5.3. If the straight line fails (distance error>ltres), find the point with the biggest error
+		var fitpoint = errorpoint; curvepass = true; errorval = 0;
+		
+		// 5.4. Fit a quadratic spline through this point, measure errors on every point in the sequence
+		// helpers and projecting to get control point
+		var t=(fitpoint-seqstart)/tl, t1=(1-t)*(1-t), t2=2*(1-t)*t, t3=t*t;
+		var cpx = (t1*path.points[seqstart].x + t3*path.points[seqend].x - path.points[fitpoint].x)/-t2 ,
+			cpy = (t1*path.points[seqstart].y + t3*path.points[seqend].y - path.points[fitpoint].y)/-t2 ;
+		
+		// Check every point
+		pcnt = seqstart+1;
+		while(pcnt != seqend){
+			t=(pcnt-seqstart)/tl; t1=(1-t)*(1-t); t2=2*(1-t)*t; t3=t*t;
+			px = t1 * path.points[seqstart].x + t2 * cpx + t3 * path.points[seqend].x;
+			py = t1 * path.points[seqstart].y + t2 * cpy + t3 * path.points[seqend].y;
+			
+			dist2 = (path.points[pcnt].x-px)*(path.points[pcnt].x-px) + (path.points[pcnt].y-py)*(path.points[pcnt].y-py);
+			
+			if(dist2>qtres){curvepass=false;}
+			if(dist2>errorval){ errorpoint=pcnt; errorval=dist2; }
+			pcnt = (pcnt+1)%path.points.length;
+		}
+		// return spline if fits
+		if(curvepass){ return [{ type:'Q', x1:path.points[seqstart].x, y1:path.points[seqstart].y, x2:cpx, y2:cpy, x3:path.points[seqend].x, y3:path.points[seqend].y }]; }
+		// 5.5. If the spline fails (distance error>qtres), find the point with the biggest error
+		var splitpoint = fitpoint; // Earlier: Math.floor((fitpoint + errorpoint)/2);
+		
+		// 5.6. Split sequence and recursively apply 5.2. - 5.6. to startpoint-splitpoint and splitpoint-endpoint sequences
+		return _this.fitseq( path, ltres, qtres, seqstart, splitpoint ).concat(
+				_this.fitseq( path, ltres, qtres, splitpoint, seqend ) );
+		
+	},// End of fitseq()
+	
+	// 5. Batch tracing paths
+	this.batchtracepaths = function(internodepaths,ltres,qtres){
+		var btracedpaths = [];
+		for(var k in internodepaths){
+			if(!internodepaths.hasOwnProperty(k)){ continue; }
+			btracedpaths.push( _this.tracepath(internodepaths[k],ltres,qtres) );
+		}
+		return btracedpaths;
+	},
+	
+	// 5. Batch tracing layers
+	this.batchtracelayers = function(binternodes, ltres, qtres){
+		var btbis = [];
+		for(var k in binternodes){
+			if(!binternodes.hasOwnProperty(k)){ continue; }
+			btbis[k] = _this.batchtracepaths(binternodes[k], ltres, qtres);
+		}
+		return btbis;
+	},
+	
+	////////////////////////////////////////////////////////////
+	//
+	//  SVG Drawing functions
+	//
+	////////////////////////////////////////////////////////////
+	
+	// Rounding to given decimals https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-in-javascript
+	this.roundtodec = function(val,places){ return +val.toFixed(places); },
+	
+	// Getting SVG path element string from a traced path
+	this.svgpathstring = function( tracedata, lnum, pathnum, options ){
+		
+		var layer = tracedata.layers[lnum], smp = layer[pathnum], str='', pcnt;
+		
+		// Line filter
+		if(options.linefilter && (smp.segments.length < 3)){ return str; }
+		
+		// Starting path element, desc contains layer and path number
+		str = '<path '+
+			( options.desc ? ('desc="l '+lnum+' p '+pathnum+'" ') : '' ) +
+			_this.tosvgcolorstr(tracedata.palette[lnum], options) +
+			'd="';
+		
+		// Creating non-hole path string
+		if( options.roundcoords === -1 ){
+			str += 'M '+ smp.segments[0].x1 * options.scale +' '+ smp.segments[0].y1 * options.scale +' ';
+			for(pcnt=0; pcnt<smp.segments.length; pcnt++){
+				str += smp.segments[pcnt].type +' '+ smp.segments[pcnt].x2 * options.scale +' '+ smp.segments[pcnt].y2 * options.scale +' ';
+				if(smp.segments[pcnt].hasOwnProperty('x3')){
+					str += smp.segments[pcnt].x3 * options.scale +' '+ smp.segments[pcnt].y3 * options.scale +' ';
+				}
+			}
+			str += 'Z ';
+		}else{
+			str += 'M '+ _this.roundtodec( smp.segments[0].x1 * options.scale, options.roundcoords ) +' '+ _this.roundtodec( smp.segments[0].y1 * options.scale, options.roundcoords ) +' ';
+			for(pcnt=0; pcnt<smp.segments.length; pcnt++){
+				str += smp.segments[pcnt].type +' '+ _this.roundtodec( smp.segments[pcnt].x2 * options.scale, options.roundcoords ) +' '+ _this.roundtodec( smp.segments[pcnt].y2 * options.scale, options.roundcoords ) +' ';
+				if(smp.segments[pcnt].hasOwnProperty('x3')){
+					str += _this.roundtodec( smp.segments[pcnt].x3 * options.scale, options.roundcoords ) +' '+ _this.roundtodec( smp.segments[pcnt].y3 * options.scale, options.roundcoords ) +' ';
+				}
+			}
+			str += 'Z ';
+		}// End of creating non-hole path string
+		
+		// Hole children
+		for( var hcnt=0; hcnt < smp.holechildren.length; hcnt++){
+			var hsmp = layer[ smp.holechildren[hcnt] ];
+			// Creating hole path string
+			if( options.roundcoords === -1 ){
+				
+				if(hsmp.segments[ hsmp.segments.length-1 ].hasOwnProperty('x3')){
+					str += 'M '+ hsmp.segments[ hsmp.segments.length-1 ].x3 * options.scale +' '+ hsmp.segments[ hsmp.segments.length-1 ].y3 * options.scale +' ';
+				}else{
+					str += 'M '+ hsmp.segments[ hsmp.segments.length-1 ].x2 * options.scale +' '+ hsmp.segments[ hsmp.segments.length-1 ].y2 * options.scale +' ';
+				}
+				
+				for(pcnt = hsmp.segments.length-1; pcnt >= 0; pcnt--){
+					str += hsmp.segments[pcnt].type +' ';
+					if(hsmp.segments[pcnt].hasOwnProperty('x3')){
+						str += hsmp.segments[pcnt].x2 * options.scale +' '+ hsmp.segments[pcnt].y2 * options.scale +' ';
+					}
+					
+					str += hsmp.segments[pcnt].x1 * options.scale +' '+ hsmp.segments[pcnt].y1 * options.scale +' ';
+				}
+				
+			}else{
+				
+				if(hsmp.segments[ hsmp.segments.length-1 ].hasOwnProperty('x3')){
+					str += 'M '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].x3 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].y3 * options.scale ) +' ';
+				}else{
+					str += 'M '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].x2 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].y2 * options.scale ) +' ';
+				}
+				
+				for(pcnt = hsmp.segments.length-1; pcnt >= 0; pcnt--){
+					str += hsmp.segments[pcnt].type +' ';
+					if(hsmp.segments[pcnt].hasOwnProperty('x3')){
+						str += _this.roundtodec( hsmp.segments[pcnt].x2 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[pcnt].y2 * options.scale ) +' ';
+					}
+					str += _this.roundtodec( hsmp.segments[pcnt].x1 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[pcnt].y1 * options.scale ) +' ';
+				}
+				
+				
+			}// End of creating hole path string
+			
+			str += 'Z '; // Close path
+			
+		}// End of holepath check
+		
+		// Closing path element
+		str += '" />';
+		
+		// Rendering control points
+		if(options.lcpr || options.qcpr){
+			for(pcnt=0; pcnt<smp.segments.length; pcnt++){
+				if( smp.segments[pcnt].hasOwnProperty('x3') && options.qcpr ){
+					str += '<circle cx="'+ smp.segments[pcnt].x2 * options.scale +'" cy="'+ smp.segments[pcnt].y2 * options.scale +'" r="'+ options.qcpr +'" fill="cyan" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+					str += '<circle cx="'+ smp.segments[pcnt].x3 * options.scale +'" cy="'+ smp.segments[pcnt].y3 * options.scale +'" r="'+ options.qcpr +'" fill="white" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+					str += '<line x1="'+ smp.segments[pcnt].x1 * options.scale +'" y1="'+ smp.segments[pcnt].y1 * options.scale +'" x2="'+ smp.segments[pcnt].x2 * options.scale +'" y2="'+ smp.segments[pcnt].y2 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+					str += '<line x1="'+ smp.segments[pcnt].x2 * options.scale +'" y1="'+ smp.segments[pcnt].y2 * options.scale +'" x2="'+ smp.segments[pcnt].x3 * options.scale +'" y2="'+ smp.segments[pcnt].y3 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+				}
+				if( (!smp.segments[pcnt].hasOwnProperty('x3')) && options.lcpr){
+					str += '<circle cx="'+ smp.segments[pcnt].x2 * options.scale +'" cy="'+ smp.segments[pcnt].y2 * options.scale +'" r="'+ options.lcpr +'" fill="white" stroke-width="'+ options.lcpr * 0.2 +'" stroke="black" />';
+				}
+			}
+			
+			// Hole children control points
+			for( var hcnt=0; hcnt < smp.holechildren.length; hcnt++){
+				var hsmp = layer[ smp.holechildren[hcnt] ];
+				for(pcnt=0; pcnt<hsmp.segments.length; pcnt++){
+					if( hsmp.segments[pcnt].hasOwnProperty('x3') && options.qcpr ){
+						str += '<circle cx="'+ hsmp.segments[pcnt].x2 * options.scale +'" cy="'+ hsmp.segments[pcnt].y2 * options.scale +'" r="'+ options.qcpr +'" fill="cyan" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+						str += '<circle cx="'+ hsmp.segments[pcnt].x3 * options.scale +'" cy="'+ hsmp.segments[pcnt].y3 * options.scale +'" r="'+ options.qcpr +'" fill="white" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+						str += '<line x1="'+ hsmp.segments[pcnt].x1 * options.scale +'" y1="'+ hsmp.segments[pcnt].y1 * options.scale +'" x2="'+ hsmp.segments[pcnt].x2 * options.scale +'" y2="'+ hsmp.segments[pcnt].y2 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+						str += '<line x1="'+ hsmp.segments[pcnt].x2 * options.scale +'" y1="'+ hsmp.segments[pcnt].y2 * options.scale +'" x2="'+ hsmp.segments[pcnt].x3 * options.scale +'" y2="'+ hsmp.segments[pcnt].y3 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+					}
+					if( (!hsmp.segments[pcnt].hasOwnProperty('x3')) && options.lcpr){
+						str += '<circle cx="'+ hsmp.segments[pcnt].x2 * options.scale +'" cy="'+ hsmp.segments[pcnt].y2 * options.scale +'" r="'+ options.lcpr +'" fill="white" stroke-width="'+ options.lcpr * 0.2 +'" stroke="black" />';
+					}
+				}
+			}
+		}// End of Rendering control points
+			
+		return str;
+		
+	},// End of svgpathstring()
+	
+	// Converting tracedata to an SVG string
+	this.getsvgstring = function( tracedata, options ){
+		
+		options = _this.checkoptions(options);
+		
+		var w = tracedata.width * options.scale, h = tracedata.height * options.scale;
+		
+		// SVG start
+		var svgstr = '<svg ' + (options.viewbox ? ('viewBox="0 0 '+w+' '+h+'" ') : ('width="'+w+'" height="'+h+'" ')) +
+			'version="1.1" xmlns="http://www.w3.org/2000/svg" desc="Created with imagetracer.js version '+_this.versionnumber+'" >';
+
+		// Drawing: Layers and Paths loops
+		for(var lcnt=0; lcnt < tracedata.layers.length; lcnt++){
+			for(var pcnt=0; pcnt < tracedata.layers[lcnt].length; pcnt++){
+				
+				// Adding SVG <path> string
+				if( !tracedata.layers[lcnt][pcnt].isholepath ){
+					svgstr += _this.svgpathstring( tracedata, lcnt, pcnt, options );
+				}
+					
+			}// End of paths loop
+		}// End of layers loop
+		
+		// SVG End
+		svgstr+='</svg>';
+		
+		return svgstr;
+		
+	},// End of getsvgstring()
+	
+	// Comparator for numeric Array.sort
+	this.compareNumbers = function(a,b){ return a - b; },
+	
+	// Convert color object to rgba string
+	this.torgbastr = function(c){ return 'rgba('+c.r+','+c.g+','+c.b+','+c.a+')'; },
+	
+	// Convert color object to SVG color string
+	this.tosvgcolorstr = function(c, options){
+		return 'fill="rgb('+c.r+','+c.g+','+c.b+')" stroke="rgb('+c.r+','+c.g+','+c.b+')" stroke-width="'+options.strokewidth+'" opacity="'+c.a/255.0+'" ';
+	},
+	
+	// Helper function: Appending an <svg> element to a container from an svgstring
+	this.appendSVGString = function(svgstr,parentid){
+		var div;
+		if(parentid){
+			div = document.getElementById(parentid);
+			if(!div){
+				div = document.createElement('div');
+				div.id = parentid;
+				document.body.appendChild(div);
+			}
+		}else{
+			div = document.createElement('div');
+			document.body.appendChild(div);
+		}
+		div.innerHTML += svgstr;
+	},
+	
+	////////////////////////////////////////////////////////////
+	//
+	//  Canvas functions
+	//
+	////////////////////////////////////////////////////////////
+	
+	// Gaussian kernels for blur
+	this.gks = [ [0.27901,0.44198,0.27901], [0.135336,0.228569,0.272192,0.228569,0.135336], [0.086776,0.136394,0.178908,0.195843,0.178908,0.136394,0.086776],
+	             [0.063327,0.093095,0.122589,0.144599,0.152781,0.144599,0.122589,0.093095,0.063327], [0.049692,0.069304,0.089767,0.107988,0.120651,0.125194,0.120651,0.107988,0.089767,0.069304,0.049692] ],
+	
+	// Selective Gaussian blur for preprocessing
+	this.blur = function(imgd,radius,delta){
+		var i,j,k,d,idx,racc,gacc,bacc,aacc,wacc;
+		
+		// new ImageData
+		var imgd2 = { width:imgd.width, height:imgd.height, data:[] };
+		
+		// radius and delta limits, this kernel
+		radius = Math.floor(radius); if(radius<1){ return imgd; } if(radius>5){ radius = 5; } delta = Math.abs( delta ); if(delta>1024){ delta = 1024; }
+		var thisgk = _this.gks[radius-1];
+		
+		// loop through all pixels, horizontal blur
+		for( j=0; j < imgd.height; j++ ){
+			for( i=0; i < imgd.width; i++ ){
+
+				racc = 0; gacc = 0; bacc = 0; aacc = 0; wacc = 0;
+				// gauss kernel loop
+				for( k = -radius; k < radius+1; k++){
+					// add weighted color values
+					if( (i+k > 0) && (i+k < imgd.width) ){
+						idx = (j*imgd.width+i+k)*4;
+						racc += imgd.data[idx  ] * thisgk[k+radius];
+						gacc += imgd.data[idx+1] * thisgk[k+radius];
+						bacc += imgd.data[idx+2] * thisgk[k+radius];
+						aacc += imgd.data[idx+3] * thisgk[k+radius];
+						wacc += thisgk[k+radius];
+					}
+				}
+				// The new pixel
+				idx = (j*imgd.width+i)*4;
+				imgd2.data[idx  ] = Math.floor(racc / wacc);
+				imgd2.data[idx+1] = Math.floor(gacc / wacc);
+				imgd2.data[idx+2] = Math.floor(bacc / wacc);
+				imgd2.data[idx+3] = Math.floor(aacc / wacc);
+				
+			}// End of width loop
+		}// End of horizontal blur
+		
+		// copying the half blurred imgd2
+		var himgd = new Uint8ClampedArray(imgd2.data);
+		
+		// loop through all pixels, vertical blur
+		for( j=0; j < imgd.height; j++ ){
+			for( i=0; i < imgd.width; i++ ){
+
+				racc = 0; gacc = 0; bacc = 0; aacc = 0; wacc = 0;
+				// gauss kernel loop
+				for( k = -radius; k < radius+1; k++){
+					// add weighted color values
+					if( (j+k > 0) && (j+k < imgd.height) ){
+						idx = ((j+k)*imgd.width+i)*4;
+						racc += himgd[idx  ] * thisgk[k+radius];
+						gacc += himgd[idx+1] * thisgk[k+radius];
+						bacc += himgd[idx+2] * thisgk[k+radius];
+						aacc += himgd[idx+3] * thisgk[k+radius];
+						wacc += thisgk[k+radius];
+					}
+				}
+				// The new pixel
+				idx = (j*imgd.width+i)*4;
+				imgd2.data[idx  ] = Math.floor(racc / wacc);
+				imgd2.data[idx+1] = Math.floor(gacc / wacc);
+				imgd2.data[idx+2] = Math.floor(bacc / wacc);
+				imgd2.data[idx+3] = Math.floor(aacc / wacc);
+				
+			}// End of width loop
+		}// End of vertical blur
+		
+		// Selective blur: loop through all pixels
+		for( j=0; j < imgd.height; j++ ){
+			for( i=0; i < imgd.width; i++ ){
+				
+				idx = (j*imgd.width+i)*4;
+				// d is the difference between the blurred and the original pixel
+				d = Math.abs(imgd2.data[idx  ] - imgd.data[idx  ]) + Math.abs(imgd2.data[idx+1] - imgd.data[idx+1]) +
+					Math.abs(imgd2.data[idx+2] - imgd.data[idx+2]) + Math.abs(imgd2.data[idx+3] - imgd.data[idx+3]);
+				// selective blur: if d>delta, put the original pixel back
+				if(d>delta){
+					imgd2.data[idx  ] = imgd.data[idx  ];
+					imgd2.data[idx+1] = imgd.data[idx+1];
+					imgd2.data[idx+2] = imgd.data[idx+2];
+					imgd2.data[idx+3] = imgd.data[idx+3];
+				}
+			}
+		}// End of Selective blur
+		
+		return imgd2;
+		
+	},// End of blur()
+	
+	// Helper function: loading an image from a URL, then executing callback with canvas as argument
+	this.loadImage = function(url,callback,options){
+		var img = new Image();
+		if(options && options.corsenabled){ img.crossOrigin = 'Anonymous'; }
+		img.onload = function(){
+			var canvas = document.createElement('canvas');
+			canvas.width = img.width;
+			canvas.height = img.height;
+			var context = canvas.getContext('2d');
+			context.drawImage(img,0,0);
+			callback(canvas);
+		};
+		img.src = url;
+	},
+	
+	// Helper function: getting ImageData from a canvas
+	this.getImgdata = function(canvas){
+		var context = canvas.getContext('2d');
+		return context.getImageData(0,0,canvas.width,canvas.height);
+	},
+	
+	// Special palette to use with drawlayers()
+	this.specpalette = [
+		{r:0,g:0,b:0,a:255}, {r:128,g:128,b:128,a:255}, {r:0,g:0,b:128,a:255}, {r:64,g:64,b:128,a:255},
+		{r:192,g:192,b:192,a:255}, {r:255,g:255,b:255,a:255}, {r:128,g:128,b:192,a:255}, {r:0,g:0,b:192,a:255},
+		{r:128,g:0,b:0,a:255}, {r:128,g:64,b:64,a:255}, {r:128,g:0,b:128,a:255}, {r:168,g:168,b:168,a:255},
+		{r:192,g:128,b:128,a:255}, {r:192,g:0,b:0,a:255}, {r:255,g:255,b:255,a:255}, {r:0,g:128,b:0,a:255}
+	],
+	
+	// Helper function: Drawing all edge node layers into a container
+	this.drawLayers = function(layers,palette,scale,parentid){
+		scale = scale||1;
+		var w,h,i,j,k;
+		
+		// Preparing container
+		var div;
+		if(parentid){
+			div = document.getElementById(parentid);
+			if(!div){
+				div = document.createElement('div');
+				div.id = parentid;
+				document.body.appendChild(div);
+			}
+		}else{
+			div = document.createElement('div');
+			document.body.appendChild(div);
+		}
+		
+		// Layers loop
+		for (k in layers) {
+			if(!layers.hasOwnProperty(k)){ continue; }
+			
+			// width, height
+			w=layers[k][0].length; h=layers[k].length;
+			
+			// Creating new canvas for every layer
+			var canvas = document.createElement('canvas'); canvas.width=w*scale; canvas.height=h*scale;
+			var context = canvas.getContext('2d');
+			
+			// Drawing
+			for(j=0; j<h; j++){
+				for(i=0; i<w; i++){
+					context.fillStyle = _this.torgbastr(palette[ layers[k][j][i]%palette.length ]);
+					context.fillRect(i*scale,j*scale,scale,scale);
+				}
+			}
+			
+			// Appending canvas to container
+			div.appendChild(canvas);
+		}// End of Layers loop
+	}// End of drawlayers
+	
+	;// End of function list
+	
+}// End of ImageTracer object
+
+// export as AMD module / Node module / browser or worker variable
+if(typeof define === 'function' && define.amd){
+	define(function() { return new ImageTracer(); });
+}else if(typeof module !== 'undefined'){
+	module.exports = new ImageTracer();
+}else if(typeof self !== 'undefined'){
+	self.ImageTracer = new ImageTracer();
+}else window.ImageTracer = new ImageTracer();
+
+})();
+  </script>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", async () => {
+      if (window.customElements && typeof window.customElements.whenDefined === "function") {
+        await Promise.all([
+          window.customElements.whenDefined("lht-text-field-help"),
+          window.customElements.whenDefined("lht-select-help"),
+          window.customElements.whenDefined("lht-file-select")
+        ]);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+
+    const fileInput = document.getElementById("file");
+    const convertBtn = document.getElementById("convert");
+    const downloadBtn = document.getElementById("download");
+    const preview = document.getElementById("preview");
+    const loading = document.getElementById("loading");
+    const colorsInput = document.getElementById("colors");
+    const ltresInput = document.getElementById("ltres");
+    const qtresInput = document.getElementById("qtres");
+    const presetSelect = document.getElementById("preset");
+    const scaleInput = document.getElementById("scalePercent");
+    const blurInput = document.getElementById("blurPx");
+
+    if (!fileInput || !convertBtn || !downloadBtn || !preview || !loading ||
+        !colorsInput || !ltresInput || !qtresInput || !presetSelect || !scaleInput || !blurInput) {
+      console.error("[img2svg] required elements are missing.");
+      return;
+    }
+
+    let selectedFile = null;
+    let lastSvgText = "";
+
+    // Gemini究極のプリセット定義
+    const presetMap = {
+      icon: { 
+        numberofcolors: 4, ltres: 0.1, qtres: 5.0, 
+        desc: "ロゴやアイコン用。輪郭を極限まで鋭く保ち、パスの数を減らしてデータ量を最小限にします。" 
+      },
+      illustration: { 
+        numberofcolors: 12, ltres: 1.0, qtres: 0.1, 
+        desc: "手書きイラストや漫画用。線のガタつきを抑え、美しいベジェ曲線で滑らかに表現します。" 
+      },
+      photo: { 
+        numberofcolors: 32, ltres: 1.0, qtres: 1.0, 
+        desc: "写真や複雑な絵画用。多めの色数でトレースし、アーティスティックな階調を生み出します。" 
+      },
+      pixelart: { 
+        numberofcolors: 16, ltres: 0.0, qtres: 10.0, 
+        desc: "ドット絵専用。1ピクセルも崩さず、元のマス目を正確な四角形としてベクター化します。" 
+      }
+    };
+
+    presetSelect.value = presetSelect.value || "illustration";
+
+    // プリセット適用関数（説明文も動的に更新）
+    function applyPreset(key) {
+      const preset = presetMap[key] || presetMap.illustration;
+      colorsInput.value = preset.numberofcolors;
+      ltresInput.value = preset.ltres;
+      qtresInput.value = preset.qtres;
+    }
+
+    // 初期化
+    applyPreset(presetSelect.value);
+
+    presetSelect.addEventListener("change", () => applyPreset(presetSelect.value));
+
+    fileInput.addEventListener("change", () => {
+      selectedFile = fileInput.files && fileInput.files[0];
+      convertBtn.disabled = !selectedFile;
+      downloadBtn.disabled = true;
+      lastSvgText = "";
+      preview.innerHTML = '<p class="md-preview__empty">「変換する」ボタンを押してください</p>';
+      document.getElementById("fileInfo").textContent = selectedFile ? `${selectedFile.name}` : "";
+    });
+
+    convertBtn.addEventListener("click", async () => {
+      if (!selectedFile) return;
+
+      showLoading(true);
+      downloadBtn.disabled = true;
+      convertBtn.disabled = true;
+
+      try {
+        await nextFrame();
+
+        if (!window.ImageTracer) throw new Error("ImageTracer not loaded.");
+
+        const img = await fileToImage(selectedFile);
+        const scalePercent = readNumber(scaleInput, 100, 10, 100);
+        const blurPx = readNumber(blurInput, 0, 0, 5);
+        const scale = scalePercent / 100;
+        const scaledWidth = Math.max(1, Math.round(img.naturalWidth * scale));
+        const scaledHeight = Math.max(1, Math.round(img.naturalHeight * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = scaledWidth;
+        canvas.height = scaledHeight;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (blurPx > 0) {
+          ctx.filter = `blur(${blurPx}px)`;
+        }
+        ctx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
+        ctx.filter = "none";
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const options = readOptions();
+        
+        // 変換実行
+        lastSvgText = window.ImageTracer.imagedataToSVG(imageData, options);
+        if (scale !== 1) {
+          lastSvgText = adjustSvgDimensions(
+            lastSvgText,
+            img.naturalWidth,
+            img.naturalHeight,
+            scaledWidth,
+            scaledHeight
+          );
+        }
+
+        preview.innerHTML = preparePreviewSvg(lastSvgText);
+        downloadBtn.disabled = false;
+      } catch (e) {
+        console.error(e);
+        alert("変換に失敗しました。ファイル形式を確認してください。");
+      } finally {
+        showLoading(false);
+        convertBtn.disabled = !selectedFile;
+      }
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      if (!lastSvgText) return;
+      downloadText(lastSvgText, "converted_vector.svg", "image/svg+xml");
+    });
+
+    // ユーティリティ
+    function showLoading(on) {
+      loading.classList.toggle("hidden", !on);
+    }
+
+    function nextFrame() { return new Promise(requestAnimationFrame); }
+
+    function fileToImage(file) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    function downloadText(text, filename, mime) {
+      const blob = new Blob([text], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function readOptions() {
+      return {
+        numberofcolors: readNumber(colorsInput, 12, 2, 64),
+        ltres: readNumber(ltresInput, 1, 0, 10),
+        qtres: readNumber(qtresInput, 1, 0.1, 10),
+      };
+    }
+
+    function readNumber(input, fallback, min, max) {
+      const value = parseFloat(input.value);
+      if (isNaN(value)) return fallback;
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function preparePreviewSvg(svgText) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svgText, "image/svg+xml");
+      const svg = doc.querySelector("svg");
+      if (!svg) return svgText;
+
+      const w = svg.getAttribute("width");
+      const h = svg.getAttribute("height");
+      if (!svg.hasAttribute("viewBox") && w && h) {
+        svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      }
+      svg.setAttribute("width", "100%");
+      svg.setAttribute("height", "100%");
+      svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+      return new XMLSerializer().serializeToString(svg);
+    }
+
+    function adjustSvgDimensions(svgText, width, height, tracedWidth, tracedHeight) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svgText, "image/svg+xml");
+      const svg = doc.querySelector("svg");
+      if (!svg) return svgText;
+
+      if (!svg.hasAttribute("viewBox")) {
+        svg.setAttribute("viewBox", `0 0 ${tracedWidth} ${tracedHeight}`);
+      }
+      svg.setAttribute("width", String(width));
+      svg.setAttribute("height", String(height));
+
+      return new XMLSerializer().serializeToString(svg);
+    }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!--
+Copyright 2025 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>find 検索コマンドジェネレータ</title>
+  <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
+  <link rel="stylesheet" href="src/find-gen/css/app.css" />
+  <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="md-surface-card md-card">
+    <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+
+    <h1 class="md-headline">
+      <span aria-hidden="true" class="md-headline__icon">🔎</span>
+      <span>find 検索コマンドジェネレータ</span>
+      <lht-help-tooltip label="find 検索コマンドジェネレータの説明" wide>
+        findでファイル/ディレクトリを検索するコマンドを生成します。条件（名前/拡張子/サイズ/更新日時/内容検索）を組み合わせて作れます。
+      </lht-help-tooltip>
+    </h1>
+
+    <div class="md-section md-stack-md">
+      <div class="md-form-row md-form-row--nowrap">
+        <lht-text-field-help field-id="basePath" label="検索開始パス" required placeholder="例: . / ~/projects" value="."></lht-text-field-help>
+      </div>
+      <div class="md-form-row md-form-row--nowrap">
+        <lht-select-help field-id="targetType" label="対象の種類" value="file">
+          <script type="application/json" slot="options">[
+            { "value": "any", "label": "指定なし（ファイル/ディレクトリ）" },
+            { "value": "file", "label": "ファイルのみ (-type f)", "selected": true },
+            { "value": "dir", "label": "ディレクトリのみ (-type d)" }
+          ]</script>
+        </lht-select-help>
+      </div>
+    </div>
+
+    <div class="md-section md-stack-md">
+      <div class="md-form-row md-form-row--nowrap">
+        <lht-text-field-help field-id="extension" label="拡張子" placeholder="例: txt / wav / jpg / java"></lht-text-field-help>
+      </div>
+      <div class="md-field">
+        <div class="md-form-row md-form-row--nowrap">
+          <lht-text-field-help field-id="namePattern" label="名前パターン（ワイルドカード可）" placeholder="例: report / *.log / data??.csv"></lht-text-field-help>
+        </div>
+        <lht-switch-help switch-id="caseInsensitive" label="大文字・小文字を区別しない (-iname)"></lht-switch-help>
+      </div>
+    </div>
+
+    <details class="md-details md-section">
+      <summary class="md-summary">詳細条件</summary>
+      <div class="md-details-body md-stack-md">
+        <label class="md-label">サイズ条件:</label>
+        <div class="md-grid md-grid-3">
+          <lht-select-help field-id="sizeComparator" label="比較" value="min">
+            <script type="application/json" slot="options">[
+              { "value": "min", "label": "以上 (>=)", "selected": true },
+              { "value": "max", "label": "以下 (<=)" }
+            ]</script>
+          </lht-select-help>
+          <lht-text-field-help field-id="sizeValue" type="number" label="サイズ" placeholder="例: 10"></lht-text-field-help>
+          <lht-select-help field-id="sizeUnit" label="単位" value="M">
+            <script type="application/json" slot="options">[
+              { "value": "K", "label": "KB" },
+              { "value": "M", "label": "MB", "selected": true },
+              { "value": "G", "label": "GB" }
+            ]</script>
+          </lht-select-help>
+        </div>
+
+        <label class="md-label">更新日時条件:</label>
+        <div class="md-grid md-grid-3">
+          <lht-select-help field-id="mtimeComparator" label="期間" value="within">
+            <script type="application/json" slot="options">[
+              { "value": "within", "label": "直近N日以内", "selected": true },
+              { "value": "older", "label": "N日より前" }
+            ]</script>
+          </lht-select-help>
+          <lht-text-field-help field-id="mtimeValue" type="number" label="日数" placeholder="例: 7"></lht-text-field-help>
+          <div class="md-label md-label--muted">日</div>
+        </div>
+
+        <label class="md-label">深さ条件:</label>
+        <div class="md-grid md-grid-2">
+          <lht-text-field-help field-id="minDepth" type="number" label="最小深さ" placeholder="mindepth"></lht-text-field-help>
+          <lht-text-field-help field-id="maxDepth" type="number" label="最大深さ" placeholder="maxdepth"></lht-text-field-help>
+        </div>
+      </div>
+    </details>
+
+    <div class="md-section md-stack-sm">
+      <div class="md-form-row md-form-row--nowrap">
+        <lht-text-field-help field-id="contentPattern" label="内容検索" placeholder="例: ERROR / TODO / 404"></lht-text-field-help>
+      </div>
+      <lht-switch-help switch-id="useRipgrep" label="rg で検索（未チェックなら grep -E を使用）" checked></lht-switch-help>
+    </div>
+
+    <button type="button" onclick="generateFindCommand()" class="md-button md-button--primary">find コマンド生成</button>
+    <lht-command-block command-id="findCmd"></lht-command-block>
+
+    <div id="toast" class="md-snackbar-host md-snackbar">コピーしました</div>
+  </div>
+
+  <script src="src/find-gen/js/main.js"></script>
+</body>
+</html>

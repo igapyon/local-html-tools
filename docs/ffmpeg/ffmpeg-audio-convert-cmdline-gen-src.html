@@ -1,0 +1,305 @@
+<!--
+Copyright 2025 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FFmpeg 音声変換 コマンドジェネレータ</title>
+    <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
+  <link rel="stylesheet" href="src/ffmpeg-audio-convert-cmdline-gen/css/app.css" />
+
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
+  <div class="md-shell md-card">
+    <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+<h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🎧</span>FFmpeg 音声変換 コマンドジェネレータ</h1>
+
+    <lht-text-field-help
+      field-id="audioFile"
+      label="音声ファイル名"
+      required
+      placeholder="例: sample.wav"
+      field-class="md-field-block"
+      help-text="例: sample.wav / sample.flac / sample.mp3"
+    ></lht-text-field-help>
+
+    <lht-select-help
+      field-id="outputFormat"
+      label="出力フォーマット"
+      required
+      field-class="md-field-block"
+      help-text="m4a: 高圧縮で互換性が高い / mp3: 汎用的 / opus: 低ビットレートに強い / flac: 可逆圧縮 / wav: 無圧縮PCM"
+      onchange="updateFormatOptions()"
+    >
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "m4a",
+          "label": "m4a (AAC)",
+          "selected": true
+        },
+        {
+          "value": "mp3",
+          "label": "mp3 (MP3)"
+        },
+        {
+          "value": "opus",
+          "label": "opus (Opus)"
+        },
+        {
+          "value": "flac",
+          "label": "flac (FLAC)"
+        },
+        {
+          "value": "wav",
+          "label": "wav (PCM)"
+        }
+      ]
+      </script>
+</lht-select-help>
+
+    <div id="bitrateBlock">
+      <lht-select-help
+        field-id="bitrate"
+        label="ビットレート"
+        field-class="md-field-block"
+        help-text="VBR OFF 時に使用します（自動も選択可能）"
+      >
+        <script type="application/json" slot="options">
+        [
+          {
+            "value": "auto",
+            "label": "元のまま（自動）"
+          },
+          {
+            "value": "128k",
+            "label": "128 kbps"
+          },
+          {
+            "value": "192k",
+            "label": "192 kbps（デフォルト）",
+            "selected": true
+          },
+          {
+            "value": "256k",
+            "label": "256 kbps"
+          },
+          {
+            "value": "320k",
+            "label": "320 kbps"
+          }
+        ]
+        </script>
+</lht-select-help>
+    </div>
+
+    <div id="vbrBlock">
+      <div class="md-form-grid md-form-grid-2 md-field-block">
+        <lht-select-help
+          field-id="vbrMode"
+          label="VBR"
+          help-text="ON/OFF を切り替えます。"
+          onchange="updateVbrOptions()"
+        >
+          <script type="application/json" slot="options">
+          [
+            {
+              "value": "off",
+              "label": "OFF",
+              "selected": true
+            },
+            {
+              "value": "on",
+              "label": "ON"
+            }
+          ]
+          </script>
+</lht-select-help>
+        <lht-select-help
+          field-id="vbrQuality"
+          label="VBR品質"
+          help-text="高め: 音質優先 / 標準: バランス / 低め: 容量優先"
+          disabled
+        >
+          <script type="application/json" slot="options">
+          [
+            {
+              "value": "low",
+              "label": "低め"
+            },
+            {
+              "value": "mid",
+              "label": "標準",
+              "selected": true
+            },
+            {
+              "value": "high",
+              "label": "高め"
+            }
+          ]
+          </script>
+</lht-select-help>
+      </div>
+    </div>
+
+    <div id="flacBlock" class="md-hidden">
+      <lht-select-help
+        field-id="flacLevel"
+        label="FLAC圧縮レベル"
+        field-class="md-field-block"
+        help-text="数字が大きいほど圧縮が強くなります。"
+      >
+        <script type="application/json" slot="options">
+        [
+          {
+            "value": "0",
+            "label": "0 (高速)"
+          },
+          {
+            "value": "5",
+            "label": "5 (標準)",
+            "selected": true
+          },
+          {
+            "value": "8",
+            "label": "8 (高圧縮)"
+          }
+        ]
+        </script>
+</lht-select-help>
+    </div>
+
+    <lht-select-help
+      field-id="sampleRate"
+      label="サンプルレート"
+      field-class="md-field-block"
+      help-text="元のまま / 44.1k / 48k から選択"
+    >
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "keep",
+          "label": "元のまま",
+          "selected": true
+        },
+        {
+          "value": "44100",
+          "label": "44.1kHz"
+        },
+        {
+          "value": "48000",
+          "label": "48kHz"
+        }
+      ]
+      </script>
+</lht-select-help>
+
+    <div class="md-section">
+      <div class="md-section-title">用途別プリセット:</div>
+      <div class="md-chip-row">
+      <div class="md-preset-item">
+        <button type="button" class="md-button md-button--tonal" onclick="applyPreset('hq-lossy')">
+          なるべく高音質で圧縮
+        </button>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+          <span class="md-tooltip-content md-tooltip">
+            m4a / VBR 高め / 256k (VBR OFF時) / 元のまま
+          </span>
+        </span>
+      </div>
+      <div class="md-preset-item">
+        <button type="button" class="md-button md-button--tonal" onclick="applyPreset('share')">
+          汎用・共有向け
+        </button>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+          <span class="md-tooltip-content md-tooltip">
+            mp3 / VBR 標準 / 44.1kHz
+          </span>
+        </span>
+      </div>
+      <div class="md-preset-item">
+        <button type="button" class="md-button md-button--tonal" onclick="applyPreset('mobile')">
+          スマホ向け軽量
+        </button>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+          <span class="md-tooltip-content md-tooltip">
+            m4a / VBR 低め / 44.1kHz
+          </span>
+        </span>
+      </div>
+      <div class="md-preset-item">
+        <button type="button" class="md-button md-button--tonal" onclick="applyPreset('archive')">
+          可逆保存（FLAC）
+        </button>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+          <span class="md-tooltip-content md-tooltip">
+            flac / 圧縮レベル 5 / 元のまま
+          </span>
+        </span>
+      </div>
+      <div class="md-preset-item">
+        <button type="button" class="md-button md-button--tonal" onclick="applyPreset('original')">
+          オリジナル（旧ツール）
+        </button>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+          <span class="md-tooltip-content md-tooltip">
+            m4a / CBR 192k / 元のまま
+          </span>
+        </span>
+      </div>
+    </div>
+    </div>
+
+    <button onclick="generateCommand()" class="md-button md-button--primary md-field-block">
+      ffmpeg コマンド生成
+    </button>
+
+    <lht-command-block command-id="audioCmd"></lht-command-block>
+
+    <div id="toast" class="md-snackbar md-hidden">
+      コピーしました
+    </div>
+  </div>
+
+    <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+  <script src="src/ffmpeg-audio-convert-cmdline-gen/js/main.js"></script>
+
+</body>
+</html>

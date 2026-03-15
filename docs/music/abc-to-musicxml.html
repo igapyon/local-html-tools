@@ -1,0 +1,5144 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABC → MusicXML 変換</title>
+    
+    
+  <style>
+/*
+ * lht-cmn components.css
+ * Version: v20260308
+ * Copyright 2026 Toshiki Iga
+ * Licensed under the Apache License, Version 2.0
+ */
+
+lht-help-tooltip {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  overflow: visible;
+}
+
+lht-help-tooltip .md-tooltip-group {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  overflow: visible;
+}
+
+lht-help-tooltip .md-tooltip-content {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  z-index: 50;
+  width: min(20rem, 90vw);
+  max-width: 90vw;
+}
+
+lht-help-tooltip .md-tooltip-group:hover .md-tooltip-content,
+lht-help-tooltip .md-tooltip-group:focus-within .md-tooltip-content {
+  opacity: 1;
+}
+
+lht-help-tooltip .md-tooltip {
+  background: #2b2831;
+  color: #f7f4fb;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+lht-help-tooltip .md-tooltip--wide {
+  width: min(32rem, 90vw);
+}
+
+lht-help-tooltip .md-tooltip--rich {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.md-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0edf5;
+  color: #3f3b46;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.md-icon-btn:hover {
+  background: #ebe6f3;
+}
+
+.md-menu-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.md-menu-panel {
+  position: absolute;
+  top: 56px;
+  right: 16px;
+  background: var(--md-sys-color-surface, #fffbfe);
+  border: 1px solid #e6e1ee;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 4px 0;
+  min-width: 160px;
+  z-index: 20;
+}
+
+.md-menu-link {
+  display: block;
+  padding: 8px 16px;
+  color: var(--md-sys-color-on-surface, #1d1b20);
+  text-decoration: none;
+}
+
+.md-menu-link:hover {
+  background: #f2edf8;
+}
+
+.md-hidden {
+  display: none !important;
+}
+
+/*
+ * Hide raw pre-upgrade content until each component finishes connectedCallback()
+ * and marks itself initialized. This prevents tooltip/help text from flashing
+ * into the normal layout before the component rewrites its internal DOM.
+ */
+lht-help-tooltip:not([data-initialized="true"]),
+lht-text-field-help:not([data-initialized="true"]),
+lht-select-help:not([data-initialized="true"]),
+lht-file-select:not([data-initialized="true"]),
+lht-switch-help:not([data-initialized="true"]),
+lht-command-block:not([data-initialized="true"]),
+lht-page-menu:not([data-initialized="true"]),
+lht-page-hero:not([data-initialized="true"]),
+lht-index-card-link:not([data-initialized="true"]),
+lht-loading-overlay:not([data-initialized="true"]),
+lht-toast:not([data-initialized="true"]),
+lht-error-alert:not([data-initialized="true"]),
+lht-input-mode-toggle:not([data-initialized="true"]),
+lht-preview-output:not([data-initialized="true"]) {
+  visibility: hidden;
+}
+
+/* Keep accidental horizontal overflow from creating blank right-space on narrow screens. */
+.md-page {
+  overflow-x: clip;
+}
+
+/* Tooltip defaults are centralized in lht to avoid per-page overflow regressions. */
+lht-help-tooltip .md-tooltip-content {
+  display: none;
+  max-width: min(24rem, calc(100vw - 2rem));
+}
+
+lht-help-tooltip .md-tooltip-group:hover .md-tooltip-content,
+lht-help-tooltip .md-tooltip-group:focus-within .md-tooltip-content {
+  display: block;
+}
+
+lht-help-tooltip .md-tooltip-group[data-force-hidden="true"] .md-tooltip-content {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  lht-help-tooltip .md-tooltip-content {
+    left: auto;
+    right: 0;
+    transform: none;
+    width: min(24rem, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+lht-page-hero {
+  display: block;
+  margin-bottom: 1.2rem;
+  padding: 1rem 1rem 0.9rem;
+  position: relative;
+  z-index: 40;
+  overflow: visible;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #f6f1ff 0%, #fbf8ff 100%);
+  border: 1px solid #e7dff6;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+lht-page-hero .lht-page-hero__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
+}
+
+lht-page-hero .lht-page-hero__title-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+lht-page-hero .lht-page-hero__title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: 100%;
+  font-size: clamp(1.12rem, 4.2vw, 1.45rem);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: #2f1f52;
+  overflow-wrap: anywhere;
+}
+
+lht-page-hero .lht-page-hero__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 0.85rem;
+  background: rgba(98, 0, 238, 0.14);
+  flex: 0 0 auto;
+}
+
+lht-page-hero .lht-page-hero__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+}
+
+lht-page-hero .lht-page-hero__subtitle {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  color: #514a5f;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+lht-page-hero .lht-page-hero__title-main .md-tooltip-group {
+  transform: translateY(1px);
+  flex: 0 0 auto;
+  z-index: 41;
+}
+
+lht-page-hero .lht-page-hero__title-main .md-tooltip-content {
+  z-index: 260;
+}
+
+lht-page-hero .lht-page-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+lht-page-hero .md-menu-button {
+  position: static;
+  top: auto;
+  right: auto;
+  margin: 0;
+}
+
+lht-page-hero .md-menu-panel {
+  top: calc(100% + 0.45rem);
+  right: 0;
+  left: auto;
+  z-index: 280;
+}
+
+@media (max-width: 640px) {
+  lht-page-hero {
+    padding: 0.9rem 0.85rem 0.8rem;
+  }
+
+  lht-page-hero .lht-page-hero__title-row {
+    gap: 0.5rem;
+  }
+
+  lht-page-hero .lht-page-hero__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  lht-page-hero .lht-page-hero__icon {
+    width: 1.55rem;
+    height: 1.55rem;
+  }
+
+  lht-page-hero .lht-page-hero__subtitle {
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 430px) {
+  lht-page-hero .lht-page-hero__title-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.4rem;
+  }
+
+  lht-page-hero .lht-page-hero__title-main {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  lht-page-hero .lht-page-hero__title {
+    font-size: clamp(1rem, 4vw, 1.18rem);
+    max-width: 100%;
+  }
+
+  lht-page-hero .lht-page-hero__actions {
+    width: auto;
+    min-width: 0;
+    margin-left: auto;
+    gap: 0.3rem;
+    justify-content: flex-end;
+    align-self: start;
+  }
+
+  lht-page-hero .md-menu-button,
+  lht-page-hero .lht-page-hero__actions .md-icon-btn,
+  lht-page-hero .lht-page-hero__actions .md-help-icon-button,
+  lht-page-hero .lht-page-hero__actions .md-help-icon-button--fallback {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+}
+
+lht-command-block {
+  display: block;
+}
+
+lht-command-block .md-copy-button--fallback {
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #efe9fa;
+  color: #3f3564;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+lht-command-block .md-copy-button--fallback .md-icon-small {
+  width: 16px;
+  height: 16px;
+}
+
+lht-text-field-help {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+lht-text-field-help .lht-text-field-help__control-wrap {
+  position: relative;
+}
+
+lht-text-field-help .lht-text-field-help__fallback-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+lht-text-field-help .lht-text-field-help__fallback {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--md-sys-color-outline, #79747e);
+  background: var(--md-sys-color-surface, #fffbfe);
+  padding: 0.9rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--md-sys-color-on-surface, #1d1b20);
+  box-sizing: border-box;
+  font: inherit;
+  resize: vertical;
+}
+
+lht-text-field-help .lht-text-field-help__fallback.lht-text-field-help__field--clearable {
+  padding-right: 2.8rem;
+}
+
+lht-text-field-help .lht-text-field-help__supporting-text {
+  min-height: 1rem;
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--md-sys-color-on-surface-variant, #49454f);
+  box-sizing: border-box;
+}
+
+lht-text-field-help .md-outlined-field.lht-text-field-help__field--clearable {
+  --md-outlined-text-field-trailing-space: 40px;
+  --md-outlined-field-trailing-space: 40px;
+}
+
+lht-text-field-help .lht-text-field-help__clear-button {
+  position: absolute;
+  top: 24px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(103, 80, 164, 0.10);
+  color: #625b71;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transform: translateY(-50%);
+  transition: background 150ms ease, color 150ms ease, transform 150ms ease;
+  z-index: 2;
+}
+
+lht-text-field-help .lht-text-field-help__clear-button:hover {
+  background: rgba(103, 80, 164, 0.18);
+  color: #4f378b;
+}
+
+lht-text-field-help .lht-text-field-help__clear-button:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+lht-text-field-help .lht-text-field-help__clear-button:focus-visible {
+  outline: 2px solid #6750a4;
+  outline-offset: 2px;
+}
+
+lht-text-field-help .lht-text-field-help__clear-button::before,
+lht-text-field-help .lht-text-field-help__clear-button::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+lht-text-field-help .lht-text-field-help__clear-button::before {
+  transform: rotate(45deg);
+}
+
+lht-text-field-help .lht-text-field-help__clear-button::after {
+  transform: rotate(-45deg);
+}
+
+lht-select-help {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+lht-select-help .lht-select-help__fallback-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+lht-select-help .lht-select-help__fallback {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--md-sys-color-outline, #79747e);
+  background: var(--md-sys-color-surface, #fffbfe);
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--md-sys-color-on-surface, #1d1b20);
+  box-sizing: border-box;
+}
+
+lht-select-help .lht-select-help__supporting-text {
+  min-height: 1rem;
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--md-sys-color-on-surface-variant, #49454f);
+  box-sizing: border-box;
+}
+
+lht-file-select {
+  display: block;
+}
+
+lht-file-select .lht-file-select {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+lht-file-select .lht-file-select__button {
+  --md-filled-button-container-color: var(--md-sys-color-primary, #6200ee);
+  --md-filled-button-label-text-color: #ffffff;
+  --md-filled-button-container-shape: 999px;
+  --md-filled-button-container-height: 54px;
+  --md-filled-button-leading-space: 20px;
+  --md-filled-button-trailing-space: 24px;
+  --md-filled-button-icon-size: 20px;
+  --md-focus-ring-color: #6c3eea;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(98, 0, 238, 0.24);
+}
+
+lht-file-select .lht-file-select__button--fallback {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 1.55rem;
+  line-height: 1;
+  color: #ffffff;
+  background: var(--md-sys-color-primary, #6200ee);
+  cursor: pointer;
+}
+
+lht-file-select .lht-file-select__button-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+}
+
+lht-file-select .lht-file-select__button-text {
+  white-space: nowrap;
+}
+
+lht-file-select .lht-file-select__file-name {
+  font-size: 0.85rem;
+  color: var(--md-sys-color-on-surface-variant, #49454f);
+  word-break: break-all;
+}
+
+lht-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 320;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(17, 13, 27, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+lht-loading-overlay[active] {
+  display: flex;
+}
+
+lht-loading-overlay[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+lht-loading-overlay .lht-loading-overlay__dialog {
+  min-width: 13rem;
+  border-radius: 16px;
+  border: 1px solid #ded4ef;
+  background: #ffffff;
+  box-shadow: 0 18px 36px rgba(24, 18, 36, 0.24);
+  padding: 1rem 1.2rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.65rem;
+}
+
+lht-loading-overlay .lht-loading-overlay__spinner {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 3px solid #d8caee;
+  border-top-color: var(--md-sys-color-primary, #6200ee);
+  animation: lht-loading-spin 0.95s linear infinite;
+}
+
+lht-loading-overlay .lht-loading-overlay__text {
+  margin: 0;
+  color: #383247;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+lht-toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px) + 0.5rem);
+  transform: translate(-50%, 18px);
+  z-index: 340;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+lht-toast[active] {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+lht-toast .lht-toast__body {
+  min-width: 8.5rem;
+  max-width: min(30rem, calc(100vw - 2rem));
+  border-radius: 12px;
+  padding: 0.62rem 0.9rem;
+  background: rgba(43, 34, 63, 0.94);
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 10px 24px rgba(18, 14, 28, 0.35);
+}
+
+lht-error-alert {
+  display: none;
+  margin: 0;
+}
+
+lht-error-alert[active] {
+  display: block;
+}
+
+lht-error-alert .lht-error-alert__body {
+  margin: 0;
+  border-radius: 12px;
+  border: 1px solid #f3c7c9;
+  background: #fff3f3;
+  color: #9a1a1f;
+  padding: 0.58rem 0.72rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+lht-error-alert[variant="warning"] .lht-error-alert__body {
+  border-color: #f0d59b;
+  background: #fff8e6;
+  color: #8a5a00;
+}
+
+lht-error-alert[variant="info"] .lht-error-alert__body {
+  border-color: #bdd7f5;
+  background: #eef6ff;
+  color: #175ea8;
+}
+
+lht-input-mode-toggle {
+  display: block;
+}
+
+lht-input-mode-toggle .lht-input-mode-toggle__group {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+lht-input-mode-toggle .lht-input-mode-toggle__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36rem;
+  color: var(--md-sys-color-on-surface, #1d1b20);
+  font-size: 0.92rem;
+}
+
+lht-input-mode-toggle .lht-input-mode-toggle__option input[type="radio"] {
+  inline-size: 1rem;
+  block-size: 1rem;
+  margin: 0;
+  accent-color: var(--md-sys-color-primary, #6200ee);
+}
+
+lht-preview-output {
+  display: block;
+}
+
+lht-preview-output .lht-preview-output__root {
+  position: relative;
+}
+
+lht-preview-output .lht-preview-output__preview {
+  margin: 0;
+  min-height: 6.4rem;
+  border-radius: 12px;
+  border: 1px solid #d4cede;
+  background: #f8f6fb;
+  color: #231f2b;
+  padding: 0.78rem 0.84rem;
+  line-height: 1.45;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+lht-preview-output .lht-preview-output__copy-button {
+  position: absolute;
+  top: 0.48rem;
+  right: 0.48rem;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 999px;
+  background: #efe9fa;
+  color: #3f3564;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+lht-preview-output .lht-preview-output__copy-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+@keyframes lht-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+md-outlined-text-field.md-outlined-field {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+  width: 100%;
+  position: relative;
+  color-scheme: light;
+  border-radius: 12px;
+  --md-outlined-text-field-container-shape: 12px;
+  --md-outlined-field-container-shape: 12px;
+  --md-outlined-text-field-top-space: 10px;
+  --md-outlined-text-field-bottom-space: 10px;
+  --md-outlined-field-top-space: 10px;
+  --md-outlined-field-bottom-space: 10px;
+  --md-outlined-text-field-content-space: 12px;
+  --md-outlined-text-field-leading-space: 12px;
+  --md-outlined-text-field-trailing-space: 12px;
+  --md-outlined-text-field-outline-color: #bdb7c8;
+  --md-outlined-field-outline-color: #bdb7c8;
+  --md-outlined-text-field-hover-outline-color: #b1aac0;
+  --md-outlined-field-hover-outline-color: #b1aac0;
+  --md-outlined-text-field-focus-outline-color: #6c3eea;
+  --md-outlined-field-focus-outline-color: #6c3eea;
+  --md-outlined-text-field-focus-outline-width: 1.5px;
+  --md-outlined-field-focus-outline-width: 1.5px;
+  --md-outlined-text-field-focus-state-layer-color: #6c3eea;
+  --md-outlined-field-focus-state-layer-color: #6c3eea;
+  --md-outlined-text-field-focus-state-layer-opacity: 0;
+  --md-outlined-field-focus-state-layer-opacity: 0;
+  --md-outlined-text-field-error-focus-outline-width: 1px;
+  --md-outlined-field-error-focus-outline-width: 1px;
+  --md-outlined-text-field-caret-color: #6c3eea;
+  --md-outlined-field-caret-color: #6c3eea;
+  transition: none;
+}
+
+md-outlined-text-field.md-outlined-field::part(outline) {
+  transition: filter 160ms ease;
+}
+
+md-outlined-text-field.md-outlined-field:focus-within::part(outline) {
+  filter: drop-shadow(0 0 4px rgba(108, 62, 234, 0.26)) drop-shadow(0 0 12px rgba(108, 62, 234, 0.22));
+}
+
+md-outlined-text-field.md-outlined-field::part(container) {
+  transition: box-shadow 160ms ease;
+}
+
+md-outlined-text-field.md-outlined-field:focus-within::part(container) {
+  box-shadow: 0 0 0 2px rgba(108, 62, 234, 0.12), 0 0 14px rgba(108, 62, 234, 0.18);
+}
+
+md-outlined-select.md-outlined-field {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+  width: 100%;
+  position: relative;
+  color-scheme: light;
+  border-radius: 12px;
+  --md-outlined-select-text-field-container-shape: 12px;
+  --md-outlined-select-text-field-top-space: 10px;
+  --md-outlined-select-text-field-bottom-space: 10px;
+  --md-outlined-select-text-field-content-space: 12px;
+  --md-outlined-select-text-field-leading-space: 12px;
+  --md-outlined-select-text-field-trailing-space: 12px;
+  --md-outlined-field-top-space: 10px;
+  --md-outlined-field-bottom-space: 10px;
+  --md-outlined-field-content-space: 12px;
+  --md-outlined-field-leading-space: 12px;
+  --md-outlined-field-trailing-space: 12px;
+  --md-outlined-select-text-field-outline-color: #bdb7c8;
+  --md-outlined-select-text-field-hover-outline-color: #b1aac0;
+  --md-outlined-select-text-field-focus-outline-color: #6c3eea;
+  --md-outlined-select-text-field-focus-outline-width: 1.5px;
+  --md-outlined-select-text-field-focus-state-layer-color: #6c3eea;
+  --md-outlined-select-text-field-focus-state-layer-opacity: 0;
+  --md-outlined-select-text-field-caret-color: #6c3eea;
+  --md-menu-item-one-line-container-height: 44px;
+  --md-menu-item-top-space: 8px;
+  --md-menu-item-bottom-space: 8px;
+  transition: none;
+}
+
+md-outlined-select.md-outlined-field::part(outline) {
+  transition: filter 160ms ease;
+}
+
+md-outlined-select.md-outlined-field:focus-within::part(outline) {
+  filter: drop-shadow(0 0 4px rgba(108, 62, 234, 0.26)) drop-shadow(0 0 12px rgba(108, 62, 234, 0.22));
+}
+
+md-outlined-select.md-outlined-field::part(container) {
+  transition: box-shadow 160ms ease;
+}
+
+md-outlined-select.md-outlined-field:focus-within::part(container) {
+  box-shadow: 0 0 0 2px rgba(108, 62, 234, 0.12), 0 0 14px rgba(108, 62, 234, 0.18);
+}
+
+lht-switch-help {
+  display: inline-flex;
+  align-items: center;
+}
+
+lht-switch-help .md-switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.24rem;
+  font-size: 0.95rem;
+  color: var(--md-sys-color-on-surface);
+}
+
+lht-switch-help .md-switch-label md-switch {
+  --md-switch-track-width: 44px;
+  --md-switch-track-height: 24px;
+  --md-switch-track-outline-width: 1px;
+  --md-switch-handle-width: 20px;
+  --md-switch-handle-height: 20px;
+  --md-switch-selected-handle-width: 20px;
+  --md-switch-selected-handle-height: 20px;
+  --md-switch-with-icon-handle-width: 20px;
+  --md-switch-with-icon-handle-height: 20px;
+  --md-switch-state-layer-size: 24px;
+  --md-focus-ring-color: #6c3eea;
+  flex: 0 0 44px;
+  inline-size: 44px;
+  min-inline-size: 44px;
+  vertical-align: middle;
+}
+
+lht-switch-help .md-switch-label .md-switch-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+lht-switch-help .md-switch-label .md-switch {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #d7d2de;
+  position: relative;
+  transition: background 150ms ease;
+  flex: 0 0 44px;
+}
+
+lht-switch-help .md-switch-label .md-switch::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 150ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+lht-switch-help .md-switch-label .md-switch-input:checked + .md-switch {
+  background: var(--md-sys-color-primary, #6200ee);
+}
+
+lht-switch-help .md-switch-label .md-switch-input:checked + .md-switch::after {
+  transform: translateX(20px);
+}
+
+lht-switch-help .md-switch-label .md-info-chip {
+  margin-left: 0;
+}
+
+/* Switch rows are often near the right edge; anchor tooltip right to avoid clipping. */
+lht-switch-help .md-switch-label .md-tooltip-content {
+  left: auto;
+  right: 0;
+  transform: none;
+  max-width: calc(100vw - 2rem);
+}
+
+.md-help-icon-button {
+  --md-icon-button-icon-size: 18px;
+  --md-icon-button-state-layer-size: 30px;
+  --md-focus-ring-color: #6c3eea;
+  color: #6f6a79;
+}
+
+.md-help-icon-button--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  cursor: help;
+}
+
+.md-help-icon-button--fallback .md-info-icon {
+  width: 18px;
+  height: 18px;
+}
+
+lht-index-card-link {
+  display: block;
+}
+
+.md-link-card {
+  position: relative;
+  display: block;
+  padding: 1rem;
+  border-radius: 16px;
+  background: var(--md-sys-color-surface, #fffbfe);
+  border: 1px solid #ece7f3;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 150ms ease, border-color 150ms ease, background 150ms ease;
+  overflow: hidden;
+  outline: none;
+  color: inherit;
+  text-decoration: none;
+}
+
+.md-link-card:hover {
+  box-shadow: 0 6px 16px rgba(35, 29, 49, 0.12);
+  border-color: #d7cfee;
+}
+
+.md-link-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--md-sys-color-state-layer, rgba(103, 80, 164, 0.08));
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.md-link-card:hover::after {
+  opacity: 1;
+}
+
+.md-link-card:focus-visible {
+  border-color: rgba(98, 0, 238, 0.55);
+  box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring, rgba(98, 0, 238, 0.22)), 0 6px 16px rgba(35, 29, 49, 0.12);
+}
+
+.md-link-card:focus-visible::after {
+  opacity: 1;
+}
+
+.md-link-card:active::after {
+  opacity: 0.18;
+}
+
+.md-link-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.md-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.md-card-title {
+  font-size: var(--md-typography-title-small, 1.1rem);
+  font-weight: 600;
+  color: #2f2a35;
+}
+
+.md-card-arrow {
+  color: #8f8a98;
+  font-size: 1.2rem;
+}
+
+.md-link-card:hover .md-card-arrow {
+  color: #6d6483;
+}
+
+.md-card-desc {
+  margin-top: 0.5rem;
+  font-size: var(--md-typography-body-small, 0.95rem);
+  color: #5f5a6b;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .md-link-card:hover,
+  .md-link-card:focus-visible {
+    overflow: visible;
+    z-index: 2;
+  }
+
+  .md-link-card:hover .md-card-desc,
+  .md-link-card:focus-visible .md-card-desc {
+    display: block;
+  }
+}
+
+.lht-index-card-link__icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.3rem;
+}
+
+.lht-index-card-link__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.45rem;
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #534a64;
+  background: rgba(108, 62, 234, 0.13);
+}
+
+.lht-index-card-link__desc--clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lht-desc-lines, 3);
+  overflow: hidden;
+}
+
+:root {
+      --md-danger: #b3261e;
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-tertiary-container: #f3e8fd;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Yu Gothic UI", "Hiragino Sans", sans-serif;
+      background: var(--md-sys-color-background);
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .md-shell {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid #ece7f3;
+      padding: 24px;
+      position: relative;
+    }
+
+    .md-headline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      padding-right: 2.5rem;
+      margin: 0 0 1rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .md-headline__icon {
+      margin-right: 0.4rem;
+    }
+
+    .md-section {
+      margin-top: 1.2rem;
+    }
+
+    .md-section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .md-title-info-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .md-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .md-required {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.15rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.54rem;
+      font-weight: 600;
+      background: #eceaf1;
+      color: #49454f;
+    }
+
+    .md-textarea,
+    .md-input,
+    .md-file {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      box-sizing: border-box;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .md-textarea {
+      min-height: 15rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      line-height: 1.5;
+    }
+
+    .md-textarea:focus,
+    .md-input:focus,
+    .md-file:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+
+    .md-radio-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+    }
+
+    .md-radio-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .md-grid--defaults {
+      margin-top: 0.8rem;
+    }
+
+    .md-grid-full {
+      grid-column: 1 / -1;
+    }
+
+    .md-check-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .md-disclosure {
+      margin-bottom: 0.8rem;
+      border: 1px solid #e5e0ec;
+      border-radius: 12px;
+      background: #faf8fc;
+      padding: 0.7rem 0.85rem;
+    }
+
+    .md-disclosure-summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #3d2e5a;
+      list-style: none;
+    }
+
+    .md-disclosure-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .md-disclosure-summary::before {
+      content: "▸";
+      display: inline-block;
+      margin-right: 0.35rem;
+      transition: transform 120ms ease;
+    }
+
+    .md-disclosure[open] .md-disclosure-summary::before {
+      transform: rotate(90deg);
+    }
+
+    @media (min-width: 720px) {
+      .md-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .md-actions {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+
+    .md-button {
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: background 150ms ease;
+      white-space: nowrap;
+    }
+
+    .md-button--primary {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
+    }
+
+    .md-button--primary:hover {
+      background: #4f00c9;
+    }
+
+    .md-button--secondary {
+      background: #e8f5f3;
+      color: #15443e;
+      box-shadow: 0 2px 6px rgba(3, 218, 198, 0.25);
+    }
+
+    .md-button:disabled {
+      background: #e6e1ee;
+      color: #9a94a7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .md-preview {
+      border: 1px solid #e5e0ec;
+      border-radius: 12px;
+      padding: 0.75rem;
+      background: var(--md-sys-color-tertiary-container);
+      font-size: 0.9rem;
+      color: #3d2e5a;
+      white-space: pre-wrap;
+    }
+
+    .md-code-block {
+      position: relative;
+    }
+
+    .md-code {
+      display: block;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      white-space: pre;
+      background: var(--md-sys-color-surface-variant);
+      border: 1px solid #e5e0ec;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      min-height: 10rem;
+    }
+
+    .md-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f7f2fa;
+      color: #3f3b46;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .md-copy-button {
+      position: absolute;
+      top: 0.4rem;
+      right: 0.4rem;
+    }
+
+    .md-error {
+      margin-top: 0.7rem;
+      color: var(--md-danger);
+      font-size: 0.92rem;
+      white-space: pre-wrap;
+    }
+
+    .md-warning {
+      margin-top: 0.7rem;
+      color: #8a4f00;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      background: #fff3e0;
+      border: 1px solid #ffcc80;
+      border-radius: 10px;
+      padding: 0.6rem 0.7rem;
+    }
+
+    .md-snackbar {
+      position: fixed;
+      left: 50%;
+      bottom: 1.2rem;
+      transform: translateX(-50%);
+      background: #2b2831;
+      color: #f7f4fb;
+      padding: 0.65rem 0.95rem;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 120;
+    }
+
+    .md-visible {
+      opacity: 1;
+    }
+
+    .md-hidden {
+      display: none;
+    }
+
+    .md-menu-button {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      background: #f0edf5;
+      border: none;
+      cursor: pointer;
+    }
+
+    .md-menu-panel {
+      position: absolute;
+      top: 58px;
+      right: 14px;
+      background: #ffffff;
+      border: 1px solid #ddd5ea;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      min-width: 160px;
+      z-index: 100;
+    }
+
+    .md-menu-link {
+      display: block;
+      padding: 0.7rem 0.9rem;
+      color: #342f3e;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .md-menu-link:hover {
+      background: #f6f1fb;
+    }
+
+    .md-tooltip-group {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: transparent;
+      color: #4a4458;
+    }
+
+    .md-info-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: 20rem;
+      max-width: 90vw;
+    }
+
+    .md-tooltip-group:hover .md-tooltip-content,
+    .md-tooltip-group:focus-within .md-tooltip-content {
+      opacity: 1;
+    }
+
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 7h16" />
+        <path d="M4 12h16" />
+        <path d="M4 17h16" />
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2" />
+        <rect x="4" y="4" width="11" height="11" rx="2" />
+      </symbol>
+    </defs>
+  </svg>
+
+  <main class="md-shell">
+    <section class="md-card">
+      <button type="button" class="md-menu-button" aria-label="メニュー" onclick="toggleMenu()">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <use href="#md-icon-menu" xlink:href="#md-icon-menu"></use>
+        </svg>
+      </button>
+      <div id="menuPanel" class="md-menu-panel md-hidden">
+        <a href="../index.html" class="md-menu-link">トップへ戻る</a>
+      </div>
+
+      <h1 class="md-headline">
+        <span aria-hidden="true" class="md-headline__icon">🎵</span>
+        <span>ABC → MusicXML 変換</span>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip" tabindex="0" aria-label="このツールの説明">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+              <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+              <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+              <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+            </svg>
+          </span>
+          <span class="md-tooltip-content md-tooltip">ABC記法をMusicXMLへ変換します。MVPとして単旋律と基本ヘッダ（T/M/L/K/C）を対象にしています。</span>
+        </span>
+      </h1>
+
+      <section class="md-section">
+        <div class="md-title-info-row">
+          <h2 class="md-section-title">ABC入力</h2>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip" tabindex="0" aria-label="入力説明">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+                <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+                <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+                <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+              </svg>
+            </span>
+            <span class="md-tooltip-content md-tooltip">ABCソースを入力するか `.abc` / `.txt` を読み込んでください。</span>
+          </span>
+        </div>
+
+        <lht-input-mode-toggle
+          name="inputMode"
+          group-label="入力方式"
+          file-id="inputModeFile"
+          source-id="inputModeSource"
+          file-label="ファイル読込"
+          source-label="ソースコード入力"
+          source-target-id="sourceInputBlock"
+          file-target-id="fileInputBlock">
+        </lht-input-mode-toggle>
+
+        <div id="sourceInputBlock">
+          <textarea id="abcInput" class="md-textarea" spellcheck="false">X:1
+T:Simple Scale
+C:Unknown
+M:4/4
+L:1/4
+K:C
+C D E F | G A B c |</textarea>
+        </div>
+
+        <div id="fileInputBlock" class="md-hidden">
+          <lht-file-select
+            input-id="fileInput"
+            button-id="fileSelectBtn"
+            file-name-id="fileNameText"
+            accept=".abc,.txt,text/plain"
+            button-label="ファイルを選択"
+            placeholder="未選択"
+            show-file-name>
+          </lht-file-select>
+        </div>
+      </section>
+
+      <section class="md-section">
+        <div class="md-title-info-row">
+          <h2 class="md-section-title">変換設定</h2>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip" tabindex="0" aria-label="設定説明">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+                <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+                <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+                <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+              </svg>
+            </span>
+            <span class="md-tooltip-content md-tooltip">ABC内に `T:` / `C:` が無い場合の既定値を指定します。</span>
+          </span>
+        </div>
+
+        <details class="md-disclosure">
+          <summary class="md-disclosure-summary">詳細設定（既定タイトル / 既定作曲者）</summary>
+          <div class="md-grid md-grid--defaults">
+            <div>
+              <label class="md-label" for="defaultTitleInput">既定タイトル</label>
+              <input id="defaultTitleInput" class="md-input" type="text" value="Untitled" />
+            </div>
+            <div>
+              <label class="md-label" for="defaultComposerInput">既定作曲者</label>
+              <input id="defaultComposerInput" class="md-input" type="text" value="Unknown" />
+            </div>
+            <div class="md-grid-full">
+              <label class="md-check-option" for="inferTransposeFromPartNameCheckbox">
+                <input id="inferTransposeFromPartNameCheckbox" type="checkbox" checked />
+                <span>パート名の "in A / in Bb" から移調を推定する</span>
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <div class="md-actions">
+          <button id="convertBtn" class="md-button md-button--primary" type="button">変換</button>
+          <button id="downloadBtn" class="md-button md-button--secondary" type="button" disabled>MusicXML保存</button>
+          <button id="playSineBtn" class="md-button md-button--secondary" type="button" disabled>
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="vertical-align:middle;margin-right:0.35rem">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            <span>sine再生</span>
+          </button>
+        </div>
+        <lht-error-alert id="errorText"></lht-error-alert>
+        <p id="warningText" class="md-warning md-hidden"></p>
+      </section>
+
+      <section class="md-section">
+        <div class="md-title-info-row">
+          <h2 class="md-section-title">簡易プレビュー</h2>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip" tabindex="0" aria-label="プレビュー説明">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+                <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+                <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+                <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+              </svg>
+            </span>
+            <span class="md-tooltip-content md-tooltip">生成したMusicXMLの要約情報です。詳細は下のXMLテキストで確認してください。</span>
+          </span>
+        </div>
+        <div id="previewText" class="md-preview">未変換</div>
+      </section>
+
+      <section class="md-section">
+        <div class="md-title-info-row">
+          <h2 class="md-section-title">MusicXMLテキスト</h2>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip" tabindex="0" aria-label="MusicXML説明">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+                <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+                <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+                <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+              </svg>
+            </span>
+            <span class="md-tooltip-content md-tooltip">生成されたMusicXMLです。コピー・保存して他ツールへ連携できます。</span>
+          </span>
+        </div>
+        <div class="md-code-block">
+          <code id="xmlOutput" class="md-code"></code>
+          <button class="md-copy-button md-icon-btn" aria-label="MusicXMLをコピー" type="button" id="copyBtn">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
+            </svg>
+          </button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <lht-toast id="toast"></lht-toast>
+
+    
+    
+    
+    
+    
+    
+    
+    
+  <script>
+/*
+ * lht-cmn components.js
+ * Version: v20260308
+ * Copyright 2026 Toshiki Iga
+ * Licensed under the Apache License, Version 2.0
+ */
+
+class LhtHelpTooltip extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const label = this.getAttribute("label") || "説明";
+    const isWide = this.hasAttribute("wide");
+    const helpContentHtml = this.innerHTML.trim();
+    const placement = this._normalizePlacement(this.getAttribute("placement"));
+
+    this.textContent = "";
+
+    const group = document.createElement("span");
+    group.className = "md-tooltip-group";
+
+    const hasMdIconButton = !!(window.customElements && window.customElements.get("md-icon-button"));
+    const button = document.createElement(hasMdIconButton ? "md-icon-button" : "button");
+    button.className = "md-help-icon-button";
+    if (!hasMdIconButton) {
+      button.type = "button";
+      button.classList.add("md-help-icon-button--fallback");
+    }
+    button.setAttribute("aria-label", label);
+    button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg>';
+
+    const tooltip = document.createElement("span");
+    tooltip.className = `md-tooltip-content md-tooltip md-tooltip--rich${isWide ? " md-tooltip--wide" : ""}`;
+    tooltip.innerHTML = helpContentHtml;
+    tooltip.dataset.placement = placement;
+
+    group.appendChild(button);
+    group.appendChild(tooltip);
+    this.appendChild(group);
+
+    this._group = group;
+    this._tooltip = tooltip;
+    this._activeTooltip = false;
+    this._handleTooltipEnter = () => {
+      this._activeTooltip = true;
+      group.removeAttribute("data-force-hidden");
+      this._applyTooltipPlacement();
+    };
+    this._handleTooltipLeave = () => {
+      this._activeTooltip = false;
+      group.removeAttribute("data-force-hidden");
+      this._resetTooltipPlacement();
+    };
+    this._handleTooltipKeydown = (event) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      this._activeTooltip = false;
+      group.setAttribute("data-force-hidden", "true");
+      this._resetTooltipPlacement();
+      if (document.activeElement && group.contains(document.activeElement)) {
+        document.activeElement.blur();
+      }
+    };
+    this._handleTooltipResize = () => {
+      if (!this._activeTooltip) return;
+      this._applyTooltipPlacement();
+    };
+
+    group.addEventListener("mouseenter", this._handleTooltipEnter);
+    group.addEventListener("focusin", this._handleTooltipEnter);
+    group.addEventListener("mouseleave", this._handleTooltipLeave);
+    group.addEventListener("keydown", this._handleTooltipKeydown);
+    group.addEventListener("focusout", () => {
+      requestAnimationFrame(() => {
+        if (!group.matches(":focus-within")) {
+          this._handleTooltipLeave();
+        }
+      });
+    });
+    window.addEventListener("resize", this._handleTooltipResize);
+  }
+
+  disconnectedCallback() {
+    if (this._group && this._handleTooltipEnter) {
+      this._group.removeEventListener("mouseenter", this._handleTooltipEnter);
+      this._group.removeEventListener("focusin", this._handleTooltipEnter);
+      this._group.removeEventListener("mouseleave", this._handleTooltipLeave);
+      this._group.removeEventListener("keydown", this._handleTooltipKeydown);
+    }
+    if (this._handleTooltipResize) {
+      window.removeEventListener("resize", this._handleTooltipResize);
+    }
+  }
+
+  _normalizePlacement(rawPlacement) {
+    const normalized = (rawPlacement || "auto").trim().toLowerCase();
+    return ["auto", "left", "right", "top", "bottom"].includes(normalized) ? normalized : "auto";
+  }
+
+  _applyTooltipPlacement() {
+    const tooltip = this._tooltip;
+    const group = this._group;
+    if (!tooltip || !group) return;
+
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    const safeWidth = Math.max(120, viewportWidth - 32);
+    tooltip.style.maxWidth = `${safeWidth}px`;
+    tooltip.style.visibility = "hidden";
+    tooltip.style.display = "block";
+
+    const anchorRect = group.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const placement = this._normalizePlacement(this.getAttribute("placement"));
+    const appliedPlacement = placement === "auto"
+      ? this._pickAutoPlacement(anchorRect, tooltipRect, viewportWidth, viewportHeight)
+      : placement;
+    const position = this._computeTooltipPosition(appliedPlacement, anchorRect, tooltipRect, viewportWidth, viewportHeight);
+    const relativeLeft = position.left - anchorRect.left;
+    const relativeTop = position.top - anchorRect.top;
+
+    tooltip.dataset.placement = appliedPlacement;
+    tooltip.style.left = `${relativeLeft}px`;
+    tooltip.style.top = `${relativeTop}px`;
+    tooltip.style.right = "auto";
+    tooltip.style.bottom = "auto";
+    tooltip.style.transform = "none";
+    tooltip.style.marginTop = "0";
+    tooltip.style.visibility = "";
+  }
+
+  _resetTooltipPlacement() {
+    const tooltip = this._tooltip;
+    if (!tooltip) return;
+    tooltip.dataset.placement = this._normalizePlacement(this.getAttribute("placement"));
+    tooltip.style.left = "";
+    tooltip.style.top = "";
+    tooltip.style.right = "";
+    tooltip.style.bottom = "";
+    tooltip.style.transform = "";
+    tooltip.style.marginTop = "";
+    tooltip.style.maxWidth = "";
+    tooltip.style.visibility = "";
+    tooltip.style.display = "";
+  }
+
+  _pickAutoPlacement(anchorRect, tooltipRect, viewportWidth, viewportHeight) {
+    const candidates = ["right", "left", "bottom", "top"];
+    let bestPlacement = "right";
+    let bestScore = Number.POSITIVE_INFINITY;
+
+    for (const candidate of candidates) {
+      const position = this._computeTooltipPosition(candidate, anchorRect, tooltipRect, viewportWidth, viewportHeight);
+      const score = this._computeOverflowScore(position, tooltipRect, viewportWidth, viewportHeight);
+      if (score < bestScore) {
+        bestScore = score;
+        bestPlacement = candidate;
+      }
+    }
+
+    return bestPlacement;
+  }
+
+  _computeTooltipPosition(placement, anchorRect, tooltipRect, viewportWidth, viewportHeight) {
+    const gap = 8;
+    const minInset = 16;
+    const maxLeft = Math.max(minInset, viewportWidth - tooltipRect.width - minInset);
+    const maxTop = Math.max(minInset, viewportHeight - tooltipRect.height - minInset);
+
+    if (placement === "left") {
+      return {
+        left: Math.max(minInset, anchorRect.left - tooltipRect.width - gap),
+        top: this._clamp(anchorRect.top + (anchorRect.height - tooltipRect.height) / 2, minInset, maxTop)
+      };
+    }
+    if (placement === "right") {
+      return {
+        left: Math.min(maxLeft, anchorRect.right + gap),
+        top: this._clamp(anchorRect.top + (anchorRect.height - tooltipRect.height) / 2, minInset, maxTop)
+      };
+    }
+    if (placement === "top") {
+      return {
+        left: this._clamp(anchorRect.left + (anchorRect.width - tooltipRect.width) / 2, minInset, maxLeft),
+        top: Math.max(minInset, anchorRect.top - tooltipRect.height - gap)
+      };
+    }
+    return {
+      left: this._clamp(anchorRect.left + (anchorRect.width - tooltipRect.width) / 2, minInset, maxLeft),
+      top: Math.min(maxTop, anchorRect.bottom + gap)
+    };
+  }
+
+  _computeOverflowScore(position, tooltipRect, viewportWidth, viewportHeight) {
+    const overflowLeft = Math.max(0, 16 - position.left);
+    const overflowRight = Math.max(0, position.left + tooltipRect.width + 16 - viewportWidth);
+    const overflowTop = Math.max(0, 16 - position.top);
+    const overflowBottom = Math.max(0, position.top + tooltipRect.height + 16 - viewportHeight);
+    return overflowLeft + overflowRight + overflowTop + overflowBottom;
+  }
+
+  _clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+}
+
+class LhtTextFieldHelp extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const fieldId = (this.getAttribute("field-id") || "").trim();
+    if (!fieldId) return;
+
+    const hasMdOutlinedTextField = !!(window.customElements && window.customElements.get("md-outlined-text-field"));
+    const isTextarea = (this.getAttribute("type") || "").trim().toLowerCase() === "textarea" || this.hasAttribute("rows");
+    const isClearable = this.hasAttribute("clearable") && !isTextarea;
+    const field = hasMdOutlinedTextField
+      ? document.createElement("md-outlined-text-field")
+      : document.createElement(isTextarea ? "textarea" : "input");
+    field.id = fieldId;
+    this._isFallbackTextField = !hasMdOutlinedTextField;
+    let fallbackWrapper = null;
+    let fallbackSupportingText = null;
+    let controlWrap = null;
+    let clearButton = null;
+
+    const label = (this.getAttribute("label") || "").trim();
+    if (label) {
+      if (this._isFallbackTextField) {
+        field.setAttribute("aria-label", label);
+      } else {
+        field.setAttribute("label", label);
+      }
+    }
+
+    const placeholder = this.getAttribute("placeholder");
+    if (placeholder != null) field.setAttribute("placeholder", placeholder);
+
+    const autocomplete = this.getAttribute("autocomplete");
+    if (autocomplete != null) field.setAttribute("autocomplete", autocomplete);
+
+    const type = this.getAttribute("type");
+    if (isTextarea && !this._isFallbackTextField) {
+      field.setAttribute("type", "textarea");
+    } else if (type != null && !isTextarea) {
+      field.setAttribute("type", type);
+    }
+
+    const min = this.getAttribute("min");
+    if (min != null) field.setAttribute("min", min);
+
+    const max = this.getAttribute("max");
+    if (max != null) field.setAttribute("max", max);
+
+    const step = this.getAttribute("step");
+    if (step != null) field.setAttribute("step", step);
+
+    const rows = this.getAttribute("rows");
+    if (rows != null) field.setAttribute("rows", rows);
+
+    const value = this.getAttribute("value");
+    if (value != null) {
+      if (this._isFallbackTextField) {
+        field.value = value;
+      } else {
+        field.setAttribute("value", value);
+      }
+    }
+
+    const fieldClass = (this.getAttribute("field-class") || "").trim();
+    if (fieldClass) {
+      fieldClass.split(/\s+/).filter(Boolean).forEach((name) => field.classList.add(name));
+    }
+    field.classList.add(this._isFallbackTextField ? "lht-text-field-help__fallback" : "md-outlined-field");
+    if (isClearable) {
+      field.classList.add("lht-text-field-help__field--clearable");
+    }
+
+    if (this.hasAttribute("required")) {
+      field.required = true;
+      field.setAttribute("required", "");
+    }
+    if (this.hasAttribute("disabled")) field.disabled = true;
+
+    if (isClearable) {
+      controlWrap = document.createElement("div");
+      controlWrap.className = "lht-text-field-help__control-wrap";
+
+      clearButton = document.createElement("button");
+      clearButton.type = "button";
+      clearButton.className = "lht-text-field-help__clear-button";
+      clearButton.hidden = true;
+      clearButton.setAttribute("aria-label", `${label || fieldId}をクリア`);
+
+      const syncClearButtonVisibility = () => {
+        const currentValue = String(field.value || "");
+        clearButton.hidden = currentValue.length === 0 || !!field.disabled;
+      };
+
+      clearButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        field.value = "";
+        if (!this._isFallbackTextField) {
+          field.setAttribute("value", "");
+        }
+        syncClearButtonVisibility();
+        field.focus();
+        field.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
+        field.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
+      });
+
+      field.addEventListener("input", syncClearButtonVisibility);
+      field.addEventListener("change", syncClearButtonVisibility);
+      queueMicrotask(syncClearButtonVisibility);
+    }
+
+    const helpText = (this.getAttribute("help-text") || "").trim();
+    const hideDelayMsAttr = this.getAttribute("hide-delay-ms");
+    const hideDelayMsRaw = hideDelayMsAttr == null ? Number.NaN : Number(hideDelayMsAttr);
+    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 160;
+    if (helpText) {
+      if (this._isFallbackTextField) {
+        field.title = helpText;
+        fallbackWrapper = document.createElement("div");
+        fallbackWrapper.className = "lht-text-field-help__fallback-wrap";
+        fallbackSupportingText = document.createElement("div");
+        fallbackSupportingText.className = "lht-text-field-help__supporting-text";
+        fallbackSupportingText.textContent = helpText;
+        fallbackSupportingText.hidden = true;
+        fallbackSupportingText.setAttribute("aria-hidden", "true");
+        fallbackSupportingText.setAttribute("aria-live", "polite");
+      } else {
+      }
+      let blurHideTimer = null;
+      field.addEventListener("focus", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+          blurHideTimer = null;
+        }
+        if (this._isFallbackTextField) {
+          fallbackSupportingText.hidden = false;
+          fallbackSupportingText.setAttribute("aria-hidden", "false");
+        } else {
+          field.supportingText = helpText;
+        }
+      });
+      field.addEventListener("blur", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+        }
+        blurHideTimer = setTimeout(() => {
+          if (this._isFallbackTextField) {
+            fallbackSupportingText.hidden = true;
+            fallbackSupportingText.setAttribute("aria-hidden", "true");
+          } else {
+            field.supportingText = "";
+          }
+          blurHideTimer = null;
+        }, hideDelayMs);
+      });
+    }
+
+    this.textContent = "";
+    if (fallbackWrapper) {
+      if (controlWrap) {
+        controlWrap.appendChild(field);
+        controlWrap.appendChild(clearButton);
+        fallbackWrapper.appendChild(controlWrap);
+      } else {
+        fallbackWrapper.appendChild(field);
+      }
+      fallbackWrapper.appendChild(fallbackSupportingText);
+      this.appendChild(fallbackWrapper);
+      return;
+    }
+    if (controlWrap) {
+      controlWrap.appendChild(field);
+      controlWrap.appendChild(clearButton);
+      this.appendChild(controlWrap);
+      return;
+    }
+    this.appendChild(field);
+  }
+}
+
+class LhtSelectHelp extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const fieldId = (this.getAttribute("field-id") || "").trim();
+    if (!fieldId) return;
+    const hasDeclarativeOptions = this._hasDeclarativeOptions();
+
+    const hasMdOutlinedSelect = !!(window.customElements && window.customElements.get("md-outlined-select"));
+    const field = document.createElement(hasMdOutlinedSelect ? "md-outlined-select" : "select");
+    field.id = fieldId;
+    this._lhtField = field;
+    this._isFallbackSelect = !hasMdOutlinedSelect;
+    let fallbackWrapper = null;
+    let fallbackSupportingText = null;
+
+    const label = (this.getAttribute("label") || "").trim();
+    if (label) {
+      if (this._isFallbackSelect) {
+        field.setAttribute("aria-label", label);
+      } else {
+        field.setAttribute("label", label);
+      }
+    }
+
+    const value = this.getAttribute("value");
+    if (value != null) field.value = value;
+
+    const fieldClass = (this.getAttribute("field-class") || "").trim();
+    if (fieldClass) {
+      fieldClass.split(/\s+/).filter(Boolean).forEach((name) => field.classList.add(name));
+    }
+    if (this._isFallbackSelect) {
+      field.classList.add("lht-select-help__fallback");
+    } else {
+      field.classList.add("md-outlined-field");
+    }
+
+    if (this.hasAttribute("required")) {
+      field.required = true;
+      field.setAttribute("required", "");
+    }
+    if (this.hasAttribute("disabled")) field.disabled = true;
+
+    const helpText = (this.getAttribute("help-text") || "").trim();
+    const hideDelayMsAttr = this.getAttribute("hide-delay-ms");
+    const hideDelayMsRaw = hideDelayMsAttr == null ? Number.NaN : Number(hideDelayMsAttr);
+    const hideDelayMs = Number.isFinite(hideDelayMsRaw) && hideDelayMsRaw >= 0 ? hideDelayMsRaw : 160;
+    if (helpText) {
+      if (this._isFallbackSelect) {
+        field.title = helpText;
+        fallbackWrapper = document.createElement("div");
+        fallbackWrapper.className = "lht-select-help__fallback-wrap";
+        fallbackSupportingText = document.createElement("div");
+        fallbackSupportingText.className = "lht-select-help__supporting-text";
+        fallbackSupportingText.textContent = helpText;
+        fallbackSupportingText.hidden = true;
+        fallbackSupportingText.setAttribute("aria-hidden", "true");
+        fallbackSupportingText.setAttribute("aria-live", "polite");
+      } else {
+      }
+      let blurHideTimer = null;
+      field.addEventListener("focus", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+          blurHideTimer = null;
+        }
+        if (this._isFallbackSelect) {
+          fallbackSupportingText.hidden = false;
+          fallbackSupportingText.setAttribute("aria-hidden", "false");
+        } else {
+          field.supportingText = helpText;
+        }
+      });
+      field.addEventListener("blur", () => {
+        if (blurHideTimer) {
+          clearTimeout(blurHideTimer);
+        }
+        blurHideTimer = setTimeout(() => {
+          if (this._isFallbackSelect) {
+            fallbackSupportingText.hidden = true;
+            fallbackSupportingText.setAttribute("aria-hidden", "true");
+          } else {
+            field.supportingText = "";
+          }
+          blurHideTimer = null;
+        }, hideDelayMs);
+      });
+    }
+
+    if (fallbackWrapper) {
+      fallbackWrapper.appendChild(field);
+      fallbackWrapper.appendChild(fallbackSupportingText);
+      this.appendChild(fallbackWrapper);
+    } else {
+      this.appendChild(field);
+    }
+    this.hydrateOptions();
+
+    if (!hasDeclarativeOptions) {
+      this._optionsObserver = new MutationObserver(() => {
+        this.hydrateOptions();
+      });
+      this._optionsObserver.observe(this, { childList: true, subtree: true });
+      requestAnimationFrame(() => this.hydrateOptions());
+    }
+  }
+
+  disconnectedCallback() {
+    if (this._optionsObserver) {
+      this._optionsObserver.disconnect();
+      this._optionsObserver = null;
+    }
+  }
+
+  _hasDeclarativeOptions() {
+    return this.hasAttribute("options") || !!this.querySelector("script[type='application/json'][slot='options']");
+  }
+
+  _normalizeOptions(rawOptions) {
+    return rawOptions
+      .map((entry) => {
+        const value = String(entry?.value ?? entry?.label ?? "");
+        const label = String(entry?.label ?? entry?.text ?? entry?.value ?? "");
+        return {
+          value,
+          label,
+          selected: !!entry?.selected,
+          disabled: !!entry?.disabled
+        };
+      })
+      .filter((entry) => entry.value || entry.label);
+  }
+
+  _readDeclarativeOptions() {
+    const optionsJson = (this.getAttribute("options") || "").trim();
+    if (optionsJson) {
+      try {
+        const parsed = JSON.parse(optionsJson);
+        if (Array.isArray(parsed)) return this._normalizeOptions(parsed);
+      } catch (_) {
+        // JSON 不正時は次の入力ソースへフォールバック
+      }
+    }
+
+    const script = this.querySelector("script[type='application/json'][slot='options']");
+    if (script) {
+      try {
+        const parsed = JSON.parse(script.textContent || "[]");
+        if (Array.isArray(parsed)) return this._normalizeOptions(parsed);
+      } catch (_) {
+        // JSON 不正時は空扱い
+      }
+      return [];
+    }
+
+    return null;
+  }
+
+  _readChildOptionElements() {
+    const sourceOptions = Array.from(this.querySelectorAll("option"));
+    if (sourceOptions.length === 0) return [];
+    return sourceOptions.map((sourceOption) => ({
+      value: sourceOption.getAttribute("value") ?? sourceOption.textContent ?? "",
+      label: sourceOption.textContent ?? "",
+      selected: sourceOption.hasAttribute("selected"),
+      disabled: sourceOption.hasAttribute("disabled")
+    }));
+  }
+
+  _setFieldOptions(options) {
+    const field = this._lhtField;
+    if (!field) return;
+    const previousValue = field.value;
+    field.innerHTML = "";
+
+    for (const entry of options) {
+      if (this._isFallbackSelect) {
+        const option = document.createElement("option");
+        option.value = entry.value;
+        option.textContent = entry.label;
+        if (entry.disabled) option.disabled = true;
+        if (entry.selected) {
+          option.selected = true;
+          field.value = entry.value;
+        }
+        field.appendChild(option);
+      } else {
+        const option = document.createElement("md-select-option");
+        option.value = entry.value;
+        if (entry.disabled) option.disabled = true;
+        if (entry.selected) {
+          option.selected = true;
+          option.setAttribute("selected", "");
+          field.value = entry.value;
+        }
+        const headline = document.createElement("div");
+        headline.slot = "headline";
+        headline.textContent = entry.label;
+        option.appendChild(headline);
+        field.appendChild(option);
+      }
+    }
+
+    if (!field.value && previousValue) {
+      field.value = previousValue;
+    }
+  }
+
+  hydrateOptions() {
+    const declarativeOptions = this._readDeclarativeOptions();
+    if (Array.isArray(declarativeOptions)) {
+      this._setFieldOptions(declarativeOptions);
+      const jsonScript = this.querySelector("script[type='application/json'][slot='options']");
+      if (jsonScript) jsonScript.remove();
+      if (this._optionsObserver) {
+        this._optionsObserver.disconnect();
+        this._optionsObserver = null;
+      }
+      return;
+    }
+
+    const optionsFromChildren = this._readChildOptionElements();
+    if (optionsFromChildren.length === 0) return;
+    this._setFieldOptions(optionsFromChildren);
+    this.querySelectorAll("option").forEach((option) => option.remove());
+    if (this._optionsObserver) {
+      this._optionsObserver.disconnect();
+      this._optionsObserver = null;
+    }
+  }
+
+  setOptions(rawOptions, config = {}) {
+    const options = this._normalizeOptions(Array.isArray(rawOptions) ? rawOptions : []);
+    const preserveValue = config?.preserveValue !== false;
+    const field = this._lhtField;
+    const previousValue = preserveValue ? (field?.value || "") : "";
+
+    if (field) {
+      field.innerHTML = "";
+    }
+    this.querySelectorAll("option, script[type='application/json'][slot='options']").forEach((node) => node.remove());
+    if (this._optionsObserver) {
+      this._optionsObserver.disconnect();
+      this._optionsObserver = null;
+    }
+
+    const nextOptions = preserveValue && previousValue
+      ? options.map((entry) => ({
+          ...entry,
+          selected: entry.value === previousValue || entry.selected
+        }))
+      : options;
+
+    this._setFieldOptions(nextOptions);
+    if (field && previousValue && !nextOptions.some((entry) => entry.value === previousValue)) {
+      field.value = "";
+    }
+  }
+
+  getValue() {
+    return this._lhtField?.value ?? "";
+  }
+
+  setValue(value) {
+    if (!this._lhtField) return;
+    this._lhtField.value = value == null ? "" : String(value);
+  }
+}
+
+class LhtLoadingOverlay extends HTMLElement {
+  static get observedAttributes() {
+    return ["active", "text"];
+  }
+
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    this.setAttribute("role", "status");
+    this.setAttribute("aria-live", "polite");
+
+    const text = (this.getAttribute("text") || "Loading...").trim();
+
+    this.textContent = "";
+
+    const dialog = document.createElement("div");
+    dialog.className = "lht-loading-overlay__dialog";
+
+    const spinner = document.createElement("div");
+    spinner.className = "lht-loading-overlay__spinner";
+    spinner.setAttribute("aria-hidden", "true");
+
+    const message = document.createElement("p");
+    message.className = "lht-loading-overlay__text";
+    message.textContent = text;
+
+    dialog.appendChild(spinner);
+    dialog.appendChild(message);
+    this.appendChild(dialog);
+
+    this._messageNode = message;
+    this.setActive(this.hasAttribute("active"));
+  }
+
+  attributeChangedCallback(name, _oldValue, newValue) {
+    if (name === "text" && this._messageNode) {
+      const text = (newValue || "Loading...").trim();
+      this._messageNode.textContent = text || "Loading...";
+      return;
+    }
+    if (name === "active") {
+      this.setActive(newValue !== null);
+    }
+  }
+
+  isActive() {
+    return this.hasAttribute("active");
+  }
+
+  setActive(inProgress) {
+    const next = !!inProgress;
+    this.toggleAttribute("active", next);
+    this.setAttribute("aria-hidden", next ? "false" : "true");
+
+    const busyTargetId = (this.getAttribute("busy-target-id") || "").trim();
+    if (busyTargetId) {
+      const target = document.getElementById(busyTargetId);
+      if (target) target.setAttribute("aria-busy", next ? "true" : "false");
+    }
+
+    const disableTargetIds = (this.getAttribute("disable-target-ids") || "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+    for (const id of disableTargetIds) {
+      const element = document.getElementById(id);
+      if (!element || !("disabled" in element)) continue;
+      element.disabled = next;
+    }
+  }
+
+  waitForNextPaint() {
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+  }
+}
+
+class LhtToast extends HTMLElement {
+  static get observedAttributes() {
+    return ["text", "active"];
+  }
+
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    this.setAttribute("role", "status");
+    this.setAttribute("aria-live", "polite");
+    this.setAttribute("aria-atomic", "true");
+
+    const initialText = (this.getAttribute("text") || this.textContent || "完了").trim();
+    const text = initialText || "完了";
+
+    this.textContent = "";
+
+    const body = document.createElement("div");
+    body.className = "lht-toast__body";
+    body.textContent = text;
+    this.appendChild(body);
+    this._body = body;
+
+    this.setActive(this.hasAttribute("active"));
+
+    if (typeof window.showToast !== "function") {
+      window.showToast = (message, durationMs) => {
+        this.show(message, durationMs);
+      };
+    }
+  }
+
+  disconnectedCallback() {
+    if (this._hideTimer) {
+      clearTimeout(this._hideTimer);
+      this._hideTimer = null;
+    }
+  }
+
+  attributeChangedCallback(name, _oldValue, newValue) {
+    if (name === "text") {
+      if (!this._body) return;
+      const text = (newValue || "").trim();
+      if (text) this._body.textContent = text;
+      return;
+    }
+    if (name === "active") {
+      this.setActive(newValue !== null);
+    }
+  }
+
+  show(message, durationMs) {
+    if (this._hideTimer) {
+      clearTimeout(this._hideTimer);
+      this._hideTimer = null;
+    }
+
+    const defaultDurationMs = Number(this.getAttribute("duration-ms"));
+    const fallbackDuration = Number.isFinite(defaultDurationMs) && defaultDurationMs > 0 ? defaultDurationMs : 1600;
+    const nextDuration = Number(durationMs);
+    const hideAfterMs = Number.isFinite(nextDuration) && nextDuration > 0 ? nextDuration : fallbackDuration;
+
+    const text = (message || this.getAttribute("text") || this._body?.textContent || "完了").trim();
+    if (this._body) this._body.textContent = text || "完了";
+
+    this.setActive(true);
+
+    this._hideTimer = setTimeout(() => {
+      this.hide();
+    }, hideAfterMs);
+  }
+
+  hide() {
+    if (this._hideTimer) {
+      clearTimeout(this._hideTimer);
+      this._hideTimer = null;
+    }
+    this.setActive(false);
+  }
+
+  setActive(active) {
+    const next = !!active;
+    this.toggleAttribute("active", next);
+    this.setAttribute("data-visible", next ? "true" : "false");
+    this.setAttribute("aria-hidden", next ? "false" : "true");
+  }
+}
+
+class LhtErrorAlert extends HTMLElement {
+  static get observedAttributes() {
+    return ["text", "active", "variant"];
+  }
+
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    this.setAttribute("aria-atomic", "true");
+
+    const initialText = (this.getAttribute("text") || this.textContent || "").trim();
+
+    this.textContent = "";
+
+    const body = document.createElement("p");
+    body.className = "lht-error-alert__body";
+    body.textContent = initialText;
+    this.appendChild(body);
+    this._body = body;
+
+    this._syncVariant();
+    this.setActive(this.hasAttribute("active"));
+  }
+
+  attributeChangedCallback(name, _oldValue, newValue) {
+    if (name === "text") {
+      const text = (newValue || "").trim();
+      if (this._body) this._body.textContent = text;
+      return;
+    }
+    if (name === "variant") {
+      this._syncVariant();
+      return;
+    }
+    if (name === "active") {
+      this.setActive(newValue !== null);
+    }
+  }
+
+  isVisible() {
+    return this.getAttribute("data-visible") === "true";
+  }
+
+  show(message) {
+    const text = (message || this.getAttribute("text") || "").trim();
+    if (this._body) this._body.textContent = text;
+    this.setActive(text.length > 0);
+  }
+
+  clear() {
+    if (this._body) this._body.textContent = "";
+    this.hide();
+  }
+
+  hide() {
+    this.setActive(false);
+  }
+
+  setActive(active) {
+    const next = !!active;
+    this.toggleAttribute("active", next);
+    this.setAttribute("data-visible", next ? "true" : "false");
+    this.setAttribute("aria-hidden", next ? "false" : "true");
+  }
+
+  _normalizeVariant(value) {
+    const normalized = (value || "error").trim().toLowerCase();
+    return ["error", "warning", "info"].includes(normalized) ? normalized : "error";
+  }
+
+  _syncVariant() {
+    const variant = this._normalizeVariant(this.getAttribute("variant"));
+    if (this.getAttribute("variant") !== variant) {
+      this.setAttribute("variant", variant);
+      return;
+    }
+    this.setAttribute("data-variant", variant);
+
+    if (variant === "error") {
+      this.setAttribute("role", "alert");
+      this.setAttribute("aria-live", "assertive");
+      return;
+    }
+
+    this.setAttribute("role", "status");
+    this.setAttribute("aria-live", "polite");
+  }
+}
+
+class LhtInputModeToggle extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const groupLabel = (this.getAttribute("group-label") || "入力方式").trim();
+    const groupName = (this.getAttribute("name") || "inputMode").trim();
+    const fileId = (this.getAttribute("file-id") || "inputModeFile").trim();
+    const sourceId = (this.getAttribute("source-id") || "inputModeSource").trim();
+    const fileLabel = (this.getAttribute("file-label") || "ファイル読込").trim();
+    const sourceLabel = (this.getAttribute("source-label") || "ソースコード入力").trim();
+    const defaultMode = (this.getAttribute("default-mode") || "file").trim().toLowerCase();
+    const disabled = this.hasAttribute("disabled");
+
+    this.textContent = "";
+    this.classList.add("lht-input-mode-toggle");
+
+    const group = document.createElement("div");
+    group.className = "lht-input-mode-toggle__group";
+    group.setAttribute("role", "radiogroup");
+    group.setAttribute("aria-label", groupLabel);
+
+    const fileOption = this.createOption({
+      id: fileId,
+      name: groupName,
+      label: fileLabel,
+      value: "file",
+      checked: defaultMode !== "source",
+      disabled
+    });
+
+    const sourceOption = this.createOption({
+      id: sourceId,
+      name: groupName,
+      label: sourceLabel,
+      value: "source",
+      checked: defaultMode === "source",
+      disabled
+    });
+
+    group.appendChild(fileOption.label);
+    group.appendChild(sourceOption.label);
+    this.appendChild(group);
+
+    this._fileRadio = fileOption.input;
+    this._sourceRadio = sourceOption.input;
+
+    const onChange = () => this.applyModeUi();
+    this._fileRadio.addEventListener("change", onChange);
+    this._sourceRadio.addEventListener("change", onChange);
+
+    this.applyModeUi();
+  }
+
+  createOption({ id, name, label, value, checked, disabled }) {
+    const optionLabel = document.createElement("label");
+    optionLabel.className = "lht-input-mode-toggle__option";
+
+    const input = document.createElement("input");
+    input.id = id;
+    input.type = "radio";
+    input.name = name;
+    input.value = value;
+    input.checked = !!checked;
+    input.disabled = !!disabled;
+
+    const text = document.createElement("span");
+    text.textContent = label;
+
+    optionLabel.appendChild(input);
+    optionLabel.appendChild(text);
+    return { label: optionLabel, input };
+  }
+
+  getMode() {
+    return this._sourceRadio?.checked ? "source" : "file";
+  }
+
+  setMode(mode) {
+    const normalized = (mode || "").trim().toLowerCase();
+    const sourceMode = normalized === "source";
+    if (this._sourceRadio) this._sourceRadio.checked = sourceMode;
+    if (this._fileRadio) this._fileRadio.checked = !sourceMode;
+    this.applyModeUi();
+  }
+
+  applyModeUi() {
+    const sourceMode = this.getMode() === "source";
+    const sourceTargetId = (this.getAttribute("source-target-id") || "").trim();
+    const fileTargetId = (this.getAttribute("file-target-id") || "").trim();
+
+    if (sourceTargetId) {
+      const sourceTarget = document.getElementById(sourceTargetId);
+      if (sourceTarget) sourceTarget.classList.toggle("md-hidden", !sourceMode);
+    }
+    if (fileTargetId) {
+      const fileTarget = document.getElementById(fileTargetId);
+      if (fileTarget) fileTarget.classList.toggle("md-hidden", sourceMode);
+    }
+
+    const onChangeFnName = (this.getAttribute("on-change") || "").trim();
+    if (onChangeFnName) {
+      const fn = window[onChangeFnName];
+      if (typeof fn === "function") fn(this.getMode());
+    }
+
+    this.dispatchEvent(new CustomEvent("input-mode-change", {
+      detail: { mode: this.getMode() },
+      bubbles: true
+    }));
+  }
+}
+
+class LhtPreviewOutput extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const previewId = (this.getAttribute("preview-id") || "previewText").trim();
+    const copyButtonId = (this.getAttribute("copy-button-id") || "copyBtn").trim();
+    const copyTargetId = (this.getAttribute("copy-target-id") || previewId).trim();
+    const placeholder = this.getAttribute("placeholder") || "未変換";
+    const copyLabel = (this.getAttribute("copy-label") || "コピー").trim();
+    const copyAriaLabel = (this.getAttribute("copy-aria-label") || `${copyLabel}をコピー`).trim();
+    const previewTag = (this.getAttribute("preview-tag") || "div").trim().toLowerCase();
+    const showCopyButton = !this.hasAttribute("no-copy");
+
+    this.textContent = "";
+    this.classList.add("lht-preview-output");
+
+    const root = document.createElement("div");
+    root.className = "lht-preview-output__root";
+
+    const preview = document.createElement(previewTag === "pre" ? "pre" : "div");
+    preview.id = previewId;
+    preview.className = "lht-preview-output__preview";
+    preview.textContent = placeholder;
+    root.appendChild(preview);
+    this._previewNode = preview;
+
+    if (showCopyButton) {
+      const copyButton = document.createElement("button");
+      copyButton.type = "button";
+      copyButton.id = copyButtonId;
+      copyButton.className = "lht-preview-output__copy-button";
+      copyButton.setAttribute("aria-label", copyAriaLabel);
+      copyButton.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="lht-preview-output__copy-icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><rect x="4" y="4" width="11" height="11" rx="2"></rect></svg>';
+      copyButton.addEventListener("click", () => this.copy(copyTargetId));
+      root.appendChild(copyButton);
+      this._copyButton = copyButton;
+    }
+
+    this.appendChild(root);
+  }
+
+  getText() {
+    return (this._previewNode?.textContent || "").trim();
+  }
+
+  setText(text) {
+    if (!this._previewNode) return;
+    this._previewNode.textContent = text == null ? "" : String(text);
+  }
+
+  clear() {
+    if (!this._previewNode) return;
+    const placeholder = this.getAttribute("placeholder") || "";
+    this._previewNode.textContent = placeholder;
+  }
+
+  async copy(targetId) {
+    const target = document.getElementById(targetId);
+    const text = (target?.textContent || "").trim();
+    if (!text) return;
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+      }
+      if (typeof window.showToast === "function") {
+        window.showToast("コピーしました");
+      }
+    } catch (_) {
+      // コピー不可環境では失敗を握りつぶす
+    }
+  }
+}
+
+class LhtFileSelect extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const inputId = (this.getAttribute("input-id") || "fileInput").trim();
+    const buttonId = (this.getAttribute("button-id") || "fileSelectBtn").trim();
+    const fileNameId = (this.getAttribute("file-name-id") || "fileNameText").trim();
+    const accept = (this.getAttribute("accept") || "").trim();
+    const buttonLabel = (this.getAttribute("button-label") || "ファイルを選択").trim();
+    const placeholder = (this.getAttribute("placeholder") || "未選択").trim();
+    const showFileName = this.hasAttribute("show-file-name");
+    const autoOpenValue = (this.getAttribute("auto-open") || "").trim().toLowerCase();
+    const autoOpen = autoOpenValue !== "false";
+
+    this.textContent = "";
+
+    const root = document.createElement("div");
+    root.className = "lht-file-select";
+
+    const hasMdFilledButton = !!(window.customElements && window.customElements.get("md-filled-button"));
+    const triggerButton = document.createElement(hasMdFilledButton ? "md-filled-button" : "button");
+    if (!hasMdFilledButton) {
+      triggerButton.type = "button";
+    }
+    triggerButton.id = buttonId;
+    triggerButton.className = `lht-file-select__button${hasMdFilledButton ? "" : " lht-file-select__button--fallback"}`;
+
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("slot", "icon");
+    icon.setAttribute("aria-hidden", "true");
+    icon.setAttribute("viewBox", "0 0 24 24");
+    icon.setAttribute("class", "lht-file-select__button-icon");
+    icon.setAttribute("fill", "none");
+    icon.setAttribute("stroke", "currentColor");
+    icon.setAttribute("stroke-width", "1.9");
+    icon.setAttribute("stroke-linecap", "round");
+    icon.setAttribute("stroke-linejoin", "round");
+    icon.innerHTML = '<path d="M4 7h7l2 2h7v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M12 10v6"></path><path d="M9 13l3 3 3-3"></path>';
+
+    const labelNode = document.createElement("span");
+    labelNode.className = "lht-file-select__button-text";
+    labelNode.textContent = buttonLabel;
+    triggerButton.appendChild(icon);
+    triggerButton.appendChild(labelNode);
+
+    const input = document.createElement("input");
+    input.id = inputId;
+    input.type = "file";
+    input.className = "md-file";
+    input.hidden = true;
+    if (accept) input.setAttribute("accept", accept);
+    if (this.hasAttribute("multiple")) input.multiple = true;
+
+    const fileName = document.createElement("span");
+    fileName.id = fileNameId;
+    fileName.className = "lht-file-select__file-name";
+    fileName.textContent = placeholder;
+    if (!showFileName) fileName.hidden = true;
+
+    if (this.hasAttribute("disabled")) {
+      input.disabled = true;
+      triggerButton.disabled = true;
+    }
+
+    triggerButton.addEventListener("click", () => {
+      const beforeOpenEvent = new CustomEvent("lht-file-select:before-open", {
+        detail: {
+          inputId,
+          buttonId,
+          input,
+          triggerButton,
+          autoOpen
+        },
+        bubbles: true,
+        cancelable: true
+      });
+      const canAutoOpen = this.dispatchEvent(beforeOpenEvent);
+      if (autoOpen && canAutoOpen) {
+        input.click();
+      }
+    });
+    input.addEventListener("change", () => {
+      const names = Array.from(input.files || []).map((file) => file.name).filter(Boolean);
+      fileName.textContent = names.length > 0 ? names.join(", ") : placeholder;
+      this.dispatchEvent(new CustomEvent("lht-file-select:change", {
+        detail: {
+          files: Array.from(input.files || []),
+          names,
+          input,
+          fileName
+        },
+        bubbles: true
+      }));
+    });
+
+    root.appendChild(triggerButton);
+    root.appendChild(fileName);
+    this.appendChild(root);
+    this.appendChild(input);
+  }
+}
+
+class LhtSwitchHelp extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const switchId = (this.getAttribute("switch-id") || "").trim();
+    if (!switchId) return;
+    const labelText = (this.getAttribute("label") || "").trim();
+    const helpLabel = (this.getAttribute("help-label") || `${labelText}の説明`).trim();
+    const helpContentHtml = this.innerHTML.trim();
+    const onChangeFnName = (this.getAttribute("on-change") || "").trim();
+    const isChecked = this.hasAttribute("checked");
+    const isHelpWide = this.hasAttribute("help-wide");
+
+    this.textContent = "";
+
+    const label = document.createElement("label");
+    label.className = "md-switch-label";
+
+    const hasMdSwitch = !!(window.customElements && window.customElements.get("md-switch"));
+    const switchControl = hasMdSwitch
+      ? this._createMaterialSwitch(switchId, isChecked)
+      : this._createFallbackSwitch(switchId, isChecked);
+
+    if (onChangeFnName) {
+      switchControl.control.addEventListener("change", () => {
+        const fn = window[onChangeFnName];
+        if (typeof fn === "function") {
+          fn();
+        }
+      });
+    }
+    label.appendChild(switchControl.node);
+
+    const labelSpan = document.createElement("span");
+    labelSpan.textContent = labelText;
+    label.appendChild(labelSpan);
+
+    if (helpContentHtml) {
+      const help = document.createElement("lht-help-tooltip");
+      help.setAttribute("label", helpLabel);
+      if (isHelpWide) {
+        help.setAttribute("wide", "");
+      }
+      help.innerHTML = helpContentHtml;
+      label.appendChild(help);
+    }
+
+    this.appendChild(label);
+  }
+
+  _createMaterialSwitch(switchId, isChecked) {
+    const mdSwitch = document.createElement("md-switch");
+    mdSwitch.id = switchId;
+    Object.defineProperty(mdSwitch, "checked", {
+      get() {
+        return !!mdSwitch.selected;
+      },
+      set(value) {
+        mdSwitch.selected = !!value;
+      }
+    });
+    if (isChecked) {
+      mdSwitch.selected = true;
+      mdSwitch.setAttribute("selected", "");
+    }
+    return { node: mdSwitch, control: mdSwitch };
+  }
+
+  _createFallbackSwitch(switchId, isChecked) {
+    const input = document.createElement("input");
+    input.id = switchId;
+    input.type = "checkbox";
+    input.className = "md-switch-input";
+    input.checked = isChecked;
+    input.setAttribute("role", "switch");
+    input.setAttribute("aria-checked", isChecked ? "true" : "false");
+
+    input.addEventListener("change", () => {
+      input.setAttribute("aria-checked", input.checked ? "true" : "false");
+    });
+
+    const visual = document.createElement("span");
+    visual.className = "md-switch";
+    visual.setAttribute("aria-hidden", "true");
+
+    const fragment = document.createDocumentFragment();
+    fragment.appendChild(input);
+    fragment.appendChild(visual);
+    return { node: fragment, control: input };
+  }
+}
+
+class LhtCommandBlock extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const commandId = (this.getAttribute("command-id") || "").trim();
+    if (!commandId) return;
+    const copyButtons = (this.getAttribute("copy-buttons") || "single").trim().toLowerCase();
+    const isDual = copyButtons === "dual";
+
+    this.textContent = "";
+
+    const block = document.createElement("div");
+    block.className = "md-code-block";
+
+    const code = document.createElement("code");
+    code.id = commandId;
+    code.className = `md-code${isDual ? " md-code--dual-copy" : ""}`;
+    block.appendChild(code);
+
+    const topCopyButton = this.createCopyButton("コピー", () => this.copyFromCommand(commandId));
+    block.appendChild(topCopyButton);
+
+    if (isDual) {
+      const bottomCopyButton = this.createCopyButton("コピー（右下）", () => this.copyFromCommand(commandId));
+      bottomCopyButton.classList.add("md-copy-button--bottom-right");
+      block.appendChild(bottomCopyButton);
+    }
+
+    this.appendChild(block);
+  }
+
+  createCopyButton(label, onClick) {
+    const hasMdIconButton = !!(window.customElements && window.customElements.get("md-icon-button"));
+    const button = document.createElement(hasMdIconButton ? "md-icon-button" : "button");
+    button.className = `md-copy-button md-copy-button--surface${hasMdIconButton ? "" : " md-copy-button--fallback"}`;
+    if (!hasMdIconButton) {
+      button.type = "button";
+    }
+    button.setAttribute("aria-label", label);
+    button.innerHTML = '<svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#md-icon-copy" xlink:href="#md-icon-copy"></use></svg>';
+    button.addEventListener("click", onClick);
+    return button;
+  }
+
+  async copyFromCommand(commandId) {
+    const commandElement = document.getElementById(commandId);
+    if (!commandElement) return;
+    const text = (commandElement.textContent || "").trim();
+    if (!text) return;
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+      }
+      if (typeof window.showToast === "function") {
+        window.showToast("コピーしました");
+      }
+    } catch (_) {
+      // Clipboard API 利用不可環境では失敗を無視
+    }
+  }
+}
+
+class LhtIndexCardLink extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const href = (this.getAttribute("href") || "").trim();
+    if (!href) return;
+
+    const title = (this.getAttribute("title") || "").trim();
+    const descAttr = (this.getAttribute("desc") || "").trim();
+    const iconAttr = (this.getAttribute("icon") || "").trim();
+    const target = (this.getAttribute("target") || "").trim();
+    const relAttr = (this.getAttribute("rel") || "").trim();
+    const variant = (this.getAttribute("variant") || "default").trim().toLowerCase();
+    const arrowMode = (this.getAttribute("arrow") || "auto").trim().toLowerCase();
+    const badgeText = (this.getAttribute("badge") || "").trim();
+    const descLines = (this.getAttribute("desc-lines") || "").trim();
+
+    if (!title || !descAttr) {
+      const missing = [];
+      if (!title) missing.push("title");
+      if (!descAttr) missing.push("desc");
+      // Fail fast for authoring mistakes in index cards.
+      console.warn(`[lht-index-card-link] Missing required attribute(s): ${missing.join(", ")}`, this);
+      return;
+    }
+
+    this.textContent = "";
+
+    const link = document.createElement("a");
+    link.href = href;
+    link.className = "md-link-card";
+    const isExternalHref = /^(https?:)?\/\//i.test(href);
+    const isExternal = variant === "external" || isExternalHref || target === "_blank";
+    const effectiveTarget = target || (isExternal ? "_blank" : "");
+    if (effectiveTarget) link.target = effectiveTarget;
+    if (effectiveTarget === "_blank") {
+      link.rel = relAttr || "noopener noreferrer";
+    } else if (relAttr) {
+      link.rel = relAttr;
+    }
+    if (variant === "simple") link.classList.add("lht-index-card-link--simple");
+    if (isExternal) link.classList.add("lht-index-card-link--external");
+
+    const head = document.createElement("div");
+    head.className = "md-card-head";
+
+    const h3 = document.createElement("h3");
+    h3.className = "md-card-title";
+    if (iconAttr) {
+      const iconContainer = document.createElement("span");
+      iconContainer.className = "lht-index-card-link__icon";
+      iconContainer.textContent = iconAttr;
+      h3.appendChild(iconContainer);
+    }
+    const titleContainer = document.createElement("span");
+    titleContainer.className = "lht-index-card-link__title";
+    titleContainer.textContent = title;
+    h3.appendChild(titleContainer);
+    if (badgeText) {
+      const badge = document.createElement("span");
+      badge.className = "lht-index-card-link__badge";
+      badge.textContent = badgeText;
+      h3.appendChild(badge);
+    }
+
+    const arrow = document.createElement("span");
+    arrow.className = "md-card-arrow";
+    const showArrow = arrowMode === "auto" ? variant !== "simple" : arrowMode !== "none";
+    arrow.textContent = isExternal ? "↗" : "→";
+    if (!showArrow) arrow.hidden = true;
+
+    const desc = document.createElement("p");
+    desc.className = "md-card-desc";
+    desc.textContent = descAttr;
+    if (descLines && /^\d+$/.test(descLines)) {
+      desc.classList.add("lht-index-card-link__desc--clamp");
+      desc.style.setProperty("--lht-desc-lines", descLines);
+    }
+
+    head.appendChild(h3);
+    head.appendChild(arrow);
+    link.appendChild(head);
+    link.appendChild(desc);
+    this.appendChild(link);
+  }
+}
+
+class LhtPageHero extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const title = (this.getAttribute("title") || "").trim();
+    if (!title) return;
+    const subtitle = (this.getAttribute("subtitle") || "").trim();
+    const icon = (this.getAttribute("icon") || "").trim();
+    const helpLabel = (this.getAttribute("help-label") || "説明").trim();
+    const homeHref = (this.getAttribute("menu-home-href") || "../index.html").trim();
+    const homeLabel = (this.getAttribute("menu-home-label") || "トップへ戻る").trim();
+    const useWideHelp = this.hasAttribute("help-wide");
+    const showMenu = !this.hasAttribute("no-menu");
+    const helpHtml = this.innerHTML.trim();
+    const actionHref = (this.getAttribute("action-href") || "").trim();
+    const actionLabel = (this.getAttribute("action-label") || "").trim();
+    const actionAriaLabel = (this.getAttribute("action-aria-label") || actionLabel).trim();
+    const actionIconId = (this.getAttribute("action-icon-id") || "").trim();
+
+    this.textContent = "";
+    this.classList.add("lht-page-hero");
+
+    const topRow = document.createElement("div");
+    topRow.className = "lht-page-hero__title-row";
+
+    const titleMain = document.createElement("span");
+    titleMain.className = "lht-page-hero__title-main";
+
+    const heading = document.createElement("h1");
+    heading.className = "lht-page-hero__title";
+    if (icon) {
+      const iconNode = document.createElement("span");
+      iconNode.className = "lht-page-hero__icon";
+      iconNode.setAttribute("aria-hidden", "true");
+      iconNode.textContent = icon;
+      heading.appendChild(iconNode);
+    }
+    const titleNode = document.createElement("span");
+    titleNode.textContent = title;
+    heading.appendChild(titleNode);
+    titleMain.appendChild(heading);
+
+    if (helpHtml) {
+      const help = document.createElement("lht-help-tooltip");
+      help.setAttribute("label", helpLabel);
+      if (useWideHelp) {
+        help.setAttribute("wide", "");
+      }
+      help.innerHTML = helpHtml;
+      titleMain.appendChild(help);
+    }
+
+    if (actionHref && actionLabel) {
+      const actionLink = document.createElement("a");
+      actionLink.href = actionHref;
+      actionLink.className = "ms-hero-link";
+      actionLink.target = "_blank";
+      actionLink.rel = "noopener noreferrer";
+      if (actionAriaLabel) {
+        actionLink.setAttribute("aria-label", actionAriaLabel);
+      }
+      if (actionIconId) {
+        const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        iconSvg.setAttribute("aria-hidden", "true");
+        iconSvg.setAttribute("viewBox", "0 0 16 16");
+        iconSvg.setAttribute("class", "ms-btn-icon");
+        iconSvg.setAttribute("fill", "currentColor");
+        const useNode = document.createElementNS("http://www.w3.org/2000/svg", "use");
+        useNode.setAttribute("href", `#${actionIconId}`);
+        useNode.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `#${actionIconId}`);
+        iconSvg.appendChild(useNode);
+        actionLink.appendChild(iconSvg);
+      }
+      const labelNode = document.createElement("span");
+      labelNode.textContent = actionLabel;
+      actionLink.appendChild(labelNode);
+      titleMain.appendChild(actionLink);
+    }
+
+    topRow.appendChild(titleMain);
+
+    if (showMenu) {
+      const actions = document.createElement("span");
+      actions.className = "lht-page-hero__actions";
+      const menu = document.createElement("lht-page-menu");
+      menu.setAttribute("home-href", homeHref);
+      menu.setAttribute("home-label", homeLabel);
+      actions.appendChild(menu);
+      topRow.appendChild(actions);
+    }
+
+    this.appendChild(topRow);
+
+    if (subtitle) {
+      const subtitleNode = document.createElement("div");
+      subtitleNode.className = "lht-page-hero__subtitle";
+      subtitleNode.textContent = subtitle;
+      this.appendChild(subtitleNode);
+    }
+  }
+}
+
+class LhtPageMenu extends HTMLElement {
+  connectedCallback() {
+    if (this.dataset.initialized === "true") return;
+    this.dataset.initialized = "true";
+
+    const homeHref = (this.getAttribute("home-href") || "../index.html").trim();
+    const homeLabel = (this.getAttribute("home-label") || "トップへ戻る").trim();
+
+    this.textContent = "";
+    this.classList.add("lht-page-menu");
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "md-menu-button md-icon-btn";
+    button.setAttribute("aria-label", "メニュー");
+    button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-icon-20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"></path><path d="M4 12h16"></path><path d="M4 18h16"></path></svg>';
+
+    const panel = document.createElement("div");
+    panel.className = "md-menu-panel md-hidden";
+
+    const link = document.createElement("a");
+    link.className = "md-menu-link";
+    link.href = homeHref;
+    link.textContent = homeLabel;
+    panel.appendChild(link);
+
+    button.addEventListener("click", () => {
+      panel.classList.toggle("md-hidden");
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (!this.contains(event.target)) {
+        panel.classList.add("md-hidden");
+      }
+    });
+
+    this.appendChild(button);
+    this.appendChild(panel);
+  }
+}
+
+if (!customElements.get("lht-help-tooltip")) {
+  customElements.define("lht-help-tooltip", LhtHelpTooltip);
+}
+if (!customElements.get("lht-text-field-help")) {
+  customElements.define("lht-text-field-help", LhtTextFieldHelp);
+}
+if (!customElements.get("lht-select-help")) {
+  customElements.define("lht-select-help", LhtSelectHelp);
+}
+if (!customElements.get("lht-file-select")) {
+  customElements.define("lht-file-select", LhtFileSelect);
+}
+if (!customElements.get("lht-loading-overlay")) {
+  customElements.define("lht-loading-overlay", LhtLoadingOverlay);
+}
+if (!customElements.get("lht-toast")) {
+  customElements.define("lht-toast", LhtToast);
+}
+if (!customElements.get("lht-error-alert")) {
+  customElements.define("lht-error-alert", LhtErrorAlert);
+}
+if (!customElements.get("lht-input-mode-toggle")) {
+  customElements.define("lht-input-mode-toggle", LhtInputModeToggle);
+}
+if (!customElements.get("lht-preview-output")) {
+  customElements.define("lht-preview-output", LhtPreviewOutput);
+}
+if (!customElements.get("lht-switch-help")) {
+  customElements.define("lht-switch-help", LhtSwitchHelp);
+}
+if (!customElements.get("lht-command-block")) {
+  customElements.define("lht-command-block", LhtCommandBlock);
+}
+if (!customElements.get("lht-index-card-link")) {
+  customElements.define("lht-index-card-link", LhtIndexCardLink);
+}
+if (!customElements.get("lht-page-hero")) {
+  customElements.define("lht-page-hero", LhtPageHero);
+}
+if (!customElements.get("lht-page-menu")) {
+  customElements.define("lht-page-menu", LhtPageMenu);
+}
+  </script>
+
+  <script>
+const AbcCommon = (() => {
+    function gcd(a, b) {
+        let x = Math.abs(Number(a) || 0);
+        let y = Math.abs(Number(b) || 0);
+        while (y !== 0) {
+            const t = x % y;
+            x = y;
+            y = t;
+        }
+        return x || 1;
+    }
+    function reduceFraction(num, den, fallback = { num: 1, den: 1 }) {
+        if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) {
+            return { num: fallback.num, den: fallback.den };
+        }
+        const sign = den < 0 ? -1 : 1;
+        const n = num * sign;
+        const d = den * sign;
+        const g = gcd(n, d);
+        return { num: n / g, den: d / g };
+    }
+    function multiplyFractions(a, b, fallback = { num: 1, den: 1 }) {
+        return reduceFraction(a.num * b.num, a.den * b.den, fallback);
+    }
+    function divideFractions(a, b, fallback = { num: 1, den: 1 }) {
+        return reduceFraction(a.num * b.den, a.den * b.num, fallback);
+    }
+    function parseFractionText(text, fallback = { num: 1, den: 8 }) {
+        const m = String(text || "").match(/^\s*(\d+)\/(\d+)\s*$/);
+        if (!m) {
+            return { num: fallback.num, den: fallback.den };
+        }
+        const num = Number.parseInt(m[1], 10);
+        const den = Number.parseInt(m[2], 10);
+        if (!num || !den) {
+            return { num: fallback.num, den: fallback.den };
+        }
+        return reduceFraction(num, den, fallback);
+    }
+    function parseAbcLengthToken(token, lineNo) {
+        if (!token) {
+            return { num: 1, den: 1 };
+        }
+        if (token === "/") {
+            return { num: 1, den: 2 };
+        }
+        if (/^\d+$/.test(token)) {
+            return { num: Number(token), den: 1 };
+        }
+        if (/^\/\d+$/.test(token)) {
+            return { num: 1, den: Number(token.slice(1)) };
+        }
+        if (/^\d+\/\d+$/.test(token)) {
+            const p = token.split("/");
+            return reduceFraction(Number(p[0]), Number(p[1]), { num: 1, den: 1 });
+        }
+        throw new Error("line " + lineNo + ": 長さ指定を解釈できません: " + token);
+    }
+    function abcLengthTokenFromFraction(ratio) {
+        const reduced = reduceFraction(ratio.num, ratio.den, { num: 1, den: 1 });
+        if (reduced.num === reduced.den) {
+            return "";
+        }
+        if (reduced.den === 1) {
+            return String(reduced.num);
+        }
+        if (reduced.num === 1 && reduced.den === 2) {
+            return "/";
+        }
+        if (reduced.num === 1) {
+            return "/" + reduced.den;
+        }
+        return reduced.num + "/" + reduced.den;
+    }
+    function abcPitchFromStepOctave(step, octave) {
+        const upperStep = String(step || "").toUpperCase();
+        if (!/^[A-G]$/.test(upperStep)) {
+            return "C";
+        }
+        if (octave >= 5) {
+            return upperStep.toLowerCase() + "'".repeat(octave - 5);
+        }
+        return upperStep + ",".repeat(Math.max(0, 4 - octave));
+    }
+    function accidentalFromAlter(alter) {
+        if (alter === 0) {
+            return "";
+        }
+        if (alter > 0) {
+            return "^".repeat(Math.min(2, alter));
+        }
+        return "_".repeat(Math.min(2, Math.abs(alter)));
+    }
+    function keyFromFifthsMode(fifths, mode) {
+        const major = ["Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#"];
+        const minor = ["Abm", "Ebm", "Bbm", "Fm", "Cm", "Gm", "Dm", "Am", "Em", "Bm", "F#m", "C#m", "G#m", "D#m", "A#m"];
+        const idx = Number(fifths) + 7;
+        if (idx < 0 || idx >= major.length) {
+            return "C";
+        }
+        const lowerMode = String(mode || "").toLowerCase();
+        if (lowerMode === "minor") {
+            return minor[idx];
+        }
+        return major[idx];
+    }
+    function fifthsFromAbcKey(raw) {
+        const table = {
+            "C": 0,
+            "G": 1,
+            "D": 2,
+            "A": 3,
+            "E": 4,
+            "B": 5,
+            "F#": 6,
+            "C#": 7,
+            "F": -1,
+            "Bb": -2,
+            "Eb": -3,
+            "Ab": -4,
+            "Db": -5,
+            "Gb": -6,
+            "Cb": -7,
+            "Am": 0,
+            "Em": 1,
+            "Bm": 2,
+            "F#m": 3,
+            "C#m": 4,
+            "G#m": 5,
+            "D#m": 6,
+            "A#m": 7,
+            "Dm": -1,
+            "Gm": -2,
+            "Cm": -3,
+            "Fm": -4,
+            "Bbm": -5,
+            "Ebm": -6,
+            "Abm": -7
+        };
+        const normalized = String(raw || "").trim().replace(/\s+/g, "");
+        if (Object.prototype.hasOwnProperty.call(table, normalized)) {
+            return table[normalized];
+        }
+        return null;
+    }
+    return {
+        gcd,
+        reduceFraction,
+        multiplyFractions,
+        divideFractions,
+        parseFractionText,
+        parseAbcLengthToken,
+        abcLengthTokenFromFraction,
+        abcPitchFromStepOctave,
+        accidentalFromAlter,
+        keyFromFifthsMode,
+        fifthsFromAbcKey
+    };
+})();
+if (typeof window !== "undefined") {
+    window["AbcCommon"] = AbcCommon;
+}
+  </script>
+
+  <script>
+const MusicXmlCommon = (() => {
+    function readTextFileUtf8(file, onLoad, onError) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            onLoad(String(reader.result || ""));
+        };
+        reader.onerror = () => {
+            if (typeof onError === "function") {
+                onError(reader.error || new Error("file read failed"));
+            }
+        };
+        reader.readAsText(file, "utf-8");
+    }
+    function normalizeMusicXmlSource(rawText) {
+        if (!rawText) {
+            return "";
+        }
+        const lines = String(rawText).split("\n");
+        let first = 0;
+        let last = lines.length - 1;
+        while (first <= last && lines[first].trim() === "") {
+            first += 1;
+        }
+        while (last >= first && lines[last].trim() === "") {
+            last -= 1;
+        }
+        if (first > last) {
+            return "";
+        }
+        const firstLine = lines[first].trim();
+        const lastLine = lines[last].trim();
+        const hasCodeFencePair = /^```.*$/.test(firstLine) && /^```\s*$/.test(lastLine);
+        if (hasCodeFencePair) {
+            return lines.slice(first + 1, last).join("\n").trim();
+        }
+        return lines.slice(first, last + 1).join("\n").trim();
+    }
+    function parseScorePartwiseXml(source) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(source, "application/xml");
+        const parseErr = xmlDoc.querySelector("parsererror");
+        if (parseErr) {
+            throw new Error("XMLの構文解釈に失敗しました。");
+        }
+        const root = xmlDoc.documentElement;
+        if (!root || root.nodeName !== "score-partwise") {
+            throw new Error("score-partwise 形式のMusicXMLに対応しています。");
+        }
+        return xmlDoc;
+    }
+    return {
+        readTextFileUtf8,
+        normalizeMusicXmlSource,
+        parseScorePartwiseXml
+    };
+})();
+if (typeof window !== "undefined") {
+    window["MusicXmlCommon"] = MusicXmlCommon;
+}
+  </script>
+
+  <script>
+const MusicXmlSynthScheduleCommon = (() => {
+    const musicXmlCommonRef = window["MusicXmlCommon"] || (typeof MusicXmlCommon !== "undefined" ? MusicXmlCommon : null);
+    if (!musicXmlCommonRef) {
+        throw new Error("MusicXmlCommon is not loaded.");
+    }
+    function buildSynthScheduleFromMusicXml(source, options) {
+        const ticksPerQuarter = normalizeTicksPerQuarter(options && options.ticksPerQuarter);
+        const xmlDoc = musicXmlCommonRef.parseScorePartwiseXml(source);
+        const root = xmlDoc.documentElement;
+        const partNodes = Array.from(root.children).filter((node) => node.nodeType === 1 && node.nodeName === "part");
+        if (partNodes.length === 0) {
+            throw new Error("part が見つかりません。");
+        }
+        let tempo = 120;
+        let tempoDetected = false;
+        const events = [];
+        for (let partIndex = 0; partIndex < partNodes.length; partIndex += 1) {
+            const part = partNodes[partIndex];
+            let divisions = 960;
+            let timelineTick = 0;
+            let currentTranspose = 0;
+            const channel = defaultChannelForPartIndex(partIndex);
+            const measureNodes = Array.from(part.children).filter((node) => node.nodeType === 1 && node.nodeName === "measure");
+            for (const measureNode of measureNodes) {
+                const attrNode = firstDirectChild(measureNode, "attributes");
+                if (attrNode) {
+                    const divText = getChildText(attrNode, "divisions");
+                    if (divText) {
+                        const divVal = Number.parseInt(divText, 10);
+                        if (Number.isFinite(divVal) && divVal > 0) {
+                            divisions = divVal;
+                        }
+                    }
+                    const transposeNode = firstDirectChild(attrNode, "transpose");
+                    if (transposeNode) {
+                        const chromaticText = getChildText(transposeNode, "chromatic");
+                        const octaveChangeText = getChildText(transposeNode, "octave-change");
+                        const chromatic = chromaticText ? Number.parseInt(chromaticText, 10) : 0;
+                        const octaveChange = octaveChangeText ? Number.parseInt(octaveChangeText, 10) : 0;
+                        currentTranspose =
+                            (Number.isFinite(chromatic) ? chromatic : 0) +
+                                ((Number.isFinite(octaveChange) ? octaveChange : 0) * 12);
+                    }
+                }
+                if (!tempoDetected) {
+                    for (const child of Array.from(measureNode.children)) {
+                        if (child.nodeName !== "direction") {
+                            continue;
+                        }
+                        const soundNode = firstDirectChild(child, "sound");
+                        const tempoText = soundNode ? soundNode.getAttribute("tempo") : "";
+                        if (tempoText) {
+                            const tempoVal = Number.parseFloat(tempoText);
+                            if (Number.isFinite(tempoVal) && tempoVal > 0) {
+                                tempo = Math.max(20, Math.min(300, Math.round(tempoVal)));
+                                tempoDetected = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                let cursorTick = 0;
+                let measureMaxTick = 0;
+                for (const child of Array.from(measureNode.children)) {
+                    if (child.nodeName === "note") {
+                        const durationVal = Number.parseInt(getChildText(child, "duration"), 10);
+                        const ticks = durationToMidiTicks(durationVal, divisions, ticksPerQuarter);
+                        const isRest = !!firstDirectChild(child, "rest");
+                        const isChord = !!firstDirectChild(child, "chord");
+                        const startTick = isChord ? Math.max(0, timelineTick + cursorTick - ticks) : timelineTick + cursorTick;
+                        if (!isRest) {
+                            const pitchNode = firstDirectChild(child, "pitch");
+                            const step = getChildText(pitchNode, "step");
+                            const octave = Number.parseInt(getChildText(pitchNode, "octave"), 10);
+                            const alterText = getChildText(pitchNode, "alter");
+                            const alter = alterText === "" ? 0 : Number.parseInt(alterText, 10);
+                            if (step && Number.isFinite(octave)) {
+                                const soundingMidi = stepAlterOctaveToMidiNumber(step, Number.isFinite(alter) ? alter : 0, octave) + currentTranspose;
+                                if (soundingMidi >= 0 && soundingMidi <= 127) {
+                                    events.push({
+                                        midiNumber: soundingMidi,
+                                        start: Math.max(0, Math.round(startTick)),
+                                        ticks: Math.max(1, ticks),
+                                        channel
+                                    });
+                                }
+                            }
+                        }
+                        if (!isChord) {
+                            cursorTick += ticks;
+                            measureMaxTick = Math.max(measureMaxTick, cursorTick);
+                        }
+                    }
+                    else if (child.nodeName === "backup") {
+                        cursorTick = Math.max(0, cursorTick - durationToMidiTicks(Number.parseInt(getChildText(child, "duration"), 10), divisions, ticksPerQuarter));
+                    }
+                    else if (child.nodeName === "forward") {
+                        cursorTick += durationToMidiTicks(Number.parseInt(getChildText(child, "duration"), 10), divisions, ticksPerQuarter);
+                        measureMaxTick = Math.max(measureMaxTick, cursorTick);
+                    }
+                }
+                timelineTick += Math.max(0, measureMaxTick);
+            }
+        }
+        events.sort((a, b) => {
+            if (a.start !== b.start) {
+                return a.start - b.start;
+            }
+            return a.midiNumber - b.midiNumber;
+        });
+        return {
+            tempo,
+            events
+        };
+    }
+    function normalizeTicksPerQuarter(value) {
+        const parsed = Number(value);
+        if (Number.isFinite(parsed) && parsed > 0) {
+            return Math.round(parsed);
+        }
+        return 128;
+    }
+    function durationToMidiTicks(durationVal, divisions, ticksPerQuarter) {
+        if (!Number.isFinite(durationVal) || durationVal <= 0 || !Number.isFinite(divisions) || divisions <= 0) {
+            return 1;
+        }
+        return Math.max(1, Math.round((durationVal * ticksPerQuarter) / divisions));
+    }
+    function stepAlterOctaveToMidiNumber(step, alter, octave) {
+        const base = {
+            C: 0,
+            D: 2,
+            E: 4,
+            F: 5,
+            G: 7,
+            A: 9,
+            B: 11
+        };
+        const s = String(step || "").toUpperCase();
+        if (!Object.prototype.hasOwnProperty.call(base, s)) {
+            return 60;
+        }
+        const semitone = base[s] + alter;
+        return (octave + 1) * 12 + semitone;
+    }
+    function defaultChannelForPartIndex(partIndex) {
+        const oneBased = (partIndex % 16) + 1;
+        if (oneBased === 10) {
+            return 11;
+        }
+        return oneBased;
+    }
+    function firstDirectChild(parent, tagName) {
+        if (!parent) {
+            return null;
+        }
+        for (const child of Array.from(parent.children)) {
+            if (child.nodeName === tagName) {
+                return child;
+            }
+        }
+        return null;
+    }
+    function getChildText(parent, tagName) {
+        const node = firstDirectChild(parent, tagName);
+        return node ? node.textContent.trim() : "";
+    }
+    return {
+        buildSynthScheduleFromMusicXml
+    };
+})();
+if (typeof window !== "undefined") {
+    window["MusicXmlSynthScheduleCommon"] = MusicXmlSynthScheduleCommon;
+}
+  </script>
+
+  <script>
+const MusicSynthCommon = (() => {
+    function normalizeWaveform(value) {
+        if (value === "square" || value === "triangle") {
+            return value;
+        }
+        return "sine";
+    }
+    function midiNumberToFrequency(midiNumber) {
+        return 440 * Math.pow(2, (Number(midiNumber) - 69) / 12);
+    }
+    function createBasicWaveSynthEngine(options = {}) {
+        const ticksPerQuarter = Number.isFinite(options.ticksPerQuarter)
+            ? Math.max(1, Math.round(options.ticksPerQuarter))
+            : 128;
+        let audioContext = null;
+        let activeSynthNodes = [];
+        let synthStopTimer = null;
+        async function playSchedule(schedule, waveform, onEnded) {
+            if (!schedule || !Array.isArray(schedule.events) || schedule.events.length === 0) {
+                throw new Error("先に変換してください。");
+            }
+            const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextCtor) {
+                throw new Error("このブラウザはWebAudioに対応していません。");
+            }
+            if (!audioContext) {
+                audioContext = new AudioContextCtor();
+            }
+            stop();
+            await audioContext.resume();
+            const normalizedWaveform = normalizeWaveform(waveform);
+            const secPerTick = 60 / (Math.max(1, Number(schedule.tempo) || 120) * ticksPerQuarter);
+            const baseTime = audioContext.currentTime + 0.04;
+            let latestEndTime = baseTime;
+            for (const event of schedule.events) {
+                const startAt = baseTime + (event.start * secPerTick);
+                const bodyDuration = Math.max(0.04, event.ticks * secPerTick);
+                latestEndTime = Math.max(latestEndTime, scheduleBasicWaveNote(event, startAt, bodyDuration, normalizedWaveform));
+            }
+            if (synthStopTimer) {
+                clearTimeout(synthStopTimer);
+            }
+            const waitMs = Math.max(0, Math.ceil((latestEndTime - audioContext.currentTime) * 1000));
+            synthStopTimer = setTimeout(() => {
+                activeSynthNodes = [];
+                if (typeof onEnded === "function") {
+                    onEnded();
+                }
+            }, waitMs);
+        }
+        function stop() {
+            if (synthStopTimer) {
+                clearTimeout(synthStopTimer);
+                synthStopTimer = null;
+            }
+            for (const node of activeSynthNodes) {
+                try {
+                    node.oscillator.stop();
+                }
+                catch (_error) {
+                    // ignore already-stopped nodes
+                }
+                try {
+                    node.oscillator.disconnect();
+                    node.gainNode.disconnect();
+                }
+                catch (_error) {
+                    // ignore disconnect error
+                }
+            }
+            activeSynthNodes = [];
+        }
+        function scheduleBasicWaveNote(event, startAt, bodyDuration, waveform) {
+            const attack = 0.005;
+            const release = 0.03;
+            const endAt = startAt + bodyDuration;
+            const oscillator = audioContext.createOscillator();
+            oscillator.type = waveform;
+            oscillator.frequency.setValueAtTime(midiNumberToFrequency(event.midiNumber), startAt);
+            const gainNode = audioContext.createGain();
+            const gainLevel = event.channel === 10 ? 0.06 : 0.1;
+            gainNode.gain.setValueAtTime(0.0001, startAt);
+            gainNode.gain.linearRampToValueAtTime(gainLevel, startAt + attack);
+            gainNode.gain.setValueAtTime(gainLevel, endAt);
+            gainNode.gain.linearRampToValueAtTime(0.0001, endAt + release);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.start(startAt);
+            oscillator.stop(endAt + release + 0.01);
+            registerSynthNode(oscillator, gainNode);
+            return endAt + release + 0.02;
+        }
+        function registerSynthNode(oscillator, gainNode) {
+            oscillator.onended = () => {
+                try {
+                    oscillator.disconnect();
+                    gainNode.disconnect();
+                }
+                catch (_error) {
+                    // ignore cleanup failure
+                }
+            };
+            activeSynthNodes.push({ oscillator, gainNode });
+        }
+        return {
+            playSchedule,
+            stop
+        };
+    }
+    return {
+        normalizeWaveform,
+        midiNumberToFrequency,
+        createBasicWaveSynthEngine
+    };
+})();
+if (typeof window !== "undefined") {
+    window["MusicSynthCommon"] = MusicSynthCommon;
+}
+  </script>
+
+  <script>
+const MusicXmlWriterCommon = (() => {
+    function escapeXml(value) {
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&apos;");
+    }
+    function buildScorePartwiseXml(parsed) {
+        const lines = [];
+        const meta = parsed.meta;
+        const parts = Array.isArray(parsed.parts) && parsed.parts.length > 0
+            ? parsed.parts
+            : [{
+                    partId: "P1",
+                    partName: "Music",
+                    measures: parsed.measures || [[]]
+                }];
+        lines.push('<?xml version="1.0" encoding="UTF-8"?>');
+        lines.push('<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN"');
+        lines.push('  "http://www.musicxml.org/dtds/partwise.dtd">');
+        lines.push('<score-partwise version="3.1">');
+        lines.push('  <work><work-title>' + escapeXml(meta.title) + '</work-title></work>');
+        lines.push('  <identification><creator type="composer">' + escapeXml(meta.composer) + '</creator></identification>');
+        lines.push('  <part-list>');
+        for (const part of parts) {
+            const partId = part.partId || "P1";
+            const partName = part.partName || "Music";
+            const midiProgram = normalizeMidiProgram(part.midiProgram);
+            const midiChannel = normalizeMidiChannel(part.midiChannel);
+            const scoreInstrumentId = partId + "-I1";
+            lines.push('    <score-part id="' + escapeXml(partId) + '">');
+            lines.push('      <part-name>' + escapeXml(partName) + '</part-name>');
+            if (midiProgram !== null || midiChannel !== null) {
+                lines.push('      <score-instrument id="' + escapeXml(scoreInstrumentId) + '">');
+                lines.push('        <instrument-name>' + escapeXml(resolveMidiInstrumentName(partName, midiProgram)) + '</instrument-name>');
+                lines.push('      </score-instrument>');
+                lines.push('      <midi-instrument id="' + escapeXml(scoreInstrumentId) + '">');
+                if (midiChannel !== null) {
+                    lines.push("        <midi-channel>" + midiChannel + "</midi-channel>");
+                }
+                if (midiProgram !== null) {
+                    lines.push("        <midi-program>" + midiProgram + "</midi-program>");
+                }
+                lines.push("      </midi-instrument>");
+            }
+            lines.push("    </score-part>");
+        }
+        lines.push('  </part-list>');
+        const tempoChangesByMeasure = normalizeTempoChanges(meta.tempoChanges, meta.tempo);
+        for (let partIndex = 0; partIndex < parts.length; partIndex += 1) {
+            const part = parts[partIndex];
+            const partId = part.partId || "P1";
+            const measures = Array.isArray(part.measures) && part.measures.length > 0 ? part.measures : [[]];
+            const measureDynamics = Array.isArray(part.measureDynamics) ? part.measureDynamics : [];
+            lines.push('  <part id="' + escapeXml(partId) + '">');
+            for (let measureIndex = 0; measureIndex < measures.length; measureIndex += 1) {
+                const measureNo = measureIndex + 1;
+                const notes = measures[measureIndex];
+                lines.push('    <measure number="' + measureNo + '">');
+                if (measureIndex === 0) {
+                    const clef = normalizeClef(part.clef);
+                    const keyMode = normalizeKeyMode(meta.keyInfo && meta.keyInfo.mode);
+                    lines.push('      <attributes>');
+                    lines.push('        <divisions>960</divisions>');
+                    lines.push('        <key><fifths>' + meta.keyInfo.fifths + '</fifths><mode>' + keyMode + '</mode></key>');
+                    lines.push('        <time><beats>' + meta.meter.beats + '</beats><beat-type>' + meta.meter.beatType + '</beat-type></time>');
+                    const transpose = normalizeTranspose(part.transpose);
+                    if (transpose) {
+                        lines.push("        <transpose>");
+                        lines.push("          <chromatic>" + transpose.chromatic + "</chromatic>");
+                        if (Number.isFinite(transpose.octaveChange) && transpose.octaveChange !== 0) {
+                            lines.push("          <octave-change>" + transpose.octaveChange + "</octave-change>");
+                        }
+                        lines.push("        </transpose>");
+                    }
+                    lines.push('        <clef><sign>' + clef.sign + '</sign><line>' + clef.line + '</line></clef>');
+                    lines.push('      </attributes>');
+                }
+                if (partIndex === 0) {
+                    const tempoBpm = tempoChangesByMeasure.get(measureNo);
+                    if (Number.isFinite(tempoBpm) && tempoBpm > 0) {
+                        lines.push('      <direction placement="above">');
+                        lines.push("        <direction-type>");
+                        lines.push("          <metronome>");
+                        lines.push("            <beat-unit>quarter</beat-unit>");
+                        lines.push("            <per-minute>" + tempoBpm + "</per-minute>");
+                        lines.push("          </metronome>");
+                        lines.push("        </direction-type>");
+                        lines.push("        <sound tempo=\"" + tempoBpm + "\"/>");
+                        lines.push("      </direction>");
+                    }
+                }
+                const dynamicMark = normalizeDynamicMark(measureDynamics[measureIndex]);
+                if (dynamicMark) {
+                    lines.push('      <direction placement="below">');
+                    lines.push("        <direction-type>");
+                    lines.push("          <dynamics>");
+                    lines.push("            <" + dynamicMark + "/>");
+                    lines.push("          </dynamics>");
+                    lines.push("        </direction-type>");
+                    lines.push("      </direction>");
+                }
+                for (const note of notes) {
+                    lines.push('      <note>');
+                    if (note.chord) {
+                        lines.push("        <chord/>");
+                    }
+                    if (note.isRest) {
+                        lines.push('        <rest/>');
+                    }
+                    else {
+                        lines.push('        <pitch>');
+                        lines.push('          <step>' + note.step + '</step>');
+                        if (note.alter !== null) {
+                            lines.push('          <alter>' + note.alter + '</alter>');
+                        }
+                        lines.push('          <octave>' + note.octave + '</octave>');
+                        lines.push('        </pitch>');
+                    }
+                    lines.push('        <duration>' + note.duration + '</duration>');
+                    lines.push('        <type>' + note.type + '</type>');
+                    if (note.voice) {
+                        lines.push('        <voice>' + escapeXml(note.voice) + '</voice>');
+                    }
+                    if (!note.isRest && note.accidentalText) {
+                        lines.push('        <accidental>' + note.accidentalText + '</accidental>');
+                    }
+                    if (!note.isRest && note.tieStart) {
+                        lines.push("        <tie type=\"start\"/>");
+                    }
+                    if (!note.isRest && note.tieStop) {
+                        lines.push("        <tie type=\"stop\"/>");
+                    }
+                    if (!note.isRest && (note.tieStart || note.tieStop)) {
+                        lines.push("        <notations>");
+                        if (note.tieStart) {
+                            lines.push("          <tied type=\"start\"/>");
+                        }
+                        if (note.tieStop) {
+                            lines.push("          <tied type=\"stop\"/>");
+                        }
+                        lines.push("        </notations>");
+                    }
+                    lines.push('      </note>');
+                }
+                lines.push('    </measure>');
+            }
+            lines.push('  </part>');
+        }
+        lines.push('</score-partwise>');
+        return lines.join("\n");
+    }
+    function normalizeTranspose(rawTranspose) {
+        if (rawTranspose === null || typeof rawTranspose === "undefined") {
+            return null;
+        }
+        if (Number.isFinite(rawTranspose)) {
+            const chromaticOnly = Number(rawTranspose);
+            if (chromaticOnly === 0) {
+                return null;
+            }
+            return { chromatic: chromaticOnly, octaveChange: 0 };
+        }
+        if (typeof rawTranspose !== "object") {
+            return null;
+        }
+        const chromatic = Number(rawTranspose.chromatic);
+        const octaveChange = Number(rawTranspose.octaveChange || 0);
+        if (!Number.isFinite(chromatic) || chromatic === 0) {
+            return null;
+        }
+        return {
+            chromatic,
+            octaveChange: Number.isFinite(octaveChange) ? octaveChange : 0
+        };
+    }
+    function normalizeClef(rawClef) {
+        if (!rawClef || typeof rawClef !== "object") {
+            return { sign: "G", line: 2 };
+        }
+        const sign = String(rawClef.sign || "G").trim().toUpperCase();
+        const line = Number.parseInt(rawClef.line, 10);
+        if ((sign !== "G" && sign !== "F" && sign !== "C") || !Number.isFinite(line) || line <= 0) {
+            return { sign: "G", line: 2 };
+        }
+        return { sign, line };
+    }
+    function normalizeKeyMode(rawMode) {
+        const mode = String(rawMode || "major").trim().toLowerCase();
+        if (mode === "minor") {
+            return "minor";
+        }
+        return "major";
+    }
+    function normalizeMidiProgram(rawProgram) {
+        const value = Number.parseInt(rawProgram, 10);
+        if (!Number.isFinite(value) || value < 1 || value > 128) {
+            return null;
+        }
+        return value;
+    }
+    function normalizeMidiChannel(rawChannel) {
+        const value = Number.parseInt(rawChannel, 10);
+        if (!Number.isFinite(value) || value < 1 || value > 16) {
+            return null;
+        }
+        return value;
+    }
+    function resolveMidiInstrumentName(partName, midiProgram) {
+        const normalizedPartName = String(partName || "").trim();
+        if (normalizedPartName) {
+            return normalizedPartName;
+        }
+        if (midiProgram !== null) {
+            return "Program " + midiProgram;
+        }
+        return "Instrument";
+    }
+    function normalizeDynamicMark(rawMark) {
+        const mark = String(rawMark || "").trim().toLowerCase();
+        if (mark === "p" || mark === "mp" || mark === "mf" || mark === "f") {
+            return mark;
+        }
+        return null;
+    }
+    function normalizeTempoChanges(rawTempoChanges, fallbackTempo) {
+        const tempoByMeasure = new Map();
+        if (Array.isArray(rawTempoChanges)) {
+            for (const change of rawTempoChanges) {
+                if (!change || typeof change !== "object") {
+                    continue;
+                }
+                const measure = Number.parseInt(change.measure, 10);
+                const bpm = Number.parseInt(change.bpm, 10);
+                if (!Number.isFinite(measure) || measure <= 0 || !Number.isFinite(bpm) || bpm <= 0) {
+                    continue;
+                }
+                tempoByMeasure.set(measure, bpm);
+            }
+        }
+        if (tempoByMeasure.size === 0) {
+            const fallback = Number.parseInt(fallbackTempo, 10);
+            if (Number.isFinite(fallback) && fallback > 0) {
+                tempoByMeasure.set(1, fallback);
+            }
+        }
+        else if (!tempoByMeasure.has(1)) {
+            const fallback = Number.parseInt(fallbackTempo, 10);
+            if (Number.isFinite(fallback) && fallback > 0) {
+                tempoByMeasure.set(1, fallback);
+            }
+        }
+        return tempoByMeasure;
+    }
+    return {
+        escapeXml,
+        buildScorePartwiseXml
+    };
+})();
+if (typeof window !== "undefined") {
+    window["MusicXmlWriterCommon"] = MusicXmlWriterCommon;
+}
+  </script>
+
+  <script>
+(function (global) {
+    const abcCommon = global["AbcCommon"] || (typeof AbcCommon !== "undefined" ? AbcCommon : null);
+    if (!abcCommon) {
+        throw new Error("AbcCommon is not loaded.");
+    }
+    function parseForMusicXml(source, settings) {
+        const warnings = [];
+        const lines = String(source || "").split("\n");
+        const headers = {};
+        const bodyEntries = [];
+        const declaredVoiceIds = [];
+        const voiceNameById = {};
+        let currentVoiceId = "1";
+        let scoreDirective = "";
+        for (let i = 0; i < lines.length; i += 1) {
+            const lineNo = i + 1;
+            const raw = lines[i];
+            const noComment = raw.split("%")[0];
+            const trimmed = noComment.trim();
+            if (!trimmed) {
+                continue;
+            }
+            const scoreMatch = trimmed.match(/^%%\s*score\s+(.+)$/i);
+            if (scoreMatch) {
+                scoreDirective = scoreMatch[1].trim();
+                continue;
+            }
+            const headerMatch = trimmed.match(/^([A-Za-z]):\s*(.*)$/);
+            if (headerMatch && /^[A-Za-z]$/.test(headerMatch[1])) {
+                const key = headerMatch[1];
+                const value = headerMatch[2].trim();
+                if (key === "V") {
+                    const m = value.match(/^(\S+)\s*(.*)$/);
+                    if (!m) {
+                        continue;
+                    }
+                    currentVoiceId = m[1];
+                    if (!declaredVoiceIds.includes(currentVoiceId)) {
+                        declaredVoiceIds.push(currentVoiceId);
+                    }
+                    const rest = m[2].trim();
+                    const parsedVoice = parseVoiceDirectiveTail(rest);
+                    if (parsedVoice.name) {
+                        voiceNameById[currentVoiceId] = parsedVoice.name;
+                    }
+                    if (parsedVoice.bodyText) {
+                        bodyEntries.push({ text: parsedVoice.bodyText, lineNo, voiceId: currentVoiceId });
+                    }
+                    continue;
+                }
+                headers[key] = value;
+                continue;
+            }
+            if (!declaredVoiceIds.includes(currentVoiceId)) {
+                declaredVoiceIds.push(currentVoiceId);
+            }
+            bodyEntries.push({ text: noComment, lineNo, voiceId: currentVoiceId });
+        }
+        if (bodyEntries.length === 0) {
+            throw new Error("本文が見つかりません。ABCのノート列を入力してください。 (line 1)");
+        }
+        const meter = parseMeter(headers.M || "4/4", warnings);
+        const unitLength = parseFraction(headers.L || "1/8", "L", warnings);
+        const keyInfo = parseKey(headers.K || "C", warnings);
+        const keySignatureAccidentals = keySignatureAlterByStep(keyInfo.fifths);
+        const measuresByVoice = {};
+        let noteCount = 0;
+        function ensureVoice(voiceId) {
+            if (!Object.prototype.hasOwnProperty.call(measuresByVoice, voiceId)) {
+                measuresByVoice[voiceId] = [[]];
+            }
+            return measuresByVoice[voiceId];
+        }
+        for (const entry of bodyEntries) {
+            const measures = ensureVoice(entry.voiceId);
+            let currentMeasure = measures[measures.length - 1];
+            let measureAccidentals = {};
+            let lastNote = null;
+            let lastEventNotes = [];
+            let pendingTieToNext = false;
+            let pendingRhythmScale = null;
+            let tupletRemaining = 0;
+            let tupletScale = null;
+            let idx = 0;
+            const text = entry.text;
+            while (idx < text.length) {
+                const ch = text[idx];
+                if (ch === " " || ch === "\t") {
+                    idx += 1;
+                    continue;
+                }
+                if (ch === "," || ch === "'") {
+                    // Lenient compatibility: some real-world sources include standalone octave marks.
+                    // They are non-standard in strict ABC, but skipping them improves interoperability.
+                    idx += 1;
+                    continue;
+                }
+                if (ch === "|" || ch === ":") {
+                    if (ch === "|" && (currentMeasure.length > 0 || measures.length === 0)) {
+                        currentMeasure = [];
+                        measures.push(currentMeasure);
+                    }
+                    if (ch === "|") {
+                        measureAccidentals = {};
+                        lastNote = null;
+                    }
+                    idx += 1;
+                    continue;
+                }
+                if (ch === ">" || ch === "<") {
+                    if (!lastEventNotes || lastEventNotes.length === 0 || lastEventNotes.some((n) => n.isRest)) {
+                        warnings.push("line " + entry.lineNo + ": broken rhythm(" + ch + ") の前にノートがないためスキップしました。");
+                        idx += 1;
+                        continue;
+                    }
+                    const lastScale = ch === ">" ? { num: 3, den: 2 } : { num: 1, den: 2 };
+                    pendingRhythmScale = ch === ">" ? { num: 1, den: 2 } : { num: 3, den: 2 };
+                    scaleNotesDuration(lastEventNotes, lastScale);
+                    idx += 1;
+                    continue;
+                }
+                if (ch === "(") {
+                    const tupletMatch = text.slice(idx).match(/^\((\d)(?::(\d))?(?::(\d))?/);
+                    if (tupletMatch) {
+                        const n = Number(tupletMatch[1] || 0);
+                        const qRaw = tupletMatch[2] ? Number(tupletMatch[2]) : NaN;
+                        const rRaw = tupletMatch[3] ? Number(tupletMatch[3]) : NaN;
+                        const q = Number.isFinite(qRaw) && qRaw > 0 ? qRaw : (n === 3 ? 2 : n);
+                        const r = Number.isFinite(rRaw) && rRaw > 0 ? rRaw : n;
+                        if (n > 0 && q > 0 && r > 0) {
+                            tupletScale = { num: q, den: n };
+                            tupletRemaining = r;
+                        }
+                        else {
+                            warnings.push("line " + entry.lineNo + ": 連符記法の解釈に失敗しました: " + tupletMatch[0]);
+                        }
+                        idx += tupletMatch[0].length;
+                        continue;
+                    }
+                    warnings.push("line " + entry.lineNo + ": 非対応の連符記法をスキップしました: (");
+                    idx += 1;
+                    continue;
+                }
+                if (ch === "-") {
+                    if (lastNote && !lastNote.isRest) {
+                        lastNote.tieStart = true;
+                        pendingTieToNext = true;
+                    }
+                    else {
+                        warnings.push("line " + entry.lineNo + ": tie(-) の前にノートがないためスキップしました。");
+                    }
+                    idx += 1;
+                    continue;
+                }
+                if (ch === "\"") {
+                    const endQuote = text.indexOf("\"", idx + 1);
+                    if (endQuote >= 0) {
+                        idx = endQuote + 1;
+                    }
+                    else {
+                        idx = text.length;
+                    }
+                    warnings.push("line " + entry.lineNo + ': インライン文字列("...")はスキップしました。');
+                    continue;
+                }
+                if (ch === "!" || ch === "+") {
+                    const endMark = text.indexOf(ch, idx + 1);
+                    if (endMark >= 0) {
+                        idx = endMark + 1;
+                    }
+                    else {
+                        idx += 1;
+                    }
+                    warnings.push("line " + entry.lineNo + ": 装飾記法をスキップしました: " + ch + "..." + ch);
+                    continue;
+                }
+                if (ch === "[") {
+                    const chordResult = parseChordAt(text, idx, entry.lineNo);
+                    if (!chordResult) {
+                        warnings.push("line " + entry.lineNo + ": 和音記法の解釈に失敗したためスキップしました。");
+                        idx += 1;
+                        continue;
+                    }
+                    idx = chordResult.nextIdx;
+                    let chordLength = parseLengthToken(chordResult.lengthToken, entry.lineNo);
+                    if (!chordResult.lengthToken && chordResult.notes.length > 0 && chordResult.notes[0].lengthToken) {
+                        chordLength = parseLengthToken(chordResult.notes[0].lengthToken, entry.lineNo);
+                    }
+                    let absoluteLength = multiplyFractions(unitLength, chordLength);
+                    if (pendingRhythmScale) {
+                        absoluteLength = multiplyFractions(absoluteLength, pendingRhythmScale);
+                        pendingRhythmScale = null;
+                    }
+                    if (tupletRemaining > 0 && tupletScale) {
+                        absoluteLength = multiplyFractions(absoluteLength, tupletScale);
+                        tupletRemaining -= 1;
+                        if (tupletRemaining <= 0) {
+                            tupletScale = null;
+                        }
+                    }
+                    if (idx < text.length && (text[idx] === ">" || text[idx] === "<")) {
+                        const rhythmChar = text[idx];
+                        idx += 1;
+                        if (rhythmChar === ">") {
+                            absoluteLength = multiplyFractions(absoluteLength, { num: 3, den: 2 });
+                            pendingRhythmScale = { num: 1, den: 2 };
+                        }
+                        else {
+                            absoluteLength = multiplyFractions(absoluteLength, { num: 1, den: 2 });
+                            pendingRhythmScale = { num: 3, den: 2 };
+                        }
+                    }
+                    const dur = durationInDivisions(absoluteLength, 960);
+                    if (dur <= 0) {
+                        throw new Error("line " + entry.lineNo + ": 長さが不正です");
+                    }
+                    const chordNotes = [];
+                    for (let chordIndex = 0; chordIndex < chordResult.notes.length; chordIndex += 1) {
+                        const chordNote = chordResult.notes[chordIndex];
+                        const note = buildNoteData(chordNote.pitchChar, chordNote.accidentalText, chordNote.octaveShift, absoluteLength, dur, entry.lineNo, keySignatureAccidentals, measureAccidentals);
+                        note.voice = entry.voiceId;
+                        if (chordIndex > 0) {
+                            note.chord = true;
+                        }
+                        chordNotes.push(note);
+                    }
+                    if (pendingTieToNext && chordNotes.length > 0) {
+                        chordNotes[0].tieStop = true;
+                        pendingTieToNext = false;
+                    }
+                    for (const note of chordNotes) {
+                        currentMeasure.push(note);
+                    }
+                    lastNote = chordNotes[0] || null;
+                    lastEventNotes = chordNotes;
+                    noteCount += chordNotes.length;
+                    continue;
+                }
+                if (ch === "]" || ch === ")" || ch === "{" || ch === "}") {
+                    warnings.push("line " + entry.lineNo + ": 非対応記法をスキップしました: " + ch);
+                    idx += 1;
+                    continue;
+                }
+                let accidentalText = "";
+                while (idx < text.length && (text[idx] === "^" || text[idx] === "_" || text[idx] === "=")) {
+                    accidentalText += text[idx];
+                    idx += 1;
+                    if (accidentalText === "=" || accidentalText.startsWith("^") || accidentalText.startsWith("_")) {
+                        if (accidentalText.length >= 2 && accidentalText[0] !== accidentalText[1]) {
+                            break;
+                        }
+                        if (accidentalText.length >= 2 && accidentalText[0] === "=") {
+                            accidentalText = "=";
+                            break;
+                        }
+                    }
+                }
+                const pitchChar = text[idx];
+                if (!pitchChar || !/[A-Ga-gzZxX]/.test(pitchChar)) {
+                    throw new Error("line " + entry.lineNo + ": ノート/休符の解釈に失敗しました: " + text.slice(idx, idx + 12));
+                }
+                idx += 1;
+                let octaveShift = "";
+                while (idx < text.length && (text[idx] === "'" || text[idx] === ",")) {
+                    octaveShift += text[idx];
+                    idx += 1;
+                }
+                let lengthToken = "";
+                const lengthMatch = text.slice(idx).match(/^(\d+\/\d+|\d+|\/\d+|\/)/);
+                if (lengthMatch) {
+                    lengthToken = lengthMatch[1];
+                    idx += lengthToken.length;
+                }
+                const len = parseLengthToken(lengthToken, entry.lineNo);
+                let absoluteLength = multiplyFractions(unitLength, len);
+                if (pendingRhythmScale) {
+                    absoluteLength = multiplyFractions(absoluteLength, pendingRhythmScale);
+                    pendingRhythmScale = null;
+                }
+                if (tupletRemaining > 0 && tupletScale) {
+                    absoluteLength = multiplyFractions(absoluteLength, tupletScale);
+                    tupletRemaining -= 1;
+                    if (tupletRemaining <= 0) {
+                        tupletScale = null;
+                    }
+                }
+                if (idx < text.length && (text[idx] === ">" || text[idx] === "<")) {
+                    const rhythmChar = text[idx];
+                    idx += 1;
+                    if (rhythmChar === ">") {
+                        absoluteLength = multiplyFractions(absoluteLength, { num: 3, den: 2 });
+                        pendingRhythmScale = { num: 1, den: 2 };
+                    }
+                    else {
+                        absoluteLength = multiplyFractions(absoluteLength, { num: 1, den: 2 });
+                        pendingRhythmScale = { num: 3, den: 2 };
+                    }
+                }
+                const dur = durationInDivisions(absoluteLength, 960);
+                if (dur <= 0) {
+                    throw new Error("line " + entry.lineNo + ": 長さが不正です");
+                }
+                const note = buildNoteData(pitchChar, accidentalText, octaveShift, absoluteLength, dur, entry.lineNo, keySignatureAccidentals, measureAccidentals);
+                if (pendingTieToNext && !note.isRest) {
+                    note.tieStop = true;
+                    pendingTieToNext = false;
+                }
+                else if (note.isRest && pendingTieToNext) {
+                    warnings.push("line " + entry.lineNo + ": tie(-) の後ろが休符のため tie を解除しました。");
+                    pendingTieToNext = false;
+                }
+                note.voice = entry.voiceId;
+                currentMeasure.push(note);
+                lastNote = note;
+                lastEventNotes = [note];
+                noteCount += 1;
+            }
+        }
+        for (const voiceId of Object.keys(measuresByVoice)) {
+            const measures = measuresByVoice[voiceId];
+            while (measures.length > 1 && measures[measures.length - 1].length === 0) {
+                measures.pop();
+            }
+        }
+        if (noteCount === 0) {
+            throw new Error("ノートまたは休符が見つかりませんでした。 (line 1)");
+        }
+        const orderedVoiceIds = parseScoreVoiceOrder(scoreDirective, declaredVoiceIds);
+        const parts = orderedVoiceIds.map((voiceId, index) => {
+            const partName = voiceNameById[voiceId] || ("Voice " + voiceId);
+            return {
+                partId: "P" + String(index + 1),
+                partName,
+                transpose: settings.inferTransposeFromPartName ? inferTransposeFromPartName(partName) : null,
+                voiceId,
+                measures: measuresByVoice[voiceId] || [[]]
+            };
+        });
+        const measureCount = parts.reduce((acc, part) => Math.max(acc, part.measures.length), 0);
+        return {
+            meta: {
+                title: headers.T || settings.defaultTitle,
+                composer: headers.C || settings.defaultComposer,
+                meter,
+                meterText: headers.M || "4/4",
+                unitLength,
+                unitLengthText: headers.L || "1/8",
+                keyInfo,
+                keyText: headers.K || "C"
+            },
+            parts,
+            measures: parts[0] ? parts[0].measures : [[]],
+            voiceCount: parts.length,
+            measureCount,
+            noteCount,
+            warnings
+        };
+    }
+    function parseScoreVoiceOrder(raw, declaredVoiceIds) {
+        const baseOrder = Array.from(declaredVoiceIds || []);
+        if (!raw) {
+            return baseOrder.length > 0 ? baseOrder : ["1"];
+        }
+        const ordered = [];
+        const seen = new Set();
+        const groupRegex = /\(([^)]*)\)|([^\s()]+)/g;
+        let m;
+        while ((m = groupRegex.exec(raw)) !== null) {
+            const chunk = m[1] || m[2] || "";
+            const ids = chunk
+                .split(/\s+/)
+                .map((v) => v.trim())
+                .filter((v) => /^[A-Za-z0-9_.-]+$/.test(v));
+            for (const id of ids) {
+                if (!seen.has(id)) {
+                    seen.add(id);
+                    ordered.push(id);
+                }
+            }
+        }
+        for (const id of baseOrder) {
+            if (!seen.has(id)) {
+                seen.add(id);
+                ordered.push(id);
+            }
+        }
+        return ordered.length > 0 ? ordered : ["1"];
+    }
+    function parseVoiceDirectiveTail(raw) {
+        if (!raw) {
+            return { name: "", bodyText: "" };
+        }
+        let bodyText = String(raw);
+        let name = "";
+        const attrRegex = /([A-Za-z][A-Za-z0-9_-]*)\s*=\s*("([^"]*)"|(\S+))/g;
+        bodyText = bodyText.replace(attrRegex, (_full, key, _quotedValue, quotedInner, bareValue) => {
+            if (String(key).toLowerCase() === "name") {
+                name = quotedInner || bareValue || "";
+            }
+            return " ";
+        });
+        return {
+            name: name.trim(),
+            bodyText: bodyText.trim()
+        };
+    }
+    function inferTransposeFromPartName(partName) {
+        if (!partName) {
+            return null;
+        }
+        const normalized = String(partName).replace(/[♭]/g, "b").replace(/[♯]/g, "#");
+        const m = normalized.match(/\bin\s+([A-Ga-g])([#b]?)/);
+        if (!m) {
+            return null;
+        }
+        const tonic = String(m[1]).toUpperCase() + (m[2] || "");
+        const semitoneByTonic = {
+            C: 0,
+            "C#": 1,
+            Db: 1,
+            D: 2,
+            "D#": 3,
+            Eb: 3,
+            E: 4,
+            F: 5,
+            "F#": 6,
+            Gb: 6,
+            G: 7,
+            "G#": 8,
+            Ab: 8,
+            A: 9,
+            "A#": 10,
+            Bb: 10,
+            B: 11
+        };
+        if (!Object.prototype.hasOwnProperty.call(semitoneByTonic, tonic)) {
+            return null;
+        }
+        let chromatic = semitoneByTonic[tonic];
+        if (chromatic > 6) {
+            chromatic -= 12;
+        }
+        if (chromatic === 0) {
+            return null;
+        }
+        return { chromatic };
+    }
+    function parseMeter(raw, warnings) {
+        const normalized = String(raw || "").trim();
+        if (normalized === "C") {
+            return { beats: 4, beatType: 4 };
+        }
+        if (normalized === "C|") {
+            return { beats: 2, beatType: 2 };
+        }
+        const m = normalized.match(/^(\d+)\/(\d+)$/);
+        if (!m) {
+            warnings.push("拍子 M: の形式が不正なため 4/4 を使用しました: " + raw);
+            return { beats: 4, beatType: 4 };
+        }
+        return { beats: Number(m[1]), beatType: Number(m[2]) };
+    }
+    function parseFraction(raw, fieldName, warnings) {
+        const parsed = abcCommon.parseFractionText(raw, { num: 1, den: 8 });
+        if (parsed.num === 1 && parsed.den === 8 && !/^\s*\d+\/\d+\s*$/.test(String(raw || ""))) {
+            warnings.push(fieldName + " の形式が不正なため 1/8 を使用しました: " + raw);
+            return parsed;
+        }
+        const m = String(raw || "").match(/^\s*(\d+)\/(\d+)\s*$/);
+        if (!m || !Number(m[1]) || !Number(m[2])) {
+            warnings.push(fieldName + " の値が不正なため 1/8 を使用しました: " + raw);
+            return { num: 1, den: 8 };
+        }
+        return parsed;
+    }
+    function parseKey(raw, warnings) {
+        const key = raw.trim();
+        const fifths = abcCommon.fifthsFromAbcKey(key);
+        if (fifths !== null) {
+            return { fifths };
+        }
+        warnings.push("K: 非対応キーのため C を使用しました: " + key);
+        return { fifths: 0 };
+    }
+    function parseLengthToken(token, lineNo) {
+        return abcCommon.parseAbcLengthToken(token, lineNo);
+    }
+    function parseChordAt(text, startIdx, lineNo) {
+        if (text[startIdx] !== "[") {
+            return null;
+        }
+        const closeIdx = text.indexOf("]", startIdx + 1);
+        if (closeIdx < 0) {
+            return null;
+        }
+        const inner = text.slice(startIdx + 1, closeIdx);
+        const noteRegex = /(\^{1,2}|_{1,2}|=)?([A-Ga-g])([',]*)(\d+\/\d+|\d+|\/\d+|\/)?/g;
+        const notes = [];
+        let match;
+        while ((match = noteRegex.exec(inner)) !== null) {
+            notes.push({
+                accidentalText: match[1] || "",
+                pitchChar: match[2],
+                octaveShift: match[3] || "",
+                lengthToken: match[4] || ""
+            });
+        }
+        if (notes.length === 0) {
+            return null;
+        }
+        const after = text.slice(closeIdx + 1);
+        const lengthMatch = after.match(/^(\d+\/\d+|\d+|\/\d+|\/)/);
+        const lengthToken = lengthMatch ? lengthMatch[1] : "";
+        const nextIdx = closeIdx + 1 + (lengthMatch ? lengthMatch[1].length : 0);
+        return {
+            notes,
+            lengthToken,
+            nextIdx
+        };
+    }
+    function scaleNotesDuration(notes, scale) {
+        if (!Array.isArray(notes) || notes.length === 0 || !scale) {
+            return;
+        }
+        for (const note of notes) {
+            note.duration = Math.max(1, Math.round(note.duration * (scale.num / scale.den)));
+            note.type = typeFromDuration(note.duration, 960);
+        }
+    }
+    function accidentalToAlter(accidental) {
+        if (!accidental) {
+            return null;
+        }
+        if (accidental === "=") {
+            return 0;
+        }
+        if (/^\^+$/.test(accidental)) {
+            return accidental.length;
+        }
+        if (/^_+$/.test(accidental)) {
+            return -accidental.length;
+        }
+        return null;
+    }
+    function buildNoteData(pitchChar, accidental, octaveShift, absoluteLength, duration, lineNo, keySignatureAccidentals, measureAccidentals) {
+        const isRest = /[zZxX]/.test(pitchChar);
+        if (isRest) {
+            return {
+                isRest: true,
+                duration,
+                type: typeFromFraction(absoluteLength)
+            };
+        }
+        const step = pitchChar.toUpperCase();
+        const isLower = /[a-g]/.test(pitchChar);
+        let octave = isLower ? 5 : 4;
+        for (const ch of octaveShift) {
+            if (ch === "'") {
+                octave += 1;
+            }
+            else if (ch === ",") {
+                octave -= 1;
+            }
+        }
+        if (octave < 0 || octave > 9) {
+            throw new Error("line " + lineNo + ": オクターブが範囲外です");
+        }
+        let alter = null;
+        let accidentalText = null;
+        const explicitAlter = accidentalToAlter(accidental);
+        if (explicitAlter !== null) {
+            alter = explicitAlter;
+            if (explicitAlter === 0) {
+                accidentalText = "natural";
+            }
+            else if (explicitAlter > 0) {
+                accidentalText = explicitAlter >= 2 ? "double-sharp" : "sharp";
+            }
+            else {
+                accidentalText = explicitAlter <= -2 ? "flat-flat" : "flat";
+            }
+            measureAccidentals[step] = explicitAlter;
+        }
+        else {
+            let resolvedAlter = 0;
+            if (Object.prototype.hasOwnProperty.call(measureAccidentals, step)) {
+                resolvedAlter = measureAccidentals[step];
+            }
+            else if (Object.prototype.hasOwnProperty.call(keySignatureAccidentals, step)) {
+                resolvedAlter = keySignatureAccidentals[step];
+            }
+            alter = resolvedAlter === 0 ? null : resolvedAlter;
+        }
+        return {
+            isRest: false,
+            step,
+            octave,
+            alter,
+            accidentalText,
+            duration,
+            type: typeFromFraction(absoluteLength)
+        };
+    }
+    function keySignatureAlterByStep(fifths) {
+        const map = {};
+        const sharpOrder = ["F", "C", "G", "D", "A", "E", "B"];
+        const flatOrder = ["B", "E", "A", "D", "G", "C", "F"];
+        const f = Number.isFinite(fifths) ? Math.max(-7, Math.min(7, Math.trunc(fifths))) : 0;
+        if (f > 0) {
+            for (let i = 0; i < f; i += 1) {
+                map[sharpOrder[i]] = 1;
+            }
+        }
+        else if (f < 0) {
+            for (let i = 0; i < Math.abs(f); i += 1) {
+                map[flatOrder[i]] = -1;
+            }
+        }
+        return map;
+    }
+    function typeFromFraction(frac) {
+        const value = frac.num / frac.den;
+        if (value >= 1) {
+            return "whole";
+        }
+        if (value >= 0.5) {
+            return "half";
+        }
+        if (value >= 0.25) {
+            return "quarter";
+        }
+        if (value >= 0.125) {
+            return "eighth";
+        }
+        if (value >= 0.0625) {
+            return "16th";
+        }
+        return "32nd";
+    }
+    function durationInDivisions(wholeFraction, divisionsPerQuarter) {
+        return Math.round((wholeFraction.num / wholeFraction.den) * 4 * divisionsPerQuarter);
+    }
+    function typeFromDuration(duration, divisionsPerQuarter) {
+        const whole = Number(duration) / (4 * divisionsPerQuarter);
+        if (whole >= 1) {
+            return "whole";
+        }
+        if (whole >= 0.5) {
+            return "half";
+        }
+        if (whole >= 0.25) {
+            return "quarter";
+        }
+        if (whole >= 0.125) {
+            return "eighth";
+        }
+        if (whole >= 0.0625) {
+            return "16th";
+        }
+        return "32nd";
+    }
+    function multiplyFractions(a, b) {
+        return abcCommon.multiplyFractions(a, b, { num: 1, den: 1 });
+    }
+    const api = {
+        parseForMusicXml
+    };
+    if (typeof module !== "undefined" && module.exports) {
+        module.exports = api;
+    }
+    global.AbcCompatParser = api;
+    if (typeof window !== "undefined") {
+        window["AbcCompatParser"] = api;
+    }
+})(typeof globalThis !== "undefined" ? globalThis : this);
+  </script>
+
+  <script>
+const abcCommon = window["AbcCommon"] || (typeof AbcCommon !== "undefined" ? AbcCommon : null);
+const musicXmlCommon = window["MusicXmlCommon"] || (typeof MusicXmlCommon !== "undefined" ? MusicXmlCommon : null);
+const musicXmlSynthScheduleCommon = window["MusicXmlSynthScheduleCommon"] || (typeof MusicXmlSynthScheduleCommon !== "undefined" ? MusicXmlSynthScheduleCommon : null);
+const musicSynthCommon = window["MusicSynthCommon"] || (typeof MusicSynthCommon !== "undefined" ? MusicSynthCommon : null);
+const musicXmlWriterCommon = window["MusicXmlWriterCommon"] || (typeof MusicXmlWriterCommon !== "undefined" ? MusicXmlWriterCommon : null);
+const abcCompatParser = window["AbcCompatParser"] || (typeof AbcCompatParser !== "undefined" ? AbcCompatParser : null);
+if (!abcCommon) {
+    throw new Error("AbcCommon is not loaded.");
+}
+if (!musicXmlCommon) {
+    throw new Error("MusicXmlCommon is not loaded.");
+}
+if (!musicXmlSynthScheduleCommon) {
+    throw new Error("MusicXmlSynthScheduleCommon is not loaded.");
+}
+if (!musicSynthCommon) {
+    throw new Error("MusicSynthCommon is not loaded.");
+}
+if (!musicXmlWriterCommon) {
+    throw new Error("MusicXmlWriterCommon is not loaded.");
+}
+if (!abcCompatParser) {
+    throw new Error("AbcCompatParser is not loaded.");
+}
+const abcInput = document.getElementById("abcInput");
+const fileInput = document.getElementById("fileInput");
+const inputModeSourceRadio = document.getElementById("inputModeSource");
+const inputModeFileRadio = document.getElementById("inputModeFile");
+const sourceInputBlock = document.getElementById("sourceInputBlock");
+const fileInputBlock = document.getElementById("fileInputBlock");
+const fileSelectBtn = document.getElementById("fileSelectBtn");
+const fileNameText = document.getElementById("fileNameText");
+const defaultTitleInput = document.getElementById("defaultTitleInput");
+const defaultComposerInput = document.getElementById("defaultComposerInput");
+const inferTransposeFromPartNameCheckbox = document.getElementById("inferTransposeFromPartNameCheckbox");
+const convertBtn = document.getElementById("convertBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const playSineBtn = document.getElementById("playSineBtn");
+const copyBtn = document.getElementById("copyBtn");
+const previewText = document.getElementById("previewText");
+const xmlOutput = document.getElementById("xmlOutput");
+const errorText = document.getElementById("errorText");
+const warningText = document.getElementById("warningText");
+const toast = document.getElementById("toast");
+const menuPanel = document.getElementById("menuPanel");
+const SETTINGS_KEY = "diagram-abc-to-musicxml-settings";
+const MIDI_TICKS_PER_QUARTER = 128;
+let lastXml = "";
+let lastSynthSchedule = null;
+const synthEngine = musicSynthCommon.createBasicWaveSynthEngine({
+    ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+});
+restoreSettings();
+convertBtn.addEventListener("click", convertAbc);
+downloadBtn.addEventListener("click", downloadMusicXml);
+playSineBtn.addEventListener("click", playSine);
+copyBtn.addEventListener("click", copyMusicXml);
+fileInput.addEventListener("change", loadAbcFile);
+if (!(fileSelectBtn && fileSelectBtn.closest("lht-file-select"))) {
+    fileSelectBtn.addEventListener("click", () => fileInput.click());
+}
+inputModeSourceRadio.addEventListener("change", applyInputMode);
+inputModeFileRadio.addEventListener("change", applyInputMode);
+defaultTitleInput.addEventListener("change", persistSettings);
+defaultComposerInput.addEventListener("change", persistSettings);
+inferTransposeFromPartNameCheckbox.addEventListener("change", () => {
+    persistSettings();
+    convertAbc();
+});
+document.addEventListener("click", handleDocumentClick);
+applyInputMode();
+convertAbc();
+function loadAbcFile(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) {
+        updateFileName("");
+        return;
+    }
+    inputModeFileRadio.checked = true;
+    applyInputMode();
+    updateFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = () => {
+        abcInput.value = String(reader.result || "");
+        showToast("ABCを読み込みました。");
+    };
+    reader.onerror = () => {
+        setError("ファイルの読み込みに失敗しました。");
+    };
+    reader.readAsText(file, "utf-8");
+}
+function updateFileName(name) {
+    fileNameText.textContent = name || "未選択";
+}
+function applyInputMode() {
+    const sourceMode = inputModeSourceRadio.checked;
+    sourceInputBlock.classList.toggle("md-hidden", !sourceMode);
+    fileInputBlock.classList.toggle("md-hidden", sourceMode);
+    if (sourceMode) {
+        fileInput.value = "";
+        updateFileName("");
+    }
+}
+function convertAbc() {
+    const source = normalizeSource(abcInput.value);
+    if (!source) {
+        setError("ABCソースを入力してください。");
+        resetOutput();
+        return;
+    }
+    clearError();
+    clearWarning();
+    try {
+        const result = parseAbc(source, {
+            defaultTitle: defaultTitleInput.value.trim() || "Untitled",
+            defaultComposer: defaultComposerInput.value.trim() || "Unknown",
+            inferTransposeFromPartName: !!inferTransposeFromPartNameCheckbox.checked
+        });
+        const xml = musicXmlWriterCommon.buildScorePartwiseXml(result);
+        lastXml = xml;
+        lastSynthSchedule = musicXmlSynthScheduleCommon.buildSynthScheduleFromMusicXml(xml, {
+            ticksPerQuarter: MIDI_TICKS_PER_QUARTER
+        });
+        xmlOutput.textContent = xml;
+        previewText.textContent = [
+            "title: " + result.meta.title,
+            "composer: " + result.meta.composer,
+            "meter: " + result.meta.meterText,
+            "unit length: " + result.meta.unitLengthText,
+            "key: " + result.meta.keyText,
+            "voices: " + result.voiceCount,
+            "measures: " + result.measureCount,
+            "notes/rests: " + result.noteCount
+        ].join("\n");
+        downloadBtn.disabled = false;
+        playSineBtn.disabled = !lastSynthSchedule || lastSynthSchedule.events.length === 0;
+        if (result.warnings.length > 0) {
+            warningText.textContent = "警告:\n" + result.warnings.join("\n");
+            warningText.classList.remove("md-hidden");
+        }
+        showToast("MusicXMLを生成しました。");
+    }
+    catch (error) {
+        resetOutput();
+        const message = error && error.message ? error.message : String(error);
+        const lineNumber = extractLineNumber(message);
+        setError("変換に失敗しました: " + message, lineNumber);
+    }
+}
+function resetOutput() {
+    lastXml = "";
+    lastSynthSchedule = null;
+    synthEngine.stop();
+    xmlOutput.textContent = "";
+    previewText.textContent = "未変換";
+    downloadBtn.disabled = true;
+    playSineBtn.disabled = true;
+}
+function parseAbc(source, settings) {
+    return abcCompatParser.parseForMusicXml(source, settings);
+}
+function normalizeSource(rawText) {
+    if (!rawText) {
+        return "";
+    }
+    const lines = rawText.split("\n");
+    let first = 0;
+    let last = lines.length - 1;
+    while (first <= last && lines[first].trim() === "") {
+        first += 1;
+    }
+    while (last >= first && lines[last].trim() === "") {
+        last -= 1;
+    }
+    if (first > last) {
+        return "";
+    }
+    const firstLine = lines[first].trim();
+    const lastLine = lines[last].trim();
+    const hasCodeFencePair = /^```.*$/.test(firstLine) && /^```\s*$/.test(lastLine);
+    if (hasCodeFencePair) {
+        return lines.slice(first + 1, last).join("\n").trim();
+    }
+    return lines.slice(first, last + 1).join("\n").trim();
+}
+function downloadMusicXml() {
+    if (!lastXml) {
+        setError("先に変換してください。");
+        return;
+    }
+    const blob = new Blob([lastXml], { type: "application/vnd.recordare.musicxml+xml;charset=utf-8" });
+    downloadBlob(blob, "score.musicxml");
+    showToast("MusicXMLを保存しました。");
+}
+function copyMusicXml() {
+    if (!lastXml) {
+        setError("先に変換してください。");
+        return;
+    }
+    navigator.clipboard.writeText(lastXml).then(() => {
+        clearError();
+        showToast("MusicXMLをコピーしました。");
+    }).catch((error) => {
+        setError("コピーに失敗しました: " + (error && error.message ? error.message : String(error)));
+    });
+}
+function playSine() {
+    if (!lastSynthSchedule || lastSynthSchedule.events.length === 0) {
+        setError("先に変換してください。");
+        return;
+    }
+    synthEngine.playSchedule(lastSynthSchedule, "sine").then(() => {
+        clearError();
+        showToast("sine再生を開始しました。");
+    }).catch((error) => {
+        setError("sine再生に失敗しました: " + (error && error.message ? error.message : String(error)));
+    });
+}
+function setError(message, lineNumber) {
+    if (errorText && typeof errorText.show === "function") {
+        errorText.show(message);
+    }
+    else if (errorText) {
+        errorText.textContent = message;
+        errorText.classList.remove("md-hidden");
+    }
+    if (Number.isInteger(lineNumber) && lineNumber > 0) {
+        focusLine(lineNumber);
+    }
+}
+function clearError() {
+    if (errorText && typeof errorText.clear === "function") {
+        errorText.clear();
+    }
+    else if (errorText) {
+        errorText.textContent = "";
+        errorText.classList.add("md-hidden");
+    }
+}
+function clearWarning() {
+    warningText.textContent = "";
+    warningText.classList.add("md-hidden");
+}
+function showToast(message) {
+    if (!toast || typeof toast.show !== "function") {
+        return;
+    }
+    toast.show(message, 1400);
+}
+function toggleMenu() {
+    menuPanel.classList.toggle("md-hidden");
+}
+function handleDocumentClick(event) {
+    const menuButton = event.target.closest(".md-menu-button");
+    if (menuButton) {
+        return;
+    }
+    if (!event.target.closest("#menuPanel")) {
+        menuPanel.classList.add("md-hidden");
+    }
+}
+function extractLineNumber(message) {
+    if (!message) {
+        return null;
+    }
+    const m = message.match(/line\s+(\d+)/i);
+    if (m) {
+        return Number(m[1]);
+    }
+    return null;
+}
+function focusLine(lineNumber) {
+    const text = abcInput.value;
+    if (!text) {
+        return;
+    }
+    let currentLine = 1;
+    let start = 0;
+    while (currentLine < lineNumber && start < text.length) {
+        const nextBreak = text.indexOf("\n", start);
+        if (nextBreak < 0) {
+            start = text.length;
+            break;
+        }
+        start = nextBreak + 1;
+        currentLine += 1;
+    }
+    let end = text.indexOf("\n", start);
+    if (end < 0) {
+        end = text.length;
+    }
+    abcInput.focus();
+    abcInput.setSelectionRange(start, end);
+    const style = window.getComputedStyle(abcInput);
+    const lineHeight = Number.parseFloat(style.lineHeight) || 24;
+    abcInput.scrollTop = Math.max(0, (lineNumber - 2) * lineHeight);
+}
+function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function persistSettings() {
+    const payload = {
+        defaultTitle: defaultTitleInput.value,
+        defaultComposer: defaultComposerInput.value,
+        inferTransposeFromPartName: !!inferTransposeFromPartNameCheckbox.checked
+    };
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(payload));
+}
+function restoreSettings() {
+    inferTransposeFromPartNameCheckbox.checked = true;
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) {
+        return;
+    }
+    try {
+        const data = JSON.parse(raw);
+        if (data && typeof data === "object") {
+            if (typeof data.defaultTitle === "string") {
+                defaultTitleInput.value = data.defaultTitle;
+            }
+            if (typeof data.defaultComposer === "string") {
+                defaultComposerInput.value = data.defaultComposer;
+            }
+            if (typeof data.inferTransposeFromPartName === "boolean") {
+                inferTransposeFromPartNameCheckbox.checked = data.inferTransposeFromPartName;
+            }
+        }
+    }
+    catch (_error) {
+        // ignore broken localStorage
+        inferTransposeFromPartNameCheckbox.checked = true;
+    }
+}
+  </script>
+</body>
+</html>

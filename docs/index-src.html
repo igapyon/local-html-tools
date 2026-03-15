@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>local-html-tools</title>
+  <link rel="stylesheet" href="../lht-cmn/css/components.css">
+  <script src="../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../lht-cmn/js/components.js" defer></script>
+  <style>
+    /* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
+    :root {
+      --md-danger: #b3261e;
+      --md-state-layer: rgba(98, 0, 238, 0.12);
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-focus-ring: rgba(98, 0, 238, 0.35);
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-on-secondary: #00332c;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-on-tertiary: #FFFFFF;
+      --md-sys-color-on-tertiary-container: #3d2e5a;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-secondary: #03dac6;
+      --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
+      --md-sys-color-state-layer: rgba(98, 0, 238, 0.08);
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-tertiary: #7D5260;
+      --md-sys-color-tertiary-container: #f3e8fd;
+      --md-typography-body-medium: 1rem;
+      --md-typography-body-small: 0.875rem;
+      --md-typography-headline-large: 1.85rem;
+      --md-typography-title-medium: 1.1rem;
+      --md-typography-title-small: 1.05rem;
+      --status-later: #ff9800;
+      --status-ok: #4caf50;
+      --status-todo: #00bcd4;
+    }
+
+    /* local-html-tools MD3 Core Spec v1.0.2 (2026-02-08) */
+    .md-page {
+      background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; min-height: 100vh;
+    }
+
+    .md-shell {
+      max-width: 980px; margin: 0 auto;
+    }
+
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 18px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 30px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e9e3f0;
+      padding: 28px;
+    }
+
+    .md-headline {
+      font-size: 1.8rem; font-weight: 700; margin-bottom: 0.75rem;
+    }
+
+    .md-subtitle {
+      color: var(--md-sys-color-on-surface-variant); font-size: 0.95rem;
+    }
+
+    .md-section {
+      margin-top: 28px;
+    }
+
+    .md-section-title {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
+    }
+
+    .md-grid {
+      display: grid; gap: 16px;
+    }
+
+    .md-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+      margin-bottom: 0.35rem;
+    }
+
+    .md-required {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.15rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.54rem;
+      font-weight: 600;
+      background: #ECEAF1;
+      color: #49454F;
+    }
+
+    .md-input, .md-textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .md-textarea {
+      min-height: 6.5rem;
+    }
+
+    .md-input:focus, .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-field-block {
+      margin-bottom: 1rem;
+    }
+
+    .md-button {
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .md-button--primary {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
+    }
+
+    .md-button--primary:hover {
+      background: #4f00c9;
+    }
+
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .md-tooltip-group {
+      position: relative; display: inline-flex; align-items: center;
+    }
+
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: 20rem;
+      max-width: 90vw;
+    }
+
+    .md-tooltip-group:hover .md-tooltip-content {
+      opacity: 1;
+    }
+
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: transparent;
+      color: #4a4458;
+      margin-left: 0.2rem;
+    }
+
+    .md-info-icon {
+      width: 18px; height: 18px;
+    }
+
+    .md-code-block {
+      position: relative; margin-top: 0.5rem;
+    }
+
+    .md-code {
+      display: block;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      white-space: pre;
+      background: var(--md-sys-color-surface-variant);
+      border: 1px solid #e5e0ec;
+      color: #1f1b2d;
+      min-height: 2.5rem;
+    }
+
+    .md-copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      background: #f7f2fa;
+      border: none;
+      cursor: pointer;
+    }
+
+    .md-snackbar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #2b2831;
+      color: #f7f4fb;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      font-size: 0.85rem;
+    }
+
+    .md-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(98, 0, 238, 0.12);
+      color: var(--md-sys-color-primary);
+      margin-left: 6px;
+    }
+
+    .md-section-wrap {
+      display: grid; gap: 1.75rem;
+    }
+
+    .md-section-card {
+      padding: 1.25rem 1.25rem 1.5rem;
+      border-radius: 24px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #ece7f3;
+      box-shadow: 0 2px 10px rgba(41, 35, 58, 0.06);
+    }
+
+    .md-section-subtitle {
+      font-size: var(--md-typography-body-small);
+      color: #6a6675;
+      margin-bottom: 1rem;
+    }
+
+    .md-section-title--spaced {
+      margin-top: 1rem;
+    }
+
+    .md-grid-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .md-card-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    }
+
+    .md-card-title {
+      font-size: var(--md-typography-title-small); font-weight: 600; color: #2f2a35;
+    }
+
+    .md-card-arrow {
+      color: #8f8a98; font-size: 1.2rem;
+    }
+
+    .md-card-desc {
+      margin-top: 0.5rem;
+      font-size: var(--md-typography-body-small);
+      color: #5f5a6b;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .md-info-chip:focus-visible {
+      box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring);
+    }
+
+    .md-tooltip--wide {
+      width: min(32rem, 90vw);
+    }
+
+    .md-tooltip--rich {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .md-menu-button {
+      position: absolute; top: 16px; right: 16px;
+    }
+
+    .md-menu-panel {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 20;
+    }
+
+    .md-menu-link {
+      display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface);
+    }
+
+    .md-menu-link:hover {
+      background: #f2edf8;
+    }
+
+    .md-headline__icon {
+      margin-right: 0.5rem;
+    }
+
+    .md-section-title--lg {
+      font-size: 1.1rem;
+    }
+
+    .md-input, .md-select, .md-textarea {
+      display: block;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+      box-sizing: border-box;
+    }
+
+    .md-input:focus, .md-select:focus, .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-icon-btn:hover {
+      background: #e6e1ee;
+    }
+
+    .md-icon-btn--small {
+      width: 32px; height: 32px; border-radius: 16px;
+    }
+
+    .md-icon-btn--surface {
+      background: #f7f2fa;
+    }
+
+    .md-snackbar.md-visible {
+      opacity: 1; pointer-events: auto;
+    }
+
+    .md-hidden {
+      display: none;
+    }
+
+        .md-sr-only {
+          position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
+        }
+        .md-preview .md-sr-only { display: none !important; }
+
+    .md-stack-sm > * + * {
+      margin-top: 0.75rem;
+    }
+
+    .md-radio-row { display: flex; align-items: flex-start; gap: 0.5rem; }
+    .md-radio {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: #3f3b46;
+    }
+
+    .md-radio input {
+      accent-color: var(--md-sys-color-primary);
+    }
+
+    .md-switch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .md-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #f0ebf7;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: inset 0 0 0 1px #cfc7dc;
+    }
+
+    .md-switch::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: #ffffff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 150ms ease, background 150ms ease;
+    }
+
+    .md-switch-input {
+      position: absolute; opacity: 0; pointer-events: none;
+    }
+
+    .md-switch-input:checked + .md-switch {
+      background: rgba(98, 0, 238, 0.32);
+      box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.6);
+    }
+
+    .md-switch-input:checked + .md-switch::after {
+      transform: translateX(20px);
+      background: #ffffff;
+    }
+
+    .md-tab-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border-bottom: 1px solid #e6e1ee;
+      margin-bottom: 1rem;
+    }
+
+    .md-tab-button {
+      border: 1px solid #e6e1ee;
+      border-bottom: none;
+      background: #f3f1f7;
+      padding: 0.4rem 0.9rem;
+      margin-bottom: -1px;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #3f3b46;
+    }
+
+    .md-tab-button[aria-selected="true"] {
+      background: #ffffff;
+      border-color: #c8c5d0;
+      color: #1c1b1f;
+    }
+
+    .md-tab-panel {
+      border: 1px solid #e6e1ee;
+      border-top: none;
+      padding: 1rem;
+      background: #ffffff;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .md-label--row {
+      margin-bottom: 0.5rem;
+    }
+
+    .md-input, .md-select {
+      display: block;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+      box-sizing: border-box;
+    }
+
+    .md-input:focus, .md-select:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-form-grid {
+      display: grid; gap: 0.75rem;
+    }
+
+    .md-button--tonal {
+      background: #f0edf5;
+      color: #3f3b46;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .md-button--tonal:hover {
+      background: #e6e1ee;
+    }
+
+    .md-chip-row {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;
+    }
+
+    .md-tooltip--narrow {
+      width: 18rem;
+    }
+
+    .md-surface-card {
+      max-width: 48rem; margin: 0 auto; padding: 24px; position: relative;
+    }
+
+    .md-choice {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.25rem 0;
+    }
+
+    .md-input {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      font-size: 1rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .md-input:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-button:hover {
+      box-shadow: 0 4px 10px rgba(98, 0, 238, 0.35);
+    }
+
+    .md-button:active {
+      opacity: 0.7;
+    }
+
+    .md-button--surface {
+      background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); border: 1px solid var(--md-sys-color-outline);
+    }
+
+    .md-button--secondary {
+      background: var(--md-sys-color-secondary); color: var(--md-sys-color-on-secondary); margin-bottom: 10px;
+    }
+
+    .md-button-row {
+      display: flex; gap: 15px; height: clamp(120px, 20vh, 220px); margin-bottom: 10px;
+    }
+
+    .md-button--hero {
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
+    }
+
+    .md-field {
+      position: relative; min-width: 200px;
+    }
+
+    .md-field__label {
+      position: absolute;
+      top: -9px;
+      left: 12px;
+      padding: 0 6px;
+      background: var(--md-sys-color-surface);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+      letter-spacing: 0.02em;
+    }
+
+    .md-field .md-select {
+      appearance: none;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.8rem 2.2rem 0.8rem 0.9rem;
+      font-size: 0.9rem;
+      color: var(--md-sys-color-on-surface);
+      min-width: 200px;
+      line-height: 1.2;
+      background-image: linear-gradient(45deg, transparent 50%, #6c6775 50%), linear-gradient(135deg, #6c6775 50%, transparent 50%);
+      background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+
+    .md-field .md-select:focus {
+      outline: none; border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-stack-md > * + * {
+      margin-top: 0.75rem;
+    }
+
+    .md-grid-2 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .md-form-row {
+      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+    }
+
+    .md-form-row--nowrap {
+      flex-wrap: nowrap;
+    }
+
+    .md-label--muted {
+      color: #3f3b46;
+    }
+
+    .md-label--block {
+      margin-bottom: 0.5rem;
+    }
+
+    .md-snackbar-host {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      padding: 0.5rem 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+
+    .md-snackbar-host.md-visible {
+      opacity: 1; pointer-events: auto;
+    }
+
+    .md-button:disabled {
+      background: #e6e1ee;
+      color: #9a94a7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-input-block {
+      margin-bottom: 1rem;
+    }
+
+    .md-section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .md-output-wrap {
+      position: relative;
+    }
+
+    .md-output {
+      background: var(--md-sys-color-surface-variant);
+    }
+
+    .md-stack-lg > * + * {
+      margin-top: 1.5rem;
+    }
+
+    .md-form-row--start {
+      align-items: flex-start;
+    }
+
+    .md-input:disabled, .md-select:disabled {
+      background: #f3f0f7;
+    }
+
+    .md-choice-card {
+      border: 1px solid #e2dcec;
+      border-radius: 16px;
+      padding: 1rem;
+      background: #ffffff;
+    }
+
+    .md-choice-card--muted {
+      background: #f7f3fb;
+    }
+
+    .md-choice-row {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+
+    .md-choice-row input {
+      margin: 0;
+    }
+
+    .md-choice-sub {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #6a6675;
+    }
+
+    .md-choice-sub small {
+      font-size: 0.75rem; color: #7b7784;
+    }
+
+    .md-chip--primary {
+      background: #e2d9f7;
+      color: #4a1e9e;
+    }
+
+    .md-chip--warn {
+      background: #f7ece1;
+      color: #8a4b0f;
+    }
+
+    .md-field-stack {
+      display: flex; flex-direction: column; align-items: stretch; gap: 0.5rem;
+    }
+
+    .md-label--full {
+      width: 100%;
+    }
+
+    .md-switch-row {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; color: var(--md-sys-color-on-surface); font-size: 0.95rem;
+    }
+
+    .md-input-wrap {
+      position: relative;
+      flex: 1 1 16rem;
+      min-width: 12rem;
+    }
+
+    .md-input-wrap .md-input {
+      padding-right: 3rem;
+    }
+
+    .md-input-action {
+      position: absolute;
+      top: 50%;
+      right: -0.5rem;
+      transform: translateY(-50%);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .md-field-stack .md-input, .md-field-stack .md-select {
+      flex: 0 0 auto;
+    }
+
+    .md-field--dropdown {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23635b75' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem 1rem;
+      padding-right: 2.25rem;
+    }
+
+    .md-select--inline {
+      flex: 1 1 18rem; min-width: 14rem;
+    }
+
+    .md-input.md-disabled, .md-select.md-disabled {
+      background: #f3f0f7;
+    }
+
+    .md-choice-inline {
+      display: flex; flex-wrap: wrap; gap: 1.25rem; row-gap: 0.5rem;
+    }
+
+    .md-choice-text {
+      font-size: 0.9rem; color: #4a4458;
+    }
+
+
+
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: "Roboto", "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif; font-size: var(--md-typography-body-medium); line-height: 1.5; }
+
+    .md-page { background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); }
+    .md-container { max-width: 72rem; margin: 0 auto; padding: 1.5rem 1rem 2.5rem; }
+
+    .md-app-bar { margin-bottom: 1.75rem; }
+    .md-app-bar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      border-radius: 20px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #ede7f3;
+      box-shadow: 0 6px 20px rgba(41, 35, 58, 0.08);
+    }
+    .md-app-heading {
+      display: grid;
+      gap: 0.35rem;
+    }
+    .md-app-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: var(--md-typography-headline-large);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .md-app-supporting {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: #5f5b67;
+      font-size: 0.98rem;
+      line-height: 1.45;
+    }
+    .md-app-meta { font-size: 0.95rem; color: #6a6675; }
+    .md-icon-inline { margin-right: 0.5rem; }
+    .md-section-wrap { display: grid; gap: 1.75rem; }
+
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      border: 1px solid #ece7f3;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .md-info-card {
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.75rem;
+      background: var(--md-sys-color-tertiary-container);
+      border-color: rgba(61, 46, 90, 0.08);
+      color: var(--md-sys-color-on-tertiary-container);
+    }
+    .md-info-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+    .md-section-card {
+      padding: 1.25rem 1.25rem 1.5rem;
+      border-radius: 24px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #ece7f3;
+      box-shadow: 0 2px 10px rgba(41, 35, 58, 0.06);
+    }
+    .md-section-title {
+      font-size: var(--md-typography-title-medium);
+      font-weight: 600;
+      color: #3f3b46;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .md-section-subtitle {
+      font-size: var(--md-typography-body-small);
+      color: #6a6675;
+      margin-bottom: 1rem;
+    }
+    .md-section-title--spaced { margin-top: 1rem; }
+
+    .md-grid { display: grid; gap: 1rem; }
+    .md-grid-3 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    @media (min-width: 640px) {
+      .md-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1024px) {
+      .md-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    .md-section { margin-bottom: 0; }
+    .md-divider { border: none; border-top: 1px solid #e2dcec; margin: 2.5rem 0 1.5rem; }
+
+    .md-footer { text-align: center; font-size: 0.875rem; color: #6a6675; padding-bottom: 1.5rem; }
+    .md-footer-links { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem; }
+    .md-footer-link { display: inline-flex; align-items: center; gap: 0.5rem; color: #4a3d6b; text-decoration: none; font-weight: 600; }
+    a { text-decoration: none; color: inherit; }
+    .md-footer-link:hover { color: #2f2347; }
+    .md-footer-sep { color: #c8c2d0; }
+    .md-footer-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.15rem 0.6rem;
+      border-radius: 9999px;
+      background: #f4eef8;
+      border: 1px solid #e0d8ea;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #4a3d6b;
+    }
+    .md-footer-icon { width: 1rem; height: 1rem; }
+
+    .md-link-card {
+      position: relative;
+      display: block;
+      padding: 1rem;
+      border-radius: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #ece7f3;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 150ms ease, border-color 150ms ease, background 150ms ease;
+      overflow: hidden;
+      outline: none;
+    }
+    .md-link-card:hover {
+      box-shadow: 0 6px 16px rgba(35, 29, 49, 0.12);
+      border-color: #d7cfee;
+    }
+    .md-link-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--md-sys-color-state-layer);
+      opacity: 0;
+      transition: opacity 150ms ease;
+    }
+    .md-link-card:hover::after { opacity: 1; }
+    .md-link-card:focus-visible {
+      border-color: rgba(98, 0, 238, 0.55);
+      box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring), 0 6px 16px rgba(35, 29, 49, 0.12);
+    }
+    .md-link-card:focus-visible::after { opacity: 1; }
+    .md-link-card:active::after { opacity: 0.18; }
+    .md-link-card > * { position: relative; z-index: 1; }
+
+    .md-card-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .md-card-title { font-size: var(--md-typography-title-small); font-weight: 600; color: #2f2a35; }
+    .md-card-arrow { color: #8f8a98; font-size: 1.2rem; }
+    .md-link-card:hover .md-card-arrow { color: #6d6483; }
+
+    .md-card-desc {
+      margin-top: 0.5rem;
+      font-size: var(--md-typography-body-small);
+      color: #5f5a6b;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .md-link-card:hover,
+      .md-link-card:focus-visible {
+        overflow: visible;
+        z-index: 2;
+      }
+      .md-link-card:hover .md-card-desc,
+      .md-link-card:focus-visible .md-card-desc {
+        display: block;
+        -webkit-line-clamp: unset;
+        line-clamp: unset;
+        -webkit-box-orient: initial;
+        overflow: visible;
+      }
+    }
+
+    .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: #f0edf5;
+      color: #4a4458;
+      font-size: 0.75rem;
+      font-weight: 600;
+      outline: none;
+      border: none;
+      cursor: help;
+      padding: 0;
+    }
+    .md-info-chip:focus-visible {
+      box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring);
+    }
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: min(32rem, 90vw);
+    }
+    .md-tooltip-group:hover .md-tooltip-content { opacity: 1; }
+    .md-tooltip--wide { width: min(32rem, 90vw); }
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.5;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    .md-tooltip--rich { border: 1px solid rgba(255, 255, 255, 0.08); }
+  </style>
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-github" viewBox="0 0 16 16">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+      </symbol>
+      <symbol id="md-icon-globe" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M3 12h18"/>
+        <path d="M12 3a14 14 0 0 1 0 18"/>
+        <path d="M12 3a14 14 0 0 0 0 18"/>
+      </symbol>
+    </defs>
+  </svg>
+  <div class="md-container">
+    <header class="md-app-bar">
+      <div class="md-app-bar-inner">
+        <div class="md-app-heading">
+          <div class="md-app-title">
+            <span aria-hidden="true" class="md-icon-inline">🗂️</span>
+            <span>local-html-tools</span>
+          </div>
+          <div class="md-app-supporting">
+            <span>ウェブブラウザで動くローカルHTMLツール集（Single-file Web App）です。</span>
+            <lht-help-tooltip label="このツール集について" wide>
+              各ツール（HTMLファイル）をウェブブラウザで開くと、専用の入力画面が表示されます。必要な情報を入力するだけで、用途に応じたテキストやコマンドを生成できます。<br><br>
+              主な特徴:<br>
+              ・ローカル動作（サーバ不要）<br>
+              ・単一HTML配布（必要な資産を内包）<br>
+              ・入力から生成までを短手順で実行
+            </lht-help-tooltip>
+          </div>
+        </div>
+        <div class="md-app-meta">更新日: {{BUILD_DATE}}</div>
+      </div>
+    </header>
+
+    <div class="md-section-wrap">
+
+
+
+
+
+      <section class="md-section-card">
+      <h2 class="md-section-title">
+        <span aria-hidden="true" class="md-icon-inline">🧰</span>Git
+      </h3>
+      <p class="md-section-subtitle">Git操作の補助ツール</p>
+      <div class="md-grid md-grid-3 md-section">
+        <lht-index-card-link href="git/git-work-list.html" icon="🗂️" title="Git 作業一覧" desc="複数リポジトリの作業状況を一覧管理します。URL、基準ブランチ、作業ブランチ、ローカル/リモートの扱いを保存し、比較や squash への導線もまとめて扱えます。"></lht-index-card-link>
+        <lht-index-card-link href="git/git-pseudo-squash.html" icon="🧩" title="Git pseudo-squash" desc="reset --soft と再コミットで履歴を整え、内容を1コミットにまとめるコマンドを生成します。運用の流れ（作成 → まとめ → 必要なら push）が先に可視化され、段階ごとに必要なコマンドが並ぶのがこのツールの価値です。"></lht-index-card-link>
+        <lht-index-card-link href="git/git-branch-diff.html" icon="🧰" title="Git ブランチ比較" desc="2つのブランチ差分を表示する `git diff` コマンドを生成します。ローカル/リモートを選べ、表示形式（内容/統計/ファイル一覧）や `..` / `...` を切り替えできます。"></lht-index-card-link>
+        <lht-index-card-link href="git/git-config-setup.html" icon="⚙️" title="Git ユーザー設定" desc="グローバル設定でGitユーザー名とメールアドレスを設定するためのコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="git/git-config-advanced-setup.html" icon="🔧" title="Git 詳細設定" desc="core.autocrlf や push.default などのGit詳細設定をグローバル設定するコマンドを生成します。"></lht-index-card-link>
+      </div>
+      </section>
+
+      <section class="md-section-card">
+      <h2 class="md-section-title">
+        <span aria-hidden="true" class="md-icon-inline">📄</span>テキスト
+      </h3>
+      <p class="md-section-subtitle">テキスト表示/加工</p>
+      <div class="md-grid md-grid-3 md-section">
+        <lht-index-card-link href="prompt/prompt-gen.html" icon="📝" title="プロンプト作成支援" desc="生成AIに引き渡す定型プロンプトの作成を支援します。PR 文面、Release 文面、レビュー依頼、引継ぎ、作業確認など、繰り返し使う依頼文を素早く揃えられます。"></lht-index-card-link>
+        <lht-index-card-link href="text/text-processing.html" icon="🧩" title="テキスト加工" desc="テキストを即時に変換・整形するためのツールです。入力内容に対して選択した変換オプションが順番に適用され、結果が出力欄に反映されます。文字の変換・行の変換・空白の変換を組み合わせて使えます。"></lht-index-card-link>
+        <lht-index-card-link href="password/password-gen.html" icon="🛡️" title="パスワードジェネレーター" desc="選択した文字種と文字数でパスワードを生成します。英大文字または英小文字は必須で、生成結果は英字から始まります。目視で認識しづらい文字は除外した設計になっています。"></lht-index-card-link>
+        <lht-index-card-link href="text/text-viewer.html" icon="📄" title="テキスト表示" desc="テキストをペーストして、読みやすく表示します。マークダウン形式にも対応しています。"></lht-index-card-link>
+        <lht-index-card-link href="text/file-rename-cmdline-gen.html" icon="🏷️" title="ファイル名連番リネーム" desc="ファイル名リストから連番にリネームするコマンドを生成します。bashまたはPowerShellで実行できるコマンドを出力します。"></lht-index-card-link>
+        <lht-index-card-link href="text/japanese-romaji-guide.html" icon="🔤" title="日本語ローマ字メモ" desc="旅券ローマ字を中心に、ヘボン式・訓令式・日本式（理論寄り）を比較しながら、かなをローマ字に変換します。"></lht-index-card-link>
+      </div>
+      </section>
+
+      <section class="md-section-card">
+      <h2 class="md-section-title">
+        <span aria-hidden="true" class="md-icon-inline">🎼</span>Music
+      </h3>
+      <p class="md-section-subtitle">楽譜データの変換</p>
+      <div class="md-grid md-grid-3 md-section">
+        <lht-index-card-link href="music/musicxml-to-svg.html" icon="🎼" title="MusicXML → SVG 変換" desc="MusicXMLから楽譜SVGを生成し、SVGとして保存できます。"></lht-index-card-link>
+        <lht-index-card-link href="music/musicxml-to-midi.html" icon="🥁" title="MusicXML → MIDI 変換" desc="MusicXMLからMIDIを生成し、.midとして保存できます。"></lht-index-card-link>
+        <lht-index-card-link href="music/midi-to-musicxml.html" icon="🎹" title="MIDI → MusicXML 変換" desc="MIDIからMusicXMLを生成し、MusicXMLとして保存できます。"></lht-index-card-link>
+        <lht-index-card-link href="music/musicxml-to-abc.html" icon="🎶" title="MusicXML → ABC 変換" desc="MusicXMLからABC記法を生成し、ABCとして保存できます。"></lht-index-card-link>
+        <lht-index-card-link href="music/abc-to-musicxml.html" icon="🎵" title="ABC → MusicXML 変換" desc="ABC記法をMusicXMLへ変換し、MusicXMLとして保存できます。"></lht-index-card-link>
+      </div>
+      </section>
+
+      <section class="md-section-card">
+      <h2 class="md-section-title">
+        <span aria-hidden="true" class="md-icon-inline">🔍</span>検索
+      </h3>
+      <p class="md-section-subtitle">ローカル検索コマンド生成</p>
+      <div class="md-grid md-grid-3 md-section">
+        <lht-index-card-link href="grep/find-gen.html" icon="🔎" title="find 検索" desc="findでファイル/ディレクトリを検索するコマンドを生成します。条件（名前/拡張子/サイズ/更新日時/内容検索）を組み合わせて作れます。"></lht-index-card-link>
+      </div>
+      </section>
+
+
+
+
+
+
+
+      <section class="md-section-card">
+      <h2 class="md-section-title md-section-title--spaced">
+        <span aria-hidden="true" class="md-icon-inline">🎬</span>メディア処理（FFmpeg）
+      </h2>
+      <p class="md-section-subtitle">FFmpeg向けコマンド生成</p>
+      <div class="md-grid md-grid-3 md-section">
+        <lht-index-card-link href="ffmpeg/ffmpeg-concat-cmdline-gen.html" icon="🧩" title="FFmpeg ファイル結合" desc="複数の.wavファイルを1つに結合するコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-loudnorm-cmdline-gen.html" icon="🔊" title="FFmpeg 音量正規化 (Loudnorm)" desc=".wavファイルの音量をラウドネス基準に合わせて正規化します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-trim-cmdline-gen.html" icon="✂️" title="FFmpeg 切り出し (Trim)" desc="音声/動画ファイルの一部を時間指定で切り出すコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-audio-convert-cmdline-gen.html" icon="🎧" title="FFmpeg 音声変換" desc="音声ファイルを指定の形式に変換するコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-youtube-mkv-gen.html" icon="📺" title="YouTube向け動画生成" desc="一枚の画像と音声ファイルから、YouTube投稿用の動画ファイル(.mkv)を生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-mp4-to-wav-gen.html" icon="🎵" title="MP4からWAV抽出" desc="mp4ファイルから音声をWAVとして取り出すコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-replace-audio-with-wav-gen.html" icon="🔁" title="MP4音声差し替え（WAV）" desc="動画の映像はそのままに、WAV音声へ差し替えるコマンドを生成します。"></lht-index-card-link>
+        <lht-index-card-link href="ffmpeg/ffmpeg-silence-detect-gen.html" icon="🔇" title="無音区間検出" desc="silencedetect で無音区間を検出するコマンドを生成します。"></lht-index-card-link>
+      </div>
+      </section>
+
+
+
+
+
+
+
+      <section class="md-section-card">
+      <h2 class="md-section-title">
+        <span aria-hidden="true" class="md-icon-inline">🌐</span>Web/URL
+      </h3>
+      <p class="md-section-subtitle">URL処理のユーティリティ</p>
+      <div class="md-grid md-grid-3 md-section">
+        <lht-index-card-link href="link/amazon-dp-extract.html" icon="🛒" title="Amazon dp 抽出" desc="Amazon URL から dp/ASIN を取り出します。"></lht-index-card-link>
+        <lht-index-card-link href="link/facebook-fbclid-remove.html" icon="🔗" title="Facebook識別子（fbclid）除去" desc="URL から Facebook識別子（fbclid）を除去します。"></lht-index-card-link>
+        <lht-index-card-link href="link/url-encode-decode.html" icon="🔤" title="URL エンコード/デコード" desc="URLのエンコードとデコードを行います。"></lht-index-card-link>
+        <lht-index-card-link href="link/mime-base64.html" icon="📦" title="MIME Base64" desc="MIME Base64のエンコード/デコードを行います。"></lht-index-card-link>
+        <lht-index-card-link href="link/utm-remove.html" icon="🧹" title="UTM除去" desc="URL から utm_* パラメータを削除します。"></lht-index-card-link>
+      </div>
+      </section>
+
+
+
+
+
+
+
+      <section class="md-section-card">
+      <h2 class="md-section-title">
+        <span aria-hidden="true" class="md-icon-inline">📊</span>Diagram
+      </h3>
+      <p class="md-section-subtitle">図表の作成・変換</p>
+      <div class="md-grid md-grid-3 md-section">
+        <lht-index-card-link href="diagram/mermaid-to-svg.html" icon="🧭" title="Mermaid → SVG 変換" desc="Mermaid記法からSVGを生成し、SVGとして保存できます。"></lht-index-card-link>
+        <lht-index-card-link href="diagram/graphviz-dot-to-svg.html" icon="🕸️" title="Graphviz DOT → SVG 変換" desc="Graphviz DOT記法からSVGを生成し、SVGとして保存できます。"></lht-index-card-link>
+      </div>
+      </section>
+
+
+      <section class="md-section-card">
+      <h2 class="md-section-title">
+        <span aria-hidden="true" class="md-icon-inline">🖼️</span>画像/SVG
+      </h3>
+      <div class="md-grid md-grid-3 md-section">
+        <lht-index-card-link href="img/img2svg.html" icon="🧩" title="画像 → SVG 変換" desc="画像ファイルをSVGに変換します。これは困難なことを実現するツールです。アイコン・ロゴのようなものはよく再現できますが、イラスト・写真などは技術的な理由から再現度が高くないことをあらかじめご承知ください。"></lht-index-card-link>
+      </div>
+      </section>
+
+
+
+
+
+
+
+
+      <section class="md-section-card">
+      <h2 class="md-section-title">
+        <span aria-hidden="true" class="md-icon-inline">📚</span>知識タイムライン
+      </h3>
+      <p class="md-section-subtitle">知識を時系列で俯瞰するツール</p>
+      <div class="md-grid md-grid-3 md-section">
+        <lht-index-card-link href="knowledge-timeline/composers.html" icon="🎼" title="クラシック作曲家タイムライン" desc="作曲家の生没年・主要作品・時代背景を同一時間軸で確認できます。"></lht-index-card-link>
+      </div>
+      </section>
+
+
+
+
+
+
+      <section class="md-section-card">
+      <h2 class="md-section-title md-section-title--spaced">
+        <span aria-hidden="true" class="md-icon-inline">🧳</span>日々の生活
+      </h2>
+      <p class="md-section-subtitle">生活系の小ツール</p>
+      <div class="md-grid md-grid-3 md-section">
+        <lht-index-card-link href="life/japan-weather.html" icon="🌤️" title="Japan Weather" desc="地域と府県を選んで天気予報を表示します（オンライン取得）。"></lht-index-card-link>
+        <lht-index-card-link href="life/forgot-items-check.html" icon="✅" title="忘れ物チェック" desc="持ち物を順番に確認して、忘れ物を防ぎます。"></lht-index-card-link>
+      </div>
+      </section>
+
+    </div>
+
+    <hr class="md-divider">
+    <footer class="md-footer">
+      <div class="md-footer-links">
+        <a href="https://github.com/igapyon/local-html-tools" class="md-footer-link" target="_blank" rel="noopener noreferrer">
+          <svg aria-hidden="true" viewBox="0 0 16 16" class="md-footer-icon" fill="currentColor">
+            <use href="#md-icon-github" xlink:href="#md-icon-github"></use>
+          </svg>
+          <span>GitHub</span>
+        </a>
+        <span class="md-footer-sep">|</span>
+        <a href="https://github.com/igapyon/local-html-tools/blob/main/THIRD_PARTY_NOTICES.md" class="md-footer-link" target="_blank" rel="noopener noreferrer">
+          <span class="md-footer-badge">Third-Party Notices</span>
+        </a>
+        <span class="md-footer-sep">|</span>
+        <a href="https://igapyon.github.io/local-html-tools/" class="md-footer-link" target="_blank" rel="noopener noreferrer">
+          <svg aria-hidden="true" viewBox="0 0 24 24" class="md-footer-icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <use href="#md-icon-globe" xlink:href="#md-icon-globe"></use>
+          </svg>
+          <span>GitHub Pages</span>
+        </a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

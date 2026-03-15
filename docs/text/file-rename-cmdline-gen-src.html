@@ -1,0 +1,1116 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ファイル名連番リネームコマンドジェネレータ</title>
+  <link rel="stylesheet" href="../../lht-cmn/css/components.css">
+  <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+  <style>
+    /* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
+    :root {
+      --md-danger: #b3261e;
+      --md-state-layer: rgba(98, 0, 238, 0.12);
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-focus-ring: rgba(98, 0, 238, 0.35);
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-on-secondary: #00332c;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-typography-body-small: 0.875rem;
+    }
+
+    .md-page {
+      background: var(--md-sys-color-background);
+      color: var(--md-sys-color-on-surface);
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .md-surface-card {
+      max-width: 48rem;
+      margin: 0 auto;
+      padding: 24px;
+      position: relative;
+    }
+
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid #ece7f3;
+    }
+
+    .md-headline {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      padding-right: 2.5rem;
+    }
+
+    .md-section { margin-bottom: 1rem; }
+
+    .md-section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .md-flow-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .md-step-icon {
+      width: 3rem;
+      height: 3rem;
+      flex-shrink: 0;
+    }
+
+    .md-flow-divider {
+      margin: 1rem 0 0.75rem;
+    }
+
+    .md-flow-strip {
+      width: 100%;
+      height: 52px;
+      display: block;
+    }
+
+    .md-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.18rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .md-required {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.15rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.54rem;
+      font-weight: 600;
+      background: #eceaf1;
+      color: #49454f;
+    }
+
+    .md-input,
+    .md-select,
+    .md-textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+      box-sizing: border-box;
+    }
+
+    .md-textarea {
+      min-height: 11rem;
+      resize: vertical;
+    }
+
+    .md-input:focus,
+    .md-select:focus,
+    .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+
+    .md-form-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .md-form-row--nowrap {
+      flex-wrap: nowrap;
+    }
+
+    .md-form-row--nowrap > .md-label {
+      flex: 0 0 13rem;
+      min-width: 13rem;
+    }
+
+    .md-form-row--compact > .md-label {
+      flex: 0 0 11.5rem;
+      min-width: 11.5rem;
+    }
+
+    .md-label--tight {
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      gap: 0.12rem;
+    }
+
+    .md-row-input {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .md-step1-fields .md-form-row + .md-form-row {
+      margin-top: 0.5rem;
+    }
+
+    .md-inline-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      align-items: flex-start;
+      margin-top: 0.75rem;
+    }
+
+    .md-inline-field {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 0.4rem;
+      white-space: nowrap;
+      width: 100%;
+    }
+
+    .md-inline-field .md-label {
+      margin: 0;
+      flex: 0 0 10.5rem;
+      min-width: 10.5rem;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    .md-input--prefix { width: 14rem; }
+    .md-input--short { width: 6rem; }
+    .md-input--count { width: 7rem; }
+    .md-input--output {
+      background: #f4f1f7;
+      color: #5b5663;
+      border-style: dashed;
+      cursor: default;
+    }
+
+    .md-code-block {
+      position: relative;
+      margin-top: 1rem;
+    }
+
+    .md-code {
+      display: block;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 1rem;
+      line-height: 1.5;
+      background: var(--md-sys-color-surface-variant);
+      border: 1px solid #e5e0ec;
+      color: #1f1b2d;
+      min-height: 2.5rem;
+    }
+
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .md-button {
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .md-button--surface {
+      background: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface);
+      border: 1px solid var(--md-sys-color-outline);
+    }
+
+    .md-button--compact {
+      padding: 0.38rem 0.75rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .md-button--with-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .md-inline-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .md-icon-btn:hover {
+      background: #e6e1ee;
+    }
+
+    .md-copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      background: #f7f2fa;
+      border: none;
+      cursor: pointer;
+    }
+
+    .md-tooltip-group {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: 20rem;
+      max-width: 90vw;
+    }
+
+    .md-tooltip-group:hover .md-tooltip-content {
+      opacity: 1;
+    }
+
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.35;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: transparent;
+      color: #4a4458;
+      margin-left: 0.2rem;
+    }
+
+    .md-info-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .md-switch-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .md-switch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .md-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #f0ebf7;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: inset 0 0 0 1px #cfc7dc;
+    }
+
+    .md-switch::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: #ffffff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 150ms ease;
+    }
+
+    .md-switch-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .md-switch-input:checked + .md-switch {
+      background: rgba(98, 0, 238, 0.32);
+      box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.6);
+    }
+
+    .md-switch-input:checked + .md-switch::after {
+      transform: translateX(20px);
+    }
+
+    .md-menu-button {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+
+    .md-menu-panel {
+      position: absolute;
+      top: 48px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 20;
+    }
+
+    .md-menu-link {
+      display: block;
+      padding: 8px 16px;
+      color: var(--md-sys-color-on-surface);
+      text-decoration: none;
+    }
+
+    .md-menu-link:hover {
+      background: #f2edf8;
+    }
+
+    .md-hidden {
+      display: none;
+    }
+
+    .md-error {
+      margin-top: 0.5rem;
+      color: var(--md-danger);
+      font-size: var(--md-typography-body-small);
+    }
+
+    .md-preview {
+      overflow-x: auto;
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      background: #fff;
+      margin-top: 0.5rem;
+    }
+
+    .md-preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .md-preview-table th,
+    .md-preview-table td {
+      padding: 0.5rem 0.6rem;
+      border-bottom: 1px solid #ede7f5;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .md-preview-table tbody tr:nth-child(even) {
+      background: #faf8fd;
+    }
+
+    .md-preview-empty {
+      padding: 0.75rem;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.9rem;
+    }
+
+    .md-snackbar-host {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+
+    .md-snackbar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #2b2831;
+      color: #f7f4fb;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      font-size: 0.85rem;
+    }
+
+    .md-snackbar-host.md-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .md-flow-divider {
+      display: flex;
+      justify-content: center;
+      padding: 0.5rem 0;
+    }
+
+    .md-flow-strip {
+      width: 100%;
+      max-width: 36rem;
+      height: 2.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .md-form-row--nowrap { flex-wrap: wrap; }
+      .md-form-row--nowrap > .md-label {
+        flex-basis: auto;
+        min-width: auto;
+      }
+      .md-form-row--compact > .md-label {
+        flex-basis: auto;
+        min-width: auto;
+      }
+      .md-inline-field .md-label {
+        flex-basis: auto;
+        min-width: auto;
+      }
+      .md-input--prefix,
+      .md-input--short,
+      .md-input--count {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-trash" viewBox="0 0 24 24">
+        <path d="M4 7h16"/>
+        <path d="M10 11v6"/>
+        <path d="M14 11v6"/>
+        <path d="M6 7l1 12h10l1-12"/>
+        <path d="M9 7V5h6v2"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <main class="md-surface-card md-card">
+    <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+
+    <h1 class="md-headline">
+      <span aria-hidden="true">🏷️</span>
+      <span>ファイル名連番リネームコマンドジェネレータ</span>
+      <span class="md-tooltip-group">
+        <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+        <span class="md-tooltip-content md-tooltip">ファイル名リストから連番にリネームするコマンドを生成します。bashまたはPowerShellで実行できるコマンドを出力します。</span>
+      </span>
+    </h1>
+
+    <div class="md-switch-row">
+      <lht-switch-help
+        switch-id="shellEnvPowerShell"
+        label="PowerShell環境"
+        help-label="PowerShell環境の説明"
+      >Windows PowerShell用のコマンドを出力するかどうかを切り替えます。スイッチがオフの場合はmacOS/Linuxのbash/zsh向けのコマンドを出力します。ご利用の環境に従って切り替えてください。</lht-switch-help>
+      <span class="md-inline-action">
+        <button type="button" class="md-button md-button--surface md-button--compact md-button--with-icon" onclick="clearUiPreferences()" title="設定をクリア" aria-label="設定をクリア">
+          <svg viewBox="0 0 24 24" class="md-info-icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <use href="#md-icon-trash" xlink:href="#md-icon-trash"></use>
+          </svg>
+          <span>設定をクリア</span>
+        </button>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg>
+          </span>
+          <span class="md-tooltip-content md-tooltip">ローカルに保存されているこのツールの設定をクリアします。</span>
+        </span>
+      </span>
+    </div>
+
+    <section class="md-section">
+      <div class="md-flow-row">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <rect x="14" y="17" width="36" height="30" rx="6" fill="#DBEAFE" />
+          <path d="M20 25h24M20 31h24M20 37h16" stroke="#4F46E5" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="50" cy="47" r="7" fill="#A7F3D0" />
+        </svg>
+        <p class="md-section-title">ファイル一覧取得コマンド</p>
+      </div>
+
+      <div class="md-step1-fields">
+        <div class="md-form-row md-form-row--nowrap md-form-row--compact">
+          <label class="md-label md-label--tight" for="extensionFilter">
+            <span>拡張子</span>
+            <span class="md-required" aria-hidden="true">Required</span>
+            <span class="md-tooltip-group">
+              <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+              <span class="md-tooltip-content md-tooltip">対象とする拡張子。*.png形式でもpngだけでもOKです。</span>
+            </span>
+            <span>：</span>
+          </label>
+          <input id="extensionFilter" list="extensionSuggestions" class="md-input md-row-input" placeholder="png" value="png" />
+          <datalist id="extensionSuggestions">
+            <option value="png"></option>
+            <option value="jpg"></option>
+            <option value="jpeg"></option>
+            <option value="gif"></option>
+            <option value="webp"></option>
+            <option value="svg"></option>
+            <option value="txt"></option>
+            <option value="csv"></option>
+            <option value="md"></option>
+            <option value="json"></option>
+            <option value="html"></option>
+            <option value="docx"></option>
+            <option value="xlsx"></option>
+            <option value="pdf"></option>
+            <option value="mp3"></option>
+            <option value="wav"></option>
+            <option value="mp4"></option>
+            <option value="mkv"></option>
+          </datalist>
+        </div>
+        <div class="md-form-row md-form-row--nowrap md-form-row--compact">
+          <label class="md-label md-label--tight" for="filenamePattern">
+            <span>名前パターン</span>
+            <span class="md-tooltip-group">
+              <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+              <span class="md-tooltip-content md-tooltip">ファイル名の一部で絞り込み（ワイルドカード使用可）。空欄の場合は拡張子のみでフィルタリングします。</span>
+            </span>
+            <span>：</span>
+          </label>
+          <input id="filenamePattern" list="filenamePatternSuggestions" class="md-input md-row-input" placeholder="スクリーンショット*" value="スクリーンショット*" />
+          <datalist id="filenamePatternSuggestions">
+            <option value="スクリーンショット"></option>
+            <option value="スクリーンショット*"></option>
+            <option value="IMG_*"></option>
+            <option value="DSC_*"></option>
+            <option value="report-*"></option>
+            <option value="sample-*"></option>
+            <option value="test-*"></option>
+            <option value="draft-*"></option>
+            <option value="backup-*"></option>
+            <option value="export-*"></option>
+            <option value="*"></option>
+          </datalist>
+        </div>
+      </div>
+
+      <lht-command-block command-id="listCmd"></lht-command-block>
+    </section>
+
+    <div class="md-flow-divider" aria-hidden="true">
+      <svg viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
+        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
+        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
+        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
+      </svg>
+    </div>
+
+    <section class="md-section">
+      <div class="md-flow-row">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <rect x="12" y="14" width="40" height="36" rx="6" fill="#F5F3FF" />
+          <path d="M18 22h28M18 30h22M18 38h26" stroke="#7C3AED" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="50" cy="18" r="5" fill="#93C5FD"/>
+        </svg>
+        <p class="md-section-title">実行結果貼り付け + リネームルール</p>
+      </div>
+
+      <div class="md-form-row md-form-row--nowrap">
+        <label class="md-label md-label--tight" for="fileListInput">
+          <span>ファイル名リスト</span>
+          <span class="md-required" aria-hidden="true">Required</span>
+          <span class="md-tooltip-group">
+            <span class="md-info-chip"><svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none"><circle cx="12" cy="12" r="9" fill="#cbbcf0"/><rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/><circle cx="12" cy="7.5" r="1" fill="#ffffff"/></svg></span>
+            <span class="md-tooltip-content md-tooltip">PowerShellやbashの出力結果をそのまま貼り付けられます。空行やヘッダー行は自動的にスキップします。</span>
+          </span>
+          <span>：</span>
+        </label>
+        <textarea id="fileListInput" class="md-textarea md-row-input" rows="10" placeholder="スクリーンショット-2024-01-15-123456.png&#10;スクリーンショット-2024-01-15-123457.png"></textarea>
+      </div>
+
+      <div class="md-inline-fields">
+        <div class="md-inline-field">
+          <label class="md-label" for="prefixInput"><span>プレフィックス</span><span class="md-required" aria-hidden="true">Required</span><span>：</span></label>
+          <input id="prefixInput" class="md-input md-input--prefix" placeholder="MyImage_" value="MyImage_" />
+        </div>
+        <div class="md-inline-field">
+          <label class="md-label" for="startNoInput"><span>開始番号</span><span class="md-required" aria-hidden="true">Required</span><span>：</span></label>
+          <input id="startNoInput" class="md-input md-input--short" type="number" min="1" value="1" />
+        </div>
+        <div class="md-inline-field">
+          <label class="md-label" for="digitsInput"><span>桁数</span><span class="md-required" aria-hidden="true">Required</span><span>：</span></label>
+          <select id="digitsInput" class="md-select md-input--short">
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+        <div class="md-inline-field">
+          <label class="md-label" for="fileCount"><span>対象件数（出力）</span><span>：</span></label>
+          <input id="fileCount" class="md-input md-input--count md-input--output" value="0" readonly aria-readonly="true" />
+        </div>
+      </div>
+      <p id="inputError" class="md-error"></p>
+    </section>
+
+    <div class="md-flow-divider" aria-hidden="true">
+      <svg viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+        <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
+        <rect x="96" y="18" width="110" height="28" rx="8" fill="#E8DDF7" />
+        <rect x="214" y="18" width="70" height="28" rx="8" fill="#D9F5F0" />
+        <rect x="292" y="18" width="110" height="28" rx="8" fill="#FCE7F3" />
+      </svg>
+    </div>
+
+    <section class="md-section">
+      <div class="md-flow-row">
+        <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
+          <path d="M18 24h14M18 32h14M18 40h14" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"/>
+          <path d="M34 32h12" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+          <path d="M42 26l8 6-8 6" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="md-section-title">結果表示: リネームコマンド</p>
+      </div>
+
+      <lht-command-block command-id="renameCmd"></lht-command-block>
+
+    </section>
+  </main>
+
+  <div id="toast" class="md-snackbar-host md-hidden">
+    <div class="md-snackbar">コピーしました</div>
+  </div>
+
+  <script>
+    const UI_SHELL_ENV_POWERSHELL_STORAGE_KEY = "fileRenameCmdlineGen.ui.shellEnvPowerShell";
+    const UI_EXTENSION_FILTER_STORAGE_KEY = "fileRenameCmdlineGen.ui.extensionFilter";
+    const UI_FILENAME_PATTERN_STORAGE_KEY = "fileRenameCmdlineGen.ui.filenamePattern";
+    const UI_PREFIX_STORAGE_KEY = "fileRenameCmdlineGen.ui.prefix";
+    const UI_START_NO_STORAGE_KEY = "fileRenameCmdlineGen.ui.startNo";
+    const UI_DIGITS_STORAGE_KEY = "fileRenameCmdlineGen.ui.digits";
+
+    function getStoredString(key) {
+      try {
+        const value = localStorage.getItem(key);
+        return value == null ? null : value;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function getStoredBoolean(key) {
+      const raw = getStoredString(key);
+      if (raw === "true") return true;
+      if (raw === "false") return false;
+      return null;
+    }
+
+    function setStoredValue(key, value) {
+      try {
+        localStorage.setItem(key, String(value));
+      } catch (error) {
+        // localStorage が使えない環境でも動作継続
+      }
+    }
+    function getShellEnv() {
+      return document.getElementById("shellEnvPowerShell")?.checked ? "powershell" : "posix";
+    }
+
+    function normalizeExtension(raw) {
+      let value = (raw || "").trim();
+      if (!value) return "";
+      value = value.replace(/^\*\./, "");
+      value = value.replace(/^\./, "");
+      value = value.replace(/^\*/, "");
+      value = value.replace(/\s+/g, "");
+      return value;
+    }
+
+    function buildNamePattern(namePattern, ext) {
+      const pattern = (namePattern || "").trim();
+      if (!pattern) {
+        return `*.${ext}`;
+      }
+      const extSuffix = `.${ext}`.toLowerCase();
+      if (pattern.toLowerCase().endsWith(extSuffix)) {
+        return pattern;
+      }
+      return `${pattern}.${ext}`;
+    }
+
+    function quoteLiteral(value, shellEnv) {
+      if (shellEnv === "powershell") {
+        return `'${String(value).replace(/'/g, "''")}'`;
+      }
+      return `'${String(value).replace(/'/g, `'\\''`)}'`;
+    }
+
+    function generateListCommand(options = {}) {
+      const silent = options && options.silent === true;
+      const output = document.getElementById("listCmd");
+      const extRaw = document.getElementById("extensionFilter")?.value;
+      const patternRaw = document.getElementById("filenamePattern")?.value;
+      const ext = normalizeExtension(extRaw);
+      const shellEnv = getShellEnv();
+
+      if (!ext) {
+        if (!silent) {
+          document.getElementById("inputError").textContent = "拡張子フィルターを入力してください。";
+        }
+        output.textContent = "";
+        return "";
+      }
+
+      const namePattern = buildNamePattern(patternRaw, ext);
+      if (shellEnv === "powershell") {
+        output.textContent = `Get-ChildItem -File -Filter ${quoteLiteral(namePattern, shellEnv)} | Select-Object -ExpandProperty Name`;
+      } else {
+        output.textContent = `find . -maxdepth 1 -type f -name ${quoteLiteral(namePattern, shellEnv)} -print`;
+      }
+      return namePattern;
+    }
+
+    function normalizeListedFilename(value) {
+      return String(value)
+        .replace(/^\.\//, "")
+        .replace(/^\.\\/, "");
+    }
+
+    function parseFileList(text) {
+      const lines = String(text || "").split(/\r?\n/);
+      const skipHeaders = new Set(["name", "filename", "file name"]);
+      const files = [];
+      lines.forEach((line) => {
+        const trimmed = normalizeListedFilename(line.trim());
+        if (!trimmed) return;
+        const lower = trimmed.toLowerCase();
+        if (skipHeaders.has(lower)) return;
+        files.push(trimmed);
+      });
+      return files;
+    }
+
+    function getFileExtension(filename) {
+      const lastDot = filename.lastIndexOf(".");
+      if (lastDot <= 0 || lastDot === filename.length - 1) {
+        return "";
+      }
+      return filename.slice(lastDot);
+    }
+
+    function buildRenamePlan(files, prefix, startNo, digits) {
+      const plan = [];
+      files.forEach((oldName, index) => {
+        const nextNo = startNo + index;
+        const seq = String(nextNo).padStart(digits, "0");
+        const ext = getFileExtension(oldName);
+        const newName = `${prefix}${seq}${ext}`;
+        plan.push({ oldName, newName });
+      });
+      return plan;
+    }
+
+    function generateRenameCommands(plan, shellEnv) {
+      return plan.map((item) => {
+        if (shellEnv === "powershell") {
+          return `Rename-Item ${quoteLiteral(item.oldName, shellEnv)} ${quoteLiteral(item.newName, shellEnv)}`;
+        }
+        return `mv ${quoteLiteral(item.oldName, shellEnv)} ${quoteLiteral(item.newName, shellEnv)}`;
+      }).join("\n");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function regenerateAll() {
+      const shellEnv = getShellEnv();
+      const err = document.getElementById("inputError");
+      const renameCmd = document.getElementById("renameCmd");
+      const fileCount = document.getElementById("fileCount");
+      err.textContent = "";
+
+      generateListCommand({ silent: true });
+
+      const fileListRaw = document.getElementById("fileListInput")?.value || "";
+      const prefix = (document.getElementById("prefixInput")?.value || "").trim();
+      const startNo = Number(document.getElementById("startNoInput")?.value || "0");
+      const digits = Number(document.getElementById("digitsInput")?.value || "3");
+      const files = parseFileList(fileListRaw);
+      fileCount.value = String(files.length);
+
+      if (!normalizeExtension(document.getElementById("extensionFilter")?.value || "")) {
+        err.textContent = "拡張子フィルターを入力してください。";
+      }
+
+      if (!files.length || !prefix || !Number.isInteger(startNo) || startNo < 1) {
+        renameCmd.textContent = "";
+        if (!files.length) {
+          err.textContent = err.textContent || "";
+        } else if (!prefix) {
+          err.textContent = err.textContent || "プレフィックスを入力してください。";
+        } else {
+          err.textContent = err.textContent || "開始番号は1以上の整数で入力してください。";
+        }
+        return;
+      }
+
+      if (files.length > 9999) {
+        renameCmd.textContent = "";
+        err.textContent = "最大9999件まで対応です。入力件数を減らしてください。";
+        return;
+      }
+
+      const plan = buildRenamePlan(files, prefix, startNo, digits);
+      renameCmd.textContent = generateRenameCommands(plan, shellEnv);
+    }
+    function showToast(message) {
+      const host = document.getElementById("toast");
+      if (!host) return;
+      host.querySelector(".md-snackbar").textContent = message;
+      host.classList.remove("md-hidden");
+      host.classList.add("md-visible");
+      setTimeout(() => {
+        host.classList.remove("md-visible");
+        host.classList.add("md-hidden");
+      }, 1800);
+    }
+
+    function setupAutoUpdate() {
+      const ids = [
+        "shellEnvPowerShell",
+        "extensionFilter",
+        "filenamePattern",
+        "fileListInput",
+        "prefixInput",
+        "startNoInput",
+        "digitsInput"
+      ];
+      ids.forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener("input", regenerateAll);
+        element.addEventListener("change", regenerateAll);
+      });
+    }
+
+    function loadPersistedInputs() {
+      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
+      const extensionFilter = document.getElementById("extensionFilter");
+      const filenamePattern = document.getElementById("filenamePattern");
+      const prefixInput = document.getElementById("prefixInput");
+      const startNoInput = document.getElementById("startNoInput");
+      const digitsInput = document.getElementById("digitsInput");
+
+      const shellEnvValue = getStoredBoolean(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY);
+      const extensionValue = getStoredString(UI_EXTENSION_FILTER_STORAGE_KEY);
+      const filenamePatternValue = getStoredString(UI_FILENAME_PATTERN_STORAGE_KEY);
+      const prefixValue = getStoredString(UI_PREFIX_STORAGE_KEY);
+      const startNoValue = getStoredString(UI_START_NO_STORAGE_KEY);
+      const digitsValue = getStoredString(UI_DIGITS_STORAGE_KEY);
+
+      if (shellEnvPowerShell && shellEnvValue !== null) {
+        shellEnvPowerShell.checked = shellEnvValue;
+      }
+      if (extensionFilter && extensionValue !== null) {
+        extensionFilter.value = extensionValue;
+      }
+      if (filenamePattern && filenamePatternValue !== null) {
+        filenamePattern.value = filenamePatternValue;
+      }
+      if (prefixInput && prefixValue !== null) {
+        prefixInput.value = prefixValue;
+      }
+      if (startNoInput && startNoValue !== null) {
+        const parsed = Number(startNoValue);
+        if (Number.isInteger(parsed) && parsed >= 1) {
+          startNoInput.value = String(parsed);
+        }
+      }
+      if (digitsInput && digitsValue && digitsInput.querySelector(`option[value="${digitsValue}"]`)) {
+        digitsInput.value = digitsValue;
+      }
+    }
+
+    function savePersistedInputs() {
+      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
+      const extensionFilter = document.getElementById("extensionFilter");
+      const filenamePattern = document.getElementById("filenamePattern");
+      const prefixInput = document.getElementById("prefixInput");
+      const startNoInput = document.getElementById("startNoInput");
+      const digitsInput = document.getElementById("digitsInput");
+
+      if (shellEnvPowerShell) {
+        setStoredValue(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY, shellEnvPowerShell.checked);
+      }
+      if (extensionFilter) {
+        setStoredValue(UI_EXTENSION_FILTER_STORAGE_KEY, extensionFilter.value);
+      }
+      if (filenamePattern) {
+        setStoredValue(UI_FILENAME_PATTERN_STORAGE_KEY, filenamePattern.value);
+      }
+      if (prefixInput) {
+        setStoredValue(UI_PREFIX_STORAGE_KEY, prefixInput.value);
+      }
+      if (startNoInput) {
+        setStoredValue(UI_START_NO_STORAGE_KEY, startNoInput.value);
+      }
+      if (digitsInput) {
+        setStoredValue(UI_DIGITS_STORAGE_KEY, digitsInput.value);
+      }
+    }
+
+    function setupInputPersistence() {
+      const ids = [
+        "shellEnvPowerShell",
+        "extensionFilter",
+        "filenamePattern",
+        "prefixInput",
+        "startNoInput",
+        "digitsInput"
+      ];
+      ids.forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener("input", savePersistedInputs);
+        element.addEventListener("change", savePersistedInputs);
+      });
+    }
+
+    function clearUiPreferences() {
+      const confirmed = confirm("ローカルに保存されているこのツールの設定をクリアします。よろしいですか？");
+      if (!confirmed) return;
+
+      try {
+        localStorage.removeItem(UI_SHELL_ENV_POWERSHELL_STORAGE_KEY);
+        localStorage.removeItem(UI_EXTENSION_FILTER_STORAGE_KEY);
+        localStorage.removeItem(UI_FILENAME_PATTERN_STORAGE_KEY);
+        localStorage.removeItem(UI_PREFIX_STORAGE_KEY);
+        localStorage.removeItem(UI_START_NO_STORAGE_KEY);
+        localStorage.removeItem(UI_DIGITS_STORAGE_KEY);
+      } catch (error) {
+        showToast("設定のクリアに失敗しました");
+        return;
+      }
+
+      const shellEnvPowerShell = document.getElementById("shellEnvPowerShell");
+      const extensionFilter = document.getElementById("extensionFilter");
+      const filenamePattern = document.getElementById("filenamePattern");
+      const prefixInput = document.getElementById("prefixInput");
+      const startNoInput = document.getElementById("startNoInput");
+      const digitsInput = document.getElementById("digitsInput");
+
+      if (shellEnvPowerShell) shellEnvPowerShell.checked = false;
+      if (extensionFilter) extensionFilter.value = "png";
+      if (filenamePattern) filenamePattern.value = "スクリーンショット*";
+      if (prefixInput) prefixInput.value = "MyImage_";
+      if (startNoInput) startNoInput.value = "1";
+      if (digitsInput) digitsInput.value = "3";
+
+      regenerateAll();
+      showToast("設定をクリアしました");
+    }
+
+    loadPersistedInputs();
+    setupAutoUpdate();
+    setupInputPersistence();
+    regenerateAll();
+  </script>
+</body>
+</html>

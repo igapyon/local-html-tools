@@ -2,6 +2,26 @@
 
 このフォルダにはローカルで動作するHTMLのパスワードジェネレーターを配置します。
 
+## 開発ファイル構成
+
+- 配布物（生成物）: `docs/password/password-gen.html`
+- 編集元:
+  - `docs/password/password-gen-src.html`
+  - `docs/password/src/password-gen/css/app.css`
+  - `docs/password/src/password-gen/js/main.js`
+
+`password-gen.html` は直接編集せず、編集元を更新してビルドで反映します。
+
+## ビルド
+
+- `npm run build:password`
+
+## 関連README
+
+- [ルートREADME](../../README.md)
+- [MD3リファレンス](../../md3/README.md)
+- [GitツールREADME](../git/README.md)
+
 ## 文字セット（固定）
 - 数字: 0 1 2 3 4 5 6 7 8 9
 - 英大文字: A D E F H M N R T Y

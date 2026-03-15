@@ -1,0 +1,2200 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>クラシック作曲家タイムライン</title>
+  
+  <style>
+    :root {
+      color-scheme: light;
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-tertiary-container: #f3e8fd;
+    }
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+      background: var(--md-sys-color-background);
+      color: var(--md-sys-color-on-surface);
+    }
+    main {
+      padding: 16px;
+      max-width: 1260px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .page-head {
+      position: relative;
+      margin: 0 0 12px;
+      padding-right: 48px;
+    }
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      margin: 0;
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+    }
+    .md-hidden {
+      display: none !important;
+    }
+    .md-menu-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 20px;
+      background: #f0edf5;
+      color: #4a4458;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+      z-index: 20;
+    }
+    .md-menu-panel {
+      position: absolute;
+      top: 46px;
+      right: 0;
+      min-width: 160px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #ddd5ea;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      z-index: 25;
+    }
+    .md-menu-link {
+      display: block;
+      padding: 0.7rem 0.9rem;
+      border-radius: 8px;
+      color: #342f3e;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .md-menu-link:hover {
+      background: #f6f1fb;
+    }
+    .md-tooltip-group {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: transparent;
+      color: #4a4458;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: help;
+      user-select: none;
+    }
+    .md-info-icon {
+      width: 18px;
+      height: 18px;
+    }
+    .md-info-chip:hover,
+    .md-info-chip:focus-visible {
+      background: rgba(98, 0, 238, 0.12);
+      outline: none;
+    }
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      width: 20rem;
+      max-width: 90vw;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #2b2831;
+      color: #f7f4fb;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 150ms ease, visibility 150ms ease;
+      z-index: 30;
+    }
+    .md-tooltip-group:hover .md-tooltip-content,
+    .md-tooltip-group:focus-within .md-tooltip-content {
+      opacity: 1;
+      visibility: visible;
+    }
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 10px;
+      flex-wrap: wrap;
+    }
+    .controls button {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #0f172a;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .controls button.active {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a;
+    }
+    .controls button:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+    .frame {
+      position: relative;
+      background: #fff;
+      border: 1px solid #d9dce3;
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .scroll-pane {
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    #chart {
+      display: block;
+      min-width: 1700px;
+      height: auto;
+    }
+    .clickable {
+      cursor: pointer !important;
+    }
+    .clickable:hover {
+      filter: brightness(0.92);
+    }
+    .lifespan-band,
+    .active-band,
+    .composer-name {
+      cursor: pointer !important;
+    }
+    .error-box {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border: 1px solid #fca5a5;
+      background: #fff1f2;
+      color: #9f1239;
+      border-radius: 8px;
+      font-size: 12px;
+      display: none;
+      white-space: pre-wrap;
+    }
+    .composer-dialog {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: min(460px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.18);
+      z-index: 40;
+      display: none;
+      padding: 12px;
+    }
+    .composer-dialog.visible {
+      display: block;
+    }
+    .composer-dialog h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.3;
+      color: #0f172a;
+    }
+    .composer-dialog .meta {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #334155;
+    }
+    .composer-dialog .section-title {
+      margin-top: 12px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .composer-dialog ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .composer-dialog li {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #111827;
+      margin: 2px 0;
+    }
+    .composer-dialog .work-yt-link {
+      margin-left: 8px;
+      color: #1d4ed8;
+      text-decoration: underline;
+      font-size: 12px;
+    }
+    .composer-dialog .dialog-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .composer-dialog .close {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #0f172a;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .composer-dialog .yt-link {
+      margin-top: 8px;
+      display: inline-block;
+      font-size: 13px;
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 7h16" />
+        <path d="M4 12h16" />
+        <path d="M4 17h16" />
+      </symbol>
+    </defs>
+  </svg>
+
+  <main>
+    <div class="page-head">
+      <button type="button" class="md-menu-button" aria-label="メニュー" onclick="toggleMenu(event)">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <use href="#md-icon-menu" xlink:href="#md-icon-menu"></use>
+        </svg>
+      </button>
+      <div id="menuPanel" class="md-menu-panel md-hidden">
+        <a href="../index.html" class="md-menu-link">トップへ戻る</a>
+      </div>
+      <h1>
+        <span>クラシック作曲家タイムライン（生年-没年）</span>
+        <span class="md-tooltip-group">
+          <span class="md-info-chip" tabindex="0" aria-label="このタイムラインの説明">
+            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
+              <circle cx="12" cy="12" r="9" fill="#cbbcf0"></circle>
+              <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"></rect>
+              <circle cx="12" cy="7.5" r="1" fill="#ffffff"></circle>
+            </svg>
+          </span>
+          <span class="md-tooltip-content md-tooltip">作曲家の生没年と主な活動時期、代表作、社会・舞曲・楽器の背景を同一時間軸で確認できます。</span>
+        </span>
+      </h1>
+    </div>
+    <div class="controls" aria-label="スケール切替">
+      <button type="button" id="scaleFull" class="active">全期間</button>
+      <button type="button" id="scale100">100年フォーカス</button>
+      <button type="button" id="clearFocus">フォーカス解除</button>
+    </div>
+    <div class="frame" id="frame">
+      <div class="scroll-pane" id="scrollPane">
+        <svg id="chart" xmlns="http://www.w3.org/2000/svg" width="1700" height="1500" viewBox="0 0 1700 1500" role="img" aria-label="作曲家ごとの生年と没年のタイムライン"></svg>
+      </div>
+      <div class="error-box" id="errorBox"></div>
+    </div>
+    <section id="composerDialog" class="composer-dialog" aria-live="polite" aria-label="Composer details">
+      <div class="dialog-head">
+        <h2 id="dialogName"></h2>
+        <button type="button" id="closeDialog" class="close">Close</button>
+      </div>
+      <div class="meta" id="dialogMeta"></div>
+      <a id="dialogYoutube" class="yt-link" href="#" target="_blank" rel="noopener noreferrer">YouTube</a>
+      <div class="section-title">Major Works</div>
+      <ul id="dialogFeatured"></ul>
+      <div class="section-title">Other Works</div>
+      <ul id="dialogOther"></ul>
+    </section>
+  </main>
+
+  
+  
+  
+  <script>
+(function () {
+  window.KT_DATA = window.KT_DATA || {};
+  const composers = [
+        {
+          name: "C. Monteverdi",
+          birth: 1567,
+          death: 1643,
+          works: [
+            { title: "L'Orfeo", number: "SV 318", year: 1607, kind: "opera" },
+            { title: "Vespro della Beata Vergine", number: "SV 206", year: 1610, kind: "choral" }
+          ]
+        },
+        {
+          name: "H. Schutz",
+          birth: 1585,
+          death: 1672,
+          works: [
+            { title: "Psalmen Davids", number: "SWV 22-47", year: 1619, kind: "choral" },
+            { title: "Musikalische Exequien", number: "SWV 279-281", year: 1636, kind: "choral" }
+          ]
+        },
+        {
+          name: "J.-B. Lully",
+          birth: 1632,
+          death: 1687,
+          works: [
+            { title: "Atys", number: "1676", year: 1676, kind: "opera" },
+            { title: "Te Deum", number: "LWV 55", year: 1677, kind: "choral" }
+          ]
+        },
+        {
+          name: "A. Corelli",
+          birth: 1653,
+          death: 1713,
+          works: [
+            { title: "12 Concerti Grossi", number: "Op.6", year: 1714, kind: "concerto" },
+            { title: "Violin Sonatas", number: "Op.5", year: 1700, kind: "violin" }
+          ]
+        },
+        {
+          name: "J. Pachelbel",
+          birth: 1653,
+          death: 1706,
+          works: [
+            { title: "Canon and Gigue in D major", number: "P.37", year: 1680, kind: "orchestral" },
+            { title: "Hexachordum Apollinis", number: "1699", year: 1699, kind: "keyboard" }
+          ]
+        },
+        {
+          name: "H. Purcell",
+          birth: 1659,
+          death: 1695,
+          works: [
+            { title: "Dido and Aeneas", number: "Z.626", year: 1689, kind: "opera" },
+            { title: "Music for the Funeral of Queen Mary", number: "Z.860", year: 1695, kind: "choral" }
+          ]
+        },
+        {
+          name: "D. Buxtehude",
+          birth: 1637,
+          death: 1707,
+          works: [
+            { title: "Membra Jesu nostri", number: "BuxWV 75", year: 1680, kind: "choral" },
+            { title: "Passacaglia in D minor", number: "BuxWV 161", year: 1690, kind: "keyboard" }
+          ]
+        },
+        {
+          name: "A. Vivaldi",
+          birth: 1678,
+          death: 1741,
+          works: [
+            { title: "The Four Seasons", number: "Op.8", year: 1725, kind: "concerto" },
+            { title: "Gloria", number: "RV 589", year: 1715, kind: "choral" }
+          ]
+        },
+        {
+          name: "D. Scarlatti",
+          birth: 1685,
+          death: 1757,
+          works: [
+            { title: "Keyboard Sonatas", number: "K.1-555", year: 1738, kind: "keyboard" },
+            { title: "Stabat Mater", number: "1739", year: 1739, kind: "choral" }
+          ]
+        },
+        {
+          name: "G.P. Telemann",
+          birth: 1681,
+          death: 1767,
+          works: [
+            { title: "Tafelmusik", number: "TWV 20", year: 1733, kind: "orchestral" },
+            { title: "Paris Quartets", number: "TWV 43", year: 1730, kind: "quartet" }
+          ]
+        },
+        {
+          name: "J.S. Bach",
+          birth: 1685,
+          death: 1750,
+          works: [
+            { title: "Brandenburg Concertos", number: "BWV 1046-1051", year: 1721, kind: "concerto" },
+            { title: "Mass in B minor", number: "BWV 232", year: 1749, kind: "choral" }
+          ]
+        },
+        {
+          name: "G.F. Handel",
+          birth: 1685,
+          death: 1759,
+          works: [
+            { title: "Water Music", number: "HWV 348-350", year: 1717, kind: "orchestral" },
+            { title: "Messiah", number: "HWV 56", year: 1741, kind: "choral" }
+          ]
+        },
+        {
+          name: "F. Couperin",
+          birth: 1668,
+          death: 1733,
+          works: [
+            { title: "Pieces de clavecin", number: "1713", year: 1713, kind: "keyboard" },
+            { title: "Lecons de tenebres", number: "1714", year: 1714, kind: "choral" }
+          ]
+        },
+        {
+          name: "J.-P. Rameau",
+          birth: 1683,
+          death: 1764,
+          works: [
+            { title: "Hippolyte et Aricie", number: "1733", year: 1733, kind: "opera" },
+            { title: "Dardanus", number: "1739", year: 1739, kind: "opera" }
+          ]
+        },
+        {
+          name: "C.P.E. Bach",
+          birth: 1714,
+          death: 1788,
+          works: [
+            { title: "Magnificat", number: "Wq 215", year: 1749, kind: "choral" },
+            { title: "Symphony in E minor", number: "Wq 178", year: 1756, kind: "symphony" }
+          ]
+        },
+        {
+          name: "L. Mozart",
+          birth: 1719,
+          death: 1787,
+          works: [
+            { title: "Toy Symphony", number: "1759", year: 1759, kind: "symphony" },
+            { title: "Trumpet Concerto in D", number: "1762", year: 1762, kind: "concerto" }
+          ]
+        },
+        {
+          name: "C.W. Gluck",
+          birth: 1714,
+          death: 1787,
+          works: [
+            { title: "Orfeo ed Euridice", number: "1762", year: 1762, kind: "opera" },
+            { title: "Alceste", number: "1767", year: 1767, kind: "opera" }
+          ]
+        },
+        {
+          name: "J. Haydn",
+          birth: 1732,
+          death: 1809,
+          active: { start: 1760, end: 1808 },
+          works: [
+            { title: "Symphony No.94", number: "Hob.I:94", year: 1791, kind: "symphony" },
+            { title: "The Creation", number: "Hob.XXI:2", year: 1798, kind: "choral" }
+          ]
+        },
+        {
+          name: "J.C. Bach",
+          birth: 1735,
+          death: 1782,
+          works: [
+            { title: "Symphony in G minor", number: "Op.6 No.6", year: 1766, kind: "symphony" },
+            { title: "Amadis de Gaule", number: "1779", year: 1779, kind: "opera" }
+          ]
+        },
+        {
+          name: "L. Boccherini",
+          birth: 1743,
+          death: 1805,
+          works: [
+            { title: "String Quintet in E major", number: "G.275", year: 1771, kind: "chamber" },
+            { title: "Cello Concerto in B-flat major", number: "G.482", year: 1772, kind: "concerto" }
+          ]
+        },
+        {
+          name: "A. Salieri",
+          birth: 1750,
+          death: 1825,
+          works: [
+            { title: "Les Danaides", number: "1784", year: 1784, kind: "opera" },
+            { title: "Falstaff", number: "1799", year: 1799, kind: "opera" }
+          ]
+        },
+        {
+          name: "M. Clementi",
+          birth: 1752,
+          death: 1832,
+          works: [
+            { title: "Sonatina in C major", number: "Op.36 No.1", year: 1797, kind: "piano" },
+            { title: "Gradus ad Parnassum", number: "Op.44", year: 1817, kind: "piano" }
+          ]
+        },
+        {
+          name: "W.A. Mozart",
+          birth: 1756,
+          death: 1791,
+          works: [
+            { title: "Symphony No.40", number: "K.550", year: 1788, kind: "symphony" },
+            { title: "The Magic Flute", number: "K.620", year: 1791, kind: "opera" }
+          ]
+        },
+        {
+          name: "L. van Beethoven",
+          birth: 1770,
+          death: 1827,
+          works: [
+            { title: "Symphony No.5", number: "Op.67", year: 1808, kind: "symphony" },
+            { title: "Symphony No.9", number: "Op.125", year: 1824, kind: "symphony" }
+          ]
+        },
+        {
+          name: "L. Cherubini",
+          birth: 1760,
+          death: 1842,
+          works: [
+            { title: "Medee", number: "1797", year: 1797, kind: "opera" },
+            { title: "Requiem in C minor", number: "1816", year: 1816, kind: "choral" }
+          ]
+        },
+        {
+          name: "J.N. Hummel",
+          birth: 1778,
+          death: 1837,
+          works: [
+            { title: "Piano Concerto No.2", number: "Op.85", year: 1821, kind: "concerto" },
+            { title: "Trumpet Concerto in E-flat", number: "S.49", year: 1803, kind: "concerto" }
+          ]
+        },
+        {
+          name: "N. Paganini",
+          birth: 1782,
+          death: 1840,
+          works: [
+            { title: "24 Caprices", number: "Op.1", year: 1817, kind: "violin" },
+            { title: "Violin Concerto No.1", number: "Op.6", year: 1819, kind: "concerto" }
+          ]
+        },
+        {
+          name: "C.M. von Weber",
+          birth: 1786,
+          death: 1826,
+          works: [
+            { title: "Der Freischutz", number: "J.277", year: 1821, kind: "opera" },
+            { title: "Invitation to the Dance", number: "Op.65", year: 1819, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "G. Rossini",
+          birth: 1792,
+          death: 1868,
+          works: [
+            { title: "Il barbiere di Siviglia", number: "1816", year: 1816, kind: "opera" },
+            { title: "Guillaume Tell", number: "1829", year: 1829, kind: "opera" }
+          ]
+        },
+        {
+          name: "V. Bellini",
+          birth: 1801,
+          death: 1835,
+          works: [
+            { title: "Norma", number: "1831", year: 1831, kind: "opera" },
+            { title: "La sonnambula", number: "1831", year: 1831, kind: "opera" }
+          ]
+        },
+        {
+          name: "G. Donizetti",
+          birth: 1797,
+          death: 1848,
+          works: [
+            { title: "Lucia di Lammermoor", number: "1835", year: 1835, kind: "opera" },
+            { title: "L'elisir d'amore", number: "1832", year: 1832, kind: "opera" }
+          ]
+        },
+        {
+          name: "F. Schubert",
+          birth: 1797,
+          death: 1828,
+          works: [
+            { title: "Symphony No.8", number: "D.759", year: 1822, kind: "symphony" },
+            { title: "Winterreise", number: "D.911", year: 1827, kind: "song" }
+          ]
+        },
+        {
+          name: "F. Chopin",
+          birth: 1810,
+          death: 1849,
+          works: [
+            { title: "Nocturne", number: "Op.9 No.2", year: 1832, kind: "piano" },
+            { title: "Ballade No.1", number: "Op.23", year: 1835, kind: "piano" }
+          ]
+        },
+        {
+          name: "R. Schumann",
+          birth: 1810,
+          death: 1856,
+          works: [
+            { title: "Carnaval", number: "Op.9", year: 1835, kind: "piano" },
+            { title: "Symphony No.3 Rhenish", number: "Op.97", year: 1850, kind: "symphony" }
+          ]
+        },
+        {
+          name: "F. Mendelssohn",
+          birth: 1809,
+          death: 1847,
+          works: [
+            { title: "A Midsummer Night's Dream", number: "Op.61", year: 1842, kind: "orchestral" },
+            { title: "Violin Concerto in E minor", number: "Op.64", year: 1844, kind: "concerto" }
+          ]
+        },
+        {
+          name: "M. Glinka",
+          birth: 1804,
+          death: 1857,
+          works: [
+            { title: "A Life for the Tsar", number: "1836", year: 1836, kind: "opera" },
+            { title: "Ruslan and Lyudmila", number: "1842", year: 1842, kind: "opera" }
+          ]
+        },
+        {
+          name: "M. Balakirev",
+          birth: 1837,
+          death: 1910,
+          works: [
+            { title: "Islamey", number: "1869", year: 1869, kind: "piano" },
+            { title: "Tamara", number: "1882", year: 1882, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "C. Cui",
+          birth: 1835,
+          death: 1918,
+          works: [
+            { title: "Kaleidoscope", number: "Op.50", year: 1878, kind: "piano" },
+            { title: "The Prisoner of the Caucasus", number: "1883", year: 1883, kind: "opera" }
+          ]
+        },
+        {
+          name: "M. Mussorgsky",
+          birth: 1839,
+          death: 1881,
+          works: [
+            { title: "Boris Godunov", number: "1874", year: 1874, kind: "opera" },
+            { title: "Pictures at an Exhibition", number: "1874", year: 1874, kind: "piano" }
+          ]
+        },
+        {
+          name: "N. Rimsky-Korsakov",
+          birth: 1844,
+          death: 1908,
+          works: [
+            { title: "Scheherazade", number: "Op.35", year: 1888, kind: "orchestral" },
+            { title: "The Golden Cockerel", number: "1909", year: 1909, kind: "opera" }
+          ]
+        },
+        {
+          name: "A. Glazunov",
+          birth: 1865,
+          death: 1936,
+          works: [
+            { title: "The Seasons", number: "Op.67", year: 1899, kind: "ballet" },
+            { title: "Symphony No.5", number: "Op.55", year: 1895, kind: "symphony" }
+          ]
+        },
+        {
+          name: "A. Borodin",
+          birth: 1833,
+          death: 1887,
+          works: [
+            { title: "Prince Igor", number: "1890", year: 1890, kind: "opera" },
+            { title: "Symphony No.2", number: "1876", year: 1876, kind: "symphony" }
+          ]
+        },
+        {
+          name: "H. Berlioz",
+          birth: 1803,
+          death: 1869,
+          works: [
+            { title: "Symphonie fantastique", number: "Op.14", year: 1830, kind: "symphony" },
+            { title: "Harold en Italie", number: "Op.16", year: 1834, kind: "symphony" }
+          ]
+        },
+        {
+          name: "J. Strauss I",
+          birth: 1804,
+          death: 1849,
+          works: [
+            { title: "Radetzky March", number: "Op.228", year: 1848, kind: "orchestral" },
+            { title: "Lorelei-Rhein-Klaenge", number: "Op.154", year: 1843, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "J. Offenbach",
+          birth: 1819,
+          death: 1880,
+          works: [
+            { title: "Orphee aux enfers", number: "1858", year: 1858, kind: "opera" },
+            { title: "Les Contes d'Hoffmann", number: "1881", year: 1881, kind: "opera" }
+          ]
+        },
+        {
+          name: "C. Schumann",
+          birth: 1819,
+          death: 1896,
+          works: [
+            { title: "Piano Concerto", number: "Op.7", year: 1835, kind: "concerto" },
+            { title: "Piano Trio in G minor", number: "Op.17", year: 1846, kind: "chamber" }
+          ]
+        },
+        {
+          name: "F. Liszt",
+          birth: 1811,
+          death: 1886,
+          works: [
+            { title: "Hungarian Rhapsody No.2", number: "S.244/2", year: 1847, kind: "piano" },
+            { title: "Faust Symphony", number: "S.108", year: 1857, kind: "symphony" }
+          ]
+        },
+        {
+          name: "A. Bruckner",
+          birth: 1824,
+          death: 1896,
+          works: [
+            { title: "Symphony No.7", number: "WAB 107", year: 1883, kind: "symphony" },
+            { title: "Symphony No.8", number: "WAB 108", year: 1887, kind: "symphony" }
+          ]
+        },
+        {
+          name: "J. Strauss II",
+          birth: 1825,
+          death: 1899,
+          works: [
+            { title: "An der schoenen blauen Donau", number: "Op.314", year: 1867, kind: "orchestral" },
+            { title: "Die Fledermaus", number: "1874", year: 1874, kind: "opera" }
+          ]
+        },
+        {
+          name: "J. Strauss (Josef)",
+          birth: 1827,
+          death: 1870,
+          works: [
+            { title: "Spharenklange", number: "Op.235", year: 1868, kind: "orchestral" },
+            { title: "Delirien", number: "Op.212", year: 1867, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "R. Wagner",
+          birth: 1813,
+          death: 1883,
+          works: [
+            { title: "Tristan und Isolde", number: "WWV 90", year: 1859, kind: "opera" },
+            { title: "Der Ring des Nibelungen", number: "WWV 86", year: 1874, kind: "opera" }
+          ]
+        },
+        {
+          name: "G. Verdi",
+          birth: 1813,
+          death: 1901,
+          works: [
+            { title: "Rigoletto", number: "1851", year: 1851, kind: "opera" },
+            { title: "Aida", number: "1871", year: 1871, kind: "opera" }
+          ]
+        },
+        {
+          name: "J. Brahms",
+          birth: 1833,
+          death: 1897,
+          works: [
+            { title: "Ein deutsches Requiem", number: "Op.45", year: 1868, kind: "choral" },
+            { title: "Symphony No.1", number: "Op.68", year: 1876, kind: "symphony" }
+          ]
+        },
+        {
+          name: "C. Saint-Saens",
+          birth: 1835,
+          death: 1921,
+          works: [
+            { title: "Symphony No.3 Organ", number: "Op.78", year: 1886, kind: "symphony" },
+            { title: "Samson et Dalila", number: "1877", year: 1877, kind: "opera" }
+          ]
+        },
+        {
+          name: "G. Bizet",
+          birth: 1838,
+          death: 1875,
+          works: [
+            { title: "Carmen", number: "1875", year: 1875, kind: "opera" },
+            { title: "Les pecheurs de perles", number: "1863", year: 1863, kind: "opera" }
+          ]
+        },
+        {
+          name: "E. Grieg",
+          birth: 1843,
+          death: 1907,
+          works: [
+            { title: "Peer Gynt Suites", number: "Op.46/55", year: 1888, kind: "orchestral" },
+            { title: "Piano Concerto in A minor", number: "Op.16", year: 1868, kind: "concerto" }
+          ]
+        },
+        {
+          name: "B. Smetana",
+          birth: 1824,
+          death: 1884,
+          works: [
+            { title: "Ma vlast", number: "1874", year: 1874, kind: "orchestral" },
+            { title: "The Bartered Bride", number: "1866", year: 1866, kind: "opera" },
+            { title: "The Moldau (Vltava)", number: "JB 1:112/2", year: 1874, kind: "orchestral" },
+            { title: "String Quartet No.1 From My Life", number: "JB 1:105", year: 1876, kind: "quartet" },
+            { title: "Dalibor", number: "1868", year: 1868, kind: "opera" }
+          ]
+        },
+        {
+          name: "P.I. Tchaikovsky",
+          birth: 1840,
+          death: 1893,
+          works: [
+            { title: "Swan Lake", number: "Op.20", year: 1876, kind: "ballet" },
+            { title: "Symphony No.6", number: "Op.74", year: 1893, kind: "symphony" }
+          ]
+        },
+        {
+          name: "A. Dvorak",
+          birth: 1841,
+          death: 1904,
+          works: [
+            { title: "Symphony No.9 From the New World", number: "Op.95", year: 1893, kind: "symphony" },
+            { title: "Cello Concerto", number: "Op.104", year: 1895, kind: "concerto" }
+          ]
+        },
+        {
+          name: "G. Faure",
+          birth: 1845,
+          death: 1924,
+          works: [
+            { title: "Requiem", number: "Op.48", year: 1888, kind: "choral" },
+            { title: "Pavane", number: "Op.50", year: 1887, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "E. Chausson",
+          birth: 1855,
+          death: 1899,
+          works: [
+            { title: "Poeme", number: "Op.25", year: 1896, kind: "violin" },
+            { title: "Symphony in B-flat", number: "Op.20", year: 1890, kind: "symphony" }
+          ]
+        },
+        {
+          name: "E. Elgar",
+          birth: 1857,
+          death: 1934,
+          works: [
+            { title: "Enigma Variations", number: "Op.36", year: 1899, kind: "orchestral" },
+            { title: "Cello Concerto", number: "Op.85", year: 1919, kind: "concerto" }
+          ]
+        },
+        {
+          name: "L. Janacek",
+          birth: 1854,
+          death: 1928,
+          works: [
+            { title: "Jenufa", number: "1904", year: 1904, kind: "opera" },
+            { title: "Sinfonietta", number: "1926", year: 1926, kind: "symphony" }
+          ]
+        },
+        {
+          name: "R. Leoncavallo",
+          birth: 1857,
+          death: 1919,
+          works: [
+            { title: "Pagliacci", number: "1892", year: 1892, kind: "opera" },
+            { title: "La Boheme", number: "1897", year: 1897, kind: "opera" }
+          ]
+        },
+        {
+          name: "P. Mascagni",
+          birth: 1863,
+          death: 1945,
+          works: [
+            { title: "Cavalleria rusticana", number: "1890", year: 1890, kind: "opera" },
+            { title: "L'amico Fritz", number: "1891", year: 1891, kind: "opera" }
+          ]
+        },
+        {
+          name: "G. Mahler",
+          birth: 1860,
+          death: 1911,
+          works: [
+            { title: "Symphony No.2 Resurrection", number: "1894", year: 1894, kind: "symphony" },
+            { title: "Symphony No.5", number: "1902", year: 1902, kind: "symphony" }
+          ]
+        },
+        {
+          name: "I. Albeniz",
+          birth: 1860,
+          death: 1909,
+          works: [
+            { title: "Iberia", number: "1905", year: 1905, kind: "piano" },
+            { title: "Suite espanola", number: "Op.47", year: 1886, kind: "piano" }
+          ]
+        },
+        {
+          name: "C. Debussy",
+          birth: 1862,
+          death: 1918,
+          works: [
+            { title: "Prelude to the Afternoon of a Faun", number: "L.86", year: 1894, kind: "orchestral" },
+            { title: "La Mer", number: "L.109", year: 1905, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "R. Strauss",
+          birth: 1864,
+          death: 1949,
+          works: [
+            { title: "Also sprach Zarathustra", number: "Op.30", year: 1896, kind: "orchestral" },
+            { title: "Der Rosenkavalier", number: "Op.59", year: 1911, kind: "opera" }
+          ]
+        },
+        {
+          name: "J. Sibelius",
+          birth: 1865,
+          death: 1957,
+          works: [
+            { title: "Finlandia", number: "Op.26", year: 1900, kind: "orchestral" },
+            { title: "Symphony No.2", number: "Op.43", year: 1902, kind: "symphony" }
+          ]
+        },
+        {
+          name: "E. Satie",
+          birth: 1866,
+          death: 1925,
+          works: [
+            { title: "Gymnopedie No.1", number: "1888", year: 1888, kind: "piano" },
+            { title: "Parade", number: "1917", year: 1917, kind: "ballet" }
+          ]
+        },
+        {
+          name: "S. Rachmaninoff",
+          birth: 1873,
+          death: 1943,
+          works: [
+            { title: "Piano Concerto No.2", number: "Op.18", year: 1901, kind: "concerto" },
+            { title: "Symphony No.2", number: "Op.27", year: 1907, kind: "symphony" }
+          ]
+        },
+        {
+          name: "R. Vaughan Williams",
+          birth: 1872,
+          death: 1958,
+          works: [
+            { title: "The Lark Ascending", number: "1914", year: 1914, kind: "violin" },
+            { title: "Fantasia on a Theme by Thomas Tallis", number: "1910", year: 1910, kind: "strings" }
+          ]
+        },
+        {
+          name: "C. Nielsen",
+          birth: 1865,
+          death: 1931,
+          works: [
+            { title: "Symphony No.4 The Inextinguishable", number: "Op.29", year: 1916, kind: "symphony" },
+            { title: "Clarinet Concerto", number: "Op.57", year: 1928, kind: "concerto" }
+          ]
+        },
+        {
+          name: "J. Suk",
+          birth: 1874,
+          death: 1935,
+          works: [
+            { title: "Serenade for Strings", number: "Op.6", year: 1892, kind: "strings" },
+            { title: "Asrael Symphony", number: "Op.27", year: 1906, kind: "symphony" }
+          ]
+        },
+        {
+          name: "G. Holst",
+          birth: 1874,
+          death: 1934,
+          works: [
+            { title: "The Planets", number: "Op.32", year: 1916, kind: "orchestral" },
+            { title: "St Paul's Suite", number: "Op.29 No.2", year: 1913, kind: "strings" }
+          ]
+        },
+        {
+          name: "A. Scriabin",
+          birth: 1872,
+          death: 1915,
+          works: [
+            { title: "Poem of Ecstasy", number: "Op.54", year: 1908, kind: "orchestral" },
+            { title: "Prometheus", number: "Op.60", year: 1910, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "M. Ravel",
+          birth: 1875,
+          death: 1937,
+          works: [
+            { title: "Daphnis et Chloe", number: "M.57", year: 1912, kind: "ballet" },
+            { title: "Bolero", number: "M.81", year: 1928, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "O. Respighi",
+          birth: 1879,
+          death: 1936,
+          works: [
+            { title: "Roman Festivals", number: "P.157", year: 1928, kind: "orchestral" },
+            { title: "Pines of Rome", number: "P.141", year: 1924, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "M. de Falla",
+          birth: 1876,
+          death: 1946,
+          works: [
+            { title: "El amor brujo", number: "1915", year: 1915, kind: "ballet" },
+            { title: "The Three-Cornered Hat", number: "1919", year: 1919, kind: "ballet" }
+          ]
+        },
+        {
+          name: "A. Casella",
+          birth: 1883,
+          death: 1947,
+          works: [
+            { title: "Scarlattiana", number: "Op.44", year: 1926, kind: "orchestral" },
+            { title: "Paganiniana", number: "Op.65", year: 1942, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "A. Ketelbey",
+          birth: 1875,
+          death: 1959,
+          works: [
+            { title: "In a Persian Market", number: "1920", year: 1920, kind: "orchestral" },
+            { title: "In a Monastery Garden", number: "1915", year: 1915, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "B. Bartok",
+          birth: 1881,
+          death: 1945,
+          works: [
+            { title: "Concerto for Orchestra", number: "Sz.116", year: 1943, kind: "orchestral" },
+            { title: "Music for Strings, Percussion and Celesta", number: "Sz.106", year: 1936, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "I. Stravinsky",
+          birth: 1882,
+          death: 1971,
+          works: [
+            { title: "The Firebird", number: "K010", year: 1910, kind: "ballet" },
+            { title: "The Rite of Spring", number: "K015", year: 1913, kind: "ballet" }
+          ]
+        },
+        {
+          name: "H. Villa-Lobos",
+          birth: 1887,
+          death: 1959,
+          works: [
+            { title: "Bachianas brasileiras No.5", number: "1938", year: 1938, kind: "vocal" },
+            { title: "Bachianas brasileiras No.2", number: "1930", year: 1930, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "D. Milhaud",
+          birth: 1892,
+          death: 1974,
+          works: [
+            { title: "La creation du monde", number: "Op.81", year: 1923, kind: "ballet" },
+            { title: "Saudades do Brasil", number: "Op.67", year: 1921, kind: "piano" }
+          ]
+        },
+        {
+          name: "F. Poulenc",
+          birth: 1899,
+          death: 1963,
+          works: [
+            { title: "Gloria", number: "FP 177", year: 1959, kind: "choral" },
+            { title: "Dialogues des Carmelites", number: "FP 159", year: 1957, kind: "opera" }
+          ]
+        },
+        {
+          name: "J. Rodrigo",
+          birth: 1901,
+          death: 1999,
+          works: [
+            { title: "Concierto de Aranjuez", number: "1939", year: 1939, kind: "concerto" },
+            { title: "Fantasia para un gentilhombre", number: "1954", year: 1954, kind: "concerto" }
+          ]
+        },
+        {
+          name: "S. Prokofiev",
+          birth: 1891,
+          death: 1953,
+          works: [
+            { title: "Romeo and Juliet", number: "Op.64", year: 1935, kind: "ballet" },
+            { title: "Symphony No.5", number: "Op.100", year: 1944, kind: "symphony" }
+          ]
+        },
+        {
+          name: "G. Puccini",
+          birth: 1858,
+          death: 1924,
+          works: [
+            { title: "La Boheme", number: "1896", year: 1896, kind: "opera" },
+            { title: "Madama Butterfly", number: "1904", year: 1904, kind: "opera" }
+          ]
+        },
+        {
+          name: "G. Gershwin",
+          birth: 1898,
+          death: 1937,
+          works: [
+            { title: "Rhapsody in Blue", number: "1924", year: 1924, kind: "orchestral" },
+            { title: "An American in Paris", number: "1928", year: 1928, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "A. Copland",
+          birth: 1900,
+          death: 1990,
+          works: [
+            { title: "Appalachian Spring", number: "1944", year: 1944, kind: "orchestral" },
+            { title: "Fanfare for the Common Man", number: "1942", year: 1942, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "A. Ginastera",
+          birth: 1916,
+          death: 1983,
+          works: [
+            { title: "Estancia", number: "Op.8", year: 1941, kind: "ballet" },
+            { title: "Piano Concerto No.1", number: "Op.28", year: 1961, kind: "concerto" }
+          ]
+        },
+        {
+          name: "S. Barber",
+          birth: 1910,
+          death: 1981,
+          works: [
+            { title: "Adagio for Strings", number: "Op.11", year: 1938, kind: "strings" },
+            { title: "Violin Concerto", number: "Op.14", year: 1939, kind: "concerto" }
+          ]
+        },
+        {
+          name: "W. Lutoslawski",
+          birth: 1913,
+          death: 1994,
+          works: [
+            { title: "Concerto for Orchestra", number: "1954", year: 1954, kind: "orchestral" },
+            { title: "Symphony No.3", number: "1983", year: 1983, kind: "symphony" }
+          ]
+        },
+        {
+          name: "B. Britten",
+          birth: 1913,
+          death: 1976,
+          works: [
+            { title: "Peter Grimes", number: "Op.33", year: 1945, kind: "opera" },
+            { title: "War Requiem", number: "Op.66", year: 1962, kind: "choral" }
+          ]
+        },
+        {
+          name: "D. Shostakovich",
+          birth: 1906,
+          death: 1975,
+          works: [
+            { title: "Symphony No.5", number: "Op.47", year: 1937, kind: "symphony" },
+            { title: "Symphony No.10", number: "Op.93", year: 1953, kind: "symphony" }
+          ]
+        },
+        {
+          name: "A. Khachaturian",
+          birth: 1903,
+          death: 1978,
+          works: [
+            { title: "Gayane", number: "1942", year: 1942, kind: "ballet" },
+            { title: "Spartacus", number: "1954", year: 1954, kind: "ballet" }
+          ]
+        },
+        {
+          name: "L. Bernstein",
+          birth: 1918,
+          death: 1990,
+          works: [
+            { title: "West Side Story", number: "1957", year: 1957, kind: "opera" },
+            { title: "Candide Overture", number: "1956", year: 1956, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "J. Williams",
+          birth: 1932,
+          death: 9999,
+          works: [
+            { title: "Jaws", number: "1975", year: 1975, kind: "orchestral" },
+            { title: "Star Wars Main Title", number: "1977", year: 1977, kind: "orchestral" },
+            { title: "Superman", number: "1978", year: 1978, kind: "orchestral" },
+            { title: "Raiders of the Lost Ark", number: "1981", year: 1981, kind: "orchestral" },
+            { title: "E.T. the Extra-Terrestrial", number: "1982", year: 1982, kind: "orchestral" },
+            { title: "Jurassic Park", number: "1993", year: 1993, kind: "orchestral" },
+            { title: "Schindler's List", number: "1993", year: 1993, kind: "orchestral" },
+            { title: "Harry Potter and the Sorcerer's Stone", number: "2001", year: 2001, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "J. Hisaishi",
+          birth: 1950,
+          death: 9999,
+          works: [
+            { title: "Nausicaa of the Valley of the Wind", number: "1984", year: 1984, kind: "orchestral" },
+            { title: "Castle in the Sky", number: "1986", year: 1986, kind: "orchestral" },
+            { title: "My Neighbor Totoro", number: "1988", year: 1988, kind: "orchestral" },
+            { title: "Kiki's Delivery Service", number: "1989", year: 1989, kind: "orchestral" },
+            { title: "Porco Rosso", number: "1992", year: 1992, kind: "orchestral" },
+            { title: "Princess Mononoke", number: "1997", year: 1997, kind: "orchestral" },
+            { title: "Spirited Away", number: "2001", year: 2001, kind: "orchestral" },
+            { title: "Howl's Moving Castle", number: "2004", year: 2004, kind: "orchestral" },
+            { title: "Ponyo", number: "2008", year: 2008, kind: "orchestral" },
+            { title: "The Wind Rises", number: "2013", year: 2013, kind: "orchestral" },
+            { title: "The Boy and the Heron", number: "2023", year: 2023, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "K. Sugiyama",
+          birth: 1931,
+          death: 2021,
+          works: [
+            { title: "Dragon Quest Overture: Roto", number: "DQ I", year: 1986, kind: "orchestral" },
+            { title: "Symphonic Suite Dragon Quest III", number: "DQ III", year: 1988, kind: "orchestral" },
+            { title: "Symphonic Suite Dragon Quest V", number: "DQ V", year: 1992, kind: "orchestral" },
+            { title: "Symphonic Suite Dragon Quest VIII", number: "DQ VIII", year: 2004, kind: "orchestral" },
+            { title: "Symphonic Suite Dragon Quest XI", number: "DQ XI", year: 2017, kind: "orchestral" }
+          ]
+        },
+        {
+          name: "A. Piazzolla",
+          birth: 1921,
+          death: 1992,
+          works: [
+            { title: "Adios Nonino", number: "1959", year: 1959, kind: "other" },
+            { title: "Libertango", number: "1974", year: 1974, kind: "other" }
+          ]
+        },
+        {
+          name: "G. Ligeti",
+          birth: 1923,
+          death: 2006,
+          works: [
+            { title: "Atmospheres", number: "1961", year: 1961, kind: "orchestral" },
+            { title: "Lux Aeterna", number: "1966", year: 1966, kind: "choral" }
+          ]
+        },
+        {
+          name: "T. Takemitsu",
+          birth: 1930,
+          death: 1996,
+          works: [
+            { title: "November Steps", number: "1967", year: 1967, kind: "orchestral" },
+            { title: "Requiem for Strings", number: "1957", year: 1957, kind: "strings" }
+          ]
+        },
+        {
+          name: "K. Penderecki",
+          birth: 1933,
+          death: 2020,
+          works: [
+            { title: "Threnody to the Victims of Hiroshima", number: "1960", year: 1960, kind: "orchestral" },
+            { title: "Polish Requiem", number: "1984", year: 1984, kind: "choral" }
+          ]
+        }
+  ];
+  
+  const extraWorks = {
+        "C. Monteverdi": [
+          { title: "L'incoronazione di Poppea", number: "SV 308", year: 1643, kind: "opera" }
+        ],
+        "J. Pachelbel": [
+          { title: "Chaconne in F minor", number: "P.43", year: 1690, kind: "keyboard" }
+        ],
+        "A. Vivaldi": [
+          { title: "Stabat Mater", number: "RV 621", year: 1712, kind: "choral" }
+        ],
+        "J.S. Bach": [
+          { title: "St Matthew Passion", number: "BWV 244", year: 1727, kind: "choral" },
+          { title: "The Art of Fugue", number: "BWV 1080", year: 1742, kind: "keyboard" }
+        ],
+        "G.F. Handel": [
+          { title: "Music for the Royal Fireworks", number: "HWV 351", year: 1749, kind: "orchestral" }
+        ],
+        "J. Haydn": [
+          { title: "Symphony No.45 Farewell", number: "Hob.I:45", year: 1772, kind: "symphony" },
+          { title: "Symphony No.88", number: "Hob.I:88", year: 1787, kind: "symphony" },
+          { title: "Symphony No.104", number: "Hob.I:104", year: 1795, kind: "symphony" }
+        ],
+        "W.A. Mozart": [
+          { title: "Symphony No.25", number: "K.183", year: 1773, kind: "symphony" },
+          { title: "Symphony No.29", number: "K.201", year: 1774, kind: "symphony" },
+          { title: "Symphony No.31 Paris", number: "K.297", year: 1778, kind: "symphony" },
+          { title: "Symphony No.35 Haffner", number: "K.385", year: 1782, kind: "symphony" },
+          { title: "Symphony No.36 Linz", number: "K.425", year: 1783, kind: "symphony" },
+          { title: "Symphony No.38 Prague", number: "K.504", year: 1786, kind: "symphony" },
+          { title: "Symphony No.39", number: "K.543", year: 1788, kind: "symphony" },
+          { title: "Symphony No.41 Jupiter", number: "K.551", year: 1788, kind: "symphony" },
+          { title: "Requiem", number: "K.626", year: 1791, kind: "choral" },
+          { title: "Don Giovanni", number: "K.527", year: 1787, kind: "opera" }
+        ],
+        "L. van Beethoven": [
+          { title: "Symphony No.6 Pastoral", number: "Op.68", year: 1808, kind: "symphony" },
+          { title: "Symphony No.7", number: "Op.92", year: 1812, kind: "symphony" },
+          { title: "Symphony No.3 Eroica", number: "Op.55", year: 1804, kind: "symphony" },
+          { title: "Missa solemnis", number: "Op.123", year: 1823, kind: "choral" }
+        ],
+        "N. Paganini": [
+          { title: "La Campanella", number: "Op.7 No.2", year: 1826, kind: "violin" }
+        ],
+        "F. Schubert": [
+          { title: "Symphony No.9", number: "D.944", year: 1825, kind: "symphony" },
+          { title: "String Quintet in C", number: "D.956", year: 1828, kind: "strings" }
+        ],
+        "F. Chopin": [
+          { title: "Piano Concerto No.1", number: "Op.11", year: 1830, kind: "concerto" }
+        ],
+        "R. Schumann": [
+          { title: "Piano Concerto", number: "Op.54", year: 1845, kind: "concerto" },
+          { title: "Symphony No.4", number: "Op.120", year: 1851, kind: "symphony" }
+        ],
+        "H. Berlioz": [
+          { title: "La Damnation de Faust", number: "Op.24", year: 1846, kind: "orchestral" },
+          { title: "Roméo et Juliette", number: "Op.17", year: 1839, kind: "orchestral" }
+        ],
+        "F. Mendelssohn": [
+          { title: "Symphony No.3 Scottish", number: "Op.56", year: 1842, kind: "symphony" },
+          { title: "Symphony No.4 Italian", number: "Op.90", year: 1833, kind: "symphony" }
+        ],
+        "G. Donizetti": [
+          { title: "Don Pasquale", number: "1843", year: 1843, kind: "opera" },
+          { title: "Anna Bolena", number: "1830", year: 1830, kind: "opera" }
+        ],
+        "J. Strauss I": [
+          { title: "Paris Waltz", number: "Op.101", year: 1838, kind: "orchestral" }
+        ],
+        "F. Liszt": [
+          { title: "Les Preludes", number: "S.97", year: 1854, kind: "orchestral" }
+        ],
+        "R. Wagner": [
+          { title: "Parsifal", number: "WWV 111", year: 1882, kind: "opera" }
+        ],
+        "G. Verdi": [
+          { title: "La Traviata", number: "1853", year: 1853, kind: "opera" }
+        ],
+        "A. Bruckner": [
+          { title: "Symphony No.4", number: "WAB 104", year: 1874, kind: "symphony" },
+          { title: "Symphony No.9", number: "WAB 109", year: 1896, kind: "symphony" }
+        ],
+        "J. Strauss II": [
+          { title: "Kaiser-Walzer", number: "Op.437", year: 1889, kind: "orchestral" }
+        ],
+        "J. Strauss (Josef)": [
+          { title: "Dorfschwalben aus Osterreich", number: "Op.164", year: 1864, kind: "orchestral" }
+        ],
+        "J. Brahms": [
+          { title: "Violin Concerto", number: "Op.77", year: 1878, kind: "concerto" },
+          { title: "Symphony No.4", number: "Op.98", year: 1885, kind: "symphony" }
+        ],
+        "P.I. Tchaikovsky": [
+          { title: "Symphony No.4", number: "Op.36", year: 1878, kind: "symphony" },
+          { title: "The Nutcracker", number: "Op.71", year: 1892, kind: "ballet" }
+        ],
+        "A. Dvorak": [
+          { title: "Slavonic Dances", number: "Op.46", year: 1878, kind: "orchestral" },
+          { title: "Symphony No.7", number: "Op.70", year: 1885, kind: "symphony" },
+          { title: "Symphony No.8", number: "Op.88", year: 1889, kind: "symphony" },
+          { title: "String Quartet No.12 American", number: "Op.96", year: 1893, kind: "strings" }
+        ],
+        "G. Mahler": [
+          { title: "Symphony No.3", number: "1896", year: 1896, kind: "symphony" },
+          { title: "Symphony No.6", number: "1904", year: 1904, kind: "symphony" },
+          { title: "Das Lied von der Erde", number: "1909", year: 1909, kind: "song" }
+        ],
+        "C. Debussy": [
+          { title: "Pelleas et Melisande", number: "L.88", year: 1902, kind: "opera" }
+        ],
+        "R. Strauss": [
+          { title: "Ein Heldenleben", number: "Op.40", year: 1898, kind: "orchestral" }
+        ],
+        "J. Sibelius": [
+          { title: "Symphony No.1", number: "Op.39", year: 1899, kind: "symphony" },
+          { title: "Symphony No.5", number: "Op.82", year: 1915, kind: "symphony" },
+          { title: "Violin Concerto", number: "Op.47", year: 1904, kind: "concerto" }
+        ],
+        "C. Nielsen": [
+          { title: "Symphony No.3 Sinfonia Espansiva", number: "Op.27", year: 1911, kind: "symphony" },
+          { title: "Symphony No.5", number: "Op.50", year: 1922, kind: "symphony" }
+        ],
+        "J. Suk": [
+          { title: "A Summer's Tale", number: "Op.29", year: 1909, kind: "orchestral" }
+        ],
+        "M. Ravel": [
+          { title: "Piano Concerto in G", number: "M.83", year: 1931, kind: "concerto" }
+        ],
+        "B. Bartok": [
+          { title: "Mikrokosmos", number: "Sz.107", year: 1939, kind: "piano" }
+        ],
+        "I. Stravinsky": [
+          { title: "Petrushka", number: "K012", year: 1911, kind: "ballet" }
+        ],
+        "S. Prokofiev": [
+          { title: "Peter and the Wolf", number: "Op.67", year: 1936, kind: "orchestral" },
+          { title: "Symphony No.1 Classical", number: "Op.25", year: 1917, kind: "symphony" },
+          { title: "Symphony No.7", number: "Op.131", year: 1952, kind: "symphony" }
+        ],
+        "D. Shostakovich": [
+          { title: "Symphony No.7 Leningrad", number: "Op.60", year: 1941, kind: "symphony" },
+          { title: "Symphony No.8", number: "Op.65", year: 1943, kind: "symphony" },
+          { title: "String Quartet No.8", number: "Op.110", year: 1960, kind: "strings" }
+        ]
+  };
+  window.KT_DATA.composers = composers;
+  window.KT_DATA.extraWorks = extraWorks;
+})();
+  </script>
+
+  <script>
+(function () {
+  window.KT_DATA = window.KT_DATA || {};
+  const historicalEvents = [
+        { name: "ルネサンス（盛期）", start: 1500, end: 1600, category: "culture" },
+        { name: "宗教改革", start: 1517, end: 1648, category: "religion" },
+        { name: "産業革命", start: 1760, end: 1840, category: "culture" },
+        { name: "フランス革命", start: 1789, end: 1799, category: "revolution" },
+        { name: "ナポレオン戦争", start: 1803, end: 1815, category: "war" },
+        { name: "浅間山の天明大噴火", start: 1783, end: 1783, category: "disaster" },
+        { name: "第一次アヘン戦争", start: 1839, end: 1842, category: "war" },
+        { name: "第二次アヘン戦争", start: 1856, end: 1860, category: "war" },
+        { name: "クリミア戦争", start: 1853, end: 1856, category: "war" },
+        { name: "明治維新", start: 1868, end: 1869, category: "revolution" },
+        { name: "第一次世界大戦", start: 1914, end: 1918, category: "war" },
+        { name: "第二次世界大戦", start: 1939, end: 1945, category: "war" }
+  ];
+  
+  const danceEvents = [
+        { name: "パヴァーヌ流行", start: 1500, end: 1630, category: "court" },
+        { name: "ガリアルド流行", start: 1550, end: 1650, category: "court" },
+        { name: "メヌエット流行", start: 1660, end: 1790, category: "court" },
+        { name: "ワルツ流行", start: 1780, end: 1910, category: "ballroom" },
+        { name: "ポロネーズ流行", start: 1700, end: 1900, category: "national" },
+        { name: "マズルカ流行", start: 1750, end: 1900, category: "national" }
+  ];
+  
+  const instrumentEvents = [
+        { name: "アマティ家工房（クレモナ）", start: 1538, end: 1740, category: "violin" },
+        { name: "ストラディバリ工房", start: 1666, end: 1737, category: "violin" },
+        { name: "ガルネリ（デル・ジェス）", start: 1698, end: 1744, category: "violin" },
+        { name: "ガダニーニ工房", start: 1746, end: 1786, category: "violin" },
+        { name: "ロッカ工房（トリノ）", start: 1830, end: 1865, category: "violin" },
+        { name: "J.B. ヴィヨーム工房", start: 1828, end: 1875, category: "violin" },
+        { name: "トゥルト弓（モダン弓の確立）", start: 1775, end: 1835, category: "bow" },
+        { name: "ヴォワラン弓", start: 1855, end: 1885, category: "bow" },
+        { name: "ヴィヨーム工房の弓製作", start: 1830, end: 1875, category: "bow" },
+        { name: "E.A. サルトリー弓", start: 1885, end: 1946, category: "bow" },
+        { name: "ヴィオラ・ダ・ガンバ隆盛", start: 1500, end: 1750, category: "strings" },
+        { name: "ヴィオラ・ダ・ガンバ復興", start: 1900, end: 1980, category: "strings" },
+        { name: "フォルテピアノ普及", start: 1700, end: 1820, category: "piano" },
+        { name: "近代ピアノの確立", start: 1820, end: 1900, category: "piano" },
+        { name: "6弦クラシックギター定着", start: 1770, end: 1860, category: "guitar" },
+        { name: "エレキギター実用化", start: 1931, end: 1960, category: "guitar" },
+        { name: "スタインウェイ量産時代", start: 1853, end: 1980, category: "piano" },
+        { name: "金管のバルブ実用化", start: 1814, end: 1850, category: "brass" },
+        { name: "ホルンのバルブ化", start: 1818, end: 1860, category: "brass" },
+        { name: "トランペットのバルブ化", start: 1815, end: 1860, category: "brass" },
+        { name: "クラリネットの登場", start: 1690, end: 1730, category: "woodwind" },
+        { name: "ベーム式フルート普及", start: 1847, end: 1900, category: "woodwind" },
+        { name: "クラリネットの多鍵化", start: 1812, end: 1900, category: "woodwind" },
+        { name: "サクソフォン発明", start: 1840, end: 1846, category: "woodwind" }
+  ];
+  window.KT_DATA.historicalEvents = historicalEvents;
+  window.KT_DATA.danceEvents = danceEvents;
+  window.KT_DATA.instrumentEvents = instrumentEvents;
+})();
+  </script>
+
+  <script>
+    const KT_DATA = window.KT_DATA || {};
+    const composers = Array.isArray(KT_DATA.composers) ? KT_DATA.composers : [];
+    const extraWorks = KT_DATA.extraWorks && typeof KT_DATA.extraWorks === "object" ? KT_DATA.extraWorks : {};
+
+    composers.forEach((composer) => {
+      composer.works = (composer.works || []).map((work) => ({ ...work, featured: work.featured !== false }));
+      const extras = extraWorks[composer.name];
+      if (Array.isArray(extras) && extras.length > 0) {
+        composer.works = [
+          ...composer.works,
+          ...extras.map((work) => ({ ...work, featured: false }))
+        ];
+      }
+    });
+
+    composers.sort((a, b) => {
+      const aYears = Array.isArray(a.works) ? a.works.map((w) => w.year).filter((v) => Number.isFinite(v)) : [];
+      const bYears = Array.isArray(b.works) ? b.works.map((w) => w.year).filter((v) => Number.isFinite(v)) : [];
+      const aStart = a.active && Number.isFinite(a.active.start) ? a.active.start : (aYears.length > 0 ? Math.min(...aYears) : a.birth);
+      const bStart = b.active && Number.isFinite(b.active.start) ? b.active.start : (bYears.length > 0 ? Math.min(...bYears) : b.birth);
+      return aStart - bStart || a.birth - b.birth;
+    });
+
+    const cfg = {
+      width: 1700,
+      height: 1500,
+      left: 20,
+      right: 70,
+      top: 70,
+      bottom: 130,
+      minYear: 1500,
+      maxYear: 1980,
+      rowStep: 38,
+      bandHeight: 20
+    };
+
+    const historicalEvents = Array.isArray(KT_DATA.historicalEvents) ? KT_DATA.historicalEvents : [];
+    const danceEvents = Array.isArray(KT_DATA.danceEvents) ? KT_DATA.danceEvents : [];
+    const instrumentEvents = Array.isArray(KT_DATA.instrumentEvents) ? KT_DATA.instrumentEvents : [];
+
+    const svg = document.getElementById("chart");
+    const scrollPane = document.getElementById("scrollPane");
+    const errorBox = document.getElementById("errorBox");
+    const scaleFullButton = document.getElementById("scaleFull");
+    const scale100Button = document.getElementById("scale100");
+    const clearFocusButton = document.getElementById("clearFocus");
+    const menuPanel = document.getElementById("menuPanel");
+    const composerDialog = document.getElementById("composerDialog");
+    const dialogName = document.getElementById("dialogName");
+    const dialogMeta = document.getElementById("dialogMeta");
+    const dialogFeatured = document.getElementById("dialogFeatured");
+    const dialogOther = document.getElementById("dialogOther");
+    const closeDialogButton = document.getElementById("closeDialog");
+    const dialogYoutube = document.getElementById("dialogYoutube");
+
+    const NS = "http://www.w3.org/2000/svg";
+    const LIVING_DEATH_YEAR = 9999;
+    let scaleMode = "full";
+    let chartHeight = cfg.height;
+    let focusedComposerName = null;
+
+    function xForYear(year) {
+      const plotWidth = cfg.width - cfg.left - cfg.right;
+      return cfg.left + ((year - cfg.minYear) / (cfg.maxYear - cfg.minYear)) * plotWidth;
+    }
+
+    function add(tag, attrs, parent) {
+      const el = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, String(v)));
+      parent.appendChild(el);
+      return el;
+    }
+
+    function isLivingComposer(composer) {
+      return Boolean(composer) && composer.death === LIVING_DEATH_YEAR;
+    }
+
+    function getLifespanEndYear(composer) {
+      if (!composer) return cfg.maxYear;
+      if (isLivingComposer(composer)) {
+        return Math.min(new Date().getFullYear(), cfg.maxYear);
+      }
+      return composer.death;
+    }
+
+    function getDeathLabel(composer) {
+      return isLivingComposer(composer) ? "Living" : String(composer.death);
+    }
+
+    function getActiveRange(composer) {
+      const workYears = Array.isArray(composer.works)
+        ? composer.works.map((w) => w.year).filter((v) => Number.isFinite(v))
+        : [];
+      const start = composer.active && Number.isFinite(composer.active.start)
+        ? composer.active.start
+        : (workYears.length > 0 ? Math.min(...workYears) : composer.birth);
+      const end = composer.active && Number.isFinite(composer.active.end)
+        ? composer.active.end
+        : (workYears.length > 0 ? Math.max(...workYears) : getLifespanEndYear(composer));
+      return { start, end };
+    }
+
+    function computeRequiredHeight() {
+      const composerRows = composers.length;
+      const instrumentRows = instrumentEvents.length;
+      const danceRows = danceEvents.length;
+      const historyRows = historicalEvents.length;
+
+      const firstRowY = cfg.top;
+      const lastComposerY = firstRowY + (composerRows - 1) * cfg.rowStep;
+      const axisYBottom = lastComposerY + 56;
+      const instrumentStartY = axisYBottom + 48 + 24;
+      const instrumentEndY = instrumentStartY + (instrumentRows - 1) * 22 + 10;
+      const danceStartY = instrumentEndY + 18 + 24;
+      const danceEndY = danceStartY + (danceRows - 1) * 22 + 10;
+      const historyStartY = danceEndY + 18 + 24;
+      const historyEndY = historyStartY + (historyRows - 1) * 22 + 10;
+
+      return Math.max(900, historyEndY + 40);
+    }
+
+    function layoutEventsWithoutOverlap(events) {
+      const laneEnds = [];
+      const sorted = [...events].sort((a, b) => a.start - b.start || a.end - b.end);
+      return sorted.map((ev) => {
+        let lane = laneEnds.findIndex((laneEnd) => ev.start > laneEnd);
+        if (lane === -1) {
+          lane = laneEnds.length;
+          laneEnds.push(ev.end);
+        } else {
+          laneEnds[lane] = ev.end;
+        }
+        return { ...ev, lane };
+      });
+    }
+
+    function normalizeWorkCategory(kind, title) {
+      const t = String(title || "").toLowerCase();
+      if (kind === "symphony") return "symphony";
+      if (kind === "choral" || kind === "song" || kind === "opera") return "vocal";
+      if (kind === "strings" && t.includes("quartet")) return "quartet";
+      if (kind === "chamber" || kind === "strings" || kind === "piano" || kind === "violin" || kind === "keyboard") return "chamber";
+      return "other";
+    }
+
+    function addWorkIcon(parent, x, y, kind, title) {
+      const category = normalizeWorkCategory(kind, title);
+      const palette = {
+        symphony: "#2563eb",
+        chamber: "#16a34a",
+        vocal: "#9333ea",
+        quartet: "#d97706",
+        other: "#0891b2"
+      };
+      const color = palette[category] || palette.other;
+      const g = add("g", { class: "work-icon", transform: `translate(${x} ${y})`, "data-kind": kind, "data-category": category }, parent);
+
+      if (category === "symphony") {
+        add("circle", { cx: 0, cy: 0, r: 5, fill: color }, g);
+      } else if (category === "chamber") {
+        add("rect", { x: -5, y: -5, width: 10, height: 10, rx: 2, fill: color }, g);
+      } else if (category === "vocal") {
+        add("polygon", { points: "0,-7 7,6 -7,6", fill: color }, g);
+      } else if (category === "quartet") {
+        add("path", { d: "M0,-7 L2,-2 L7,0 L2,2 L0,7 L-2,2 L-7,0 L-2,-2 Z", fill: color }, g);
+      } else {
+        add("polygon", { points: "0,-7 7,0 0,7 -7,0", fill: color }, g);
+      }
+
+      add("circle", { cx: 0, cy: 0, r: 8, fill: "transparent" }, g);
+      return g;
+    }
+
+    function draw() {
+      svg.innerHTML = "";
+      const axisYTop = cfg.top - 30;
+      const firstRowY = cfg.top;
+      const lastRowY = cfg.top + (composers.length - 1) * cfg.rowStep;
+      const axisYBottom = lastRowY + 56;
+      const plotTop = firstRowY - 18;
+      const plotBottom = lastRowY + 18;
+
+      add("rect", { x: 0, y: 0, width: cfg.width, height: cfg.height, fill: "#fff" }, svg);
+
+      // Axis lines
+      add("line", { x1: cfg.left, y1: plotTop, x2: cfg.left, y2: plotBottom, stroke: "#333", "stroke-width": 1.5 }, svg);
+      add("line", { x1: cfg.left, y1: axisYBottom, x2: cfg.width - cfg.right, y2: axisYBottom, stroke: "#333", "stroke-width": 1.5 }, svg);
+      add("line", { x1: cfg.left, y1: axisYTop, x2: cfg.width - cfg.right, y2: axisYTop, stroke: "#333", "stroke-width": 1.5 }, svg);
+
+      // Grid + year labels (top and bottom)
+      for (let year = cfg.minYear; year <= cfg.maxYear; year += 25) {
+        const x = xForYear(year);
+        const isMajor = year % 100 === 0;
+        add("line", {
+          x1: x,
+          y1: plotTop,
+          x2: x,
+          y2: plotBottom,
+          stroke: isMajor ? "#d0d7e2" : "#edf1f6",
+          "stroke-width": isMajor ? 1.2 : 0.8
+        }, svg);
+
+        if (isMajor) {
+          add("text", {
+            x,
+            y: axisYTop + 18,
+            "text-anchor": "middle",
+            "font-size": 12,
+            fill: "#333"
+          }, svg).textContent = String(year);
+
+          add("text", {
+            x,
+            y: axisYBottom + 20,
+            "text-anchor": "middle",
+            "font-size": 12,
+            fill: "#333"
+          }, svg).textContent = String(year);
+        }
+      }
+
+      add("text", { x: cfg.left, y: 26, "font-size": 15, fill: "#111", "font-weight": 600 }, svg)
+        .textContent = "Classical Composers Timeline (Birth-Death)";
+
+      composers.forEach((c, i) => {
+        const y = cfg.top + i * cfg.rowStep;
+        const x1 = xForYear(c.birth);
+        const x2 = xForYear(getLifespanEndYear(c));
+        const isFocused = focusedComposerName === c.name;
+
+        const row = add("g", { class: "composer-row", "data-name": c.name, "data-birth": c.birth, "data-death": c.death }, svg);
+        row.setAttribute("opacity", "1");
+
+        const band = add("rect", {
+          x: x1,
+          y: y - cfg.bandHeight / 2,
+          width: Math.max(2, x2 - x1),
+          height: cfg.bandHeight,
+          rx: 5,
+          class: "lifespan-band",
+          fill: isFocused ? "#60a5fa" : "#9ec5fe",
+          opacity: isFocused ? 0.8 : 0.6,
+          cursor: "pointer"
+        }, row);
+
+        const { start: activeStart, end: activeEnd } = getActiveRange(c);
+        const activeX1 = xForYear(activeStart);
+        const activeX2 = xForYear(activeEnd);
+        add("rect", {
+          x: activeX1,
+          y: y - 6,
+          width: Math.max(2, activeX2 - activeX1),
+          height: 12,
+          rx: 4,
+          class: "active-band clickable",
+          fill: "#60a5fa",
+          opacity: isFocused ? 0.48 : 0.28,
+          cursor: "pointer"
+        }, row);
+        row.setAttribute("data-active-start", String(activeStart));
+        row.setAttribute("data-active-end", String(activeEnd));
+
+        const rightLimit = cfg.width - cfg.right - 6;
+        const estimatedNameWidth = c.name.length * 7;
+        let nameX = x2 + 12;
+        let nameAnchor = "start";
+        if (nameX + estimatedNameWidth > rightLimit) {
+          nameX = x1 - 10;
+          nameAnchor = "end";
+        }
+        const nameText = add("text", {
+          x: nameX,
+          y,
+          "text-anchor": nameAnchor,
+          "dominant-baseline": "middle",
+          "font-size": 12,
+          fill: "#374151",
+          "font-weight": isFocused ? 700 : 500,
+          class: "composer-name clickable",
+          "data-name": c.name,
+          cursor: "pointer"
+        }, svg);
+        nameText.textContent = c.name;
+
+        if (Array.isArray(c.works)) {
+          c.works.forEach((w) => {
+            const wx = xForYear(w.year);
+            const icon = addWorkIcon(row, wx, y, w.kind, w.title);
+            icon.setAttribute("data-composer", c.name);
+            icon.setAttribute("data-title", w.title);
+            icon.setAttribute("data-number", w.number);
+            icon.setAttribute("data-year", String(w.year));
+            icon.setAttribute("opacity", "1");
+          });
+        }
+      });
+
+      // Instrument context lanes
+      const instrumentTitleY = axisYBottom + 48;
+      add("text", {
+        x: cfg.left,
+        y: instrumentTitleY,
+        "font-size": 13,
+        "font-weight": 600,
+        fill: "#374151"
+      }, svg).textContent = "楽器関連";
+
+      const instrumentY = instrumentTitleY + 24;
+      const instrumentColors = {
+        luthier: "#a5b4fc",
+        violin: "#818cf8",
+        bow: "#c4b5fd",
+        piano: "#93c5fd",
+        guitar: "#fdba74",
+        strings: "#fcd34d",
+        brass: "#f9a8d4",
+        woodwind: "#67e8f9",
+        other: "#cbd5e1"
+      };
+
+      let maxInstrumentLane = 0;
+      instrumentEvents.forEach((ev, idx) => {
+        const x1 = xForYear(ev.start);
+        const x2 = xForYear(ev.end);
+        const lane = idx;
+        maxInstrumentLane = Math.max(maxInstrumentLane, lane);
+        const y = instrumentY + lane * 22;
+        const color = instrumentColors[ev.category] || instrumentColors.other;
+
+        const eventRect = add("rect", {
+          x: x1,
+          y: y - 8,
+          width: Math.max(3, x2 - x1),
+          height: 16,
+          rx: 4,
+          class: "instrument-event",
+          fill: color,
+          opacity: 0.85
+        }, svg);
+        eventRect.setAttribute("data-name", ev.name);
+        eventRect.setAttribute("data-start", String(ev.start));
+        eventRect.setAttribute("data-end", String(ev.end));
+
+        add("text", {
+          x: x1 + 4,
+          y: y + 4,
+          "font-size": 11,
+          fill: "#1f2937"
+        }, svg).textContent = ev.name;
+      });
+
+      // Historical context lanes
+      const danceTitleY = instrumentY + (maxInstrumentLane + 1) * 22 + 18;
+      add("text", {
+        x: cfg.left,
+        y: danceTitleY,
+        "font-size": 13,
+        "font-weight": 600,
+        fill: "#374151"
+      }, svg).textContent = "舞曲史";
+
+      const danceY = danceTitleY + 24;
+      const danceColors = {
+        court: "#fbcfe8",
+        ballroom: "#fdba74",
+        national: "#86efac",
+        other: "#cbd5e1"
+      };
+
+      let maxDanceLane = 0;
+      danceEvents.forEach((ev, idx) => {
+        const x1 = xForYear(ev.start);
+        const x2 = xForYear(ev.end);
+        const lane = idx;
+        maxDanceLane = Math.max(maxDanceLane, lane);
+        const y = danceY + lane * 22;
+        const color = danceColors[ev.category] || danceColors.other;
+
+        const eventRect = add("rect", {
+          x: x1,
+          y: y - 8,
+          width: Math.max(3, x2 - x1),
+          height: 16,
+          rx: 4,
+          class: "dance-event",
+          fill: color,
+          opacity: 0.85
+        }, svg);
+        eventRect.setAttribute("data-name", ev.name);
+        eventRect.setAttribute("data-start", String(ev.start));
+        eventRect.setAttribute("data-end", String(ev.end));
+
+        add("text", {
+          x: x1 + 4,
+          y: y + 4,
+          "font-size": 11,
+          fill: "#1f2937"
+        }, svg).textContent = ev.name;
+      });
+
+      // Historical context lanes
+      const historyTitleY = danceY + (maxDanceLane + 1) * 22 + 18;
+      add("text", {
+        x: cfg.left,
+        y: historyTitleY,
+        "font-size": 13,
+        "font-weight": 600,
+        fill: "#374151"
+      }, svg).textContent = "社会情勢";
+
+      const historyY = historyTitleY + 24;
+      const historyColors = {
+        war: "#fca5a5",
+        revolution: "#f59e0b",
+        culture: "#86efac",
+        religion: "#c4b5fd",
+        disaster: "#fb7185",
+        other: "#cbd5e1"
+      };
+
+      historicalEvents.forEach((ev, idx) => {
+        const x1 = xForYear(ev.start);
+        const x2 = xForYear(ev.end);
+        const lane = idx;
+        const y = historyY + lane * 22;
+        const color = historyColors[ev.category] || historyColors.other;
+
+        const eventRect = add("rect", {
+          x: x1,
+          y: y - 8,
+          width: Math.max(3, x2 - x1),
+          height: 16,
+          rx: 4,
+          class: "history-event",
+          fill: color,
+          opacity: 0.8
+        }, svg);
+        eventRect.setAttribute("data-name", ev.name);
+        eventRect.setAttribute("data-start", String(ev.start));
+        eventRect.setAttribute("data-end", String(ev.end));
+
+        add("text", {
+          x: x1 + 4,
+          y: y + 4,
+          "font-size": 11,
+          fill: "#1f2937"
+        }, svg).textContent = ev.name;
+      });
+
+      const clickTargets = Array.from(svg.querySelectorAll(".lifespan-band, .active-band, .composer-name"));
+      clickTargets.forEach((node) => {
+        node.addEventListener("click", () => {
+          const composerName = node.getAttribute("data-name") || node.parentElement.getAttribute("data-name");
+          focusComposer(composerName);
+        });
+      });
+    }
+
+    function scrollToComposer(name) {
+      const composer = composers.find((c) => c.name === name);
+      if (!composer) return;
+      const { start, end } = getActiveRange(composer);
+      const targetYear = Math.round((start + end) / 2);
+      scrollPane.scrollLeft = Math.max(0, xForYear(targetYear) - scrollPane.clientWidth * 0.45);
+    }
+
+    function updateFocusButtonState() {
+      if (!clearFocusButton) return;
+      clearFocusButton.disabled = !focusedComposerName;
+      clearFocusButton.classList.toggle("active", Boolean(focusedComposerName));
+    }
+
+    function renderWorkItems(target, works, composerName, withYoutubeLink) {
+      if (!target) return;
+      target.innerHTML = "";
+      if (!Array.isArray(works) || works.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "(No entries)";
+        target.appendChild(li);
+        return;
+      }
+
+      works
+        .slice()
+        .sort((a, b) => (a.year || 0) - (b.year || 0))
+        .forEach((work) => {
+          const li = document.createElement("li");
+          const label = document.createElement("span");
+          label.textContent = `${work.year}年: ${work.title}${work.number ? ` (${work.number})` : ""}`;
+          li.appendChild(label);
+          if (withYoutubeLink && composerName) {
+            const a = document.createElement("a");
+            const q = encodeURIComponent(`${composerName} ${work.title}`);
+            a.href = `https://www.youtube.com/results?search_query=${q}`;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.className = "work-yt-link";
+            a.textContent = "YouTube";
+            li.appendChild(a);
+          }
+          target.appendChild(li);
+        });
+    }
+
+    function showComposerDialog(name) {
+      const composer = composers.find((c) => c.name === name);
+      if (!composer || !composerDialog) return;
+      const { start, end } = getActiveRange(composer);
+      const featuredWorks = (composer.works || []).filter((w) => w.featured !== false);
+      const otherWorks = (composer.works || []).filter((w) => w.featured === false);
+
+      if (dialogName) dialogName.textContent = composer.name;
+      if (dialogMeta) {
+        dialogMeta.textContent = `${composer.birth} - ${getDeathLabel(composer)} (Active ${start} - ${end})`;
+      }
+      if (dialogYoutube) {
+        const q = encodeURIComponent(composer.name);
+        dialogYoutube.href = `https://www.youtube.com/results?search_query=${q}`;
+      }
+      renderWorkItems(dialogFeatured, featuredWorks, composer.name, true);
+      renderWorkItems(dialogOther, otherWorks, composer.name, true);
+      composerDialog.classList.add("visible");
+    }
+
+    function hideComposerDialog() {
+      if (!composerDialog) return;
+      composerDialog.classList.remove("visible");
+    }
+
+    function isDialogVisible() {
+      return Boolean(composerDialog && composerDialog.classList.contains("visible"));
+    }
+
+    function focusComposer(name) {
+      if (!name) return;
+      focusedComposerName = name;
+      updateFocusButtonState();
+      if (scaleMode !== "focus100") {
+        setScaleMode("focus100");
+      } else {
+        draw();
+      }
+      scrollToComposer(name);
+      showComposerDialog(name);
+    }
+
+    function clearComposerFocus() {
+      focusedComposerName = null;
+      updateFocusButtonState();
+      draw();
+      hideComposerDialog();
+    }
+
+    function setScaleMode(mode) {
+      scaleMode = mode;
+      const yearSpan = cfg.maxYear - cfg.minYear;
+      const focusYears = 100;
+      const basePlotWidth = 1450;
+      const focusCompression = 0.5;
+      const pxPerYear = mode === "focus100"
+        ? (basePlotWidth / focusYears) * focusCompression
+        : basePlotWidth / yearSpan;
+      cfg.width = Math.round(cfg.left + cfg.right + yearSpan * pxPerYear);
+      chartHeight = computeRequiredHeight();
+      cfg.height = chartHeight;
+
+      svg.setAttribute("width", String(cfg.width));
+      svg.setAttribute("height", String(chartHeight));
+      svg.setAttribute("viewBox", `0 0 ${cfg.width} ${chartHeight}`);
+
+      if (scaleFullButton) {
+        scaleFullButton.classList.toggle("active", mode === "full");
+      }
+      if (scale100Button) {
+        scale100Button.classList.toggle("active", mode === "focus100");
+      }
+
+      draw();
+
+      if (mode === "full") {
+        scrollPane.scrollLeft = 0;
+      } else {
+        const targetYear = focusedComposerName
+          ? Math.round((() => {
+            const composer = composers.find((c) => c.name === focusedComposerName);
+            if (!composer) return 1800;
+            const { start, end } = getActiveRange(composer);
+            return (start + end) / 2;
+          })())
+          : 1800;
+        scrollPane.scrollLeft = Math.max(0, xForYear(targetYear) - scrollPane.clientWidth * 0.45);
+      }
+    }
+
+    if (scaleFullButton) {
+      scaleFullButton.addEventListener("click", () => setScaleMode("full"));
+    }
+    if (scale100Button) {
+      scale100Button.addEventListener("click", () => setScaleMode("focus100"));
+    }
+    if (clearFocusButton) {
+      clearFocusButton.addEventListener("click", () => clearComposerFocus());
+    }
+    if (closeDialogButton) {
+      closeDialogButton.addEventListener("click", () => clearComposerFocus());
+    }
+    document.addEventListener("keydown", (event) => {
+      if (!isDialogVisible()) return;
+      if (event.key === "Escape") {
+        clearComposerFocus();
+      }
+    });
+    document.addEventListener("click", (event) => {
+      if (!isDialogVisible()) return;
+      const target = event && event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest("#composerDialog")) return;
+      if (target.closest(".lifespan-band, .active-band, .composer-name")) return;
+      clearComposerFocus();
+    });
+    document.addEventListener("click", (event) => {
+      if (!menuPanel) return;
+      const target = event && event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest(".md-menu-button")) return;
+      if (target.closest(".md-menu-panel")) return;
+      menuPanel.classList.add("md-hidden");
+    });
+
+    try {
+      updateFocusButtonState();
+      setScaleMode("full");
+    } catch (err) {
+      if (errorBox) {
+        errorBox.style.display = "block";
+        errorBox.textContent = `描画エラー: ${err && err.message ? err.message : err}`;
+      }
+    }
+
+    window.toggleMenu = function toggleMenu(event) {
+      if (!menuPanel) return;
+      if (event && typeof event.stopPropagation === "function") {
+        event.stopPropagation();
+      }
+      menuPanel.classList.toggle("md-hidden");
+    };
+  </script>
+</body>
+</html>

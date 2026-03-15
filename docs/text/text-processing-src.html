@@ -1,0 +1,2010 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>テキスト加工</title>
+<link rel="stylesheet" href="../../lht-cmn/css/components.css">
+  <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+  <style>
+    /* local-html-tools MD3 Token Spec v1.0.0 (2026-02-08) */
+    :root {
+      --md-danger: #b3261e;
+      --md-state-layer: rgba(98, 0, 238, 0.12);
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-focus-ring: rgba(98, 0, 238, 0.35);
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-on-secondary: #00332c;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-on-tertiary: #FFFFFF;
+      --md-sys-color-on-tertiary-container: #3d2e5a;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-secondary: #03dac6;
+      --md-sys-color-shadow: rgba(0, 0, 0, 0.2);
+      --md-sys-color-state-layer: rgba(98, 0, 238, 0.08);
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-sys-color-tertiary: #7D5260;
+      --md-sys-color-tertiary-container: #f3e8fd;
+      --md-typography-body-medium: 1rem;
+      --md-typography-body-small: 0.875rem;
+      --md-typography-headline-large: 1.85rem;
+      --md-typography-title-medium: 1.1rem;
+      --md-typography-title-small: 1.05rem;
+      --status-later: #ff9800;
+      --status-ok: #4caf50;
+      --status-todo: #00bcd4;
+    }
+
+    /* local-html-tools MD3 Core Spec v1.0.2 (2026-02-08) */
+    .md-page {
+      background: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; min-height: 100vh;
+    }
+    
+    .md-shell {
+      max-width: 980px; margin: 0 auto;
+    }
+    
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 18px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 16px 30px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e9e3f0;
+      padding: 28px;
+    }
+    
+    .md-headline {
+      font-size: 1.8rem; font-weight: 700; margin-bottom: 0.75rem;
+    }
+    
+    .md-subtitle {
+      color: var(--md-sys-color-on-surface-variant); font-size: 0.95rem;
+    }
+    
+    .md-section {
+      margin-top: 28px;
+    }
+    
+    .md-section-title {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
+    }
+    
+    .md-grid {
+      display: grid; gap: 16px;
+    }
+    
+    .md-label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+      margin-bottom: 0.35rem;
+    }
+    
+    .md-required {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.15rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.54rem;
+      font-weight: 600;
+      background: #ECEAF1;
+      color: #49454F;
+    }
+    
+    .md-input, .md-textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    
+    .md-textarea {
+      min-height: 6.5rem;
+    }
+    
+    .md-input:focus, .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-field-block {
+      margin-bottom: 1rem;
+    }
+    
+    .md-button {
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+    
+    .md-button--primary {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
+    }
+    
+    .md-button--primary:hover {
+      background: #4f00c9;
+    }
+    
+    .md-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    
+    .md-tooltip-group {
+      position: relative; display: inline-flex; align-items: center;
+    }
+    
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: 20rem;
+      max-width: 90vw;
+    }
+    
+    .md-tooltip-group:hover .md-tooltip-content {
+      opacity: 1;
+    }
+    
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: transparent;
+      color: #4a4458;
+      margin-left: 0.2rem;
+    }
+    
+    .md-info-icon {
+      width: 18px; height: 18px;
+    }
+    
+    .md-code-block {
+      position: relative; margin-top: 0.5rem;
+    }
+    
+    .md-code {
+      display: block;
+      padding: 0.75rem;
+      padding-right: 2.5rem;
+      border-radius: 12px;
+      overflow-x: auto;
+      white-space: pre;
+      background: var(--md-sys-color-surface-variant);
+      border: 1px solid #e5e0ec;
+      color: #1f1b2d;
+      min-height: 2.5rem;
+    }
+    
+    .md-copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      background: #f7f2fa;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .md-snackbar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #2b2831;
+      color: #f7f4fb;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      font-size: 0.85rem;
+    }
+    
+    .md-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(98, 0, 238, 0.12);
+      color: var(--md-sys-color-primary);
+      margin-left: 6px;
+    }
+    
+    .md-section-wrap {
+      display: grid; gap: 1.75rem;
+    }
+    
+    .md-section-card {
+      padding: 1.25rem 1.25rem 1.5rem;
+      border-radius: 24px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #ece7f3;
+      box-shadow: 0 2px 10px rgba(41, 35, 58, 0.06);
+    }
+    
+    .md-section-subtitle {
+      font-size: var(--md-typography-body-small);
+      color: #6a6675;
+      margin-bottom: 1rem;
+    }
+    
+    .md-section-title--spaced {
+      margin-top: 1rem;
+    }
+    
+    .md-grid-3 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    
+    .md-card-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+    }
+    
+    .md-card-title {
+      font-size: var(--md-typography-title-small); font-weight: 600; color: #2f2a35;
+    }
+    
+    .md-card-arrow {
+      color: #8f8a98; font-size: 1.2rem;
+    }
+    
+    .md-card-desc {
+      margin-top: 0.5rem;
+      font-size: var(--md-typography-body-small);
+      color: #5f5a6b;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .md-info-chip:focus-visible {
+      box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring);
+    }
+    
+    .md-tooltip--wide {
+      width: min(32rem, 90vw);
+    }
+    
+    .md-tooltip--rich {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .md-menu-button {
+      position: absolute; top: 16px; right: 16px;
+    }
+    
+    .md-menu-panel {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 20;
+    }
+    
+    .md-menu-link {
+      display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface);
+    }
+    
+    .md-menu-link:hover {
+      background: #f2edf8;
+    }
+    
+    .md-headline__icon {
+      margin-right: 0.5rem;
+    }
+    
+    .md-section-title--lg {
+      font-size: 1.1rem;
+    }
+    
+    .md-input, .md-select, .md-textarea {
+      display: block;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+      box-sizing: border-box;
+    }
+    
+    .md-input:focus, .md-select:focus, .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-icon-btn:hover {
+      background: #e6e1ee;
+    }
+    
+    .md-icon-btn--small {
+      width: 32px; height: 32px; border-radius: 16px;
+    }
+    
+    .md-icon-btn--surface {
+      background: #f7f2fa;
+    }
+    
+    .md-snackbar.md-visible {
+      opacity: 1; pointer-events: auto;
+    }
+    
+    .md-hidden {
+      display: none;
+    }
+    
+        .md-sr-only {
+          position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
+        }
+        .md-preview .md-sr-only { display: none !important; }
+    
+    .md-stack-sm > * + * {
+      margin-top: 0.75rem;
+    }
+    
+    .md-radio-row { display: flex; align-items: flex-start; gap: 0.5rem; }
+    .md-radio {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: #3f3b46;
+    }
+    
+    .md-radio input {
+      accent-color: var(--md-sys-color-primary);
+    }
+    
+    .md-switch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+    }
+    
+    .md-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #f0ebf7;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: inset 0 0 0 1px #cfc7dc;
+    }
+    
+    .md-switch::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: #ffffff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 150ms ease, background 150ms ease;
+    }
+    
+    .md-switch-input {
+      position: absolute; opacity: 0; pointer-events: none;
+    }
+    
+    .md-switch-input:checked + .md-switch {
+      background: rgba(98, 0, 238, 0.32);
+      box-shadow: inset 0 0 0 1px rgba(98, 0, 238, 0.6);
+    }
+    
+    .md-switch-input:checked + .md-switch::after {
+      transform: translateX(20px);
+      background: #ffffff;
+    }
+    
+    .md-tab-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border-bottom: 1px solid #e6e1ee;
+      margin-bottom: 1rem;
+    }
+    
+    .md-tab-button {
+      border: 1px solid #e6e1ee;
+      border-bottom: none;
+      background: #f3f1f7;
+      padding: 0.4rem 0.9rem;
+      margin-bottom: -1px;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #3f3b46;
+    }
+    
+    .md-tab-button[aria-selected="true"] {
+      background: #ffffff;
+      border-color: #c8c5d0;
+      color: #1c1b1f;
+    }
+    
+    .md-tab-panel {
+      border: 1px solid #e6e1ee;
+      border-top: none;
+      padding: 1rem;
+      background: #ffffff;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      margin-bottom: 1rem;
+    }
+    
+    .md-label--row {
+      margin-bottom: 0.5rem;
+    }
+    
+    .md-input, .md-select {
+      display: block;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+      box-sizing: border-box;
+    }
+    
+    .md-input:focus, .md-select:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-form-grid {
+      display: grid; gap: 0.75rem;
+    }
+    
+    .md-button--tonal {
+      background: #f0edf5;
+      color: #3f3b46;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    
+    .md-button--tonal:hover {
+      background: #e6e1ee;
+    }
+    
+    .md-chip-row {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;
+    }
+    
+    .md-tooltip--narrow {
+      width: 18rem;
+    }
+    
+    .md-surface-card {
+      max-width: 48rem; margin: 0 auto; padding: 24px; position: relative;
+    }
+    
+    .md-choice {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.25rem 0;
+    }
+    
+    .md-input {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      font-size: 1rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    
+    .md-input:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-button:hover {
+      box-shadow: 0 4px 10px rgba(98, 0, 238, 0.35);
+    }
+    
+    .md-button:active {
+      opacity: 0.7;
+    }
+    
+    .md-button--surface {
+      background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface); border: 1px solid var(--md-sys-color-outline);
+    }
+    
+    .md-button--secondary {
+      background: var(--md-sys-color-secondary); color: var(--md-sys-color-on-secondary); margin-bottom: 10px;
+    }
+    
+    .md-button-row {
+      display: flex; gap: 15px; height: clamp(120px, 20vh, 220px); margin-bottom: 10px;
+    }
+    
+    .md-button--hero {
+      font-size: clamp(1.2rem, 4vw, 1.6rem);
+    }
+    
+    .md-field {
+      position: relative; min-width: 200px;
+    }
+    
+    .md-field__label {
+      position: absolute;
+      top: -9px;
+      left: 12px;
+      padding: 0 6px;
+      background: var(--md-sys-color-surface);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+      letter-spacing: 0.02em;
+    }
+    
+    .md-field .md-select {
+      appearance: none;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.8rem 2.2rem 0.8rem 0.9rem;
+      font-size: 0.9rem;
+      color: var(--md-sys-color-on-surface);
+      min-width: 200px;
+      line-height: 1.2;
+      background-image: linear-gradient(45deg, transparent 50%, #6c6775 50%), linear-gradient(135deg, #6c6775 50%, transparent 50%);
+      background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+    }
+    
+    .md-field .md-select:focus {
+      outline: none; border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-stack-md > * + * {
+      margin-top: 0.75rem;
+    }
+    
+    .md-grid-2 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    
+    .md-form-row {
+      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+    }
+    
+    .md-form-row--nowrap {
+      flex-wrap: nowrap;
+    }
+    
+    .md-label--muted {
+      color: #3f3b46;
+    }
+    
+    .md-label--block {
+      margin-bottom: 0.5rem;
+    }
+    
+    .md-snackbar-host {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      padding: 0.5rem 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+    
+    .md-snackbar-host.md-visible {
+      opacity: 1; pointer-events: auto;
+    }
+    
+    .md-button:disabled {
+      background: #e6e1ee;
+      color: #9a94a7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    
+    .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    
+    .md-input-block {
+      margin-bottom: 1rem;
+    }
+    
+    .md-section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    
+    .md-output-wrap {
+      position: relative;
+    }
+    
+    .md-output {
+      background: var(--md-sys-color-surface-variant);
+    }
+    
+    .md-stack-lg > * + * {
+      margin-top: 1.5rem;
+    }
+    
+    .md-form-row--start {
+      align-items: flex-start;
+    }
+    
+    .md-input:disabled, .md-select:disabled {
+      background: #f3f0f7;
+    }
+    
+    .md-choice-card {
+      border: 1px solid #e2dcec;
+      border-radius: 16px;
+      padding: 1rem;
+      background: #ffffff;
+    }
+    
+    .md-choice-card--muted {
+      background: #f7f3fb;
+    }
+    
+    .md-choice-row {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    
+    .md-choice-row input {
+      margin: 0;
+    }
+    
+    .md-choice-sub {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #6a6675;
+    }
+    
+    .md-choice-sub small {
+      font-size: 0.75rem; color: #7b7784;
+    }
+    
+    .md-chip--primary {
+      background: #e2d9f7;
+      color: #4a1e9e;
+    }
+    
+    .md-chip--warn {
+      background: #f7ece1;
+      color: #8a4b0f;
+    }
+    
+    .md-field-stack {
+      display: flex; flex-direction: column; align-items: stretch; gap: 0.5rem;
+    }
+    
+    .md-label--full {
+      width: 100%;
+    }
+    
+    .md-switch-row {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; color: var(--md-sys-color-on-surface); font-size: 0.95rem;
+    }
+    
+    .md-input-wrap {
+      position: relative;
+      flex: 1 1 16rem;
+      min-width: 12rem;
+    }
+    
+    .md-input-wrap .md-input {
+      padding-right: 3rem;
+    }
+    
+    .md-input-action {
+      position: absolute;
+      top: 50%;
+      right: -0.5rem;
+      transform: translateY(-50%);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    }
+    
+    .md-field-stack .md-input, .md-field-stack .md-select {
+      flex: 0 0 auto;
+    }
+    
+    .md-field--dropdown {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23635b75' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem 1rem;
+      padding-right: 2.25rem;
+    }
+    
+    .md-select--inline {
+      flex: 1 1 18rem; min-width: 14rem;
+    }
+    
+    .md-input.md-disabled, .md-select.md-disabled {
+      background: #f3f0f7;
+    }
+    
+    .md-choice-inline {
+      display: flex; flex-wrap: wrap; gap: 1.25rem; row-gap: 0.5rem;
+    }
+    
+    .md-choice-text {
+      font-size: 0.9rem; color: #4a4458;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: "Roboto", "Segoe UI", "Noto Sans JP", "Hiragino Sans", sans-serif; font-size: 1rem; line-height: 1.5; }
+    button { border: none; background: transparent; cursor: pointer; font: inherit; }
+    textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    a { text-decoration: none; color: inherit; }
+
+    .md-page { background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-surface); padding: 24px; }
+    .md-shell { max-width: 48rem; margin: 0 auto; }
+    .md-card {
+      background: var(--md-sys-color-surface);
+      border-radius: 16px;
+      border: 1px solid #ece7f3;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      padding: 24px;
+      position: relative;
+    }
+
+    .md-menu-button { position: absolute; top: 16px; right: 16px; }
+    .md-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f0edf5;
+      color: #3f3b46;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .md-icon-btn:hover { background: #e6e1ee; }
+    .md-icon-20 { width: 20px; height: 20px; }
+
+    .md-menu-panel {
+      position: absolute;
+      top: 56px;
+      right: 16px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #e6e1ee;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 4px 0;
+      min-width: 160px;
+      z-index: 10;
+    }
+    .md-menu-link { display: block; padding: 8px 16px; color: var(--md-sys-color-on-surface); }
+    .md-menu-link:hover { background: #f2edf8; }
+
+    .md-headline {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .md-label {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+      color: #3f3b46;
+      margin-bottom: 0.35rem;
+    }
+
+    .md-textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .md-textarea:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.2);
+    }
+    .md-input-block { margin-bottom: 1rem; }
+
+    .md-section { margin-bottom: 1.5rem; }
+    .md-section-title { font-weight: 600; color: #3f3b46; margin-bottom: 0.5rem; }
+    .md-section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .md-text-button {
+      background: rgba(98, 0, 238, 0.12);
+      color: var(--md-sys-color-primary);
+      border-radius: 999px;
+      padding: 0.25rem 0.85rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: background 150ms ease, color 150ms ease;
+    }
+    .md-text-button:hover {
+      background: rgba(98, 0, 238, 0.2);
+    }
+    .md-text-button:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.3);
+    }
+
+    .md-option-card {
+      border: 1px solid #e5e0ec;
+      border-radius: 14px;
+      background: var(--md-sys-color-surface-variant);
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .md-check-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: #3f3b46;
+    }
+    .md-checkbox { accent-color: var(--md-sys-color-primary); }
+    .md-switch-label {
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .md-switch-text { flex: 1; }
+    .md-switch-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .md-switch {
+      width: 44px;
+      height: 24px;
+      background: #f0ebf7;
+      border-radius: 9999px;
+      position: relative;
+      box-shadow: inset 0 0 0 1px #cfc7dc;
+      transition: background 150ms ease, box-shadow 150ms ease;
+      flex-shrink: 0;
+    }
+    .md-switch::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: #ffffff;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 150ms ease, background 150ms ease;
+    }
+    .md-switch-input:checked + .md-switch {
+      background: #8b5cf6;
+      box-shadow: inset 0 0 0 1px #7c3aed;
+    }
+    .md-switch-input:checked + .md-switch::after {
+      transform: translateX(20px);
+      background: #ffffff;
+    }
+
+    .md-subpanel {
+      margin-top: 0.5rem;
+      padding-left: 1rem;
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .md-accordion {
+      border: 1px solid #e5e0ec;
+      border-radius: 14px;
+      background: var(--md-sys-color-surface);
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .md-accordion summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: #3f3b46;
+      padding: 0.35rem 0;
+    }
+    .md-accordion summary::-webkit-details-marker { display: none; }
+    .md-accordion summary::after {
+      content: "▾";
+      font-size: 0.9rem;
+      color: #6a6675;
+      transition: transform 150ms ease;
+    }
+    .md-accordion[open] summary::after { transform: rotate(180deg); }
+    .md-sub-label { font-size: 0.85rem; color: #3f3b46; }
+    .md-select {
+      border-radius: 10px;
+      border: 1px solid var(--md-sys-color-outline);
+      padding: 0.35rem 0.5rem;
+      background: var(--md-sys-color-surface);
+      font-size: 0.85rem;
+    }
+
+    .md-output-wrap { position: relative; }
+    .md-output { background: var(--md-sys-color-surface-variant); }
+    .md-copy-button { position: absolute; top: 0.5rem; right: 0.5rem; }
+
+    .md-muted { color: #6a6675; font-size: 0.85rem; margin-top: 0.5rem; }
+
+    .md-snackbar {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2b2831;
+      color: #f7f4fb;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+    .md-snackbar.md-visible { opacity: 1; pointer-events: auto; }
+
+    .md-tooltip-group { position: relative; display: inline-flex; align-items: center; }
+    .md-info-chip {
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: #f0edf5;
+      color: #4a4458;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+    }
+    .md-tooltip-group:hover .md-tooltip-content { opacity: 1; }
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      min-width: 12rem;
+      width: min(24rem, 90vw);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .hidden { display: none; }
+
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .pl-4 { padding-left: 1rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-xs { font-size: 0.75rem; }
+    .font-semibold { font-weight: 600; }
+    .font-bold { font-weight: 700; }
+  </style>
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
+<div class="md-shell md-card">
+<lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+<h1 class="md-headline">
+<span aria-hidden="true">🧩</span>
+<span>テキスト加工</span>
+<span class="md-tooltip-group">
+<span class="md-info-chip">?</span>
+<span class="md-tooltip-content md-tooltip">
+          テキストを即時に変換・整形するためのツールです。入力内容に対して選択した変換オプションが順番に適用され、結果が出力欄に反映されます。文字の変換・行の変換・空白の変換を組み合わせて使えます。
+        </span>
+</span>
+</h1>
+<lht-text-field-help
+  field-id="inputText"
+  label="入力テキスト"
+  type="textarea"
+  rows="8"
+  field-class="md-input-block"
+  placeholder="加工したいテキストを入力してください"
+  help-text="ここに入力したテキストが変換対象になります。"
+></lht-text-field-help>
+<div class="md-section">
+<div class="md-section-title md-section-title-row">
+<div>
+          変換オプション:
+          <span class="md-tooltip-group">
+<span class="md-info-chip">?</span>
+<span class="md-tooltip-content md-tooltip">
+            変換オプション: チェックや選択した内容が出力に反映されます。複数の変換を同時に適用できます。
+            変換の順序: 行末 → 全角/半角 → 記号 → ひら/カタ → 大文字/小文字 → 行の並び → 空行除去 → 改行→空白 → トリム → 空白正規化
+          </span>
+</span>
+</div>
+<button class="md-text-button" onclick="applyCommonPreset()" type="button">よくある</button>
+</div>
+<details class="md-accordion">
+<summary>文字の変換</summary>
+<div class="md-subpanel" id="charConvertPanel">
+<lht-select-help
+  field-id="optWidth"
+  label="全角/半角"
+  help-text="全角と半角の相互変換を指定します。"
+>
+<script type="application/json" slot="options">
+[
+  { "value": "none", "label": "変換しない", "selected": true },
+  { "value": "toHalf", "label": "半角に変換" },
+  { "value": "toFull", "label": "全角に変換" }
+]
+</script>
+</lht-select-help>
+<lht-switch-help
+  switch-id="optIncludeKana"
+  label="仮名を含める"
+  help-label="仮名変換の説明"
+>全角/半角変換時に、かな文字も対象へ含めます。</lht-switch-help>
+<lht-select-help
+  field-id="optKana"
+  label="ひらがな/カタカナ"
+  help-text="ひらがなとカタカナの変換方向を指定します。"
+>
+<script type="application/json" slot="options">
+[
+  { "value": "none", "label": "変換しない", "selected": true },
+  { "value": "toKata", "label": "ひらがな → カタカナ" },
+  { "value": "toHira", "label": "カタカナ → ひらがな" }
+]
+</script>
+</lht-select-help>
+<lht-select-help
+  field-id="optCase"
+  label="大文字/小文字（英字）"
+  help-text="英字の大文字化または小文字化を指定します。"
+>
+<script type="application/json" slot="options">
+[
+  { "value": "none", "label": "変換しない", "selected": true },
+  { "value": "upper", "label": "大文字に変換" },
+  { "value": "lower", "label": "小文字に変換" }
+]
+</script>
+</lht-select-help>
+</div>
+</details>
+<details class="md-accordion">
+<summary>記号を変換</summary>
+<div class="md-subpanel" id="symbolConvertPanel">
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">すべて切り替え</span>
+<input class="md-switch-input" id="optSymbolAll" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">セミコロン（； → ;）</span>
+<input class="md-switch-input" id="optSymbolSemicolon" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">コロン（： → :）</span>
+<input class="md-switch-input" id="optSymbolColon" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">クオート（＇ → '）</span>
+<input class="md-switch-input" id="optSymbolSingleQuote" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">ダブルクオート（＂ → "）</span>
+<input class="md-switch-input" id="optSymbolDoubleQuote" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">バッククオート（｀ → `）</span>
+<input class="md-switch-input" id="optSymbolBackQuote" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">丸括弧（（ ） → ( )）</span>
+<input class="md-switch-input" id="optSymbolParentheses" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">感嘆符（！ → !）</span>
+<input class="md-switch-input" id="optSymbolExclamation" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">ドル（＄ → $）</span>
+<input class="md-switch-input" id="optSymbolDollar" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">クエスチョン（？ → ?）</span>
+<input class="md-switch-input" id="optSymbolQuestion" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">アンパサンド（＆ → &amp;）</span>
+<input class="md-switch-input" id="optSymbolAmpersand" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">アットマーク（＠ → @）</span>
+<input class="md-switch-input" id="optSymbolAt" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">シャープ（＃ → #）</span>
+<input class="md-switch-input" id="optSymbolHash" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">パーセント（％ → %）</span>
+<input class="md-switch-input" id="optSymbolPercent" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">プラス（＋ → +）</span>
+<input class="md-switch-input" id="optSymbolPlus" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">イコール（＝ → =）</span>
+<input class="md-switch-input" id="optSymbolEquals" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">スラッシュ（／ → /）</span>
+<input class="md-switch-input" id="optSymbolSlash" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">バックスラッシュ（＼ → \\）</span>
+<input class="md-switch-input" id="optSymbolBackslash" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">ハイフン（－ → -）</span>
+<input class="md-switch-input" id="optSymbolHyphen" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">アンダースコア（＿ → _）</span>
+<input class="md-switch-input" id="optSymbolUnderscore" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">カンマ（， → ,）</span>
+<input class="md-switch-input" id="optSymbolComma" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">ピリオド（． → .）</span>
+<input class="md-switch-input" id="optSymbolPeriod" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">キャレット（＾ → ^）</span>
+<input class="md-switch-input" id="optSymbolCaret" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">パイプ（｜ → |）</span>
+<input class="md-switch-input" id="optSymbolPipe" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">不等号（＜ ＞ → &lt; &gt;）</span>
+<input class="md-switch-input" id="optSymbolAngle" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">波括弧（｛ ｝ → { }）</span>
+<input class="md-switch-input" id="optSymbolBrace" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">角括弧（［ ］ → [ ]）</span>
+<input class="md-switch-input" id="optSymbolBracket" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">チルダ（～ → ~）</span>
+<input class="md-switch-input" id="optSymbolTilde" type="checkbox">
+<span class="md-switch"></span>
+</label>
+</div>
+</details>
+<details class="md-accordion">
+<summary>行の変換</summary>
+<div class="md-subpanel" id="lineConvertPanel">
+<label class="md-sub-label">行末:
+          <select class="md-select" id="optLineEnding">
+<option value="keep">維持</option>
+<option value="lf">LF に統一</option>
+<option value="crlf">CRLF に統一</option>
+</select>
+</label>
+<label class="md-sub-label">行の並び:
+          <select class="md-select" id="optSortLines">
+<option value="none">並び替えしない</option>
+<option value="asc">昇順</option>
+<option value="desc">降順</option>
+</select>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">空行を除去</span>
+<input class="md-switch-input" id="optRemoveEmptyLines" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">連続する空行を1行に</span>
+<input class="md-switch-input" id="optCollapseEmptyLines" type="checkbox">
+<span class="md-switch"></span>
+</label>
+</div>
+</details>
+<details class="md-accordion">
+<summary>空白の変換</summary>
+<div class="md-subpanel" id="spaceConvertPanel">
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">全角/特殊空白を半角空白に変換</span>
+<input class="md-switch-input" id="optNormalizeUnicodeSpaces" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">サイズのない空白を除去</span>
+<input class="md-switch-input" id="optRemoveZeroWidthSpaces" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">句読点/記号（。、？！）の直前の半角空白を除去</span>
+<input class="md-switch-input" id="optRemoveSpaceBeforePunct" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">前後の空白をトリム</span>
+<input class="md-switch-input" id="optTrim" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">連続する空白・タブを1つにする</span>
+<input class="md-switch-input" id="optNormalizeSpaces" type="checkbox">
+<span class="md-switch"></span>
+</label>
+<label class="md-check-row md-switch-label">
+<span class="md-switch-text">改行を空白に変換</span>
+<input class="md-switch-input" id="optNewlineToSpace" type="checkbox">
+<span class="md-switch"></span>
+</label>
+</div>
+</details>
+<div class="md-muted"></div>
+</div>
+<label class="md-label">
+      出力テキスト:
+      <span class="md-tooltip-group">
+<span class="md-info-chip">?</span>
+<span class="md-tooltip-content md-tooltip">
+          入力テキストに変換オプションを適用した結果が表示されます。コピーアイコンで内容をクリップボードへコピーできます。
+        </span>
+</span>
+</label>
+<div class="md-output-wrap">
+<textarea class="md-textarea md-output" id="outputText" placeholder="ここに結果が表示されます" readonly="" rows="6"></textarea>
+<button class="md-icon-btn md-copy-button" onclick="copyToClipboard('outputText')" aria-label="コピー">
+<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
+        </svg>
+</button>
+</div>
+<div class="md-muted" id="outputStats">文字数: 0 / 行数: 0</div>
+<div class="md-snackbar" id="toast">
+      コピーしました
+    </div>
+</div>
+<script>
+    const halfToFullKanaMap = {
+      '｡': '。', '｢': '「', '｣': '」', '､': '、', '･': '・',
+      'ｧ': 'ァ', 'ｨ': 'ィ', 'ｩ': 'ゥ', 'ｪ': 'ェ', 'ｫ': 'ォ',
+      'ｬ': 'ャ', 'ｭ': 'ュ', 'ｮ': 'ョ', 'ｯ': 'ッ', 'ｰ': 'ー',
+      'ｱ': 'ア', 'ｲ': 'イ', 'ｳ': 'ウ', 'ｴ': 'エ', 'ｵ': 'オ',
+      'ｶ': 'カ', 'ｷ': 'キ', 'ｸ': 'ク', 'ｹ': 'ケ', 'ｺ': 'コ',
+      'ｻ': 'サ', 'ｼ': 'シ', 'ｽ': 'ス', 'ｾ': 'セ', 'ｿ': 'ソ',
+      'ﾀ': 'タ', 'ﾁ': 'チ', 'ﾂ': 'ツ', 'ﾃ': 'テ', 'ﾄ': 'ト',
+      'ﾅ': 'ナ', 'ﾆ': 'ニ', 'ﾇ': 'ヌ', 'ﾈ': 'ネ', 'ﾉ': 'ノ',
+      'ﾊ': 'ハ', 'ﾋ': 'ヒ', 'ﾌ': 'フ', 'ﾍ': 'ヘ', 'ﾎ': 'ホ',
+      'ﾏ': 'マ', 'ﾐ': 'ミ', 'ﾑ': 'ム', 'ﾒ': 'メ', 'ﾓ': 'モ',
+      'ﾔ': 'ヤ', 'ﾕ': 'ユ', 'ﾖ': 'ヨ',
+      'ﾗ': 'ラ', 'ﾘ': 'リ', 'ﾙ': 'ル', 'ﾚ': 'レ', 'ﾛ': 'ロ',
+      'ﾜ': 'ワ', 'ｦ': 'ヲ', 'ﾝ': 'ン',
+      'ﾞ': '゛', 'ﾟ': '゜'
+    };
+    const halfVoicedMap = {
+      'ｶﾞ': 'ガ', 'ｷﾞ': 'ギ', 'ｸﾞ': 'グ', 'ｹﾞ': 'ゲ', 'ｺﾞ': 'ゴ',
+      'ｻﾞ': 'ザ', 'ｼﾞ': 'ジ', 'ｽﾞ': 'ズ', 'ｾﾞ': 'ゼ', 'ｿﾞ': 'ゾ',
+      'ﾀﾞ': 'ダ', 'ﾁﾞ': 'ヂ', 'ﾂﾞ': 'ヅ', 'ﾃﾞ': 'デ', 'ﾄﾞ': 'ド',
+      'ﾊﾞ': 'バ', 'ﾋﾞ': 'ビ', 'ﾌﾞ': 'ブ', 'ﾍﾞ': 'ベ', 'ﾎﾞ': 'ボ',
+      'ｳﾞ': 'ヴ'
+    };
+    const halfSemiVoicedMap = {
+      'ﾊﾟ': 'パ', 'ﾋﾟ': 'ピ', 'ﾌﾟ': 'プ', 'ﾍﾟ': 'ペ', 'ﾎﾟ': 'ポ'
+    };
+    const fullToHalfKanaMap = {
+      '。': '｡', '「': '｢', '」': '｣', '、': '､', '・': '･',
+      'ァ': 'ｧ', 'ィ': 'ｨ', 'ゥ': 'ｩ', 'ェ': 'ｪ', 'ォ': 'ｫ',
+      'ャ': 'ｬ', 'ュ': 'ｭ', 'ョ': 'ｮ', 'ッ': 'ｯ', 'ー': 'ｰ',
+      'ア': 'ｱ', 'イ': 'ｲ', 'ウ': 'ｳ', 'エ': 'ｴ', 'オ': 'ｵ',
+      'カ': 'ｶ', 'キ': 'ｷ', 'ク': 'ｸ', 'ケ': 'ｹ', 'コ': 'ｺ',
+      'サ': 'ｻ', 'シ': 'ｼ', 'ス': 'ｽ', 'セ': 'ｾ', 'ソ': 'ｿ',
+      'タ': 'ﾀ', 'チ': 'ﾁ', 'ツ': 'ﾂ', 'テ': 'ﾃ', 'ト': 'ﾄ',
+      'ナ': 'ﾅ', 'ニ': 'ﾆ', 'ヌ': 'ﾇ', 'ネ': 'ﾈ', 'ノ': 'ﾉ',
+      'ハ': 'ﾊ', 'ヒ': 'ﾋ', 'フ': 'ﾌ', 'ヘ': 'ﾍ', 'ホ': 'ﾎ',
+      'マ': 'ﾏ', 'ミ': 'ﾐ', 'ム': 'ﾑ', 'メ': 'ﾒ', 'モ': 'ﾓ',
+      'ヤ': 'ﾔ', 'ユ': 'ﾕ', 'ヨ': 'ﾖ',
+      'ラ': 'ﾗ', 'リ': 'ﾘ', 'ル': 'ﾙ', 'レ': 'ﾚ', 'ロ': 'ﾛ',
+      'ワ': 'ﾜ', 'ヲ': 'ｦ', 'ン': 'ﾝ',
+      '゛': 'ﾞ', '゜': 'ﾟ'
+    };
+    const fullToHalfVoicedMap = {
+      'ガ': 'ｶﾞ', 'ギ': 'ｷﾞ', 'グ': 'ｸﾞ', 'ゲ': 'ｹﾞ', 'ゴ': 'ｺﾞ',
+      'ザ': 'ｻﾞ', 'ジ': 'ｼﾞ', 'ズ': 'ｽﾞ', 'ゼ': 'ｾﾞ', 'ゾ': 'ｿﾞ',
+      'ダ': 'ﾀﾞ', 'ヂ': 'ﾁﾞ', 'ヅ': 'ﾂﾞ', 'デ': 'ﾃﾞ', 'ド': 'ﾄﾞ',
+      'バ': 'ﾊﾞ', 'ビ': 'ﾋﾞ', 'ブ': 'ﾌﾞ', 'ベ': 'ﾍﾞ', 'ボ': 'ﾎﾞ',
+      'ヴ': 'ｳﾞ'
+    };
+    const fullToHalfSemiVoicedMap = {
+      'パ': 'ﾊﾟ', 'ピ': 'ﾋﾟ', 'プ': 'ﾌﾟ', 'ペ': 'ﾍﾟ', 'ポ': 'ﾎﾟ'
+    };
+
+    function detectPreferredNewline(text) {
+      if (/\r\n/.test(text)) return "\r\n";
+      if (/\r/.test(text)) return "\r";
+      return "\n";
+    }
+
+    function normalizeLineEnding(text, mode) {
+      if (mode === "keep") return text;
+      const normalized = text.replace(/\r\n|\r/g, "\n");
+      if (mode === "lf") return normalized;
+      if (mode === "crlf") return normalized.replace(/\n/g, "\r\n");
+      return text;
+    }
+
+    function convertHalfToFull(text, includeKana) {
+      let result = "";
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+        if (includeKana && next && (next === 'ﾞ' || next === 'ﾟ')) {
+          const combined = char + next;
+          if (halfVoicedMap[combined]) {
+            result += halfVoicedMap[combined];
+            i++;
+            continue;
+          }
+          if (halfSemiVoicedMap[combined]) {
+            result += halfSemiVoicedMap[combined];
+            i++;
+            continue;
+          }
+        }
+        const code = char.charCodeAt(0);
+        if (char === " ") {
+          result += "　";
+        } else if (code >= 0x21 && code <= 0x7e) {
+          result += String.fromCharCode(code + 0xfee0);
+        } else if (includeKana && halfToFullKanaMap[char]) {
+          result += halfToFullKanaMap[char];
+        } else {
+          result += char;
+        }
+      }
+      return result;
+    }
+
+    function convertFullToHalf(text, includeKana) {
+      let result = "";
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const code = char.charCodeAt(0);
+        if (char === "　") {
+          result += " ";
+        } else if (code >= 0xff01 && code <= 0xff5e) {
+          result += String.fromCharCode(code - 0xfee0);
+        } else if (includeKana && fullToHalfVoicedMap[char]) {
+          result += fullToHalfVoicedMap[char];
+        } else if (includeKana && fullToHalfSemiVoicedMap[char]) {
+          result += fullToHalfSemiVoicedMap[char];
+        } else if (includeKana && fullToHalfKanaMap[char]) {
+          result += fullToHalfKanaMap[char];
+        } else {
+          result += char;
+        }
+      }
+      return result;
+    }
+
+    function convertHiraganaToKatakana(text) {
+      return text.replace(/[\u3041-\u3096]/g, (char) =>
+        String.fromCharCode(char.charCodeAt(0) + 0x60)
+      );
+    }
+
+    function convertKatakanaToHiragana(text) {
+      return text.replace(/[\u30a1-\u30f6]/g, (char) =>
+        String.fromCharCode(char.charCodeAt(0) - 0x60)
+      );
+    }
+
+    function convertFullWidthSymbolsToHalf(text, options) {
+      let result = text;
+      if (options.semicolon) {
+        result = result.replace(/；/g, ";");
+      }
+      if (options.colon) {
+        result = result.replace(/：/g, ":");
+      }
+      if (options.singleQuote) {
+        result = result.replace(/＇/g, "'");
+      }
+      if (options.doubleQuote) {
+        result = result.replace(/＂/g, "\"");
+      }
+      if (options.backQuote) {
+        result = result.replace(/｀/g, "`");
+      }
+      if (options.parentheses) {
+        result = result.replace(/（/g, "(").replace(/）/g, ")");
+      }
+      if (options.exclamation) {
+        result = result.replace(/！/g, "!");
+      }
+      if (options.dollar) {
+        result = result.replace(/＄/g, "$");
+      }
+      if (options.question) {
+        result = result.replace(/？/g, "?");
+      }
+      if (options.ampersand) {
+        result = result.replace(/＆/g, "&");
+      }
+      if (options.at) {
+        result = result.replace(/＠/g, "@");
+      }
+      if (options.hash) {
+        result = result.replace(/＃/g, "#");
+      }
+      if (options.percent) {
+        result = result.replace(/％/g, "%");
+      }
+      if (options.plus) {
+        result = result.replace(/＋/g, "+");
+      }
+      if (options.equals) {
+        result = result.replace(/＝/g, "=");
+      }
+      if (options.slash) {
+        result = result.replace(/／/g, "/");
+      }
+      if (options.backslash) {
+        result = result.replace(/＼/g, "\\");
+      }
+      if (options.hyphen) {
+        result = result.replace(/－/g, "-");
+      }
+      if (options.underscore) {
+        result = result.replace(/＿/g, "_");
+      }
+      if (options.comma) {
+        result = result.replace(/，/g, ",");
+      }
+      if (options.period) {
+        result = result.replace(/．/g, ".");
+      }
+      if (options.caret) {
+        result = result.replace(/＾/g, "^");
+      }
+      if (options.pipe) {
+        result = result.replace(/｜/g, "|");
+      }
+      if (options.angle) {
+        result = result.replace(/＜/g, "<").replace(/＞/g, ">");
+      }
+      if (options.brace) {
+        result = result.replace(/｛/g, "{").replace(/｝/g, "}");
+      }
+      if (options.bracket) {
+        result = result.replace(/［/g, "[").replace(/］/g, "]");
+      }
+      if (options.tilde) {
+        result = result.replace(/～/g, "~");
+      }
+      return result;
+    }
+
+    function normalizeUnicodeSpacesToHalf(text) {
+      return text.replace(/[\u3000\u00A0\u1680\u180E\u2000-\u200A\u202F\u205F]/g, " ");
+    }
+
+    function removeZeroWidthSpaces(text) {
+      return text.replace(/[\u200B\u200C\u200D\u2060\uFEFF]/g, "");
+    }
+
+    function removeHalfSpaceBeforeJapanesePunctuation(text) {
+      return text.replace(/ ([\u3002\u3001！？\?！])/g, "$1");
+    }
+
+    function sortLines(text, direction, preferredNewline) {
+      if (direction === "none") return text;
+      const lines = text.split(/\r\n|\r|\n/);
+      const sorted = lines.sort((a, b) => a.localeCompare(b, "ja"));
+      if (direction === "desc") sorted.reverse();
+      return sorted.join(preferredNewline);
+    }
+
+    function autoResizeOutput() {
+      const textarea = document.getElementById('outputText');
+      if (!textarea) return;
+      const maxLines = 100;
+      const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 18;
+      const maxHeight = lineHeight * maxLines + 24;
+      textarea.style.height = 'auto';
+      const nextHeight = Math.min(textarea.scrollHeight, maxHeight);
+      textarea.style.height = `${nextHeight}px`;
+    }
+
+    function updateOutput() {
+      const input = document.getElementById('inputText').value;
+      const optWidth = document.getElementById('optWidth').value;
+      const optIncludeKana = document.getElementById('optIncludeKana').checked;
+      const optKana = document.getElementById('optKana').value;
+      const optCase = document.getElementById('optCase').value;
+      const optSymbolSemicolon = document.getElementById('optSymbolSemicolon').checked;
+      const optSymbolColon = document.getElementById('optSymbolColon').checked;
+      const optSymbolSingleQuote = document.getElementById('optSymbolSingleQuote').checked;
+      const optSymbolDoubleQuote = document.getElementById('optSymbolDoubleQuote').checked;
+      const optSymbolBackQuote = document.getElementById('optSymbolBackQuote').checked;
+      const optSymbolParentheses = document.getElementById('optSymbolParentheses').checked;
+      const optSymbolExclamation = document.getElementById('optSymbolExclamation').checked;
+      const optSymbolDollar = document.getElementById('optSymbolDollar').checked;
+      const optSymbolQuestion = document.getElementById('optSymbolQuestion').checked;
+      const optSymbolAmpersand = document.getElementById('optSymbolAmpersand').checked;
+      const optSymbolAt = document.getElementById('optSymbolAt').checked;
+      const optSymbolHash = document.getElementById('optSymbolHash').checked;
+      const optSymbolPercent = document.getElementById('optSymbolPercent').checked;
+      const optSymbolPlus = document.getElementById('optSymbolPlus').checked;
+      const optSymbolEquals = document.getElementById('optSymbolEquals').checked;
+      const optSymbolSlash = document.getElementById('optSymbolSlash').checked;
+      const optSymbolBackslash = document.getElementById('optSymbolBackslash').checked;
+      const optSymbolHyphen = document.getElementById('optSymbolHyphen').checked;
+      const optSymbolUnderscore = document.getElementById('optSymbolUnderscore').checked;
+      const optSymbolComma = document.getElementById('optSymbolComma').checked;
+      const optSymbolPeriod = document.getElementById('optSymbolPeriod').checked;
+      const optSymbolCaret = document.getElementById('optSymbolCaret').checked;
+      const optSymbolPipe = document.getElementById('optSymbolPipe').checked;
+      const optSymbolAngle = document.getElementById('optSymbolAngle').checked;
+      const optSymbolBrace = document.getElementById('optSymbolBrace').checked;
+      const optSymbolBracket = document.getElementById('optSymbolBracket').checked;
+      const optSymbolTilde = document.getElementById('optSymbolTilde').checked;
+      const optSymbolConvert = [
+        optSymbolSemicolon, optSymbolColon, optSymbolSingleQuote, optSymbolDoubleQuote,
+        optSymbolBackQuote, optSymbolParentheses, optSymbolExclamation, optSymbolDollar,
+        optSymbolQuestion, optSymbolAmpersand, optSymbolAt, optSymbolHash,
+        optSymbolPercent, optSymbolPlus, optSymbolEquals, optSymbolSlash,
+        optSymbolBackslash, optSymbolHyphen, optSymbolUnderscore, optSymbolComma,
+        optSymbolPeriod, optSymbolCaret, optSymbolPipe, optSymbolAngle,
+        optSymbolBrace, optSymbolBracket, optSymbolTilde
+      ].some(Boolean);
+      const optLineEnding = document.getElementById('optLineEnding').value;
+      const optSortLines = document.getElementById('optSortLines').value;
+      const optRemoveEmptyLines = document.getElementById('optRemoveEmptyLines').checked;
+      const optCollapseEmptyLines = document.getElementById('optCollapseEmptyLines').checked;
+      const optNewlineToSpace = document.getElementById('optNewlineToSpace').checked;
+      const optNormalizeUnicodeSpaces = document.getElementById('optNormalizeUnicodeSpaces').checked;
+      const optRemoveZeroWidthSpaces = document.getElementById('optRemoveZeroWidthSpaces').checked;
+      const optRemoveSpaceBeforePunct = document.getElementById('optRemoveSpaceBeforePunct').checked;
+      const optTrim = document.getElementById('optTrim').checked;
+      const optNormalizeSpaces = document.getElementById('optNormalizeSpaces').checked;
+
+      let text = input;
+      const preferredNewline = optLineEnding === "keep" ? detectPreferredNewline(text) : (optLineEnding === "crlf" ? "\r\n" : "\n");
+      text = normalizeLineEnding(text, optLineEnding);
+
+      if (optWidth === "toHalf") {
+        text = convertFullToHalf(text, optIncludeKana);
+      } else if (optWidth === "toFull") {
+        text = convertHalfToFull(text, optIncludeKana);
+      }
+
+      if (optSymbolConvert) {
+        text = convertFullWidthSymbolsToHalf(text, {
+          semicolon: optSymbolSemicolon,
+          colon: optSymbolColon,
+          singleQuote: optSymbolSingleQuote,
+          doubleQuote: optSymbolDoubleQuote,
+          backQuote: optSymbolBackQuote,
+          parentheses: optSymbolParentheses,
+          exclamation: optSymbolExclamation,
+          dollar: optSymbolDollar,
+          question: optSymbolQuestion,
+          ampersand: optSymbolAmpersand,
+          at: optSymbolAt,
+          hash: optSymbolHash,
+          percent: optSymbolPercent,
+          plus: optSymbolPlus,
+          equals: optSymbolEquals,
+          slash: optSymbolSlash,
+          backslash: optSymbolBackslash,
+          hyphen: optSymbolHyphen,
+          underscore: optSymbolUnderscore,
+          comma: optSymbolComma,
+          period: optSymbolPeriod,
+          caret: optSymbolCaret,
+          pipe: optSymbolPipe,
+          angle: optSymbolAngle,
+          brace: optSymbolBrace,
+          bracket: optSymbolBracket,
+          tilde: optSymbolTilde
+        });
+      }
+
+      if (optKana === "toKata") {
+        text = convertHiraganaToKatakana(text);
+      } else if (optKana === "toHira") {
+        text = convertKatakanaToHiragana(text);
+      }
+
+      if (optCase === "upper") {
+        text = text.toUpperCase();
+      } else if (optCase === "lower") {
+        text = text.toLowerCase();
+      }
+
+      text = sortLines(text, optSortLines, preferredNewline);
+
+      if (optCollapseEmptyLines) {
+        const lines = text.split(/\r\n|\r|\n/);
+        const collapsed = [];
+        let prevEmpty = false;
+        lines.forEach((line) => {
+          const isEmpty = line.trim() === "";
+          if (isEmpty) {
+            if (!prevEmpty) collapsed.push("");
+            prevEmpty = true;
+          } else {
+            collapsed.push(line);
+            prevEmpty = false;
+          }
+        });
+        text = collapsed.join(preferredNewline);
+      }
+
+      if (optRemoveEmptyLines) {
+        const lineSep = optNewlineToSpace ? "\n" : preferredNewline;
+        const lines = text.split(/\r\n|\r|\n/).filter((line) => line.trim() !== "");
+        text = lines.join(lineSep);
+      }
+
+      if (optNewlineToSpace) {
+        text = text.replace(/\r\n|\r|\n/g, " ");
+      }
+
+      if (optNormalizeUnicodeSpaces) {
+        text = normalizeUnicodeSpacesToHalf(text);
+      }
+
+      if (optRemoveZeroWidthSpaces) {
+        text = removeZeroWidthSpaces(text);
+      }
+
+      if (optRemoveSpaceBeforePunct) {
+        text = removeHalfSpaceBeforeJapanesePunctuation(text);
+      }
+
+      if (optTrim) {
+        text = text.trim();
+      }
+
+      if (optNormalizeSpaces) {
+        text = text.replace(/[ \t]+/g, " ");
+      }
+
+      document.getElementById('outputText').value = text;
+      autoResizeOutput();
+      const lineCount = text ? text.split(/\r\n|\r|\n/).length : 0;
+      document.getElementById('outputStats').textContent = `文字数: ${text.length} / 行数: ${lineCount}`;
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).value;
+      if (!text) return;
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showToast('コピーしました');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('md-visible');
+      setTimeout(() => {
+        toast.classList.remove('md-visible');
+      }, 2000);
+    }
+    function applyCommonPreset() {
+      const setChecked = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = value;
+      };
+      const setSelect = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+      };
+
+      setSelect('optWidth', 'toHalf');
+
+      const symbolIds = [
+        'optSymbolSemicolon', 'optSymbolColon', 'optSymbolSingleQuote',
+        'optSymbolDoubleQuote', 'optSymbolBackQuote', 'optSymbolParentheses',
+        'optSymbolExclamation', 'optSymbolDollar', 'optSymbolQuestion',
+        'optSymbolAmpersand', 'optSymbolAt', 'optSymbolHash',
+        'optSymbolPercent', 'optSymbolPlus', 'optSymbolEquals',
+        'optSymbolSlash', 'optSymbolBackslash', 'optSymbolUnderscore',
+        'optSymbolComma', 'optSymbolPeriod', 'optSymbolCaret',
+        'optSymbolPipe', 'optSymbolAngle', 'optSymbolBrace',
+        'optSymbolBracket', 'optSymbolTilde'
+      ];
+      symbolIds.forEach((id) => setChecked(id, true));
+      setChecked('optSymbolHyphen', false);
+      setChecked('optSymbolTilde', false);
+
+      setChecked('optNormalizeUnicodeSpaces', true);
+      setChecked('optRemoveZeroWidthSpaces', true);
+      setChecked('optNewlineToSpace', false);
+      setChecked('optRemoveSpaceBeforePunct', false);
+      setChecked('optRemoveEmptyLines', false);
+      setChecked('optCollapseEmptyLines', false);
+      setChecked('optTrim', false);
+      setChecked('optNormalizeSpaces', false);
+
+      updateSymbolAllState();
+      updateOutput();
+    }
+
+    function getSymbolOptionIds() {
+      return [
+        'optSymbolSemicolon', 'optSymbolColon', 'optSymbolSingleQuote',
+        'optSymbolDoubleQuote', 'optSymbolBackQuote', 'optSymbolParentheses',
+        'optSymbolExclamation', 'optSymbolDollar', 'optSymbolQuestion',
+        'optSymbolAmpersand', 'optSymbolAt', 'optSymbolHash',
+        'optSymbolPercent', 'optSymbolPlus', 'optSymbolEquals',
+        'optSymbolSlash', 'optSymbolBackslash', 'optSymbolHyphen',
+        'optSymbolUnderscore', 'optSymbolComma', 'optSymbolPeriod',
+        'optSymbolCaret', 'optSymbolPipe', 'optSymbolAngle',
+        'optSymbolBrace', 'optSymbolBracket', 'optSymbolTilde'
+      ];
+    }
+
+    function updateSymbolAllState() {
+      const allToggle = document.getElementById('optSymbolAll');
+      if (!allToggle) return;
+      const ids = getSymbolOptionIds();
+      const elements = ids.map((id) => document.getElementById(id)).filter(Boolean);
+      if (elements.length === 0) return;
+      const allChecked = elements.every((el) => el.checked);
+      allToggle.checked = allChecked;
+      allToggle.indeterminate = !allChecked && elements.some((el) => el.checked);
+    }
+
+    function toggleAllSymbols(checked) {
+      getSymbolOptionIds().forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = checked;
+      });
+    }
+
+
+    function setupAutoUpdate() {
+      const ids = [
+        'inputText', 'optWidth', 'optIncludeKana', 'optKana', 'optCase',
+        'optSymbolAll', 'optSymbolSemicolon', 'optSymbolColon', 'optSymbolSingleQuote',
+        'optSymbolDoubleQuote', 'optSymbolBackQuote', 'optSymbolParentheses',
+        'optSymbolExclamation', 'optSymbolDollar', 'optSymbolQuestion', 'optSymbolAmpersand',
+        'optSymbolAt', 'optSymbolHash', 'optSymbolPercent', 'optSymbolPlus',
+        'optSymbolEquals', 'optSymbolSlash', 'optSymbolBackslash', 'optSymbolHyphen',
+        'optSymbolUnderscore', 'optSymbolComma', 'optSymbolPeriod', 'optSymbolCaret',
+        'optSymbolPipe', 'optSymbolAngle', 'optSymbolBrace', 'optSymbolBracket',
+        'optSymbolTilde', 'optLineEnding', 'optSortLines', 'optNewlineToSpace',
+        'optRemoveEmptyLines', 'optCollapseEmptyLines', 'optNormalizeUnicodeSpaces',
+        'optRemoveZeroWidthSpaces', 'optRemoveSpaceBeforePunct', 'optTrim', 'optNormalizeSpaces'
+      ];
+      ids.forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        // Web Components (md-outlined-select / md-switch) と native 要素の差異を吸収するため両方を購読
+        element.addEventListener('change', updateOutput);
+        element.addEventListener('input', updateOutput);
+      });
+      updateOutput();
+    }
+
+    async function initTextProcessingPage() {
+      if (window.customElements && typeof window.customElements.whenDefined === 'function') {
+        await Promise.all([
+          window.customElements.whenDefined('lht-text-field-help'),
+          window.customElements.whenDefined('lht-select-help'),
+          window.customElements.whenDefined('lht-switch-help')
+        ]);
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      }
+
+      setupAutoUpdate();
+
+      const optSymbolAll = document.getElementById('optSymbolAll');
+      if (optSymbolAll) {
+        optSymbolAll.addEventListener('change', () => {
+          toggleAllSymbols(optSymbolAll.checked);
+          updateSymbolAllState();
+          updateOutput();
+        });
+      }
+      getSymbolOptionIds().forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('change', () => {
+          updateSymbolAllState();
+          updateOutput();
+        });
+      });
+      updateSymbolAllState();
+    }
+
+    initTextProcessingPage();
+  </script>
+</body>
+</html>

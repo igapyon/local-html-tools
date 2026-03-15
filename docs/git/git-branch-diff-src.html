@@ -1,0 +1,145 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git ブランチ比較</title>
+    <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
+  <link rel="stylesheet" href="src/git-branch-diff/css/app.css" />
+  <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
+  <div class="md-surface-card md-card">
+    <lht-page-hero
+      title="Git ブランチ比較"
+      subtitle="2つのブランチ差分を表示するコマンドを生成します。"
+      icon="🧰"
+      help-label="Git ブランチ比較の説明"
+      help-wide
+      menu-home-href="../index.html"
+      menu-home-label="トップへ戻る">
+      2つのブランチ差分を表示する `git diff` コマンドを生成します。ローカル/リモートを選べ、表示形式（内容/統計/ファイル一覧）や `..` / `...` を切り替えできます。
+    </lht-page-hero>
+
+    <div class="md-section md-stack-md">
+      <div class="md-form-row md-form-row--nowrap">
+        <lht-text-field-help field-id="branchA" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。差分の片側として使われます。例: main / devel。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-text-field-help>
+        <lht-switch-help switch-id="scopeA" label="リモートとして扱う" on-change="updateRemoteState"></lht-switch-help>
+      </div>
+
+      <div id="branchBRow" class="md-form-row md-form-row--nowrap">
+        <lht-text-field-help field-id="branchB" label="比較ブランチ" required placeholder="例: devel" help-text="比較対象のブランチです。2つのブランチ差分を表示します。例: devel / feature123。ローカルとして扱う場合は、ブランチ名に加えてコミットID（SHA）も指定できます。"></lht-text-field-help>
+        <lht-switch-help switch-id="scopeB" label="リモートとして扱う" on-change="updateRemoteState"></lht-switch-help>
+      </div>
+    </div>
+
+    <div class="md-section md-stack-md">
+      <div class="md-choice-inline md-choice-text">
+        <lht-switch-help switch-id="useHeadWork" label="HEAD" on-change="updateWorkHeadState">
+          作業側の比較対象に `HEAD` を使います。
+        </lht-switch-help>
+        <lht-switch-help switch-id="lockOrigin" label="リモート名は origin 固定" help-label="リモート名は origin 固定の説明" checked on-change="updateRemoteState">
+          origin 固定で使う場合にオンにします。オフにすると任意のリモート名を入力できます。
+          ふだんは origin を使うケースが多いです。
+        </lht-switch-help>
+        <lht-switch-help switch-id="useTripleDot" label="共通祖先からの差分比較" help-label="共通祖先からの差分比較の説明" help-wide>
+          オフ時は A と B のスナップショット差分で、A/B の両方の変更が見えます。
+          オン時は共通祖先から B までの差分になり、B 側で増えた変更だけが見え、A だけの変更は見えません。
+        </lht-switch-help>
+      </div>
+      <div id="remoteNameBlock" class="md-form-row md-form-row--nowrap">
+        <lht-text-field-help field-id="remoteName" label="リモート名" placeholder="例: origin" value="origin" help-text="fetch と差分比較に使うリモート名です。"></lht-text-field-help>
+      </div>
+    </div>
+
+    <div class="md-section md-form-row md-form-row--nowrap">
+      <lht-select-help field-id="diffMode" label="出力形式">
+        <script type="application/json" slot="options">[
+          { "value": "", "label": "内容差分 (git diff)", "selected": true },
+          { "value": "--stat", "label": "差分統計 (git diff --stat)" },
+          { "value": "--name-only", "label": "変更ファイル一覧 (git diff --name-only)" }
+        ]</script>
+      </lht-select-help>
+    </div>
+
+    <div id="statWidthBlock" class="md-section md-form-row md-form-row--nowrap md-hidden">
+      <lht-switch-help
+        switch-id="useStat200"
+        label="長いファイル名向けに --stat=200 を使う"
+        help-label="--stat=200 の説明">
+        オフ: `git diff --stat`（デフォルト）<br>
+        オン: `git diff --stat=200`
+      </lht-switch-help>
+    </div>
+
+    <lht-command-block command-id="diffCmd"></lht-command-block>
+
+    <div class="md-section md-actions-row">
+      <button id="saveToWorkBranchListBtn" type="button" class="md-button md-button--primary">
+        <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7h16"></path>
+          <path d="M4 12h16"></path>
+          <path d="M4 17h16"></path>
+        </svg>
+        <span>一覧</span>
+      </button>
+      <div class="md-actions-row__field">
+        <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" placeholder="例: https://github.com/igapyon/local-html-tools" help-text="Git 作業一覧へ戻すときの保存先識別に使います。`git-work-list` から遷移した場合は自動入力されます。"></lht-text-field-help>
+      </div>
+      <button id="openGitHubCompareBtn" type="button" class="md-button md-button--compact md-button--surface" title="GitHub 比較を開く" aria-label="GitHub 比較を開く" disabled>
+        <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 7h10"></path>
+          <path d="M7 12h5"></path>
+          <path d="M7 17h10"></path>
+          <path d="M17 4l3 3-3 3"></path>
+        </svg>
+        <span>GitHub比較</span>
+      </button>
+      <button id="openRepoUrlBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" title="URL を開く" aria-label="URL を開く">
+        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 5h5v5"></path>
+          <path d="M10 14 19 5"></path>
+          <path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"></path>
+        </svg>
+      </button>
+    </div>
+
+    <lht-toast id="toast"></lht-toast>
+  </div>
+
+    <script src="src/git-branch-diff/js/main.js"></script>
+</body>
+</html>

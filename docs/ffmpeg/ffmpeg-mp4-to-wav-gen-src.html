@@ -1,0 +1,175 @@
+<!--
+Copyright 2025 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FFmpeg MP4→WAV コマンドジェネレータ</title>
+    <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
+  <link rel="stylesheet" href="src/ffmpeg-mp4-to-wav-gen/css/app.css" />
+
+</head>
+<body class="md-page">
+  <svg aria-hidden="true" class="md-icon-sprite" width="0" height="0" viewBox="0 0 0 0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <symbol id="md-icon-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16"/>
+        <path d="M4 12h16"/>
+        <path d="M4 18h16"/>
+      </symbol>
+      <symbol id="md-icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2"/>
+        <rect x="4" y="4" width="11" height="11" rx="2"/>
+      </symbol>
+      <symbol id="md-icon-refresh" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+        <path d="M20 4v6h-6"/>
+      </symbol>
+    </defs>
+  </svg>
+  <div class="md-shell md-card">
+    <lht-page-menu home-href="../index.html" home-label="トップへ戻る"></lht-page-menu>
+<h1 class="md-headline"><span aria-hidden="true" class="md-headline__icon">🎵</span>FFmpeg MP4→WAV コマンドジェネレータ</h1>
+
+    <lht-text-field-help
+      field-id="mp4File"
+      label="MP4ファイル名"
+      required
+      placeholder="例: sample.mp4"
+      field-class="md-field-block"
+      help-text="例: sample.mp4"
+    ></lht-text-field-help>
+
+    <h2 class="md-section-title md-section-title--lg">1. 解析用 ffprobe コマンド</h2>
+    <button onclick="generateProbeCommand()" class="md-button md-button--primary md-field-block">
+      ffprobe コマンド生成
+    </button>
+    <div class="md-field-block">
+      <lht-command-block command-id="probeCmd"></lht-command-block>
+    </div>
+
+    <lht-text-field-help
+      field-id="probeOutput"
+      type="textarea"
+      rows="6"
+      label="ffprobe 出力（JSON/テキスト）"
+      placeholder="ffprobe の出力を貼り付けてください"
+      field-class="md-field-block"
+      help-text="解析用 ffprobe コマンドの出力を貼り付けます。"
+    ></lht-text-field-help>
+    <button onclick="applyProbeResult()" class="md-button md-button--tonal md-field-block">
+      解析結果を反映
+    </button>
+    <p id="probeSummary" class="md-muted md-field-block">解析結果: 未反映</p>
+
+    <h2 class="md-section-title md-section-title--lg">2. 抽出設定</h2>
+    <lht-select-help
+      field-id="sampleRate"
+      label="サンプルレート"
+      field-class="md-field-block"
+      help-text="出力WAVのサンプルレートを選択します。"
+    >
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "44100",
+          "label": "44.1 kHz（標準）",
+          "selected": true
+        },
+        {
+          "value": "48000",
+          "label": "48 kHz"
+        },
+        {
+          "value": "96000",
+          "label": "96 kHz"
+        },
+        {
+          "value": "192000",
+          "label": "192 kHz"
+        }
+      ]
+      </script>
+</lht-select-help>
+
+    <lht-select-help
+      field-id="channels"
+      label="チャンネル数"
+      field-class="md-field-block"
+      help-text="自動または固定チャンネル数を選択します。"
+    >
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "auto",
+          "label": "ソースに合わせる（自動）",
+          "selected": true
+        },
+        {
+          "value": "1",
+          "label": "モノラル（1ch）"
+        },
+        {
+          "value": "2",
+          "label": "ステレオ（2ch）"
+        }
+      ]
+      </script>
+</lht-select-help>
+
+    <lht-select-help
+      field-id="bitDepth"
+      label="ビット深度"
+      field-class="md-field-block"
+      help-text="WAVエンコード形式（PCM）を選択します。"
+    >
+      <script type="application/json" slot="options">
+      [
+        {
+          "value": "pcm_s16le",
+          "label": "16-bit（標準）",
+          "selected": true
+        },
+        {
+          "value": "pcm_s24le",
+          "label": "24-bit"
+        },
+        {
+          "value": "pcm_s32le",
+          "label": "32-bit"
+        }
+      ]
+      </script>
+</lht-select-help>
+
+    <button onclick="generateWavCommand()" class="md-button md-button--primary md-field-block">
+      ffmpeg コマンド生成
+    </button>
+
+    <lht-command-block command-id="wavCmd"></lht-command-block>
+
+    <div id="toast" class="md-snackbar md-hidden">
+      コピーしました
+    </div>
+  </div>
+
+    <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+  <script src="src/ffmpeg-mp4-to-wav-gen/js/main.js"></script>
+
+</body>
+</html>

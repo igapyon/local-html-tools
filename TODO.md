@@ -18,3 +18,133 @@
 - ImageMagick/sox: 画像/音声変換のパラメータ生成（バッチリサイズ/ウォーターマーク）
 - regex/sed/awk: 文字列変換テンプレの生成
 - [後まわし] docker/docker-compose: よくある起動・開発用コマンド生成
+- [方針] `md3/` は段階的にリファレンス用途へ縮退し、実運用スタイルは `lht-cmn` に集約する
+- [方針] 最優先: Material Web vendor バンドル（`material-web-outlined-text-field.bundle.js`）の配置場所を `lht-cmn` 基準へ適正化し、各 `*-src.html` / build script の参照を整理する
+- [lht-cmn] `lht-toast` を追加し、`toast + showToast()` の重複実装を共通化する（`role="status"` / `aria-live="polite"` を標準化）
+- [横展開] music/git 以外の全アプリでも `lht-toast` 統一を適用し、`showToast` の旧フォールバック（`md-visible` / `md-hidden` 手動制御）を削除する
+- [横展開] music/git 以外の全アプリでも `lht-error-alert`（エラー表示）を適用し、エラー表示の重複実装を共通化する
+- [横展開] music/git 以外の全アプリでも `lht-input-mode-toggle`（source/file 切替）を適用し、切替UIの重複実装を共通化する
+- [横展開] music/git 以外の全アプリでも `lht-file-select`（ファイル選択UI）を適用し、選択ボタン＋ファイル名表示を共通化する
+- [横展開] music/git 以外の全アプリでも `lht-preview-output`（プレビュー表示＋コピー導線）を適用し、表示領域の重複実装を共通化する
+- [横展開] music/git 以外の全アプリでも `lht-command-block`（コマンド表示ブロック）を適用し、コマンド表示・コピー導線を共通化する
+- [ffmpeg] `docs/ffmpeg/ffmpeg-youtube-mkv-gen.html` を YouTube 専用命名から汎用寄りへ再設計する（ツール名・説明文・spec・出力プリセット差分の整理）
+- [ルール横展開] 表示制御属性は `active` に統一し、既存の `md-hidden` / `md-visible` 依存を段階的に削減する
+- [ルール横展開] API命名規約を統一する（表示系は `show/hide`、内容消去系は `show/clear`）
+- [運用スタイル] 新規実装は上記 `lht-cmn` コンポーネント + ルール準拠を必須とし、既存画面は「触るタイミングで順次置換」を原則に進める
+- [lht-cmn] `lht-error-alert` を追加し、`errorText` の表示/非表示と `role="alert"` 運用を共通化する
+- [lht-cmn] `lht-input-mode-toggle`（file/source 切替）を追加し、music系で反復しているラジオUIを共通化する
+- [lht-cmn] `lht-preview-output`（プレビュー + コピー導線）を追加し、`previewText` 周辺の反復UIを共通化する
+- [lht-cmn] `lht-text-field-help` の trailing action を正式設計する。現在は `prompt-gen` 向けに `clearable` を暫定追加しているが、`lht-cmn` チームの更新版を受領したら、slot / action API を含めてちゃんとした実装へ置き換える
+- [lht-cmn][git-work-list] Material Web の `md-outlined-text-field` / `md-outlined-select` が DevTools で `translateY(NaNpx) scale(NaN)` 警告を出す件を調査し、非表示時初期化の回避または fallback 利用へ寄せる方針を決める
+- [prompt-gen][仕様検討] JSON から追加ボタン定義を投入し、`localStorage` に保存して再表示できる仕組みを初版スコープで整理する
+- [prompt-gen][導線整理] `生成AIで整理` ボタンは外部 URL 扱いではなく `local-html-tools` 内部導線として扱えるよう、遷移方式と UI 表現を見直す
+- [prompt-gen][仕様検討] 初版は「固定文面ボタンのみ追加可能」とし、`commitId` 差し込みや任意ロジックは対象外と明記する
+- [prompt-gen][仕様検討] 追加ボタン定義の JSON schema を固定する（初版: `id` / `label` / `keywords` / `body`。`requiresCommitId` は常に `false` 扱い）
+- [prompt-gen][仕様検討] JSON schema の妥当性チェック方針を決める（必須項目欠落・重複 `id`・不正 JSON の扱い）
+- [prompt-gen][仕様検討] 組み込み定義とユーザー追加定義のマージ方針を決める（組み込み優先。衝突時は追加定義を拒否する想定）
+- [prompt-gen][仕様検討] `localStorage` 保存キーを 1 つに固定し、保存データに `version` を持たせるか決める
+- [prompt-gen][仕様検討] `localStorage` 破損時の復旧方針を決める（読み飛ばし・初期化・エラーメッセージ表示）
+- [prompt-gen][仕様検討] 追加定義の削除 UI は初版で「追加ボタン全削除」のみとし、個別削除は次段階に回す
+- [prompt-gen][仕様検討] 追加ボタンの投入 UI を決める（JSON 入力欄、取り込みボタン、エラー表示、保存完了通知）
+- [prompt-gen][仕様検討] Single-file Web App 方針のまま成立することを確認し、README / prompt README への反映要否を整理する
+- [prompt-gen][仕様検討] 出力オプション候補を整理する。スイッチや選択UIで切り替え可能なものを優先し、本文そのものの差し替えが必要なものとは分けて扱う
+- [prompt-gen][仕様検討][出力オプション候補] `Markdown出力` 系: 形式保証をどこまで共通オプション化できるか整理する（見出し順、必須項目、空欄時の書き方、箇条書き数など）
+- [prompt-gen][仕様検討][出力オプション候補] `幻想防止` 系: 情報不足時の挙動を共通オプション化できるか整理する（不明と書く、追加質問する、条件不足なら出力を控える等）
+- [prompt-gen][仕様検討][出力オプション候補] `入力前提の明示` 系: 何を根拠にしてよいか、何を入力値として扱うか、を共通オプションとしてテンプレート化できるか整理する
+- [prompt-gen][仕様検討][出力オプション候補] `自己レビュー` 系: 第三者レビューア視点での見直しを共通オプション化する。選択肢は `無指定` / `内部レビュー` / `レビュー結果出力` を基本とする
+- [prompt-gen][仕様検討][出力オプション候補] `自己レビュー` 系: レビュー観点を整理する（分かりやすさ、抜け漏れ、過不足、構成の自然さ、依頼意図との一致など）
+- [prompt-gen][仕様検討][出力オプション候補] `自己レビュー` 系: `レビュー結果出力` の場合は本文末尾に `自己レビュー` セクションを付ける前提で、出力粒度と書式を整理する
+- [prompt-gen][仕様検討][出力オプション候補] UI 形状を整理する。2値ならスイッチ、3値以上や強度差があるものはドロップダウンとし、プロンプトごとのデフォルト値を持てるようにする
+- [優先度高][lht-cmn] `lht-*` 全体を棚卸しし、各コンポーネントを「内部保証」または「フォールバック保証」のどちらかへ統一する
+- [music] `docs/music/musicxml-to-midi.html` に、ダウンロードせずその場でMIDI再生できる機能を追加する
+  - 現状: Web Audio による簡易シンセ再生は実装済み
+  - 未実装: 生成したMIDI実データ（SMF）のその場再生（MIDIパーサ/プレイヤー経由）
+- [music] `docs/music/*` の「ファイルを選択」操作を、Material Design のよくあるパターン（Filled ボタン + 選択ファイル名表示）で目立たせる
+- [優先度高] Git 以外も含む全アプリで、狭幅端末の不要な右スクロール（謎の右余白）を発火させない。特殊な個別対応ではなく `lht` 共通ルール（`lht-help-tooltip` と `.md-page`）を優先して適用し、残件のみ個別調整する
+- なんの変哲もないカレンダアプリが欲しい
+
+# DONE
+
+- [引継] `docs/prompt/prompt-gen` を段階的に整理済み
+- `docs/prompt/prompt-gen-src.html` の巨大 inline CSS / JS は外出し済み
+- 開発時ソースは `docs/prompt/src/prompt-gen/css/app.css` と `docs/prompt/src/prompt-gen/ts/*.ts`
+- `scripts/build-prompt.mjs` で `ts -> js` を行ってから single-file の `docs/prompt/prompt-gen.html` を生成する構成に変更済み
+- `promptDefinitions` は `docs/prompt/src/prompt-gen/ts/prompt-definitions.ts` へ切り出し済み
+- 各定義は `id / label / keywords / requiresCommitId / buildBody()` を持つ形に整理済み
+- `main.ts` は検索・選択・表示制御側へ寄せ、本文生成ロジックは定義側へ集約済み
+- `docs/prompt/tests/prompt-gen-main.test.js` を追加済み
+- `docs/prompt/README.md` に、出力オプションと現行テスト範囲を追記済み
+- `docs/git/README.md` に、`git-work-list` の `url` 種別対応を反映済み
+- `docs/git/git-pseudo-squash-spec.md` に、Git 作業一覧との連携挙動を反映済み
+- 現在の最小テスト対象:
+- 一意候補絞り込み後の PR 文面生成
+- 固定文面でのラベル接頭辞 ON/OFF
+- 検索語変更時の commit ID クリアと出力切替
+- `prompt-gen` の候補ボタンには分類用の番号帯を付与済み
+- `100` 台: ディレクトリ/markdown 確認系
+- `300` 台: 会話/レビュー/確認系
+- `500` 台: GitHub 文面系
+- `700` 台: 実装方針/運用/ビルド系
+- 直近では `keywords` に、日本語ラベル由来の名詞・動詞を明示追加する改善を実施済み
+- 例: `306: 依頼内容の実施状況を確認` に `依頼 / 内容 / 実施 / 状況 / じょうきょう / joukyou` を追加
+- 例: `304: 批判的レビューの依頼` に `依頼` を追加
+- 例: `102: markdown 更新漏れの確認` に `更新 / 漏れ / 確認` を追加
+- 直近で `705: 完全ビルドの実施確認` と `706: 作業終了時の引継確認` を追加済み
+- `prompt-gen` の検索欄クリア導線は、外付け absolute 配置をやめて `lht-text-field-help clearable` の暫定実装へ寄せた
+- この `clearable` は正式仕様確定前の provisional API として扱い、`lht-cmn` 側の更新版受領後に見直す前提
+- 最新状態で `npm run build:all` は実施済み
+- 次回再開時は、まず `git status --short` と `npm test -- docs/prompt/tests/prompt-gen-main.test.js` を見ると状況把握が早い
+
+- `scripts/lib/single-html.mjs` を導入し、`text/link/life/img/docs-index` の `*-src.html` から配布用 `*.html` 生成時にローカル `link/script src` をインライン化（単一HTML化）する運用へ統一
+- 各HTMLのタイトル右に「?」説明を置く方針に統一し、その文言を docs/index.html のホバー説明へ転記する対応を実施
+- [優先度高] タイトルに「?」が未設置のHTML一覧（対応済み分）
+- 対象: docs/ffmpeg/ffmpeg-audio-convert-cmdline-gen.html
+- 対象: docs/ffmpeg/ffmpeg-concat-cmdline-gen.html
+- 対象: docs/ffmpeg/ffmpeg-loudnorm-cmdline-gen.html
+- 対象: docs/ffmpeg/ffmpeg-mp4-to-wav-gen.html
+- 対象: docs/ffmpeg/ffmpeg-replace-audio-with-wav-gen.html
+- 対象: docs/ffmpeg/ffmpeg-silence-detect-gen.html
+- 対象: docs/ffmpeg/ffmpeg-trim-cmdline-gen.html
+- 対象: docs/ffmpeg/ffmpeg-youtube-mkv-gen.html
+- 対象: docs/index.html
+- 対象: docs/life/forgot-items-check.html
+- 対象: docs/life/japan-weather.html
+- 対象: docs/link/amazon-dp-extract.html
+- 対象: docs/link/facebook-fbclid-remove.html
+- 対象: docs/link/mime-base64.html
+- 対象: docs/link/url-encode-decode.html
+- 対象: docs/link/utm-remove.html
+- 対象: docs/text/text-viewer.html
+- [対応] `docs/text/file-rename-cmdline-gen.html` の lht 化（`lht-text-field-help` / `lht-select-help` / `lht-switch-help` への置換）
+- [対応] ドロップダウン項目（`md-select-option`）の生成ロジックを `lht-cmn/js/components.js` 側へ共通化
+- [対応] `lht-cmn/js/components.js` の読み込み順依存軽減（`defer` 運用 + `lht-select-help` 側で宣言オプション/後着 option を吸収）
+- [クローズ] `docs/text/text-processing.html` の「スペース連打で `.` 自動挿入」は OS 側の自動補正由来として対応終了
+- [クローズ] `docs/index.html` のカード構造JSON化検討は、`lht` 対応で目的を満たしたため対応終了
+- [対応] `docs/git/git-pseudo-squash.html` の iPhone SE 幅で右スクロールして謎の右余白が見える不具合を修正
+- 原因: `tooltip` が非表示時でも幅を持ったまま配置され、狭幅画面でビューポート外にはみ出してページ全体の横幅を押し広げていた
+- 実施内容: `docs/git/src/git-pseudo-squash/css/app.css` で `.md-tooltip-content` を非表示時 `display:none` に変更し、表示時のみ `display:block` へ。あわせてモバイル向けに `tooltip` の幅を `calc(100vw - 2rem)` 以内へ制限し、右寄せ配置で画面外はみ出しを防止
+- 実施内容: `.md-page` に `overflow-x: clip` を追加して、ページ全体の横方向オーバーフローを抑制
+- 反映: `npm run build:git` 実行済み（`docs/git/git-pseudo-squash.html` へ反映）
+- [対応] 右スクロール不具合の横展開に向けて、同系レイアウト（`.md-tooltip-content` / `.md-tooltip--wide` / `.md-page`）の利用画面を全体棚卸し
+- 対象分類: Git 3画面（`git-config-setup` / `git-config-advanced-setup` / `git-branch-diff`）、Grep 1画面（`find-gen`）、Password 1画面（`password-gen`）、Diagram 2画面（`mermaid-to-svg` / `graphviz-dot-to-svg`）、Music 5画面（`abc-to-musicxml` / `midi-to-musicxml` / `musicxml-to-abc` / `musicxml-to-midi` / `musicxml-to-svg`）
+- 記録: 横展開の優先対応対象は `TODO` の `[優先度高]` 項目（狭幅端末での右余白対策）に集約
+- [対応] `lht-cmn/css/components.css` に横スクロール抑止の共通ルールを追加（`.md-page { overflow-x: clip; }`）
+- [対応] `lht-help-tooltip` の表示制御と幅制限を `lht` 側へ共通化（非表示時 `display:none`、表示時のみ表示、モバイルで右寄せ + `calc(100vw - 2rem)` 制限）
+- [反映] Music 以外の各アプリを再ビルドし、共通ルールを生成HTMLへ反映（`git/grep/password/diagram/ffmpeg/life/link/text/img/docs-index`）
+- [対応] `lht-select-help` で declarative-options 判定を script 消費前に確定し、不要な再 hydration を防止
+- [対応] `lht-switch-help` を self-contained 化し、`md-switch` 未読込時 fallback を正式サポート
+- [対応] `lht-help-tooltip` を self-contained 化し、`md-icon-button` 未読込時 fallback と `placement="auto|left|right|top|bottom"` を追加
+- [対応] pre-upgrade content flash を防ぐ初期化ガードを `lht-cmn/css/components.css` に追加し、`data-initialized="true"` 契約を明文化
+- [対応] `lht-file-select` に `lht-file-select:before-open` / `lht-file-select:change` と `auto-open="false"` を追加し、event ownership を明文化
+- [対応] `lht-select-help` に `setOptions([...])` / `getValue()` / `setValue()` を追加し、selected-value retention を定義
+- [対応] `lht-cmn/README.md` に integration contract / fallback parity 表 / `lht-select-help` lifecycle を追加
+- [反映] `npm run build:all` が最後まで通る状態を確認
+- [対応] `lht-error-alert` に `variant="error|warning|info"` を追加し、variant ごとに `role` / `aria-live` を整理
+- [対応] `lht-cmn/components.test.js` に Material 読込あり / なし の両モード回帰テストを追加
+- [対応] `lht-text-field-help` を self-contained 化し、`md-outlined-text-field` 未読込時 fallback を追加
+- [対応] `lht-command-block` を self-contained 化し、`md-icon-button` 未読込時 fallback を追加
+- [対応] `docs/git/git-branch-diff-src.html` と `docs/git/git-pseudo-squash-src.html` に残っていた raw `md-*` field/switch/select を `lht-*` へ置換
+- [対応] `docs/grep/find-gen-src.html` に残っていた raw `md-outlined-select` を `lht-select-help` へ置換
+- 対象: docs/grep/find-gen.html
+- 対象: docs/img/img2svg.html
+- 対象: docs/password/password-gen.html

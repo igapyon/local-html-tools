@@ -2,29 +2,11 @@
 
 This project includes the following third-party software:
 
-## Tailwind CSS
-- Project: https://tailwindcss.com/
-- License: MIT
+## Material Design
+- Project: https://m3.material.io/
+- License: N/A (Design specification)
 
-Copyright (c) Tailwind Labs, Inc.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Material Design is a design specification by Google and is referenced in this project.
 
 ## ImageTracerJS
 - Project: https://jankovicsandras.github.io/imagetracerjs/
@@ -68,3 +50,38 @@ You can copy, modify, distribute and perform the work, even for commercial
 purposes, all without asking permission.
 
 For more information, please refer to https://creativecommons.org/publicdomain/zero/1.0/.
+
+## Mermaid
+- Project: https://github.com/mermaid-js/mermaid
+- License: MIT
+
+Mermaid is used for diagram rendering in `docs/diagram/mermaid-to-svg.html`.
+
+## Viz.js (Graphviz renderer)
+- Project: https://github.com/mdaines/viz-js
+- License: MIT
+
+Viz.js is used for DOT diagram rendering in `docs/diagram/graphviz-dot-to-svg.html`.
+
+This distribution contains bundled third-party object code:
+- Graphviz (EPL-1.0)
+- Expat (MIT)
+- zlib (zlib license)
+
+## Verovio
+- Project: https://github.com/rism-digital/verovio
+- License: LGPL-3.0-or-later
+
+Verovio is used for MusicXML score rendering in `docs/music/musicxml-to-svg.html`.
+
+## JSZip
+- Project: https://github.com/Stuk/jszip
+- License: MIT or GPL-3.0
+
+JSZip is used for ZIP archive generation in `docs/music/musicxml-to-svg.html`.
+
+## midi-writer-js
+- Project: https://github.com/grimmdude/MidiWriterJS
+- License: MIT
+
+midi-writer-js is used for MIDI file generation in `docs/music/musicxml-to-midi.html`.
