@@ -154,9 +154,24 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
 }
 
 .md-output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.md-output-header__main {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+
+.md-output-header__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
 }
 
 .md-output-help {
@@ -174,6 +189,13 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+}
+
+@media (max-width: 720px) {
+  .md-output-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .md-secondary-button {
