@@ -177,6 +177,16 @@ function mountPromptDom() {
       <option value="internal">内部レビュー</option>
       <option value="report">レビュー結果出力</option>
     </select>
+    <select id="legalComplianceReview">
+      <option value="unspecified">無指定</option>
+      <option value="internal">内部レビュー</option>
+      <option value="report">レビュー結果出力</option>
+    </select>
+    <select id="publicOrderReview">
+      <option value="unspecified">無指定</option>
+      <option value="internal">内部レビュー</option>
+      <option value="report">レビュー結果出力</option>
+    </select>
     <input id="outputMarkdown" type="checkbox" />
     <button id="copyShareLinkButton" type="button"></button>
     <a id="gitPseudoSquashLink" class="md-hidden" href="../git/git-work-list.html"></a>
@@ -338,6 +348,8 @@ describe("prompt-gen main", () => {
     const discomfortRiskReview = document.getElementById("discomfortRiskReview");
     const aggressiveExpressionReview = document.getElementById("aggressiveExpressionReview");
     const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview");
+    const legalComplianceReview = document.getElementById("legalComplianceReview");
+    const publicOrderReview = document.getElementById("publicOrderReview");
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
@@ -349,6 +361,8 @@ describe("prompt-gen main", () => {
     expect(discomfortRiskReview.value).toBe("unspecified");
     expect(aggressiveExpressionReview.value).toBe("unspecified");
     expect(sensitiveExpressionReview.value).toBe("unspecified");
+    expect(legalComplianceReview.value).toBe("unspecified");
+    expect(publicOrderReview.value).toBe("unspecified");
     expect(outputMarkdown.checked).toBe(true);
     expect(promptOutput.textContent).toContain("○ハルシネーション防止のため");
     expect(promptOutput.textContent).toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
@@ -365,6 +379,8 @@ describe("prompt-gen main", () => {
     const discomfortRiskReview = document.getElementById("discomfortRiskReview");
     const aggressiveExpressionReview = document.getElementById("aggressiveExpressionReview");
     const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview");
+    const legalComplianceReview = document.getElementById("legalComplianceReview");
+    const publicOrderReview = document.getElementById("publicOrderReview");
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
@@ -384,6 +400,10 @@ describe("prompt-gen main", () => {
     aggressiveExpressionReview.dispatchEvent(new Event("change"));
     sensitiveExpressionReview.value = "internal";
     sensitiveExpressionReview.dispatchEvent(new Event("change"));
+    legalComplianceReview.value = "report";
+    legalComplianceReview.dispatchEvent(new Event("change"));
+    publicOrderReview.value = "internal";
+    publicOrderReview.dispatchEvent(new Event("change"));
     outputMarkdown.checked = false;
     outputMarkdown.dispatchEvent(new Event("change"));
 
@@ -397,6 +417,8 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、不快感リスクがないかを観点として見直してください。");
     expect(promptOutput.textContent).toContain("`攻撃性レビュー` セクション");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。");
+    expect(promptOutput.textContent).toContain("`法令遵守レビュー` セクション");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、公序良俗の観点で問題がないかを見直してください。");
     expect(promptOutput.textContent.indexOf("○文体は、である調で統一してください。箇条書きは体言止めでも構いません。"))
       .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。"));
     expect(promptOutput.textContent.indexOf("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。"))
@@ -409,6 +431,10 @@ describe("prompt-gen main", () => {
       .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、攻撃的な表現がないかを観点として見直してください。"));
     expect(promptOutput.textContent.indexOf("○回答案を作成したあと、攻撃的な表現がないかを観点として見直してください。"))
       .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。"));
+    expect(promptOutput.textContent.indexOf("○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。"))
+      .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、法令遵守の観点で問題がないかを見直してください。"));
+    expect(promptOutput.textContent.indexOf("○回答案を作成したあと、法令遵守の観点で問題がないかを見直してください。"))
+      .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、公序良俗の観点で問題がないかを見直してください。"));
   });
 
   it("resets output options to prompt defaults when switching prompts", async () => {
@@ -423,6 +449,8 @@ describe("prompt-gen main", () => {
     const discomfortRiskReview = document.getElementById("discomfortRiskReview");
     const aggressiveExpressionReview = document.getElementById("aggressiveExpressionReview");
     const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview");
+    const legalComplianceReview = document.getElementById("legalComplianceReview");
+    const publicOrderReview = document.getElementById("publicOrderReview");
     const outputMarkdown = document.getElementById("outputMarkdown");
 
     promptSearch.value = "A501";
@@ -443,6 +471,10 @@ describe("prompt-gen main", () => {
     aggressiveExpressionReview.dispatchEvent(new Event("change"));
     sensitiveExpressionReview.value = "internal";
     sensitiveExpressionReview.dispatchEvent(new Event("change"));
+    legalComplianceReview.value = "report";
+    legalComplianceReview.dispatchEvent(new Event("change"));
+    publicOrderReview.value = "internal";
+    publicOrderReview.dispatchEvent(new Event("change"));
     outputMarkdown.checked = false;
     outputMarkdown.dispatchEvent(new Event("change"));
 
@@ -459,6 +491,8 @@ describe("prompt-gen main", () => {
     expect(discomfortRiskReview.value).toBe("unspecified");
     expect(aggressiveExpressionReview.value).toBe("unspecified");
     expect(sensitiveExpressionReview.value).toBe("unspecified");
+    expect(legalComplianceReview.value).toBe("unspecified");
+    expect(publicOrderReview.value).toBe("unspecified");
     expect(outputMarkdown.checked).toBe(true);
   });
 
@@ -473,6 +507,8 @@ describe("prompt-gen main", () => {
     const discomfortRiskReview = document.getElementById("discomfortRiskReview");
     const aggressiveExpressionReview = document.getElementById("aggressiveExpressionReview");
     const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview");
+    const legalComplianceReview = document.getElementById("legalComplianceReview");
+    const publicOrderReview = document.getElementById("publicOrderReview");
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
@@ -484,6 +520,8 @@ describe("prompt-gen main", () => {
     expect(discomfortRiskReview.value).toBe("unspecified");
     expect(aggressiveExpressionReview.value).toBe("unspecified");
     expect(sensitiveExpressionReview.value).toBe("unspecified");
+    expect(legalComplianceReview.value).toBe("unspecified");
+    expect(publicOrderReview.value).toBe("unspecified");
     expect(outputMarkdown.checked).toBe(false);
     expect(promptOutput.textContent).not.toContain("○ハルシネーション防止のため");
     expect(promptOutput.textContent).not.toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
@@ -504,6 +542,10 @@ describe("prompt-gen main", () => {
     aggressiveExpressionReview.dispatchEvent(new Event("change"));
     sensitiveExpressionReview.value = "internal";
     sensitiveExpressionReview.dispatchEvent(new Event("change"));
+    legalComplianceReview.value = "internal";
+    legalComplianceReview.dispatchEvent(new Event("change"));
+    publicOrderReview.value = "internal";
+    publicOrderReview.dispatchEvent(new Event("change"));
     outputMarkdown.checked = true;
     outputMarkdown.dispatchEvent(new Event("change"));
 
@@ -517,11 +559,15 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、不快感リスクがないかを観点として見直してください。");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、攻撃的な表現がないかを観点として見直してください。");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、法令遵守の観点で問題がないかを見直してください。");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、公序良俗の観点で問題がないかを見直してください。");
     expect(promptOutput.textContent).not.toContain("`誤解表現レビュー` セクション");
     expect(promptOutput.textContent).not.toContain("`配慮不足レビュー` セクション");
     expect(promptOutput.textContent).not.toContain("`不快感レビュー` セクション");
     expect(promptOutput.textContent).not.toContain("`攻撃性レビュー` セクション");
     expect(promptOutput.textContent).not.toContain("`センシティブ表現レビュー` セクション");
+    expect(promptOutput.textContent).not.toContain("`法令遵守レビュー` セクション");
+    expect(promptOutput.textContent).not.toContain("`公序良俗レビュー` セクション");
   });
 
   it("uses docs as the default docs path for A150", async () => {

@@ -1201,6 +1201,20 @@ ${getMarkdownFenceInstruction()}`
         buildBody: () => `与えられた内容について、センシティブな表現がないか確認してください。属性、立場、背景、文化的事情などに関わる表現で、読み手や関係者に不必要な負荷や反発を生みそうな箇所があれば整理してください。断定しすぎず、どの観点で注意が必要そうかが分かるように示してください。`
     },
     {
+        id: "popular-legal-compliance-request",
+        label: "P1001-006: 法令遵守の観点で確認する",
+        keywords: ["P1001-006", "legal compliance", "law compliance", "regulatory compliance", "legal review", "法令遵守", "法律確認", "違法性確認", "ほうれいじゅんしゅ", "いほうせいかくにん"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容について、法令遵守の観点で問題がないか確認してください。日本の法令を基準として、違法行為の助長、法的に問題となりうる指示や表現、誤解を招きやすい記述があれば整理してください。必要に応じて、より安全で適切な方向も示してください。`
+    },
+    {
+        id: "popular-public-order-review-request",
+        label: "P1001-007: 公序良俗の観点で確認する",
+        keywords: ["P1001-007", "public order and morals", "public morals", "social acceptability", "appropriateness review", "公序良俗", "社会通念", "不適切表現", "こうじょりょうぞく", "しゃかいつうねん"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容について、公序良俗の観点で問題がないか確認してください。日本を基準として、公序良俗に反するおそれのある内容、社会通念上不適切に受け取られうる表現、過度に扇情的または有害と受け取られうる記述があれば整理してください。必要に応じて、より穏当で適切な方向も示してください。`
+    },
+    {
         id: "popular-clarify-request-request",
         label: "P1205-003: 曖昧な依頼を明確化する",
         keywords: ["P1205-003", "clarify request", "clarify vague request", "refine request", "request clarification", "依頼明確化", "曖昧な依頼", "依頼整理", "いらいめいかくか", "あいまいないらい"],

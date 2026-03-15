@@ -69,12 +69,16 @@ async function initializePromptPage() {
         (await waitForElementById("aggressiveExpressionReview"));
     const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview") ||
         (await waitForElementById("sensitiveExpressionReview"));
+    const legalComplianceReview = document.getElementById("legalComplianceReview") ||
+        (await waitForElementById("legalComplianceReview"));
+    const publicOrderReview = document.getElementById("publicOrderReview") ||
+        (await waitForElementById("publicOrderReview"));
     const hallucinationGuard = document.getElementById("hallucinationGuard") ||
         (await waitForElementById("hallucinationGuard"));
     const outputMarkdown = document.getElementById("outputMarkdown");
     const copyShareLinkButton = document.getElementById("copyShareLinkButton");
     const promptOutput = document.getElementById("promptOutput");
-    if (!promptSearch || !outputTone || !selfReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+    if (!promptSearch || !outputTone || !selfReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !legalComplianceReview || !publicOrderReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
         return;
     }
     function loadSeriesVisibilitySettings() {
@@ -630,7 +634,9 @@ async function initializePromptPage() {
             considerationRiskReview: (considerationRiskReview.value || "unspecified"),
             discomfortRiskReview: (discomfortRiskReview.value || "unspecified"),
             aggressiveExpressionReview: (aggressiveExpressionReview.value || "unspecified"),
-            sensitiveExpressionReview: (sensitiveExpressionReview.value || "unspecified")
+            sensitiveExpressionReview: (sensitiveExpressionReview.value || "unspecified"),
+            legalComplianceReview: (legalComplianceReview.value || "unspecified"),
+            publicOrderReview: (publicOrderReview.value || "unspecified")
         };
     }
     function inferPromptOutputOptionDefaults(definition) {
@@ -644,7 +650,9 @@ async function initializePromptPage() {
                 considerationRiskReview: "unspecified",
                 discomfortRiskReview: "unspecified",
                 aggressiveExpressionReview: "unspecified",
-                sensitiveExpressionReview: "unspecified"
+                sensitiveExpressionReview: "unspecified",
+                legalComplianceReview: "unspecified",
+                publicOrderReview: "unspecified"
             };
         }
         const cached = promptOutputOptionDefaultsById.get(definition.id);
@@ -665,7 +673,9 @@ async function initializePromptPage() {
                 considerationRiskReview: "unspecified",
                 discomfortRiskReview: "unspecified",
                 aggressiveExpressionReview: "unspecified",
-                sensitiveExpressionReview: "unspecified"
+                sensitiveExpressionReview: "unspecified",
+                legalComplianceReview: "unspecified",
+                publicOrderReview: "unspecified"
             };
             promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
             return explicitDefaults;
@@ -680,7 +690,9 @@ async function initializePromptPage() {
             considerationRiskReview: "unspecified",
             discomfortRiskReview: "unspecified",
             aggressiveExpressionReview: "unspecified",
-            sensitiveExpressionReview: "unspecified"
+            sensitiveExpressionReview: "unspecified",
+            legalComplianceReview: "unspecified",
+            publicOrderReview: "unspecified"
         });
         const argsForInference = {};
         for (const argumentDefinition of getSelectedPromptArguments(definition)) {
@@ -699,7 +711,9 @@ async function initializePromptPage() {
             considerationRiskReview: instructionProfile.considerationRiskReview,
             discomfortRiskReview: instructionProfile.discomfortRiskReview,
             aggressiveExpressionReview: instructionProfile.aggressiveExpressionReview,
-            sensitiveExpressionReview: instructionProfile.sensitiveExpressionReview
+            sensitiveExpressionReview: instructionProfile.sensitiveExpressionReview,
+            legalComplianceReview: instructionProfile.legalComplianceReview,
+            publicOrderReview: instructionProfile.publicOrderReview
         };
         promptOutputOptionDefaultsById.set(definition.id, defaults);
         return defaults;
@@ -715,6 +729,8 @@ async function initializePromptPage() {
         discomfortRiskReview.value = defaults.discomfortRiskReview;
         aggressiveExpressionReview.value = defaults.aggressiveExpressionReview;
         sensitiveExpressionReview.value = defaults.sensitiveExpressionReview;
+        legalComplianceReview.value = defaults.legalComplianceReview;
+        publicOrderReview.value = defaults.publicOrderReview;
     }
     function renderSelectedPromptHelp() {
         const selectedDefinition = getSelectedPromptDefinition();
@@ -879,7 +895,9 @@ async function initializePromptPage() {
             considerationRiskReview: "unspecified",
             discomfortRiskReview: "unspecified",
             aggressiveExpressionReview: "unspecified",
-            sensitiveExpressionReview: "unspecified"
+            sensitiveExpressionReview: "unspecified",
+            legalComplianceReview: "unspecified",
+            publicOrderReview: "unspecified"
         });
         const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
         setPromptOutputOptions(currentOptions);
@@ -999,6 +1017,8 @@ async function initializePromptPage() {
     discomfortRiskReview.addEventListener("change", updateOutput);
     aggressiveExpressionReview.addEventListener("change", updateOutput);
     sensitiveExpressionReview.addEventListener("change", updateOutput);
+    legalComplianceReview.addEventListener("change", updateOutput);
+    publicOrderReview.addEventListener("change", updateOutput);
     hallucinationGuard.addEventListener("change", updateOutput);
     outputMarkdown.addEventListener("change", updateOutput);
     copyShareLinkButton.addEventListener("click", () => {
