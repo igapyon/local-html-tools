@@ -1,5 +1,5 @@
 function getMarkdownFenceInstruction() {
-    return "回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。";
+    return "最終的な回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。";
 }
 function appendMarkdownFenceInstruction(body) {
     return `${body}\n\n${getMarkdownFenceInstruction()}`;
