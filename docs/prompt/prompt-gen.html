@@ -1633,6 +1633,24 @@ md-icon-button.md-copy-button--surface {
           <option value="internal">内部レビュー</option>
           <option value="report">レビュー結果出力</option>
         </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="legalComplianceReview"
+          label="法令遵守"
+          help-text="法令遵守の観点で問題がないかを見直す方法を選択します。日本の法令を基準に、無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="publicOrderReview"
+          label="公序良俗"
+          help-text="公序良俗の観点で問題がないかを見直す方法を選択します。日本を基準に、無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
       </div>
     </section>
 
@@ -3827,6 +3845,24 @@ const reportedSensitiveExpressionReviewInstruction = `○回答案を作成し�
 - 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
 - 最終回答の末尾に \`センシティブ表現レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
 - 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalLegalComplianceReviewInstruction = `○回答案を作成したあと、法令遵守の観点で問題がないかを見直してください。
+- 日本の法令を基準として、違法行為の助長、法的に問題となりうる指示や表現、誤解を招きやすい記述があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedLegalComplianceReviewInstruction = `○回答案を作成したあと、法令遵守の観点で問題がないかを見直してください。
+- 日本の法令を基準として、違法行為の助長、法的に問題となりうる指示や表現、誤解を招きやすい記述があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`法令遵守レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalPublicOrderReviewInstruction = `○回答案を作成したあと、公序良俗の観点で問題がないかを見直してください。
+- 日本を基準として、公序良俗に反するおそれのある内容、社会通念上不適切に受け取られうる表現、過度に扇情的または有害と受け取られうる記述があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedPublicOrderReviewInstruction = `○回答案を作成したあと、公序良俗の観点で問題がないかを見直してください。
+- 日本を基準として、公序良俗に反するおそれのある内容、社会通念上不適切に受け取られうる表現、過度に扇情的または有害と受け取られうる記述があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`公序良俗レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
 let currentPromptOutputOptions = {
     hallucinationGuardLevel: "high",
     outputMarkdownEnabled: true,
@@ -3836,7 +3872,9 @@ let currentPromptOutputOptions = {
     considerationRiskReview: "unspecified",
     discomfortRiskReview: "unspecified",
     aggressiveExpressionReview: "unspecified",
-    sensitiveExpressionReview: "unspecified"
+    sensitiveExpressionReview: "unspecified",
+    legalComplianceReview: "unspecified",
+    publicOrderReview: "unspecified"
 };
 function setPromptOutputOptions(options) {
     currentPromptOutputOptions = {
@@ -3848,7 +3886,9 @@ function setPromptOutputOptions(options) {
         considerationRiskReview: options.considerationRiskReview || "unspecified",
         discomfortRiskReview: options.discomfortRiskReview || "unspecified",
         aggressiveExpressionReview: options.aggressiveExpressionReview || "unspecified",
-        sensitiveExpressionReview: options.sensitiveExpressionReview || "unspecified"
+        sensitiveExpressionReview: options.sensitiveExpressionReview || "unspecified",
+        legalComplianceReview: options.legalComplianceReview || "unspecified",
+        publicOrderReview: options.publicOrderReview || "unspecified"
     };
 }
 function getPromptOutputInstructionTemplates() {
@@ -3869,7 +3909,11 @@ function getPromptOutputInstructionTemplates() {
         internalAggressiveExpressionReviewInstruction,
         reportedAggressiveExpressionReviewInstruction,
         internalSensitiveExpressionReviewInstruction,
-        reportedSensitiveExpressionReviewInstruction
+        reportedSensitiveExpressionReviewInstruction,
+        internalLegalComplianceReviewInstruction,
+        reportedLegalComplianceReviewInstruction,
+        internalPublicOrderReviewInstruction,
+        reportedPublicOrderReviewInstruction
     };
 }
 function trimTrailingPromptSeparators(value) {
@@ -3919,6 +3963,16 @@ function inferPromptOutputInstructionProfile(body) {
             ? "report"
             : normalizedBody.includes(templates.internalSensitiveExpressionReviewInstruction)
                 ? "internal"
+                : "unspecified",
+        legalComplianceReview: normalizedBody.includes(templates.reportedLegalComplianceReviewInstruction)
+            ? "report"
+            : normalizedBody.includes(templates.internalLegalComplianceReviewInstruction)
+                ? "internal"
+                : "unspecified",
+        publicOrderReview: normalizedBody.includes(templates.reportedPublicOrderReviewInstruction)
+            ? "report"
+            : normalizedBody.includes(templates.internalPublicOrderReviewInstruction)
+                ? "internal"
                 : "unspecified"
     };
 }
@@ -3929,6 +3983,10 @@ function stripPromptOutputInstructions(body) {
     while (changed) {
         changed = false;
         for (const template of [
+            templates.reportedPublicOrderReviewInstruction,
+            templates.internalPublicOrderReviewInstruction,
+            templates.reportedLegalComplianceReviewInstruction,
+            templates.internalLegalComplianceReviewInstruction,
             templates.reportedSensitiveExpressionReviewInstruction,
             templates.internalSensitiveExpressionReviewInstruction,
             templates.reportedAggressiveExpressionReviewInstruction,
@@ -4011,6 +4069,18 @@ function appendPromptOutputInstructions(body, options, hallucinationGuardMode = 
     }
     else if (options.sensitiveExpressionReview === "report") {
         segments.push(reportedSensitiveExpressionReviewInstruction);
+    }
+    if (options.legalComplianceReview === "internal") {
+        segments.push(internalLegalComplianceReviewInstruction);
+    }
+    else if (options.legalComplianceReview === "report") {
+        segments.push(reportedLegalComplianceReviewInstruction);
+    }
+    if (options.publicOrderReview === "internal") {
+        segments.push(internalPublicOrderReviewInstruction);
+    }
+    else if (options.publicOrderReview === "report") {
+        segments.push(reportedPublicOrderReviewInstruction);
     }
     return segments.join("\n\n");
 }
@@ -8199,6 +8269,20 @@ ${getMarkdownFenceInstruction()}`
         buildBody: () => `与えられた内容について、センシティブな表現がないか確認してください。属性、立場、背景、文化的事情などに関わる表現で、読み手や関係者に不必要な負荷や反発を生みそうな箇所があれば整理してください。断定しすぎず、どの観点で注意が必要そうかが分かるように示してください。`
     },
     {
+        id: "popular-legal-compliance-request",
+        label: "P1001-006: 法令遵守の観点で確認する",
+        keywords: ["P1001-006", "legal compliance", "law compliance", "regulatory compliance", "legal review", "法令遵守", "法律確認", "違法性確認", "ほうれいじゅんしゅ", "いほうせいかくにん"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容について、法令遵守の観点で問題がないか確認してください。日本の法令を基準として、違法行為の助長、法的に問題となりうる指示や表現、誤解を招きやすい記述があれば整理してください。必要に応じて、より安全で適切な方向も示してください。`
+    },
+    {
+        id: "popular-public-order-review-request",
+        label: "P1001-007: 公序良俗の観点で確認する",
+        keywords: ["P1001-007", "public order and morals", "public morals", "social acceptability", "appropriateness review", "公序良俗", "社会通念", "不適切表現", "こうじょりょうぞく", "しゃかいつうねん"],
+        requiresCommitId: false,
+        buildBody: () => `与えられた内容について、公序良俗の観点で問題がないか確認してください。日本を基準として、公序良俗に反するおそれのある内容、社会通念上不適切に受け取られうる表現、過度に扇情的または有害と受け取られうる記述があれば整理してください。必要に応じて、より穏当で適切な方向も示してください。`
+    },
+    {
         id: "popular-clarify-request-request",
         label: "P1205-003: 曖昧な依頼を明確化する",
         keywords: ["P1205-003", "clarify request", "clarify vague request", "refine request", "request clarification", "依頼明確化", "曖昧な依頼", "依頼整理", "いらいめいかくか", "あいまいないらい"],
@@ -8728,12 +8812,16 @@ async function initializePromptPage() {
         (await waitForElementById("aggressiveExpressionReview"));
     const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview") ||
         (await waitForElementById("sensitiveExpressionReview"));
+    const legalComplianceReview = document.getElementById("legalComplianceReview") ||
+        (await waitForElementById("legalComplianceReview"));
+    const publicOrderReview = document.getElementById("publicOrderReview") ||
+        (await waitForElementById("publicOrderReview"));
     const hallucinationGuard = document.getElementById("hallucinationGuard") ||
         (await waitForElementById("hallucinationGuard"));
     const outputMarkdown = document.getElementById("outputMarkdown");
     const copyShareLinkButton = document.getElementById("copyShareLinkButton");
     const promptOutput = document.getElementById("promptOutput");
-    if (!promptSearch || !outputTone || !selfReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+    if (!promptSearch || !outputTone || !selfReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !legalComplianceReview || !publicOrderReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
         return;
     }
     function loadSeriesVisibilitySettings() {
@@ -9289,7 +9377,9 @@ async function initializePromptPage() {
             considerationRiskReview: (considerationRiskReview.value || "unspecified"),
             discomfortRiskReview: (discomfortRiskReview.value || "unspecified"),
             aggressiveExpressionReview: (aggressiveExpressionReview.value || "unspecified"),
-            sensitiveExpressionReview: (sensitiveExpressionReview.value || "unspecified")
+            sensitiveExpressionReview: (sensitiveExpressionReview.value || "unspecified"),
+            legalComplianceReview: (legalComplianceReview.value || "unspecified"),
+            publicOrderReview: (publicOrderReview.value || "unspecified")
         };
     }
     function inferPromptOutputOptionDefaults(definition) {
@@ -9303,7 +9393,9 @@ async function initializePromptPage() {
                 considerationRiskReview: "unspecified",
                 discomfortRiskReview: "unspecified",
                 aggressiveExpressionReview: "unspecified",
-                sensitiveExpressionReview: "unspecified"
+                sensitiveExpressionReview: "unspecified",
+                legalComplianceReview: "unspecified",
+                publicOrderReview: "unspecified"
             };
         }
         const cached = promptOutputOptionDefaultsById.get(definition.id);
@@ -9324,7 +9416,9 @@ async function initializePromptPage() {
                 considerationRiskReview: "unspecified",
                 discomfortRiskReview: "unspecified",
                 aggressiveExpressionReview: "unspecified",
-                sensitiveExpressionReview: "unspecified"
+                sensitiveExpressionReview: "unspecified",
+                legalComplianceReview: "unspecified",
+                publicOrderReview: "unspecified"
             };
             promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
             return explicitDefaults;
@@ -9339,7 +9433,9 @@ async function initializePromptPage() {
             considerationRiskReview: "unspecified",
             discomfortRiskReview: "unspecified",
             aggressiveExpressionReview: "unspecified",
-            sensitiveExpressionReview: "unspecified"
+            sensitiveExpressionReview: "unspecified",
+            legalComplianceReview: "unspecified",
+            publicOrderReview: "unspecified"
         });
         const argsForInference = {};
         for (const argumentDefinition of getSelectedPromptArguments(definition)) {
@@ -9358,7 +9454,9 @@ async function initializePromptPage() {
             considerationRiskReview: instructionProfile.considerationRiskReview,
             discomfortRiskReview: instructionProfile.discomfortRiskReview,
             aggressiveExpressionReview: instructionProfile.aggressiveExpressionReview,
-            sensitiveExpressionReview: instructionProfile.sensitiveExpressionReview
+            sensitiveExpressionReview: instructionProfile.sensitiveExpressionReview,
+            legalComplianceReview: instructionProfile.legalComplianceReview,
+            publicOrderReview: instructionProfile.publicOrderReview
         };
         promptOutputOptionDefaultsById.set(definition.id, defaults);
         return defaults;
@@ -9374,6 +9472,8 @@ async function initializePromptPage() {
         discomfortRiskReview.value = defaults.discomfortRiskReview;
         aggressiveExpressionReview.value = defaults.aggressiveExpressionReview;
         sensitiveExpressionReview.value = defaults.sensitiveExpressionReview;
+        legalComplianceReview.value = defaults.legalComplianceReview;
+        publicOrderReview.value = defaults.publicOrderReview;
     }
     function renderSelectedPromptHelp() {
         const selectedDefinition = getSelectedPromptDefinition();
@@ -9538,7 +9638,9 @@ async function initializePromptPage() {
             considerationRiskReview: "unspecified",
             discomfortRiskReview: "unspecified",
             aggressiveExpressionReview: "unspecified",
-            sensitiveExpressionReview: "unspecified"
+            sensitiveExpressionReview: "unspecified",
+            legalComplianceReview: "unspecified",
+            publicOrderReview: "unspecified"
         });
         const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
         setPromptOutputOptions(currentOptions);
@@ -9658,6 +9760,8 @@ async function initializePromptPage() {
     discomfortRiskReview.addEventListener("change", updateOutput);
     aggressiveExpressionReview.addEventListener("change", updateOutput);
     sensitiveExpressionReview.addEventListener("change", updateOutput);
+    legalComplianceReview.addEventListener("change", updateOutput);
+    publicOrderReview.addEventListener("change", updateOutput);
     hallucinationGuard.addEventListener("change", updateOutput);
     outputMarkdown.addEventListener("change", updateOutput);
     copyShareLinkButton.addEventListener("click", () => {

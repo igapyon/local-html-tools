@@ -63,6 +63,24 @@ const reportedSensitiveExpressionReviewInstruction = `○回答案を作成し�
 - 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
 - 最終回答の末尾に \`センシティブ表現レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
 - 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalLegalComplianceReviewInstruction = `○回答案を作成したあと、法令遵守の観点で問題がないかを見直してください。
+- 日本の法令を基準として、違法行為の助長、法的に問題となりうる指示や表現、誤解を招きやすい記述があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedLegalComplianceReviewInstruction = `○回答案を作成したあと、法令遵守の観点で問題がないかを見直してください。
+- 日本の法令を基準として、違法行為の助長、法的に問題となりうる指示や表現、誤解を招きやすい記述があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`法令遵守レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalPublicOrderReviewInstruction = `○回答案を作成したあと、公序良俗の観点で問題がないかを見直してください。
+- 日本を基準として、公序良俗に反するおそれのある内容、社会通念上不適切に受け取られうる表現、過度に扇情的または有害と受け取られうる記述があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedPublicOrderReviewInstruction = `○回答案を作成したあと、公序良俗の観点で問題がないかを見直してください。
+- 日本を基準として、公序良俗に反するおそれのある内容、社会通念上不適切に受け取られうる表現、過度に扇情的または有害と受け取られうる記述があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`公序良俗レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
 let currentPromptOutputOptions = {
     hallucinationGuardLevel: "high",
     outputMarkdownEnabled: true,
@@ -72,7 +90,9 @@ let currentPromptOutputOptions = {
     considerationRiskReview: "unspecified",
     discomfortRiskReview: "unspecified",
     aggressiveExpressionReview: "unspecified",
-    sensitiveExpressionReview: "unspecified"
+    sensitiveExpressionReview: "unspecified",
+    legalComplianceReview: "unspecified",
+    publicOrderReview: "unspecified"
 };
 function setPromptOutputOptions(options) {
     currentPromptOutputOptions = {
@@ -84,7 +104,9 @@ function setPromptOutputOptions(options) {
         considerationRiskReview: options.considerationRiskReview || "unspecified",
         discomfortRiskReview: options.discomfortRiskReview || "unspecified",
         aggressiveExpressionReview: options.aggressiveExpressionReview || "unspecified",
-        sensitiveExpressionReview: options.sensitiveExpressionReview || "unspecified"
+        sensitiveExpressionReview: options.sensitiveExpressionReview || "unspecified",
+        legalComplianceReview: options.legalComplianceReview || "unspecified",
+        publicOrderReview: options.publicOrderReview || "unspecified"
     };
 }
 function getPromptOutputInstructionTemplates() {
@@ -105,7 +127,11 @@ function getPromptOutputInstructionTemplates() {
         internalAggressiveExpressionReviewInstruction,
         reportedAggressiveExpressionReviewInstruction,
         internalSensitiveExpressionReviewInstruction,
-        reportedSensitiveExpressionReviewInstruction
+        reportedSensitiveExpressionReviewInstruction,
+        internalLegalComplianceReviewInstruction,
+        reportedLegalComplianceReviewInstruction,
+        internalPublicOrderReviewInstruction,
+        reportedPublicOrderReviewInstruction
     };
 }
 function trimTrailingPromptSeparators(value) {
@@ -155,6 +181,16 @@ function inferPromptOutputInstructionProfile(body) {
             ? "report"
             : normalizedBody.includes(templates.internalSensitiveExpressionReviewInstruction)
                 ? "internal"
+                : "unspecified",
+        legalComplianceReview: normalizedBody.includes(templates.reportedLegalComplianceReviewInstruction)
+            ? "report"
+            : normalizedBody.includes(templates.internalLegalComplianceReviewInstruction)
+                ? "internal"
+                : "unspecified",
+        publicOrderReview: normalizedBody.includes(templates.reportedPublicOrderReviewInstruction)
+            ? "report"
+            : normalizedBody.includes(templates.internalPublicOrderReviewInstruction)
+                ? "internal"
                 : "unspecified"
     };
 }
@@ -165,6 +201,10 @@ function stripPromptOutputInstructions(body) {
     while (changed) {
         changed = false;
         for (const template of [
+            templates.reportedPublicOrderReviewInstruction,
+            templates.internalPublicOrderReviewInstruction,
+            templates.reportedLegalComplianceReviewInstruction,
+            templates.internalLegalComplianceReviewInstruction,
             templates.reportedSensitiveExpressionReviewInstruction,
             templates.internalSensitiveExpressionReviewInstruction,
             templates.reportedAggressiveExpressionReviewInstruction,
@@ -247,6 +287,18 @@ function appendPromptOutputInstructions(body, options, hallucinationGuardMode = 
     }
     else if (options.sensitiveExpressionReview === "report") {
         segments.push(reportedSensitiveExpressionReviewInstruction);
+    }
+    if (options.legalComplianceReview === "internal") {
+        segments.push(internalLegalComplianceReviewInstruction);
+    }
+    else if (options.legalComplianceReview === "report") {
+        segments.push(reportedLegalComplianceReviewInstruction);
+    }
+    if (options.publicOrderReview === "internal") {
+        segments.push(internalPublicOrderReviewInstruction);
+    }
+    else if (options.publicOrderReview === "report") {
+        segments.push(reportedPublicOrderReviewInstruction);
     }
     return segments.join("\n\n");
 }
