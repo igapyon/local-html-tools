@@ -143,6 +143,11 @@ function mountPromptDom() {
       <option value="desumasu">です・ます調</option>
       <option value="dearu">である調</option>
     </select>
+    <select id="selfReview">
+      <option value="unspecified">無指定</option>
+      <option value="internal">内部レビュー</option>
+      <option value="report">レビュー結果出力</option>
+    </select>
     <select id="hallucinationGuard">
       <option value="none">なし</option>
       <option value="low">弱</option>
@@ -298,15 +303,17 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("A simplified cute illustration of `a small fox`");
   });
 
-  it("applies prompt defaults to hallucinationGuard and outputMarkdown", async () => {
+  it("applies prompt defaults to output options", async () => {
     await bootPromptPage("?q=A501&commit=abc1234");
 
     const outputTone = document.getElementById("outputTone");
+    const selfReview = document.getElementById("selfReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
     expect(outputTone.value).toBe("unspecified");
+    expect(selfReview.value).toBe("unspecified");
     expect(hallucinationGuard.value).toBe("high");
     expect(outputMarkdown.checked).toBe(true);
     expect(promptOutput.textContent).toContain("○ハルシネーション防止のため");
@@ -317,12 +324,15 @@ describe("prompt-gen main", () => {
     await bootPromptPage("?q=A501&commit=abc1234");
 
     const outputTone = document.getElementById("outputTone");
+    const selfReview = document.getElementById("selfReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
     outputTone.value = "dearu";
     outputTone.dispatchEvent(new Event("change"));
+    selfReview.value = "report";
+    selfReview.dispatchEvent(new Event("change"));
     hallucinationGuard.value = "none";
     hallucinationGuard.dispatchEvent(new Event("change"));
     outputMarkdown.checked = false;
@@ -331,6 +341,8 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).not.toContain("○ハルシネーション防止のため");
     expect(promptOutput.textContent).not.toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
     expect(promptOutput.textContent).toContain("○文体は、である調で統一してください。箇条書きは体言止めでも構いません。");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。");
+    expect(promptOutput.textContent).toContain("`自己レビュー` セクション");
   });
 
   it("resets output options to prompt defaults when switching prompts", async () => {
@@ -338,6 +350,7 @@ describe("prompt-gen main", () => {
 
     const promptSearch = document.getElementById("promptSearch");
     const outputTone = document.getElementById("outputTone");
+    const selfReview = document.getElementById("selfReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
     const outputMarkdown = document.getElementById("outputMarkdown");
 
@@ -345,6 +358,8 @@ describe("prompt-gen main", () => {
     promptSearch.dispatchEvent(new Event("input"));
     outputTone.value = "desumasu";
     outputTone.dispatchEvent(new Event("change"));
+    selfReview.value = "internal";
+    selfReview.dispatchEvent(new Event("change"));
     hallucinationGuard.value = "none";
     hallucinationGuard.dispatchEvent(new Event("change"));
     outputMarkdown.checked = false;
@@ -356,19 +371,22 @@ describe("prompt-gen main", () => {
     promptSearch.dispatchEvent(new Event("input"));
 
     expect(outputTone.value).toBe("unspecified");
+    expect(selfReview.value).toBe("unspecified");
     expect(hallucinationGuard.value).toBe("high");
     expect(outputMarkdown.checked).toBe(true);
   });
 
-  it("applies hallucinationGuard and outputMarkdown to prompts without embedded instructions", async () => {
+  it("applies output options to prompts without embedded instructions", async () => {
     await bootPromptPage("?q=P1803-004");
 
     const outputTone = document.getElementById("outputTone");
+    const selfReview = document.getElementById("selfReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
     expect(outputTone.value).toBe("unspecified");
+    expect(selfReview.value).toBe("unspecified");
     expect(hallucinationGuard.value).toBe("none");
     expect(outputMarkdown.checked).toBe(false);
     expect(promptOutput.textContent).not.toContain("○ハルシネーション防止のため");
@@ -376,6 +394,8 @@ describe("prompt-gen main", () => {
 
     outputTone.value = "desumasu";
     outputTone.dispatchEvent(new Event("change"));
+    selfReview.value = "internal";
+    selfReview.dispatchEvent(new Event("change"));
     hallucinationGuard.value = "high";
     hallucinationGuard.dispatchEvent(new Event("change"));
     outputMarkdown.checked = true;
@@ -384,6 +404,8 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("○ハルシネーション防止のため");
     expect(promptOutput.textContent).toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
     expect(promptOutput.textContent).toContain("○文体は、です・ます調で統一してください。箇条書きは体言止めでも構いません。");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。");
+    expect(promptOutput.textContent).not.toContain("`自己レビュー` セクション");
   });
 
   it("uses docs as the default docs path for A150", async () => {
