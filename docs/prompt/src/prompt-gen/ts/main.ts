@@ -28,6 +28,7 @@ type PromptOutputOptionDefaults = {
   hallucinationGuard: "none" | "low" | "high";
   outputMarkdown: boolean;
   outputTone: "unspecified" | "desumasu" | "dearu";
+  selfReview: "unspecified" | "internal" | "report";
 };
 
 type PromptSearchIndex = {
@@ -120,6 +121,9 @@ async function initializePromptPage() {
   const outputTone =
     (document.getElementById("outputTone") as HTMLSelectElement | null) ||
     (await waitForElementById<HTMLSelectElement>("outputTone"));
+  const selfReview =
+    (document.getElementById("selfReview") as HTMLSelectElement | null) ||
+    (await waitForElementById<HTMLSelectElement>("selfReview"));
   const hallucinationGuard =
     (document.getElementById("hallucinationGuard") as HTMLSelectElement | null) ||
     (await waitForElementById<HTMLSelectElement>("hallucinationGuard"));
@@ -127,7 +131,7 @@ async function initializePromptPage() {
   const copyShareLinkButton = document.getElementById("copyShareLinkButton") as HTMLButtonElement | null;
   const promptOutput = document.getElementById("promptOutput") as HTMLElement | null;
 
-  if (!promptSearch || !includeLabelPrefix || !outputTone || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+  if (!promptSearch || !includeLabelPrefix || !outputTone || !selfReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
     return;
   }
 
@@ -775,7 +779,8 @@ async function initializePromptPage() {
     return {
       hallucinationGuardLevel: ((hallucinationGuard.value || "none") as "none" | "low" | "high"),
       outputMarkdownEnabled: outputMarkdown.checked,
-      outputTone: ((outputTone.value || "unspecified") as "unspecified" | "desumasu" | "dearu")
+      outputTone: ((outputTone.value || "unspecified") as "unspecified" | "desumasu" | "dearu"),
+      selfReview: ((selfReview.value || "unspecified") as "unspecified" | "internal" | "report")
     };
   }
 
@@ -784,7 +789,8 @@ async function initializePromptPage() {
       return {
         hallucinationGuard: "none",
         outputMarkdown: false,
-        outputTone: "unspecified"
+        outputTone: "unspecified",
+        selfReview: "unspecified"
       };
     }
 
@@ -801,7 +807,8 @@ async function initializePromptPage() {
             ? "high"
             : "none",
         outputMarkdown: definition.outputMarkdown === true,
-        outputTone: "unspecified"
+        outputTone: "unspecified",
+        selfReview: "unspecified"
       };
       promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
       return explicitDefaults;
@@ -811,7 +818,8 @@ async function initializePromptPage() {
     setPromptOutputOptions({
       hallucinationGuardLevel: "high",
       outputMarkdownEnabled: true,
-      outputTone: "unspecified"
+      outputTone: "unspecified",
+      selfReview: "unspecified"
     });
     const argsForInference: Record<string, string> = {};
     for (const argumentDefinition of getSelectedPromptArguments(definition)) {
@@ -828,7 +836,8 @@ async function initializePromptPage() {
     const defaults = {
       hallucinationGuard: instructionProfile.hallucinationGuardMode,
       outputMarkdown: instructionProfile.outputMarkdown,
-      outputTone: instructionProfile.outputTone
+      outputTone: instructionProfile.outputTone,
+      selfReview: instructionProfile.selfReview
     };
     promptOutputOptionDefaultsById.set(definition.id, defaults);
     return defaults;
@@ -839,6 +848,7 @@ async function initializePromptPage() {
     hallucinationGuard.value = defaults.hallucinationGuard;
     outputMarkdown.checked = defaults.outputMarkdown;
     outputTone.value = defaults.outputTone;
+    selfReview.value = defaults.selfReview;
   }
 
   function renderSelectedPromptHelp() {
@@ -1022,7 +1032,8 @@ async function initializePromptPage() {
     setPromptOutputOptions({
       hallucinationGuardLevel: "high",
       outputMarkdownEnabled: true,
-      outputTone: "unspecified"
+      outputTone: "unspecified",
+      selfReview: "unspecified"
     });
     const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
     setPromptOutputOptions(currentOptions);
@@ -1162,6 +1173,7 @@ async function initializePromptPage() {
   promptSearch.addEventListener("input", renderCandidates);
   includeLabelPrefix.addEventListener("change", updateOutput);
   outputTone.addEventListener("change", updateOutput);
+  selfReview.addEventListener("change", updateOutput);
   hallucinationGuard.addEventListener("change", updateOutput);
   outputMarkdown.addEventListener("change", updateOutput);
   copyShareLinkButton.addEventListener("click", () => {

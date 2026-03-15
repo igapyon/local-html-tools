@@ -2,6 +2,7 @@ type PromptOutputOptions = {
   hallucinationGuardLevel: "none" | "low" | "high";
   outputMarkdownEnabled: boolean;
   outputTone: "unspecified" | "desumasu" | "dearu";
+  selfReview: "unspecified" | "internal" | "report";
 };
 
 type PromptHallucinationGuardMode = "none" | "low" | "high";
@@ -10,6 +11,7 @@ type PromptOutputInstructionProfile = {
   hallucinationGuardMode: PromptHallucinationGuardMode | null;
   outputMarkdown: boolean;
   outputTone: "unspecified" | "desumasu" | "dearu";
+  selfReview: "unspecified" | "internal" | "report";
 };
 
 const strictHallucinationPreventionInstruction = `○ハルシネーション防止のため、次のルールに従ってください。
@@ -25,18 +27,29 @@ const softHallucinationPreventionInstruction = `○事実誤認を避けるた�
 const markdownFenceInstruction = "○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。";
 const desumasuToneInstruction = "○文体は、です・ます調で統一してください。箇条書きは体言止めでも構いません。";
 const dearuToneInstruction = "○文体は、である調で統一してください。箇条書きは体言止めでも構いません。";
+const internalSelfReviewInstruction = `○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。
+- 依頼者にとって分かりやすいか、抜け漏れがないか、過不足がないか、構成が自然かを見直してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 自己レビューの途中経過や思考過程は出力しないでください。`;
+const reportedSelfReviewInstruction = `○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。
+- 依頼者にとって分かりやすいか、抜け漏れがないか、過不足がないか、構成が自然かを見直してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`自己レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 自己レビューの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
 
 let currentPromptOutputOptions: PromptOutputOptions = {
   hallucinationGuardLevel: "high",
   outputMarkdownEnabled: true,
-  outputTone: "unspecified"
+  outputTone: "unspecified",
+  selfReview: "unspecified"
 };
 
 function setPromptOutputOptions(options: PromptOutputOptions): void {
   currentPromptOutputOptions = {
     hallucinationGuardLevel: options.hallucinationGuardLevel || "none",
     outputMarkdownEnabled: options.outputMarkdownEnabled !== false,
-    outputTone: options.outputTone || "unspecified"
+    outputTone: options.outputTone || "unspecified",
+    selfReview: options.selfReview || "unspecified"
   };
 }
 
@@ -46,7 +59,9 @@ function getPromptOutputInstructionTemplates() {
     softHallucinationPreventionInstruction,
     markdownFenceInstruction,
     desumasuToneInstruction,
-    dearuToneInstruction
+    dearuToneInstruction,
+    internalSelfReviewInstruction,
+    reportedSelfReviewInstruction
   };
 }
 
@@ -68,6 +83,11 @@ function inferPromptOutputInstructionProfile(body: string): PromptOutputInstruct
       ? "desumasu"
       : normalizedBody.includes(templates.dearuToneInstruction)
         ? "dearu"
+        : "unspecified",
+    selfReview: normalizedBody.includes(templates.reportedSelfReviewInstruction)
+      ? "report"
+      : normalizedBody.includes(templates.internalSelfReviewInstruction)
+        ? "internal"
         : "unspecified"
   };
 }
@@ -80,6 +100,8 @@ function stripPromptOutputInstructions(body: string): string {
   while (changed) {
     changed = false;
     for (const template of [
+      templates.reportedSelfReviewInstruction,
+      templates.internalSelfReviewInstruction,
       templates.dearuToneInstruction,
       templates.desumasuToneInstruction,
       templates.markdownFenceInstruction,
@@ -123,6 +145,11 @@ function appendPromptOutputInstructions(
     segments.push(desumasuToneInstruction);
   } else if (options.outputTone === "dearu") {
     segments.push(dearuToneInstruction);
+  }
+  if (options.selfReview === "internal") {
+    segments.push(internalSelfReviewInstruction);
+  } else if (options.selfReview === "report") {
+    segments.push(reportedSelfReviewInstruction);
   }
 
   return segments.join("\n\n");

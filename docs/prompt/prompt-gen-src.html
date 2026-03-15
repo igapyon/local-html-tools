@@ -142,6 +142,15 @@ limitations under the License.
         </lht-select-help>
         <lht-select-help
           class="md-output-options__select md-output-options__select--compact"
+          field-id="selfReview"
+          label="自己レビュー"
+          help-text="第三者レビューア視点での見直し方法を選択します。無指定 / 内部レビュー / レビュー結果出力 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="internal">内部レビュー</option>
+          <option value="report">レビュー結果出力</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
           field-id="hallucinationGuard"
           label="幻想防止"
           help-text="幻想防止の強さを選択します。なし / 弱 / 強 の3段階です。">
