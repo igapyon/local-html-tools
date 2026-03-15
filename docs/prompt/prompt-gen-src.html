@@ -121,17 +121,20 @@ limitations under the License.
           help-label="ラベル名を先頭に含める説明">
           ON の場合は `[ボタンラベル] 本文` の形式で出力します。OFF の場合は本文のみを出力します。
         </lht-switch-help>
-        <lht-switch-help
-          switch-id="hallucinationGuard"
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
+          field-id="hallucinationGuard"
           label="幻想防止"
-          help-label="幻想防止の説明">
-          ON の場合は、事実誤認や根拠のない補完を避けるための注意文を含めます。
-        </lht-switch-help>
+          help-text="幻想防止の強さを選択します。なし / 弱 / 強 の3段階です。">
+          <option value="none">なし</option>
+          <option value="low">弱</option>
+          <option value="high">強</option>
+        </lht-select-help>
         <lht-switch-help
           switch-id="outputMarkdown"
-          label="Markdownフェンス"
-          help-label="Markdownフェンスの説明">
-          ON の場合は、最終回答を `~~~~` で囲んで出力する指定を含めます。
+          label="Markdown出力"
+          help-label="Markdown出力の説明">
+          ON の場合は、最終回答を Markdown として出力し、外側を `~~~~` で囲む指定を含めます。
         </lht-switch-help>
         <a
           id="gitPseudoSquashLink"

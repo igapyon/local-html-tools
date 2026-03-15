@@ -16,14 +16,14 @@ const softHallucinationPreventionInstruction = `○事実誤認を避けるた�
 - 根拠がある事実と、推測・評価・提案は区別して記載してください。
 - 推測や評価を書く場合は、断定を避け、根拠や前提が分かるようにしてください。
 - 不明点が残る場合は、不明のまま扱ってください。`;
-const markdownFenceInstruction = "○最終的な回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。";
+const markdownFenceInstruction = "○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。";
 let currentPromptOutputOptions = {
-    hallucinationGuardEnabled: true,
+    hallucinationGuardLevel: "high",
     outputMarkdownEnabled: true
 };
 function setPromptOutputOptions(options) {
     currentPromptOutputOptions = {
-        hallucinationGuardEnabled: options.hallucinationGuardEnabled !== false,
+        hallucinationGuardLevel: options.hallucinationGuardLevel || "none",
         outputMarkdownEnabled: options.outputMarkdownEnabled !== false
     };
 }
@@ -34,6 +34,57 @@ function getPromptOutputInstructionTemplates() {
         markdownFenceInstruction
     };
 }
+function trimTrailingPromptSeparators(value) {
+    return String(value || "").replace(/(?:\s*\n\s*)+$/g, "").trimEnd();
+}
+function inferPromptOutputInstructionProfile(body) {
+    const templates = getPromptOutputInstructionTemplates();
+    const normalizedBody = String(body || "");
+    return {
+        hallucinationGuardMode: normalizedBody.includes(templates.strictHallucinationPreventionInstruction)
+            ? "high"
+            : normalizedBody.includes(templates.softHallucinationPreventionInstruction)
+                ? "low"
+                : "none",
+        outputMarkdown: normalizedBody.includes(templates.markdownFenceInstruction)
+    };
+}
+function stripPromptOutputInstructions(body) {
+    const templates = getPromptOutputInstructionTemplates();
+    let normalizedBody = trimTrailingPromptSeparators(body);
+    let changed = true;
+    while (changed) {
+        changed = false;
+        for (const template of [
+            templates.markdownFenceInstruction,
+            templates.strictHallucinationPreventionInstruction,
+            templates.softHallucinationPreventionInstruction
+        ]) {
+            if (!template || !normalizedBody.endsWith(template)) {
+                continue;
+            }
+            normalizedBody = trimTrailingPromptSeparators(normalizedBody.slice(0, normalizedBody.length - template.length));
+            changed = true;
+        }
+    }
+    return normalizedBody;
+}
+function appendPromptOutputInstructions(body, options, hallucinationGuardMode = "high") {
+    const normalizedBody = trimTrailingPromptSeparators(body);
+    if (!normalizedBody) {
+        return "";
+    }
+    const segments = [normalizedBody];
+    if (options.hallucinationGuardLevel !== "none") {
+        segments.push((options.hallucinationGuardLevel || hallucinationGuardMode) === "low"
+            ? softHallucinationPreventionInstruction
+            : strictHallucinationPreventionInstruction);
+    }
+    if (options.outputMarkdownEnabled) {
+        segments.push(markdownFenceInstruction);
+    }
+    return segments.join("\n\n");
+}
 function getMarkdownFenceInstruction() {
     return currentPromptOutputOptions.outputMarkdownEnabled ? markdownFenceInstruction : "";
 }
@@ -42,10 +93,10 @@ function appendMarkdownFenceInstruction(body) {
     return instruction ? `${body}\n\n${instruction}` : body;
 }
 function getStrictHallucinationPreventionInstruction() {
-    return currentPromptOutputOptions.hallucinationGuardEnabled ? strictHallucinationPreventionInstruction : "";
+    return currentPromptOutputOptions.hallucinationGuardLevel === "high" ? strictHallucinationPreventionInstruction : "";
 }
 function getSoftHallucinationPreventionInstruction() {
-    return currentPromptOutputOptions.hallucinationGuardEnabled ? softHallucinationPreventionInstruction : "";
+    return currentPromptOutputOptions.hallucinationGuardLevel === "low" ? softHallucinationPreventionInstruction : "";
 }
 function getTodoReflectionInstruction() {
     return "必要に応じて、今回の作業結果を TODO.md に反映してください。関連する既存の TODO があれば補強・更新し、該当する記述がなければ新規の TODO を追加してください。";

@@ -1,6 +1,13 @@
 type PromptOutputOptions = {
-  hallucinationGuardEnabled: boolean;
+  hallucinationGuardLevel: "none" | "low" | "high";
   outputMarkdownEnabled: boolean;
+};
+
+type PromptHallucinationGuardMode = "none" | "low" | "high";
+
+type PromptOutputInstructionProfile = {
+  hallucinationGuardMode: PromptHallucinationGuardMode | null;
+  outputMarkdown: boolean;
 };
 
 const strictHallucinationPreventionInstruction = `○ハルシネーション防止のため、次のルールに従ってください。
@@ -23,16 +30,16 @@ const softHallucinationPreventionInstruction = `○事実誤認を避けるた�
 - 推測や評価を書く場合は、断定を避け、根拠や前提が分かるようにしてください。
 - 不明点が残る場合は、不明のまま扱ってください。`;
 
-const markdownFenceInstruction = "○最終的な回答は ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。";
+const markdownFenceInstruction = "○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。";
 
 let currentPromptOutputOptions: PromptOutputOptions = {
-  hallucinationGuardEnabled: true,
+  hallucinationGuardLevel: "high",
   outputMarkdownEnabled: true
 };
 
 function setPromptOutputOptions(options: PromptOutputOptions): void {
   currentPromptOutputOptions = {
-    hallucinationGuardEnabled: options.hallucinationGuardEnabled !== false,
+    hallucinationGuardLevel: options.hallucinationGuardLevel || "none",
     outputMarkdownEnabled: options.outputMarkdownEnabled !== false
   };
 }
@@ -45,6 +52,72 @@ function getPromptOutputInstructionTemplates() {
   };
 }
 
+function trimTrailingPromptSeparators(value: string): string {
+  return String(value || "").replace(/(?:\s*\n\s*)+$/g, "").trimEnd();
+}
+
+function inferPromptOutputInstructionProfile(body: string): PromptOutputInstructionProfile {
+  const templates = getPromptOutputInstructionTemplates();
+  const normalizedBody = String(body || "");
+  return {
+    hallucinationGuardMode: normalizedBody.includes(templates.strictHallucinationPreventionInstruction)
+      ? "high"
+      : normalizedBody.includes(templates.softHallucinationPreventionInstruction)
+        ? "low"
+        : "none",
+    outputMarkdown: normalizedBody.includes(templates.markdownFenceInstruction)
+  };
+}
+
+function stripPromptOutputInstructions(body: string): string {
+  const templates = getPromptOutputInstructionTemplates();
+  let normalizedBody = trimTrailingPromptSeparators(body);
+  let changed = true;
+
+  while (changed) {
+    changed = false;
+    for (const template of [
+      templates.markdownFenceInstruction,
+      templates.strictHallucinationPreventionInstruction,
+      templates.softHallucinationPreventionInstruction
+    ]) {
+      if (!template || !normalizedBody.endsWith(template)) {
+        continue;
+      }
+      normalizedBody = trimTrailingPromptSeparators(normalizedBody.slice(0, normalizedBody.length - template.length));
+      changed = true;
+    }
+  }
+
+  return normalizedBody;
+}
+
+function appendPromptOutputInstructions(
+  body: string,
+  options: PromptOutputOptions,
+  hallucinationGuardMode: PromptHallucinationGuardMode = "high"
+): string {
+  const normalizedBody = trimTrailingPromptSeparators(body);
+  if (!normalizedBody) {
+    return "";
+  }
+
+  const segments = [normalizedBody];
+
+  if (options.hallucinationGuardLevel !== "none") {
+    segments.push(
+      (options.hallucinationGuardLevel || hallucinationGuardMode) === "low"
+        ? softHallucinationPreventionInstruction
+        : strictHallucinationPreventionInstruction
+    );
+  }
+  if (options.outputMarkdownEnabled) {
+    segments.push(markdownFenceInstruction);
+  }
+
+  return segments.join("\n\n");
+}
+
 function getMarkdownFenceInstruction(): string {
   return currentPromptOutputOptions.outputMarkdownEnabled ? markdownFenceInstruction : "";
 }
@@ -55,11 +128,11 @@ function appendMarkdownFenceInstruction(body: string): string {
 }
 
 function getStrictHallucinationPreventionInstruction(): string {
-  return currentPromptOutputOptions.hallucinationGuardEnabled ? strictHallucinationPreventionInstruction : "";
+  return currentPromptOutputOptions.hallucinationGuardLevel === "high" ? strictHallucinationPreventionInstruction : "";
 }
 
 function getSoftHallucinationPreventionInstruction(): string {
-  return currentPromptOutputOptions.hallucinationGuardEnabled ? softHallucinationPreventionInstruction : "";
+  return currentPromptOutputOptions.hallucinationGuardLevel === "low" ? softHallucinationPreventionInstruction : "";
 }
 
 function getTodoReflectionInstruction(): string {

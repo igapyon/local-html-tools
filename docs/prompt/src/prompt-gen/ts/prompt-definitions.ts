@@ -19,7 +19,7 @@ type PromptDefinition = {
   subjectHelpText?: string;
   subjectDefaultValue?: string;
   args?: PromptArgumentDefinition[];
-  hallucinationGuard?: boolean;
+  hallucinationGuard?: "none" | "low" | "high" | boolean;
   outputMarkdown?: boolean;
   buildBody: (commitId: string, subject?: string) => string;
 };
