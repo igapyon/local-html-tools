@@ -1,13 +1,26 @@
+type PromptArgumentDefinition = {
+  id: string;
+  label: string;
+  required?: boolean;
+  placeholder?: string;
+  helpText?: string;
+  defaultValue?: string;
+  inputMode?: "text" | "latin";
+};
+
 type PromptDefinition = {
   id: string;
   label: string;
   keywords: string[];
-  requiresCommitId: boolean;
+  requiresCommitId?: boolean;
   requiresSubject?: boolean;
   subjectLabel?: string;
   subjectPlaceholder?: string;
   subjectHelpText?: string;
   subjectDefaultValue?: string;
+  args?: PromptArgumentDefinition[];
+  hallucinationGuard?: boolean;
+  outputMarkdown?: boolean;
   buildBody: (commitId: string, subject?: string) => string;
 };
 

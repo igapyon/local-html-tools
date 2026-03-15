@@ -2,13 +2,31 @@ type PromptDefinition = {
   id: string;
   label: string;
   keywords: string[];
-  requiresCommitId: boolean;
+  requiresCommitId?: boolean;
   requiresSubject?: boolean;
   subjectLabel?: string;
   subjectPlaceholder?: string;
   subjectHelpText?: string;
   subjectDefaultValue?: string;
+  args?: PromptArgumentDefinition[];
+  hallucinationGuard?: boolean;
+  outputMarkdown?: boolean;
   buildBody: (commitId: string, subject?: string) => string;
+};
+
+type PromptArgumentDefinition = {
+  id: string;
+  label: string;
+  required?: boolean;
+  placeholder?: string;
+  helpText?: string;
+  defaultValue?: string;
+  inputMode?: "text" | "latin";
+};
+
+type PromptOutputOptionDefaults = {
+  hallucinationGuard: boolean;
+  outputMarkdown: boolean;
 };
 
 type PromptSearchIndex = {
@@ -77,20 +95,19 @@ async function initializePromptPage() {
 
   const promptSearch = document.getElementById("promptSearch") as HTMLInputElement | null;
   const promptCandidateArea = document.getElementById("promptCandidateArea") as HTMLDivElement | null;
-  const commitInputSection = document.getElementById("commitInputSection") as HTMLElement | null;
-  const subjectInputSection = document.getElementById("subjectInputSection") as HTMLElement | null;
-  let subjectInputFieldHost = document.getElementById("subjectInputField") as HTMLElement | null;
+  const promptArgsSection = document.getElementById("promptArgsSection") as HTMLElement | null;
+  const promptArgsContainer = document.getElementById("promptArgsContainer") as HTMLDivElement | null;
   const promptOutputSection = document.getElementById("promptOutputSection") as HTMLElement | null;
   const promptOutputTitle = document.getElementById("promptOutputTitle") as HTMLElement | null;
   const promptOutputHelp = document.getElementById("promptOutputHelp") as HTMLDivElement | null;
   const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink") as HTMLAnchorElement | null;
-  const commitIdInput = document.getElementById("commitId") as HTMLInputElement | null;
-  let subjectInput = document.getElementById("subjectInput") as HTMLInputElement | null;
   const includeLabelPrefix = document.getElementById("includeLabelPrefix") as HTMLInputElement | null;
+  const hallucinationGuard = document.getElementById("hallucinationGuard") as HTMLInputElement | null;
+  const outputMarkdown = document.getElementById("outputMarkdown") as HTMLInputElement | null;
   const copyShareLinkButton = document.getElementById("copyShareLinkButton") as HTMLButtonElement | null;
   const promptOutput = document.getElementById("promptOutput") as HTMLElement | null;
 
-  if (!promptSearch || !commitIdInput || !subjectInput || !includeLabelPrefix || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !commitInputSection || !subjectInputSection || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+  if (!promptSearch || !includeLabelPrefix || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
     return;
   }
 
@@ -134,13 +151,49 @@ async function initializePromptPage() {
 
   let seriesVisibilitySettings = loadSeriesVisibilitySettings();
 
+  function getLegacyPromptArguments(definition: PromptDefinition): PromptArgumentDefinition[] {
+    const args: PromptArgumentDefinition[] = [];
+
+    if (definition.requiresCommitId) {
+      args.push({
+        id: "commitId",
+        label: "コミットID",
+        required: true,
+        placeholder: "例: abc1234",
+        helpText: "PR 文面の作成対象にしたいコミット ID を入力します。短縮 SHA でも構いません。",
+        inputMode: "latin"
+      });
+    }
+
+    if (definition.requiresSubject) {
+      args.push({
+        id: "subject",
+        label: definition.subjectLabel || "subject",
+        required: true,
+        placeholder: definition.subjectPlaceholder || "例: a small fox",
+        helpText: definition.subjectHelpText || "プロンプト内の [subject] に差し込む対象を入力します。英語でも日本語でも構いません。",
+        defaultValue: definition.subjectDefaultValue,
+        inputMode: "text"
+      });
+    }
+
+    return args;
+  }
+
+  function normalizePromptDefinition(definition: PromptDefinition): PromptDefinition {
+    return {
+      ...definition,
+      args: Array.isArray(definition.args) ? definition.args : getLegacyPromptArguments(definition)
+    };
+  }
+
   function getVisiblePromptDefinitions() {
     return [
       ...(seriesVisibilitySettings.showA ? basePromptDefinitions : []),
       ...(seriesVisibilitySettings.showX ? expansionDefinitions : []),
       ...(seriesVisibilitySettings.showS ? suggestDefinitions : []),
       ...(seriesVisibilitySettings.showP ? popularDefinitions : [])
-    ];
+    ].map(normalizePromptDefinition);
   }
 
   let visiblePromptDefinitions: PromptDefinition[] = [];
@@ -160,14 +213,9 @@ async function initializePromptPage() {
   }
 
   applyLatinInputHints(promptSearch, "search");
-  applyLatinInputHints(commitIdInput, "done");
-
   const MAX_EMBED_INPUT_LENGTH = 1024;
-  const defaultSubjectFieldConfig = {
-    label: "subject",
-    placeholder: "例: a small fox",
-    helpText: "プロンプト内の [subject] に差し込む対象を入力します。英語でも日本語でも構いません。"
-  };
+  let activeArgumentDefinitions: PromptArgumentDefinition[] = [];
+  let promptArgumentInputs = new Map<string, HTMLInputElement>();
 
   function sanitizePromptVariableInput(value: string) {
     const normalizedWhitespace = String(value || "")
@@ -183,75 +231,123 @@ async function initializePromptPage() {
     return `\`${normalizedQuotes}\``;
   }
 
-  function getSubjectFieldConfig(definition: PromptDefinition | null) {
-    return {
-      label: definition?.subjectLabel || defaultSubjectFieldConfig.label,
-      placeholder: definition?.subjectPlaceholder || defaultSubjectFieldConfig.placeholder,
-      helpText: definition?.subjectHelpText || defaultSubjectFieldConfig.helpText
-    };
-  }
-
-  function handleSubjectInput() {
+  function handleArgumentInput() {
     updateOutput();
   }
 
-  function refreshSubjectInputReference() {
-    subjectInput = document.getElementById("subjectInput") as HTMLInputElement | null;
-    if (subjectInput) {
-      subjectInput.addEventListener("input", handleSubjectInput);
+  function getSelectedPromptArguments(definition: PromptDefinition | null): PromptArgumentDefinition[] {
+    return Array.isArray(definition?.args) ? definition.args : [];
+  }
+
+  function getArgumentInput(argumentId: string) {
+    return promptArgumentInputs.get(argumentId) || null;
+  }
+
+  function getArgumentDomId(argumentId: string) {
+    if (argumentId === "subject") {
+      return "subjectInput";
+    }
+    return argumentId;
+  }
+
+  function getArgumentValue(argumentId: string) {
+    return getArgumentInput(argumentId)?.value || "";
+  }
+
+  function getArgumentQueryParamName(argumentId: string) {
+    if (argumentId === "commitId") {
+      return "commit";
+    }
+    if (argumentId === "subject") {
+      return "subject";
+    }
+    return `arg_${argumentId}`;
+  }
+
+  function getPromptArgumentValues() {
+    const values: Record<string, string> = {};
+    for (const argumentDefinition of activeArgumentDefinitions) {
+      values[argumentDefinition.id] = getArgumentValue(argumentDefinition.id);
+    }
+    return values;
+  }
+
+  function setPromptArgumentValues(values: Record<string, string>) {
+    for (const argumentDefinition of activeArgumentDefinitions) {
+      const input = getArgumentInput(argumentDefinition.id);
+      if (!input) {
+        continue;
+      }
+      input.value = values[argumentDefinition.id] || "";
     }
   }
 
-  function renderSubjectInputField(definition: PromptDefinition | null) {
-    const config = getSubjectFieldConfig(definition);
-    const currentValue = subjectInput?.value || "";
-
-    if (subjectInputFieldHost && subjectInputFieldHost.parentElement) {
-      const nextField = document.createElement("lht-text-field-help");
-      nextField.id = "subjectInputField";
-      nextField.setAttribute("field-id", "subjectInput");
-      nextField.setAttribute("label", config.label);
-      nextField.setAttribute("placeholder", config.placeholder);
-      nextField.setAttribute("help-text", config.helpText);
-      nextField.setAttribute("required", "");
-      subjectInputFieldHost.replaceWith(nextField);
-      subjectInputFieldHost = nextField;
-    } else if (subjectInput) {
-      subjectInput.setAttribute("aria-label", config.label);
-      subjectInput.setAttribute("placeholder", config.placeholder);
-      subjectInput.setAttribute("title", config.helpText);
-    }
-
-    refreshSubjectInputReference();
-    if (subjectInput) {
-      subjectInput.value = currentValue;
+  function refreshArgumentInputReferences(definition: PromptDefinition | null) {
+    promptArgumentInputs = new Map();
+    for (const argumentDefinition of getSelectedPromptArguments(definition)) {
+      const input = document.getElementById(getArgumentDomId(argumentDefinition.id)) as HTMLInputElement | null;
+      if (!input) {
+        continue;
+      }
+      promptArgumentInputs.set(argumentDefinition.id, input);
+      input.addEventListener("input", handleArgumentInput);
+      if (argumentDefinition.inputMode === "latin") {
+        applyLatinInputHints(input, "done");
+      }
     }
   }
 
-  function applyDefaultSubjectValue(selectedDefinition: PromptDefinition | null) {
-    if (!selectedDefinition?.requiresSubject || !subjectInput) {
+  function renderArgumentFields(definition: PromptDefinition | null) {
+    const currentValues = getPromptArgumentValues();
+    activeArgumentDefinitions = getSelectedPromptArguments(definition).map((argumentDefinition) => ({ ...argumentDefinition }));
+    promptArgsContainer.innerHTML = "";
+
+    for (const argumentDefinition of activeArgumentDefinitions) {
+      const field = document.createElement("lht-text-field-help");
+      field.id = `${getArgumentDomId(argumentDefinition.id)}Field`;
+      field.setAttribute("field-id", getArgumentDomId(argumentDefinition.id));
+      field.setAttribute("label", argumentDefinition.label);
+      if (argumentDefinition.placeholder) {
+        field.setAttribute("placeholder", argumentDefinition.placeholder);
+      }
+      if (argumentDefinition.helpText) {
+        field.setAttribute("help-text", argumentDefinition.helpText);
+      }
+      if (argumentDefinition.required !== false) {
+        field.setAttribute("required", "");
+      }
+      promptArgsContainer.appendChild(field);
+    }
+
+    refreshArgumentInputReferences(definition);
+    setPromptArgumentValues(currentValues);
+  }
+
+  function applyDefaultArgumentValues(selectedDefinition: PromptDefinition | null) {
+    if (!selectedDefinition) {
       return;
     }
-    if ((subjectInput.value || "").trim()) {
-      return;
+
+    for (const argumentDefinition of getSelectedPromptArguments(selectedDefinition)) {
+      const input = getArgumentInput(argumentDefinition.id);
+      if (!input) {
+        continue;
+      }
+      if ((input.value || "").trim()) {
+        continue;
+      }
+      if (!argumentDefinition.defaultValue) {
+        continue;
+      }
+      input.value = argumentDefinition.defaultValue;
     }
-    if (!selectedDefinition.subjectDefaultValue) {
-      return;
-    }
-    subjectInput.value = selectedDefinition.subjectDefaultValue;
   }
 
   function syncInputSections(selectedDefinition: PromptDefinition | null) {
-    if (selectedDefinition?.requiresCommitId) {
-      commitInputSection.classList.remove("md-hidden");
+    if (getSelectedPromptArguments(selectedDefinition).length > 0) {
+      promptArgsSection.classList.remove("md-hidden");
     } else {
-      commitInputSection.classList.add("md-hidden");
-    }
-
-    if (selectedDefinition?.requiresSubject) {
-      subjectInputSection.classList.remove("md-hidden");
-    } else {
-      subjectInputSection.classList.add("md-hidden");
+      promptArgsSection.classList.add("md-hidden");
     }
   }
 
@@ -259,6 +355,7 @@ async function initializePromptPage() {
   let lastSearchQuery = "";
   let pendingInitialPromptCode = "";
   let suppressSearchResetOnce = false;
+  const promptOutputOptionDefaultsById = new Map<string, PromptOutputOptionDefaults>();
 
   const kanaToRomajiMap = new Map<string, string>([
     ["きゃ", "kya"], ["きゅ", "kyu"], ["きょ", "kyo"],
@@ -654,6 +751,68 @@ async function initializePromptPage() {
     return visiblePromptDefinitions.find((definition) => definition.id === selectedPrompt) || null;
   }
 
+  function getPromptOutputOptions() {
+    return {
+      hallucinationGuardEnabled: hallucinationGuard.checked,
+      outputMarkdownEnabled: outputMarkdown.checked
+    };
+  }
+
+  function inferPromptOutputOptionDefaults(definition: PromptDefinition | null): PromptOutputOptionDefaults {
+    if (!definition) {
+      return {
+        hallucinationGuard: false,
+        outputMarkdown: false
+      };
+    }
+
+    const cached = promptOutputOptionDefaultsById.get(definition.id);
+    if (cached) {
+      return cached;
+    }
+
+    if (typeof definition.hallucinationGuard === "boolean" || typeof definition.outputMarkdown === "boolean") {
+      const explicitDefaults = {
+        hallucinationGuard: definition.hallucinationGuard === true,
+        outputMarkdown: definition.outputMarkdown === true
+      };
+      promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
+      return explicitDefaults;
+    }
+
+    const originalOptions = getPromptOutputOptions();
+    setPromptOutputOptions({
+      hallucinationGuardEnabled: true,
+      outputMarkdownEnabled: true
+    });
+    const argsForInference: Record<string, string> = {};
+    for (const argumentDefinition of getSelectedPromptArguments(definition)) {
+      const rawValue = getArgumentValue(argumentDefinition.id) || argumentDefinition.defaultValue || `dummy-${argumentDefinition.id}`;
+      argsForInference[argumentDefinition.id] = rawValue;
+    }
+    const body = definition.buildBody(
+      sanitizePromptVariableInput(argsForInference.commitId || ""),
+      sanitizePromptVariableInput(argsForInference.subject || "")
+    );
+    setPromptOutputOptions(originalOptions);
+
+    const templates = getPromptOutputInstructionTemplates();
+    const defaults = {
+      hallucinationGuard:
+        body.includes(templates.strictHallucinationPreventionInstruction) ||
+        body.includes(templates.softHallucinationPreventionInstruction),
+      outputMarkdown: body.includes(templates.markdownFenceInstruction)
+    };
+    promptOutputOptionDefaultsById.set(definition.id, defaults);
+    return defaults;
+  }
+
+  function applyPromptOutputOptionDefaults(definition: PromptDefinition | null) {
+    const defaults = inferPromptOutputOptionDefaults(definition);
+    hallucinationGuard.checked = defaults.hallucinationGuard;
+    outputMarkdown.checked = defaults.outputMarkdown;
+  }
+
   function renderSelectedPromptHelp() {
     const selectedDefinition = getSelectedPromptDefinition();
     promptOutputHelp.innerHTML = "";
@@ -723,11 +882,9 @@ async function initializePromptPage() {
       } else {
         selectedPrompt = "";
         syncInputSections(null);
+        renderArgumentFields(null);
         promptOutputSection.classList.add("md-hidden");
-        commitIdInput.value = "";
-        if (subjectInput) {
-          subjectInput.value = "";
-        }
+        applyPromptOutputOptionDefaults(null);
         promptOutput.textContent = "";
       }
     }
@@ -751,7 +908,7 @@ async function initializePromptPage() {
     if (matchedDefinitions.length === 0) {
       if (selectedPrompt) {
         selectedPrompt = "";
-        commitInputSection.classList.add("md-hidden");
+        promptArgsSection.classList.add("md-hidden");
         promptOutputSection.classList.add("md-hidden");
         updateOutput();
       }
@@ -781,9 +938,10 @@ async function initializePromptPage() {
       if (selectedButton) {
         selectedButton.classList.add("is-active");
       }
-      renderSubjectInputField(selectedDefinition);
+      renderArgumentFields(selectedDefinition);
       syncInputSections(selectedDefinition);
-      applyDefaultSubjectValue(selectedDefinition);
+      applyDefaultArgumentValues(selectedDefinition);
+      applyPromptOutputOptionDefaults(selectedDefinition);
       revealOutputSection();
       updateOutput();
     }
@@ -808,17 +966,17 @@ async function initializePromptPage() {
       }
     }
     syncInputSections(selectedDefinition || null);
-    renderSubjectInputField(selectedDefinition || null);
-    applyDefaultSubjectValue(selectedDefinition || null);
-    if (selectedDefinition?.requiresCommitId) {
-      commitIdInput.focus();
-    } else if (selectedDefinition?.requiresSubject) {
-      subjectInput.focus();
+    renderArgumentFields(selectedDefinition || null);
+    applyDefaultArgumentValues(selectedDefinition || null);
+    applyPromptOutputOptionDefaults(selectedDefinition || null);
+    const firstArgument = getSelectedPromptArguments(selectedDefinition || null)[0];
+    if (firstArgument) {
+      getArgumentInput(firstArgument.id)?.focus();
     }
 
     updateOutput();
 
-    if (options?.autoCopy && selectedDefinition && !selectedDefinition.requiresCommitId && !selectedDefinition.requiresSubject) {
+    if (options?.autoCopy && selectedDefinition && getSelectedPromptArguments(selectedDefinition).length === 0) {
       await copyText(promptOutput.textContent || "");
     }
   }
@@ -829,15 +987,18 @@ async function initializePromptPage() {
       return "";
     }
     const label = selectedDefinition ? selectedDefinition.label : "";
-    const commitId = sanitizePromptVariableInput(commitIdInput.value || "");
-    const subject = sanitizePromptVariableInput(subjectInput.value || "");
+    const argumentValues = getPromptArgumentValues();
+    const commitId = sanitizePromptVariableInput(argumentValues.commitId || "");
+    const subject = sanitizePromptVariableInput(argumentValues.subject || "");
+    setPromptOutputOptions(getPromptOutputOptions());
     const body = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
 
     if (!body || !label) {
       return "";
     }
 
-    return includeLabelPrefix.checked ? `[${label}] ${body}` : body;
+    const normalizedBody = body.trim().replace(/\n{3,}/g, "\n\n");
+    return includeLabelPrefix.checked ? `[${label}] ${normalizedBody}` : normalizedBody;
   }
 
   function getDefinitionLabelCode(definition: PromptDefinition | null) {
@@ -857,8 +1018,6 @@ async function initializePromptPage() {
     url.search = "";
 
     const query = (promptSearch.value || "").trim();
-    const subject = subjectInput.value || "";
-    const commitId = commitIdInput.value || "";
     const selectedDefinition = getSelectedPromptDefinition();
     const selectedDefinitionCode = getDefinitionLabelCode(selectedDefinition);
 
@@ -868,11 +1027,12 @@ async function initializePromptPage() {
     if (selectedDefinitionCode) {
       url.searchParams.set("id", selectedDefinitionCode);
     }
-    if (subject) {
-      url.searchParams.set("subject", subject);
-    }
-    if (commitId) {
-      url.searchParams.set("commit", commitId);
+    for (const argumentDefinition of activeArgumentDefinitions) {
+      const value = getArgumentValue(argumentDefinition.id);
+      if (!value) {
+        continue;
+      }
+      url.searchParams.set(getArgumentQueryParamName(argumentDefinition.id), value);
     }
 
     return url.toString();
@@ -960,23 +1120,27 @@ async function initializePromptPage() {
   }
 
   promptSearch.addEventListener("input", renderCandidates);
-  commitIdInput.addEventListener("input", updateOutput);
-  renderSubjectInputField(null);
   includeLabelPrefix.addEventListener("change", updateOutput);
+  hallucinationGuard.addEventListener("change", updateOutput);
+  outputMarkdown.addEventListener("change", updateOutput);
   copyShareLinkButton.addEventListener("click", () => {
     void copyText(buildShareLink());
   });
 
   let initialQuery = "";
   let initialPromptCode = "";
-  let initialSubject = "";
-  let initialCommitId = "";
+  const initialArgumentValues: Record<string, string> = {};
   try {
     const url = new URL(window.location.href);
     initialQuery = (url.searchParams.get("q") || "").trim();
     initialPromptCode = (url.searchParams.get("id") || "").trim();
-    initialSubject = url.searchParams.get("subject") || "";
-    initialCommitId = url.searchParams.get("commit") || "";
+    initialArgumentValues.subject = url.searchParams.get("subject") || "";
+    initialArgumentValues.commitId = url.searchParams.get("commit") || "";
+    for (const [key, value] of url.searchParams.entries()) {
+      if (key.startsWith("arg_")) {
+        initialArgumentValues[key.slice(4)] = value;
+      }
+    }
     if (initialQuery) {
       promptSearch.value = initialQuery;
     }
@@ -984,17 +1148,15 @@ async function initializePromptPage() {
     // Ignore invalid or unavailable location values.
   }
 
+  applyPromptOutputOptionDefaults(null);
   createSeriesVisibilityMenu();
+  renderArgumentFields(null);
   if (initialPromptCode) {
     pendingInitialPromptCode = initialPromptCode;
   }
   renderCandidates();
-  if (initialSubject) {
-    subjectInput.value = initialSubject;
-  }
-  if (initialCommitId) {
-    commitIdInput.value = initialCommitId;
-  }
+  setPromptArgumentValues(initialArgumentValues);
+  applyDefaultArgumentValues(getSelectedPromptDefinition());
   updateOutput();
 
   requestAnimationFrame(() => {

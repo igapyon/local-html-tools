@@ -36,6 +36,32 @@ const mainCode = readFileSync(
 
 function defineElementIfNeeded(tagName) {
   if (!customElements.get(tagName)) {
+    if (tagName === "lht-text-field-help") {
+      customElements.define(tagName, class extends HTMLElement {
+        connectedCallback() {
+          if (this.dataset.initialized === "true") return;
+          this.dataset.initialized = "true";
+          const fieldId = (this.getAttribute("field-id") || "").trim();
+          const labelText = (this.getAttribute("label") || "").trim();
+          const placeholder = this.getAttribute("placeholder") || "";
+          const helpText = this.getAttribute("help-text") || "";
+          const isRequired = this.hasAttribute("required");
+          this.textContent = "";
+          const label = document.createElement("label");
+          const span = document.createElement("span");
+          span.textContent = labelText;
+          const input = document.createElement("input");
+          input.id = fieldId;
+          input.placeholder = placeholder;
+          input.title = helpText;
+          input.required = isRequired;
+          label.appendChild(span);
+          label.appendChild(input);
+          this.appendChild(label);
+        }
+      });
+      return;
+    }
     if (tagName === "lht-switch-help") {
       customElements.define(tagName, class extends HTMLElement {
         connectedCallback() {
@@ -68,15 +94,16 @@ function mountPromptDom() {
     <lht-page-menu><div class="md-menu-panel"></div></lht-page-menu>
     <input id="promptSearch" />
     <div id="promptCandidateArea"></div>
-    <div id="commitInputSection" class="md-hidden"></div>
-    <div id="subjectInputSection" class="md-hidden"></div>
+    <div id="promptArgsSection" class="md-hidden">
+      <div id="promptArgsContainer"></div>
+    </div>
     <div id="promptOutputSection" class="md-hidden">
       <p id="promptOutputTitle">生成結果</p>
       <div id="promptOutputHelp"></div>
     </div>
-    <input id="commitId" />
-    <input id="subjectInput" />
     <input id="includeLabelPrefix" type="checkbox" />
+    <input id="hallucinationGuard" type="checkbox" />
+    <input id="outputMarkdown" type="checkbox" />
     <button id="copyShareLinkButton" type="button"></button>
     <a id="gitPseudoSquashLink" class="md-hidden" href="../git/git-work-list.html"></a>
     <div id="promptOutput"></div>
@@ -184,16 +211,16 @@ describe("prompt-gen main", () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
-    const subjectInput = document.getElementById("subjectInput");
     const copyShareLinkButton = document.getElementById("copyShareLinkButton");
-    const buttons = [...document.querySelectorAll(".md-chip-button")];
 
     promptSearch.value = "和";
     promptSearch.dispatchEvent(new Event("input"));
+    const buttons = [...document.querySelectorAll(".md-chip-button")];
     const targetButton = buttons.find((button) =>
       button.querySelector(".md-chip-label").textContent.includes("A852: 和紙切絵作品")
     );
     targetButton.click();
+    const subjectInput = document.getElementById("subjectInput");
     subjectInput.value = "a small fox";
     subjectInput.dispatchEvent(new Event("input"));
     copyShareLinkButton.click();
@@ -206,13 +233,13 @@ describe("prompt-gen main", () => {
     await bootPromptPage("?q=A852");
 
     const promptSearch = document.getElementById("promptSearch");
-    const subjectInputSection = document.getElementById("subjectInputSection");
+    const promptArgsSection = document.getElementById("promptArgsSection");
     const buttons = [...document.querySelectorAll(".md-chip-button")];
 
     expect(promptSearch.value).toBe("A852");
     expect(buttons).toHaveLength(1);
     expect(buttons[0].querySelector(".md-chip-label").textContent).toContain("和紙切絵作品");
-    expect(subjectInputSection.classList.contains("md-hidden")).toBe(false);
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(false);
   });
 
   it("applies subject query parameter and generates output on load", async () => {
@@ -223,6 +250,58 @@ describe("prompt-gen main", () => {
 
     expect(subjectInput.value).toBe("a small fox");
     expect(promptOutput.textContent).toContain("A simplified cute illustration of `a small fox`");
+  });
+
+  it("applies prompt defaults to hallucinationGuard and outputMarkdown", async () => {
+    await bootPromptPage("?q=A501&commit=abc1234");
+
+    const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const outputMarkdown = document.getElementById("outputMarkdown");
+    const promptOutput = document.getElementById("promptOutput");
+
+    expect(hallucinationGuard.checked).toBe(true);
+    expect(outputMarkdown.checked).toBe(true);
+    expect(promptOutput.textContent).toContain("○ハルシネーション防止のため");
+    expect(promptOutput.textContent).toContain("○最終的な回答は ~~~~ で囲まれた一塊として出力してください。");
+  });
+
+  it("updates output when hallucinationGuard and outputMarkdown are toggled", async () => {
+    await bootPromptPage("?q=A501");
+
+    const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const outputMarkdown = document.getElementById("outputMarkdown");
+    const promptOutput = document.getElementById("promptOutput");
+
+    hallucinationGuard.checked = false;
+    hallucinationGuard.dispatchEvent(new Event("change"));
+    outputMarkdown.checked = false;
+    outputMarkdown.dispatchEvent(new Event("change"));
+
+    expect(promptOutput.textContent).not.toContain("○ハルシネーション防止のため");
+    expect(promptOutput.textContent).not.toContain("○最終的な回答は ~~~~ で囲まれた一塊として出力してください。");
+  });
+
+  it("resets hallucinationGuard and outputMarkdown to prompt defaults when switching prompts", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const outputMarkdown = document.getElementById("outputMarkdown");
+
+    promptSearch.value = "A501";
+    promptSearch.dispatchEvent(new Event("input"));
+    hallucinationGuard.checked = false;
+    hallucinationGuard.dispatchEvent(new Event("change"));
+    outputMarkdown.checked = false;
+    outputMarkdown.dispatchEvent(new Event("change"));
+
+    promptSearch.value = "A503";
+    promptSearch.dispatchEvent(new Event("input"));
+    promptSearch.value = "A501";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    expect(hallucinationGuard.checked).toBe(true);
+    expect(outputMarkdown.checked).toBe(true);
   });
 
   it("uses docs as the default docs path for A150", async () => {
@@ -317,8 +396,7 @@ describe("prompt-gen main", () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
-    const commitId = document.getElementById("commitId");
-    const commitInputSection = document.getElementById("commitInputSection");
+    const promptArgsSection = document.getElementById("promptArgsSection");
     const promptOutputSection = document.getElementById("promptOutputSection");
     const promptOutput = document.getElementById("promptOutput");
 
@@ -329,10 +407,11 @@ describe("prompt-gen main", () => {
     expect(buttons).toHaveLength(1);
     expect(buttons[0].querySelector(".md-chip-label").textContent).toContain("GitHub PR 文面の作成");
     expect(buttons[0].classList.contains("is-active")).toBe(true);
-    expect(commitInputSection.classList.contains("md-hidden")).toBe(false);
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(false);
     expect(promptOutputSection.classList.contains("md-hidden")).toBe(false);
     expect(promptOutput.textContent).toBe("");
 
+    const commitId = document.getElementById("commitId");
     commitId.value = "abc1234";
     commitId.dispatchEvent(new Event("input"));
 
@@ -363,14 +442,14 @@ describe("prompt-gen main", () => {
 
     const promptSearch = document.getElementById("promptSearch");
     const includeLabelPrefix = document.getElementById("includeLabelPrefix");
-    const commitInputSection = document.getElementById("commitInputSection");
+    const promptArgsSection = document.getElementById("promptArgsSection");
     const promptOutput = document.getElementById("promptOutput");
 
     promptSearch.value = "A701";
     promptSearch.dispatchEvent(new Event("input"));
 
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
-    expect(commitInputSection.classList.contains("md-hidden")).toBe(true);
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
     expect(promptOutput.textContent).toBe(
       "このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
     );
@@ -387,17 +466,17 @@ describe("prompt-gen main", () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
-    const subjectInput = document.getElementById("subjectInput");
-    const subjectInputSection = document.getElementById("subjectInputSection");
+    const promptArgsSection = document.getElementById("promptArgsSection");
     const promptOutput = document.getElementById("promptOutput");
 
     promptSearch.value = "A852";
     promptSearch.dispatchEvent(new Event("input"));
 
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
-    expect(subjectInputSection.classList.contains("md-hidden")).toBe(false);
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(false);
     expect(promptOutput.textContent).toBe("");
 
+    const subjectInput = document.getElementById("subjectInput");
     subjectInput.value = "a small fox";
     subjectInput.dispatchEvent(new Event("input"));
 
@@ -409,12 +488,12 @@ describe("prompt-gen main", () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
-    const commitId = document.getElementById("commitId");
     const promptOutput = document.getElementById("promptOutput");
 
     promptSearch.value = "A501";
     promptSearch.dispatchEvent(new Event("input"));
 
+    const commitId = document.getElementById("commitId");
     commitId.value = `ab\`cd${"x".repeat(1100)}`;
     commitId.dispatchEvent(new Event("input"));
 
@@ -429,12 +508,12 @@ describe("prompt-gen main", () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
-    const subjectInput = document.getElementById("subjectInput");
     const promptOutput = document.getElementById("promptOutput");
 
     promptSearch.value = "A852";
     promptSearch.dispatchEvent(new Event("input"));
 
+    const subjectInput = document.getElementById("subjectInput");
     subjectInput.value = `small \`fox\`${"y".repeat(1100)}`;
     subjectInput.dispatchEvent(new Event("input"));
 
@@ -449,12 +528,12 @@ describe("prompt-gen main", () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
-    const commitId = document.getElementById("commitId");
     const promptOutput = document.getElementById("promptOutput");
 
     promptSearch.value = "A501";
     promptSearch.dispatchEvent(new Event("input"));
 
+    const commitId = document.getElementById("commitId");
     setRawInputValue(commitId, "ab\tcd\nef\u0000gh\u200Biz");
     commitId.dispatchEvent(new Event("input"));
 
@@ -465,12 +544,12 @@ describe("prompt-gen main", () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
-    const subjectInput = document.getElementById("subjectInput");
     const promptOutput = document.getElementById("promptOutput");
 
     promptSearch.value = "A852";
     promptSearch.dispatchEvent(new Event("input"));
 
+    const subjectInput = document.getElementById("subjectInput");
     setRawInputValue(subjectInput, "small\tfox\nwith\u200Bhat");
     subjectInput.dispatchEvent(new Event("input"));
 
@@ -481,13 +560,13 @@ describe("prompt-gen main", () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
-    const commitId = document.getElementById("commitId");
     const promptOutput = document.getElementById("promptOutput");
-    const commitInputSection = document.getElementById("commitInputSection");
+    const promptArgsSection = document.getElementById("promptArgsSection");
     const promptOutputSection = document.getElementById("promptOutputSection");
 
     promptSearch.value = "A501";
     promptSearch.dispatchEvent(new Event("input"));
+    const commitId = document.getElementById("commitId");
     commitId.value = "abc1234";
     commitId.dispatchEvent(new Event("input"));
     expect(promptOutput.textContent).toContain("abc1234");
@@ -495,10 +574,10 @@ describe("prompt-gen main", () => {
     promptSearch.value = "A703";
     promptSearch.dispatchEvent(new Event("input"));
 
-    expect(commitId.value).toBe("");
+    expect(document.getElementById("commitId")).toBeNull();
     expect(promptOutput.textContent).not.toContain("abc1234");
     expect(promptOutput.textContent).toContain("今からの作業は仕様の検討です。");
-    expect(commitInputSection.classList.contains("md-hidden")).toBe(true);
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
     expect(promptOutputSection.classList.contains("md-hidden")).toBe(false);
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
   });

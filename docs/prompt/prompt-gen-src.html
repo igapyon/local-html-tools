@@ -93,35 +93,25 @@ limitations under the License.
       <div id="promptCandidateArea" class="md-chip-row" aria-live="polite"></div>
     </section>
 
-    <section id="commitInputSection" class="md-section md-stack-md md-hidden">
-      <div class="md-form-grid md-form-grid-2">
-        <lht-text-field-help
-          field-id="commitId"
-          label="コミットID"
-          required
-          placeholder="例: abc1234"
-          help-text="PR 文面の作成対象にしたいコミット ID を入力します。短縮 SHA でも構いません。">
-        </lht-text-field-help>
-      </div>
-    </section>
-
-    <section id="subjectInputSection" class="md-section md-stack-md md-hidden">
-      <div class="md-form-grid md-form-grid-2">
-        <lht-text-field-help
-          id="subjectInputField"
-          field-id="subjectInput"
-          label="subject"
-          required
-          placeholder="例: a small fox"
-          help-text="プロンプト内の [subject] に差し込む対象を入力します。英語でも日本語でも構いません。">
-        </lht-text-field-help>
+    <section id="promptArgsSection" class="md-section md-stack-md md-hidden">
+      <div id="promptArgsContainer" class="md-form-grid md-form-grid-2">
       </div>
     </section>
 
     <section id="promptOutputSection" class="md-section md-stack-md md-hidden">
       <div class="md-output-header">
-        <p id="promptOutputTitle" class="md-output-title">生成結果</p>
-        <div id="promptOutputHelp" class="md-output-help"></div>
+        <div class="md-output-header__main">
+          <p id="promptOutputTitle" class="md-output-title">生成結果</p>
+          <div id="promptOutputHelp" class="md-output-help"></div>
+        </div>
+        <div class="md-output-header__actions">
+          <button id="copyShareLinkButton" type="button" class="md-secondary-button">
+            <svg viewBox="0 0 24 24" class="md-secondary-button__icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <use href="#md-icon-link" xlink:href="#md-icon-link"></use>
+            </svg>
+            <span>共有リンクをコピー</span>
+          </button>
+        </div>
       </div>
       <lht-command-block command-id="promptOutput" copy-buttons="dual"></lht-command-block>
       <div class="md-output-options">
@@ -131,12 +121,18 @@ limitations under the License.
           help-label="ラベル名を先頭に含める説明">
           ON の場合は `[ボタンラベル] 本文` の形式で出力します。OFF の場合は本文のみを出力します。
         </lht-switch-help>
-        <button id="copyShareLinkButton" type="button" class="md-secondary-button">
-          <svg viewBox="0 0 24 24" class="md-secondary-button__icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <use href="#md-icon-link" xlink:href="#md-icon-link"></use>
-          </svg>
-          <span>共有リンクをコピー</span>
-        </button>
+        <lht-switch-help
+          switch-id="hallucinationGuard"
+          label="幻想防止"
+          help-label="幻想防止の説明">
+          ON の場合は、事実誤認や根拠のない補完を避けるための注意文を含めます。
+        </lht-switch-help>
+        <lht-switch-help
+          switch-id="outputMarkdown"
+          label="Markdownフェンス"
+          help-label="Markdownフェンスの説明">
+          ON の場合は、最終回答を `~~~~` で囲んで出力する指定を含めます。
+        </lht-switch-help>
         <a
           id="gitPseudoSquashLink"
           class="md-secondary-button md-hidden"
