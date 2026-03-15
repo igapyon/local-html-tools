@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -188,6 +188,7 @@ function mountPromptDom() {
       <option value="report">レビュー結果出力</option>
     </select>
     <input id="outputMarkdown" type="checkbox" />
+    <input id="customPromptImportInput" type="file" />
     <button id="copyShareLinkButton" type="button"></button>
     <a id="gitPseudoSquashLink" class="md-hidden" href="../git/git-work-list.html"></a>
     <div id="promptOutput"></div>
@@ -195,7 +196,8 @@ function mountPromptDom() {
 }
 
 function ensureLocalStorageMock() {
-  const backingStore = new Map();
+  const backingStore = globalThis.__promptGenLocalStorageStore || new Map();
+  globalThis.__promptGenLocalStorageStore = backingStore;
   Object.defineProperty(window, "localStorage", {
     configurable: true,
     value: {
@@ -215,6 +217,15 @@ function ensureLocalStorageMock() {
   });
 }
 
+function ensureUrlObjectMock() {
+  if (typeof URL.createObjectURL !== "function") {
+    URL.createObjectURL = () => "blob:mock";
+  }
+  if (typeof URL.revokeObjectURL !== "function") {
+    URL.revokeObjectURL = () => {};
+  }
+}
+
 function setRawInputValue(element, value) {
   Object.defineProperty(element, "value", {
     configurable: true,
@@ -231,7 +242,7 @@ async function bootPromptPage(urlSearch = "") {
   defineElementIfNeeded("lht-switch-help");
   defineElementIfNeeded("lht-help-tooltip");
   ensureLocalStorageMock();
-  window.localStorage.clear();
+  ensureUrlObjectMock();
   window.history.replaceState({}, "", urlSearch ? `/${urlSearch.startsWith("?") ? urlSearch : `?${urlSearch}`}` : "/");
   mountPromptDom();
   const promptOutputSection = document.getElementById("promptOutputSection");
@@ -255,7 +266,51 @@ function ensureClipboardMock() {
   return () => copiedText;
 }
 
+function ensureExportMock() {
+  let exportedText = "";
+  let exportedFilename = "";
+  const originalBlob = globalThis.Blob;
+  const originalCreateObjectURL = URL.createObjectURL;
+  const originalRevokeObjectURL = URL.revokeObjectURL;
+  const originalClick = HTMLAnchorElement.prototype.click;
+
+  globalThis.Blob = class MockBlob {
+    constructor(parts) {
+      exportedText = (parts || []).map((part) => String(part)).join("");
+    }
+  };
+  URL.createObjectURL = (blob) => {
+    return "blob:mock-export";
+  };
+  URL.revokeObjectURL = () => {};
+  HTMLAnchorElement.prototype.click = function click() {
+    exportedFilename = this.download || "";
+  };
+
+  return async () => {
+    globalThis.Blob = originalBlob;
+    if (originalCreateObjectURL) {
+      URL.createObjectURL = originalCreateObjectURL;
+    } else {
+      delete URL.createObjectURL;
+    }
+    if (originalRevokeObjectURL) {
+      URL.revokeObjectURL = originalRevokeObjectURL;
+    } else {
+      delete URL.revokeObjectURL;
+    }
+    HTMLAnchorElement.prototype.click = originalClick;
+    return { exportedText, exportedFilename };
+  };
+}
+
 describe("prompt-gen main", () => {
+  beforeEach(() => {
+    if (globalThis.__promptGenLocalStorageStore instanceof Map) {
+      globalThis.__promptGenLocalStorageStore.clear();
+    }
+  });
+
   it("applies strong class to label matches", async () => {
     await bootPromptPage();
 
@@ -311,7 +366,454 @@ describe("prompt-gen main", () => {
     copyShareLinkButton.click();
     await Promise.resolve();
 
-    expect(getCopiedText()).toBe("http://localhost:3000/?q=%E5%92%8C&id=A852&subject=a+small+fox");
+    expect(getCopiedText()).toBe("http://localhost:3000/?q=%E5%92%8C&promptId=a-washi-collage-whisper-request&id=A852&subject=a+small+fox");
+  });
+
+  it("imports a custom prompt file and shows it in the output", async () => {
+    window.localStorage.clear();
+    await bootPromptPage("?q=A501&commit=abc1234");
+
+    const importInput = document.getElementById("customPromptImportInput");
+    const promptOutput = document.getElementById("promptOutput");
+    const promptOutputTitle = document.getElementById("promptOutputTitle");
+    const file = {
+      name: "weekly-prompt.json",
+      async text() {
+        return JSON.stringify({
+          version: 1,
+          exportedAt: "2026-03-16T00:00:00.000Z",
+          isSample: false,
+          state: {
+            query: "custom",
+            selectedPromptId: "custom-weekly",
+            selectedPromptCode: "A501",
+            argumentValues: { commitId: "abc1234" },
+            outputOptions: {
+              hallucinationGuardLevel: "high",
+              outputMarkdownEnabled: true,
+              outputTone: "unspecified",
+              selfReview: "unspecified",
+              misleadingExpressionReview: "unspecified",
+              considerationRiskReview: "unspecified",
+              discomfortRiskReview: "unspecified",
+              aggressiveExpressionReview: "unspecified",
+              sensitiveExpressionReview: "unspecified",
+              legalComplianceReview: "unspecified",
+              publicOrderReview: "unspecified"
+            },
+            seriesVisibilitySettings: {
+              showA: true,
+              showX: true,
+              showS: true,
+              showP: true
+            },
+            customPrompt: {
+              id: "custom-weekly",
+              label: "週次カスタム",
+              keywords: ["週次", "報告", "custom"],
+              promptText: "custom prompt body"
+            }
+          }
+        });
+      }
+    };
+
+    Object.defineProperty(importInput, "files", {
+      configurable: true,
+      get() {
+        return [file];
+      }
+    });
+
+    importInput.dispatchEvent(new Event("change"));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(promptOutput.textContent).toContain("custom prompt body");
+    expect(promptOutputTitle.textContent).toBe("週次カスタム");
+  });
+
+  it("keeps imported custom prompt after reload until settings reset", async () => {
+    window.localStorage.clear();
+    await bootPromptPage("?q=A501&commit=abc1234");
+
+    const importInput = document.getElementById("customPromptImportInput");
+    const promptOutput = document.getElementById("promptOutput");
+    const file = {
+      name: "weekly-prompt.json",
+      async text() {
+        return JSON.stringify({
+          version: 1,
+          exportedAt: "2026-03-16T00:00:00.000Z",
+          isSample: false,
+          state: {
+            query: "custom",
+            selectedPromptId: "custom-weekly",
+            selectedPromptCode: "A501",
+            argumentValues: { commitId: "abc1234" },
+            outputOptions: {
+              hallucinationGuardLevel: "high",
+              outputMarkdownEnabled: true,
+              outputTone: "unspecified",
+              selfReview: "unspecified",
+              misleadingExpressionReview: "unspecified",
+              considerationRiskReview: "unspecified",
+              discomfortRiskReview: "unspecified",
+              aggressiveExpressionReview: "unspecified",
+              sensitiveExpressionReview: "unspecified",
+              legalComplianceReview: "unspecified",
+              publicOrderReview: "unspecified"
+            },
+            seriesVisibilitySettings: {
+              showA: true,
+              showX: true,
+              showS: true,
+              showP: true
+            },
+            customPrompt: {
+              id: "custom-weekly",
+              label: "週次カスタム",
+              keywords: ["週次", "報告", "custom"],
+              promptText: "custom prompt body"
+            }
+          }
+        });
+      }
+    };
+
+    Object.defineProperty(importInput, "files", {
+      configurable: true,
+      get() {
+        return [file];
+      }
+    });
+
+    importInput.dispatchEvent(new Event("change"));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(promptOutput.textContent).toContain("custom prompt body");
+
+    await bootPromptPage("?q=A501&commit=abc1234");
+    document.getElementById("promptSearch").value = "custom";
+    document.getElementById("promptSearch").dispatchEvent(new Event("input"));
+    const labels = [...document.querySelectorAll(".md-chip-button .md-chip-label")].map((node) => node.textContent);
+    expect(labels.some((label) => label.includes("週次カスタム"))).toBe(true);
+  });
+
+  it("clears imported custom prompt when settings are reset", async () => {
+    window.localStorage.clear();
+    await bootPromptPage("?q=A501&commit=abc1234");
+
+    const importInput = document.getElementById("customPromptImportInput");
+    const file = {
+      name: "weekly-prompt.json",
+      async text() {
+        return JSON.stringify({
+          version: 1,
+          exportedAt: "2026-03-16T00:00:00.000Z",
+          isSample: false,
+          state: {
+            query: "custom",
+            selectedPromptId: "custom-weekly",
+            selectedPromptCode: "A501",
+            argumentValues: { commitId: "abc1234" },
+            outputOptions: {
+              hallucinationGuardLevel: "high",
+              outputMarkdownEnabled: true,
+              outputTone: "unspecified",
+              selfReview: "unspecified",
+              misleadingExpressionReview: "unspecified",
+              considerationRiskReview: "unspecified",
+              discomfortRiskReview: "unspecified",
+              aggressiveExpressionReview: "unspecified",
+              sensitiveExpressionReview: "unspecified",
+              legalComplianceReview: "unspecified",
+              publicOrderReview: "unspecified"
+            },
+            seriesVisibilitySettings: {
+              showA: true,
+              showX: true,
+              showS: true,
+              showP: true
+            },
+            customPrompt: {
+              id: "custom-weekly",
+              label: "週次カスタム",
+              keywords: ["週次", "報告", "custom"],
+              promptText: "custom prompt body"
+            }
+          }
+        });
+      }
+    };
+
+    Object.defineProperty(importInput, "files", {
+      configurable: true,
+      get() {
+        return [file];
+      }
+    });
+
+    importInput.dispatchEvent(new Event("change"));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const resetButton = document.querySelector(".md-menu-settings__reset");
+    resetButton.click();
+
+    expect(document.getElementById("promptOutput").textContent).toBe("");
+    expect(window.localStorage.getItem("promptGenCustomPrompt")).toBe(null);
+  });
+
+  it("exports the current page state as json", async () => {
+    const getExportResult = ensureExportMock();
+    window.localStorage.clear();
+    await bootPromptPage("?q=A501&commit=abc1234");
+
+    document.getElementById("outputTone").value = "dearu";
+    document.getElementById("outputTone").dispatchEvent(new Event("change"));
+
+    const exportButton = document.getElementById("exportCustomPromptButton");
+    exportButton.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    const { exportedText, exportedFilename } = await getExportResult();
+    const parsed = JSON.parse(exportedText);
+
+    expect(exportedFilename).toMatch(/^prompt-gen-export-\d{8}-\d{6}\.json$/);
+    expect(parsed.version).toBe(1);
+    expect(parsed.exportedAt).toBeTypeOf("string");
+    expect(parsed.isSample).toBe(false);
+    expect(parsed.state.query).toBe("A501");
+    expect(parsed.state.selectedPromptCode).toBe("A501");
+    expect(parsed.state.argumentValues.commitId).toBe("abc1234");
+    expect(parsed.state.outputOptions.outputTone).toBe("dearu");
+    expect(parsed.state.customPrompt).toBe(null);
+  });
+
+  it("exports a sample json when there is no prompt to export", async () => {
+    const getExportResult = ensureExportMock();
+    window.localStorage.clear();
+    await bootPromptPage();
+
+    const exportButton = document.getElementById("exportCustomPromptButton");
+    exportButton.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    const { exportedText, exportedFilename } = await getExportResult();
+    const parsed = JSON.parse(exportedText);
+
+    expect(exportedFilename).toMatch(/^prompt-gen-export-\d{8}-\d{6}\.json$/);
+    expect(parsed.version).toBe(1);
+    expect(parsed.isSample).toBe(true);
+    expect(parsed.note).toBe("0件だったためサンプルを出力");
+    expect(parsed.state.customPrompt.id).toBe("custom-sample-prompt");
+    expect(parsed.state.customPrompt.label).toBe("サンプル");
+    expect(parsed.state.customPrompt.keywords).toContain("要約");
+    expect(parsed.state.customPrompt.promptText).toContain("3点で要約");
+  });
+
+  it("imports the current page state from json", async () => {
+    window.localStorage.clear();
+    await bootPromptPage();
+
+    const importInput = document.getElementById("customPromptImportInput");
+    const file = {
+      name: "prompt-gen-state.json",
+      async text() {
+        return JSON.stringify({
+          version: 1,
+          exportedAt: "2026-03-16T00:00:00.000Z",
+          isSample: false,
+          state: {
+            query: "A852",
+            selectedPromptCode: "A852",
+            argumentValues: { subject: "a small fox" },
+            outputOptions: {
+              hallucinationGuardLevel: "low",
+              outputMarkdownEnabled: false,
+              outputTone: "dearu",
+              selfReview: "report",
+              misleadingExpressionReview: "unspecified",
+              considerationRiskReview: "unspecified",
+              discomfortRiskReview: "unspecified",
+              aggressiveExpressionReview: "unspecified",
+              sensitiveExpressionReview: "unspecified",
+              legalComplianceReview: "unspecified",
+              publicOrderReview: "unspecified"
+            },
+            seriesVisibilitySettings: {
+              showA: true,
+              showX: false,
+              showS: true,
+              showP: false
+            },
+            customPrompt: null
+          }
+        });
+      }
+    };
+
+    Object.defineProperty(importInput, "files", {
+      configurable: true,
+      get() {
+        return [file];
+      }
+    });
+
+    importInput.dispatchEvent(new Event("change"));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(document.getElementById("promptSearch").value).toBe("A852");
+    expect(document.getElementById("subjectInput").value).toBe("a small fox");
+    expect(document.getElementById("outputTone").value).toBe("dearu");
+    expect(document.getElementById("selfReview").value).toBe("report");
+    expect(document.getElementById("hallucinationGuard").value).toBe("low");
+    expect(document.getElementById("outputMarkdown").checked).toBe(false);
+    expect(document.getElementById("promptOutput").textContent).toContain("a small fox");
+    expect(JSON.parse(window.localStorage.getItem("promptGenSeriesVisibility"))).toMatchObject({
+      showA: true,
+      showX: false,
+      showS: true,
+      showP: false
+    });
+  });
+
+  it("includes imported custom prompt in search results via keywords", async () => {
+    window.localStorage.clear();
+    await bootPromptPage();
+
+    const importInput = document.getElementById("customPromptImportInput");
+    const promptSearch = document.getElementById("promptSearch");
+    const file = {
+      name: "prompt-gen-state.json",
+      async text() {
+        return JSON.stringify({
+          version: 1,
+          exportedAt: "2026-03-16T00:00:00.000Z",
+          isSample: false,
+          state: {
+            query: "",
+            selectedPromptId: "",
+            argumentValues: {},
+            outputOptions: {
+              hallucinationGuardLevel: "none",
+              outputMarkdownEnabled: false,
+              outputTone: "unspecified",
+              selfReview: "unspecified",
+              misleadingExpressionReview: "unspecified",
+              considerationRiskReview: "unspecified",
+              discomfortRiskReview: "unspecified",
+              aggressiveExpressionReview: "unspecified",
+              sensitiveExpressionReview: "unspecified",
+              legalComplianceReview: "unspecified",
+              publicOrderReview: "unspecified"
+            },
+            seriesVisibilitySettings: {
+              showA: true,
+              showX: true,
+              showS: true,
+              showP: true
+            },
+            customPrompt: {
+              id: "custom-summary",
+              label: "会議要約テンプレート",
+              keywords: ["会議", "要約", "summary"],
+              promptText: "meeting summary prompt"
+            }
+          }
+        });
+      }
+    };
+
+    Object.defineProperty(importInput, "files", {
+      configurable: true,
+      get() {
+        return [file];
+      }
+    });
+
+    importInput.dispatchEvent(new Event("change"));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    promptSearch.value = "要約";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    const labels = [...document.querySelectorAll(".md-chip-button .md-chip-label")].map((node) => node.textContent);
+    expect(labels.some((label) => label.includes("会議要約テンプレート"))).toBe(true);
+  });
+
+  it("applies output options to imported custom prompt", async () => {
+    window.localStorage.clear();
+    await bootPromptPage();
+
+    const importInput = document.getElementById("customPromptImportInput");
+    const outputTone = document.getElementById("outputTone");
+    const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const outputMarkdown = document.getElementById("outputMarkdown");
+    const promptOutput = document.getElementById("promptOutput");
+    const file = {
+      name: "prompt-gen-state.json",
+      async text() {
+        return JSON.stringify({
+          version: 1,
+          exportedAt: "2026-03-16T00:00:00.000Z",
+          isSample: false,
+          state: {
+            query: "summary",
+            selectedPromptId: "custom-summary",
+            argumentValues: {},
+            outputOptions: {
+              hallucinationGuardLevel: "none",
+              outputMarkdownEnabled: false,
+              outputTone: "unspecified",
+              selfReview: "unspecified",
+              misleadingExpressionReview: "unspecified",
+              considerationRiskReview: "unspecified",
+              discomfortRiskReview: "unspecified",
+              aggressiveExpressionReview: "unspecified",
+              sensitiveExpressionReview: "unspecified",
+              legalComplianceReview: "unspecified",
+              publicOrderReview: "unspecified"
+            },
+            seriesVisibilitySettings: {
+              showA: true,
+              showX: true,
+              showS: true,
+              showP: true
+            },
+            customPrompt: {
+              id: "custom-summary",
+              label: "会議要約テンプレート",
+              keywords: ["会議", "要約", "summary"],
+              promptText: "meeting summary prompt"
+            }
+          }
+        });
+      }
+    };
+
+    Object.defineProperty(importInput, "files", {
+      configurable: true,
+      get() {
+        return [file];
+      }
+    });
+
+    importInput.dispatchEvent(new Event("change"));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    outputTone.value = "dearu";
+    outputTone.dispatchEvent(new Event("change"));
+    hallucinationGuard.value = "low";
+    hallucinationGuard.dispatchEvent(new Event("change"));
+    outputMarkdown.checked = true;
+    outputMarkdown.dispatchEvent(new Event("change"));
+
+    expect(promptOutput.textContent).toContain("meeting summary prompt");
+    expect(promptOutput.textContent).toContain("○文体は、である調で統一してください。");
+    expect(promptOutput.textContent).toContain("○事実誤認を避けるため");
+    expect(promptOutput.textContent).toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
   });
 
   it("applies q query parameter to the search field on load", async () => {

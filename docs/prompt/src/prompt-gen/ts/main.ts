@@ -38,6 +38,46 @@ type PromptOutputOptionDefaults = {
   publicOrderReview: "unspecified" | "internal" | "report";
 };
 
+type CustomPromptState = {
+  id: string;
+  label: string;
+  keywords: string[];
+  promptText: string;
+};
+
+type PromptPageStateExportPayload = {
+  version: number;
+  exportedAt: string;
+  isSample: boolean;
+  note?: string;
+  state: {
+    query: string;
+    selectedPromptId: string;
+    selectedPromptCode?: string;
+    argumentValues: Record<string, string>;
+    outputOptions: {
+      hallucinationGuardLevel: "none" | "low" | "high";
+      outputMarkdownEnabled: boolean;
+      outputTone: "unspecified" | "desumasu" | "dearu";
+      selfReview: "unspecified" | "internal" | "report";
+      misleadingExpressionReview: "unspecified" | "internal" | "report";
+      considerationRiskReview: "unspecified" | "internal" | "report";
+      discomfortRiskReview: "unspecified" | "internal" | "report";
+      aggressiveExpressionReview: "unspecified" | "internal" | "report";
+      sensitiveExpressionReview: "unspecified" | "internal" | "report";
+      legalComplianceReview: "unspecified" | "internal" | "report";
+      publicOrderReview: "unspecified" | "internal" | "report";
+    };
+    seriesVisibilitySettings: {
+      showA: boolean;
+      showX: boolean;
+      showS: boolean;
+      showP: boolean;
+    };
+    customPrompt: CustomPromptState | null;
+  };
+};
+
 type PromptSearchIndex = {
   definition: PromptDefinition;
   labelTokens: string[];
@@ -54,6 +94,8 @@ declare const popularPromptDefinitions: PromptDefinition[];
 
 async function initializePromptPage() {
   const SERIES_VISIBILITY_STORAGE_KEY = "promptGenSeriesVisibility";
+  const CUSTOM_PROMPT_STORAGE_KEY = "promptGenCustomPrompt";
+  const CUSTOM_PROMPT_EXPORT_VERSION = 1;
 
   type SeriesVisibilitySettings = {
     showA: boolean;
@@ -155,10 +197,11 @@ async function initializePromptPage() {
     (document.getElementById("hallucinationGuard") as HTMLSelectElement | null) ||
     (await waitForElementById<HTMLSelectElement>("hallucinationGuard"));
   const outputMarkdown = document.getElementById("outputMarkdown") as HTMLInputElement | null;
+  const customPromptImportInput = document.getElementById("customPromptImportInput") as HTMLInputElement | null;
   const copyShareLinkButton = document.getElementById("copyShareLinkButton") as HTMLButtonElement | null;
   const promptOutput = document.getElementById("promptOutput") as HTMLElement | null;
 
-  if (!promptSearch || !outputTone || !selfReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !legalComplianceReview || !publicOrderReview || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+  if (!promptSearch || !outputTone || !selfReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !legalComplianceReview || !publicOrderReview || !hallucinationGuard || !outputMarkdown || !customPromptImportInput || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
     return;
   }
 
@@ -200,6 +243,54 @@ async function initializePromptPage() {
     storage.removeItem(SERIES_VISIBILITY_STORAGE_KEY);
   }
 
+  function loadImportedCustomPrompt() {
+    try {
+      const storage = window.localStorage;
+      if (!storage || typeof storage.getItem !== "function") {
+        return null;
+      }
+      const raw = storage.getItem(CUSTOM_PROMPT_STORAGE_KEY);
+      if (!raw) {
+        return null;
+      }
+      const parsed = JSON.parse(raw);
+      if (typeof parsed?.promptText !== "string" || !parsed.promptText.trim()) {
+        return null;
+      }
+      const normalizedKeywords = Array.isArray(parsed?.keywords)
+        ? parsed.keywords.map((keyword: unknown) => String(keyword || "").trim()).filter(Boolean)
+        : [];
+      return {
+        id: typeof parsed?.id === "string" && parsed.id.trim() ? parsed.id.trim() : "custom-imported-prompt",
+        label: typeof parsed?.label === "string" && parsed.label.trim()
+          ? parsed.label.trim()
+          : typeof parsed?.promptName === "string" && parsed.promptName.trim()
+            ? parsed.promptName.trim()
+            : "カスタムプロンプト",
+        keywords: normalizedKeywords,
+        promptText: parsed.promptText.trim()
+      } as CustomPromptState;
+    } catch (_error) {
+      return null;
+    }
+  }
+
+  function saveImportedCustomPrompt(prompt: CustomPromptState) {
+    const storage = window.localStorage;
+    if (!storage || typeof storage.setItem !== "function") {
+      return;
+    }
+    storage.setItem(CUSTOM_PROMPT_STORAGE_KEY, JSON.stringify(prompt));
+  }
+
+  function clearImportedCustomPromptStorage() {
+    const storage = window.localStorage;
+    if (!storage || typeof storage.removeItem !== "function") {
+      return;
+    }
+    storage.removeItem(CUSTOM_PROMPT_STORAGE_KEY);
+  }
+
   let seriesVisibilitySettings = loadSeriesVisibilitySettings();
 
   function getLegacyPromptArguments(definition: PromptDefinition): PromptArgumentDefinition[] {
@@ -238,8 +329,22 @@ async function initializePromptPage() {
     };
   }
 
+  function createCustomPromptDefinition(prompt: CustomPromptState | null): PromptDefinition | null {
+    if (!prompt || !prompt.promptText.trim()) {
+      return null;
+    }
+    return normalizePromptDefinition({
+      id: prompt.id,
+      label: prompt.label,
+      keywords: prompt.keywords,
+      buildBody: () => prompt.promptText
+    });
+  }
+
   function getVisiblePromptDefinitions() {
+    const customPromptDefinition = createCustomPromptDefinition(customPromptState);
     return [
+      ...(customPromptDefinition ? [customPromptDefinition] : []),
       ...(seriesVisibilitySettings.showA ? basePromptDefinitions : []),
       ...(seriesVisibilitySettings.showX ? expansionDefinitions : []),
       ...(seriesVisibilitySettings.showS ? suggestDefinitions : []),
@@ -405,7 +510,9 @@ async function initializePromptPage() {
   let selectedPrompt = "";
   let lastSearchQuery = "";
   let pendingInitialPromptCode = "";
+  let pendingInitialPromptId = "";
   let suppressSearchResetOnce = false;
+  let customPromptState: CustomPromptState | null = loadImportedCustomPrompt();
   const promptOutputOptionDefaultsById = new Map<string, PromptOutputOptionDefaults>();
 
   const kanaToRomajiMap = new Map<string, string>([
@@ -1002,7 +1109,13 @@ async function initializePromptPage() {
       prioritizedSingleDefinition
     } = searchPromptDefinitions(query, promptSearchIndexes, promptSearchIndexById);
 
-    if (pendingInitialPromptCode) {
+    if (pendingInitialPromptId) {
+      const pendingDefinition = matchedDefinitions.find((definition) => definition.id === pendingInitialPromptId);
+      if (pendingDefinition) {
+        selectedPrompt = pendingDefinition.id;
+      }
+      pendingInitialPromptId = "";
+    } else if (pendingInitialPromptCode) {
       const pendingDefinition = matchedDefinitions.find((definition) =>
         getDefinitionLabelCode(definition) === pendingInitialPromptCode
       );
@@ -1110,7 +1223,12 @@ async function initializePromptPage() {
       legalComplianceReview: "unspecified",
       publicOrderReview: "unspecified"
     });
-    const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
+    const rawBody =
+      customPromptState && selectedDefinition.id === customPromptState.id
+        ? customPromptState.promptText
+        : selectedDefinition
+          ? selectedDefinition.buildBody(commitId, subject)
+          : "";
     setPromptOutputOptions(currentOptions);
     const instructionProfile = inferPromptOutputInstructionProfile(rawBody);
     const body = appendPromptOutputInstructions(
@@ -1149,6 +1267,9 @@ async function initializePromptPage() {
     if (query) {
       url.searchParams.set("q", query);
     }
+    if (selectedDefinition?.id) {
+      url.searchParams.set("promptId", selectedDefinition.id);
+    }
     if (selectedDefinitionCode) {
       url.searchParams.set("id", selectedDefinitionCode);
     }
@@ -1169,11 +1290,320 @@ async function initializePromptPage() {
     promptOutput.textContent = text;
   }
 
+  function createSamplePageStateExportPayload(): PromptPageStateExportPayload {
+    return {
+      version: CUSTOM_PROMPT_EXPORT_VERSION,
+      exportedAt: new Date().toISOString(),
+      isSample: true,
+      note: "0件だったためサンプルを出力",
+      state: {
+        query: "",
+        selectedPromptId: "custom-sample-prompt",
+        selectedPromptCode: "",
+        argumentValues: {},
+        outputOptions: {
+          hallucinationGuardLevel: "none",
+          outputMarkdownEnabled: false,
+          outputTone: "unspecified",
+          selfReview: "unspecified",
+          misleadingExpressionReview: "unspecified",
+          considerationRiskReview: "unspecified",
+          discomfortRiskReview: "unspecified",
+          aggressiveExpressionReview: "unspecified",
+          sensitiveExpressionReview: "unspecified",
+          legalComplianceReview: "unspecified",
+          publicOrderReview: "unspecified"
+        },
+        seriesVisibilitySettings: { ...defaultSeriesVisibilitySettings },
+        customPrompt: {
+          id: "custom-sample-prompt",
+          label: "サンプル",
+          keywords: ["sample", "summary", "要約"],
+          promptText: "以下の文章を、要点がひと目で分かるように3点で要約してください。専門用語はできるだけ平易な表現に言い換えてください。"
+        }
+      }
+    };
+  }
+
+  function setPromptOutputOptions(options: {
+    hallucinationGuardLevel: "none" | "low" | "high";
+    outputMarkdownEnabled: boolean;
+    outputTone: "unspecified" | "desumasu" | "dearu";
+    selfReview: "unspecified" | "internal" | "report";
+    misleadingExpressionReview: "unspecified" | "internal" | "report";
+    considerationRiskReview: "unspecified" | "internal" | "report";
+    discomfortRiskReview: "unspecified" | "internal" | "report";
+    aggressiveExpressionReview: "unspecified" | "internal" | "report";
+    sensitiveExpressionReview: "unspecified" | "internal" | "report";
+    legalComplianceReview: "unspecified" | "internal" | "report";
+    publicOrderReview: "unspecified" | "internal" | "report";
+  }) {
+    hallucinationGuard.value = options.hallucinationGuardLevel;
+    outputMarkdown.checked = options.outputMarkdownEnabled;
+    outputTone.value = options.outputTone;
+    selfReview.value = options.selfReview;
+    misleadingExpressionReview.value = options.misleadingExpressionReview;
+    considerationRiskReview.value = options.considerationRiskReview;
+    discomfortRiskReview.value = options.discomfortRiskReview;
+    aggressiveExpressionReview.value = options.aggressiveExpressionReview;
+    sensitiveExpressionReview.value = options.sensitiveExpressionReview;
+    legalComplianceReview.value = options.legalComplianceReview;
+    publicOrderReview.value = options.publicOrderReview;
+  }
+
+  function createPageStateExportPayload(): PromptPageStateExportPayload {
+    const currentState: PromptPageStateExportPayload = {
+      version: CUSTOM_PROMPT_EXPORT_VERSION,
+      exportedAt: new Date().toISOString(),
+      isSample: false,
+      state: {
+        query: (promptSearch.value || "").trim(),
+        selectedPromptId: selectedPrompt || "",
+        selectedPromptCode: getDefinitionLabelCode(getSelectedPromptDefinition()),
+        argumentValues: getPromptArgumentValues(),
+        outputOptions: getPromptOutputOptions(),
+        seriesVisibilitySettings: { ...seriesVisibilitySettings },
+        customPrompt: customPromptState ? { ...customPromptState } : null
+      }
+    };
+
+    const hasMeaningfulState =
+      currentState.state.query ||
+      currentState.state.selectedPromptId ||
+      Object.values(currentState.state.argumentValues).some((value) => String(value || "").trim()) ||
+      currentState.state.customPrompt ||
+      currentState.state.outputOptions.hallucinationGuardLevel !== "none" ||
+      currentState.state.outputOptions.outputMarkdownEnabled ||
+      currentState.state.outputOptions.outputTone !== "unspecified" ||
+      currentState.state.outputOptions.selfReview !== "unspecified" ||
+      currentState.state.outputOptions.misleadingExpressionReview !== "unspecified" ||
+      currentState.state.outputOptions.considerationRiskReview !== "unspecified" ||
+      currentState.state.outputOptions.discomfortRiskReview !== "unspecified" ||
+      currentState.state.outputOptions.aggressiveExpressionReview !== "unspecified" ||
+      currentState.state.outputOptions.sensitiveExpressionReview !== "unspecified" ||
+      currentState.state.outputOptions.legalComplianceReview !== "unspecified" ||
+      currentState.state.outputOptions.publicOrderReview !== "unspecified" ||
+      JSON.stringify(currentState.state.seriesVisibilitySettings) !== JSON.stringify(defaultSeriesVisibilitySettings);
+
+    if (!hasMeaningfulState) {
+      return createSamplePageStateExportPayload();
+    }
+    return currentState;
+  }
+
+  function buildCustomPromptExportFilename() {
+    const now = new Date();
+    const yyyy = String(now.getFullYear());
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const hh = String(now.getHours()).padStart(2, "0");
+    const mi = String(now.getMinutes()).padStart(2, "0");
+    const ss = String(now.getSeconds()).padStart(2, "0");
+    return `prompt-gen-export-${yyyy}${mm}${dd}-${hh}${mi}${ss}.json`;
+  }
+
+  function downloadTextFile(text: string, filename: string, contentType: string) {
+    const blob = new Blob([text], { type: contentType });
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.setTimeout(() => {
+      URL.revokeObjectURL(objectUrl);
+    }, 0);
+  }
+
+  function normalizeImportedPageStatePayload(rawPayload: unknown) {
+    if (!rawPayload || typeof rawPayload !== "object" || Array.isArray(rawPayload)) {
+      return null;
+    }
+    const payload = rawPayload as Partial<PromptPageStateExportPayload> & {
+      version?: unknown;
+      exportedAt?: unknown;
+    };
+    if (Number(payload.version) !== CUSTOM_PROMPT_EXPORT_VERSION) {
+      return null;
+    }
+    if (typeof payload.exportedAt !== "string" || !payload.exportedAt.trim()) {
+      return null;
+    }
+    if (!payload.state || typeof payload.state !== "object" || Array.isArray(payload.state)) {
+      return null;
+    }
+
+    const state = payload.state as PromptPageStateExportPayload["state"];
+
+    return {
+      query: typeof state.query === "string" ? state.query.trim() : "",
+      selectedPromptId: typeof state.selectedPromptId === "string" ? state.selectedPromptId.trim() : "",
+      selectedPromptCode: typeof state.selectedPromptCode === "string" ? state.selectedPromptCode.trim() : "",
+      argumentValues: state.argumentValues && typeof state.argumentValues === "object" && !Array.isArray(state.argumentValues)
+        ? Object.fromEntries(
+            Object.entries(state.argumentValues).map(([key, value]) => [key, typeof value === "string" ? value : ""])
+          )
+        : {},
+      outputOptions: {
+        hallucinationGuardLevel: state.outputOptions?.hallucinationGuardLevel === "low" || state.outputOptions?.hallucinationGuardLevel === "high"
+          ? state.outputOptions.hallucinationGuardLevel
+          : "none",
+        outputMarkdownEnabled: state.outputOptions?.outputMarkdownEnabled === true,
+        outputTone: state.outputOptions?.outputTone === "desumasu" || state.outputOptions?.outputTone === "dearu"
+          ? state.outputOptions.outputTone
+          : "unspecified",
+        selfReview: state.outputOptions?.selfReview === "internal" || state.outputOptions?.selfReview === "report"
+          ? state.outputOptions.selfReview
+          : "unspecified",
+        misleadingExpressionReview: state.outputOptions?.misleadingExpressionReview === "internal" || state.outputOptions?.misleadingExpressionReview === "report"
+          ? state.outputOptions.misleadingExpressionReview
+          : "unspecified",
+        considerationRiskReview: state.outputOptions?.considerationRiskReview === "internal" || state.outputOptions?.considerationRiskReview === "report"
+          ? state.outputOptions.considerationRiskReview
+          : "unspecified",
+        discomfortRiskReview: state.outputOptions?.discomfortRiskReview === "internal" || state.outputOptions?.discomfortRiskReview === "report"
+          ? state.outputOptions.discomfortRiskReview
+          : "unspecified",
+        aggressiveExpressionReview: state.outputOptions?.aggressiveExpressionReview === "internal" || state.outputOptions?.aggressiveExpressionReview === "report"
+          ? state.outputOptions.aggressiveExpressionReview
+          : "unspecified",
+        sensitiveExpressionReview: state.outputOptions?.sensitiveExpressionReview === "internal" || state.outputOptions?.sensitiveExpressionReview === "report"
+          ? state.outputOptions.sensitiveExpressionReview
+          : "unspecified",
+        legalComplianceReview: state.outputOptions?.legalComplianceReview === "internal" || state.outputOptions?.legalComplianceReview === "report"
+          ? state.outputOptions.legalComplianceReview
+          : "unspecified",
+        publicOrderReview: state.outputOptions?.publicOrderReview === "internal" || state.outputOptions?.publicOrderReview === "report"
+          ? state.outputOptions.publicOrderReview
+          : "unspecified"
+      },
+      seriesVisibilitySettings: {
+        showA: state.seriesVisibilitySettings?.showA !== false,
+        showX: state.seriesVisibilitySettings?.showX !== false,
+        showS: state.seriesVisibilitySettings?.showS !== false,
+        showP: state.seriesVisibilitySettings?.showP !== false
+      },
+      customPrompt:
+        state.customPrompt &&
+        typeof state.customPrompt === "object" &&
+        typeof state.customPrompt.promptText === "string" &&
+        state.customPrompt.promptText.trim()
+          ? {
+              id: typeof state.customPrompt.id === "string" && state.customPrompt.id.trim()
+                ? state.customPrompt.id.trim()
+                : "custom-imported-prompt",
+              label: typeof state.customPrompt.label === "string" && state.customPrompt.label.trim()
+                ? state.customPrompt.label.trim()
+                : typeof (state.customPrompt as { promptName?: string }).promptName === "string" &&
+                    String((state.customPrompt as { promptName?: string }).promptName || "").trim()
+                  ? String((state.customPrompt as { promptName?: string }).promptName || "").trim()
+                  : "カスタムプロンプト",
+              keywords: Array.isArray(state.customPrompt.keywords)
+                ? state.customPrompt.keywords.map((keyword) => String(keyword || "").trim()).filter(Boolean)
+                : [],
+              promptText: state.customPrompt.promptText.trim()
+            }
+          : null
+    };
+  }
+
+  async function importCustomPromptFile(file: File | null) {
+    if (!file) {
+      return;
+    }
+
+    try {
+      const rawText = await file.text();
+      const parsed = JSON.parse(rawText);
+      const normalized = normalizeImportedPageStatePayload(parsed);
+      if (!normalized) {
+        if (typeof window.showToast === "function") {
+          window.showToast("JSON の読み込みに失敗しました");
+        }
+        return;
+      }
+
+      customPromptState = normalized.customPrompt;
+      if (customPromptState) {
+        saveImportedCustomPrompt(customPromptState);
+      } else {
+        clearImportedCustomPromptStorage();
+      }
+
+      seriesVisibilitySettings = { ...normalized.seriesVisibilitySettings };
+      saveSeriesVisibilitySettings(seriesVisibilitySettings);
+      rebuildVisiblePromptIndexes();
+
+      pendingInitialPromptId = normalized.selectedPromptId;
+      pendingInitialPromptCode = normalized.selectedPromptCode;
+      lastSearchQuery = "";
+      promptSearch.value = normalized.query;
+      selectedPrompt = "";
+      activeArgumentDefinitions = [];
+      renderCandidates();
+      setPromptArgumentValues(normalized.argumentValues);
+      applyDefaultArgumentValues(getSelectedPromptDefinition());
+      setPromptOutputOptions(normalized.outputOptions);
+
+      revealOutputSection();
+      updateOutput();
+      if (typeof window.showToast === "function") {
+        window.showToast("画面状態を JSON から取り込みました");
+      }
+    } catch (_error) {
+      if (typeof window.showToast === "function") {
+        window.showToast("JSON の読み込みに失敗しました");
+      }
+    } finally {
+      customPromptImportInput.value = "";
+    }
+  }
+
+  function exportCustomPrompt() {
+    const payload = createPageStateExportPayload();
+    downloadTextFile(
+      `${JSON.stringify(payload, null, 2)}\n`,
+      buildCustomPromptExportFilename(),
+      "application/json;charset=utf-8"
+    );
+    if (typeof window.showToast === "function") {
+      window.showToast(
+        payload.isSample
+          ? "データが空のためサンプルJSONを出力しました"
+          : "画面状態を JSON でエクスポートしました"
+      );
+    }
+  }
+
   function createSeriesVisibilityMenu() {
     const menuPanel = document.querySelector("lht-page-menu .md-menu-panel") as HTMLDivElement | null;
     if (!menuPanel) {
       return;
     }
+
+    const exportButton = document.createElement("a");
+    exportButton.id = "exportCustomPromptButton";
+    exportButton.className = "md-menu-link";
+    exportButton.href = "#";
+    exportButton.textContent = "Export";
+    exportButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      exportCustomPrompt();
+    });
+    menuPanel.appendChild(exportButton);
+
+    const importButton = document.createElement("a");
+    importButton.id = "importCustomPromptButton";
+    importButton.className = "md-menu-link";
+    importButton.href = "#";
+    importButton.textContent = "Import";
+    importButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      customPromptImportInput.value = "";
+      customPromptImportInput.click();
+    });
+    menuPanel.appendChild(importButton);
 
     const separator = document.createElement("div");
     separator.className = "md-menu-separator";
@@ -1228,6 +1658,8 @@ async function initializePromptPage() {
     resetButton.className = "md-menu-settings__reset";
     resetButton.innerHTML = '<svg viewBox="0 0 24 24" class="md-menu-settings__reset-icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#md-icon-trash" xlink:href="#md-icon-trash"></use></svg><span>設定を初期化</span>';
     resetButton.addEventListener("click", () => {
+      clearImportedCustomPromptStorage();
+      customPromptState = null;
       clearSeriesVisibilitySettings();
       seriesVisibilitySettings = { ...defaultSeriesVisibilitySettings };
       for (const option of seriesOptions) {
@@ -1256,17 +1688,22 @@ async function initializePromptPage() {
   publicOrderReview.addEventListener("change", updateOutput);
   hallucinationGuard.addEventListener("change", updateOutput);
   outputMarkdown.addEventListener("change", updateOutput);
+  customPromptImportInput.addEventListener("change", () => {
+    void importCustomPromptFile(customPromptImportInput.files?.[0] || null);
+  });
   copyShareLinkButton.addEventListener("click", () => {
     void copyText(buildShareLink());
   });
 
   let initialQuery = "";
   let initialPromptCode = "";
+  let initialPromptId = "";
   const initialArgumentValues: Record<string, string> = {};
   try {
     const url = new URL(window.location.href);
     initialQuery = (url.searchParams.get("q") || "").trim();
     initialPromptCode = (url.searchParams.get("id") || "").trim();
+    initialPromptId = (url.searchParams.get("promptId") || "").trim();
     initialArgumentValues.subject = url.searchParams.get("subject") || "";
     initialArgumentValues.commitId = url.searchParams.get("commit") || "";
     for (const [key, value] of url.searchParams.entries()) {
@@ -1284,6 +1721,9 @@ async function initializePromptPage() {
   applyPromptOutputOptionDefaults(null);
   createSeriesVisibilityMenu();
   renderArgumentFields(null);
+  if (initialPromptId) {
+    pendingInitialPromptId = initialPromptId;
+  }
   if (initialPromptCode) {
     pendingInitialPromptCode = initialPromptCode;
   }
