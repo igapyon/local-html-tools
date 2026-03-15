@@ -33,6 +33,19 @@ async function initializePromptPage() {
     const popularDefinitions = Array.isArray(popularPromptDefinitions) ? popularPromptDefinitions : [];
     if (window.customElements && window.customElements.whenDefined) {
         await window.customElements.whenDefined("lht-text-field-help");
+        await window.customElements.whenDefined("lht-select-help");
+    }
+    async function waitForElementById(id, maxFrames = 4) {
+        for (let index = 0; index < maxFrames; index += 1) {
+            const element = document.getElementById(id);
+            if (element) {
+                return element;
+            }
+            await new Promise((resolve) => {
+                requestAnimationFrame(() => resolve());
+            });
+        }
+        return document.getElementById(id);
     }
     const promptSearch = document.getElementById("promptSearch");
     const promptCandidateArea = document.getElementById("promptCandidateArea");
@@ -43,7 +56,7 @@ async function initializePromptPage() {
     const promptOutputHelp = document.getElementById("promptOutputHelp");
     const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink");
     const includeLabelPrefix = document.getElementById("includeLabelPrefix");
-    const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const hallucinationGuard = await waitForElementById("hallucinationGuard");
     const outputMarkdown = document.getElementById("outputMarkdown");
     const copyShareLinkButton = document.getElementById("copyShareLinkButton");
     const promptOutput = document.getElementById("promptOutput");
@@ -595,14 +608,14 @@ async function initializePromptPage() {
     }
     function getPromptOutputOptions() {
         return {
-            hallucinationGuardEnabled: hallucinationGuard.checked,
+            hallucinationGuardLevel: (hallucinationGuard.value || "none"),
             outputMarkdownEnabled: outputMarkdown.checked
         };
     }
     function inferPromptOutputOptionDefaults(definition) {
         if (!definition) {
             return {
-                hallucinationGuard: false,
+                hallucinationGuard: "none",
                 outputMarkdown: false
             };
         }
@@ -610,9 +623,13 @@ async function initializePromptPage() {
         if (cached) {
             return cached;
         }
-        if (typeof definition.hallucinationGuard === "boolean" || typeof definition.outputMarkdown === "boolean") {
+        if (typeof definition.hallucinationGuard === "string" || typeof definition.hallucinationGuard === "boolean" || typeof definition.outputMarkdown === "boolean") {
             const explicitDefaults = {
-                hallucinationGuard: definition.hallucinationGuard === true,
+                hallucinationGuard: typeof definition.hallucinationGuard === "string"
+                    ? definition.hallucinationGuard
+                    : definition.hallucinationGuard === true
+                        ? "high"
+                        : "none",
                 outputMarkdown: definition.outputMarkdown === true
             };
             promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
@@ -620,7 +637,7 @@ async function initializePromptPage() {
         }
         const originalOptions = getPromptOutputOptions();
         setPromptOutputOptions({
-            hallucinationGuardEnabled: true,
+            hallucinationGuardLevel: "high",
             outputMarkdownEnabled: true
         });
         const argsForInference = {};
@@ -630,18 +647,17 @@ async function initializePromptPage() {
         }
         const body = definition.buildBody(sanitizePromptVariableInput(argsForInference.commitId || ""), sanitizePromptVariableInput(argsForInference.subject || ""));
         setPromptOutputOptions(originalOptions);
-        const templates = getPromptOutputInstructionTemplates();
+        const instructionProfile = inferPromptOutputInstructionProfile(body);
         const defaults = {
-            hallucinationGuard: body.includes(templates.strictHallucinationPreventionInstruction) ||
-                body.includes(templates.softHallucinationPreventionInstruction),
-            outputMarkdown: body.includes(templates.markdownFenceInstruction)
+            hallucinationGuard: instructionProfile.hallucinationGuardMode,
+            outputMarkdown: instructionProfile.outputMarkdown
         };
         promptOutputOptionDefaultsById.set(definition.id, defaults);
         return defaults;
     }
     function applyPromptOutputOptionDefaults(definition) {
         const defaults = inferPromptOutputOptionDefaults(definition);
-        hallucinationGuard.checked = defaults.hallucinationGuard;
+        hallucinationGuard.value = defaults.hallucinationGuard;
         outputMarkdown.checked = defaults.outputMarkdown;
     }
     function renderSelectedPromptHelp() {
@@ -798,8 +814,15 @@ async function initializePromptPage() {
         const argumentValues = getPromptArgumentValues();
         const commitId = sanitizePromptVariableInput(argumentValues.commitId || "");
         const subject = sanitizePromptVariableInput(argumentValues.subject || "");
-        setPromptOutputOptions(getPromptOutputOptions());
-        const body = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
+        const currentOptions = getPromptOutputOptions();
+        setPromptOutputOptions({
+            hallucinationGuardLevel: "high",
+            outputMarkdownEnabled: true
+        });
+        const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
+        setPromptOutputOptions(currentOptions);
+        const instructionProfile = inferPromptOutputInstructionProfile(rawBody);
+        const body = appendPromptOutputInstructions(stripPromptOutputInstructions(rawBody), currentOptions, instructionProfile.hallucinationGuardMode || "high");
         if (!body || !label) {
             return "";
         }

@@ -62,6 +62,42 @@ function defineElementIfNeeded(tagName) {
       });
       return;
     }
+    if (tagName === "lht-select-help") {
+      customElements.define(tagName, class extends HTMLElement {
+        connectedCallback() {
+          if (this.dataset.initialized === "true") return;
+          this.dataset.initialized = "true";
+          const selectId = (this.getAttribute("select-id") || "").trim();
+          const labelText = (this.getAttribute("label") || "").trim();
+          const helpText = this.getAttribute("help-text") || "";
+          const sourceOptions = Array.from(this.querySelectorAll("option")).map((option) => ({
+            value: option.getAttribute("value") || "",
+            label: option.textContent || "",
+            selected: option.hasAttribute("selected")
+          }));
+          this.textContent = "";
+          const label = document.createElement("label");
+          const span = document.createElement("span");
+          span.textContent = labelText;
+          const select = document.createElement("select");
+          select.id = selectId;
+          select.title = helpText;
+          for (const entry of sourceOptions) {
+            const option = document.createElement("option");
+            option.value = entry.value;
+            option.textContent = entry.label;
+            if (entry.selected) {
+              option.selected = true;
+            }
+            select.appendChild(option);
+          }
+          label.appendChild(span);
+          label.appendChild(select);
+          this.appendChild(label);
+        }
+      });
+      return;
+    }
     if (tagName === "lht-switch-help") {
       customElements.define(tagName, class extends HTMLElement {
         connectedCallback() {
@@ -102,7 +138,11 @@ function mountPromptDom() {
       <div id="promptOutputHelp"></div>
     </div>
     <input id="includeLabelPrefix" type="checkbox" />
-    <input id="hallucinationGuard" type="checkbox" />
+    <select id="hallucinationGuard">
+      <option value="none">なし</option>
+      <option value="low">弱</option>
+      <option value="high">強</option>
+    </select>
     <input id="outputMarkdown" type="checkbox" />
     <button id="copyShareLinkButton" type="button"></button>
     <a id="gitPseudoSquashLink" class="md-hidden" href="../git/git-work-list.html"></a>
@@ -143,6 +183,7 @@ function setRawInputValue(element, value) {
 
 async function bootPromptPage(urlSearch = "") {
   defineElementIfNeeded("lht-text-field-help");
+  defineElementIfNeeded("lht-select-help");
   defineElementIfNeeded("lht-switch-help");
   defineElementIfNeeded("lht-help-tooltip");
   ensureLocalStorageMock();
@@ -259,10 +300,10 @@ describe("prompt-gen main", () => {
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
-    expect(hallucinationGuard.checked).toBe(true);
+    expect(hallucinationGuard.value).toBe("high");
     expect(outputMarkdown.checked).toBe(true);
     expect(promptOutput.textContent).toContain("○ハルシネーション防止のため");
-    expect(promptOutput.textContent).toContain("○最終的な回答は ~~~~ で囲まれた一塊として出力してください。");
+    expect(promptOutput.textContent).toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
   });
 
   it("updates output when hallucinationGuard and outputMarkdown are toggled", async () => {
@@ -272,13 +313,13 @@ describe("prompt-gen main", () => {
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
-    hallucinationGuard.checked = false;
+    hallucinationGuard.value = "none";
     hallucinationGuard.dispatchEvent(new Event("change"));
     outputMarkdown.checked = false;
     outputMarkdown.dispatchEvent(new Event("change"));
 
     expect(promptOutput.textContent).not.toContain("○ハルシネーション防止のため");
-    expect(promptOutput.textContent).not.toContain("○最終的な回答は ~~~~ で囲まれた一塊として出力してください。");
+    expect(promptOutput.textContent).not.toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
   });
 
   it("resets hallucinationGuard and outputMarkdown to prompt defaults when switching prompts", async () => {
@@ -290,7 +331,7 @@ describe("prompt-gen main", () => {
 
     promptSearch.value = "A501";
     promptSearch.dispatchEvent(new Event("input"));
-    hallucinationGuard.checked = false;
+    hallucinationGuard.value = "none";
     hallucinationGuard.dispatchEvent(new Event("change"));
     outputMarkdown.checked = false;
     outputMarkdown.dispatchEvent(new Event("change"));
@@ -300,8 +341,29 @@ describe("prompt-gen main", () => {
     promptSearch.value = "A501";
     promptSearch.dispatchEvent(new Event("input"));
 
-    expect(hallucinationGuard.checked).toBe(true);
+    expect(hallucinationGuard.value).toBe("high");
     expect(outputMarkdown.checked).toBe(true);
+  });
+
+  it("applies hallucinationGuard and outputMarkdown to prompts without embedded instructions", async () => {
+    await bootPromptPage("?q=P1803-004");
+
+    const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const outputMarkdown = document.getElementById("outputMarkdown");
+    const promptOutput = document.getElementById("promptOutput");
+
+    expect(hallucinationGuard.value).toBe("none");
+    expect(outputMarkdown.checked).toBe(false);
+    expect(promptOutput.textContent).not.toContain("○ハルシネーション防止のため");
+    expect(promptOutput.textContent).not.toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
+
+    hallucinationGuard.value = "high";
+    hallucinationGuard.dispatchEvent(new Event("change"));
+    outputMarkdown.checked = true;
+    outputMarkdown.dispatchEvent(new Event("change"));
+
+    expect(promptOutput.textContent).toContain("○ハルシネーション防止のため");
+    expect(promptOutput.textContent).toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
   });
 
   it("uses docs as the default docs path for A150", async () => {

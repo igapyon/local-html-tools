@@ -9,7 +9,7 @@ type PromptDefinition = {
   subjectHelpText?: string;
   subjectDefaultValue?: string;
   args?: PromptArgumentDefinition[];
-  hallucinationGuard?: boolean;
+  hallucinationGuard?: "none" | "low" | "high" | boolean;
   outputMarkdown?: boolean;
   buildBody: (commitId: string, subject?: string) => string;
 };
@@ -25,7 +25,7 @@ type PromptArgumentDefinition = {
 };
 
 type PromptOutputOptionDefaults = {
-  hallucinationGuard: boolean;
+  hallucinationGuard: "none" | "low" | "high";
   outputMarkdown: boolean;
 };
 
@@ -91,6 +91,20 @@ async function initializePromptPage() {
 
   if (window.customElements && window.customElements.whenDefined) {
     await window.customElements.whenDefined("lht-text-field-help");
+    await window.customElements.whenDefined("lht-select-help");
+  }
+
+  async function waitForElementById<T extends HTMLElement>(id: string, maxFrames = 4): Promise<T | null> {
+    for (let index = 0; index < maxFrames; index += 1) {
+      const element = document.getElementById(id) as T | null;
+      if (element) {
+        return element;
+      }
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    }
+    return document.getElementById(id) as T | null;
   }
 
   const promptSearch = document.getElementById("promptSearch") as HTMLInputElement | null;
@@ -102,7 +116,7 @@ async function initializePromptPage() {
   const promptOutputHelp = document.getElementById("promptOutputHelp") as HTMLDivElement | null;
   const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink") as HTMLAnchorElement | null;
   const includeLabelPrefix = document.getElementById("includeLabelPrefix") as HTMLInputElement | null;
-  const hallucinationGuard = document.getElementById("hallucinationGuard") as HTMLInputElement | null;
+  const hallucinationGuard = await waitForElementById<HTMLSelectElement>("hallucinationGuard");
   const outputMarkdown = document.getElementById("outputMarkdown") as HTMLInputElement | null;
   const copyShareLinkButton = document.getElementById("copyShareLinkButton") as HTMLButtonElement | null;
   const promptOutput = document.getElementById("promptOutput") as HTMLElement | null;
@@ -753,7 +767,7 @@ async function initializePromptPage() {
 
   function getPromptOutputOptions() {
     return {
-      hallucinationGuardEnabled: hallucinationGuard.checked,
+      hallucinationGuardLevel: ((hallucinationGuard.value || "none") as "none" | "low" | "high"),
       outputMarkdownEnabled: outputMarkdown.checked
     };
   }
@@ -761,7 +775,7 @@ async function initializePromptPage() {
   function inferPromptOutputOptionDefaults(definition: PromptDefinition | null): PromptOutputOptionDefaults {
     if (!definition) {
       return {
-        hallucinationGuard: false,
+        hallucinationGuard: "none",
         outputMarkdown: false
       };
     }
@@ -771,9 +785,13 @@ async function initializePromptPage() {
       return cached;
     }
 
-    if (typeof definition.hallucinationGuard === "boolean" || typeof definition.outputMarkdown === "boolean") {
+    if (typeof definition.hallucinationGuard === "string" || typeof definition.hallucinationGuard === "boolean" || typeof definition.outputMarkdown === "boolean") {
       const explicitDefaults = {
-        hallucinationGuard: definition.hallucinationGuard === true,
+        hallucinationGuard: typeof definition.hallucinationGuard === "string"
+          ? definition.hallucinationGuard
+          : definition.hallucinationGuard === true
+            ? "high"
+            : "none",
         outputMarkdown: definition.outputMarkdown === true
       };
       promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
@@ -782,7 +800,7 @@ async function initializePromptPage() {
 
     const originalOptions = getPromptOutputOptions();
     setPromptOutputOptions({
-      hallucinationGuardEnabled: true,
+      hallucinationGuardLevel: "high",
       outputMarkdownEnabled: true
     });
     const argsForInference: Record<string, string> = {};
@@ -796,12 +814,10 @@ async function initializePromptPage() {
     );
     setPromptOutputOptions(originalOptions);
 
-    const templates = getPromptOutputInstructionTemplates();
+    const instructionProfile = inferPromptOutputInstructionProfile(body);
     const defaults = {
-      hallucinationGuard:
-        body.includes(templates.strictHallucinationPreventionInstruction) ||
-        body.includes(templates.softHallucinationPreventionInstruction),
-      outputMarkdown: body.includes(templates.markdownFenceInstruction)
+      hallucinationGuard: instructionProfile.hallucinationGuardMode,
+      outputMarkdown: instructionProfile.outputMarkdown
     };
     promptOutputOptionDefaultsById.set(definition.id, defaults);
     return defaults;
@@ -809,7 +825,7 @@ async function initializePromptPage() {
 
   function applyPromptOutputOptionDefaults(definition: PromptDefinition | null) {
     const defaults = inferPromptOutputOptionDefaults(definition);
-    hallucinationGuard.checked = defaults.hallucinationGuard;
+    hallucinationGuard.value = defaults.hallucinationGuard;
     outputMarkdown.checked = defaults.outputMarkdown;
   }
 
@@ -990,8 +1006,19 @@ async function initializePromptPage() {
     const argumentValues = getPromptArgumentValues();
     const commitId = sanitizePromptVariableInput(argumentValues.commitId || "");
     const subject = sanitizePromptVariableInput(argumentValues.subject || "");
-    setPromptOutputOptions(getPromptOutputOptions());
-    const body = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
+    const currentOptions = getPromptOutputOptions();
+    setPromptOutputOptions({
+      hallucinationGuardLevel: "high",
+      outputMarkdownEnabled: true
+    });
+    const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
+    setPromptOutputOptions(currentOptions);
+    const instructionProfile = inferPromptOutputInstructionProfile(rawBody);
+    const body = appendPromptOutputInstructions(
+      stripPromptOutputInstructions(rawBody),
+      currentOptions,
+      instructionProfile.hallucinationGuardMode || "high"
+    );
 
     if (!body || !label) {
       return "";

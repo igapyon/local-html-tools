@@ -187,8 +187,28 @@ lht-text-field-help .lht-text-field-help__fallback::placeholder {
 .md-output-options {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
+}
+
+.md-output-options__select {
+  flex: 0 0 auto;
+  margin-right: 20px;
+}
+
+.md-output-options__select--compact {
+  min-width: 9rem;
+  max-width: 11rem;
+}
+
+.md-output-options__select--compact md-outlined-select,
+.md-output-options__select--compact .lht-select-help__fallback-wrap,
+.md-output-options__select--compact .lht-select-help__fallback {
+  width: 100%;
+}
+
+.md-output-options lht-switch-help {
+  flex: 0 0 auto;
 }
 
 @media (max-width: 720px) {
