@@ -4957,8 +4957,8 @@ if (!customElements.get("lht-page-menu")) {
 
     function convertTimeToThreeChars(hours, minutes) {
       const s1 = String.fromCharCode(97 + hours);
-      const s2 = String.fromCharCode(97 + Math.floor(minutes / 26));
-      const s3 = String.fromCharCode(97 + (minutes % 26));
+      const s2 = String.fromCharCode(97 + Math.floor(minutes / 10));
+      const s3 = String.fromCharCode(97 + (minutes % 10));
       return s1 + s2 + s3;
     }
 
@@ -5109,6 +5109,14 @@ if (!customElements.get("lht-page-menu")) {
       const timeStr = convertTimeToThreeChars(hh, min);
       input.value = `tiga${mm}${dd}${timeStr}`;
       regenerateAllCommands();
+      const saved = upsertWorkBranchListEntry({
+        requireRepoUrl: false,
+        showAlertOnInvalid: false,
+        updateRecentActions: false
+      });
+      if (saved) {
+        showToast("作業ブランチ名を更新し、Git 作業一覧へ反映しました");
+      }
     }
 
     function generateRebaseCommand(options = {}) {
@@ -5822,22 +5830,32 @@ if (!customElements.get("lht-page-menu")) {
       window.location.href = url;
     }
 
-    function saveToWorkBranchListAndOpen() {
+    function upsertWorkBranchListEntry(options = {}) {
+      const requireRepoUrl = options.requireRepoUrl !== false;
+      const showAlertOnInvalid = options.showAlertOnInvalid !== false;
+      const updateRecent = options.updateRecentActions !== false;
       const repoUrlField = document.getElementById("repoUrl");
       const repoUrl = repoUrlField ? normalizeRepoUrl(repoUrlField.value) : "";
       if (!repoUrl) {
-        alert("リポジトリ URL を入力してください。");
+        if (!requireRepoUrl) {
+          return null;
+        }
+        if (showAlertOnInvalid) {
+          alert("リポジトリ URL を入力してください。");
+        }
         if (repoUrlField && typeof repoUrlField.focus === "function") {
           repoUrlField.focus();
         }
-        return;
+        return null;
       }
 
       const baseBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
       const compareBranch = document.getElementById("workBranch")?.value.trim() || "";
       if (!baseBranch || !compareBranch) {
-        alert("基点ブランチと作業ブランチを入力してください。");
-        return;
+        if (showAlertOnInvalid) {
+          alert("基点ブランチと作業ブランチを入力してください。");
+        }
+        return null;
       }
 
       const baseScope = document.getElementById("squashBaseScope")?.value === "local" ? "local" : "remote";
@@ -5871,8 +5889,25 @@ if (!customElements.get("lht-page-menu")) {
         entries.push(nextEntry);
       }
       saveWorkBranchListEntries(entries);
-      saveRecentActions(updateRecentActions(loadRecentActions(), nextEntry.id, "pseudo-squash"));
-      showToast(existingIndex >= 0 ? "Git 作業一覧を更新しました" : "Git 作業一覧へ追加しました");
+      if (updateRecent) {
+        saveRecentActions(updateRecentActions(loadRecentActions(), nextEntry.id, "pseudo-squash"));
+      }
+      return {
+        entry: nextEntry,
+        existed: existingIndex >= 0
+      };
+    }
+
+    function saveToWorkBranchListAndOpen() {
+      const saved = upsertWorkBranchListEntry({
+        requireRepoUrl: true,
+        showAlertOnInvalid: true,
+        updateRecentActions: true
+      });
+      if (!saved) {
+        return;
+      }
+      showToast(saved.existed ? "Git 作業一覧を更新しました" : "Git 作業一覧へ追加しました");
       navigateTo("git-work-list.html");
     }
 
