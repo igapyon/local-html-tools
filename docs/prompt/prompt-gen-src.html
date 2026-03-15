@@ -105,6 +105,16 @@ limitations under the License.
           <div id="promptOutputHelp" class="md-output-help"></div>
         </div>
         <div class="md-output-header__actions">
+          <a
+            id="gitPseudoSquashLink"
+            class="md-secondary-button md-hidden"
+            href="../git/git-work-list.html"
+            aria-label="Git 作業一覧">
+            <svg viewBox="0 0 24 24" class="md-secondary-button__icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <use href="#md-icon-auto-fix" xlink:href="#md-icon-auto-fix"></use>
+            </svg>
+            <span>Git 作業一覧</span>
+          </a>
           <button id="copyShareLinkButton" type="button" class="md-secondary-button">
             <svg viewBox="0 0 24 24" class="md-secondary-button__icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <use href="#md-icon-link" xlink:href="#md-icon-link"></use>
@@ -123,6 +133,15 @@ limitations under the License.
         </lht-switch-help>
         <lht-select-help
           class="md-output-options__select md-output-options__select--compact"
+          field-id="outputTone"
+          label="文体"
+          help-text="文体を選択します。無指定 / です・ます調 / である調 の3段階です。">
+          <option value="unspecified">無指定</option>
+          <option value="desumasu">です・ます調</option>
+          <option value="dearu">である調</option>
+        </lht-select-help>
+        <lht-select-help
+          class="md-output-options__select md-output-options__select--compact"
           field-id="hallucinationGuard"
           label="幻想防止"
           help-text="幻想防止の強さを選択します。なし / 弱 / 強 の3段階です。">
@@ -136,16 +155,6 @@ limitations under the License.
           help-label="Markdown出力の説明">
           ON の場合は、最終回答を Markdown として出力し、外側を `~~~~` で囲む指定を含めます。
         </lht-switch-help>
-        <a
-          id="gitPseudoSquashLink"
-          class="md-secondary-button md-hidden"
-          href="../git/git-work-list.html"
-          aria-label="Git 作業一覧">
-          <svg viewBox="0 0 24 24" class="md-secondary-button__icon" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <use href="#md-icon-auto-fix" xlink:href="#md-icon-auto-fix"></use>
-          </svg>
-          <span>Git 作業一覧</span>
-        </a>
       </div>
     </section>
 

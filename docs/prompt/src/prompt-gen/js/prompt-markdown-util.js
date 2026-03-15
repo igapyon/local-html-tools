@@ -7,21 +7,27 @@ const softHallucinationPreventionInstruction = `○事実誤認を避けるた�
 - 代替行動: (1)情報が不足して判断しきれない場合は、その旨を明示してください。 (2)必要であれば、確認すべき追加質問や確認観点を示してください。
 - 出力規則: (1)根拠がある事実と、推測・評価・提案は区別して記載してください。 (2)推測や評価を書く場合は、断定を避け、根拠や前提が分かるようにしてください。 (3)不明点が残る場合は、不明のまま扱ってください。`;
 const markdownFenceInstruction = "○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。";
+const desumasuToneInstruction = "○文体は、です・ます調で統一してください。箇条書きは体言止めでも構いません。";
+const dearuToneInstruction = "○文体は、である調で統一してください。箇条書きは体言止めでも構いません。";
 let currentPromptOutputOptions = {
     hallucinationGuardLevel: "high",
-    outputMarkdownEnabled: true
+    outputMarkdownEnabled: true,
+    outputTone: "unspecified"
 };
 function setPromptOutputOptions(options) {
     currentPromptOutputOptions = {
         hallucinationGuardLevel: options.hallucinationGuardLevel || "none",
-        outputMarkdownEnabled: options.outputMarkdownEnabled !== false
+        outputMarkdownEnabled: options.outputMarkdownEnabled !== false,
+        outputTone: options.outputTone || "unspecified"
     };
 }
 function getPromptOutputInstructionTemplates() {
     return {
         strictHallucinationPreventionInstruction,
         softHallucinationPreventionInstruction,
-        markdownFenceInstruction
+        markdownFenceInstruction,
+        desumasuToneInstruction,
+        dearuToneInstruction
     };
 }
 function trimTrailingPromptSeparators(value) {
@@ -36,7 +42,12 @@ function inferPromptOutputInstructionProfile(body) {
             : normalizedBody.includes(templates.softHallucinationPreventionInstruction)
                 ? "low"
                 : "none",
-        outputMarkdown: normalizedBody.includes(templates.markdownFenceInstruction)
+        outputMarkdown: normalizedBody.includes(templates.markdownFenceInstruction),
+        outputTone: normalizedBody.includes(templates.desumasuToneInstruction)
+            ? "desumasu"
+            : normalizedBody.includes(templates.dearuToneInstruction)
+                ? "dearu"
+                : "unspecified"
     };
 }
 function stripPromptOutputInstructions(body) {
@@ -46,6 +57,8 @@ function stripPromptOutputInstructions(body) {
     while (changed) {
         changed = false;
         for (const template of [
+            templates.dearuToneInstruction,
+            templates.desumasuToneInstruction,
             templates.markdownFenceInstruction,
             templates.strictHallucinationPreventionInstruction,
             templates.softHallucinationPreventionInstruction
@@ -72,6 +85,12 @@ function appendPromptOutputInstructions(body, options, hallucinationGuardMode = 
     }
     if (options.outputMarkdownEnabled) {
         segments.push(markdownFenceInstruction);
+    }
+    if (options.outputTone === "desumasu") {
+        segments.push(desumasuToneInstruction);
+    }
+    else if (options.outputTone === "dearu") {
+        segments.push(dearuToneInstruction);
     }
     return segments.join("\n\n");
 }
