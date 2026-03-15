@@ -31,6 +31,7 @@
 | `squashRemote` | squashリモート | text | `origin` | `lockOrigin=ON` で無効化かつ非表示。 |
 | `commitMessage` | コミットメッセージ | textarea | 空 | rebase生成時に必須。 |
 | `useCurrentBranch` | 現在ブランチで作業 | checkbox | ON | ON時、rebase/push/diff で `HEAD`/現在ブランチ運用。 |
+| `repoUrl` | リポジトリ URL | text | 空 | Git 作業一覧との連携、および外部 URL を開く導線で利用。 |
 
 ### 2.3 文字列のクォート仕様
 `quoteIfNeeded(value, shell)` を利用する。
@@ -191,6 +192,33 @@ PowerShellモードでも `useCurrentBranch = true` 時のリネーム行は POS
 2. コピー対象が空文字なら何もしない
 3. コピー成功時はトースト「コピーしました」を2秒表示
 4. メニューボタンは `#menuPanel` の `md-hidden` をトグル
+
+### 2.11 Git 作業一覧との連携
+`git-pseudo-squash` から `git-work-list` への連携機能を持つ。
+
+前提:
+1. `repoUrl` 必須
+2. `squashBaseBranch` 必須
+3. `workBranch` 必須
+
+保存内容:
+1. `repoUrl`
+2. `baseBranch`
+3. `baseScope`
+4. `compareBranch`
+5. `compareScope = "local"`
+6. `compareUseHead`
+7. `remoteName`
+
+現行挙動:
+1. Git 作業一覧への保存時は、同一の `repoUrl` / `baseBranch` / `compareBranch` があれば更新し、なければ追加する
+2. `saveToWorkBranchListAndOpen()` 実行時は、保存後に `git-work-list.html` へ遷移する
+3. `updateWorkBranchWithCurrentTime()` 実行時は、作業ブランチ名を更新したうえで、保存可能なら Git 作業一覧側の同一項目も更新する
+4. 保存成功時は、追加・更新内容に応じたトーストを表示する
+
+補足:
+1. `repoUrl` が GitHub Pull Request URL の場合は、保存前にリポジトリ URL へ正規化する
+2. `remoteName` は `lockOrigin = ON` のとき `origin` 固定とする
 
 ## 3. 追加永続化仕様（実装済み）
 

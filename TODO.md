@@ -73,6 +73,9 @@
 - 各定義は `id / label / keywords / requiresCommitId / buildBody()` を持つ形に整理済み
 - `main.ts` は検索・選択・表示制御側へ寄せ、本文生成ロジックは定義側へ集約済み
 - `docs/prompt/tests/prompt-gen-main.test.js` を追加済み
+- `docs/prompt/README.md` に、出力オプションと現行テスト範囲を追記済み
+- `docs/git/README.md` に、`git-work-list` の `url` 種別対応を反映済み
+- `docs/git/git-pseudo-squash-spec.md` に、Git 作業一覧との連携挙動を反映済み
 - 現在の最小テスト対象:
 - 一意候補絞り込み後の PR 文面生成
 - 固定文面でのラベル接頭辞 ON/OFF

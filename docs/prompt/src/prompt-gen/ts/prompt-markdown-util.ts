@@ -173,5 +173,5 @@ function getSoftHallucinationPreventionInstruction(): string {
 }
 
 function getTodoReflectionInstruction(): string {
-  return "必要に応じて、今回の作業結果を TODO.md に反映してください。関連する既存の TODO があれば補強・更新し、該当する記述がなければ新規の TODO を追加してください。";
+  return "今回の作業結果は、必要に応じて TODO.md に反映してください。関連する既存の TODO があれば補強・更新し、該当する記述がなければ新規の TODO を追加してください。";
 }
