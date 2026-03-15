@@ -26,6 +26,7 @@
   - `git reset --soft` と再コミットで履歴をまとめる「pseudo-squash」手順のコマンドを段階ごとに生成します。
 - `docs/git/git-work-list.html`
   - 複数リポジトリと複数作業の組み合わせを一覧で管理し、比較や squash への導線もまとめて扱えます。
+  - `git` 種別に加えて、Git 連携なしで URL とメモを管理する `url` 種別も扱えます。
 
 ## 使い方
 
