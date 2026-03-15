@@ -27,6 +27,7 @@ type PromptArgumentDefinition = {
 type PromptOutputOptionDefaults = {
   hallucinationGuard: "none" | "low" | "high";
   outputMarkdown: boolean;
+  outputTone: "unspecified" | "desumasu" | "dearu";
 };
 
 type PromptSearchIndex = {
@@ -116,12 +117,17 @@ async function initializePromptPage() {
   const promptOutputHelp = document.getElementById("promptOutputHelp") as HTMLDivElement | null;
   const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink") as HTMLAnchorElement | null;
   const includeLabelPrefix = document.getElementById("includeLabelPrefix") as HTMLInputElement | null;
-  const hallucinationGuard = await waitForElementById<HTMLSelectElement>("hallucinationGuard");
+  const outputTone =
+    (document.getElementById("outputTone") as HTMLSelectElement | null) ||
+    (await waitForElementById<HTMLSelectElement>("outputTone"));
+  const hallucinationGuard =
+    (document.getElementById("hallucinationGuard") as HTMLSelectElement | null) ||
+    (await waitForElementById<HTMLSelectElement>("hallucinationGuard"));
   const outputMarkdown = document.getElementById("outputMarkdown") as HTMLInputElement | null;
   const copyShareLinkButton = document.getElementById("copyShareLinkButton") as HTMLButtonElement | null;
   const promptOutput = document.getElementById("promptOutput") as HTMLElement | null;
 
-  if (!promptSearch || !includeLabelPrefix || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+  if (!promptSearch || !includeLabelPrefix || !outputTone || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
     return;
   }
 
@@ -768,7 +774,8 @@ async function initializePromptPage() {
   function getPromptOutputOptions() {
     return {
       hallucinationGuardLevel: ((hallucinationGuard.value || "none") as "none" | "low" | "high"),
-      outputMarkdownEnabled: outputMarkdown.checked
+      outputMarkdownEnabled: outputMarkdown.checked,
+      outputTone: ((outputTone.value || "unspecified") as "unspecified" | "desumasu" | "dearu")
     };
   }
 
@@ -776,7 +783,8 @@ async function initializePromptPage() {
     if (!definition) {
       return {
         hallucinationGuard: "none",
-        outputMarkdown: false
+        outputMarkdown: false,
+        outputTone: "unspecified"
       };
     }
 
@@ -792,7 +800,8 @@ async function initializePromptPage() {
           : definition.hallucinationGuard === true
             ? "high"
             : "none",
-        outputMarkdown: definition.outputMarkdown === true
+        outputMarkdown: definition.outputMarkdown === true,
+        outputTone: "unspecified"
       };
       promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
       return explicitDefaults;
@@ -801,7 +810,8 @@ async function initializePromptPage() {
     const originalOptions = getPromptOutputOptions();
     setPromptOutputOptions({
       hallucinationGuardLevel: "high",
-      outputMarkdownEnabled: true
+      outputMarkdownEnabled: true,
+      outputTone: "unspecified"
     });
     const argsForInference: Record<string, string> = {};
     for (const argumentDefinition of getSelectedPromptArguments(definition)) {
@@ -817,7 +827,8 @@ async function initializePromptPage() {
     const instructionProfile = inferPromptOutputInstructionProfile(body);
     const defaults = {
       hallucinationGuard: instructionProfile.hallucinationGuardMode,
-      outputMarkdown: instructionProfile.outputMarkdown
+      outputMarkdown: instructionProfile.outputMarkdown,
+      outputTone: instructionProfile.outputTone
     };
     promptOutputOptionDefaultsById.set(definition.id, defaults);
     return defaults;
@@ -827,6 +838,7 @@ async function initializePromptPage() {
     const defaults = inferPromptOutputOptionDefaults(definition);
     hallucinationGuard.value = defaults.hallucinationGuard;
     outputMarkdown.checked = defaults.outputMarkdown;
+    outputTone.value = defaults.outputTone;
   }
 
   function renderSelectedPromptHelp() {
@@ -1009,7 +1021,8 @@ async function initializePromptPage() {
     const currentOptions = getPromptOutputOptions();
     setPromptOutputOptions({
       hallucinationGuardLevel: "high",
-      outputMarkdownEnabled: true
+      outputMarkdownEnabled: true,
+      outputTone: "unspecified"
     });
     const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
     setPromptOutputOptions(currentOptions);
@@ -1148,6 +1161,7 @@ async function initializePromptPage() {
 
   promptSearch.addEventListener("input", renderCandidates);
   includeLabelPrefix.addEventListener("change", updateOutput);
+  outputTone.addEventListener("change", updateOutput);
   hallucinationGuard.addEventListener("change", updateOutput);
   outputMarkdown.addEventListener("change", updateOutput);
   copyShareLinkButton.addEventListener("click", () => {

@@ -56,11 +56,14 @@ async function initializePromptPage() {
     const promptOutputHelp = document.getElementById("promptOutputHelp");
     const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink");
     const includeLabelPrefix = document.getElementById("includeLabelPrefix");
-    const hallucinationGuard = await waitForElementById("hallucinationGuard");
+    const outputTone = document.getElementById("outputTone") ||
+        (await waitForElementById("outputTone"));
+    const hallucinationGuard = document.getElementById("hallucinationGuard") ||
+        (await waitForElementById("hallucinationGuard"));
     const outputMarkdown = document.getElementById("outputMarkdown");
     const copyShareLinkButton = document.getElementById("copyShareLinkButton");
     const promptOutput = document.getElementById("promptOutput");
-    if (!promptSearch || !includeLabelPrefix || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+    if (!promptSearch || !includeLabelPrefix || !outputTone || !hallucinationGuard || !outputMarkdown || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
         return;
     }
     function loadSeriesVisibilitySettings() {
@@ -609,14 +612,16 @@ async function initializePromptPage() {
     function getPromptOutputOptions() {
         return {
             hallucinationGuardLevel: (hallucinationGuard.value || "none"),
-            outputMarkdownEnabled: outputMarkdown.checked
+            outputMarkdownEnabled: outputMarkdown.checked,
+            outputTone: (outputTone.value || "unspecified")
         };
     }
     function inferPromptOutputOptionDefaults(definition) {
         if (!definition) {
             return {
                 hallucinationGuard: "none",
-                outputMarkdown: false
+                outputMarkdown: false,
+                outputTone: "unspecified"
             };
         }
         const cached = promptOutputOptionDefaultsById.get(definition.id);
@@ -630,7 +635,8 @@ async function initializePromptPage() {
                     : definition.hallucinationGuard === true
                         ? "high"
                         : "none",
-                outputMarkdown: definition.outputMarkdown === true
+                outputMarkdown: definition.outputMarkdown === true,
+                outputTone: "unspecified"
             };
             promptOutputOptionDefaultsById.set(definition.id, explicitDefaults);
             return explicitDefaults;
@@ -638,7 +644,8 @@ async function initializePromptPage() {
         const originalOptions = getPromptOutputOptions();
         setPromptOutputOptions({
             hallucinationGuardLevel: "high",
-            outputMarkdownEnabled: true
+            outputMarkdownEnabled: true,
+            outputTone: "unspecified"
         });
         const argsForInference = {};
         for (const argumentDefinition of getSelectedPromptArguments(definition)) {
@@ -650,7 +657,8 @@ async function initializePromptPage() {
         const instructionProfile = inferPromptOutputInstructionProfile(body);
         const defaults = {
             hallucinationGuard: instructionProfile.hallucinationGuardMode,
-            outputMarkdown: instructionProfile.outputMarkdown
+            outputMarkdown: instructionProfile.outputMarkdown,
+            outputTone: instructionProfile.outputTone
         };
         promptOutputOptionDefaultsById.set(definition.id, defaults);
         return defaults;
@@ -659,6 +667,7 @@ async function initializePromptPage() {
         const defaults = inferPromptOutputOptionDefaults(definition);
         hallucinationGuard.value = defaults.hallucinationGuard;
         outputMarkdown.checked = defaults.outputMarkdown;
+        outputTone.value = defaults.outputTone;
     }
     function renderSelectedPromptHelp() {
         const selectedDefinition = getSelectedPromptDefinition();
@@ -817,7 +826,8 @@ async function initializePromptPage() {
         const currentOptions = getPromptOutputOptions();
         setPromptOutputOptions({
             hallucinationGuardLevel: "high",
-            outputMarkdownEnabled: true
+            outputMarkdownEnabled: true,
+            outputTone: "unspecified"
         });
         const rawBody = selectedDefinition ? selectedDefinition.buildBody(commitId, subject) : "";
         setPromptOutputOptions(currentOptions);
@@ -932,6 +942,7 @@ async function initializePromptPage() {
     }
     promptSearch.addEventListener("input", renderCandidates);
     includeLabelPrefix.addEventListener("change", updateOutput);
+    outputTone.addEventListener("change", updateOutput);
     hallucinationGuard.addEventListener("change", updateOutput);
     outputMarkdown.addEventListener("change", updateOutput);
     copyShareLinkButton.addEventListener("click", () => {

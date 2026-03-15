@@ -1,6 +1,7 @@
 type PromptOutputOptions = {
   hallucinationGuardLevel: "none" | "low" | "high";
   outputMarkdownEnabled: boolean;
+  outputTone: "unspecified" | "desumasu" | "dearu";
 };
 
 type PromptHallucinationGuardMode = "none" | "low" | "high";
@@ -8,6 +9,7 @@ type PromptHallucinationGuardMode = "none" | "low" | "high";
 type PromptOutputInstructionProfile = {
   hallucinationGuardMode: PromptHallucinationGuardMode | null;
   outputMarkdown: boolean;
+  outputTone: "unspecified" | "desumasu" | "dearu";
 };
 
 const strictHallucinationPreventionInstruction = `○ハルシネーション防止のため、次のルールに従ってください。
@@ -21,16 +23,20 @@ const softHallucinationPreventionInstruction = `○事実誤認を避けるた�
 - 出力規則: (1)根拠がある事実と、推測・評価・提案は区別して記載してください。 (2)推測や評価を書く場合は、断定を避け、根拠や前提が分かるようにしてください。 (3)不明点が残る場合は、不明のまま扱ってください。`;
 
 const markdownFenceInstruction = "○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。markdown 内に backtick による code fence が含まれる場合があるため、外側の囲みは tilde を使ってください。";
+const desumasuToneInstruction = "○文体は、です・ます調で統一してください。箇条書きは体言止めでも構いません。";
+const dearuToneInstruction = "○文体は、である調で統一してください。箇条書きは体言止めでも構いません。";
 
 let currentPromptOutputOptions: PromptOutputOptions = {
   hallucinationGuardLevel: "high",
-  outputMarkdownEnabled: true
+  outputMarkdownEnabled: true,
+  outputTone: "unspecified"
 };
 
 function setPromptOutputOptions(options: PromptOutputOptions): void {
   currentPromptOutputOptions = {
     hallucinationGuardLevel: options.hallucinationGuardLevel || "none",
-    outputMarkdownEnabled: options.outputMarkdownEnabled !== false
+    outputMarkdownEnabled: options.outputMarkdownEnabled !== false,
+    outputTone: options.outputTone || "unspecified"
   };
 }
 
@@ -38,7 +44,9 @@ function getPromptOutputInstructionTemplates() {
   return {
     strictHallucinationPreventionInstruction,
     softHallucinationPreventionInstruction,
-    markdownFenceInstruction
+    markdownFenceInstruction,
+    desumasuToneInstruction,
+    dearuToneInstruction
   };
 }
 
@@ -55,7 +63,12 @@ function inferPromptOutputInstructionProfile(body: string): PromptOutputInstruct
       : normalizedBody.includes(templates.softHallucinationPreventionInstruction)
         ? "low"
         : "none",
-    outputMarkdown: normalizedBody.includes(templates.markdownFenceInstruction)
+    outputMarkdown: normalizedBody.includes(templates.markdownFenceInstruction),
+    outputTone: normalizedBody.includes(templates.desumasuToneInstruction)
+      ? "desumasu"
+      : normalizedBody.includes(templates.dearuToneInstruction)
+        ? "dearu"
+        : "unspecified"
   };
 }
 
@@ -67,6 +80,8 @@ function stripPromptOutputInstructions(body: string): string {
   while (changed) {
     changed = false;
     for (const template of [
+      templates.dearuToneInstruction,
+      templates.desumasuToneInstruction,
       templates.markdownFenceInstruction,
       templates.strictHallucinationPreventionInstruction,
       templates.softHallucinationPreventionInstruction
@@ -103,6 +118,11 @@ function appendPromptOutputInstructions(
   }
   if (options.outputMarkdownEnabled) {
     segments.push(markdownFenceInstruction);
+  }
+  if (options.outputTone === "desumasu") {
+    segments.push(desumasuToneInstruction);
+  } else if (options.outputTone === "dearu") {
+    segments.push(dearuToneInstruction);
   }
 
   return segments.join("\n\n");
