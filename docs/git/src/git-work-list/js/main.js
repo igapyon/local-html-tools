@@ -52,6 +52,24 @@
       return value || fallbackValue;
     }
 
+    function normalizeEntryType(value) {
+      return value === "url" ? "url" : "git";
+    }
+
+    function isGitEntry(entry) {
+      return normalizeEntryType(entry?.entryType) === "git";
+    }
+
+    function isValidEntry(entry) {
+      if (!entry || !entry.repoUrl) {
+        return false;
+      }
+      if (isGitEntry(entry)) {
+        return !!(entry.baseBranch && entry.compareBranch);
+      }
+      return true;
+    }
+
     function showToast(message) {
       const toast = document.getElementById("toast");
       if (!toast || typeof toast.show !== "function") return;
@@ -123,7 +141,7 @@
         if (!Array.isArray(parsed)) return [];
         return parsed
           .map((entry) => normalizeEntry(entry))
-          .filter((entry) => entry.repoUrl && entry.baseBranch && entry.compareBranch);
+          .filter(isValidEntry);
       } catch (_) {
         return [];
       }
@@ -280,7 +298,7 @@
       return {
         entries: rawPayload.entries
           .map((entry) => normalizeEntry(entry))
-          .filter((entry) => entry.repoUrl && entry.baseBranch && entry.compareBranch),
+          .filter(isValidEntry),
         memos: normalizeMemos(rawPayload.memos || {})
       };
     }
@@ -312,16 +330,25 @@
     }
 
     function normalizeEntry(raw) {
+      const inferredEntryType = raw?.entryType
+        ? normalizeEntryType(raw?.entryType)
+        : (
+          String(raw?.baseBranch || "").trim() || String(raw?.compareBranch || "").trim()
+            ? "git"
+            : "url"
+        );
+      const entryType = normalizeEntryType(inferredEntryType);
       return {
         id: raw?.id ? String(raw.id) : createId(),
+        entryType,
         repoUrl: normalizeRepoUrl(raw?.repoUrl),
-        baseBranch: String(raw?.baseBranch || "").trim(),
+        baseBranch: entryType === "git" ? String(raw?.baseBranch || "").trim() : "",
         baseScope: normalizeScope(raw?.baseScope),
-        compareBranch: String(raw?.compareBranch || "").trim(),
+        compareBranch: entryType === "git" ? String(raw?.compareBranch || "").trim() : "",
         compareScope: normalizeScope(raw?.compareScope),
-        compareUseHead: raw?.compareUseHead === true,
+        compareUseHead: entryType === "git" && raw?.compareUseHead === true,
         locked: raw?.locked === true,
-        remoteName: String(raw?.remoteName || "origin").trim() || "origin",
+        remoteName: entryType === "git" ? (String(raw?.remoteName || "origin").trim() || "origin") : "",
         createdAt: Number(raw?.createdAt || raw?.updatedAt || Date.now()),
         updatedAt: Number(raw?.updatedAt || Date.now())
       };
@@ -344,7 +371,14 @@
     }
 
     function buildGroupKey(entry) {
+      if (!isGitEntry(entry)) {
+        return [
+          "url",
+          entry.repoUrl
+        ].join("::");
+      }
       return [
+        "git",
         entry.repoUrl,
         buildRef(entry.baseBranch, entry.baseScope, entry.remoteName)
       ].join("::");
@@ -362,6 +396,7 @@
         }
         groupedMap.set(key, {
           key,
+          entryType: entry.entryType,
           repoUrl: entry.repoUrl,
           displayName: buildDisplayName(entry),
           baseBranch: entry.baseBranch,
@@ -453,16 +488,18 @@
 
     function readFormEntry() {
       const existingEntry = entries.find((item) => item.id === editingId);
+      const entryType = normalizeEntryType(readSelectValue("entryType", existingEntry?.entryType || "git"));
       return normalizeEntry({
         id: editingId || createId(),
+        entryType,
         repoUrl: normalizeRepoUrl(readText("repoUrl")),
-        baseBranch: readText("baseBranch"),
+        baseBranch: entryType === "git" ? readText("baseBranch") : "",
         baseScope: readSelectValue("baseScope", "remote"),
-        compareBranch: readText("compareBranch"),
+        compareBranch: entryType === "git" ? readText("compareBranch") : "",
         compareScope: readSelectValue("compareScope", "local"),
         compareUseHead: false,
         locked: existingEntry?.locked === true,
-        remoteName: readText("remoteName") || "origin",
+        remoteName: entryType === "git" ? (readText("remoteName") || "origin") : "",
         createdAt: existingEntry?.createdAt || Date.now(),
         updatedAt: Date.now()
       });
@@ -473,20 +510,46 @@
         alert("リポジトリ URL を入力してください。");
         return false;
       }
-      if (!entry.baseBranch) {
+      if (isGitEntry(entry) && !entry.baseBranch) {
         alert("基準ブランチを入力してください。");
         return false;
       }
-      if (!entry.compareBranch) {
+      if (isGitEntry(entry) && !entry.compareBranch) {
         alert("比較ブランチを入力してください。");
         return false;
       }
       return true;
     }
 
+    function updateEntryTypeUi(entryType) {
+      const normalizedEntryType = normalizeEntryType(entryType);
+      const gitFields = document.getElementById("gitFields");
+      const gitRemoteField = document.getElementById("gitRemoteField");
+      const titleNode = document.getElementById("entryDialogTitle");
+      const subtitleNode = document.querySelector("#entryForm .md-dialog__subtitle");
+      if (gitFields) {
+        gitFields.classList.toggle("md-hidden", normalizedEntryType !== "git");
+      }
+      if (gitRemoteField) {
+        gitRemoteField.classList.toggle("md-hidden", normalizedEntryType !== "git");
+      }
+      if (titleNode && dialogMode === "create") {
+        titleNode.textContent = "登録";
+      }
+      if (subtitleNode) {
+        subtitleNode.textContent = normalizedEntryType === "git"
+          ? "リポジトリ URL と作業対象ブランチを入力します。"
+          : "URL とメモだけを管理する項目を登録します。";
+      }
+    }
+
     function resetForm() {
       editingId = "";
       dialogMode = "create";
+      const entryTypeField = document.getElementById("entryType");
+      if (entryTypeField) {
+        entryTypeField.value = "git";
+      }
       setText("repoUrl", "");
       updateRepoUrlLockState(false);
       setText("baseBranch", "");
@@ -502,11 +565,16 @@
       if (titleNode) {
         titleNode.textContent = "登録";
       }
+      updateEntryTypeUi("git");
     }
 
     function populateForm(entry) {
       editingId = entry.id;
       dialogMode = "edit";
+      const entryTypeField = document.getElementById("entryType");
+      if (entryTypeField) {
+        entryTypeField.value = normalizeEntryType(entry.entryType);
+      }
       setText("repoUrl", entry.repoUrl);
       updateRepoUrlLockState(!!entry.repoUrl);
       setText("baseBranch", entry.baseBranch);
@@ -522,6 +590,7 @@
       if (titleNode) {
         titleNode.textContent = "更新";
       }
+      updateEntryTypeUi(entry.entryType);
     }
 
     function openCreateDialog() {
@@ -563,6 +632,19 @@
 
     function renderGroup(group) {
       const memoPreview = group.memo.length > 16 ? `${group.memo.slice(0, 16)}...` : group.memo;
+      const baseSection = isGitEntry(group)
+        ? `
+            <section class="md-ref-box md-entry-base-box">
+              <div class="md-ref-label">基準 <span class="md-scope-badge" data-scope="${escapeHtml(group.baseScope)}">${escapeHtml(group.baseScope)}</span></div>
+              <div class="md-ref-value">${escapeHtml(buildRef(group.baseBranch, group.baseScope, group.remoteName))}</div>
+            </section>
+          `
+        : `
+            <section class="md-ref-box md-entry-base-box">
+              <div class="md-ref-label">種別</div>
+              <div class="md-ref-value">URLのみ</div>
+            </section>
+          `;
       return `
         <article class="md-entry-card md-entry-group" data-group-key="${escapeHtml(group.key)}">
           <div class="md-entry-head">
@@ -578,10 +660,7 @@
                 ${isOpenableExternalUrl(group.repoUrl) ? `<button type="button" class="md-entry-link-btn" data-action="open-repo-url" data-repo-url="${escapeHtml(group.repoUrl)}" title="URL を開く" aria-label="URL を開く">${getButtonIconSvg("open-external")}</button>` : ""}
               </div>
             </div>
-            <section class="md-ref-box md-entry-base-box">
-              <div class="md-ref-label">基準 <span class="md-scope-badge" data-scope="${escapeHtml(group.baseScope)}">${escapeHtml(group.baseScope)}</span></div>
-              <div class="md-ref-value">${escapeHtml(buildRef(group.baseBranch, group.baseScope, group.remoteName))}</div>
-            </section>
+            ${baseSection}
           </div>
           <div class="md-entry-meta">
             <div class="md-entry-divider" aria-hidden="true"></div>
@@ -684,6 +763,25 @@
     }
 
     function renderWorkRow(entry) {
+      if (!isGitEntry(entry)) {
+        return `
+          <section class="md-work-row" data-entry-id="${escapeHtml(entry.id)}">
+            <div class="md-work-row__main">
+              <div class="md-ref-box md-ref-box--work">
+                <div class="md-ref-label">${entry.locked ? `<span class="md-entry-lock-icon" aria-label="ロック中">${getButtonIconSvg("lock")}</span>` : ""}利用モード</div>
+                <div class="md-ref-value-row">
+                  <div class="md-ref-value">Git連携なし</div>
+                </div>
+              </div>
+            </div>
+            <div class="md-entry-actions md-work-row__actions">
+              <button type="button" class="md-button md-button--surface" data-action="edit-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("edit")}<span>変更</span></button>
+              <button type="button" class="md-button md-button--danger" data-action="delete-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("delete")}<span>削除</span></button>
+              <button type="button" class="md-button ${entry.locked ? "md-button--lock-active" : "md-button--surface"}" data-action="toggle-lock">${getButtonIconSvg(entry.locked ? "lock" : "unlock")}<span>${entry.locked ? "解除" : "ロック"}</span></button>
+            </div>
+          </section>
+        `;
+      }
       const workRef = buildRef(entry.compareBranch, entry.compareScope, entry.remoteName);
       return `
         <section class="md-work-row" data-entry-id="${escapeHtml(entry.id)}">
@@ -855,6 +953,12 @@
       const saveButton = document.getElementById("saveEntryBtn");
       if (saveButton) {
         saveButton.addEventListener("click", saveCurrentEntry);
+      }
+      const entryTypeField = document.getElementById("entryType");
+      if (entryTypeField) {
+        entryTypeField.addEventListener("change", () => {
+          updateEntryTypeUi(readSelectValue("entryType", "git"));
+        });
       }
       const closeButton = document.getElementById("closeDialogBtn");
       if (closeButton) {

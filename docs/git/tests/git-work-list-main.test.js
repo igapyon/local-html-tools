@@ -17,6 +17,15 @@ const mainCode = readFileSync(
 function mountDom() {
   document.body.innerHTML = `
     <button id="openCreateDialogBtn" type="button">open</button>
+    <form id="entryForm">
+      <p class="md-dialog__subtitle"></p>
+    </form>
+    <div id="gitFields"></div>
+    <div id="gitRemoteField"></div>
+    <select id="entryType">
+      <option value="git" selected>git</option>
+      <option value="url">url</option>
+    </select>
     <input id="repoUrl" value="" />
     <input id="baseBranch" value="" />
     <select id="baseScope">
@@ -152,6 +161,7 @@ describe("git-work-list main", () => {
     expect(document.getElementById("entryDialog").open).toBe(true);
     expect(document.getElementById("repoUrl").value).toBe("");
     expect(document.getElementById("repoUrl").readOnly).toBe(false);
+    expect(document.getElementById("entryType").value).toBe("git");
     expect(document.getElementById("compareScope").value).toBe("local");
     expect(document.getElementById("entryDialogTitle").textContent).toBe("登録");
   });
@@ -177,6 +187,7 @@ describe("git-work-list main", () => {
 
     window.__gitWorkListTest.openEditDialog({
       id: "entry-1",
+      entryType: "git",
       repoUrl: "https://example.com/repo-a",
       baseBranch: "main",
       baseScope: "remote",
@@ -187,7 +198,65 @@ describe("git-work-list main", () => {
 
     expect(document.getElementById("repoUrl").value).toBe("https://example.com/repo-a");
     expect(document.getElementById("repoUrl").readOnly).toBe(true);
+    expect(document.getElementById("entryType").value).toBe("git");
     expect(document.getElementById("entryDialogTitle").textContent).toBe("更新");
+  });
+
+  it("saves a url-only entry without git fields", () => {
+    bootPage();
+
+    document.getElementById("entryType").value = "url";
+    document.getElementById("entryType").dispatchEvent(new Event("change"));
+    document.getElementById("repoUrl").value = "https://example.com/docs/page";
+
+    window.__gitWorkListTest.saveCurrentEntry();
+
+    const savedEntries = getSavedJsonByKey("gitWorkList.entries");
+    expect(savedEntries).toHaveLength(1);
+    expect(savedEntries[0].entryType).toBe("url");
+    expect(savedEntries[0].baseBranch).toBe("");
+    expect(savedEntries[0].compareBranch).toBe("");
+    expect(document.getElementById("entriesList").textContent).toContain("Git連携なし");
+    expect(document.getElementById("entriesList").textContent).not.toContain("比較");
+    expect(document.getElementById("entriesList").textContent).not.toContain("Squash");
+  });
+
+  it("loads legacy entries without entryType as git entries", () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "a",
+        repoUrl: "https://example.com/repo-a",
+        baseBranch: "main",
+        baseScope: "remote",
+        compareBranch: "feature-a",
+        compareScope: "remote",
+        remoteName: "origin"
+      }
+    ]));
+
+    bootPage();
+
+    expect(document.getElementById("entriesList").textContent).toContain("比較");
+    expect(document.getElementById("entriesList").textContent).toContain("Squash");
+  });
+
+  it("keeps url-only entries visible after reload even when entryType is missing", () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "u",
+        repoUrl: "https://example.com/docs/page",
+        baseBranch: "",
+        compareBranch: ""
+      }
+    ]));
+
+    bootPage();
+
+    const entriesText = document.getElementById("entriesList").textContent;
+    expect(entriesText).toContain("page");
+    expect(entriesText).toContain("Git連携なし");
+    expect(entriesText).not.toContain("比較");
+    expect(entriesText).not.toContain("Squash");
   });
 
   it("derives display name from repository URL", () => {
