@@ -54,6 +54,10 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.md-hidden {
+  display: none !important;
+}
+
 .md-button {
   display: inline-flex;
   align-items: center;

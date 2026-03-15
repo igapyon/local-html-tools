@@ -84,10 +84,19 @@ limitations under the License.
 
         <div class="md-dialog__body md-stack-md">
           <div class="md-form-grid md-form-grid-1">
+            <lht-select-help field-id="entryType" label="種別" help-text="Git 連携を使う通常登録か、URL とメモだけを管理する登録かを選びます。">
+              <script type="application/json" slot="options">[
+                { "value": "git", "label": "Git連携あり", "selected": true },
+                { "value": "url", "label": "URLのみ" }
+              ]</script>
+            </lht-select-help>
+          </div>
+
+          <div class="md-form-grid md-form-grid-1">
             <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" required placeholder="例: https://github.com/igapyon/local-html-tools" help-text="リポジトリを識別する URL や clone URL を入力します。HTTPS / SSH / ローカルパスのどれでも構いません。表示名は URL の末尾から自動で組み立てます。"></lht-text-field-help>
           </div>
 
-          <div class="md-form-grid md-form-grid-4">
+          <div id="gitFields" class="md-form-grid md-form-grid-4">
             <lht-text-field-help field-id="baseBranch" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。"></lht-text-field-help>
             <lht-select-help field-id="baseScope" label="基準の扱い" help-text="基準ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
               <script type="application/json" slot="options">[
@@ -104,7 +113,7 @@ limitations under the License.
             </lht-select-help>
           </div>
 
-          <div class="md-form-grid md-form-grid-1">
+          <div id="gitRemoteField" class="md-form-grid md-form-grid-1">
             <lht-text-field-help field-id="remoteName" label="リモート名" placeholder="例: origin" value="origin" help-text="remote 扱いのブランチ参照に使うリモート名です。通常は origin です。"></lht-text-field-help>
           </div>
         </div>
