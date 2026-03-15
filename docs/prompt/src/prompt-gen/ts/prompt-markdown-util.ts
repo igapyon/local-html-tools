@@ -3,6 +3,11 @@ type PromptOutputOptions = {
   outputMarkdownEnabled: boolean;
   outputTone: "unspecified" | "desumasu" | "dearu";
   selfReview: "unspecified" | "internal" | "report";
+  misleadingExpressionReview: "unspecified" | "internal" | "report";
+  considerationRiskReview: "unspecified" | "internal" | "report";
+  discomfortRiskReview: "unspecified" | "internal" | "report";
+  aggressiveExpressionReview: "unspecified" | "internal" | "report";
+  sensitiveExpressionReview: "unspecified" | "internal" | "report";
 };
 
 type PromptHallucinationGuardMode = "none" | "low" | "high";
@@ -12,6 +17,11 @@ type PromptOutputInstructionProfile = {
   outputMarkdown: boolean;
   outputTone: "unspecified" | "desumasu" | "dearu";
   selfReview: "unspecified" | "internal" | "report";
+  misleadingExpressionReview: "unspecified" | "internal" | "report";
+  considerationRiskReview: "unspecified" | "internal" | "report";
+  discomfortRiskReview: "unspecified" | "internal" | "report";
+  aggressiveExpressionReview: "unspecified" | "internal" | "report";
+  sensitiveExpressionReview: "unspecified" | "internal" | "report";
 };
 
 const strictHallucinationPreventionInstruction = `○ハルシネーション防止のため、次のルールに従ってください。
@@ -36,12 +46,62 @@ const reportedSelfReviewInstruction = `○回答案を作成したあと、第�
 - 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
 - 最終回答の末尾に \`自己レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
 - 自己レビューの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalMisleadingExpressionReviewInstruction = `○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。
+- 読み手が別の意味に受け取りそうな表現、主語や対象が曖昧な表現、断定が強すぎる表現があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedMisleadingExpressionReviewInstruction = `○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。
+- 読み手が別の意味に受け取りそうな表現、主語や対象が曖昧な表現、断定が強すぎる表現があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`誤解表現レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalConsiderationRiskReviewInstruction = `○回答案を作成したあと、配慮不足リスクがないかを観点として見直してください。
+- 相手や状況への配慮が不足して見える表現、断定的すぎる言い回し、受け手への負荷が高い表現があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedConsiderationRiskReviewInstruction = `○回答案を作成したあと、配慮不足リスクがないかを観点として見直してください。
+- 相手や状況への配慮が不足して見える表現、断定的すぎる言い回し、受け手への負荷が高い表現があれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`配慮不足レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalDiscomfortRiskReviewInstruction = `○回答案を作成したあと、不快感リスクがないかを観点として見直してください。
+- 読み手に不快感を与えやすい表現、不要にきつい語調、印象を悪くしやすい言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedDiscomfortRiskReviewInstruction = `○回答案を作成したあと、不快感リスクがないかを観点として見直してください。
+- 読み手に不快感を与えやすい表現、不要にきつい語調、印象を悪くしやすい言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`不快感レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalAggressiveExpressionReviewInstruction = `○回答案を作成したあと、攻撃的な表現がないかを観点として見直してください。
+- 相手を責めるように読める表現、強すぎる否定、対立を unnecessary に強める言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedAggressiveExpressionReviewInstruction = `○回答案を作成したあと、攻撃的な表現がないかを観点として見直してください。
+- 相手を責めるように読める表現、強すぎる否定、対立を unnecessary に強める言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`攻撃性レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const internalSensitiveExpressionReviewInstruction = `○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。
+- 読み手によっては慎重な扱いが必要な表現、センシティブな話題への不用意な言及、配慮不足に見える言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 見直しの途中経過や思考過程は出力しないでください。`;
+const reportedSensitiveExpressionReviewInstruction = `○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。
+- 読み手によっては慎重な扱いが必要な表現、センシティブな話題への不用意な言及、配慮不足に見える言い回しがあれば修正してください。
+- 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
+- 最終回答の末尾に \`センシティブ表現レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
+- 見直しの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
 
 let currentPromptOutputOptions: PromptOutputOptions = {
   hallucinationGuardLevel: "high",
   outputMarkdownEnabled: true,
   outputTone: "unspecified",
-  selfReview: "unspecified"
+  selfReview: "unspecified",
+  misleadingExpressionReview: "unspecified",
+  considerationRiskReview: "unspecified",
+  discomfortRiskReview: "unspecified",
+  aggressiveExpressionReview: "unspecified",
+  sensitiveExpressionReview: "unspecified"
 };
 
 function setPromptOutputOptions(options: PromptOutputOptions): void {
@@ -49,7 +109,12 @@ function setPromptOutputOptions(options: PromptOutputOptions): void {
     hallucinationGuardLevel: options.hallucinationGuardLevel || "none",
     outputMarkdownEnabled: options.outputMarkdownEnabled !== false,
     outputTone: options.outputTone || "unspecified",
-    selfReview: options.selfReview || "unspecified"
+    selfReview: options.selfReview || "unspecified",
+    misleadingExpressionReview: options.misleadingExpressionReview || "unspecified",
+    considerationRiskReview: options.considerationRiskReview || "unspecified",
+    discomfortRiskReview: options.discomfortRiskReview || "unspecified",
+    aggressiveExpressionReview: options.aggressiveExpressionReview || "unspecified",
+    sensitiveExpressionReview: options.sensitiveExpressionReview || "unspecified"
   };
 }
 
@@ -61,7 +126,17 @@ function getPromptOutputInstructionTemplates() {
     desumasuToneInstruction,
     dearuToneInstruction,
     internalSelfReviewInstruction,
-    reportedSelfReviewInstruction
+    reportedSelfReviewInstruction,
+    internalMisleadingExpressionReviewInstruction,
+    reportedMisleadingExpressionReviewInstruction,
+    internalConsiderationRiskReviewInstruction,
+    reportedConsiderationRiskReviewInstruction,
+    internalDiscomfortRiskReviewInstruction,
+    reportedDiscomfortRiskReviewInstruction,
+    internalAggressiveExpressionReviewInstruction,
+    reportedAggressiveExpressionReviewInstruction,
+    internalSensitiveExpressionReviewInstruction,
+    reportedSensitiveExpressionReviewInstruction
   };
 }
 
@@ -88,6 +163,31 @@ function inferPromptOutputInstructionProfile(body: string): PromptOutputInstruct
       ? "report"
       : normalizedBody.includes(templates.internalSelfReviewInstruction)
         ? "internal"
+        : "unspecified",
+    misleadingExpressionReview: normalizedBody.includes(templates.reportedMisleadingExpressionReviewInstruction)
+      ? "report"
+      : normalizedBody.includes(templates.internalMisleadingExpressionReviewInstruction)
+        ? "internal"
+        : "unspecified",
+    considerationRiskReview: normalizedBody.includes(templates.reportedConsiderationRiskReviewInstruction)
+      ? "report"
+      : normalizedBody.includes(templates.internalConsiderationRiskReviewInstruction)
+        ? "internal"
+        : "unspecified",
+    discomfortRiskReview: normalizedBody.includes(templates.reportedDiscomfortRiskReviewInstruction)
+      ? "report"
+      : normalizedBody.includes(templates.internalDiscomfortRiskReviewInstruction)
+        ? "internal"
+        : "unspecified",
+    aggressiveExpressionReview: normalizedBody.includes(templates.reportedAggressiveExpressionReviewInstruction)
+      ? "report"
+      : normalizedBody.includes(templates.internalAggressiveExpressionReviewInstruction)
+        ? "internal"
+        : "unspecified",
+    sensitiveExpressionReview: normalizedBody.includes(templates.reportedSensitiveExpressionReviewInstruction)
+      ? "report"
+      : normalizedBody.includes(templates.internalSensitiveExpressionReviewInstruction)
+        ? "internal"
         : "unspecified"
   };
 }
@@ -100,13 +200,23 @@ function stripPromptOutputInstructions(body: string): string {
   while (changed) {
     changed = false;
     for (const template of [
+      templates.reportedSensitiveExpressionReviewInstruction,
+      templates.internalSensitiveExpressionReviewInstruction,
+      templates.reportedAggressiveExpressionReviewInstruction,
+      templates.internalAggressiveExpressionReviewInstruction,
+      templates.reportedDiscomfortRiskReviewInstruction,
+      templates.internalDiscomfortRiskReviewInstruction,
+      templates.reportedConsiderationRiskReviewInstruction,
+      templates.internalConsiderationRiskReviewInstruction,
+      templates.reportedMisleadingExpressionReviewInstruction,
+      templates.internalMisleadingExpressionReviewInstruction,
       templates.reportedSelfReviewInstruction,
       templates.internalSelfReviewInstruction,
+      templates.strictHallucinationPreventionInstruction,
+      templates.softHallucinationPreventionInstruction,
       templates.dearuToneInstruction,
       templates.desumasuToneInstruction,
       templates.markdownFenceInstruction,
-      templates.strictHallucinationPreventionInstruction,
-      templates.softHallucinationPreventionInstruction
     ]) {
       if (!template || !normalizedBody.endsWith(template)) {
         continue;
@@ -131,13 +241,6 @@ function appendPromptOutputInstructions(
 
   const segments = [normalizedBody];
 
-  if (options.hallucinationGuardLevel !== "none") {
-    segments.push(
-      (options.hallucinationGuardLevel || hallucinationGuardMode) === "low"
-        ? softHallucinationPreventionInstruction
-        : strictHallucinationPreventionInstruction
-    );
-  }
   if (options.outputMarkdownEnabled) {
     segments.push(markdownFenceInstruction);
   }
@@ -146,10 +249,42 @@ function appendPromptOutputInstructions(
   } else if (options.outputTone === "dearu") {
     segments.push(dearuToneInstruction);
   }
+  if (options.hallucinationGuardLevel !== "none") {
+    segments.push(
+      (options.hallucinationGuardLevel || hallucinationGuardMode) === "low"
+        ? softHallucinationPreventionInstruction
+        : strictHallucinationPreventionInstruction
+    );
+  }
   if (options.selfReview === "internal") {
     segments.push(internalSelfReviewInstruction);
   } else if (options.selfReview === "report") {
     segments.push(reportedSelfReviewInstruction);
+  }
+  if (options.misleadingExpressionReview === "internal") {
+    segments.push(internalMisleadingExpressionReviewInstruction);
+  } else if (options.misleadingExpressionReview === "report") {
+    segments.push(reportedMisleadingExpressionReviewInstruction);
+  }
+  if (options.considerationRiskReview === "internal") {
+    segments.push(internalConsiderationRiskReviewInstruction);
+  } else if (options.considerationRiskReview === "report") {
+    segments.push(reportedConsiderationRiskReviewInstruction);
+  }
+  if (options.discomfortRiskReview === "internal") {
+    segments.push(internalDiscomfortRiskReviewInstruction);
+  } else if (options.discomfortRiskReview === "report") {
+    segments.push(reportedDiscomfortRiskReviewInstruction);
+  }
+  if (options.aggressiveExpressionReview === "internal") {
+    segments.push(internalAggressiveExpressionReviewInstruction);
+  } else if (options.aggressiveExpressionReview === "report") {
+    segments.push(reportedAggressiveExpressionReviewInstruction);
+  }
+  if (options.sensitiveExpressionReview === "internal") {
+    segments.push(internalSensitiveExpressionReviewInstruction);
+  } else if (options.sensitiveExpressionReview === "report") {
+    segments.push(reportedSensitiveExpressionReviewInstruction);
   }
 
   return segments.join("\n\n");

@@ -137,7 +137,6 @@ function mountPromptDom() {
       <p id="promptOutputTitle">生成結果</p>
       <div id="promptOutputHelp"></div>
     </div>
-    <input id="includeLabelPrefix" type="checkbox" />
     <select id="outputTone">
       <option value="unspecified">無指定</option>
       <option value="desumasu">です・ます調</option>
@@ -149,9 +148,34 @@ function mountPromptDom() {
       <option value="report">レビュー結果出力</option>
     </select>
     <select id="hallucinationGuard">
-      <option value="none">なし</option>
+      <option value="none">無指定</option>
       <option value="low">弱</option>
       <option value="high">強</option>
+    </select>
+    <select id="misleadingExpressionReview">
+      <option value="unspecified">無指定</option>
+      <option value="internal">内部レビュー</option>
+      <option value="report">レビュー結果出力</option>
+    </select>
+    <select id="considerationRiskReview">
+      <option value="unspecified">無指定</option>
+      <option value="internal">内部レビュー</option>
+      <option value="report">レビュー結果出力</option>
+    </select>
+    <select id="discomfortRiskReview">
+      <option value="unspecified">無指定</option>
+      <option value="internal">内部レビュー</option>
+      <option value="report">レビュー結果出力</option>
+    </select>
+    <select id="aggressiveExpressionReview">
+      <option value="unspecified">無指定</option>
+      <option value="internal">内部レビュー</option>
+      <option value="report">レビュー結果出力</option>
+    </select>
+    <select id="sensitiveExpressionReview">
+      <option value="unspecified">無指定</option>
+      <option value="internal">内部レビュー</option>
+      <option value="report">レビュー結果出力</option>
     </select>
     <input id="outputMarkdown" type="checkbox" />
     <button id="copyShareLinkButton" type="button"></button>
@@ -309,12 +333,22 @@ describe("prompt-gen main", () => {
     const outputTone = document.getElementById("outputTone");
     const selfReview = document.getElementById("selfReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const misleadingExpressionReview = document.getElementById("misleadingExpressionReview");
+    const considerationRiskReview = document.getElementById("considerationRiskReview");
+    const discomfortRiskReview = document.getElementById("discomfortRiskReview");
+    const aggressiveExpressionReview = document.getElementById("aggressiveExpressionReview");
+    const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview");
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
     expect(outputTone.value).toBe("unspecified");
     expect(selfReview.value).toBe("unspecified");
     expect(hallucinationGuard.value).toBe("high");
+    expect(misleadingExpressionReview.value).toBe("unspecified");
+    expect(considerationRiskReview.value).toBe("unspecified");
+    expect(discomfortRiskReview.value).toBe("unspecified");
+    expect(aggressiveExpressionReview.value).toBe("unspecified");
+    expect(sensitiveExpressionReview.value).toBe("unspecified");
     expect(outputMarkdown.checked).toBe(true);
     expect(promptOutput.textContent).toContain("○ハルシネーション防止のため");
     expect(promptOutput.textContent).toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
@@ -326,6 +360,11 @@ describe("prompt-gen main", () => {
     const outputTone = document.getElementById("outputTone");
     const selfReview = document.getElementById("selfReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const misleadingExpressionReview = document.getElementById("misleadingExpressionReview");
+    const considerationRiskReview = document.getElementById("considerationRiskReview");
+    const discomfortRiskReview = document.getElementById("discomfortRiskReview");
+    const aggressiveExpressionReview = document.getElementById("aggressiveExpressionReview");
+    const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview");
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
@@ -335,6 +374,16 @@ describe("prompt-gen main", () => {
     selfReview.dispatchEvent(new Event("change"));
     hallucinationGuard.value = "none";
     hallucinationGuard.dispatchEvent(new Event("change"));
+    misleadingExpressionReview.value = "internal";
+    misleadingExpressionReview.dispatchEvent(new Event("change"));
+    considerationRiskReview.value = "report";
+    considerationRiskReview.dispatchEvent(new Event("change"));
+    discomfortRiskReview.value = "internal";
+    discomfortRiskReview.dispatchEvent(new Event("change"));
+    aggressiveExpressionReview.value = "report";
+    aggressiveExpressionReview.dispatchEvent(new Event("change"));
+    sensitiveExpressionReview.value = "internal";
+    sensitiveExpressionReview.dispatchEvent(new Event("change"));
     outputMarkdown.checked = false;
     outputMarkdown.dispatchEvent(new Event("change"));
 
@@ -343,6 +392,23 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("○文体は、である調で統一してください。箇条書きは体言止めでも構いません。");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。");
     expect(promptOutput.textContent).toContain("`自己レビュー` セクション");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。");
+    expect(promptOutput.textContent).toContain("`配慮不足レビュー` セクション");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、不快感リスクがないかを観点として見直してください。");
+    expect(promptOutput.textContent).toContain("`攻撃性レビュー` セクション");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。");
+    expect(promptOutput.textContent.indexOf("○文体は、である調で統一してください。箇条書きは体言止めでも構いません。"))
+      .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。"));
+    expect(promptOutput.textContent.indexOf("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。"))
+      .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。"));
+    expect(promptOutput.textContent.indexOf("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。"))
+      .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、配慮不足リスクがないかを観点として見直してください。"));
+    expect(promptOutput.textContent.indexOf("○回答案を作成したあと、配慮不足リスクがないかを観点として見直してください。"))
+      .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、不快感リスクがないかを観点として見直してください。"));
+    expect(promptOutput.textContent.indexOf("○回答案を作成したあと、不快感リスクがないかを観点として見直してください。"))
+      .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、攻撃的な表現がないかを観点として見直してください。"));
+    expect(promptOutput.textContent.indexOf("○回答案を作成したあと、攻撃的な表現がないかを観点として見直してください。"))
+      .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。"));
   });
 
   it("resets output options to prompt defaults when switching prompts", async () => {
@@ -352,6 +418,11 @@ describe("prompt-gen main", () => {
     const outputTone = document.getElementById("outputTone");
     const selfReview = document.getElementById("selfReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const misleadingExpressionReview = document.getElementById("misleadingExpressionReview");
+    const considerationRiskReview = document.getElementById("considerationRiskReview");
+    const discomfortRiskReview = document.getElementById("discomfortRiskReview");
+    const aggressiveExpressionReview = document.getElementById("aggressiveExpressionReview");
+    const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview");
     const outputMarkdown = document.getElementById("outputMarkdown");
 
     promptSearch.value = "A501";
@@ -362,6 +433,16 @@ describe("prompt-gen main", () => {
     selfReview.dispatchEvent(new Event("change"));
     hallucinationGuard.value = "none";
     hallucinationGuard.dispatchEvent(new Event("change"));
+    misleadingExpressionReview.value = "internal";
+    misleadingExpressionReview.dispatchEvent(new Event("change"));
+    considerationRiskReview.value = "report";
+    considerationRiskReview.dispatchEvent(new Event("change"));
+    discomfortRiskReview.value = "internal";
+    discomfortRiskReview.dispatchEvent(new Event("change"));
+    aggressiveExpressionReview.value = "report";
+    aggressiveExpressionReview.dispatchEvent(new Event("change"));
+    sensitiveExpressionReview.value = "internal";
+    sensitiveExpressionReview.dispatchEvent(new Event("change"));
     outputMarkdown.checked = false;
     outputMarkdown.dispatchEvent(new Event("change"));
 
@@ -373,6 +454,11 @@ describe("prompt-gen main", () => {
     expect(outputTone.value).toBe("unspecified");
     expect(selfReview.value).toBe("unspecified");
     expect(hallucinationGuard.value).toBe("high");
+    expect(misleadingExpressionReview.value).toBe("unspecified");
+    expect(considerationRiskReview.value).toBe("unspecified");
+    expect(discomfortRiskReview.value).toBe("unspecified");
+    expect(aggressiveExpressionReview.value).toBe("unspecified");
+    expect(sensitiveExpressionReview.value).toBe("unspecified");
     expect(outputMarkdown.checked).toBe(true);
   });
 
@@ -382,12 +468,22 @@ describe("prompt-gen main", () => {
     const outputTone = document.getElementById("outputTone");
     const selfReview = document.getElementById("selfReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const misleadingExpressionReview = document.getElementById("misleadingExpressionReview");
+    const considerationRiskReview = document.getElementById("considerationRiskReview");
+    const discomfortRiskReview = document.getElementById("discomfortRiskReview");
+    const aggressiveExpressionReview = document.getElementById("aggressiveExpressionReview");
+    const sensitiveExpressionReview = document.getElementById("sensitiveExpressionReview");
     const outputMarkdown = document.getElementById("outputMarkdown");
     const promptOutput = document.getElementById("promptOutput");
 
     expect(outputTone.value).toBe("unspecified");
     expect(selfReview.value).toBe("unspecified");
     expect(hallucinationGuard.value).toBe("none");
+    expect(misleadingExpressionReview.value).toBe("unspecified");
+    expect(considerationRiskReview.value).toBe("unspecified");
+    expect(discomfortRiskReview.value).toBe("unspecified");
+    expect(aggressiveExpressionReview.value).toBe("unspecified");
+    expect(sensitiveExpressionReview.value).toBe("unspecified");
     expect(outputMarkdown.checked).toBe(false);
     expect(promptOutput.textContent).not.toContain("○ハルシネーション防止のため");
     expect(promptOutput.textContent).not.toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
@@ -398,6 +494,16 @@ describe("prompt-gen main", () => {
     selfReview.dispatchEvent(new Event("change"));
     hallucinationGuard.value = "high";
     hallucinationGuard.dispatchEvent(new Event("change"));
+    misleadingExpressionReview.value = "internal";
+    misleadingExpressionReview.dispatchEvent(new Event("change"));
+    considerationRiskReview.value = "internal";
+    considerationRiskReview.dispatchEvent(new Event("change"));
+    discomfortRiskReview.value = "internal";
+    discomfortRiskReview.dispatchEvent(new Event("change"));
+    aggressiveExpressionReview.value = "internal";
+    aggressiveExpressionReview.dispatchEvent(new Event("change"));
+    sensitiveExpressionReview.value = "internal";
+    sensitiveExpressionReview.dispatchEvent(new Event("change"));
     outputMarkdown.checked = true;
     outputMarkdown.dispatchEvent(new Event("change"));
 
@@ -406,6 +512,16 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("○文体は、です・ます調で統一してください。箇条書きは体言止めでも構いません。");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。");
     expect(promptOutput.textContent).not.toContain("`自己レビュー` セクション");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、配慮不足リスクがないかを観点として見直してください。");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、不快感リスクがないかを観点として見直してください。");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、攻撃的な表現がないかを観点として見直してください。");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、センシティブな表現がないかを観点として見直してください。");
+    expect(promptOutput.textContent).not.toContain("`誤解表現レビュー` セクション");
+    expect(promptOutput.textContent).not.toContain("`配慮不足レビュー` セクション");
+    expect(promptOutput.textContent).not.toContain("`不快感レビュー` セクション");
+    expect(promptOutput.textContent).not.toContain("`攻撃性レビュー` セクション");
+    expect(promptOutput.textContent).not.toContain("`センシティブ表現レビュー` セクション");
   });
 
   it("uses docs as the default docs path for A150", async () => {
@@ -541,11 +657,10 @@ describe("prompt-gen main", () => {
     expect(gitPseudoSquashLink.classList.contains("md-hidden")).toBe(true);
   });
 
-  it("adds label prefix for fixed prompt when switch is enabled", async () => {
+  it("keeps fixed prompt output as body text without a label prefix option", async () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
-    const includeLabelPrefix = document.getElementById("includeLabelPrefix");
     const promptArgsSection = document.getElementById("promptArgsSection");
     const promptOutput = document.getElementById("promptOutput");
 
@@ -556,13 +671,6 @@ describe("prompt-gen main", () => {
     expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
     expect(promptOutput.textContent).toBe(
       "このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
-    );
-
-    includeLabelPrefix.checked = true;
-    includeLabelPrefix.dispatchEvent(new Event("change"));
-
-    expect(promptOutput.textContent).toBe(
-      "[A701: Single-file Web App の維持] このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
     );
   });
 

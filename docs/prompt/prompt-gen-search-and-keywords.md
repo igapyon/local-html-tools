@@ -113,8 +113,7 @@
 
 - 出力は `buildBody(commitId)` の結果をもとに生成する
 - `requiresCommitId` が必要な候補では、commit ID が空の間は本文が空のままになることがある
-- `includeLabelPrefix` が ON のときは、先頭に `[label] ` を付与する
-- `includeLabelPrefix` の切替や commit ID の変更は、その場で出力へ反映する
+- commit ID の変更は、その場で出力へ反映する
 
 ### コピーの挙動
 
