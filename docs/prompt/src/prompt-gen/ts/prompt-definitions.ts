@@ -37,7 +37,11 @@ const promptDefinitions: PromptDefinition[] = [
     keywords: ["pr", "pull request", "github pr", "markdown", "tilde", "pr作成依頼", "prタイトル", "pr本文", "文面", "作成", "github", "ぷるりく", "ぴーあーる", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
     requiresCommitId: true,
     buildBody: (commitId: string) => commitId
-      ? appendMarkdownFenceInstruction(`対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文を出力してください。`)
+      ? `対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文を出力してください。
+
+${getStrictHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
       : ""
   },
   {
@@ -46,7 +50,11 @@ const promptDefinitions: PromptDefinition[] = [
     keywords: ["release", "github release", "release notes", "github", "markdown", "tilde", "リリース", "release文面", "release本文", "文面", "作成", "りりーす", "りりーすのーと", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
     requiresCommitId: true,
     buildBody: (commitId: string) => commitId
-      ? appendMarkdownFenceInstruction(`${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文を作成してください。`)
+      ? `${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文を作成してください。
+
+${getStrictHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
       : ""
   },
   {
@@ -68,35 +76,81 @@ const promptDefinitions: PromptDefinition[] = [
     label: "352: Excel貼り付けをMarkdown化",
     keywords: ["excel", "spreadsheet", "sheet", "table", "markdown", "excel to markdown", "excel貼り付け", "excelシート", "表", "表変換", "markdown化", "スプレッドシート", "えくせる", "しーと", "ひょう", "まーくだうんか", "すぷれっどしーと"],
     requiresCommitId: false,
-    buildBody: () => appendMarkdownFenceInstruction("これから与えるテキストは、Excel シートをコピーして得られた内容である可能性が高いものとして扱ってください。その前提で、行と列、見出し、注記、空欄、表のまとまりをできるだけ読み取り、Markdown 形式へ変換してください。\n\nまずは Excel の表構造を推定し、表として表現するのが自然な部分は Markdown の表として整形してください。表ではなく見出し、注記、備考、補足説明として扱うほうが自然な部分は、Markdown の見出しや箇条書きとして整理してください。内容を勝手に補完したり、元にない値を追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。\n\n単なるプレーンテキスト化ではなく、「Excel シートを人が Markdown へ移したらどう整理するか」を意識して、読みやすく整形してください。ただし、元の構造を不必要に作り変えすぎないでください。")
+    buildBody: () => `これから与えるテキストは、Excel シートをコピーして得られた内容である可能性が高いものとして扱ってください。その前提で、行と列、見出し、注記、空欄、表のまとまりをできるだけ読み取り、Markdown 形式へ変換してください。
+
+まずは Excel の表構造を推定し、表として表現するのが自然な部分は Markdown の表として整形してください。表ではなく見出し、注記、備考、補足説明として扱うほうが自然な部分は、Markdown の見出しや箇条書きとして整理してください。内容を勝手に補完したり、元にない値を追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。
+
+単なるプレーンテキスト化ではなく、「Excel シートを人が Markdown へ移したらどう整理するか」を意識して、読みやすく整形してください。ただし、元の構造を不必要に作り変えすぎないでください。
+
+${getSoftHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "word-attachment-to-markdown-request",
     label: "353: Word添付ファイルをMarkdown化",
     keywords: ["word", "doc", "docx", "document", "markdown", "word to markdown", "word添付", "word文書", "ワード", "文書", "段落", "見出し", "markdown化", "わーど", "ぶんしょ", "だんらく", "みだし", "まーくだうんか"],
     requiresCommitId: false,
-    buildBody: () => appendMarkdownFenceInstruction("これから与える内容は、Word の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、注記、備考、補足説明などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。\n\nまずは Word 文書の構造を推定し、見出しとして扱うのが自然な部分は Markdown の見出しとして整理してください。箇条書き、段落、表、注記は、それぞれ Markdown で自然な形式へ変換してください。単なるプレーンテキスト化ではなく、「Word 文書を人が Markdown 文書へ移したらどう整理するか」を意識して、読みやすく整形してください。\n\n内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。元の文書構造を尊重しつつ、Markdown として保守しやすい形へ整えてください。")
+    buildBody: () => `これから与える内容は、Word の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、注記、備考、補足説明などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。
+
+まずは Word 文書の構造を推定し、見出しとして扱うのが自然な部分は Markdown の見出しとして整理してください。箇条書き、段落、表、注記は、それぞれ Markdown で自然な形式へ変換してください。単なるプレーンテキスト化ではなく、「Word 文書を人が Markdown 文書へ移したらどう整理するか」を意識して、読みやすく整形してください。
+
+内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。元の文書構造を尊重しつつ、Markdown として保守しやすい形へ整えてください。
+
+${getSoftHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "pdf-attachment-to-markdown-request",
     label: "354: PDF添付ファイルをMarkdown化",
     keywords: ["pdf", "document", "markdown", "pdf to markdown", "pdf添付", "pdf文書", "PDF", "文書", "見出し", "段組み", "ページ番号", "ヘッダー", "フッター", "markdown化", "ぴーでぃーえふ", "ぶんしょ", "みだし", "だんぐみ", "ぺーじばんごう", "へっだー", "ふったー", "まーくだうんか"],
     requiresCommitId: false,
-    buildBody: () => appendMarkdownFenceInstruction("これから与える内容は、PDF の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、図表説明、注記、備考などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。\n\nPDF では見た目上の改行や段組み、ページ番号、ヘッダー、フッター、脚注などがノイズとして混ざることがあるため、単なる行単位の転記ではなく、文書として自然な読み順を推定して整理してください。表として扱うのが自然な部分は Markdown の表として整形し、見出しや本文、箇条書き、注記は Markdown として自然な形式へ整理してください。\n\n内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。PDF 由来のレイアウトノイズは落として構いませんが、意味のある内容は失わないようにしてください。")
+    buildBody: () => `これから与える内容は、PDF の添付ファイルまたはそこから得られた内容である可能性が高いものとして扱ってください。その前提で、見出し階層、段落、箇条書き、表、図表説明、注記、備考などの文書構造をできるだけ読み取り、Markdown 形式へ変換してください。
+
+PDF では見た目上の改行や段組み、ページ番号、ヘッダー、フッター、脚注などがノイズとして混ざることがあるため、単なる行単位の転記ではなく、文書として自然な読み順を推定して整理してください。表として扱うのが自然な部分は Markdown の表として整形し、見出しや本文、箇条書き、注記は Markdown として自然な形式へ整理してください。
+
+内容を勝手に補完したり、元にない値や見出しを追加したりしてはいけません。解釈に自信がない箇所は、推測で埋めず、そのまま分かる形で残してください。PDF 由来のレイアウトノイズは落として構いませんが、意味のある内容は失わないようにしてください。
+
+${getSoftHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "image-attachment-to-markdown-description-request",
     label: "355: 画像添付ファイルをMarkdownで記述",
     keywords: ["image", "image attachment", "picture", "screenshot", "diagram", "illustration", "markdown", "image to markdown", "画像", "画像添付", "スクリーンショット", "図", "絵", "図解", "内容記述", "markdown記述", "がぞう", "すくりーんしょっと", "ず", "え", "ずかい", "きじゅつ", "まーくだうんきじゅつ"],
     requiresCommitId: false,
-    buildBody: () => appendMarkdownFenceInstruction("これから与える添付ファイルは、画像ファイルとして扱ってください。その画像に写っている内容を観察し、Markdown 形式で記述してください。\n\n画像内に文字、見出し、箇条書き、表、注記があれば、できるだけ読み取って Markdown として整理してください。文字以外にも、絵、図、矢印、囲み、人物、物体、配置関係などに意味がある場合は、その内容や関係が分かるように Markdown で補足してください。\n\n画像内の内容が文書とは限らず、絵や図、写真、模式図、スクリーンショット、手書きメモである可能性も考慮してください。文字情報だけに限定せず、「画像として何が表現されているか」を記述してください。\n\n内容を勝手に補完したり、元にない情報を断定的に追加したりしてはいけません。何が写っているか判断しきれない箇所、文字として判読できない箇所、意味が特定できない要素は、推測で埋めず、不明・判読困難・識別困難などと明示してください。\n\n単なる OCR の羅列ではなく、画像に含まれる情報を人が Markdown 文書として記録するならどう整理するかを意識して、読みやすく整形してください。")
+    buildBody: () => `これから与える添付ファイルは、画像ファイルとして扱ってください。その画像に写っている内容を観察し、Markdown 形式で記述してください。
+
+画像内に文字、見出し、箇条書き、表、注記があれば、できるだけ読み取って Markdown として整理してください。文字以外にも、絵、図、矢印、囲み、人物、物体、配置関係などに意味がある場合は、その内容や関係が分かるように Markdown で補足してください。
+
+画像内の内容が文書とは限らず、絵や図、写真、模式図、スクリーンショット、手書きメモである可能性も考慮してください。文字情報だけに限定せず、「画像として何が表現されているか」を記述してください。
+
+内容を勝手に補完したり、元にない情報を断定的に追加したりしてはいけません。何が写っているか判断しきれない箇所、文字として判読できない箇所、意味が特定できない要素は、推測で埋めず、不明・判読困難・識別困難などと明示してください。
+
+単なる OCR の羅列ではなく、画像に含まれる情報を人が Markdown 文書として記録するならどう整理するかを意識して、読みやすく整形してください。
+
+${getSoftHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "multiple-sources-to-consistent-markdown-request",
     label: "356: 複数情報を整合させてMarkdown化",
     keywords: ["multiple sources", "multiple markdown", "merge markdown", "consistent markdown", "integrate markdown", "markdown", "複数情報", "複数markdown", "統合", "整合", "矛盾整理", "表現ゆれ", "markdown統合", "markdown化", "ふくすうじょうほう", "とうごう", "せいごう", "むじゅんせいり", "ひょうげんゆれ", "まーくだうんとうごう", "まーくだうんか"],
     requiresCommitId: false,
-    buildBody: () => appendMarkdownFenceInstruction("これから複数の情報を渡します。主に markdown 形式の資料である可能性が高いものとして扱ってください。これらの内容を突き合わせ、重複、矛盾、表現ゆれ、粒度差をできるだけ整理したうえで、整合性のある一つの markdown 文書としてまとめてください。\n\n単に各資料を順番に連結するのではなく、内容の意味を見て統合してください。重複する説明はまとめ、表現が揺れている箇所は文脈上もっとも自然な形へ寄せてください。資料間で矛盾している箇所がある場合は、勝手に断定せず、その矛盾が分かる形で整理してください。判断に十分な根拠がない場合は、無理に一つへ決め打ちしないでください。\n\n元の情報に含まれていない新しい事実を補完してはいけません。ただし、見出しの再配置、段落の整理、箇条書き化、順序調整など、読みやすくするための再構成は行って構いません。必要に応じて、見出し、箇条書き、表を用いて、保守しやすい markdown として整理してください。\n\nもし入力が完全には整合しない場合は、統合結果に加えて、未解決の矛盾点や解釈が分かれうる点が分かるように残してください。")
+    buildBody: () => `これから複数の情報を渡します。主に markdown 形式の資料である可能性が高いものとして扱ってください。これらの内容を突き合わせ、重複、矛盾、表現ゆれ、粒度差をできるだけ整理したうえで、整合性のある一つの markdown 文書としてまとめてください。
+
+単に各資料を順番に連結するのではなく、内容の意味を見て統合してください。重複する説明はまとめ、表現が揺れている箇所は文脈上もっとも自然な形へ寄せてください。資料間で矛盾している箇所がある場合は、勝手に断定せず、その矛盾が分かる形で整理してください。判断に十分な根拠がない場合は、無理に一つへ決め打ちしないでください。
+
+元の情報に含まれていない新しい事実を補完してはいけません。ただし、見出しの再配置、段落の整理、箇条書き化、順序調整など、読みやすくするための再構成は行って構いません。必要に応じて、見出し、箇条書き、表を用いて、保守しやすい markdown として整理してください。
+
+もし入力が完全には整合しない場合は、統合結果に加えて、未解決の矛盾点や解釈が分かれうる点が分かるように残してください。
+
+${getSoftHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "bug-report-for-fix-request",
@@ -175,7 +229,7 @@ const promptDefinitions: PromptDefinition[] = [
 
 「起票時点に記入」は初回起票の時点で整理してください。「フォローアップ」は、原因分析や対応方針まで進められるだけの情報がある場合に埋めてください。情報が不足している項目は、無理に埋めず、"不明" "未確認" "要確認" のように明示してください。
 
-${getHallucinationPreventionInstruction()}
+${getStrictHallucinationPreventionInstruction()}
 
 ${getMarkdownFenceInstruction()}`
   },
@@ -250,7 +304,7 @@ ${getMarkdownFenceInstruction()}`
 
 「起票時点に記入」は初回起票の時点で整理してください。「フォローアップ」は、優先度判断、担当決定、対応方針まで進められるだけの情報がある場合に埋めてください。情報が不足している項目は、無理に埋めず、"不明" "未確認" "要確認" のように明示してください。
 
-${getHallucinationPreventionInstruction()}
+${getStrictHallucinationPreventionInstruction()}
 
 ${getMarkdownFenceInstruction()}`
   },
@@ -325,7 +379,7 @@ ${getMarkdownFenceInstruction()}`
 
 「起票時点に記入」は初回起票の時点で整理してください。「フォローアップ」は、原因分析、工程分析、再発防止策まで進められるだけの情報がある場合に埋めてください。情報が不足している項目は、無理に埋めず、"不明" "未確認" "要確認" のように明示してください。
 
-${getHallucinationPreventionInstruction()}
+${getStrictHallucinationPreventionInstruction()}
 
 ${getMarkdownFenceInstruction()}`
   },
@@ -394,7 +448,7 @@ ${getMarkdownFenceInstruction()}`
 
 「起票時点に記入」は初回案内の時点で整理してください。「フォローアップ」は、状況更新、回避策、恒久対応の見通しまで進められるだけの情報がある場合に埋めてください。情報が不足している項目は、無理に埋めず、"不明" "未確認" "要確認" のように明示してください。
 
-${getHallucinationPreventionInstruction()}
+${getStrictHallucinationPreventionInstruction()}
 
 ${getMarkdownFenceInstruction()}`
   },
@@ -410,7 +464,9 @@ ${getMarkdownFenceInstruction()}`
     label: "100: ディレクトリ内の内容を確認して把握",
     keywords: ["readme", "markdown", "directory", "ディレクトリ", "内容", "確認", "把握", "内容確認", "md確認", "りーどみー", "でぃれくとり", "ないよう", "かくにん", "はあく", "まーくだうん", "えむでぃー"],
     requiresCommitId: false,
-    buildBody: () => "README.md などこのディレクトリの内容をあらわす markdown の内容を確認してください。"
+    buildBody: () => `README.md などこのディレクトリの内容をあらわす markdown の内容を確認してください。
+
+${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "llm-docs-workflow-init-request",
@@ -671,7 +727,11 @@ When performing development work:
 After creating or updating the documentation system:
 
 1. Summarize the \`${docsRoot}\` structure.
-2. Explain briefly how future LLM sessions should use these documents.`;
+2. Explain briefly how future LLM sessions should use these documents.
+
+${getSoftHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`;
     }
   },
   {
@@ -679,7 +739,11 @@ After creating or updating the documentation system:
     label: "301: セッションの引継テキストの生成",
     keywords: ["handover", "session", "conversation", "markdown", "session handover", "引き継ぎ", "引継", "セッション", "会話", "テキスト", "引継テキスト", "生成", "生成ai", "別のai", "せっしょん", "かいわ", "ひきつぎ", "てきすと", "まーくだうん", "せいせい", "はんどおーばー", "えーあい"],
     requiresCommitId: false,
-    buildBody: () => appendMarkdownFenceInstruction("今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、引継先で状況を再現しやすいよう、重要な前提、判断、未完了事項、次に見るべき点を漏れなく整理した引き継ぎテキストを Markdown 形式で生成してください。")
+    buildBody: () => `今までのセッションでの会話を別の生成AIに引継 (KT) したいです。受け手が生成AIであることを前提に、引継先で状況を再現しやすいよう、重要な前提、判断、未完了事項、次に見るべき点を漏れなく整理した引き継ぎテキストを Markdown 形式で生成してください。
+
+${getStrictHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "spec-discussion-request",
@@ -714,28 +778,40 @@ After creating or updating the documentation system:
     label: "306: 依頼内容の実施状況を確認",
     keywords: ["done", "completed", "status", "check", "依頼", "内容", "実施", "状況", "実施済み", "未実施", "確認", "いらい", "ないよう", "じっし", "じょうきょう", "じっしずみ", "みじっし", "かくにん"],
     requiresCommitId: false,
-    buildBody: () => `さきほどお願いした一連の依頼内容は、基本的に全て実施済みでしょうか。それともまだ未実施のものはありますでしょうか。\n\n${getTodoReflectionInstruction()}`
+    buildBody: () => `さきほどお願いした一連の依頼内容は、基本的に全て実施済みでしょうか。それともまだ未実施のものはありますでしょうか。
+
+${getTodoReflectionInstruction()}
+
+${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "critical-review-request",
     label: "304: 批判的レビューの依頼",
     keywords: ["review", "critical review", "typo", "批判的", "レビュー", "依頼", "誤り", "間違い", "たいぽ", "ひはんてき", "れびゅー", "いらい", "あやまり", "まちがい"],
     requiresCommitId: false,
-    buildBody: () => "これから批判的なレビューを実施してください。私は、迎合や忖度のない率直な指摘を求めています。私の意図に合わせて甘く評価したり、無理に肯定的にまとめたりしないでください。問題がある点、不適切な設計、弱い根拠、見落とし、回帰リスクがあれば、はっきり問題があると指摘してください。必要であれば私の考えに明確に反対して構いません。遠慮することよりも、正確で率直であることを優先してください。指摘は、できるだけ根拠と理由を添えて説明してください。TYPO や細部も歓迎しますが、より重要な問題があればそちらを優先してください。"
+    buildBody: () => `これから批判的なレビューを実施してください。私は、迎合や忖度のない率直な指摘を求めています。私の意図に合わせて甘く評価したり、無理に肯定的にまとめたりしないでください。問題がある点、不適切な設計、弱い根拠、見落とし、回帰リスクがあれば、はっきり問題があると指摘してください。必要であれば私の考えに明確に反対して構いません。遠慮することよりも、正確で率直であることを優先してください。指摘は、できるだけ根拠と理由を添えて説明してください。TYPO や細部も歓迎しますが、より重要な問題があればそちらを優先してください。
+
+${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "markdown-update-check-request",
     label: "102: markdown 更新漏れの確認",
     keywords: ["markdown", "md", "update", "doc", "docs", "更新", "漏れ", "確認", "更新漏れ", "未更新", "追加すべき", "まーくだうん", "こうしん", "もれ", "かくにん", "こうしんもれ", "みこうしん", "ついかすべき"],
     requiresCommitId: false,
-    buildBody: () => `実装の側に変更がおこなわれましたが、これに対応する markdown (.md) で未更新のものはありますか。あるいは新規で markdown (.md) を追加すべき変更はありましたか。\n\n${getTodoReflectionInstruction()}`
+    buildBody: () => `実装の側に変更がおこなわれましたが、これに対応する markdown (.md) で未更新のものはありますか。あるいは新規で markdown (.md) を追加すべき変更はありましたか。
+
+${getTodoReflectionInstruction()}
+
+${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "hallucination-check-request",
     label: "305: 回答のハルシネーション有無を再確認",
     keywords: ["hallucination", "fact check", "web search", "回答", "有無", "再確認", "裏どり", "裏取り", "ハルシネーション", "回答確認", "かいとう", "うむ", "うらどり", "さいかくにん", "かいとうかくにん"],
     requiresCommitId: false,
-    buildBody: () => "先程の回答をいったん前提にせず、事実主張を個別に再点検して、ハルシネーションが含まれていないか再確認してください。確証が弱い箇所は不確実であることを明示し、必要に応じて Web を検索して裏どりを実施してください。"
+    buildBody: () => `先程の回答をいったん前提にせず、事実主張を個別に再点検して、ハルシネーションが含まれていないか再確認してください。確証が弱い箇所は不確実であることを明示し、必要に応じて Web を検索して裏どりを実施してください。
+
+${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "resource-handover-ok-request",
@@ -756,35 +832,47 @@ After creating or updating the documentation system:
     label: "309: 他メンバー指摘の受入可否を判断",
     keywords: ["feedback", "review", "peer review", "comment", "accept", "reject", "判断", "指摘", "受け入れ", "受入", "可否", "解析", "メンバー", "はんだん", "してき", "うけいれ", "かひ", "かいせき", "めんばー"],
     requiresCommitId: false,
-    buildBody: () => "他のメンバーから指摘をもらいました。この内容について、あなたなりに解析して判断して、そして受け入れられるかどうか、受け入れられないか、を判断して教えて欲しいです。"
+    buildBody: () => `他のメンバーから指摘をもらいました。この内容について、あなたなりに解析して判断して、そして受け入れられるかどうか、受け入れられないか、を判断して教えて欲しいです。
+
+${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "recent-work-status-request",
     label: "310: 直近の作業状況を確認",
     keywords: ["recent work", "current status", "what was I doing", "直近", "作業状況", "確認", "離席", "現在", "未完了", "次に何を見る", "ちょっきん", "さぎょうじょうきょう", "りせき", "げんざい", "みかんりょう", "つぎになにをみる"],
     requiresCommitId: false,
-    buildBody: () => "すみません、少し離席していました。直近で何の作業をしていたのか、現在どこまで進んでいるのか、未完了のものがあるか、次に何を見ればよいかを整理して教えてください。回答は Markdown でお願いします。"
+    buildBody: () => `すみません、少し離席していました。直近で何の作業をしていたのか、現在どこまで進んでいるのか、未完了のものがあるか、次に何を見ればよいかを整理して教えてください。回答は Markdown でお願いします。
+
+${getStrictHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "solution-soundness-review-request",
     label: "311: 場当たり対応や本質解決漏れを確認",
     keywords: ["ad hoc", "proper solution", "root cause", "architecture", "場当たり", "本質", "解決", "別解", "正しい解決方法", "設計", "妥当性", "ばあたり", "ほんしつ", "かいけつ", "べっかい", "ただしいかいけつほうほう", "せっけい", "だとうせい"],
     requiresCommitId: false,
-    buildBody: () => "今回の対応について、場当たり的な変更に留まっていないか、本質的には別のより適切な解決方法があるのにそれを選択していないところがないか、設計面と保守面から批判的に確認して教えてください。"
+    buildBody: () => `今回の対応について、場当たり的な変更に留まっていないか、本質的には別のより適切な解決方法があるのにそれを選択していないところがないか、設計面と保守面から批判的に確認して教えてください。
+
+${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "temporary-change-cleanup-request",
     label: "312: 暫定変更の置き忘れを確認",
     keywords: ["temporary", "temporary change", "cleanup", "debug code", "investigation", "暫定", "変更", "置き忘れ", "消し忘れ", "調査用", "試行錯誤", "デバッグ", "片付け", "ざんてい", "へんこう", "おきわすれ", "けしわすれ", "ちょうさよう", "しこうさくご", "でばっぐ", "かたづけ"],
     requiresCommitId: false,
-    buildBody: () => "開発中の試行錯誤や調査の過程で入れた暫定変更、デバッグ用コード、確認用の一時対応が、解決後も残ったままになっていないか確認してください。もし不要な暫定変更が残っていれば、どこにあり、なぜ不要と判断できるのかを指摘してください。"
+    buildBody: () => `開発中の試行錯誤や調査の過程で入れた暫定変更、デバッグ用コード、確認用の一時対応が、解決後も残ったままになっていないか確認してください。もし不要な暫定変更が残っていれば、どこにあり、なぜ不要と判断できるのかを指摘してください。
+
+${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "reconsider-answer-request",
     label: "313: 回答を改めて再考して確認",
     keywords: ["reconsider", "rethink", "fresh look", "answer review", "再考", "再確認", "改めて", "新鮮な気持ち", "もう一度", "回答", "見直し", "さいこう", "さいかくにん", "あらためて", "しんせんなきもち", "もういちど", "かいとう", "みなおし"],
     requiresCommitId: false,
-    buildBody: () => "その回答について、いったん先入観を外して、改めて新鮮な気持ちでよく考え直したうえでもう一度回答してください。見落としや早とちり、先入観による偏った考え方、さらに別の解釈の余地がないかも含めて再確認して欲しいです。"
+    buildBody: () => `その回答について、いったん先入観を外して、改めて新鮮な気持ちでよく考え直したうえでもう一度回答してください。見落としや早とちり、先入観による偏った考え方、さらに別の解釈の余地がないかも含めて再確認して欲しいです。
+
+${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "co-writing-tech-post-request",
@@ -1620,14 +1708,22 @@ and preceded by the suggested filename as a heading:
     label: "603: 現在の会話を Mermaid で記述",
     keywords: ["mermaid", "sequence diagram", "diagram", "conversation", "current conversation", "会話", "現在の会話", "図", "記述", "まーめいど", "しーけんすだいあぐらむ", "かいわ", "げんざいのかいわ", "ず", "きじゅつ"],
     requiresCommitId: false,
-    buildBody: () => appendMarkdownFenceInstruction("いまこのセッションで扱っている内容について、流れや関係が分かるように Mermaid 記法で整理して回答してください。必要に応じて適切な図の種類を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。")
+    buildBody: () => `いまこのセッションで扱っている内容について、流れや関係が分かるように Mermaid 記法で整理して回答してください。必要に応じて適切な図の種類を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。
+
+${getSoftHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "graphviz-current-conversation-request",
     label: "604: 現在の会話を Graphviz DOT で記述",
     keywords: ["graphviz", "dot", "graphviz dot", "diagram", "graph", "conversation", "current conversation", "会話", "現在の会話", "図", "記述", "ぐらふびず", "どっと", "かいわ", "げんざいのかいわ", "ず", "きじゅつ"],
     requiresCommitId: false,
-    buildBody: () => appendMarkdownFenceInstruction("いまこのセッションで扱っている内容について、流れや関係が分かるように Graphviz DOT 記法で整理して回答してください。必要に応じて適切なグラフ構造を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。")
+    buildBody: () => `いまこのセッションで扱っている内容について、流れや関係が分かるように Graphviz DOT 記法で整理して回答してください。必要に応じて適切なグラフ構造を選び、Markdown の code fence を用いて、そのまま貼り付けて使える形で出力してください。
+
+${getSoftHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "chat-partner-emily-request",
@@ -1802,7 +1898,11 @@ and preceded by the suggested filename as a heading:
     label: "101: ディレクトリ内容整理 markdown を作成",
     keywords: ["directory", "markdown", "summary", "index", "scan cost", "ディレクトリ", "内容", "整理", "markdown作成", "作成", "md作成", "概要整理", "走査コスト削減", "でぃれくとり", "ないよう", "せいり", "まーくだうんさくせい", "さくせい", "がいようせいり", "そうさこすとさくげん"],
     requiresCommitId: false,
-    buildBody: () => "いま作業しているディレクトリに含まれるファイルについて、無理のない範囲で、内容を調べて、それを整理した markdown (.md)ファイルを作成してほしい。既存の該当する対象ファイルがあればそれを更新あるいは加筆し、もし妥当な該当する対象ファイルがない場合は適切なファイル名の markdown ファイルを新規作成してそこに記述して欲しい。これは次回に生成AIがこのディレクトリを開いた時の走査のコストを削減することについても期待される効果となっています。"
+    buildBody: () => `いま作業しているディレクトリに含まれるファイルについて、無理のない範囲で、内容を調べて、それを整理した markdown (.md)ファイルを作成してほしい。既存の該当する対象ファイルがあればそれを更新あるいは加筆し、もし妥当な該当する対象ファイルがない場合は適切なファイル名の markdown ファイルを新規作成してそこに記述して欲しい。これは次回に生成AIがこのディレクトリを開いた時の走査のコストを削減することについても期待される効果となっています。
+
+${getStrictHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "build-check-request",
@@ -1816,7 +1916,11 @@ and preceded by the suggested filename as a heading:
     label: "706: 作業終了時の引継確認",
     keywords: ["session close", "wrap up", "handover", "todo", "todo.md", "作業終了", "終了", "引継", "伝達事項", "再開", "復帰", "さぎょうしゅうりょう", "しゅうりょう", "ひきつぎ", "でんたつじこう", "さいかい", "ふっき", "せっしょんくろーず"],
     requiresCommitId: false,
-    buildBody: () => "今回の作業はここまで。終わりにします。なお、次回に再開する時にスムーズに復帰できるように何か伝達事項はあるだろうか。もしそのようなものがあるのであれば、TODO.mdに必要な情報を記入してもらえませんか。そして必要があれば、直近の作業で何を実施したのかを実施済み引き継ぎ事項として TODO.md に記載して欲しいです。"
+    buildBody: () => `今回の作業はここまで。終わりにします。なお、次回に再開する時にスムーズに復帰できるように何か伝達事項はあるだろうか。もしそのようなものがあるのであれば、TODO.mdに必要な情報を記入してもらえませんか。そして必要があれば、直近の作業で何を実施したのかを実施済み引き継ぎ事項として TODO.md に記載して欲しいです。
+
+${getStrictHallucinationPreventionInstruction()}
+
+${getMarkdownFenceInstruction()}`
   },
   {
     id: "shared-refactoring-principles-request",
@@ -2464,7 +2568,9 @@ const normalized = normalizeBranchName(input);
 - 依存関係と前提条件
 - 自プロジェクトとの整合性
 - 採用形態
-- 不採用または概念のみ活用とする場合の理由`
+- 不採用または概念のみ活用とする場合の理由
+
+${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "single-file-web-app-request",
