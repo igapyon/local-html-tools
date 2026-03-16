@@ -18,6 +18,14 @@ const reportedSelfReviewInstruction = `○回答案を作成したあと、第�
 - 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
 - 最終回答の末尾に \`自己レビュー\` セクションを追加し、見直した観点と、必要に応じて修正点を簡潔に記載してください。
 - 自己レビューの途中経過や思考過程は出力せず、レビュー結果だけを簡潔に記載してください。`;
+const reportedMinimalDiffReviewInstruction = `○回答案を作成したあと、あなた自身の判断として内容を見直してください。
+- 事実、評価、提案を混同していないかを確認してください。
+- \`依頼どおりの結果\` とは別に、あなた自身が今回 \`最小差分で割り切った点\` と、\`本来対応すべきだったと考える理想形または代替案\` を整理してください。
+- \`最小差分で割り切った点\` や \`本来対応すべきだったと考える理想形または代替案\` がある場合でも、\`依頼どおりの結果\` を先に提示し、その後ろに補足として追記してください。
+- \`依頼どおりの結果\` の本文は書き換えず、追加が必要な場合は補足として区別して記載してください。
+- 補足は次の順序で記載してください: 1. \`今回の対応を最小差分で割り切った点\`, 2. \`あなたが本来志向していた理想形\`, 3. \`理想形を採ったほうがよい理由\`, 4. \`将来的に整理・再設計の余地があるか\`
+- 最終回答の末尾に \`自己判断メモ\` セクションを追加し、見直した観点と、必要に応じて補足した内容を記載してください。
+- 自己判断の過程は必要に応じて記載して構いません。補足を記載する場合は、その理由や判断根拠が分かるようにしてください。`;
 const internalMisleadingExpressionReviewInstruction = `○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。
 - 読み手が別の意味に受け取りそうな表現、主語や対象が曖昧な表現、断定が強すぎる表現があれば修正してください。
 - 必要があれば本文を修正し、改善後の内容を最終回答として出力してください。
@@ -86,6 +94,7 @@ let currentPromptOutputOptions = {
     outputMarkdownEnabled: true,
     outputTone: "unspecified",
     selfReview: "unspecified",
+    minimalDiffReview: "unspecified",
     misleadingExpressionReview: "unspecified",
     considerationRiskReview: "unspecified",
     discomfortRiskReview: "unspecified",
@@ -100,6 +109,7 @@ function setPromptOutputOptions(options) {
         outputMarkdownEnabled: options.outputMarkdownEnabled !== false,
         outputTone: options.outputTone || "unspecified",
         selfReview: options.selfReview || "unspecified",
+        minimalDiffReview: options.minimalDiffReview || "unspecified",
         misleadingExpressionReview: options.misleadingExpressionReview || "unspecified",
         considerationRiskReview: options.considerationRiskReview || "unspecified",
         discomfortRiskReview: options.discomfortRiskReview || "unspecified",
@@ -118,6 +128,7 @@ function getPromptOutputInstructionTemplates() {
         dearuToneInstruction,
         internalSelfReviewInstruction,
         reportedSelfReviewInstruction,
+        reportedMinimalDiffReviewInstruction,
         internalMisleadingExpressionReviewInstruction,
         reportedMisleadingExpressionReviewInstruction,
         internalConsiderationRiskReviewInstruction,
@@ -157,6 +168,9 @@ function inferPromptOutputInstructionProfile(body) {
             : normalizedBody.includes(templates.internalSelfReviewInstruction)
                 ? "internal"
                 : "unspecified",
+        minimalDiffReview: normalizedBody.includes(templates.reportedMinimalDiffReviewInstruction)
+            ? "report"
+            : "unspecified",
         misleadingExpressionReview: normalizedBody.includes(templates.reportedMisleadingExpressionReviewInstruction)
             ? "report"
             : normalizedBody.includes(templates.internalMisleadingExpressionReviewInstruction)
@@ -217,6 +231,7 @@ function stripPromptOutputInstructions(body) {
             templates.internalMisleadingExpressionReviewInstruction,
             templates.reportedSelfReviewInstruction,
             templates.internalSelfReviewInstruction,
+            templates.reportedMinimalDiffReviewInstruction,
             templates.strictHallucinationPreventionInstruction,
             templates.softHallucinationPreventionInstruction,
             templates.dearuToneInstruction,
@@ -257,6 +272,9 @@ function appendPromptOutputInstructions(body, options, hallucinationGuardMode = 
     }
     else if (options.selfReview === "report") {
         segments.push(reportedSelfReviewInstruction);
+    }
+    if (options.minimalDiffReview === "report") {
+        segments.push(reportedMinimalDiffReviewInstruction);
     }
     if (options.misleadingExpressionReview === "internal") {
         segments.push(internalMisleadingExpressionReviewInstruction);

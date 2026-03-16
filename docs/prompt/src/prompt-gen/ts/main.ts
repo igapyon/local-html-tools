@@ -29,6 +29,7 @@ type PromptOutputOptionDefaults = {
   outputMarkdown: boolean;
   outputTone: "unspecified" | "desumasu" | "dearu";
   selfReview: "unspecified" | "internal" | "report";
+  minimalDiffReview: "unspecified" | "report";
   misleadingExpressionReview: "unspecified" | "internal" | "report";
   considerationRiskReview: "unspecified" | "internal" | "report";
   discomfortRiskReview: "unspecified" | "internal" | "report";
@@ -60,6 +61,7 @@ type PromptPageStateExportPayload = {
       outputMarkdownEnabled: boolean;
       outputTone: "unspecified" | "desumasu" | "dearu";
       selfReview: "unspecified" | "internal" | "report";
+      minimalDiffReview: "unspecified" | "report";
       misleadingExpressionReview: "unspecified" | "internal" | "report";
       considerationRiskReview: "unspecified" | "internal" | "report";
       discomfortRiskReview: "unspecified" | "internal" | "report";
@@ -172,6 +174,9 @@ async function initializePromptPage() {
   const selfReview =
     (document.getElementById("selfReview") as HTMLSelectElement | null) ||
     (await waitForElementById<HTMLSelectElement>("selfReview"));
+  const minimalDiffReview =
+    (document.getElementById("minimalDiffReview") as HTMLSelectElement | null) ||
+    (await waitForElementById<HTMLSelectElement>("minimalDiffReview"));
   const misleadingExpressionReview =
     (document.getElementById("misleadingExpressionReview") as HTMLSelectElement | null) ||
     (await waitForElementById<HTMLSelectElement>("misleadingExpressionReview"));
@@ -201,7 +206,7 @@ async function initializePromptPage() {
   const copyShareLinkButton = document.getElementById("copyShareLinkButton") as HTMLButtonElement | null;
   const promptOutput = document.getElementById("promptOutput") as HTMLElement | null;
 
-  if (!promptSearch || !outputTone || !selfReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !legalComplianceReview || !publicOrderReview || !hallucinationGuard || !outputMarkdown || !customPromptImportInput || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
+  if (!promptSearch || !outputTone || !selfReview || !minimalDiffReview || !misleadingExpressionReview || !considerationRiskReview || !discomfortRiskReview || !aggressiveExpressionReview || !sensitiveExpressionReview || !legalComplianceReview || !publicOrderReview || !hallucinationGuard || !outputMarkdown || !customPromptImportInput || !copyShareLinkButton || !promptOutput || !promptCandidateArea || !promptArgsSection || !promptArgsContainer || !promptOutputSection || !promptOutputTitle || !promptOutputHelp) {
     return;
   }
 
@@ -915,6 +920,7 @@ async function initializePromptPage() {
       outputMarkdownEnabled: outputMarkdown.checked,
       outputTone: ((outputTone.value || "unspecified") as "unspecified" | "desumasu" | "dearu"),
       selfReview: ((selfReview.value || "unspecified") as "unspecified" | "internal" | "report"),
+      minimalDiffReview: ((minimalDiffReview.value || "unspecified") as "unspecified" | "report"),
       misleadingExpressionReview: ((misleadingExpressionReview.value || "unspecified") as "unspecified" | "internal" | "report"),
       considerationRiskReview: ((considerationRiskReview.value || "unspecified") as "unspecified" | "internal" | "report"),
       discomfortRiskReview: ((discomfortRiskReview.value || "unspecified") as "unspecified" | "internal" | "report"),
@@ -932,6 +938,7 @@ async function initializePromptPage() {
         outputMarkdown: false,
         outputTone: "unspecified",
         selfReview: "unspecified",
+        minimalDiffReview: "unspecified",
         misleadingExpressionReview: "unspecified",
         considerationRiskReview: "unspecified",
         discomfortRiskReview: "unspecified",
@@ -940,6 +947,25 @@ async function initializePromptPage() {
         legalComplianceReview: "unspecified",
         publicOrderReview: "unspecified"
       };
+    }
+
+    if (definition.preserveOutputInstructions) {
+      const preservedDefaults = {
+        hallucinationGuard: "none",
+        outputMarkdown: false,
+        outputTone: "unspecified",
+        selfReview: "unspecified",
+        minimalDiffReview: "unspecified",
+        misleadingExpressionReview: "unspecified",
+        considerationRiskReview: "unspecified",
+        discomfortRiskReview: "unspecified",
+        aggressiveExpressionReview: "unspecified",
+        sensitiveExpressionReview: "unspecified",
+        legalComplianceReview: "unspecified",
+        publicOrderReview: "unspecified"
+      };
+      promptOutputOptionDefaultsById.set(definition.id, preservedDefaults);
+      return preservedDefaults;
     }
 
     const cached = promptOutputOptionDefaultsById.get(definition.id);
@@ -957,6 +983,7 @@ async function initializePromptPage() {
         outputMarkdown: definition.outputMarkdown === true,
         outputTone: "unspecified",
         selfReview: "unspecified",
+        minimalDiffReview: "unspecified",
         misleadingExpressionReview: "unspecified",
         considerationRiskReview: "unspecified",
         discomfortRiskReview: "unspecified",
@@ -975,6 +1002,7 @@ async function initializePromptPage() {
       outputMarkdownEnabled: true,
       outputTone: "unspecified",
       selfReview: "unspecified",
+      minimalDiffReview: "unspecified",
       misleadingExpressionReview: "unspecified",
       considerationRiskReview: "unspecified",
       discomfortRiskReview: "unspecified",
@@ -1000,6 +1028,7 @@ async function initializePromptPage() {
       outputMarkdown: instructionProfile.outputMarkdown,
       outputTone: instructionProfile.outputTone,
       selfReview: instructionProfile.selfReview,
+      minimalDiffReview: instructionProfile.minimalDiffReview,
       misleadingExpressionReview: instructionProfile.misleadingExpressionReview,
       considerationRiskReview: instructionProfile.considerationRiskReview,
       discomfortRiskReview: instructionProfile.discomfortRiskReview,
@@ -1018,6 +1047,7 @@ async function initializePromptPage() {
     outputMarkdown.checked = defaults.outputMarkdown;
     outputTone.value = defaults.outputTone;
     selfReview.value = defaults.selfReview;
+    minimalDiffReview.value = defaults.minimalDiffReview;
     misleadingExpressionReview.value = defaults.misleadingExpressionReview;
     considerationRiskReview.value = defaults.considerationRiskReview;
     discomfortRiskReview.value = defaults.discomfortRiskReview;
@@ -1230,6 +1260,10 @@ async function initializePromptPage() {
           ? selectedDefinition.buildBody(commitId, subject)
           : "";
     setPromptOutputOptions(currentOptions);
+    if (selectedDefinition.preserveOutputInstructions) {
+      const body = appendPromptOutputInstructions(rawBody, currentOptions, "high");
+      return body ? body.trim().replace(/\n{3,}/g, "\n\n") : "";
+    }
     const instructionProfile = inferPromptOutputInstructionProfile(rawBody);
     const body = appendPromptOutputInstructions(
       stripPromptOutputInstructions(rawBody),
@@ -1301,12 +1335,13 @@ async function initializePromptPage() {
         selectedPromptId: "custom-sample-prompt",
         selectedPromptCode: "",
         argumentValues: {},
-        outputOptions: {
-          hallucinationGuardLevel: "none",
-          outputMarkdownEnabled: false,
-          outputTone: "unspecified",
-          selfReview: "unspecified",
-          misleadingExpressionReview: "unspecified",
+      outputOptions: {
+        hallucinationGuardLevel: "none",
+        outputMarkdownEnabled: false,
+        outputTone: "unspecified",
+        selfReview: "unspecified",
+        minimalDiffReview: "unspecified",
+        misleadingExpressionReview: "unspecified",
           considerationRiskReview: "unspecified",
           discomfortRiskReview: "unspecified",
           aggressiveExpressionReview: "unspecified",
@@ -1330,6 +1365,7 @@ async function initializePromptPage() {
     outputMarkdownEnabled: boolean;
     outputTone: "unspecified" | "desumasu" | "dearu";
     selfReview: "unspecified" | "internal" | "report";
+    minimalDiffReview: "unspecified" | "report";
     misleadingExpressionReview: "unspecified" | "internal" | "report";
     considerationRiskReview: "unspecified" | "internal" | "report";
     discomfortRiskReview: "unspecified" | "internal" | "report";
@@ -1342,6 +1378,7 @@ async function initializePromptPage() {
     outputMarkdown.checked = options.outputMarkdownEnabled;
     outputTone.value = options.outputTone;
     selfReview.value = options.selfReview;
+    minimalDiffReview.value = options.minimalDiffReview;
     misleadingExpressionReview.value = options.misleadingExpressionReview;
     considerationRiskReview.value = options.considerationRiskReview;
     discomfortRiskReview.value = options.discomfortRiskReview;
@@ -1376,6 +1413,7 @@ async function initializePromptPage() {
       currentState.state.outputOptions.outputMarkdownEnabled ||
       currentState.state.outputOptions.outputTone !== "unspecified" ||
       currentState.state.outputOptions.selfReview !== "unspecified" ||
+      currentState.state.outputOptions.minimalDiffReview !== "unspecified" ||
       currentState.state.outputOptions.misleadingExpressionReview !== "unspecified" ||
       currentState.state.outputOptions.considerationRiskReview !== "unspecified" ||
       currentState.state.outputOptions.discomfortRiskReview !== "unspecified" ||
@@ -1455,6 +1493,9 @@ async function initializePromptPage() {
           : "unspecified",
         selfReview: state.outputOptions?.selfReview === "internal" || state.outputOptions?.selfReview === "report"
           ? state.outputOptions.selfReview
+          : "unspecified",
+        minimalDiffReview: state.outputOptions?.minimalDiffReview === "report"
+          ? state.outputOptions.minimalDiffReview
           : "unspecified",
         misleadingExpressionReview: state.outputOptions?.misleadingExpressionReview === "internal" || state.outputOptions?.misleadingExpressionReview === "report"
           ? state.outputOptions.misleadingExpressionReview
@@ -1679,6 +1720,7 @@ async function initializePromptPage() {
   promptSearch.addEventListener("input", renderCandidates);
   outputTone.addEventListener("change", updateOutput);
   selfReview.addEventListener("change", updateOutput);
+  minimalDiffReview.addEventListener("change", updateOutput);
   misleadingExpressionReview.addEventListener("change", updateOutput);
   considerationRiskReview.addEventListener("change", updateOutput);
   discomfortRiskReview.addEventListener("change", updateOutput);

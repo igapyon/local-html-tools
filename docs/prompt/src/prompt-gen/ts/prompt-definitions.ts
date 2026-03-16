@@ -21,6 +21,7 @@ type PromptDefinition = {
   args?: PromptArgumentDefinition[];
   hallucinationGuard?: "none" | "low" | "high" | boolean;
   outputMarkdown?: boolean;
+  preserveOutputInstructions?: boolean;
   buildBody: (commitId: string, subject?: string) => string;
 };
 

@@ -215,6 +215,52 @@ const popularPromptDefinitions = [
         buildBody: () => appendSoftInstruction("与えられた内容について、チェックリストを作成してください。見落としを減らすことを目的に、確認すべき項目を過不足なく並べてください。必要であれば、実行前、実行中、実行後のように段階別に整理してください。")
     },
     {
+        id: "popular-soft-hallucination-prevention-instruction-request",
+        label: "P1001-500: 事実誤認を避けるための指示（弱）",
+        keywords: ["P1001-500", "soft hallucination prevention", "soft fact check instruction", "weak hallucination guard", "fact grounding prompt", "事実誤認防止", "ハルシネーション防止弱", "事実確認指示", "じじつごにんぼうし", "はるしねーしょんぼうしよわ"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().softHallucinationPreventionInstruction
+    },
+    {
+        id: "popular-strict-hallucination-prevention-instruction-request",
+        label: "P1001-501: ハルシネーション防止の指示（強）",
+        keywords: ["P1001-501", "strict hallucination prevention", "strict fact check instruction", "strong hallucination guard", "hallucination prevention prompt", "ハルシネーション防止強", "厳格な事実確認", "事実厳守指示", "はるしねーしょんぼうしつよ", "じじつげんしゅしじ"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().strictHallucinationPreventionInstruction
+    },
+    {
+        id: "popular-self-judgment-memo-request",
+        label: "P1001-502: 自己判断メモ付きで補足を追記する",
+        keywords: ["P1001-502", "self judgment memo", "risk and alternative appendix", "follow instruction then append concerns", "review as own judgment", "自己判断メモ", "補足追記", "リスク補足", "代替案補足", "じこはんだんめも", "ほそくついき"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => `○回答案を作成したあと、あなた自身の判断として内容を見直してください。
+- 事実、評価、提案を混同していないかを確認してください。
+- \`依頼どおりの結果\` とは別に、あなた自身が考える \`リスク・懸念点・注意点\` と \`推奨する代替案\` を整理してください。
+- 懸念点や代替案がある場合でも、\`依頼どおりの結果\` を先に提示し、その後ろに補足として追記してください。
+- \`依頼どおりの結果\` の本文は書き換えず、追加が必要な場合は補足として区別して記載してください。
+- 補足は次の順序で記載してください。: 1. \`回答結果のリスク・懸念点・注意点\` 2. \`あなたが推奨する代替案\`
+- 最終回答の末尾に \`自己判断メモ\` セクションを追加し、見直した観点と、必要に応じて補足した内容を記載してください。
+- 自己判断の過程は必要に応じて記載して構いません。懸念点や代替案を示す場合は、その理由や判断根拠が分かるようにしてください。`
+    },
+    {
+        id: "popular-minimal-diff-ideal-shape-request",
+        label: "P1001-503: 最小差分と理想形を分けて補足する",
+        keywords: ["P1001-503", "minimal diff and ideal shape", "small diff with ideal design", "follow request then describe ideal", "design compromise memo", "最小差分", "理想形", "割り切り点", "再設計余地", "さいしょうさぶん", "りそうけい"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => `○回答案を作成したあと、あなた自身の判断として内容を見直してください。
+- 事実、評価、提案を混同していないかを確認してください。
+- \`依頼どおりの結果\` とは別に、あなた自身が今回 \`最小差分で割り切った点\` と、\`本来対応すべきだったと考える理想形または代替案\` を整理してください。
+- \`最小差分で割り切った点\` や \`本来対応すべきだったと考える理想形または代替案\` がある場合でも、\`依頼どおりの結果\` を先に提示し、その後ろに補足として追記してください。
+- \`依頼どおりの結果\` の本文は書き換えず、追加が必要な場合は補足として区別して記載してください。
+- 補足は次の順序で記載してください: 1. \`今回の対応を最小差分で割り切った点\`, 2. \`あなたが本来志向していた理想形\`, 3. \`理想形を採ったほうがよい理由\`, 4. \`将来的に整理・再設計の余地があるか\`
+- 最終回答の末尾に \`自己判断メモ\` セクションを追加し、見直した観点と、必要に応じて補足した内容を記載してください。
+- 自己判断の過程は必要に応じて記載して構いません。補足を記載する場合は、その理由や判断根拠が分かるようにしてください。`
+    },
+    {
         id: "popular-weak-evidence-request",
         label: "P1004-002: 根拠の弱い箇所を抽出",
         keywords: ["P1004-002", "weak evidence", "unsupported claims", "weak rationale", "evidence check", "根拠が弱い", "裏付け不足", "根拠抽出", "こんきょがよわい", "うらづけぶそく"],
@@ -1168,51 +1214,114 @@ ${getMarkdownFenceInstruction()}`
     {
         id: "popular-misleading-expression-request",
         label: "P1001-001: 誤解を招く表現を洗い出す",
-        keywords: ["P1001-001", "misleading expressions", "misleading wording", "ambiguous phrasing", "confusing text", "誤解を招く表現", "曖昧表現", "誤読しやすい", "ごかいをまねくひょうげん", "あいまいひょうげん"],
+        keywords: ["P1001-001", "misleading expressions", "misleading wording", "ambiguous phrasing", "confusing text", "reported review", "誤解を招く表現", "曖昧表現", "誤読しやすい", "レビュー結果出力", "ごかいをまねくひょうげん", "あいまいひょうげん"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容について、誤解を招きやすい表現を洗い出してください。曖昧な言い回し、強すぎる断定、読み手によって意味がぶれそうな箇所があれば指摘し、必要に応じて改善案も示してください。`
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().reportedMisleadingExpressionReviewInstruction
     },
     {
         id: "popular-consideration-risk-request",
         label: "P1001-002: 配慮不足リスクを確認する",
-        keywords: ["P1001-002", "consideration risk", "sensitivity check", "fairness check", "inclusive wording", "配慮不足", "配慮リスク", "表現配慮", "はいりょぶそく", "ひょうげんはいりょ"],
+        keywords: ["P1001-002", "consideration risk", "sensitivity check", "fairness check", "inclusive wording", "reported review", "配慮不足", "配慮リスク", "表現配慮", "レビュー結果出力", "はいりょぶそく", "ひょうげんはいりょ"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容について、配慮不足のリスクがないか確認してください。読み手や関係者への配慮、公平性、センシティブな表現への注意などの観点から、問題になりそうな箇所を整理してください。`
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().reportedConsiderationRiskReviewInstruction
     },
     {
         id: "popular-discomfort-risk-request",
         label: "P1001-003: 不快感リスクを確認する",
-        keywords: ["P1001-003", "discomfort risk", "offensive wording", "upsetting content", "tone risk", "不快感", "不快感リスク", "不快表現", "ふかいかん", "ふかいひょうげん"],
+        keywords: ["P1001-003", "discomfort risk", "offensive wording", "upsetting content", "tone risk", "reported review", "不快感", "不快感リスク", "不快表現", "レビュー結果出力", "ふかいかん", "ふかいひょうげん"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容について、人を不快にさせるリスクがないか確認してください。言い方のきつさ、押しつけがましさ、見下し、嘲笑、過度な断定、相手の立場を軽んじる表現などの観点から、問題になりそうな箇所を整理してください。必要であれば、より穏当な言い換えの方向も示してください。`
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().reportedDiscomfortRiskReviewInstruction
     },
     {
         id: "popular-aggressive-expression-request",
         label: "P1001-004: 攻撃的な表現がないか確認する",
-        keywords: ["P1001-004", "aggressive wording", "hostile tone", "harsh expressions", "attacky language", "攻撃的表現", "攻撃的", "きつい言い方", "こうげきてきひょうげん", "きついいいかた"],
+        keywords: ["P1001-004", "aggressive wording", "hostile tone", "harsh expressions", "attacky language", "reported review", "攻撃的表現", "攻撃的", "きつい言い方", "レビュー結果出力", "こうげきてきひょうげん", "きついいいかた"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容について、攻撃的な表現が含まれていないか確認してください。相手を責める言い方、挑発的な言い回し、侮辱的に受け取られうる箇所、対立を不必要に強める表現があれば整理してください。必要に応じて、意味を保ちながら角を減らす方向も示してください。`
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().reportedAggressiveExpressionReviewInstruction
     },
     {
         id: "popular-sensitive-expression-request",
         label: "P1001-005: センシティブな表現を確認する",
-        keywords: ["P1001-005", "sensitive wording", "sensitive expressions", "social sensitivity", "inclusive language", "センシティブ表現", "配慮表現", "社会的配慮", "せんしてぃぶひょうげん", "しゃかいてきはいりょ"],
+        keywords: ["P1001-005", "sensitive wording", "sensitive expressions", "social sensitivity", "inclusive language", "reported review", "センシティブ表現", "配慮表現", "社会的配慮", "レビュー結果出力", "せんしてぃぶひょうげん", "しゃかいてきはいりょ"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容について、センシティブな表現がないか確認してください。属性、立場、背景、文化的事情などに関わる表現で、読み手や関係者に不必要な負荷や反発を生みそうな箇所があれば整理してください。断定しすぎず、どの観点で注意が必要そうかが分かるように示してください。`
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().reportedSensitiveExpressionReviewInstruction
     },
     {
         id: "popular-legal-compliance-request",
         label: "P1001-006: 法令遵守の観点で確認する",
-        keywords: ["P1001-006", "legal compliance", "law compliance", "regulatory compliance", "legal review", "法令遵守", "法律確認", "違法性確認", "ほうれいじゅんしゅ", "いほうせいかくにん"],
+        keywords: ["P1001-006", "legal compliance", "law compliance", "regulatory compliance", "legal review", "reported review", "法令遵守", "法律確認", "違法性確認", "レビュー結果出力", "ほうれいじゅんしゅ", "いほうせいかくにん"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容について、法令遵守の観点で問題がないか確認してください。日本の法令を基準として、違法行為の助長、法的に問題となりうる指示や表現、誤解を招きやすい記述があれば整理してください。必要に応じて、より安全で適切な方向も示してください。`
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().reportedLegalComplianceReviewInstruction
     },
     {
         id: "popular-public-order-review-request",
         label: "P1001-007: 公序良俗の観点で確認する",
-        keywords: ["P1001-007", "public order and morals", "public morals", "social acceptability", "appropriateness review", "公序良俗", "社会通念", "不適切表現", "こうじょりょうぞく", "しゃかいつうねん"],
+        keywords: ["P1001-007", "public order and morals", "public morals", "social acceptability", "appropriateness review", "reported review", "公序良俗", "社会通念", "不適切表現", "レビュー結果出力", "こうじょりょうぞく", "しゃかいつうねん"],
         requiresCommitId: false,
-        buildBody: () => `与えられた内容について、公序良俗の観点で問題がないか確認してください。日本を基準として、公序良俗に反するおそれのある内容、社会通念上不適切に受け取られうる表現、過度に扇情的または有害と受け取られうる記述があれば整理してください。必要に応じて、より穏当で適切な方向も示してください。`
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().reportedPublicOrderReviewInstruction
+    },
+    {
+        id: "popular-misleading-expression-internal-request",
+        label: "P1001-011: 誤解を招く表現を内部レビューする",
+        keywords: ["P1001-011", "misleading expressions", "misleading wording", "ambiguous phrasing", "confusing text", "internal review", "誤解を招く表現", "曖昧表現", "誤読しやすい", "内部レビュー", "ごかいをまねくひょうげん", "あいまいひょうげん"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().internalMisleadingExpressionReviewInstruction
+    },
+    {
+        id: "popular-consideration-risk-internal-request",
+        label: "P1001-012: 配慮不足リスクを内部レビューする",
+        keywords: ["P1001-012", "consideration risk", "sensitivity check", "fairness check", "inclusive wording", "internal review", "配慮不足", "配慮リスク", "表現配慮", "内部レビュー", "はいりょぶそく", "ひょうげんはいりょ"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().internalConsiderationRiskReviewInstruction
+    },
+    {
+        id: "popular-discomfort-risk-internal-request",
+        label: "P1001-013: 不快感リスクを内部レビューする",
+        keywords: ["P1001-013", "discomfort risk", "offensive wording", "upsetting content", "tone risk", "internal review", "不快感", "不快感リスク", "不快表現", "内部レビュー", "ふかいかん", "ふかいひょうげん"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().internalDiscomfortRiskReviewInstruction
+    },
+    {
+        id: "popular-aggressive-expression-internal-request",
+        label: "P1001-014: 攻撃的な表現を内部レビューする",
+        keywords: ["P1001-014", "aggressive wording", "hostile tone", "harsh expressions", "attacky language", "internal review", "攻撃的表現", "攻撃的", "きつい言い方", "内部レビュー", "こうげきてきひょうげん", "きついいいかた"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().internalAggressiveExpressionReviewInstruction
+    },
+    {
+        id: "popular-sensitive-expression-internal-request",
+        label: "P1001-015: センシティブな表現を内部レビューする",
+        keywords: ["P1001-015", "sensitive wording", "sensitive expressions", "social sensitivity", "inclusive language", "internal review", "センシティブ表現", "配慮表現", "社会的配慮", "内部レビュー", "せんしてぃぶひょうげん", "しゃかいてきはいりょ"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().internalSensitiveExpressionReviewInstruction
+    },
+    {
+        id: "popular-legal-compliance-internal-request",
+        label: "P1001-016: 法令遵守を内部レビューする",
+        keywords: ["P1001-016", "legal compliance", "law compliance", "regulatory compliance", "legal review", "internal review", "法令遵守", "法律確認", "違法性確認", "内部レビュー", "ほうれいじゅんしゅ", "いほうせいかくにん"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().internalLegalComplianceReviewInstruction
+    },
+    {
+        id: "popular-public-order-review-internal-request",
+        label: "P1001-017: 公序良俗を内部レビューする",
+        keywords: ["P1001-017", "public order and morals", "public morals", "social acceptability", "appropriateness review", "internal review", "公序良俗", "社会通念", "不適切表現", "内部レビュー", "こうじょりょうぞく", "しゃかいつうねん"],
+        requiresCommitId: false,
+        preserveOutputInstructions: true,
+        buildBody: () => getPromptOutputInstructionTemplates().internalPublicOrderReviewInstruction
     },
     {
         id: "popular-clarify-request-request",
