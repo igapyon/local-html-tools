@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mikuproject</title>
+  <link rel="stylesheet" href="../../lht-cmn/css/components.css" />
+  <link rel="stylesheet" href="src/mikuproject/css/app.css" />
+  <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+</head>
+<body class="md-page">
+  <div class="md-surface-card md-card">
+    <lht-page-hero
+      title="mikuproject"
+      icon="📋"
+      help-label="mikuproject の説明"
+      help-wide
+      menu-home-href="../index.html"
+      menu-home-label="トップへ戻る">
+      MS Project XML を読み込み、内部モデルへ落として、再度 MS Project XML を生成するための実験アプリです。<br><br>
+      STEP 1 では、意味的ラウンドトリップを主目的にします。
+    </lht-page-hero>
+
+    <section class="md-section md-stack-md">
+      <div class="md-panel-actions">
+        <button id="loadSampleBtn" type="button" class="md-button md-button--primary">サンプル読込</button>
+        <button id="importXmlBtn" type="button" class="md-button md-button--surface">XML Import</button>
+        <button id="parseXmlBtn" type="button" class="md-button md-button--surface">XML を解析</button>
+        <button id="exportXmlBtn" type="button" class="md-button md-button--surface">XML を再生成</button>
+        <button id="downloadXmlBtn" type="button" class="md-button md-button--surface">XML Export</button>
+        <button id="roundTripBtn" type="button" class="md-button md-button--surface">再読込テスト</button>
+        <input id="importXmlInput" type="file" accept=".xml,text/xml,application/xml" class="md-hidden" />
+      </div>
+
+      <div id="statusMessage" class="md-status">未実行</div>
+      <div id="validationIssues" class="md-issues md-hidden" aria-live="polite"></div>
+
+      <div class="md-form-grid">
+        <lht-text-field-help field-id="xmlInput" label="MS Project XML" rows="16" placeholder="ここに XML を入力" help-text="MS Project XML を読み込みます。"></lht-text-field-help>
+      </div>
+
+      <div class="md-summary-grid">
+        <div class="md-summary-card">
+          <div class="md-summary-label">プロジェクト名</div>
+          <div id="summaryProjectName" class="md-summary-value">-</div>
+        </div>
+        <div class="md-summary-card">
+          <div class="md-summary-label">タスク数</div>
+          <div id="summaryTaskCount" class="md-summary-value">0</div>
+        </div>
+        <div class="md-summary-card">
+          <div class="md-summary-label">リソース数</div>
+          <div id="summaryResourceCount" class="md-summary-value">0</div>
+        </div>
+        <div class="md-summary-card">
+          <div class="md-summary-label">割当数</div>
+          <div id="summaryAssignmentCount" class="md-summary-value">0</div>
+        </div>
+        <div class="md-summary-card">
+          <div class="md-summary-label">カレンダー数</div>
+          <div id="summaryCalendarCount" class="md-summary-value">0</div>
+        </div>
+      </div>
+
+      <div class="md-form-grid">
+        <lht-text-field-help field-id="modelOutput" label="内部モデル(JSON)" rows="16" readonly></lht-text-field-help>
+      </div>
+
+      <div class="md-preview-grid">
+        <section class="md-preview-card">
+          <h3 class="md-preview-card__title">Tasks</h3>
+          <div id="taskPreview" class="md-preview-list"></div>
+        </section>
+        <section class="md-preview-card">
+          <h3 class="md-preview-card__title">Resources</h3>
+          <div id="resourcePreview" class="md-preview-list"></div>
+        </section>
+        <section class="md-preview-card">
+          <h3 class="md-preview-card__title">Assignments</h3>
+          <div id="assignmentPreview" class="md-preview-list"></div>
+        </section>
+      </div>
+    </section>
+
+    <lht-toast id="toast"></lht-toast>
+  </div>
+  <script src="src/mikuproject/js/types.js"></script>
+  <script src="src/mikuproject/js/msproject-xml.js"></script>
+  <script src="src/mikuproject/js/main.js"></script>
+</body>
+</html>

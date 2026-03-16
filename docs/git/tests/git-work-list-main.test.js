@@ -301,7 +301,7 @@ describe("git-work-list main", () => {
       compareScope: "local",
       compareUseHead: true,
       remoteName: "origin"
-    })).toBe("git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&baseScope=remote&workBranch=feature%2Flogin&remoteName=origin&useCurrentBranch=true&defaultCommitMessage=default+memo");
+    })).toBe("git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&baseScope=remote&workBranch=feature%2Flogin&remoteName=origin&useCurrentBranch=true");
   });
 
   it("builds git-pseudo-squash URL params with current-branch mode off", () => {

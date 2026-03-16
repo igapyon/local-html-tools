@@ -1,0 +1,220 @@
+:root {
+  color-scheme: light;
+  --md-project-accent: #0f766e;
+  --md-project-accent-soft: #dff6f3;
+  --md-project-border: #d5dee7;
+  --md-project-surface: rgba(255, 255, 255, 0.94);
+  --md-project-shadow: 0 24px 60px rgba(32, 54, 84, 0.12);
+}
+
+.md-page {
+  min-height: 100vh;
+  margin: 0;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(172, 233, 223, 0.55), transparent 28%),
+    radial-gradient(circle at top left, rgba(206, 230, 255, 0.5), transparent 24%),
+    linear-gradient(180deg, #f5f8fb 0%, #eef3f8 100%);
+  color: #1c1b1f;
+  box-sizing: border-box;
+}
+
+.md-surface-card.md-card {
+  max-width: 1180px;
+  margin: 0 auto;
+  background: var(--md-project-surface);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(215, 223, 232, 0.95);
+  border-radius: 28px;
+  box-shadow: var(--md-project-shadow);
+  padding: 28px;
+}
+
+.md-section {
+  margin-top: 24px;
+}
+
+.md-stack-md {
+  display: grid;
+  gap: 16px;
+}
+
+.md-panel-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.md-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.55rem;
+  border-radius: 999px;
+  padding: 0.38rem 1.02rem;
+  border: 1px solid var(--md-project-border);
+  background: transparent;
+  color: #3f3b46;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.md-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 118, 110, 0.18);
+}
+
+.md-button--primary {
+  background: var(--md-project-accent);
+  border-color: transparent;
+  color: #fff;
+}
+
+.md-button--surface {
+  background: #fff;
+}
+
+.md-status {
+  border: 1px solid var(--md-project-border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fbfeff 0%, #fff 100%);
+  padding: 14px 16px;
+  color: #35515d;
+  font-weight: 600;
+}
+
+.md-issues {
+  border: 1px solid #efc9a6;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fffaf3 0%, #fff 100%);
+  padding: 14px 16px;
+  color: #7a4d13;
+}
+
+.md-issues.md-hidden {
+  display: none;
+}
+
+.md-issues__title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.md-issues__section + .md-issues__section {
+  margin-top: 10px;
+}
+
+.md-issues__section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #8a5a1c;
+  margin-bottom: 4px;
+}
+
+.md-issues__list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.md-issues__item + .md-issues__item {
+  margin-top: 4px;
+}
+
+.md-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.md-summary-card {
+  border: 1px solid var(--md-project-border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f9fffe 0%, #fff 100%);
+  padding: 16px;
+}
+
+.md-summary-label {
+  color: #4f6771;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.md-summary-value {
+  margin-top: 6px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f3137;
+}
+
+.md-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.md-preview-card {
+  border: 1px solid var(--md-project-border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fbfeff 0%, #fff 100%);
+  padding: 16px;
+}
+
+.md-preview-card__title {
+  margin: 0 0 10px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #244148;
+}
+
+.md-preview-list {
+  display: grid;
+  gap: 8px;
+}
+
+.md-preview-item {
+  border: 1px solid #dfe7ee;
+  border-radius: 14px;
+  background: #fff;
+  padding: 10px 12px;
+}
+
+.md-preview-item__title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1f3137;
+}
+
+.md-preview-item__meta {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #5b6f78;
+  white-space: pre-wrap;
+}
+
+.md-preview-empty {
+  color: #6d7b84;
+  font-size: 0.86rem;
+}
+
+@media (max-width: 900px) {
+  .md-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .md-preview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .md-page {
+    padding: 14px;
+  }
+
+  .md-summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

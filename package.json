@@ -16,11 +16,12 @@
     "build:ffmpeg": "npm run build:git:material && node scripts/build-ffmpeg.mjs",
     "build:life": "node scripts/build-life.mjs",
     "build:link": "node scripts/build-link.mjs",
+    "build:project": "node scripts/build-project.mjs",
     "build:prompt": "node scripts/build-prompt.mjs",
     "build:text": "node scripts/build-text.mjs",
     "build:img": "node scripts/build-img.mjs",
     "build:docs": "node scripts/build-docs-index.mjs",
-    "build:all": "npm run build:music && npm run build:git && npm run build:knowledge-timeline && npm run build:grep && npm run build:password && npm run build:diagram && npm run build:ffmpeg && npm run build:life && npm run build:link && npm run build:prompt && npm run build:text && npm run build:img && npm run build:docs"
+    "build:all": "npm run build:music && npm run build:git && npm run build:knowledge-timeline && npm run build:grep && npm run build:password && npm run build:diagram && npm run build:ffmpeg && npm run build:life && npm run build:link && npm run build:project && npm run build:prompt && npm run build:text && npm run build:img && npm run build:docs"
   },
   "devDependencies": {
     "@material/web": "^2.4.1",

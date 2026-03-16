@@ -1,24 +1,9 @@
-<!--
-Copyright 2026 Toshiki Iga
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
--->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Git 作業一覧</title>
+  <title>mikuproject</title>
   
   
   
@@ -1074,658 +1059,224 @@ lht-index-card-link {
   overflow: hidden;
 }
 
-/* local-html-tools Git work branch list */
 :root {
-  --git-board-accent: #0f766e;
-  --git-board-accent-soft: #d7f4ef;
-  --git-board-border: #d8dce8;
-  --git-board-surface: #fbfcff;
-  --git-board-text-subtle: #5b6475;
+  color-scheme: light;
+  --md-project-accent: #0f766e;
+  --md-project-accent-soft: #dff6f3;
+  --md-project-border: #d5dee7;
+  --md-project-surface: rgba(255, 255, 255, 0.94);
+  --md-project-shadow: 0 24px 60px rgba(32, 54, 84, 0.12);
 }
 
-.md-card {
+.md-page {
+  min-height: 100vh;
+  margin: 0;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(172, 233, 223, 0.55), transparent 28%),
+    radial-gradient(circle at top left, rgba(206, 230, 255, 0.5), transparent 24%),
+    linear-gradient(180deg, #f5f8fb 0%, #eef3f8 100%);
+  color: #1c1b1f;
+  box-sizing: border-box;
+}
+
+.md-surface-card.md-card {
   max-width: 1180px;
   margin: 0 auto;
+  background: var(--md-project-surface);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(215, 223, 232, 0.95);
+  border-radius: 28px;
+  box-shadow: var(--md-project-shadow);
+  padding: 28px;
+}
+
+.md-section {
+  margin-top: 24px;
 }
 
 .md-stack-md {
   display: grid;
-  gap: 1rem;
-}
-
-.md-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.md-panel-actions,
-.md-form-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.md-form-actions {
-  justify-content: flex-start;
+  gap: 16px;
 }
 
 .md-panel-actions {
-  justify-content: flex-end;
-}
-
-.md-form-grid {
-  display: grid;
-  gap: 0.9rem;
-}
-
-.md-form-grid-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.md-form-grid-4 {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.md-hidden {
-  display: none !important;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .md-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
+  min-height: 2.55rem;
   border-radius: 999px;
   padding: 0.38rem 1.02rem;
-  min-height: 2.55rem;
+  border: 1px solid var(--md-project-border);
+  background: transparent;
+  color: #3f3b46;
+  font: inherit;
   font-weight: 600;
   font-size: 0.9rem;
-  line-height: 1;
-  border: none;
-  box-sizing: border-box;
-  background: transparent;
   cursor: pointer;
   transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
 
-.md-button__icon {
-  width: 1rem;
-  height: 1rem;
-  flex: 0 0 auto;
-}
-
 .md-button:hover {
-  box-shadow: 0 4px 10px rgba(98, 0, 238, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 118, 110, 0.18);
 }
 
-.md-button:active {
-  opacity: 0.7;
+.md-button--primary {
+  background: var(--md-project-accent);
+  border-color: transparent;
+  color: #fff;
 }
 
-.md-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-  box-shadow: none;
+.md-button--surface {
+  background: #fff;
 }
 
-.md-button--compact {
-  padding: 0.34rem 0.68rem;
-  font-size: 0.78rem;
-  font-weight: 500;
-  line-height: 1.2;
+.md-status {
+  border: 1px solid var(--md-project-border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fbfeff 0%, #fff 100%);
+  padding: 14px 16px;
+  color: #35515d;
+  font-weight: 600;
 }
 
-.md-button--compact .md-button__icon {
-  width: 0.92rem;
-  height: 0.92rem;
+.md-issues {
+  border: 1px solid #efc9a6;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fffaf3 0%, #fff 100%);
+  padding: 14px 16px;
+  color: #7a4d13;
 }
 
-.md-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 0.8rem;
-  border-radius: 999px;
-  background: var(--git-board-accent-soft);
-  color: #0f3d39;
+.md-issues.md-hidden {
+  display: none;
+}
+
+.md-issues__title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.md-issues__section + .md-issues__section {
+  margin-top: 10px;
+}
+
+.md-issues__section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #8a5a1c;
+  margin-bottom: 4px;
+}
+
+.md-issues__list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.md-issues__item + .md-issues__item {
+  margin-top: 4px;
+}
+
+.md-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.md-summary-card {
+  border: 1px solid var(--md-project-border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f9fffe 0%, #fff 100%);
+  padding: 16px;
+}
+
+.md-summary-label {
+  color: #4f6771;
   font-size: 0.84rem;
   font-weight: 700;
 }
 
-.md-entry-list {
-  display: grid;
-  gap: 1rem;
-}
-
-.md-entry-card {
-  border: 1px solid var(--git-board-border);
-  border-radius: 18px;
-  background: linear-gradient(180deg, var(--git-board-surface) 0%, #ffffff 100%);
-  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.05);
-  padding: 1rem;
-}
-
-.md-entry-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.md-entry-title-wrap {
-  min-width: 0;
-  display: grid;
-  gap: 0.35rem;
-}
-
-.md-entry-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  flex-wrap: wrap;
-}
-
-.md-entry-base-box {
-  flex: 0 0 auto;
-  min-width: 250px;
-  max-width: 100%;
-}
-
-.md-entry-base-box .md-ref-value {
-  margin-left: 0;
-}
-
-.md-entry-title {
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 1.02rem;
-  line-height: 1.35;
-}
-
-.md-entry-lock-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1rem;
-  height: 1rem;
-  color: #6d28d9;
-}
-
-.md-entry-lock-icon .md-button__icon {
-  width: 1rem;
-  height: 1rem;
-}
-
-.md-entry-url {
-  color: var(--git-board-text-subtle);
-  font-size: 0.875rem;
-  word-break: break-all;
-}
-
-.md-entry-url-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.md-entry-url-row .md-entry-url {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.md-entry-link-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.9rem;
-  height: 1.9rem;
-  border-radius: 999px;
-  border: 1px solid #d6deea;
-  background: #f8fafc;
-  color: #64748b;
-  cursor: pointer;
-  flex: 0 0 auto;
-}
-
-.md-entry-memo-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.9rem;
-  height: 1.9rem;
-  border-radius: 999px;
-  border: 1px solid #d6deea;
-  background: #f8fafc;
-  color: #64748b;
-  cursor: pointer;
-  flex: 0 0 auto;
-}
-
-.md-entry-memo-btn:hover {
-  background: #eef2f7;
-}
-
-.md-entry-memo-btn .md-button__icon {
-  width: 0.92rem;
-  height: 0.92rem;
-}
-
-.md-entry-copy-dir-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.9rem;
-  height: 1.9rem;
-  border-radius: 999px;
-  border: 1px solid #d6deea;
-  background: #f8fafc;
-  color: #64748b;
-  cursor: pointer;
-  flex: 0 0 auto;
-}
-
-.md-entry-copy-dir-btn:hover {
-  background: #eef2f7;
-}
-
-.md-entry-copy-dir-btn .md-button__icon {
-  width: 0.92rem;
-  height: 0.92rem;
-}
-
-.md-entry-memo-preview {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-width: 0;
-  max-width: 18ch;
-  padding: 0.22rem 0.55rem;
-  border-radius: 999px;
-  background: #f8fafc;
-  border: 1px solid #d6deea;
-  color: #64748b;
-  font-size: 0.78rem;
-  white-space: nowrap;
-}
-
-.md-entry-memo-preview::after {
-  content: attr(data-full-text);
-  position: absolute;
-  left: 0;
-  bottom: calc(100% + 0.45rem);
-  display: none;
-  max-width: min(40ch, 70vw);
-  padding: 0.55rem 0.7rem;
-  border-radius: 10px;
-  background: #111827;
-  color: #f9fafb;
-  font-size: 0.76rem;
-  line-height: 1.4;
-  white-space: normal;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
-  z-index: 10;
-}
-
-.md-entry-memo-preview:hover::after {
-  display: block;
-}
-
-.md-entry-link-btn:hover {
-  background: #eef2f7;
-}
-
-.md-entry-link-btn .md-button__icon {
-  width: 0.92rem;
-  height: 0.92rem;
-}
-
-.md-entry-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.md-entry-meta {
-  margin-top: 0.55rem;
-  display: grid;
-  gap: 0.75rem;
-}
-
-.md-entry-group .md-entry-meta {
-  margin-top: 0.45rem;
-}
-
-.md-entry-divider {
-  height: 1px;
-  background: #e5e7ef;
-  margin: 0.05rem 0 0.15rem;
-}
-
-.md-ref-grid {
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.md-ref-grid--single {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.md-ref-box {
-  border-radius: 14px;
-  background: #f5f7fb;
-  border: 1px solid #e4e8f1;
-  padding: 0.62rem 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  flex-wrap: nowrap;
-}
-
-.md-ref-box--work {
-  min-height: 100%;
-}
-
-.md-ref-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  flex-wrap: nowrap;
-  font-size: 0.82rem;
-  color: var(--git-board-text-subtle);
+.md-summary-value {
+  margin-top: 6px;
+  font-size: 1.1rem;
   font-weight: 700;
-  white-space: nowrap;
-  width: auto;
-  max-width: 100%;
+  color: #1f3137;
 }
 
-.md-scope-badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0.22rem 0.55rem;
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
-.md-scope-badge[data-scope="remote"] {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-.md-scope-badge[data-scope="local"] {
-  background: #ede9fe;
-  color: #6d28d9;
-}
-
-.md-head-badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  background: #e7f8f5;
-  color: #0f766e;
-  line-height: 1;
-}
-
-.md-ref-value {
-  font-size: 0.96rem;
-  font-weight: 500;
-  color: #475569;
-  white-space: nowrap;
-  margin-left: 1.25rem;
-}
-
-.md-ref-value-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-}
-
-.md-ref-value-row .md-ref-value {
-  margin-left: 0;
-}
-
-.md-work-row-list {
+.md-preview-grid {
   display: grid;
-  gap: 0.7rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
 }
 
-.md-work-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.75rem;
-  align-items: center;
-  padding: 0.15rem 0;
-}
-
-.md-work-row__main {
-  min-width: 0;
-}
-
-.md-work-row__actions {
-  justify-content: flex-end;
-}
-
-.md-empty-state {
-  border: 1px dashed #c7cfdd;
+.md-preview-card {
+  border: 1px solid var(--md-project-border);
   border-radius: 18px;
-  background: #fafbfe;
-  padding: 1.1rem;
-  color: var(--git-board-text-subtle);
+  background: linear-gradient(180deg, #fbfeff 0%, #fff 100%);
+  padding: 16px;
 }
 
-.md-dialog {
-  border: none;
-  padding: 0;
-  background: transparent;
+.md-preview-card__title {
+  margin: 0 0 10px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #244148;
 }
 
-.md-dialog::backdrop {
-  background: rgba(15, 23, 42, 0.42);
-  backdrop-filter: blur(2px);
-}
-
-.md-dialog__surface {
-  width: min(1040px, calc(100vw - 3rem));
-  max-width: calc(100vw - 3rem);
-  max-height: calc(100vh - 2rem);
-  overflow: auto;
-  border: 1px solid #ddd6e7;
-  border-radius: 22px;
-  background: #ffffff;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
-  padding: 1.1rem;
-  box-sizing: border-box;
+.md-preview-list {
   display: grid;
-  gap: 1rem;
+  gap: 8px;
 }
 
-.md-dialog__surface--compact {
-  width: min(640px, calc(100vw - 3rem));
+.md-preview-item {
+  border: 1px solid #dfe7ee;
+  border-radius: 14px;
+  background: #fff;
+  padding: 10px 12px;
 }
 
-.md-dialog__header,
-.md-dialog__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
+.md-preview-item__title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1f3137;
 }
 
-.md-dialog__title {
-  margin: 0;
-  font-size: 1.12rem;
+.md-preview-item__meta {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #5b6f78;
+  white-space: pre-wrap;
 }
 
-.md-dialog__subtitle {
-  margin: 0.2rem 0 0;
-  color: var(--git-board-text-subtle);
-  font-size: 0.92rem;
-}
-
-.md-dialog__body {
-  padding-top: 0.2rem;
-}
-
-.md-button--surface {
-  background: #eef2f7;
-  color: #334155;
-  border: 1px solid #d6deea;
-}
-
-.md-button--surface:hover {
-  background: #e5ebf5;
-}
-
-.md-button--danger {
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-}
-
-.md-button--danger:hover {
-  background: #fee2e2;
-}
-
-.md-button--lock-active {
-  background: #ede9fe;
-  color: #6d28d9;
-  border: 1px solid #c4b5fd;
-}
-
-.md-button--lock-active:hover {
-  background: #e9ddff;
-}
-
-.md-button--primary {
-  background: var(--md-sys-color-primary, #6200ee);
-  color: var(--md-sys-color-on-primary, #ffffff);
-  box-shadow: 0 3px 8px rgba(98, 0, 238, 0.28);
-}
-
-.md-button--primary:hover {
-  background: #4f00c9;
-}
-
-.md-button--secondary {
-  background: #e0f2fe;
-  color: #075985;
-  border: 1px solid #bae6fd;
-}
-
-.md-button--secondary:hover {
-  background: #d0ebfb;
-}
-
-.md-disabled {
-  background-color: #f3f0f7;
+.md-preview-empty {
+  color: #6d7b84;
+  font-size: 0.86rem;
 }
 
 @media (max-width: 900px) {
-  .md-form-grid-4,
-  .md-form-grid-2,
-  .md-form-grid-1,
-  .md-ref-grid {
-    grid-template-columns: 1fr;
+  .md-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .md-panel-actions {
-    justify-content: flex-start;
-  }
-
-  .md-entry-base-box {
-    min-width: 0;
-  }
-
-  .md-work-row {
-    grid-template-columns: 1fr;
-  }
-
-  .md-work-row__actions {
-    justify-content: flex-start;
+  .md-preview-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 640px) {
-  .md-card {
-    padding: 18px;
+  .md-page {
+    padding: 14px;
   }
 
-  .md-entry-card {
-    padding: 0.9rem;
-  }
-
-  .md-dialog__surface {
-    width: calc(100vw - 1.5rem);
-    max-width: calc(100vw - 1.5rem);
-    max-height: calc(100vh - 1rem);
-    padding: 0.9rem;
-  }
-}
-
-@media (max-width: 430px) {
-  .md-dialog {
-    max-width: 100vw;
-  }
-
-  .md-dialog__surface,
-  .md-dialog__surface--compact {
-    width: calc(100vw - 1rem);
-    max-width: calc(100vw - 1rem);
-    padding: 0.8rem;
-    border-radius: 18px;
-  }
-
-  .md-dialog__header,
-  .md-dialog__footer {
-    align-items: stretch;
-  }
-
-  .md-dialog__header > *,
-  .md-dialog__footer > * {
-    min-width: 0;
-  }
-
-  .md-dialog__header .md-button,
-  .md-dialog__footer .md-button {
-    width: 100%;
-  }
-
-  .md-dialog__title {
-    font-size: 1.02rem;
-    line-height: 1.3;
-  }
-
-  .md-dialog__subtitle {
-    font-size: 0.88rem;
-    line-height: 1.5;
-  }
-
-  .md-dialog__body {
-    min-width: 0;
-  }
-
-  .md-dialog__body lht-text-field-help,
-  .md-dialog__body lht-select-help,
-  .md-dialog__body md-outlined-text-field.md-outlined-field,
-  .md-dialog__body md-outlined-select.md-outlined-field {
-    min-width: 0;
+  .md-summary-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
   </style>
@@ -1733,138 +1284,81 @@ lht-index-card-link {
 <body class="md-page">
   <div class="md-surface-card md-card">
     <lht-page-hero
-      title="Git 作業一覧"
-      icon="🗂️"
-      help-label="Git 作業一覧の説明"
+      title="mikuproject"
+      icon="📋"
+      help-label="mikuproject の説明"
       help-wide
       menu-home-href="../index.html"
       menu-home-label="トップへ戻る">
-      リポジトリ URL、基準ブランチ、作業ブランチ、ローカル/リモートの扱いをまとめて保存し、一覧で管理します。<br><br>
-      複数リポジトリ・複数作業を並行で扱うときの「今どの組み合わせを見ていたか」を忘れにくくするためのローカル専用メモ兼一覧ツールです。
+      MS Project XML を読み込み、内部モデルへ落として、再度 MS Project XML を生成するための実験アプリです。<br><br>
+      STEP 1 では、意味的ラウンドトリップを主目的にします。
     </lht-page-hero>
 
     <section class="md-section md-stack-md">
-      <div class="md-panel-header">
-        <div class="md-panel-actions">
-          <button id="openCreateDialogBtn" type="button" class="md-button md-button--primary">
-            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 5v14"></path>
-              <path d="M5 12h14"></path>
-            </svg>
-            <span>追加</span>
-          </button>
-          <button id="exportEntriesBtn" type="button" class="md-button md-button--surface">
-            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3v12"></path>
-              <path d="m7 10 5 5 5-5"></path>
-              <path d="M5 21h14"></path>
-            </svg>
-            <span>Export</span>
-          </button>
-          <button id="importEntriesBtn" type="button" class="md-button md-button--surface">
-            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 21V9"></path>
-              <path d="m7 14 5-5 5 5"></path>
-              <path d="M5 3h14"></path>
-            </svg>
-            <span>Import</span>
-          </button>
-          <input id="importEntriesInput" type="file" accept="application/json,.json" class="md-hidden" />
+      <div class="md-panel-actions">
+        <button id="loadSampleBtn" type="button" class="md-button md-button--primary">サンプル読込</button>
+        <button id="importXmlBtn" type="button" class="md-button md-button--surface">XML Import</button>
+        <button id="parseXmlBtn" type="button" class="md-button md-button--surface">XML を解析</button>
+        <button id="exportXmlBtn" type="button" class="md-button md-button--surface">XML を再生成</button>
+        <button id="downloadXmlBtn" type="button" class="md-button md-button--surface">XML Export</button>
+        <button id="roundTripBtn" type="button" class="md-button md-button--surface">再読込テスト</button>
+        <input id="importXmlInput" type="file" accept=".xml,text/xml,application/xml" class="md-hidden" />
+      </div>
+
+      <div id="statusMessage" class="md-status">未実行</div>
+      <div id="validationIssues" class="md-issues md-hidden" aria-live="polite"></div>
+
+      <div class="md-form-grid">
+        <lht-text-field-help field-id="xmlInput" label="MS Project XML" rows="16" placeholder="ここに XML を入力" help-text="MS Project XML を読み込みます。"></lht-text-field-help>
+      </div>
+
+      <div class="md-summary-grid">
+        <div class="md-summary-card">
+          <div class="md-summary-label">プロジェクト名</div>
+          <div id="summaryProjectName" class="md-summary-value">-</div>
+        </div>
+        <div class="md-summary-card">
+          <div class="md-summary-label">タスク数</div>
+          <div id="summaryTaskCount" class="md-summary-value">0</div>
+        </div>
+        <div class="md-summary-card">
+          <div class="md-summary-label">リソース数</div>
+          <div id="summaryResourceCount" class="md-summary-value">0</div>
+        </div>
+        <div class="md-summary-card">
+          <div class="md-summary-label">割当数</div>
+          <div id="summaryAssignmentCount" class="md-summary-value">0</div>
+        </div>
+        <div class="md-summary-card">
+          <div class="md-summary-label">カレンダー数</div>
+          <div id="summaryCalendarCount" class="md-summary-value">0</div>
         </div>
       </div>
 
-      <div id="emptyGuide" class="md-empty-state" hidden>まだ登録がありません。追加ボタンから登録してください。</div>
+      <div class="md-form-grid">
+        <lht-text-field-help field-id="modelOutput" label="内部モデル(JSON)" rows="16" readonly></lht-text-field-help>
+      </div>
 
-      <div id="entriesList" class="md-entry-list" aria-live="polite"></div>
+      <div class="md-preview-grid">
+        <section class="md-preview-card">
+          <h3 class="md-preview-card__title">Tasks</h3>
+          <div id="taskPreview" class="md-preview-list"></div>
+        </section>
+        <section class="md-preview-card">
+          <h3 class="md-preview-card__title">Resources</h3>
+          <div id="resourcePreview" class="md-preview-list"></div>
+        </section>
+        <section class="md-preview-card">
+          <h3 class="md-preview-card__title">Assignments</h3>
+          <div id="assignmentPreview" class="md-preview-list"></div>
+        </section>
+      </div>
     </section>
-
-    <dialog id="entryDialog" class="md-dialog">
-      <form method="dialog" class="md-dialog__surface" id="entryForm">
-        <div class="md-dialog__header">
-          <div>
-            <h2 id="entryDialogTitle" class="md-dialog__title">登録</h2>
-            <p class="md-dialog__subtitle">リポジトリ URL と作業対象ブランチを入力します。</p>
-          </div>
-          <button id="closeDialogBtn" type="button" class="md-button md-button--surface md-button--compact">閉じる</button>
-        </div>
-
-        <div class="md-dialog__body md-stack-md">
-          <div class="md-form-grid md-form-grid-1">
-            <lht-select-help field-id="entryType" label="種別" help-text="Git 連携を使う通常登録か、URL とメモだけを管理する登録かを選びます。">
-              <script type="application/json" slot="options">[
-                { "value": "git", "label": "Git連携あり", "selected": true },
-                { "value": "url", "label": "URLのみ" }
-              ]</script>
-            </lht-select-help>
-          </div>
-
-          <div class="md-form-grid md-form-grid-1">
-            <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" required placeholder="例: https://github.com/igapyon/local-html-tools" help-text="リポジトリを識別する URL や clone URL を入力します。HTTPS / SSH / ローカルパスのどれでも構いません。表示名は URL の末尾から自動で組み立てます。"></lht-text-field-help>
-          </div>
-
-          <div id="gitFields" class="md-form-grid md-form-grid-4">
-            <lht-text-field-help field-id="baseBranch" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。"></lht-text-field-help>
-            <lht-select-help field-id="baseScope" label="基準の扱い" help-text="基準ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
-              <script type="application/json" slot="options">[
-                { "value": "remote", "label": "リモート", "selected": true },
-                { "value": "local", "label": "ローカル" }
-              ]</script>
-            </lht-select-help>
-            <lht-text-field-help field-id="compareBranch" label="作業ブランチ" required placeholder="例: feature" help-text="いま確認したい作業対象ブランチです。"></lht-text-field-help>
-            <lht-select-help field-id="compareScope" label="作業の扱い" help-text="作業ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
-              <script type="application/json" slot="options">[
-                { "value": "remote", "label": "リモート" },
-                { "value": "local", "label": "ローカル", "selected": true }
-              ]</script>
-            </lht-select-help>
-          </div>
-
-          <div id="gitRemoteField" class="md-form-grid md-form-grid-1">
-            <lht-text-field-help field-id="remoteName" label="リモート名" placeholder="例: origin" value="origin" help-text="remote 扱いのブランチ参照に使うリモート名です。通常は origin です。"></lht-text-field-help>
-          </div>
-        </div>
-
-        <div class="md-dialog__footer">
-          <button id="saveEntryBtn" type="button" class="md-button md-button--primary">
-            <svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 5v14"></path>
-              <path d="M5 12h14"></path>
-            </svg>
-            <span>追加</span>
-          </button>
-        </div>
-      </form>
-    </dialog>
-
-    <dialog id="memoDialog" class="md-dialog">
-      <form method="dialog" class="md-dialog__surface md-dialog__surface--compact" id="memoForm">
-        <div class="md-dialog__header">
-          <div>
-            <h2 class="md-dialog__title">リポジトリ情報</h2>
-            <p class="md-dialog__subtitle">このリポジトリと基準ブランチの組み合わせ向け情報を入力します。</p>
-          </div>
-          <button id="closeMemoDialogBtn" type="button" class="md-button md-button--surface md-button--compact">閉じる</button>
-        </div>
-
-        <div class="md-dialog__body md-stack-md">
-          <div class="md-form-grid md-form-grid-1">
-            <lht-text-field-help field-id="memoText" label="メモ" placeholder="必要なメモを入力" help-text="保存は全文、一覧表示は先頭 16 文字までです。長い内容は hover で全文を確認できます。"></lht-text-field-help>
-          </div>
-          <div class="md-form-grid md-form-grid-1">
-            <lht-text-field-help field-id="gitCurrentDirectory" label="git カレントディレクトリ" placeholder="例: /path/to/repo" help-text="この作業を行うローカルの git カレントディレクトリを記録します。"></lht-text-field-help>
-          </div>
-        </div>
-
-        <div class="md-dialog__footer">
-          <button id="copyGitStatusCommandBtn" type="button" class="md-button md-button--secondary">cd + git status</button>
-          <button id="saveMemoBtn" type="button" class="md-button md-button--primary">保存</button>
-        </div>
-      </form>
-    </dialog>
 
     <lht-toast id="toast"></lht-toast>
   </div>
-
+  
+  
   
   <script>
 (()=>{function s(o,e,t,r){var i=arguments.length,n=i<3?e:r===null?r=Object.getOwnPropertyDescriptor(e,t):r,a;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")n=Reflect.decorate(o,e,t,r);else for(var d=o.length-1;d>=0;d--)(a=o[d])&&(n=(i<3?a(n):i>3?a(e,t,n):a(e,t))||n);return i>3&&n&&Object.defineProperty(e,t,n),n}var E=o=>(e,t)=>{t!==void 0?t.addInitializer(()=>{customElements.define(o,e)}):customElements.define(o,e)};var Qe=globalThis,et=Qe.ShadowRoot&&(Qe.ShadyCSS===void 0||Qe.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,Bt=Symbol(),$r=new WeakMap,Ne=class{constructor(e,t,r){if(this._$cssResult$=!0,r!==Bt)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o,t=this.t;if(et&&e===void 0){let r=t!==void 0&&t.length===1;r&&(e=$r.get(t)),e===void 0&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),r&&$r.set(t,e))}return e}toString(){return this.cssText}},Tr=o=>new Ne(typeof o=="string"?o:o+"",void 0,Bt),g=(o,...e)=>{let t=o.length===1?o[0]:e.reduce((r,i,n)=>r+(a=>{if(a._$cssResult$===!0)return a.cssText;if(typeof a=="number")return a;throw Error("Value passed to 'css' function must be a 'css' function result: "+a+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+o[n+1],o[0]);return new Ne(t,o,Bt)},Sr=(o,e)=>{if(et)o.adoptedStyleSheets=e.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(let t of e){let r=document.createElement("style"),i=Qe.litNonce;i!==void 0&&r.setAttribute("nonce",i),r.textContent=t.cssText,o.appendChild(r)}},Ft=et?o=>o:o=>o instanceof CSSStyleSheet?(e=>{let t="";for(let r of e.cssRules)t+=r.cssText;return Tr(t)})(o):o;var{is:Io,defineProperty:ko,getOwnPropertyDescriptor:Oo,getOwnPropertyNames:Ro,getOwnPropertySymbols:Po,getPrototypeOf:Lo}=Object,ce=globalThis,Ir=ce.trustedTypes,Do=Ir?Ir.emptyScript:"",zo=ce.reactiveElementPolyfillSupport,Be=(o,e)=>o,Fe={toAttribute(o,e){switch(e){case Boolean:o=o?Do:null;break;case Object:case Array:o=o==null?o:JSON.stringify(o)}return o},fromAttribute(o,e){let t=o;switch(e){case Boolean:t=o!==null;break;case Number:t=o===null?null:Number(o);break;case Object:case Array:try{t=JSON.parse(o)}catch{t=null}}return t}},tt=(o,e)=>!Io(o,e),kr={attribute:!0,type:String,converter:Fe,reflect:!1,useDefault:!1,hasChanged:tt};Symbol.metadata??(Symbol.metadata=Symbol("metadata")),ce.litPropertyMetadata??(ce.litPropertyMetadata=new WeakMap);var re=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??(this.l=[])).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=kr){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){let r=Symbol(),i=this.getPropertyDescriptor(e,r,t);i!==void 0&&ko(this.prototype,e,i)}}static getPropertyDescriptor(e,t,r){let{get:i,set:n}=Oo(this.prototype,e)??{get(){return this[t]},set(a){this[t]=a}};return{get:i,set(a){let d=i?.call(this);n?.call(this,a),this.requestUpdate(e,d,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??kr}static _$Ei(){if(this.hasOwnProperty(Be("elementProperties")))return;let e=Lo(this);e.finalize(),e.l!==void 0&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(Be("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(Be("properties"))){let t=this.properties,r=[...Ro(t),...Po(t)];for(let i of r)this.createProperty(i,t[i])}let e=this[Symbol.metadata];if(e!==null){let t=litPropertyMetadata.get(e);if(t!==void 0)for(let[r,i]of t)this.elementProperties.set(r,i)}this._$Eh=new Map;for(let[t,r]of this.elementProperties){let i=this._$Eu(t,r);i!==void 0&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){let t=[];if(Array.isArray(e)){let r=new Set(e.flat(1/0).reverse());for(let i of r)t.unshift(Ft(i))}else e!==void 0&&t.push(Ft(e));return t}static _$Eu(e,t){let r=t.attribute;return r===!1?void 0:typeof r=="string"?r:typeof e=="string"?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??(this._$EO=new Set)).add(e),this.renderRoot!==void 0&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){let e=new Map,t=this.constructor.elementProperties;for(let r of t.keys())this.hasOwnProperty(r)&&(e.set(r,this[r]),delete this[r]);e.size>0&&(this._$Ep=e)}createRenderRoot(){let e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return Sr(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,r){this._$AK(e,r)}_$ET(e,t){let r=this.constructor.elementProperties.get(e),i=this.constructor._$Eu(e,r);if(i!==void 0&&r.reflect===!0){let n=(r.converter?.toAttribute!==void 0?r.converter:Fe).toAttribute(t,r.type);this._$Em=e,n==null?this.removeAttribute(i):this.setAttribute(i,n),this._$Em=null}}_$AK(e,t){let r=this.constructor,i=r._$Eh.get(e);if(i!==void 0&&this._$Em!==i){let n=r.getPropertyOptions(i),a=typeof n.converter=="function"?{fromAttribute:n.converter}:n.converter?.fromAttribute!==void 0?n.converter:Fe;this._$Em=i;let d=a.fromAttribute(t,n.type);this[i]=d??this._$Ej?.get(i)??d,this._$Em=null}}requestUpdate(e,t,r,i=!1,n){if(e!==void 0){let a=this.constructor;if(i===!1&&(n=this[e]),r??(r=a.getPropertyOptions(e)),!((r.hasChanged??tt)(n,t)||r.useDefault&&r.reflect&&n===this._$Ej?.get(e)&&!this.hasAttribute(a._$Eu(e,r))))return;this.C(e,t,r)}this.isUpdatePending===!1&&(this._$ES=this._$EP())}C(e,t,{useDefault:r,reflect:i,wrapped:n},a){r&&!(this._$Ej??(this._$Ej=new Map)).has(e)&&(this._$Ej.set(e,a??t??this[e]),n!==!0||a!==void 0)||(this._$AL.has(e)||(this.hasUpdated||r||(t=void 0),this._$AL.set(e,t)),i===!0&&this._$Em!==e&&(this._$Eq??(this._$Eq=new Set)).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}let e=this.scheduleUpdate();return e!=null&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??(this.renderRoot=this.createRenderRoot()),this._$Ep){for(let[i,n]of this._$Ep)this[i]=n;this._$Ep=void 0}let r=this.constructor.elementProperties;if(r.size>0)for(let[i,n]of r){let{wrapped:a}=n,d=this[i];a!==!0||this._$AL.has(i)||d===void 0||this.C(i,void 0,n,d)}}let e=!1,t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(r=>r.hostUpdate?.()),this.update(t)):this._$EM()}catch(r){throw e=!1,this._$EM(),r}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&(this._$Eq=this._$Eq.forEach(t=>this._$ET(t,this[t]))),this._$EM()}updated(e){}firstUpdated(e){}};re.elementStyles=[],re.shadowRootOptions={mode:"open"},re[Be("elementProperties")]=new Map,re[Be("finalized")]=new Map,zo?.({ReactiveElement:re}),(ce.reactiveElementVersions??(ce.reactiveElementVersions=[])).push("2.1.2");var Mo={attribute:!0,type:String,converter:Fe,reflect:!1,hasChanged:tt},No=(o=Mo,e,t)=>{let{kind:r,metadata:i}=t,n=globalThis.litPropertyMetadata.get(i);if(n===void 0&&globalThis.litPropertyMetadata.set(i,n=new Map),r==="setter"&&((o=Object.create(o)).wrapped=!0),n.set(t.name,o),r==="accessor"){let{name:a}=t;return{set(d){let c=e.get.call(this);e.set.call(this,d),this.requestUpdate(a,c,o,!0,d)},init(d){return d!==void 0&&this.C(a,void 0,o,d),d}}}if(r==="setter"){let{name:a}=t;return function(d){let c=this[a];e.call(this,d),this.requestUpdate(a,c,o,!0,d)}}throw Error("Unsupported decorator location: "+r)};function l(o){return(e,t)=>typeof t=="object"?No(o,e,t):((r,i,n)=>{let a=i.hasOwnProperty(n);return i.constructor.createProperty(n,r),a?Object.getOwnPropertyDescriptor(i,n):void 0})(o,e,t)}function k(o){return l({...o,state:!0,attribute:!1})}var Q=(o,e,t)=>(t.configurable=!0,t.enumerable=!0,Reflect.decorate&&typeof e!="object"&&Object.defineProperty(o,e,t),t);function S(o,e){return(t,r,i)=>{let n=a=>a.renderRoot?.querySelector(o)??null;if(e){let{get:a,set:d}=typeof r=="object"?t:i??(()=>{let c=Symbol();return{get(){return this[c]},set(h){this[c]=h}}})();return Q(t,r,{get(){let c=a.call(this);return c===void 0&&(c=n(this),(c!==null||this.hasUpdated)&&d.call(this,c)),c}})}return Q(t,r,{get(){return n(this)}})}}var Bo;function Or(o){return(e,t)=>Q(e,t,{get(){return(this.renderRoot??Bo??(Bo=document.createDocumentFragment())).querySelectorAll(o)}})}function N(o){return(e,t)=>{let{slot:r,selector:i}=o??{},n="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){let a=this.renderRoot?.querySelector(n),d=a?.assignedElements(o)??[];return i===void 0?d:d.filter(c=>c.matches(i))}})}}function rt(o){return(e,t)=>{let{slot:r}=o??{},i="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){return this.renderRoot?.querySelector(i)?.assignedNodes(o)??[]}})}}var qe=globalThis,Rr=o=>o,ot=qe.trustedTypes,Pr=ot?ot.createPolicy("lit-html",{createHTML:o=>o}):void 0,qt="$lit$",oe=`lit$${Math.random().toFixed(9).slice(2)}$`,Vt="?"+oe,Fo=`<${Vt}>`,_e=document,Ve=()=>_e.createComment(""),He=o=>o===null||typeof o!="object"&&typeof o!="function",Ht=Array.isArray,Br=o=>Ht(o)||typeof o?.[Symbol.iterator]=="function",Ut=`[ 	
@@ -3991,1032 +3485,764 @@ if (!customElements.get("lht-page-menu")) {
   </script>
 
   <script>
-    const STORAGE_KEY = "gitWorkList.entries";
-    const RECENT_ACTIONS_KEY = "gitWorkList.recentActions";
-    const MEMO_STORAGE_KEY = "gitWorkList.memos";
-    const EXPORT_VERSION = 1;
-    let entries = [];
-    let recentActions = [];
-    let memos = {};
-    let editingId = "";
-    let dialogMode = "create";
-    let editingMemoKey = "";
+(() => {
+    globalThis.__mikuprojectTypes = {
+        __ready: true
+    };
+})();
+  </script>
 
-    function readText(id) {
-      const field = document.getElementById(id);
-      return field ? String(field.value || "").trim() : "";
+  <script>
+(() => {
+    const SAMPLE_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<Project xmlns="http://schemas.microsoft.com/project">
+  <Name>Sample Project</Name>
+  <CurrentDate>2026-03-16T09:00:00</CurrentDate>
+  <StartDate>2026-03-16T09:00:00</StartDate>
+  <FinishDate>2026-03-20T18:00:00</FinishDate>
+  <ScheduleFromStart>1</ScheduleFromStart>
+  <DefaultStartTime>09:00:00</DefaultStartTime>
+  <DefaultFinishTime>18:00:00</DefaultFinishTime>
+  <MinutesPerDay>480</MinutesPerDay>
+  <MinutesPerWeek>2400</MinutesPerWeek>
+  <DaysPerMonth>20</DaysPerMonth>
+  <CalendarUID>1</CalendarUID>
+  <Calendars>
+    <Calendar>
+      <UID>1</UID>
+      <Name>Standard</Name>
+      <IsBaseCalendar>1</IsBaseCalendar>
+    </Calendar>
+  </Calendars>
+  <Tasks>
+    <Task>
+      <UID>1</UID>
+      <ID>1</ID>
+      <Name>Project Summary</Name>
+      <OutlineLevel>1</OutlineLevel>
+      <OutlineNumber>1</OutlineNumber>
+      <Start>2026-03-16T09:00:00</Start>
+      <Finish>2026-03-20T18:00:00</Finish>
+      <Duration>PT40H0M0S</Duration>
+      <Milestone>0</Milestone>
+      <Summary>1</Summary>
+      <PercentComplete>50</PercentComplete>
+    </Task>
+    <Task>
+      <UID>2</UID>
+      <ID>2</ID>
+      <Name>Design</Name>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>1.1</OutlineNumber>
+      <Start>2026-03-16T09:00:00</Start>
+      <Finish>2026-03-17T18:00:00</Finish>
+      <Duration>PT16H0M0S</Duration>
+      <ActualStart>2026-03-16T09:00:00</ActualStart>
+      <ActualFinish>2026-03-17T18:00:00</ActualFinish>
+      <Milestone>0</Milestone>
+      <Summary>0</Summary>
+      <PercentComplete>100</PercentComplete>
+      <Notes>Design completed</Notes>
+    </Task>
+    <Task>
+      <UID>3</UID>
+      <ID>3</ID>
+      <Name>Implementation</Name>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>1.2</OutlineNumber>
+      <Start>2026-03-18T09:00:00</Start>
+      <Finish>2026-03-20T18:00:00</Finish>
+      <Duration>PT24H0M0S</Duration>
+      <ConstraintType>4</ConstraintType>
+      <ConstraintDate>2026-03-18T09:00:00</ConstraintDate>
+      <Milestone>0</Milestone>
+      <Summary>0</Summary>
+      <PercentComplete>0</PercentComplete>
+      <Notes>Implementation starts after design</Notes>
+      <PredecessorLink>
+        <PredecessorUID>2</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>PT0H0M0S</LinkLag>
+      </PredecessorLink>
+    </Task>
+  </Tasks>
+  <Resources>
+    <Resource>
+      <UID>1</UID>
+      <ID>1</ID>
+      <Name>Miku</Name>
+      <Type>1</Type>
+      <Initials>MK</Initials>
+      <Group>Engineering</Group>
+      <MaxUnits>1</MaxUnits>
+    </Resource>
+  </Resources>
+  <Assignments>
+    <Assignment>
+      <UID>1</UID>
+      <TaskUID>2</TaskUID>
+      <ResourceUID>1</ResourceUID>
+      <Start>2026-03-16T09:00:00</Start>
+      <Finish>2026-03-17T18:00:00</Finish>
+      <Units>1</Units>
+      <Work>PT16H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>2</UID>
+      <TaskUID>3</TaskUID>
+      <ResourceUID>1</ResourceUID>
+      <Start>2026-03-18T09:00:00</Start>
+      <Finish>2026-03-20T18:00:00</Finish>
+      <Units>1</Units>
+      <Work>PT24H0M0S</Work>
+    </Assignment>
+  </Assignments>
+</Project>`;
+    function textContent(parent, tagName) {
+        const element = parent.getElementsByTagName(tagName)[0];
+        return String((element === null || element === void 0 ? void 0 : element.textContent) || "").trim();
     }
-
-    function normalizeRepoUrl(repoUrl) {
-      const trimmed = String(repoUrl || "").trim();
-      if (!trimmed) return "";
-      try {
-        const parsed = new URL(trimmed);
-        if (parsed.hostname === "github.com") {
-          const segments = parsed.pathname.split("/").filter(Boolean);
-          if (segments.length >= 4 && segments[2] === "pull") {
-            return `${parsed.origin}/${segments[0]}/${segments[1]}`;
-          }
+    function parseBoolean(value) {
+        return value === "1" || value.toLowerCase() === "true";
+    }
+    function parseNumber(value, defaultValue = 0) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : defaultValue;
+    }
+    function parseDateValue(value) {
+        if (!value) {
+            return null;
         }
-      } catch (_) {
-        // URL として解釈できないものはそのまま扱う
-      }
-      return trimmed.replace(/\/+$/, "");
+        const timestamp = Date.parse(value);
+        return Number.isFinite(timestamp) ? timestamp : null;
     }
-
-    function setText(id, value) {
-      const field = document.getElementById(id);
-      if (!field) return;
-      field.value = value == null ? "" : String(value);
-    }
-
-    function updateRepoUrlLockState(locked) {
-      const field = document.getElementById("repoUrl");
-      if (!field) return;
-      field.readOnly = !!locked;
-      field.classList.toggle("md-disabled", !!locked);
-      field.setAttribute("aria-readonly", locked ? "true" : "false");
-    }
-
-    function readSelectValue(id, fallbackValue) {
-      const field = document.getElementById(id);
-      if (!field) return fallbackValue;
-      const value = String(field.value || "").trim();
-      return value || fallbackValue;
-    }
-
-    function normalizeEntryType(value) {
-      return value === "url" ? "url" : "git";
-    }
-
-    function isGitEntry(entry) {
-      return normalizeEntryType(entry?.entryType) === "git";
-    }
-
-    function isValidEntry(entry) {
-      if (!entry || !entry.repoUrl) {
-        return false;
-      }
-      if (isGitEntry(entry)) {
-        return !!(entry.baseBranch && entry.compareBranch);
-      }
-      return true;
-    }
-
-    function showToast(message) {
-      const toast = document.getElementById("toast");
-      if (!toast || typeof toast.show !== "function") return;
-      toast.show(message, 2200);
-    }
-
-    function updatePrimaryActionsState() {
-      const openCreateButton = document.getElementById("openCreateDialogBtn");
-      if (openCreateButton) {
-        openCreateButton.classList.toggle("md-button--primary", entries.length === 0);
-        openCreateButton.classList.toggle("md-button--surface", entries.length > 0);
-      }
-    }
-
-    function getDialog() {
-      return document.getElementById("entryDialog");
-    }
-
-    function escapeHtml(text) {
-      return String(text || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-
-    function getButtonIconSvg(kind) {
-      if (kind === "add") {
-        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>';
-      }
-      if (kind === "branch-diff") {
-        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h8"></path><path d="M11 3l4 4-4 4"></path><path d="M17 17H9"></path><path d="M13 13l-4 4 4 4"></path></svg>';
-      }
-      if (kind === "pseudo-squash") {
-        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12"></path><path d="M6 12h12"></path><path d="M6 17h12"></path><path d="M9 7v10"></path></svg>';
-      }
-      if (kind === "edit") {
-        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg>';
-      }
-      if (kind === "delete") {
-        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>';
-      }
-      if (kind === "lock") {
-        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 1 1 8 0v3"></path></svg>';
-      }
-      if (kind === "unlock") {
-        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 7.2-2.4"></path></svg>';
-      }
-      if (kind === "open-external") {
-        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5"></path><path d="M10 14 19 5"></path><path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"></path></svg>';
-      }
-      if (kind === "copy-directory") {
-        return '<svg aria-hidden="true" viewBox="0 0 24 24" class="md-button__icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><rect x="13" y="3" width="8" height="8" rx="2"></rect><path d="M15.5 7h3"></path><path d="M17 5.5v3"></path></svg>';
-      }
-      return "";
-    }
-
-    function setButtonContent(button, label, iconKind) {
-      if (!button) return;
-      button.innerHTML = `${getButtonIconSvg(iconKind)}<span>${escapeHtml(label)}</span>`;
-    }
-
-    function loadEntries() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return [];
-        return parsed
-          .map((entry) => normalizeEntry(entry))
-          .filter(isValidEntry);
-      } catch (_) {
-        return [];
-      }
-    }
-
-    function createEmptyRecentActions() {
-      return {
-        "pseudo-squash": [],
-        "branch-diff": []
-      };
-    }
-
-    function normalizeRecentActions(rawRecentActions) {
-      const empty = createEmptyRecentActions();
-      const normalizeToolEntries = (value) => (
-        Array.isArray(value)
-          ? value.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 100)
-          : []
-      );
-      if (!rawRecentActions || typeof rawRecentActions !== "object" || Array.isArray(rawRecentActions)) {
-        return empty;
-      }
-      return {
-        "pseudo-squash": normalizeToolEntries(rawRecentActions["pseudo-squash"]),
-        "branch-diff": normalizeToolEntries(rawRecentActions["branch-diff"])
-      };
-    }
-
-    function loadRecentActions() {
-      try {
-        const raw = localStorage.getItem(RECENT_ACTIONS_KEY);
-        if (!raw) return createEmptyRecentActions();
-        const parsed = JSON.parse(raw);
-        return normalizeRecentActions(parsed);
-      } catch (_) {
-        return createEmptyRecentActions();
-      }
-    }
-
-    function saveEntries() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-    }
-
-    function saveRecentActions() {
-      localStorage.setItem(RECENT_ACTIONS_KEY, JSON.stringify(recentActions));
-    }
-
-    function buildMemoKey(repoUrl, baseBranch) {
-      return `${normalizeRepoUrl(repoUrl)}::${String(baseBranch || "").trim()}`;
-    }
-
-    function normalizeMemos(rawMemos) {
-      if (!rawMemos || typeof rawMemos !== "object" || Array.isArray(rawMemos)) {
-        return {};
-      }
-      const nextMemos = {};
-      Object.entries(rawMemos).forEach(([key, value]) => {
-        const normalizedKey = String(key || "").trim();
-        if (!normalizedKey) return;
-        if (typeof value === "string") {
-          const normalizedMemo = value.trim();
-          if (normalizedMemo) {
-            nextMemos[normalizedKey] = {
-              memo: normalizedMemo,
-              gitCurrentDir: ""
-            };
-          }
-          return;
+    function parseXmlDocument(xmlText) {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(xmlText, "application/xml");
+        const parserError = xml.getElementsByTagName("parsererror")[0];
+        if (parserError) {
+            throw new Error("XML の解析に失敗しました");
         }
-        if (!value || typeof value !== "object" || Array.isArray(value)) return;
-        const normalizedMemo = String(value.memo || "").trim();
-        const normalizedGitCurrentDir = String(value.gitCurrentDir || "").trim();
-        if (normalizedMemo || normalizedGitCurrentDir) {
-          nextMemos[normalizedKey] = {
-            memo: normalizedMemo,
-            gitCurrentDir: normalizedGitCurrentDir
-          };
-        }
-      });
-      return nextMemos;
+        return xml;
     }
-
-    function loadMemos() {
-      try {
-        const raw = localStorage.getItem(MEMO_STORAGE_KEY);
-        if (!raw) return {};
-        return normalizeMemos(JSON.parse(raw));
-      } catch (_) {
-        return {};
-      }
-    }
-
-    function saveMemos() {
-      localStorage.setItem(MEMO_STORAGE_KEY, JSON.stringify(memos));
-    }
-
-    function createExportPayload() {
-      return {
-        version: EXPORT_VERSION,
-        exportedAt: new Date().toISOString(),
-        entries,
-        memos
-      };
-    }
-
-    function buildExportFilename() {
-      const now = new Date();
-      const yyyy = String(now.getFullYear());
-      const mm = String(now.getMonth() + 1).padStart(2, "0");
-      const dd = String(now.getDate()).padStart(2, "0");
-      const hh = String(now.getHours()).padStart(2, "0");
-      const mi = String(now.getMinutes()).padStart(2, "0");
-      const ss = String(now.getSeconds()).padStart(2, "0");
-      return `git-work-list-export-${yyyy}${mm}${dd}-${hh}${mi}${ss}.json`;
-    }
-
-    function downloadTextFile(text, filename, contentType) {
-      const blob = new Blob([text], { type: contentType });
-      const objectUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = objectUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.setTimeout(() => {
-        URL.revokeObjectURL(objectUrl);
-      }, 0);
-    }
-
-    function exportEntriesAndMemos() {
-      const payload = createExportPayload();
-      downloadTextFile(
-        `${JSON.stringify(payload, null, 2)}\n`,
-        buildExportFilename(),
-        "application/json;charset=utf-8"
-      );
-      showToast("一覧を JSON でエクスポートしました");
-    }
-
-    function normalizeImportedPayload(rawPayload) {
-      if (!rawPayload || typeof rawPayload !== "object" || Array.isArray(rawPayload)) {
-        return null;
-      }
-      if (Number(rawPayload.version) !== EXPORT_VERSION) {
-        return null;
-      }
-      if (typeof rawPayload.exportedAt !== "string" || !rawPayload.exportedAt.trim()) {
-        return null;
-      }
-      if (!Array.isArray(rawPayload.entries)) {
-        return null;
-      }
-      return {
-        entries: rawPayload.entries
-          .map((entry) => normalizeEntry(entry))
-          .filter(isValidEntry),
-        memos: normalizeMemos(rawPayload.memos || {})
-      };
-    }
-
-    async function importEntriesAndMemosFromFile(file) {
-      if (!file) return;
-      try {
-        const rawText = await file.text();
-        const parsed = JSON.parse(rawText);
-        const normalized = normalizeImportedPayload(parsed);
-        if (!normalized) {
-          showToast("JSON の読み込みに失敗しました");
-          return;
-        }
-        entries = normalized.entries;
-        memos = normalized.memos;
-        saveEntries();
-        saveMemos();
-        renderEntries();
-        updatePrimaryActionsState();
-        showToast("一覧を JSON から取り込みました");
-      } catch (_) {
-        showToast("JSON の読み込みに失敗しました");
-      }
-    }
-
-    function normalizeScope(value) {
-      return value === "local" ? "local" : "remote";
-    }
-
-    function normalizeEntry(raw) {
-      const inferredEntryType = raw?.entryType
-        ? normalizeEntryType(raw?.entryType)
-        : (
-          String(raw?.baseBranch || "").trim() || String(raw?.compareBranch || "").trim()
-            ? "git"
-            : "url"
-        );
-      const entryType = normalizeEntryType(inferredEntryType);
-      return {
-        id: raw?.id ? String(raw.id) : createId(),
-        entryType,
-        repoUrl: normalizeRepoUrl(raw?.repoUrl),
-        baseBranch: entryType === "git" ? String(raw?.baseBranch || "").trim() : "",
-        baseScope: normalizeScope(raw?.baseScope),
-        compareBranch: entryType === "git" ? String(raw?.compareBranch || "").trim() : "",
-        compareScope: normalizeScope(raw?.compareScope),
-        compareUseHead: entryType === "git" && raw?.compareUseHead === true,
-        locked: raw?.locked === true,
-        remoteName: entryType === "git" ? (String(raw?.remoteName || "origin").trim() || "origin") : "",
-        createdAt: Number(raw?.createdAt || raw?.updatedAt || Date.now()),
-        updatedAt: Number(raw?.updatedAt || Date.now())
-      };
-    }
-
-    function createId() {
-      return `entry-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    }
-
-    function extractRepoName(repoUrl) {
-      const trimmed = String(repoUrl || "").trim().replace(/\/+$/, "");
-      if (!trimmed) return "(名称未設定)";
-      const normalized = trimmed.replace(/\.git$/i, "");
-      const parts = normalized.split(/[/:]/).filter(Boolean);
-      return parts[parts.length - 1] || normalized;
-    }
-
-    function buildDisplayName(entry) {
-      return extractRepoName(entry.repoUrl);
-    }
-
-    function buildUrlOnlyDisplayTitle(repoUrl, memoText) {
-      const normalizedMemo = String(memoText || "").trim().replace(/\s+/g, " ");
-      if (normalizedMemo) {
-        return normalizedMemo.slice(0, 10);
-      }
-      return extractRepoName(repoUrl);
-    }
-
-    function buildGroupKey(entry) {
-      if (!isGitEntry(entry)) {
-        return [
-          "url",
-          entry.repoUrl
-        ].join("::");
-      }
-      return [
-        "git",
-        entry.repoUrl,
-        buildRef(entry.baseBranch, entry.baseScope, entry.remoteName)
-      ].join("::");
-    }
-
-    function groupEntriesByBase(visibleEntries) {
-      const groupedMap = new Map();
-      visibleEntries.forEach((entry) => {
-        const key = buildGroupKey(entry);
-        const memoKey = buildMemoKey(entry.repoUrl, entry.baseBranch);
-        const existing = groupedMap.get(key);
-        if (existing) {
-          existing.entries.push(entry);
-          return;
-        }
-        groupedMap.set(key, {
-          key,
-          entryType: entry.entryType,
-          repoUrl: entry.repoUrl,
-          baseBranch: entry.baseBranch,
-          baseScope: entry.baseScope,
-          remoteName: entry.remoteName,
-          memoKey,
-          memo: String(memos[memoKey]?.memo || "").trim(),
-          gitCurrentDir: String(memos[memoKey]?.gitCurrentDir || "").trim(),
-          entries: [entry]
-        });
-        const createdGroup = groupedMap.get(key);
-        createdGroup.displayName = isGitEntry(entry)
-          ? buildDisplayName(entry)
-          : buildUrlOnlyDisplayTitle(createdGroup.repoUrl, createdGroup.memo);
-      });
-      return Array.from(groupedMap.values());
-    }
-
-    function isOpenableExternalUrl(url) {
-      return /^https?:\/\//i.test(String(url || "").trim());
-    }
-
-    function buildRef(branch, scope, remoteName) {
-      return scope === "remote" ? `${remoteName}/${branch}` : branch;
-    }
-
-    function buildBranchDiffUrl(entry) {
-      const params = new URLSearchParams();
-      params.set("repoUrl", entry.repoUrl);
-      params.set("baseBranch", entry.baseBranch);
-      params.set("baseScope", entry.baseScope);
-      params.set("workBranch", entry.compareBranch);
-      params.set("workScope", entry.compareScope);
-      params.set("remoteName", entry.remoteName);
-      if (entry.compareUseHead) {
-        params.set("useHeadWork", "1");
-      }
-      return `git-branch-diff.html?${params.toString()}`;
-    }
-
-    function buildPseudoSquashUrl(entry) {
-      const params = new URLSearchParams();
-      params.set("repoUrl", entry.repoUrl);
-      params.set("baseBranch", entry.baseBranch);
-      params.set("baseScope", entry.baseScope);
-      params.set("workBranch", entry.compareBranch);
-      params.set("remoteName", entry.remoteName);
-      params.set("useCurrentBranch", entry.compareUseHead ? "true" : "false");
-      return `git-pseudo-squash.html?${params.toString()}`;
-    }
-
-    function updateRecentActions(currentRecentActions, entryId, tool) {
-      const normalized = normalizeRecentActions(currentRecentActions);
-      const nextToolEntries = [
-        entryId,
-        ...normalized[tool].filter((item) => item !== entryId)
-      ].slice(0, 100);
-      return {
-        ...normalized,
-        [tool]: nextToolEntries
-      };
-    }
-
-    function getToolButtonClass(entryId, tool) {
-      const toolEntries = recentActions[tool] || [];
-      if (toolEntries[0] === entryId) return "md-button--primary";
-      if (toolEntries[1] === entryId) return "md-button--secondary";
-      return "md-button--surface";
-    }
-
-    function markToolUsed(entryId, tool) {
-      recentActions = updateRecentActions(recentActions, entryId, tool);
-      saveRecentActions();
-    }
-
-    function openBranchDiff(entry) {
-      window.location.href = buildBranchDiffUrl(entry);
-    }
-
-    function openPseudoSquash(entry) {
-      window.location.href = buildPseudoSquashUrl(entry);
-    }
-
-    function openRepoUrl(entry) {
-      if (!isOpenableExternalUrl(entry.repoUrl)) return;
-      window.open(entry.repoUrl, "_blank", "noopener,noreferrer");
-    }
-
-    function readFormEntry() {
-      const existingEntry = entries.find((item) => item.id === editingId);
-      const entryType = normalizeEntryType(readSelectValue("entryType", existingEntry?.entryType || "git"));
-      return normalizeEntry({
-        id: editingId || createId(),
-        entryType,
-        repoUrl: normalizeRepoUrl(readText("repoUrl")),
-        baseBranch: entryType === "git" ? readText("baseBranch") : "",
-        baseScope: readSelectValue("baseScope", "remote"),
-        compareBranch: entryType === "git" ? readText("compareBranch") : "",
-        compareScope: readSelectValue("compareScope", "local"),
-        compareUseHead: false,
-        locked: existingEntry?.locked === true,
-        remoteName: entryType === "git" ? (readText("remoteName") || "origin") : "",
-        createdAt: existingEntry?.createdAt || Date.now(),
-        updatedAt: Date.now()
-      });
-    }
-
-    function validateEntry(entry) {
-      if (!entry.repoUrl) {
-        alert("リポジトリ URL を入力してください。");
-        return false;
-      }
-      if (isGitEntry(entry) && !entry.baseBranch) {
-        alert("基準ブランチを入力してください。");
-        return false;
-      }
-      if (isGitEntry(entry) && !entry.compareBranch) {
-        alert("比較ブランチを入力してください。");
-        return false;
-      }
-      return true;
-    }
-
-    function updateEntryTypeUi(entryType) {
-      const normalizedEntryType = normalizeEntryType(entryType);
-      const gitFields = document.getElementById("gitFields");
-      const gitRemoteField = document.getElementById("gitRemoteField");
-      const titleNode = document.getElementById("entryDialogTitle");
-      const subtitleNode = document.querySelector("#entryForm .md-dialog__subtitle");
-      if (gitFields) {
-        gitFields.classList.toggle("md-hidden", normalizedEntryType !== "git");
-      }
-      if (gitRemoteField) {
-        gitRemoteField.classList.toggle("md-hidden", normalizedEntryType !== "git");
-      }
-      if (titleNode && dialogMode === "create") {
-        titleNode.textContent = "登録";
-      }
-      if (subtitleNode) {
-        subtitleNode.textContent = normalizedEntryType === "git"
-          ? "リポジトリ URL と作業対象ブランチを入力します。"
-          : "URL とメモだけを管理する項目を登録します。";
-      }
-    }
-
-    function resetForm() {
-      editingId = "";
-      dialogMode = "create";
-      const entryTypeField = document.getElementById("entryType");
-      if (entryTypeField) {
-        entryTypeField.value = "git";
-      }
-      setText("repoUrl", "");
-      updateRepoUrlLockState(false);
-      setText("baseBranch", "");
-      setText("compareBranch", "");
-      setText("remoteName", "origin");
-      const baseScope = document.getElementById("baseScope");
-      const compareScope = document.getElementById("compareScope");
-      if (baseScope) baseScope.value = "remote";
-      if (compareScope) compareScope.value = "local";
-      const saveButton = document.getElementById("saveEntryBtn");
-      setButtonContent(saveButton, "追加", "add");
-      const titleNode = document.getElementById("entryDialogTitle");
-      if (titleNode) {
-        titleNode.textContent = "登録";
-      }
-      updateEntryTypeUi("git");
-    }
-
-    function populateForm(entry) {
-      editingId = entry.id;
-      dialogMode = "edit";
-      const entryTypeField = document.getElementById("entryType");
-      if (entryTypeField) {
-        entryTypeField.value = normalizeEntryType(entry.entryType);
-      }
-      setText("repoUrl", entry.repoUrl);
-      updateRepoUrlLockState(!!entry.repoUrl);
-      setText("baseBranch", entry.baseBranch);
-      setText("compareBranch", entry.compareBranch);
-      setText("remoteName", entry.remoteName);
-      const baseScope = document.getElementById("baseScope");
-      const compareScope = document.getElementById("compareScope");
-      if (baseScope) baseScope.value = entry.baseScope;
-      if (compareScope) compareScope.value = entry.compareScope;
-      const saveButton = document.getElementById("saveEntryBtn");
-      setButtonContent(saveButton, "更新", "edit");
-      const titleNode = document.getElementById("entryDialogTitle");
-      if (titleNode) {
-        titleNode.textContent = "更新";
-      }
-      updateEntryTypeUi(entry.entryType);
-    }
-
-    function openCreateDialog() {
-      resetForm();
-      openEntryDialog();
-    }
-
-    function openEditDialog(entry) {
-      populateForm(entry);
-      openEntryDialog();
-    }
-
-    function openEntryDialog() {
-      const dialog = getDialog();
-      if (!dialog) return;
-      if (typeof dialog.showModal === "function") {
-        dialog.showModal();
-      }
-    }
-
-    function closeEntryDialog() {
-      const dialog = getDialog();
-      if (!dialog) return;
-      if (dialog.open && typeof dialog.close === "function") {
-        dialog.close();
-      }
-    }
-
-    function updateEmptyGuide(visibleCount) {
-      const guide = document.getElementById("emptyGuide");
-      if (!guide) return;
-      if (entries.length === 0) {
-        guide.hidden = false;
-        guide.textContent = "まだ登録がありません。追加ボタンから登録してください。";
-        return;
-      }
-      guide.hidden = true;
-    }
-
-    function renderGroup(group) {
-      const memoPreview = group.memo.length > 16 ? `${group.memo.slice(0, 16)}...` : group.memo;
-      const baseSection = isGitEntry(group)
-        ? `
-            <section class="md-ref-box md-entry-base-box">
-              <div class="md-ref-label">基準 <span class="md-scope-badge" data-scope="${escapeHtml(group.baseScope)}">${escapeHtml(group.baseScope)}</span></div>
-              <div class="md-ref-value">${escapeHtml(buildRef(group.baseBranch, group.baseScope, group.remoteName))}</div>
-            </section>
-          `
-        : `
-            <section class="md-ref-box md-entry-base-box">
-              <div class="md-ref-label">種別</div>
-              <div class="md-ref-value">URLのみ</div>
-            </section>
-          `;
-      return `
-        <article class="md-entry-card md-entry-group" data-group-key="${escapeHtml(group.key)}">
-          <div class="md-entry-head">
-            <div class="md-entry-title-wrap">
-              <div class="md-entry-title-row">
-                <h3 class="md-entry-title">${escapeHtml(group.displayName)}</h3>
-                <button type="button" class="md-entry-memo-btn" data-action="edit-memo" data-memo-key="${escapeHtml(group.memoKey)}" data-repo-url="${escapeHtml(group.repoUrl)}" data-base-branch="${escapeHtml(group.baseBranch)}" aria-label="メモを編集" title="メモを編集">${getButtonIconSvg("edit")}</button>
-                ${group.memo ? `<span class="md-entry-memo-preview" data-full-text="${escapeHtml(group.memo)}">${escapeHtml(memoPreview)}</span>` : ""}
-                ${group.gitCurrentDir ? `<button type="button" class="md-entry-copy-dir-btn" data-action="copy-git-current-dir" data-git-current-dir="${escapeHtml(group.gitCurrentDir)}" aria-label="git カレントディレクトリをコピー" title="${escapeHtml(group.gitCurrentDir)}">${getButtonIconSvg("copy-directory")}</button>` : ""}
-              </div>
-              <div class="md-entry-url-row">
-                <div class="md-entry-url">${escapeHtml(group.repoUrl)}</div>
-                ${isOpenableExternalUrl(group.repoUrl) ? `<button type="button" class="md-entry-link-btn" data-action="open-repo-url" data-repo-url="${escapeHtml(group.repoUrl)}" title="URL を開く" aria-label="URL を開く">${getButtonIconSvg("open-external")}</button>` : ""}
-              </div>
-            </div>
-            ${baseSection}
-          </div>
-          <div class="md-entry-meta">
-            <div class="md-entry-divider" aria-hidden="true"></div>
-            <div class="md-work-row-list">
-              ${group.entries.map((entry) => renderWorkRow(entry)).join("")}
-            </div>
-          </div>
-        </article>
-      `;
-    }
-
-    function getMemoDialog() {
-      return document.getElementById("memoDialog");
-    }
-
-    function openMemoDialog(repoUrl, baseBranch) {
-      editingMemoKey = buildMemoKey(repoUrl, baseBranch);
-      const memoField = document.getElementById("memoText");
-      if (memoField) {
-        memoField.value = String(memos[editingMemoKey]?.memo || "");
-      }
-      const gitCurrentDirectoryField = document.getElementById("gitCurrentDirectory");
-      if (gitCurrentDirectoryField) {
-        gitCurrentDirectoryField.value = String(memos[editingMemoKey]?.gitCurrentDir || "");
-      }
-      const dialog = getMemoDialog();
-      if (!dialog) return;
-      if (typeof dialog.showModal === "function") {
-        dialog.showModal();
-      }
-    }
-
-    function closeMemoDialog() {
-      const dialog = getMemoDialog();
-      if (!dialog) return;
-      if (dialog.open && typeof dialog.close === "function") {
-        dialog.close();
-      }
-      editingMemoKey = "";
-    }
-
-    function saveMemo() {
-      if (!editingMemoKey) return;
-      const memoField = document.getElementById("memoText");
-      const memoText = memoField ? String(memoField.value || "").trim() : "";
-      const gitCurrentDirectoryField = document.getElementById("gitCurrentDirectory");
-      const gitCurrentDir = gitCurrentDirectoryField ? String(gitCurrentDirectoryField.value || "").trim() : "";
-      if (memoText || gitCurrentDir) {
-        memos[editingMemoKey] = {
-          memo: memoText,
-          gitCurrentDir
+    function importMsProjectXml(xmlText) {
+        var _a, _b, _c, _d;
+        const xml = parseXmlDocument(xmlText);
+        const projectElement = xml.documentElement;
+        const calendars = Array.from(((_a = projectElement.getElementsByTagName("Calendars")[0]) === null || _a === void 0 ? void 0 : _a.getElementsByTagName("Calendar")) || []);
+        const tasks = Array.from(((_b = projectElement.getElementsByTagName("Tasks")[0]) === null || _b === void 0 ? void 0 : _b.getElementsByTagName("Task")) || []);
+        const resources = Array.from(((_c = projectElement.getElementsByTagName("Resources")[0]) === null || _c === void 0 ? void 0 : _c.getElementsByTagName("Resource")) || []);
+        const assignments = Array.from(((_d = projectElement.getElementsByTagName("Assignments")[0]) === null || _d === void 0 ? void 0 : _d.getElementsByTagName("Assignment")) || []);
+        return {
+            project: {
+                name: textContent(projectElement, "Name"),
+                currentDate: textContent(projectElement, "CurrentDate") || undefined,
+                startDate: textContent(projectElement, "StartDate"),
+                finishDate: textContent(projectElement, "FinishDate"),
+                scheduleFromStart: parseBoolean(textContent(projectElement, "ScheduleFromStart")),
+                defaultStartTime: textContent(projectElement, "DefaultStartTime") || undefined,
+                defaultFinishTime: textContent(projectElement, "DefaultFinishTime") || undefined,
+                minutesPerDay: textContent(projectElement, "MinutesPerDay") ? parseNumber(textContent(projectElement, "MinutesPerDay"), 0) : undefined,
+                minutesPerWeek: textContent(projectElement, "MinutesPerWeek") ? parseNumber(textContent(projectElement, "MinutesPerWeek"), 0) : undefined,
+                daysPerMonth: textContent(projectElement, "DaysPerMonth") ? parseNumber(textContent(projectElement, "DaysPerMonth"), 0) : undefined,
+                calendarUID: textContent(projectElement, "CalendarUID") || undefined
+            },
+            calendars: calendars.map((calendar) => ({
+                uid: textContent(calendar, "UID"),
+                name: textContent(calendar, "Name"),
+                isBaseCalendar: parseBoolean(textContent(calendar, "IsBaseCalendar"))
+            })),
+            tasks: tasks.map((task) => ({
+                uid: textContent(task, "UID"),
+                id: textContent(task, "ID"),
+                name: textContent(task, "Name"),
+                outlineLevel: parseNumber(textContent(task, "OutlineLevel"), 1),
+                outlineNumber: textContent(task, "OutlineNumber"),
+                start: textContent(task, "Start"),
+                finish: textContent(task, "Finish"),
+                duration: textContent(task, "Duration"),
+                actualStart: textContent(task, "ActualStart") || undefined,
+                actualFinish: textContent(task, "ActualFinish") || undefined,
+                milestone: parseBoolean(textContent(task, "Milestone")),
+                summary: parseBoolean(textContent(task, "Summary")),
+                percentComplete: parseNumber(textContent(task, "PercentComplete"), 0),
+                notes: textContent(task, "Notes") || undefined,
+                constraintType: textContent(task, "ConstraintType") ? parseNumber(textContent(task, "ConstraintType"), 0) : undefined,
+                constraintDate: textContent(task, "ConstraintDate") || undefined,
+                predecessors: Array.from(task.getElementsByTagName("PredecessorLink")).map((link) => ({
+                    predecessorUid: textContent(link, "PredecessorUID"),
+                    type: parseNumber(textContent(link, "Type"), 0),
+                    linkLag: textContent(link, "LinkLag") || undefined
+                }))
+            })),
+            resources: resources.map((resource) => ({
+                uid: textContent(resource, "UID"),
+                id: textContent(resource, "ID"),
+                name: textContent(resource, "Name"),
+                type: parseNumber(textContent(resource, "Type"), 0),
+                initials: textContent(resource, "Initials") || undefined,
+                group: textContent(resource, "Group") || undefined,
+                maxUnits: textContent(resource, "MaxUnits") ? parseNumber(textContent(resource, "MaxUnits"), 0) : undefined
+            })),
+            assignments: assignments.map((assignment) => ({
+                uid: textContent(assignment, "UID"),
+                taskUid: textContent(assignment, "TaskUID"),
+                resourceUid: textContent(assignment, "ResourceUID"),
+                start: textContent(assignment, "Start") || undefined,
+                finish: textContent(assignment, "Finish") || undefined,
+                units: parseNumber(textContent(assignment, "Units"), 0),
+                work: textContent(assignment, "Work") || undefined
+            }))
         };
-      } else {
-        delete memos[editingMemoKey];
-      }
-      saveMemos();
-      renderEntries();
-      closeMemoDialog();
-      showToast("メモを保存しました");
     }
-
-    function quoteShellPath(value) {
-      const text = String(value || "");
-      if (!text) return "''";
-      return `'${text.replace(/'/g, `'\"'\"'`)}'`;
-    }
-
-    async function copyGitStatusCommand() {
-      const gitCurrentDirectoryField = document.getElementById("gitCurrentDirectory");
-      const gitCurrentDir = gitCurrentDirectoryField ? String(gitCurrentDirectoryField.value || "").trim() : "";
-      if (!gitCurrentDir) {
-        showToast("git カレントディレクトリを入力してください");
-        return;
-      }
-      const commandText = `cd ${quoteShellPath(gitCurrentDir)}\ngit status -sb`;
-      const copied = await copyTextToClipboard(commandText);
-      if (copied) {
-        showToast("cd + git status をコピーしました");
-      }
-    }
-
-    async function copyTextToClipboard(text) {
-      const normalizedText = String(text || "");
-      if (!normalizedText) return false;
-      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
-        try {
-          await navigator.clipboard.writeText(normalizedText);
-          return true;
-        } catch (_) {
-          // fallback below
+    function appendTextElement(doc, parent, name, value) {
+        if (value === undefined || value === "") {
+            return;
         }
-      }
-      const temp = document.createElement("textarea");
-      temp.value = normalizedText;
-      document.body.appendChild(temp);
-      temp.select();
-      const copied = document.execCommand("copy");
-      document.body.removeChild(temp);
-      return !!copied;
-    }
-
-    function renderWorkRow(entry) {
-      if (!isGitEntry(entry)) {
-        return `
-          <section class="md-work-row" data-entry-id="${escapeHtml(entry.id)}">
-            <div class="md-work-row__main">
-              <div class="md-ref-box md-ref-box--work">
-                <div class="md-ref-label">${entry.locked ? `<span class="md-entry-lock-icon" aria-label="ロック中">${getButtonIconSvg("lock")}</span>` : ""}利用モード</div>
-                <div class="md-ref-value-row">
-                  <div class="md-ref-value">Git連携なし</div>
-                </div>
-              </div>
-            </div>
-            <div class="md-entry-actions md-work-row__actions">
-              <button type="button" class="md-button md-button--surface" data-action="edit-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("edit")}<span>変更</span></button>
-              <button type="button" class="md-button md-button--danger" data-action="delete-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("delete")}<span>削除</span></button>
-              <button type="button" class="md-button ${entry.locked ? "md-button--lock-active" : "md-button--surface"}" data-action="toggle-lock">${getButtonIconSvg(entry.locked ? "lock" : "unlock")}<span>${entry.locked ? "解除" : "ロック"}</span></button>
-            </div>
-          </section>
-        `;
-      }
-      const workRef = buildRef(entry.compareBranch, entry.compareScope, entry.remoteName);
-      return `
-        <section class="md-work-row" data-entry-id="${escapeHtml(entry.id)}">
-          <div class="md-work-row__main">
-            <div class="md-ref-box md-ref-box--work">
-              <div class="md-ref-label">${entry.locked ? `<span class="md-entry-lock-icon" aria-label="ロック中">${getButtonIconSvg("lock")}</span>` : ""}作業 <span class="md-scope-badge" data-scope="${escapeHtml(entry.compareScope)}">${escapeHtml(entry.compareScope)}</span></div>
-              <div class="md-ref-value-row">
-                <div class="md-ref-value">${escapeHtml(workRef)}</div>
-                ${entry.compareUseHead ? '<span class="md-head-badge">HEAD</span>' : ""}
-              </div>
-            </div>
-          </div>
-          <div class="md-entry-actions md-work-row__actions">
-            <button type="button" class="md-button ${getToolButtonClass(entry.id, "pseudo-squash")}" data-action="open-pseudo-squash">${getButtonIconSvg("pseudo-squash")}<span>Squash</span></button>
-            <button type="button" class="md-button ${getToolButtonClass(entry.id, "branch-diff")}" data-action="open-branch-diff">${getButtonIconSvg("branch-diff")}<span>比較</span></button>
-            <button type="button" class="md-button md-button--surface" data-action="edit-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("edit")}<span>変更</span></button>
-            <button type="button" class="md-button md-button--danger" data-action="delete-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("delete")}<span>削除</span></button>
-            <button type="button" class="md-button ${entry.locked ? "md-button--lock-active" : "md-button--surface"}" data-action="toggle-lock">${getButtonIconSvg(entry.locked ? "lock" : "unlock")}<span>${entry.locked ? "解除" : "ロック"}</span></button>
-          </div>
-        </section>
-      `;
-    }
-
-    function renderEntries() {
-      const list = document.getElementById("entriesList");
-      if (!list) return;
-      const visibleEntries = entries
-        .slice()
-        .sort((left, right) => Number(right.createdAt || 0) - Number(left.createdAt || 0));
-      const visibleGroups = groupEntriesByBase(visibleEntries);
-
-      updateEmptyGuide(visibleEntries.length);
-      updatePrimaryActionsState();
-
-      if (visibleEntries.length === 0) {
-        list.innerHTML = "";
-        return;
-      }
-
-      list.innerHTML = visibleGroups.map((group) => renderGroup(group)).join("");
-    }
-
-    function saveCurrentEntry() {
-      const entry = readFormEntry();
-      if (!validateEntry(entry)) return;
-
-      const existingIndex = entries.findIndex((item) => item.id === entry.id);
-      if (existingIndex >= 0) {
-        entries.splice(existingIndex, 1, entry);
-        showToast("一覧を更新しました");
-      } else {
-        entries.push(entry);
-        showToast("一覧に追加しました");
-      }
-      saveEntries();
-      renderEntries();
-      closeEntryDialog();
-      resetForm();
-    }
-
-    function deleteEntry(entryId) {
-      const target = entries.find((entry) => entry.id === entryId);
-      if (!target) return;
-      if (target.locked) {
-        showToast("ロック中のため削除できません");
-        return;
-      }
-      entries = entries.filter((entry) => entry.id !== entryId);
-      saveEntries();
-      renderEntries();
-      if (editingId === entryId) {
-        resetForm();
-      }
-      showToast("一覧から削除しました");
-    }
-
-    function toggleEntryLock(entryId) {
-      const target = entries.find((entry) => entry.id === entryId);
-      if (!target) return;
-      target.locked = !target.locked;
-      saveEntries();
-      renderEntries();
-      if (editingId === entryId && target.locked) {
-        closeEntryDialog();
-        resetForm();
-      }
-      showToast(target.locked ? "ロックしました" : "ロックを解除しました");
-    }
-
-    async function handleListClick(event) {
-      const button = event.target.closest("[data-action]");
-      if (!button) return;
-      const action = button.getAttribute("data-action");
-      if (action === "edit-memo") {
-        openMemoDialog(button.getAttribute("data-repo-url"), button.getAttribute("data-base-branch"));
-        return;
-      }
-      if (action === "copy-git-current-dir") {
-        const gitCurrentDir = button.getAttribute("data-git-current-dir");
-        const copied = await copyTextToClipboard(gitCurrentDir);
-        if (copied) {
-          showToast("git カレントディレクトリをコピーしました");
+        const element = doc.createElement(name);
+        if (typeof value === "boolean") {
+            element.textContent = value ? "1" : "0";
         }
-        return;
-      }
-      if (action === "open-repo-url") {
-        const repoUrl = button.getAttribute("data-repo-url");
-        if (!isOpenableExternalUrl(repoUrl)) return;
-        window.open(repoUrl, "_blank", "noopener,noreferrer");
-        return;
-      }
-      const card = button.closest("[data-entry-id]");
-      if (!card) return;
-      const entryId = card.getAttribute("data-entry-id");
-      const entry = entries.find((item) => item.id === entryId);
-      if (!entry) return;
-
-      if (action === "open-branch-diff") {
-        markToolUsed(entryId, "branch-diff");
-        openBranchDiff(entry);
-        return;
-      }
-      if (action === "open-pseudo-squash") {
-        markToolUsed(entryId, "pseudo-squash");
-        openPseudoSquash(entry);
-        return;
-      }
-      if (action === "edit-entry") {
-        if (entry.locked) {
-          showToast("ロック中のため変更できません");
-          return;
+        else {
+            element.textContent = String(value);
         }
-        openEditDialog(entry);
-        return;
-      }
-      if (action === "delete-entry") {
-        deleteEntry(entryId);
-        return;
-      }
-      if (action === "toggle-lock") {
-        toggleEntryLock(entryId);
-      }
+        parent.appendChild(element);
     }
+    function formatXml(xml) {
+        const normalized = xml.replace(/>\s*</g, "><").trim();
+        const tokens = normalized.replace(/></g, ">\n<").split("\n");
+        let indentLevel = 0;
+        const formatted = [];
+        for (const rawToken of tokens) {
+            const token = rawToken.trim();
+            if (!token) {
+                continue;
+            }
+            if (/^<\//.test(token)) {
+                indentLevel = Math.max(indentLevel - 1, 0);
+            }
+            formatted.push(`${"  ".repeat(indentLevel)}${token}`);
+            if (/^<[^!?/][^>]*[^/]>\s*$/.test(token) && !/<\/[^>]+>$/.test(token)) {
+                indentLevel += 1;
+            }
+        }
+        return formatted.join("\n");
+    }
+    function exportMsProjectXml(model) {
+        const doc = document.implementation.createDocument("", "Project", null);
+        const project = doc.documentElement;
+        project.setAttribute("xmlns", "http://schemas.microsoft.com/project");
+        appendTextElement(doc, project, "Name", model.project.name);
+        appendTextElement(doc, project, "CurrentDate", model.project.currentDate);
+        appendTextElement(doc, project, "StartDate", model.project.startDate);
+        appendTextElement(doc, project, "FinishDate", model.project.finishDate);
+        appendTextElement(doc, project, "ScheduleFromStart", model.project.scheduleFromStart);
+        appendTextElement(doc, project, "DefaultStartTime", model.project.defaultStartTime);
+        appendTextElement(doc, project, "DefaultFinishTime", model.project.defaultFinishTime);
+        appendTextElement(doc, project, "MinutesPerDay", model.project.minutesPerDay);
+        appendTextElement(doc, project, "MinutesPerWeek", model.project.minutesPerWeek);
+        appendTextElement(doc, project, "DaysPerMonth", model.project.daysPerMonth);
+        appendTextElement(doc, project, "CalendarUID", model.project.calendarUID);
+        const calendarsElement = doc.createElement("Calendars");
+        for (const calendar of model.calendars) {
+            const calendarElement = doc.createElement("Calendar");
+            appendTextElement(doc, calendarElement, "UID", calendar.uid);
+            appendTextElement(doc, calendarElement, "Name", calendar.name);
+            appendTextElement(doc, calendarElement, "IsBaseCalendar", calendar.isBaseCalendar);
+            calendarsElement.appendChild(calendarElement);
+        }
+        project.appendChild(calendarsElement);
+        const tasksElement = doc.createElement("Tasks");
+        for (const task of model.tasks) {
+            const taskElement = doc.createElement("Task");
+            appendTextElement(doc, taskElement, "UID", task.uid);
+            appendTextElement(doc, taskElement, "ID", task.id);
+            appendTextElement(doc, taskElement, "Name", task.name);
+            appendTextElement(doc, taskElement, "OutlineLevel", task.outlineLevel);
+            appendTextElement(doc, taskElement, "OutlineNumber", task.outlineNumber);
+            appendTextElement(doc, taskElement, "Start", task.start);
+            appendTextElement(doc, taskElement, "Finish", task.finish);
+            appendTextElement(doc, taskElement, "Duration", task.duration);
+            appendTextElement(doc, taskElement, "ActualStart", task.actualStart);
+            appendTextElement(doc, taskElement, "ActualFinish", task.actualFinish);
+            appendTextElement(doc, taskElement, "ConstraintType", task.constraintType);
+            appendTextElement(doc, taskElement, "ConstraintDate", task.constraintDate);
+            appendTextElement(doc, taskElement, "Milestone", task.milestone);
+            appendTextElement(doc, taskElement, "Summary", task.summary);
+            appendTextElement(doc, taskElement, "PercentComplete", task.percentComplete);
+            appendTextElement(doc, taskElement, "Notes", task.notes);
+            for (const predecessor of task.predecessors) {
+                const predecessorElement = doc.createElement("PredecessorLink");
+                appendTextElement(doc, predecessorElement, "PredecessorUID", predecessor.predecessorUid);
+                appendTextElement(doc, predecessorElement, "Type", predecessor.type);
+                appendTextElement(doc, predecessorElement, "LinkLag", predecessor.linkLag);
+                taskElement.appendChild(predecessorElement);
+            }
+            tasksElement.appendChild(taskElement);
+        }
+        project.appendChild(tasksElement);
+        const resourcesElement = doc.createElement("Resources");
+        for (const resource of model.resources) {
+            const resourceElement = doc.createElement("Resource");
+            appendTextElement(doc, resourceElement, "UID", resource.uid);
+            appendTextElement(doc, resourceElement, "ID", resource.id);
+            appendTextElement(doc, resourceElement, "Name", resource.name);
+            appendTextElement(doc, resourceElement, "Type", resource.type);
+            appendTextElement(doc, resourceElement, "Initials", resource.initials);
+            appendTextElement(doc, resourceElement, "Group", resource.group);
+            appendTextElement(doc, resourceElement, "MaxUnits", resource.maxUnits);
+            resourcesElement.appendChild(resourceElement);
+        }
+        project.appendChild(resourcesElement);
+        const assignmentsElement = doc.createElement("Assignments");
+        for (const assignment of model.assignments) {
+            const assignmentElement = doc.createElement("Assignment");
+            appendTextElement(doc, assignmentElement, "UID", assignment.uid);
+            appendTextElement(doc, assignmentElement, "TaskUID", assignment.taskUid);
+            appendTextElement(doc, assignmentElement, "ResourceUID", assignment.resourceUid);
+            appendTextElement(doc, assignmentElement, "Start", assignment.start);
+            appendTextElement(doc, assignmentElement, "Finish", assignment.finish);
+            appendTextElement(doc, assignmentElement, "Units", assignment.units);
+            appendTextElement(doc, assignmentElement, "Work", assignment.work);
+            assignmentsElement.appendChild(assignmentElement);
+        }
+        project.appendChild(assignmentsElement);
+        const serializer = new XMLSerializer();
+        const serialized = serializer.serializeToString(doc);
+        return `<?xml version="1.0" encoding="UTF-8"?>\n${formatXml(serialized)}\n`;
+    }
+    function normalizeProjectModel(model) {
+        return JSON.parse(JSON.stringify(model));
+    }
+    function validateProjectModel(model) {
+        const issues = [];
+        const taskUidSet = new Set();
+        const taskIdSet = new Set();
+        const resourceUidSet = new Set();
+        const calendarUidSet = new Set();
+        if (!model.project.name) {
+            issues.push({ level: "warning", scope: "project", message: "Project Name が空です" });
+        }
+        if (!model.project.startDate) {
+            issues.push({ level: "warning", scope: "project", message: "Project StartDate が空です" });
+        }
+        if (!model.project.finishDate) {
+            issues.push({ level: "warning", scope: "project", message: "Project FinishDate が空です" });
+        }
+        if (model.project.minutesPerDay !== undefined && model.project.minutesPerDay <= 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project MinutesPerDay は正の値が望ましいです" });
+        }
+        if (model.project.minutesPerWeek !== undefined && model.project.minutesPerWeek <= 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project MinutesPerWeek は正の値が望ましいです" });
+        }
+        if (model.project.daysPerMonth !== undefined && model.project.daysPerMonth <= 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project DaysPerMonth は正の値が望ましいです" });
+        }
+        for (const calendar of model.calendars) {
+            if (!calendar.uid) {
+                issues.push({ level: "error", scope: "calendars", message: "Calendar UID が空です" });
+            }
+            if (calendarUidSet.has(calendar.uid)) {
+                issues.push({ level: "error", scope: "calendars", message: `Calendar UID が重複しています: ${calendar.uid}` });
+            }
+            calendarUidSet.add(calendar.uid);
+        }
+        if (model.project.calendarUID && !calendarUidSet.has(model.project.calendarUID)) {
+            issues.push({
+                level: "error",
+                scope: "project",
+                message: `Project CalendarUID が既存 Calendar を指していません: ${model.project.calendarUID}`
+            });
+        }
+        for (const task of model.tasks) {
+            if (!task.uid) {
+                issues.push({ level: "error", scope: "tasks", message: "Task UID が空です" });
+            }
+            if (!task.id) {
+                issues.push({ level: "error", scope: "tasks", message: `Task ID が空です: ${task.name || "(無名)"}` });
+            }
+            if (!task.name) {
+                issues.push({ level: "error", scope: "tasks", message: `Task Name が空です: UID=${task.uid || "(なし)"}` });
+            }
+            if (taskIdSet.has(task.id)) {
+                issues.push({ level: "error", scope: "tasks", message: `Task ID が重複しています: ${task.id}` });
+            }
+            taskIdSet.add(task.id);
+            if (!task.start) {
+                issues.push({ level: "warning", scope: "tasks", message: `Task Start が空です: UID=${task.uid}` });
+            }
+            if (!task.finish) {
+                issues.push({ level: "warning", scope: "tasks", message: `Task Finish が空です: UID=${task.uid}` });
+            }
+            if (task.outlineLevel < 1) {
+                issues.push({ level: "error", scope: "tasks", message: `Task OutlineLevel が不正です: UID=${task.uid}` });
+            }
+            if (task.outlineNumber) {
+                const outlineParts = task.outlineNumber.split(".").filter(Boolean);
+                if (outlineParts.length !== task.outlineLevel) {
+                    issues.push({
+                        level: "warning",
+                        scope: "tasks",
+                        message: `Task OutlineNumber と OutlineLevel の整合が取れていません: UID=${task.uid}`
+                    });
+                }
+            }
+            if (task.percentComplete < 0 || task.percentComplete > 100) {
+                issues.push({
+                    level: "warning",
+                    scope: "tasks",
+                    message: `Task PercentComplete が 0..100 の範囲外です: UID=${task.uid}`
+                });
+            }
+            const taskStart = parseDateValue(task.start);
+            const taskFinish = parseDateValue(task.finish);
+            const taskActualStart = parseDateValue(task.actualStart);
+            const taskActualFinish = parseDateValue(task.actualFinish);
+            if (taskStart !== null && taskFinish !== null && taskStart > taskFinish) {
+                issues.push({
+                    level: "warning",
+                    scope: "tasks",
+                    message: `Task Start が Finish より後です: UID=${task.uid}`
+                });
+            }
+            if (taskActualStart !== null && taskActualFinish !== null && taskActualStart > taskActualFinish) {
+                issues.push({
+                    level: "warning",
+                    scope: "tasks",
+                    message: `Task ActualStart が ActualFinish より後です: UID=${task.uid}`
+                });
+            }
+            if (taskUidSet.has(task.uid)) {
+                issues.push({ level: "error", scope: "tasks", message: `Task UID が重複しています: ${task.uid}` });
+            }
+            taskUidSet.add(task.uid);
+        }
+        for (const resource of model.resources) {
+            if (!resource.uid) {
+                issues.push({ level: "error", scope: "resources", message: "Resource UID が空です" });
+            }
+            if (!resource.name) {
+                issues.push({ level: "warning", scope: "resources", message: `Resource Name が空です: UID=${resource.uid || "(なし)"}` });
+            }
+            if (resourceUidSet.has(resource.uid)) {
+                issues.push({ level: "error", scope: "resources", message: `Resource UID が重複しています: ${resource.uid}` });
+            }
+            resourceUidSet.add(resource.uid);
+        }
+        for (const task of model.tasks) {
+            for (const predecessor of task.predecessors) {
+                if (!taskUidSet.has(predecessor.predecessorUid)) {
+                    issues.push({
+                        level: "error",
+                        scope: "tasks",
+                        message: `PredecessorUID が既存 Task を指していません: task=${task.uid}, predecessor=${predecessor.predecessorUid}`
+                    });
+                }
+            }
+        }
+        for (const assignment of model.assignments) {
+            if (!assignment.uid) {
+                issues.push({ level: "warning", scope: "assignments", message: "Assignment UID が空です" });
+            }
+            if (!taskUidSet.has(assignment.taskUid)) {
+                issues.push({
+                    level: "error",
+                    scope: "assignments",
+                    message: `Assignment TaskUID が既存 Task を指していません: ${assignment.taskUid}`
+                });
+            }
+            if (!resourceUidSet.has(assignment.resourceUid)) {
+                issues.push({
+                    level: "error",
+                    scope: "assignments",
+                    message: `Assignment ResourceUID が既存 Resource を指していません: ${assignment.resourceUid}`
+                });
+            }
+            if (!assignment.start) {
+                issues.push({ level: "warning", scope: "assignments", message: `Assignment Start が空です: UID=${assignment.uid || "(なし)"}` });
+            }
+            if (!assignment.finish) {
+                issues.push({ level: "warning", scope: "assignments", message: `Assignment Finish が空です: UID=${assignment.uid || "(なし)"}` });
+            }
+            const assignmentStart = parseDateValue(assignment.start);
+            const assignmentFinish = parseDateValue(assignment.finish);
+            if (assignmentStart !== null && assignmentFinish !== null && assignmentStart > assignmentFinish) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment Start が Finish より後です: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+            if (assignment.units !== undefined && assignment.units < 0) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment Units が負値です: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+        }
+        return issues;
+    }
+    globalThis.__mikuprojectXml = {
+        SAMPLE_XML,
+        parseXmlDocument,
+        importMsProjectXml,
+        exportMsProjectXml,
+        normalizeProjectModel,
+        validateProjectModel
+    };
+})();
+  </script>
 
-    function setupEvents() {
-      const openCreateButton = document.getElementById("openCreateDialogBtn");
-      if (openCreateButton) {
-        openCreateButton.addEventListener("click", openCreateDialog);
-      }
-      const exportEntriesButton = document.getElementById("exportEntriesBtn");
-      if (exportEntriesButton) {
-        exportEntriesButton.addEventListener("click", exportEntriesAndMemos);
-      }
-      const importEntriesButton = document.getElementById("importEntriesBtn");
-      const importEntriesInput = document.getElementById("importEntriesInput");
-      if (importEntriesButton && importEntriesInput) {
-        importEntriesButton.addEventListener("click", () => {
-          importEntriesInput.value = "";
-          importEntriesInput.click();
-        });
-        importEntriesInput.addEventListener("change", async () => {
-          const file = importEntriesInput.files && importEntriesInput.files[0]
-            ? importEntriesInput.files[0]
-            : null;
-          await importEntriesAndMemosFromFile(file);
-          importEntriesInput.value = "";
-        });
-      }
-      const saveButton = document.getElementById("saveEntryBtn");
-      if (saveButton) {
-        saveButton.addEventListener("click", saveCurrentEntry);
-      }
-      const entryTypeField = document.getElementById("entryType");
-      if (entryTypeField) {
-        entryTypeField.addEventListener("change", () => {
-          updateEntryTypeUi(readSelectValue("entryType", "git"));
-        });
-      }
-      const closeButton = document.getElementById("closeDialogBtn");
-      if (closeButton) {
-        closeButton.addEventListener("click", closeEntryDialog);
-      }
-      const entriesList = document.getElementById("entriesList");
-      if (entriesList) {
-        entriesList.addEventListener("click", (event) => {
-          handleListClick(event);
-        });
-      }
-      const dialog = getDialog();
-      if (dialog && !dialog.dataset.boundOutsideClose) {
-        dialog.addEventListener("click", (event) => {
-          if (event.target === dialog) {
-            closeEntryDialog();
-          }
-        });
-        dialog.dataset.boundOutsideClose = "true";
-      }
-      const closeMemoButton = document.getElementById("closeMemoDialogBtn");
-      if (closeMemoButton) {
-        closeMemoButton.addEventListener("click", closeMemoDialog);
-      }
-      const saveMemoButton = document.getElementById("saveMemoBtn");
-      if (saveMemoButton) {
-        saveMemoButton.addEventListener("click", saveMemo);
-      }
-      const copyGitStatusCommandButton = document.getElementById("copyGitStatusCommandBtn");
-      if (copyGitStatusCommandButton) {
-        copyGitStatusCommandButton.addEventListener("click", () => {
-          copyGitStatusCommand();
-        });
-      }
-      const memoDialog = getMemoDialog();
-      if (memoDialog && !memoDialog.dataset.boundOutsideClose) {
-        memoDialog.addEventListener("click", (event) => {
-          if (event.target === memoDialog) {
-            closeMemoDialog();
-          }
-        });
-        memoDialog.dataset.boundOutsideClose = "true";
-      }
+  <script>
+(() => {
+    const mikuprojectXml = globalThis.__mikuprojectXml;
+    if (!mikuprojectXml) {
+        throw new Error("mikuproject XML module is not loaded");
     }
-
-    function bootstrap() {
-      entries = loadEntries();
-      recentActions = loadRecentActions();
-      memos = loadMemos();
-      resetForm();
-      setupEvents();
-      renderEntries();
+    let currentModel = null;
+    function getElement(id) {
+        const element = document.getElementById(id);
+        if (!element) {
+            throw new Error(`Element not found: ${id}`);
+        }
+        return element;
     }
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", bootstrap);
-    } else {
-      bootstrap();
+    function getTextArea(id) {
+        return getElement(id);
     }
+    function showToast(message) {
+        const toast = document.getElementById("toast");
+        if (toast && typeof toast.show === "function") {
+            toast.show(message, 2200);
+        }
+    }
+    function setStatus(message) {
+        getElement("statusMessage").textContent = message;
+    }
+    function renderPreviewList(containerId, items) {
+        const container = getElement(containerId);
+        if (items.length === 0) {
+            container.innerHTML = `<div class="md-preview-empty">まだ表示できる項目がありません。</div>`;
+            return;
+        }
+        container.innerHTML = items.join("");
+    }
+    function renderValidationIssues(issues) {
+        const container = getElement("validationIssues");
+        if (issues.length === 0) {
+            container.classList.add("md-hidden");
+            container.innerHTML = "";
+            return;
+        }
+        const sections = ["project", "tasks", "resources", "assignments", "calendars"];
+        const sectionLabels = {
+            project: "Project",
+            tasks: "Tasks",
+            resources: "Resources",
+            assignments: "Assignments",
+            calendars: "Calendars"
+        };
+        container.classList.remove("md-hidden");
+        container.innerHTML = `
+      <div class="md-issues__title">検証メッセージ</div>
+      ${sections
+            .map((scope) => {
+            const scopedIssues = issues.filter((issue) => issue.scope === scope);
+            if (scopedIssues.length === 0) {
+                return "";
+            }
+            return `
+            <div class="md-issues__section">
+              <div class="md-issues__section-title">${sectionLabels[scope]}</div>
+              <ul class="md-issues__list">
+                ${scopedIssues.map((issue) => `<li class="md-issues__item">[${issue.level}] ${issue.message}</li>`).join("")}
+              </ul>
+            </div>
+          `;
+        })
+            .join("")}
+    `;
+    }
+    function updateSummary(model) {
+        getElement("summaryProjectName").textContent = (model === null || model === void 0 ? void 0 : model.project.name) || "-";
+        getElement("summaryTaskCount").textContent = String((model === null || model === void 0 ? void 0 : model.tasks.length) || 0);
+        getElement("summaryResourceCount").textContent = String((model === null || model === void 0 ? void 0 : model.resources.length) || 0);
+        getElement("summaryAssignmentCount").textContent = String((model === null || model === void 0 ? void 0 : model.assignments.length) || 0);
+        getElement("summaryCalendarCount").textContent = String((model === null || model === void 0 ? void 0 : model.calendars.length) || 0);
+        getTextArea("modelOutput").value = model ? JSON.stringify(model, null, 2) : "";
+        renderPreviewList("taskPreview", model ? model.tasks.map((task) => `
+      <div class="md-preview-item">
+        <div class="md-preview-item__title">${task.name || "(no name)"}</div>
+        <div class="md-preview-item__meta">UID=${task.uid} / ID=${task.id} / Outline=${task.outlineNumber || task.outlineLevel}
+Start=${task.start || "-"}
+Finish=${task.finish || "-"}
+Predecessors=${task.predecessors.map((item) => item.predecessorUid).join(", ") || "-"}</div>
+      </div>
+    `) : []);
+        renderPreviewList("resourcePreview", model ? model.resources.map((resource) => `
+      <div class="md-preview-item">
+        <div class="md-preview-item__title">${resource.name || "(no name)"}</div>
+        <div class="md-preview-item__meta">UID=${resource.uid} / ID=${resource.id}
+Initials=${resource.initials || "-"}
+Group=${resource.group || "-"}</div>
+      </div>
+    `) : []);
+        renderPreviewList("assignmentPreview", model ? model.assignments.map((assignment) => `
+      <div class="md-preview-item">
+        <div class="md-preview-item__title">Assignment ${assignment.uid || "-"}</div>
+        <div class="md-preview-item__meta">TaskUID=${assignment.taskUid}
+ResourceUID=${assignment.resourceUid}
+Start=${assignment.start || "-"}
+Finish=${assignment.finish || "-"}</div>
+      </div>
+    `) : []);
+    }
+    function loadSample() {
+        getTextArea("xmlInput").value = mikuprojectXml.SAMPLE_XML;
+        setStatus("サンプル XML を読み込みました");
+    }
+    async function importXmlFromFile(file) {
+        if (!file) {
+            return;
+        }
+        const xmlText = await file.text();
+        getTextArea("xmlInput").value = xmlText;
+        setStatus("XML ファイルを読み込みました");
+        showToast("XML を読み込みました");
+    }
+    function parseCurrentXml() {
+        const xmlText = getTextArea("xmlInput").value.trim();
+        if (!xmlText) {
+            setStatus("XML が空です");
+            return;
+        }
+        currentModel = mikuprojectXml.importMsProjectXml(xmlText);
+        const issues = mikuprojectXml.validateProjectModel(currentModel);
+        updateSummary(currentModel);
+        renderValidationIssues(issues);
+        setStatus(issues.length > 0 ? `XML を解析しました。検証で ${issues.length} 件の問題があります` : "XML を内部モデルへ変換しました");
+        showToast("XML を解析しました");
+    }
+    function exportCurrentModel() {
+        if (!currentModel) {
+            setStatus("内部モデルがありません");
+            return;
+        }
+        getTextArea("xmlInput").value = mikuprojectXml.exportMsProjectXml(currentModel);
+        renderValidationIssues([]);
+        setStatus("内部モデルから XML を再生成しました");
+        showToast("XML を再生成しました");
+    }
+    function downloadCurrentXml() {
+        const xmlText = getTextArea("xmlInput").value.trim();
+        if (!xmlText) {
+            setStatus("出力する XML がありません");
+            return;
+        }
+        const blob = new Blob([`${xmlText}\n`], { type: "application/xml;charset=utf-8" });
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const now = new Date();
+        const stamp = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, "0"),
+            String(now.getDate()).padStart(2, "0"),
+            String(now.getHours()).padStart(2, "0"),
+            String(now.getMinutes()).padStart(2, "0")
+        ].join("");
+        link.href = objectUrl;
+        link.download = `mikuproject-export-${stamp}.xml`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+        setStatus("XML ファイルをエクスポートしました");
+        showToast("XML を保存しました");
+    }
+    function runRoundTripCheck() {
+        if (!currentModel) {
+            parseCurrentXml();
+            if (!currentModel) {
+                return;
+            }
+        }
+        const exportedXml = mikuprojectXml.exportMsProjectXml(currentModel);
+        const reparsedModel = mikuprojectXml.importMsProjectXml(exportedXml);
+        const validationIssues = mikuprojectXml.validateProjectModel(reparsedModel);
+        renderValidationIssues(validationIssues);
+        if (validationIssues.some((issue) => issue.level === "error")) {
+            throw new Error(validationIssues.map((issue) => issue.message).join("\n"));
+        }
+        const normalizedLeft = JSON.stringify(mikuprojectXml.normalizeProjectModel(currentModel));
+        const normalizedRight = JSON.stringify(mikuprojectXml.normalizeProjectModel(reparsedModel));
+        if (normalizedLeft !== normalizedRight) {
+            throw new Error("再読込後の内部モデルが一致しません");
+        }
+        setStatus("再読込テストに成功しました");
+        showToast("再読込テスト成功");
+    }
+    function bindEvents() {
+        getElement("loadSampleBtn").addEventListener("click", loadSample);
+        getElement("importXmlBtn").addEventListener("click", () => {
+            getElement("importXmlInput").click();
+        });
+        getElement("parseXmlBtn").addEventListener("click", () => {
+            try {
+                parseCurrentXml();
+            }
+            catch (error) {
+                setStatus(error instanceof Error ? error.message : "XML 解析に失敗しました");
+            }
+        });
+        getElement("exportXmlBtn").addEventListener("click", () => {
+            try {
+                exportCurrentModel();
+            }
+            catch (error) {
+                setStatus(error instanceof Error ? error.message : "XML 再生成に失敗しました");
+            }
+        });
+        getElement("downloadXmlBtn").addEventListener("click", () => {
+            try {
+                downloadCurrentXml();
+            }
+            catch (error) {
+                setStatus(error instanceof Error ? error.message : "XML 保存に失敗しました");
+            }
+        });
+        getElement("roundTripBtn").addEventListener("click", () => {
+            try {
+                runRoundTripCheck();
+            }
+            catch (error) {
+                setStatus(error instanceof Error ? error.message : "再読込テストに失敗しました");
+            }
+        });
+        getElement("importXmlInput").addEventListener("change", async (event) => {
+            const input = event.target;
+            const file = (input === null || input === void 0 ? void 0 : input.files) && input.files[0];
+            try {
+                await importXmlFromFile(file);
+            }
+            catch (error) {
+                setStatus(error instanceof Error ? error.message : "XML 読み込みに失敗しました");
+            }
+            finally {
+                if (input) {
+                    input.value = "";
+                }
+            }
+        });
+    }
+    function initialize() {
+        bindEvents();
+        updateSummary(null);
+        renderValidationIssues([]);
+        loadSample();
+    }
+    document.addEventListener("DOMContentLoaded", initialize);
+})();
   </script>
 </body>
 </html>
