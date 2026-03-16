@@ -29,6 +29,11 @@ const TARGETS = [
     id: "utm-remove",
     srcHtml: "docs/link/utm-remove-src.html",
     outHtml: "docs/link/utm-remove.html"
+  },
+  {
+    id: "url-memo",
+    srcHtml: "docs/link/url-memo-src.html",
+    outHtml: "docs/link/url-memo.html"
   }
 ];
 

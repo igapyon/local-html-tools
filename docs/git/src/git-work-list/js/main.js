@@ -370,6 +370,14 @@
       return extractRepoName(entry.repoUrl);
     }
 
+    function buildUrlOnlyDisplayTitle(repoUrl, memoText) {
+      const normalizedMemo = String(memoText || "").trim().replace(/\s+/g, " ");
+      if (normalizedMemo) {
+        return normalizedMemo.slice(0, 10);
+      }
+      return extractRepoName(repoUrl);
+    }
+
     function buildGroupKey(entry) {
       if (!isGitEntry(entry)) {
         return [
@@ -398,7 +406,6 @@
           key,
           entryType: entry.entryType,
           repoUrl: entry.repoUrl,
-          displayName: buildDisplayName(entry),
           baseBranch: entry.baseBranch,
           baseScope: entry.baseScope,
           remoteName: entry.remoteName,
@@ -407,6 +414,10 @@
           gitCurrentDir: String(memos[memoKey]?.gitCurrentDir || "").trim(),
           entries: [entry]
         });
+        const createdGroup = groupedMap.get(key);
+        createdGroup.displayName = isGitEntry(entry)
+          ? buildDisplayName(entry)
+          : buildUrlOnlyDisplayTitle(createdGroup.repoUrl, createdGroup.memo);
       });
       return Array.from(groupedMap.values());
     }
