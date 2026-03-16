@@ -58,6 +58,15 @@ STEP 1 の完了条件は次のとおり。
 - まずは `mikuproject` 自身で意味的に往復できることを優先する
 - 実際の `MS Project` 本体が出力した XML との互換確認は、将来課題として扱う
 
+検証用データの参照元メモ:
+
+- 一時的な検証用データの参照元として `https://github.com/rpbouman/open-msp-viewer/` を利用する
+- ただし、Git 管理下へそのまま格納するかどうかは別途判断する
+- `open-msp-viewer` プロジェクトのサンプルには大いに助けられた。感謝する
+- 実例 XML から見えた保持項目ギャップは `docs/project/mikuproject-gap-notes.md` に整理する
+- 仕様判断で迷った場合は、MicrosoftDocs の Project XML Data Interchange リファレンスも補助資料として参照する
+  - `https://github.com/MicrosoftDocs/office-developer-msproject-xml-docs/tree/main/project-xml-data-interchange`
+
 ## STEP 1 で扱う対象
 
 STEP 1 では、MS Project XML のうち、次の情報を優先して扱う。
@@ -74,6 +83,12 @@ STEP 1 では、MS Project XML のうち、次の情報を優先して扱う。
 ### Project
 
 - `Name`
+- `Title`
+- `Author`
+- `Company`
+- `CreationDate`
+- `LastSaved`
+- `SaveVersion`
 - `CurrentDate`
 - `StartDate`
 - `FinishDate`
@@ -83,7 +98,37 @@ STEP 1 では、MS Project XML のうち、次の情報を優先して扱う。
 - `MinutesPerDay`
 - `MinutesPerWeek`
 - `DaysPerMonth`
+- `StatusDate`
+- `WeekStartDay`
+- `WorkFormat`
+- `DurationFormat`
+- `CurrencyCode`
+- `CurrencyDigits`
+- `CurrencySymbol`
+- `CurrencySymbolPosition`
+- `FYStartDate`
+- `FiscalYearStart`
+- `CriticalSlackLimit`
+- `DefaultTaskType`
+- `DefaultFixedCostAccrual`
+- `DefaultStandardRate`
+- `DefaultOvertimeRate`
+- `DefaultTaskEVMethod`
+- `NewTaskStartDate`
+- `NewTasksAreManual`
+- `NewTasksEffortDriven`
+- `NewTasksEstimated`
+- `ActualsInSync`
+- `EditableActualCosts`
+- `HonorConstraints`
+- `InsertedProjectsLikeSummary`
+- `MultipleCriticalPaths`
+- `TaskUpdatesResource`
+- `UpdateManuallyScheduledTasksWhenEditingLinks`
 - `CalendarUID`
+- `OutlineCodes`
+- `WBSMasks`
+- `ExtendedAttributes`
 
 ### Tasks
 
@@ -92,17 +137,39 @@ STEP 1 では、MS Project XML のうち、次の情報を優先して扱う。
 - `Name`
 - `OutlineLevel`
 - `OutlineNumber`
+- `WBS`
+- `Type`
+- `CalendarUID`
+- `Priority`
 - `Start`
 - `Finish`
 - `Duration`
 - `ActualStart`
 - `ActualFinish`
+- `Deadline`
+- `StartVariance`
+- `FinishVariance`
+- `Work`
+- `WorkVariance`
+- `TotalSlack`
+- `FreeSlack`
+- `Cost`
+- `ActualCost`
+- `RemainingCost`
+- `RemainingWork`
+- `ActualWork`
 - `Milestone`
 - `Summary`
+- `Critical`
 - `PercentComplete`
+- `PercentWorkComplete`
 - `Notes`
 - `ConstraintType`
 - `ConstraintDate`
+- `ExtendedAttribute`
+- `Baseline`
+- `TimephasedData`
+- `TimephasedData`
 - `PredecessorLink`
 
 ### Resources
@@ -113,7 +180,24 @@ STEP 1 では、MS Project XML のうち、次の情報を優先して扱う。
 - `Type`
 - `Initials`
 - `Group`
+- `WorkGroup`
 - `MaxUnits`
+- `CalendarUID`
+- `StandardRate`
+- `StandardRateFormat`
+- `OvertimeRate`
+- `OvertimeRateFormat`
+- `CostPerUse`
+- `Work`
+- `ActualWork`
+- `RemainingWork`
+- `Cost`
+- `ActualCost`
+- `RemainingCost`
+- `PercentWorkComplete`
+- `ExtendedAttribute`
+- `Baseline`
+- `TimephasedData`
 
 ### Assignments
 
@@ -122,14 +206,33 @@ STEP 1 では、MS Project XML のうち、次の情報を優先して扱う。
 - `ResourceUID`
 - `Start`
 - `Finish`
+- `StartVariance`
+- `FinishVariance`
+- `Delay`
+- `Milestone`
+- `WorkContour`
 - `Units`
 - `Work`
+- `Cost`
+- `ActualCost`
+- `RemainingCost`
+- `PercentWorkComplete`
+- `OvertimeWork`
+- `ActualOvertimeWork`
+- `ActualWork`
+- `RemainingWork`
+- `ExtendedAttribute`
+- `Baseline`
 
 ### Calendars
 
 - `UID`
 - `Name`
 - `IsBaseCalendar`
+- `BaseCalendarUID`
+- `WeekDays`
+- `Exceptions`
+- `WorkWeeks`
 
 ## STEP 1 で後回しにするもの
 
@@ -159,7 +262,37 @@ type ProjectModel = {
     minutesPerDay?: number;
     minutesPerWeek?: number;
     daysPerMonth?: number;
+    statusDate?: string;
+    weekStartDay?: number;
+    workFormat?: number;
+    durationFormat?: number;
+    currencyCode?: string;
+    currencyDigits?: number;
+    currencySymbol?: string;
+    currencySymbolPosition?: number;
+    fyStartDate?: string;
+    fiscalYearStart?: boolean;
+    criticalSlackLimit?: number;
+    defaultTaskType?: number;
+    defaultFixedCostAccrual?: number;
+    defaultStandardRate?: string;
+    defaultOvertimeRate?: string;
+    defaultTaskEVMethod?: number;
+    newTaskStartDate?: number;
+    newTasksAreManual?: boolean;
+    newTasksEffortDriven?: boolean;
+    newTasksEstimated?: boolean;
+    actualsInSync?: boolean;
+    editableActualCosts?: boolean;
+    honorConstraints?: boolean;
+    insertedProjectsLikeSummary?: boolean;
+    multipleCriticalPaths?: boolean;
+    taskUpdatesResource?: boolean;
+    updateManuallyScheduledTasksWhenEditingLinks?: boolean;
     calendarUID?: string;
+    outlineCodes: OutlineCodeModel[];
+    wbsMasks: WBSMaskModel[];
+    extendedAttributes: ProjectExtendedAttributeModel[];
   };
   calendars: CalendarModel[];
   tasks: TaskModel[];
@@ -173,14 +306,32 @@ type TaskModel = {
   name: string;
   outlineLevel: number;
   outlineNumber: string;
+  wbs?: string;
+  type?: number;
+  calendarUID?: string;
+  priority?: number;
   start: string;
   finish: string;
   duration: string;
   actualStart?: string;
   actualFinish?: string;
+  deadline?: string;
+  startVariance?: string;
+  finishVariance?: string;
+  work?: string;
+  workVariance?: string;
+  totalSlack?: string;
+  freeSlack?: string;
+  cost?: number;
+  actualCost?: number;
+  remainingCost?: number;
+  remainingWork?: string;
+  actualWork?: string;
   milestone: boolean;
   summary: boolean;
+  critical?: boolean;
   percentComplete: number;
+  percentWorkComplete?: number;
   notes?: string;
   constraintType?: number;
   constraintDate?: string;
@@ -200,7 +351,21 @@ type ResourceModel = {
   type?: number;
   initials?: string;
   group?: string;
+  workGroup?: number;
   maxUnits?: number;
+  calendarUID?: string;
+  standardRate?: string;
+  standardRateFormat?: number;
+  overtimeRate?: string;
+  overtimeRateFormat?: number;
+  costPerUse?: number;
+  work?: string;
+  actualWork?: string;
+  remainingWork?: string;
+  cost?: number;
+  actualCost?: number;
+  remainingCost?: number;
+  percentWorkComplete?: number;
 };
 
 type AssignmentModel = {
@@ -209,14 +374,60 @@ type AssignmentModel = {
   resourceUid: string;
   start?: string;
   finish?: string;
+  startVariance?: string;
+  finishVariance?: string;
+  delay?: string;
+  milestone?: boolean;
+  workContour?: number;
   units?: number;
   work?: string;
+  cost?: number;
+  actualCost?: number;
+  remainingCost?: number;
+  percentWorkComplete?: number;
+  overtimeWork?: string;
+  actualOvertimeWork?: string;
+  actualWork?: string;
+  remainingWork?: string;
 };
 
 type CalendarModel = {
   uid: string;
   name: string;
   isBaseCalendar: boolean;
+  isBaselineCalendar?: boolean;
+  baseCalendarUID?: string;
+  weekDays: Array<{
+    dayType: number;
+    dayWorking: boolean;
+    workingTimes: Array<{
+      fromTime: string;
+      toTime: string;
+    }>;
+  }>;
+  exceptions: Array<{
+    name?: string;
+    fromDate?: string;
+    toDate?: string;
+    dayWorking?: boolean;
+    workingTimes: Array<{
+      fromTime: string;
+      toTime: string;
+    }>;
+  }>;
+  workWeeks: Array<{
+    name?: string;
+    fromDate?: string;
+    toDate?: string;
+    weekDays: Array<{
+      dayType: number;
+      dayWorking: boolean;
+      workingTimes: Array<{
+        fromTime: string;
+        toTime: string;
+      }>;
+    }>;
+  }>;
 };
 ```
 
@@ -286,6 +497,41 @@ STEP 1 では、次は非目標とする。
 - `Project / Tasks / Resources / Assignments / Calendars` の簡易プレビュー表示
 - `project / tasks / resources / assignments / calendars` 単位の検証メッセージ表示
 - `mikuproject` 独自の最小妥当性チェック
+- `Calendar` の `BaseCalendarUID / WeekDays / WorkingTimes` の round-trip
+- `Calendar` の `IsBaselineCalendar / Exceptions / WorkWeeks / Exception WorkingTimes` の round-trip
+- `Resource` の `CalendarUID / StandardRate / CostPerUse` の round-trip
+- `Resource` の `Work / ActualWork / RemainingWork / Cost / ActualCost / RemainingCost / PercentWorkComplete` の round-trip
+- `Assignment` の `StartVariance / FinishVariance` の round-trip
+- `Resource` の `WorkGroup` の round-trip
+- `Assignment` の `Delay / Milestone / WorkContour` の round-trip
+- `Assignment` の `OvertimeWork / ActualOvertimeWork` の round-trip
+- `Task` の `Deadline / StartVariance / FinishVariance` の round-trip
+- `Task` の `WorkVariance / TotalSlack / FreeSlack / Critical` の round-trip
+- `Resource` の `StandardRateFormat / OvertimeRate / OvertimeRateFormat` の round-trip
+- `Assignment` の `PercentWorkComplete / ActualWork / RemainingWork` の round-trip
+- `Project` の `StatusDate / WeekStartDay / WorkFormat / DurationFormat` の round-trip
+- `Project` の `CurrencyCode / CurrencyDigits / CurrencySymbol / CurrencySymbolPosition` の round-trip
+- `Project` の `FYStartDate / FiscalYearStart` の round-trip
+- `Project` の `CriticalSlackLimit / DefaultTaskType` の round-trip
+- `Project` の `DefaultFixedCostAccrual / DefaultStandardRate / DefaultOvertimeRate` の round-trip
+- `Project` の `DefaultTaskEVMethod / NewTaskStartDate` の round-trip
+- `Project` の `NewTasksAreManual / NewTasksEffortDriven` の round-trip
+- `Project` の `NewTasksEstimated / ActualsInSync` の round-trip
+- `Project` の `EditableActualCosts / HonorConstraints` の round-trip
+- `Project` の `InsertedProjectsLikeSummary / MultipleCriticalPaths` の round-trip
+- `Project` の `TaskUpdatesResource / UpdateManuallyScheduledTasksWhenEditingLinks` の round-trip
+- `Project` の `OutlineCodes / WBSMasks` の最小 round-trip
+- `Project` の `ExtendedAttributes` の最小 round-trip
+- `Task` の `ExtendedAttribute` の最小 round-trip
+- `Resource` の `ExtendedAttribute` の最小 round-trip
+- `Assignment` の `ExtendedAttribute` の最小 round-trip
+- `Task` の `Baseline` の最小 round-trip
+- `Assignment` の `Baseline` の最小 round-trip
+- `Resource` の `Baseline` の最小 round-trip
+- `Task` の `TimephasedData` の最小 round-trip
+- `Resource` の `TimephasedData` の最小 round-trip
+- `Assignment` の `TimephasedData` の最小 round-trip
+- `Task / Assignment` の `Cost / ActualCost / RemainingCost` の round-trip
 - round-trip テスト
 
 ## 次に決めること

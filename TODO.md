@@ -65,6 +65,28 @@
 
 # DONE
 
+- [引継][mikuproject] 今回の `mikuproject` 作業の主対象は `MS Project XML` の STEP 1 拡張
+- [引継][mikuproject] 直近で round-trip 対象へ追加・整理したもの:
+- `Project`: `OutlineCodes / WBSMasks / ExtendedAttributes` と各種 metadata 項目
+- `Task`: `ExtendedAttribute / Baseline / TimephasedData` と各種実務項目
+- `Resource`: `ExtendedAttribute / Baseline / TimephasedData` と各種実務項目
+- `Assignment`: `ExtendedAttribute / Baseline / TimephasedData` と各種実務項目
+- `Calendar`: `BaseCalendarUID / WeekDays / WorkingTimes / Exceptions / WorkWeeks / IsBaselineCalendar`
+- [引継][mikuproject] プレビュー表示は `Tasks / Resources / Assignments` について、件数だけでなく `ExtendedAttributes / Baselines / TimephasedData` の件数と先頭要約を表示するところまで対応済み
+- [引継][mikuproject] 仕様メモは [docs/project/mikuproject-spec.md](/Users/igapyon/Documents/git/local-html-tools/docs/project/mikuproject-spec.md)、ギャップ整理は [docs/project/mikuproject-gap-notes.md](/Users/igapyon/Documents/git/local-html-tools/docs/project/mikuproject-gap-notes.md) に反映済み
+- [引継][mikuproject] `docs/project/local-data/` は Git 管理しない一時 XML 置き場として利用する前提
+- [引継][mikuproject] `open-msp-viewer` のサンプルを参照元として利用した旨と感謝メモは `mikuproject-spec.md` に記載済み
+- [引継][mikuproject] 最後に確認できていたコマンド:
+- `npm run build:project`
+- `npx vitest run docs/project/tests/mikuproject-main.test.js`
+- [引継][mikuproject] 上記確認時点では `docs/project/tests/mikuproject-main.test.js` は `22 tests` すべて成功
+- [引継][mikuproject] 次回再開時の最初の確認候補:
+- `git status --short`
+- `npm run build:project`
+- `npx vitest run docs/project/tests/mikuproject-main.test.js`
+- [引継][mikuproject][未完了着手] `docs/project/mikuproject-src.html` には `Calendars` プレビューカード追加を開始済み
+- [引継][mikuproject][未完了着手] 次回は [docs/project/src/mikuproject/ts/main.ts](/Users/igapyon/Documents/git/local-html-tools/docs/project/src/mikuproject/ts/main.ts) の描画処理と [docs/project/tests/mikuproject-main.test.js](/Users/igapyon/Documents/git/local-html-tools/docs/project/tests/mikuproject-main.test.js) の確認項目を追従させてから再ビルド・再テストすると復帰しやすい
+
 - [引継] `docs/prompt/prompt-gen` を段階的に整理済み
 - `docs/prompt/prompt-gen-src.html` の巨大 inline CSS / JS は外出し済み
 - 開発時ソースは `docs/prompt/src/prompt-gen/css/app.css` と `docs/prompt/src/prompt-gen/ts/*.ts`

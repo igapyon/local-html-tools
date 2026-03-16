@@ -31,6 +31,22 @@
         }
         container.innerHTML = items.join("");
     }
+    function formatFirstBaselineSummary(item) {
+        var _a, _b;
+        const baseline = item.baselines[0];
+        if (!baseline) {
+            return "-";
+        }
+        return `#${(_a = baseline.number) !== null && _a !== void 0 ? _a : "-"} ${baseline.start || "-"} -> ${baseline.finish || "-"} / Work=${baseline.work || "-"} / Cost=${(_b = baseline.cost) !== null && _b !== void 0 ? _b : "-"}`;
+    }
+    function formatFirstTimephasedSummary(item) {
+        var _a, _b;
+        const timephasedData = item.timephasedData[0];
+        if (!timephasedData) {
+            return "-";
+        }
+        return `Type=${(_a = timephasedData.type) !== null && _a !== void 0 ? _a : "-"} ${timephasedData.start || "-"} -> ${timephasedData.finish || "-"} / Unit=${(_b = timephasedData.unit) !== null && _b !== void 0 ? _b : "-"} / Value=${timephasedData.value || "-"}`;
+    }
     function renderValidationIssues(issues) {
         const container = getElement("validationIssues");
         if (issues.length === 0) {
@@ -80,7 +96,10 @@
         <div class="md-preview-item__meta">UID=${task.uid} / ID=${task.id} / Outline=${task.outlineNumber || task.outlineLevel}
 Start=${task.start || "-"}
 Finish=${task.finish || "-"}
-Predecessors=${task.predecessors.map((item) => item.predecessorUid).join(", ") || "-"}</div>
+Predecessors=${task.predecessors.map((item) => item.predecessorUid).join(", ") || "-"}
+Ext=${task.extendedAttributes.length} / Baselines=${task.baselines.length} / Timephased=${task.timephasedData.length}
+Baseline1=${formatFirstBaselineSummary(task)}
+Timephased1=${formatFirstTimephasedSummary(task)}</div>
       </div>
     `) : []);
         renderPreviewList("resourcePreview", model ? model.resources.map((resource) => `
@@ -88,7 +107,10 @@ Predecessors=${task.predecessors.map((item) => item.predecessorUid).join(", ") |
         <div class="md-preview-item__title">${resource.name || "(no name)"}</div>
         <div class="md-preview-item__meta">UID=${resource.uid} / ID=${resource.id}
 Initials=${resource.initials || "-"}
-Group=${resource.group || "-"}</div>
+Group=${resource.group || "-"}
+Ext=${resource.extendedAttributes.length} / Baselines=${resource.baselines.length} / Timephased=${resource.timephasedData.length}
+Baseline1=${formatFirstBaselineSummary(resource)}
+Timephased1=${formatFirstTimephasedSummary(resource)}</div>
       </div>
     `) : []);
         renderPreviewList("assignmentPreview", model ? model.assignments.map((assignment) => `
@@ -97,7 +119,10 @@ Group=${resource.group || "-"}</div>
         <div class="md-preview-item__meta">TaskUID=${assignment.taskUid}
 ResourceUID=${assignment.resourceUid}
 Start=${assignment.start || "-"}
-Finish=${assignment.finish || "-"}</div>
+Finish=${assignment.finish || "-"}
+Ext=${assignment.extendedAttributes.length} / Baselines=${assignment.baselines.length} / Timephased=${assignment.timephasedData.length}
+Baseline1=${formatFirstBaselineSummary(assignment)}
+Timephased1=${formatFirstTimephasedSummary(assignment)}</div>
       </div>
     `) : []);
     }
