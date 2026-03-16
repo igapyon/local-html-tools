@@ -147,6 +147,10 @@ function mountPromptDom() {
       <option value="internal">内部レビュー</option>
       <option value="report">レビュー結果出力</option>
     </select>
+    <select id="minimalDiffReview">
+      <option value="unspecified">無指定</option>
+      <option value="report">補足追記</option>
+    </select>
     <select id="hallucinationGuard">
       <option value="none">無指定</option>
       <option value="low">弱</option>
@@ -393,6 +397,7 @@ describe("prompt-gen main", () => {
               outputMarkdownEnabled: true,
               outputTone: "unspecified",
               selfReview: "unspecified",
+              minimalDiffReview: "unspecified",
               misleadingExpressionReview: "unspecified",
               considerationRiskReview: "unspecified",
               discomfortRiskReview: "unspecified",
@@ -456,6 +461,7 @@ describe("prompt-gen main", () => {
               outputMarkdownEnabled: true,
               outputTone: "unspecified",
               selfReview: "unspecified",
+              minimalDiffReview: "unspecified",
               misleadingExpressionReview: "unspecified",
               considerationRiskReview: "unspecified",
               discomfortRiskReview: "unspecified",
@@ -523,6 +529,7 @@ describe("prompt-gen main", () => {
               outputMarkdownEnabled: true,
               outputTone: "unspecified",
               selfReview: "unspecified",
+              minimalDiffReview: "unspecified",
               misleadingExpressionReview: "unspecified",
               considerationRiskReview: "unspecified",
               discomfortRiskReview: "unspecified",
@@ -631,6 +638,7 @@ describe("prompt-gen main", () => {
               outputMarkdownEnabled: false,
               outputTone: "dearu",
               selfReview: "report",
+              minimalDiffReview: "unspecified",
               misleadingExpressionReview: "unspecified",
               considerationRiskReview: "unspecified",
               discomfortRiskReview: "unspecified",
@@ -699,6 +707,7 @@ describe("prompt-gen main", () => {
               outputMarkdownEnabled: false,
               outputTone: "unspecified",
               selfReview: "unspecified",
+              minimalDiffReview: "unspecified",
               misleadingExpressionReview: "unspecified",
               considerationRiskReview: "unspecified",
               discomfortRiskReview: "unspecified",
@@ -767,6 +776,7 @@ describe("prompt-gen main", () => {
               outputMarkdownEnabled: false,
               outputTone: "unspecified",
               selfReview: "unspecified",
+              minimalDiffReview: "unspecified",
               misleadingExpressionReview: "unspecified",
               considerationRiskReview: "unspecified",
               discomfortRiskReview: "unspecified",
@@ -816,6 +826,80 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("○最終的な回答は Markdown テキスト形式で出力し、さらに ~~~~ で囲まれた一塊として出力してください。");
   });
 
+  it("exposes soft and strict hallucination instructions as popular prompts", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const hallucinationGuard = document.getElementById("hallucinationGuard");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "P1001-500";
+    promptSearch.dispatchEvent(new Event("input"));
+    document.querySelector(".md-chip-button").click();
+
+    expect(hallucinationGuard.value).toBe("none");
+    expect(promptOutput.textContent).toContain("○事実誤認を避けるため、次のルールを意識してください。");
+    expect(promptOutput.textContent).not.toContain("○ハルシネーション防止のため、次のルールに従ってください。");
+
+    promptSearch.value = "P1001-501";
+    promptSearch.dispatchEvent(new Event("input"));
+    document.querySelector(".md-chip-button").click();
+
+    expect(hallucinationGuard.value).toBe("none");
+    expect(promptOutput.textContent).toContain("○ハルシネーション防止のため、次のルールに従ってください。");
+  });
+
+  it("exposes P1001-502 as a standalone popular prompt", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "P1001-502";
+    promptSearch.dispatchEvent(new Event("input"));
+    document.querySelector(".md-chip-button").click();
+
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、あなた自身の判断として内容を見直してください。");
+    expect(promptOutput.textContent).toContain("`自己判断メモ` セクション");
+  });
+
+  it("exposes P1001-503 as a standalone popular prompt", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "P1001-503";
+    promptSearch.dispatchEvent(new Event("input"));
+    document.querySelector(".md-chip-button").click();
+
+    expect(promptOutput.textContent).toContain("`最小差分で割り切った点`");
+    expect(promptOutput.textContent).toContain("`あなたが本来志向していた理想形`");
+    expect(promptOutput.textContent).toContain("`自己判断メモ` セクション");
+  });
+
+  it("maps P1001 reported and internal review prompts to dropdown instruction texts", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "P1001-001";
+    promptSearch.dispatchEvent(new Event("input"));
+    document.querySelector(".md-chip-button").click();
+
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。");
+    expect(promptOutput.textContent).toContain("`誤解表現レビュー` セクション");
+
+    promptSearch.value = "P1001-011";
+    promptSearch.dispatchEvent(new Event("input"));
+    document.querySelector(".md-chip-button").click();
+
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。");
+    expect(promptOutput.textContent).not.toContain("`誤解表現レビュー` セクション");
+    expect(promptOutput.textContent).toContain("見直しの途中経過や思考過程は出力しないでください。");
+  });
+
   it("applies q query parameter to the search field on load", async () => {
     await bootPromptPage("?q=A852");
 
@@ -844,6 +928,7 @@ describe("prompt-gen main", () => {
 
     const outputTone = document.getElementById("outputTone");
     const selfReview = document.getElementById("selfReview");
+    const minimalDiffReview = document.getElementById("minimalDiffReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
     const misleadingExpressionReview = document.getElementById("misleadingExpressionReview");
     const considerationRiskReview = document.getElementById("considerationRiskReview");
@@ -857,6 +942,7 @@ describe("prompt-gen main", () => {
 
     expect(outputTone.value).toBe("unspecified");
     expect(selfReview.value).toBe("unspecified");
+    expect(minimalDiffReview.value).toBe("unspecified");
     expect(hallucinationGuard.value).toBe("high");
     expect(misleadingExpressionReview.value).toBe("unspecified");
     expect(considerationRiskReview.value).toBe("unspecified");
@@ -875,6 +961,7 @@ describe("prompt-gen main", () => {
 
     const outputTone = document.getElementById("outputTone");
     const selfReview = document.getElementById("selfReview");
+    const minimalDiffReview = document.getElementById("minimalDiffReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
     const misleadingExpressionReview = document.getElementById("misleadingExpressionReview");
     const considerationRiskReview = document.getElementById("considerationRiskReview");
@@ -890,6 +977,8 @@ describe("prompt-gen main", () => {
     outputTone.dispatchEvent(new Event("change"));
     selfReview.value = "report";
     selfReview.dispatchEvent(new Event("change"));
+    minimalDiffReview.value = "report";
+    minimalDiffReview.dispatchEvent(new Event("change"));
     hallucinationGuard.value = "none";
     hallucinationGuard.dispatchEvent(new Event("change"));
     misleadingExpressionReview.value = "internal";
@@ -914,6 +1003,7 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("○文体は、である調で統一してください。箇条書きは体言止めでも構いません。");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。");
     expect(promptOutput.textContent).toContain("`自己レビュー` セクション");
+    expect(promptOutput.textContent).toContain("`今回の対応を最小差分で割り切った点`");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。");
     expect(promptOutput.textContent).toContain("`配慮不足レビュー` セクション");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、不快感リスクがないかを観点として見直してください。");
@@ -924,6 +1014,8 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent.indexOf("○文体は、である調で統一してください。箇条書きは体言止めでも構いません。"))
       .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。"));
     expect(promptOutput.textContent.indexOf("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。"))
+      .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、あなた自身の判断として内容を見直してください。"));
+    expect(promptOutput.textContent.indexOf("○回答案を作成したあと、あなた自身の判断として内容を見直してください。"))
       .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。"));
     expect(promptOutput.textContent.indexOf("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。"))
       .toBeLessThan(promptOutput.textContent.indexOf("○回答案を作成したあと、配慮不足リスクがないかを観点として見直してください。"));
@@ -945,6 +1037,7 @@ describe("prompt-gen main", () => {
     const promptSearch = document.getElementById("promptSearch");
     const outputTone = document.getElementById("outputTone");
     const selfReview = document.getElementById("selfReview");
+    const minimalDiffReview = document.getElementById("minimalDiffReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
     const misleadingExpressionReview = document.getElementById("misleadingExpressionReview");
     const considerationRiskReview = document.getElementById("considerationRiskReview");
@@ -961,6 +1054,8 @@ describe("prompt-gen main", () => {
     outputTone.dispatchEvent(new Event("change"));
     selfReview.value = "internal";
     selfReview.dispatchEvent(new Event("change"));
+    minimalDiffReview.value = "report";
+    minimalDiffReview.dispatchEvent(new Event("change"));
     hallucinationGuard.value = "none";
     hallucinationGuard.dispatchEvent(new Event("change"));
     misleadingExpressionReview.value = "internal";
@@ -987,6 +1082,7 @@ describe("prompt-gen main", () => {
 
     expect(outputTone.value).toBe("unspecified");
     expect(selfReview.value).toBe("unspecified");
+    expect(minimalDiffReview.value).toBe("unspecified");
     expect(hallucinationGuard.value).toBe("high");
     expect(misleadingExpressionReview.value).toBe("unspecified");
     expect(considerationRiskReview.value).toBe("unspecified");
@@ -1003,6 +1099,7 @@ describe("prompt-gen main", () => {
 
     const outputTone = document.getElementById("outputTone");
     const selfReview = document.getElementById("selfReview");
+    const minimalDiffReview = document.getElementById("minimalDiffReview");
     const hallucinationGuard = document.getElementById("hallucinationGuard");
     const misleadingExpressionReview = document.getElementById("misleadingExpressionReview");
     const considerationRiskReview = document.getElementById("considerationRiskReview");
@@ -1016,6 +1113,7 @@ describe("prompt-gen main", () => {
 
     expect(outputTone.value).toBe("unspecified");
     expect(selfReview.value).toBe("unspecified");
+    expect(minimalDiffReview.value).toBe("unspecified");
     expect(hallucinationGuard.value).toBe("none");
     expect(misleadingExpressionReview.value).toBe("unspecified");
     expect(considerationRiskReview.value).toBe("unspecified");
@@ -1032,6 +1130,8 @@ describe("prompt-gen main", () => {
     outputTone.dispatchEvent(new Event("change"));
     selfReview.value = "internal";
     selfReview.dispatchEvent(new Event("change"));
+    minimalDiffReview.value = "report";
+    minimalDiffReview.dispatchEvent(new Event("change"));
     hallucinationGuard.value = "high";
     hallucinationGuard.dispatchEvent(new Event("change"));
     misleadingExpressionReview.value = "internal";
@@ -1056,6 +1156,7 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("○文体は、です・ます調で統一してください。箇条書きは体言止めでも構いません。");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、第三者のレビューアの視点に切り替えて自己レビューしてください。");
     expect(promptOutput.textContent).not.toContain("`自己レビュー` セクション");
+    expect(promptOutput.textContent).toContain("○回答案を作成したあと、あなた自身の判断として内容を見直してください。");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、配慮不足リスクがないかを観点として見直してください。");
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、不快感リスクがないかを観点として見直してください。");
