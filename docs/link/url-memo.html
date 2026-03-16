@@ -22,401 +22,7 @@ limitations under the License.
   
   
   
-  <style>
-    :root {
-      color-scheme: light;
-      --md-link-accent: #6750a4;
-      --md-link-accent-strong: #5b43a2;
-      --md-link-accent-soft: #ece6f7;
-      --md-link-accent-soft-2: #f6f2fb;
-      --md-link-border: #d8dce8;
-      --md-link-surface: rgba(255, 255, 255, 0.92);
-      --md-link-surface-solid: #fbfcff;
-      --md-link-text-subtle: #5b6475;
-      --md-chip-strong-bg: #6750a4;
-      --md-chip-strong-text: #ffffff;
-      --md-chip-medium-bg: #ece6f7;
-      --md-chip-medium-text: #4f378b;
-      --md-chip-weak-bg: #f5f1fb;
-      --md-chip-weak-text: #65558f;
-      --md-card-shadow: 0 24px 60px rgba(45, 62, 96, 0.10);
-    }
-
-    .md-page {
-      min-height: 100vh;
-      margin: 0;
-      padding: 24px;
-      background:
-        radial-gradient(circle at top right, rgba(174, 231, 255, 0.52), transparent 28%),
-        radial-gradient(circle at top left, rgba(221, 221, 255, 0.45), transparent 24%),
-        linear-gradient(180deg, #f6f7fb 0%, #eef2f8 100%);
-      color: #1c1b1f;
-      box-sizing: border-box;
-    }
-
-    .md-surface-card.md-card {
-      max-width: 1180px;
-      margin: 0 auto;
-      background: var(--md-link-surface);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(216, 223, 235, 0.95);
-      border-radius: 28px;
-      box-shadow: var(--md-card-shadow);
-      padding: 28px;
-    }
-
-    .md-section {
-      margin-top: 24px;
-    }
-
-    .md-stack-md {
-      display: grid;
-      gap: 16px;
-    }
-
-    .md-panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .md-panel-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .md-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      min-height: 2.55rem;
-      border-radius: 999px;
-      padding: 0.38rem 1.02rem;
-      border: 1px solid var(--md-link-border);
-      background: transparent;
-      color: #3f3b46;
-      font: inherit;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
-    }
-
-    .md-button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(98, 0, 238, 0.24);
-    }
-
-    .md-button--primary {
-      background: var(--md-link-accent);
-      border-color: transparent;
-      color: #ffffff;
-    }
-
-    .md-button--surface {
-      background: #ffffff;
-    }
-
-    .md-button--danger {
-      background: #fff5f5;
-      border-color: #f2c6cf;
-      color: #b3261e;
-    }
-
-    .md-button--compact {
-      min-height: 2.2rem;
-      padding: 0.34rem 0.68rem;
-      font-size: 0.78rem;
-    }
-
-    .md-button__icon {
-      width: 1rem;
-      height: 1rem;
-    }
-
-    .md-hidden {
-      display: none !important;
-    }
-
-    .md-empty-state {
-      border: 1px dashed #d8d1e3;
-      border-radius: 18px;
-      padding: 24px;
-      color: var(--md-link-text-subtle);
-      background: linear-gradient(180deg, var(--md-link-surface-solid) 0%, #ffffff 100%);
-    }
-
-    .md-chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: flex-start;
-    }
-
-    .md-chip-button {
-      appearance: none;
-      border: 1px solid #d8d1e3;
-      border-radius: 999px;
-      padding: 0.32rem 0.9rem;
-      min-height: auto;
-      cursor: pointer;
-      font: inherit;
-      font-weight: 600;
-      font-size: 0.88rem;
-      line-height: 1.1;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-      transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease, border-color 150ms ease, color 150ms ease;
-    }
-
-    .md-chip-button:hover {
-      background: #efe7f8;
-      border-color: #cfc3e3;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(74, 68, 88, 0.10);
-    }
-
-    .md-chip-button--strong {
-      padding: 0.48rem 1.12rem;
-      font-size: 1.02rem;
-      background: var(--md-chip-strong-bg);
-      color: var(--md-chip-strong-text);
-      border-color: transparent;
-    }
-
-    .md-chip-button--medium {
-      padding: 0.36rem 0.96rem;
-      font-size: 0.91rem;
-      background: var(--md-chip-medium-bg);
-      color: var(--md-chip-medium-text);
-    }
-
-    .md-chip-button--weak {
-      padding: 0.26rem 0.78rem;
-      font-size: 0.8rem;
-      background: var(--md-chip-weak-bg);
-      color: var(--md-chip-weak-text);
-    }
-
-    .md-chip-label {
-      display: block;
-      white-space: nowrap;
-    }
-
-    .md-results-meta {
-      color: #5b6475;
-      font-size: 0.92rem;
-      font-weight: 600;
-    }
-
-    .md-dialog {
-      border: none;
-      padding: 0;
-      background: transparent;
-    }
-
-    .md-dialog::backdrop {
-      background: rgba(29, 24, 37, 0.34);
-      backdrop-filter: blur(4px);
-    }
-
-    .md-dialog__surface {
-      width: min(720px, calc(100vw - 32px));
-      border: 1px solid var(--md-link-border);
-      border-radius: 24px;
-      background: linear-gradient(180deg, var(--md-link-surface-solid) 0%, #ffffff 100%);
-      box-shadow: 0 18px 48px rgba(17, 24, 39, 0.16);
-      padding: 24px;
-      box-sizing: border-box;
-    }
-
-    .md-dialog__surface--compact {
-      width: min(660px, calc(100vw - 32px));
-    }
-
-    .md-dialog__header,
-    .md-dialog__footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .md-dialog__title {
-      margin: 0;
-      font-size: 1.18rem;
-      font-weight: 700;
-      color: #27364b;
-    }
-
-    .md-dialog__subtitle {
-      margin: 6px 0 0;
-      color: var(--md-link-text-subtle);
-      line-height: 1.5;
-    }
-
-    .md-dialog__body {
-      margin-top: 18px;
-      margin-bottom: 18px;
-    }
-
-    .md-form-grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    .md-form-grid-1 {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .md-form-grid-2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .md-detail-grid {
-      display: grid;
-      gap: 12px;
-    }
-
-    .md-detail-row {
-      border: 1px solid var(--md-link-border);
-      background: linear-gradient(180deg, var(--md-link-surface-solid) 0%, #ffffff 100%);
-      border-radius: 18px;
-      padding: 14px 16px;
-    }
-
-    .md-detail-row--field {
-      border: none;
-      background: transparent;
-      border-radius: 0;
-      padding: 0;
-    }
-
-    .md-detail-inline {
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-    }
-
-    .md-detail-inline lht-text-field-help {
-      flex: 1 1 auto;
-    }
-
-    .md-icon-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 21px;
-      border: 1px solid var(--md-link-border);
-      background: #ffffff;
-      color: #5b43a2;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(45, 62, 96, 0.08);
-      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
-      flex: 0 0 auto;
-      margin-bottom: 6px;
-    }
-
-    .md-icon-button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(45, 62, 96, 0.12);
-      background: #f8f5ff;
-    }
-
-    .md-icon-button__svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    .md-detail-label {
-      display: block;
-      font-size: 0.86rem;
-      font-weight: 700;
-      color: #5b6475;
-      margin-bottom: 6px;
-    }
-
-    .md-detail-row--keywords {
-      position: relative;
-      padding-top: 30px;
-    }
-
-    .md-detail-row--keywords .md-detail-label {
-      position: absolute;
-      top: -0.72rem;
-      left: 14px;
-      display: inline-block;
-      margin: 0;
-      padding: 0 8px;
-      background: #ffffff;
-      color: #625b71;
-      font-size: 0.75rem;
-      font-weight: 400;
-      letter-spacing: 0;
-      line-height: 1.2;
-    }
-
-    .md-detail-value {
-      display: block;
-      white-space: pre-wrap;
-      word-break: break-word;
-      line-height: 1.55;
-    }
-
-    .md-keyword-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .md-keyword-chip {
-      display: inline-flex;
-      align-items: center;
-      min-height: 28px;
-      padding: 0 10px;
-      border: none;
-      border-radius: 999px;
-      background: var(--md-link-accent-soft);
-      color: var(--md-link-accent-strong);
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
-    }
-
-    .md-keyword-chip:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(74, 68, 88, 0.10);
-      background: #e3daf7;
-    }
-
-    .md-url-link {
-      color: #355ca8;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-
-    @media (max-width: 720px) {
-      .md-page {
-        padding: 14px;
-      }
-
-      .md-form-grid-2 {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .md-chip-button {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
+  
   <style>
 /*
  * lht-cmn components.css
@@ -1467,6 +1073,400 @@ lht-index-card-link {
   -webkit-line-clamp: var(--lht-desc-lines, 3);
   overflow: hidden;
 }
+
+:root {
+  color-scheme: light;
+  --md-link-accent: #6750a4;
+  --md-link-accent-strong: #5b43a2;
+  --md-link-accent-soft: #ece6f7;
+  --md-link-accent-soft-2: #f6f2fb;
+  --md-link-border: #d8dce8;
+  --md-link-surface: rgba(255, 255, 255, 0.92);
+  --md-link-surface-solid: #fbfcff;
+  --md-link-text-subtle: #5b6475;
+  --md-chip-strong-bg: #6750a4;
+  --md-chip-strong-text: #ffffff;
+  --md-chip-medium-bg: #ece6f7;
+  --md-chip-medium-text: #4f378b;
+  --md-chip-weak-bg: #f5f1fb;
+  --md-chip-weak-text: #65558f;
+  --md-card-shadow: 0 24px 60px rgba(45, 62, 96, 0.10);
+}
+
+.md-page {
+  min-height: 100vh;
+  margin: 0;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(174, 231, 255, 0.52), transparent 28%),
+    radial-gradient(circle at top left, rgba(221, 221, 255, 0.45), transparent 24%),
+    linear-gradient(180deg, #f6f7fb 0%, #eef2f8 100%);
+  color: #1c1b1f;
+  box-sizing: border-box;
+}
+
+.md-surface-card.md-card {
+  max-width: 1180px;
+  margin: 0 auto;
+  background: var(--md-link-surface);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(216, 223, 235, 0.95);
+  border-radius: 28px;
+  box-shadow: var(--md-card-shadow);
+  padding: 28px;
+}
+
+.md-section {
+  margin-top: 24px;
+}
+
+.md-stack-md {
+  display: grid;
+  gap: 16px;
+}
+
+.md-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.md-panel-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.md-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.55rem;
+  border-radius: 999px;
+  padding: 0.38rem 1.02rem;
+  border: 1px solid var(--md-link-border);
+  background: transparent;
+  color: #3f3b46;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.md-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(98, 0, 238, 0.24);
+}
+
+.md-button--primary {
+  background: var(--md-link-accent);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.md-button--surface {
+  background: #ffffff;
+}
+
+.md-button--danger {
+  background: #fff5f5;
+  border-color: #f2c6cf;
+  color: #b3261e;
+}
+
+.md-button--compact {
+  min-height: 2.2rem;
+  padding: 0.34rem 0.68rem;
+  font-size: 0.78rem;
+}
+
+.md-button__icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.md-hidden {
+  display: none !important;
+}
+
+.md-empty-state {
+  border: 1px dashed #d8d1e3;
+  border-radius: 18px;
+  padding: 24px;
+  color: var(--md-link-text-subtle);
+  background: linear-gradient(180deg, var(--md-link-surface-solid) 0%, #ffffff 100%);
+}
+
+.md-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.md-chip-button {
+  appearance: none;
+  border: 1px solid #d8d1e3;
+  border-radius: 999px;
+  padding: 0.32rem 0.9rem;
+  min-height: auto;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.88rem;
+  line-height: 1.1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background 150ms ease, box-shadow 150ms ease, transform 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.md-chip-button:hover {
+  background: #efe7f8;
+  border-color: #cfc3e3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(74, 68, 88, 0.10);
+}
+
+.md-chip-button--strong {
+  padding: 0.48rem 1.12rem;
+  font-size: 1.02rem;
+  background: var(--md-chip-strong-bg);
+  color: var(--md-chip-strong-text);
+  border-color: transparent;
+}
+
+.md-chip-button--medium {
+  padding: 0.36rem 0.96rem;
+  font-size: 0.91rem;
+  background: var(--md-chip-medium-bg);
+  color: var(--md-chip-medium-text);
+}
+
+.md-chip-button--weak {
+  padding: 0.26rem 0.78rem;
+  font-size: 0.8rem;
+  background: var(--md-chip-weak-bg);
+  color: var(--md-chip-weak-text);
+}
+
+.md-chip-label {
+  display: block;
+  white-space: nowrap;
+}
+
+.md-results-meta {
+  color: #5b6475;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.md-dialog {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.md-dialog::backdrop {
+  background: rgba(29, 24, 37, 0.34);
+  backdrop-filter: blur(4px);
+}
+
+.md-dialog__surface {
+  width: min(720px, calc(100vw - 32px));
+  border: 1px solid var(--md-link-border);
+  border-radius: 24px;
+  background: linear-gradient(180deg, var(--md-link-surface-solid) 0%, #ffffff 100%);
+  box-shadow: 0 18px 48px rgba(17, 24, 39, 0.16);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.md-dialog__surface--compact {
+  width: min(660px, calc(100vw - 32px));
+}
+
+.md-dialog__header,
+.md-dialog__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.md-dialog__title {
+  margin: 0;
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #27364b;
+}
+
+.md-dialog__subtitle {
+  margin: 6px 0 0;
+  color: var(--md-link-text-subtle);
+  line-height: 1.5;
+}
+
+.md-dialog__body {
+  margin-top: 18px;
+  margin-bottom: 18px;
+}
+
+.md-form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.md-form-grid-1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.md-form-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.md-detail-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.md-detail-row {
+  border: 1px solid var(--md-link-border);
+  background: linear-gradient(180deg, var(--md-link-surface-solid) 0%, #ffffff 100%);
+  border-radius: 18px;
+  padding: 14px 16px;
+}
+
+.md-detail-row--field {
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+
+.md-detail-inline {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.md-detail-inline lht-text-field-help {
+  flex: 1 1 auto;
+}
+
+.md-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 21px;
+  border: 1px solid var(--md-link-border);
+  background: #ffffff;
+  color: #5b43a2;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(45, 62, 96, 0.08);
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+  flex: 0 0 auto;
+  margin-bottom: 6px;
+}
+
+.md-icon-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(45, 62, 96, 0.12);
+  background: #f8f5ff;
+}
+
+.md-icon-button__svg {
+  width: 18px;
+  height: 18px;
+}
+
+.md-detail-label {
+  display: block;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #5b6475;
+  margin-bottom: 6px;
+}
+
+.md-detail-row--keywords {
+  position: relative;
+  padding-top: 30px;
+}
+
+.md-detail-row--keywords .md-detail-label {
+  position: absolute;
+  top: -0.72rem;
+  left: 14px;
+  display: inline-block;
+  margin: 0;
+  padding: 0 8px;
+  background: #ffffff;
+  color: #625b71;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+.md-detail-value {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.55;
+}
+
+.md-keyword-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.md-keyword-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 999px;
+  background: var(--md-link-accent-soft);
+  color: var(--md-link-accent-strong);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.md-keyword-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(74, 68, 88, 0.10);
+  background: #e3daf7;
+}
+
+.md-url-link {
+  color: #355ca8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .md-page {
+    padding: 14px;
+  }
+
+  .md-form-grid-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .md-chip-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
   </style>
 </head>
 <body class="md-page">
@@ -1614,924 +1614,7 @@ lht-index-card-link {
 
     <lht-toast id="toast"></lht-toast>
   </div>
-
-  <script>
-    (() => {
-      const STORAGE_KEY = "urlMemo.entries";
-      const EXPORT_VERSION = 1;
-      const DEFAULT_ENTRIES_PAYLOAD = {
-        version: 1,
-        exportedAt: "2026-03-16T09:19:24.930Z",
-        entries: [
-          {
-            id: "urlmemo-1773652733420-mu6zre",
-            title: "いがぴょんのインスタグラム",
-            url: "https://www.instagram.com/toshikiiga/",
-            memo: "いがぴょんのインスタグラム",
-            keywords: [
-              "igapyon",
-              "instagram"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-1773652689762-rumm80",
-            title: "いがぴょんの GitHub リポジトリ一覧",
-            url: "https://github.com/igapyon?tab=repositories",
-            memo: "いがぴょんの GitHub リポジトリ一覧",
-            keywords: [
-              "いがぴょん",
-              "igapyon",
-              "github",
-              "repository",
-              "リポジトリ"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-1773652636580-ye6ael",
-            title: "いがぴょんの日記ウェブページv3",
-            url: "https://www.igapyon.jp/igapyon/diary/",
-            memo: "いがぴょんの日記ウェブページv3です。",
-            keywords: [
-              "igapyon",
-              "blog",
-              "いがぴょん",
-              "伊賀敏樹",
-              "日記",
-              "v3"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-1773652554462-yf33jq",
-            title: "いがぴょんTOP",
-            url: "https://www.igapyon.jp/",
-            memo: "いがぴょんのホームページトップ",
-            keywords: [
-              "igapyon",
-              "いがぴょん",
-              "伊賀敏樹"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-local-html-tools",
-            title: "local-html-tools",
-            url: "https://igapyon.github.io/local-html-tools/",
-            memo: "ローカルHTMLツール集 (Single-file Web App)",
-            keywords: [
-              "local-html-tools"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-mikuscore",
-            title: "mikuscore",
-            url: "https://igapyon.github.io/mikuscore/mikuscore.html",
-            memo: "MusicXML 中心の譜面フォーマット変換ソフト (Single-file Web App)",
-            keywords: [
-              "mikuscore"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-starship-sim",
-            title: "starship-sim",
-            url: "https://igapyon.github.io/starship-sim/",
-            memo: "2次元宇宙戦闘シミュレーション (Single-file Web App)",
-            keywords: [
-              "starship-sim"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-klondike",
-            title: "Klondike",
-            url: "https://www.igapyon.jp/apps/klondike.html",
-            memo: "ソリティア/クロンダイク (Single-file Web App)",
-            keywords: [
-              "Klondike"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-analogclocket",
-            title: "AnalogClocket",
-            url: "https://igapyon.github.io/AnalogClocket/",
-            memo: "シンプルで実用的なアナログ時計 (Single-file Web App)",
-            keywords: [
-              "AnalogClocket"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-sql-formatter",
-            title: "sql-formatter",
-            url: "https://igapyon.github.io/sql-formatter/",
-            memo: "SQLフォーマッター (Single-file Web App)",
-            keywords: [
-              "sql-formatter"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-svg-part-editor",
-            title: "svg-part-editor",
-            url: "https://igapyon.github.io/svg-part-editor/",
-            memo: "ミニマルな SVG エディタ。開発中  (Single-file Web App)",
-            keywords: [
-              "svg-part-editor"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-remindy",
-            title: "Remindy",
-            url: "https://github.com/igapyon/remindy",
-            memo: "Windows 11向けのデスクトップ用リマインダーツール。",
-            keywords: [
-              "Remindy"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-scheduly",
-            title: "Scheduly",
-            url: "https://github.com/igapyon/scheduly",
-            memo: "iCalendar連携のスケジュール調整アプリ。BETA公開中。",
-            keywords: [
-              "Scheduly"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-chatgpt",
-            title: "ChatGPT",
-            url: "https://chatgpt.com/",
-            memo: "",
-            keywords: [
-              "chatgpt",
-              "openai",
-              "ai"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-claude",
-            title: "Claude",
-            url: "https://claude.ai/",
-            memo: "",
-            keywords: [
-              "claude",
-              "anthropic",
-              "ai"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-gemini",
-            title: "Google Gemini",
-            url: "https://gemini.google.com/",
-            memo: "",
-            keywords: [
-              "gemini",
-              "google",
-              "ai"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-perplexity",
-            title: "Perplexity",
-            url: "https://www.perplexity.ai/",
-            memo: "",
-            keywords: [
-              "perplexity",
-              "ai",
-              "search"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-google",
-            title: "Google",
-            url: "https://www.google.com/",
-            memo: "",
-            keywords: [
-              "google",
-              "search"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-gmail",
-            title: "Gmail",
-            url: "https://mail.google.com/",
-            memo: "",
-            keywords: [
-              "gmail",
-              "google",
-              "mail",
-              "email"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-google-calendar",
-            title: "Google Calendar",
-            url: "https://calendar.google.com/",
-            memo: "",
-            keywords: [
-              "google",
-              "calendar",
-              "schedule"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-youtube",
-            title: "YouTube",
-            url: "https://www.youtube.com/",
-            memo: "",
-            keywords: [
-              "youtube",
-              "video",
-              "google"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-amazon-jp",
-            title: "Amazon.co.jp",
-            url: "https://www.amazon.co.jp/",
-            memo: "",
-            keywords: [
-              "amazon",
-              "shopping",
-              "ec"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-soundhouse",
-            title: "サウンドハウス",
-            url: "https://www.soundhouse.co.jp/",
-            memo: "",
-            keywords: [
-              "サウンドハウス",
-              "楽器",
-              "音響",
-              "dtm"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-twitter",
-            title: "X (Twitter)",
-            url: "https://www.twitter.com/",
-            memo: "",
-            keywords: [
-              "x",
-              "twitter",
-              "sns"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-facebook",
-            title: "Facebook",
-            url: "https://www.facebook.com/",
-            memo: "",
-            keywords: [
-              "facebook",
-              "sns",
-              "meta"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-musicxml40",
-            title: "MusicXML 4.0",
-            url: "https://www.w3.org/2021/06/musicxml40/",
-            memo: "",
-            keywords: [
-              "musicxml",
-              "w3c",
-              "楽譜",
-              "仕様"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-certum",
-            title: "Certum",
-            url: "https://www.certum.eu/en/",
-            memo: "",
-            keywords: [
-              "certum",
-              "ssl",
-              "code signing",
-              "electronic signature"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-danime",
-            title: "dアニメストア",
-            url: "https://animestore.docomo.ne.jp/",
-            memo: "",
-            keywords: [
-              "dアニメストア",
-              "アニメ",
-              "docomo",
-              "配信"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-nhk",
-            title: "NHK",
-            url: "https://www.nhk.or.jp/",
-            memo: "",
-            keywords: [
-              "nhk",
-              "日本放送協会",
-              "放送"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-ekitan",
-            title: "乗り換え案内・時刻表 - 駅探",
-            url: "https://ekitan.com/",
-            memo: "",
-            keywords: [
-              "駅探",
-              "乗り換え",
-              "時刻表",
-              "交通"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          },
-          {
-            id: "urlmemo-default-tenkijp",
-            title: "tenki.jp",
-            url: "https://tenki.jp/",
-            memo: "",
-            keywords: [
-              "tenki.jp",
-              "天気",
-              "地震",
-              "台風"
-            ],
-            createdAt: 1773500400000,
-            lastAccessedAt: 1773500400000
-          }
-        ]
-      };
-      let entries = [];
-      let editingId = "";
-      let selectedId = "";
-
-      function showToast(message) {
-        const toast = document.getElementById("toast");
-        if (toast && typeof toast.show === "function") {
-          toast.show(message, 2200);
-        }
-      }
-
-      function createId() {
-        return `urlmemo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      }
-
-      function normalizeUrl(url) {
-        return String(url || "").trim();
-      }
-
-      function parseKeywords(value) {
-        if (Array.isArray(value)) {
-          return value.map((item) => String(item || "").trim()).filter(Boolean);
-        }
-        return String(value || "")
-          .split(/[,\n]/)
-          .map((item) => item.trim())
-          .filter(Boolean);
-      }
-
-      function formatDateTime(value) {
-        const numberValue = Number(value || 0);
-        if (!numberValue) {
-          return "未記録";
-        }
-        const date = new Date(numberValue);
-        if (Number.isNaN(date.getTime())) {
-          return "未記録";
-        }
-        return new Intl.DateTimeFormat("ja-JP", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit"
-        }).format(date);
-      }
-
-      function escapeHtml(text) {
-        return String(text || "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#39;");
-      }
-
-      function normalizeEntry(raw) {
-        const now = Date.now();
-        return {
-          id: raw && raw.id ? String(raw.id) : createId(),
-          title: String(raw?.title || "").trim(),
-          url: normalizeUrl(raw?.url),
-          memo: String(raw?.memo || "").trim(),
-          keywords: parseKeywords(raw?.keywords),
-          createdAt: Number(raw?.createdAt || now),
-          lastAccessedAt: Number(raw?.lastAccessedAt || 0)
-        };
-      }
-
-      function createDefaultEntries() {
-        const seenUrls = new Set();
-        return DEFAULT_ENTRIES_PAYLOAD.entries
-          .map(normalizeEntry)
-          .filter(isValidEntry)
-          .filter((entry) => {
-            const normalizedUrl = normalizeUrl(entry.url);
-            if (seenUrls.has(normalizedUrl)) {
-              return false;
-            }
-            seenUrls.add(normalizedUrl);
-            return true;
-          });
-      }
-
-      function isValidEntry(entry) {
-        return !!(entry && entry.title && entry.url);
-      }
-
-      function loadEntries() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return createDefaultEntries();
-          const parsed = JSON.parse(raw);
-          if (!Array.isArray(parsed)) return createDefaultEntries();
-          const loadedEntries = parsed.map(normalizeEntry).filter(isValidEntry);
-          return loadedEntries.length > 0 ? loadedEntries : createDefaultEntries();
-        } catch (_) {
-          return createDefaultEntries();
-        }
-      }
-
-      function saveEntries() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-      }
-
-      function normalizeToken(value) {
-        return String(value || "").trim().toLowerCase();
-      }
-
-      function buildSearchIndex(entry) {
-        const titleTokens = [entry.title].map(normalizeToken).filter(Boolean);
-        const keywordTokens = entry.keywords.map(normalizeToken).filter(Boolean);
-        const memoTokens = entry.memo.split(/\s+/).map(normalizeToken).filter(Boolean);
-        const urlTokens = [entry.url].map(normalizeToken).filter(Boolean);
-        return {
-          entry,
-          titleTokens,
-          keywordTokens,
-          memoTokens,
-          urlTokens,
-          expandedTokens: [...new Set([...memoTokens, ...urlTokens])]
-        };
-      }
-
-      function matchesAllTerms(tokens, terms) {
-        if (terms.length === 0) {
-          return true;
-        }
-        return terms.every((term) => tokens.some((token) => token.includes(term)));
-      }
-
-      function calculateMatchScore(tokens, terms) {
-        if (terms.length === 0) {
-          return 0;
-        }
-        let score = 0;
-        for (const term of terms) {
-          let bestScoreForTerm = 0;
-          for (const token of tokens) {
-            if (!token.includes(term) || token.length === 0) {
-              continue;
-            }
-            const currentScore = term.length / token.length;
-            if (currentScore > bestScoreForTerm) {
-              bestScoreForTerm = currentScore;
-            }
-          }
-          score += bestScoreForTerm;
-        }
-        return score;
-      }
-
-      function sortByLastAccessedDesc(items) {
-        return [...items].sort((left, right) => {
-          const rightLast = Number(right.lastAccessedAt || 0);
-          const leftLast = Number(left.lastAccessedAt || 0);
-          if (rightLast !== leftLast) {
-            return rightLast - leftLast;
-          }
-          return Number(right.createdAt || 0) - Number(left.createdAt || 0);
-        });
-      }
-
-      function sortByScore(items, terms, tokenBuilder) {
-        return [...items].sort((left, right) => {
-          const rightScore = calculateMatchScore(tokenBuilder(right), terms);
-          const leftScore = calculateMatchScore(tokenBuilder(left), terms);
-          if (rightScore !== leftScore) {
-            return rightScore - leftScore;
-          }
-          const rightLast = Number(right.lastAccessedAt || 0);
-          const leftLast = Number(left.lastAccessedAt || 0);
-          if (rightLast !== leftLast) {
-            return rightLast - leftLast;
-          }
-          return String(left.title).localeCompare(String(right.title), "ja");
-        });
-      }
-
-      function mergeEntryGroups(groups) {
-        const merged = [];
-        const seenIds = new Set();
-        for (const group of groups) {
-          for (const entry of group) {
-            if (seenIds.has(entry.id)) {
-              continue;
-            }
-            seenIds.add(entry.id);
-            merged.push(entry);
-          }
-        }
-        return merged;
-      }
-
-      function searchEntries(query) {
-        const searchIndexes = entries.map(buildSearchIndex);
-        const terms = String(query || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
-        if (terms.length === 0) {
-          const sorted = sortByLastAccessedDesc(entries);
-          return {
-            matchedEntries: sorted,
-            matchGrades: new Map(sorted.map((entry) => [entry.id, "medium"])),
-            terms
-          };
-        }
-        const titleMatches = sortByScore(
-          searchIndexes.filter((index) => matchesAllTerms(index.titleTokens, terms)).map((index) => index.entry),
-          terms,
-          (entry) => buildSearchIndex(entry).titleTokens
-        );
-        const keywordMatches = sortByScore(
-          searchIndexes.filter((index) => matchesAllTerms(index.keywordTokens, terms)).map((index) => index.entry),
-          terms,
-          (entry) => buildSearchIndex(entry).keywordTokens
-        );
-        const weakMatches = sortByScore(
-          searchIndexes.filter((index) => matchesAllTerms(index.expandedTokens, terms)).map((index) => index.entry),
-          terms,
-          (entry) => buildSearchIndex(entry).expandedTokens
-        );
-        const matchedEntries = mergeEntryGroups([titleMatches, keywordMatches, weakMatches]);
-        const matchGrades = new Map();
-        for (const entry of weakMatches) {
-          matchGrades.set(entry.id, "weak");
-        }
-        for (const entry of keywordMatches) {
-          matchGrades.set(entry.id, "medium");
-        }
-        for (const entry of titleMatches) {
-          matchGrades.set(entry.id, "strong");
-        }
-        return { matchedEntries, matchGrades, terms };
-      }
-
-      function renderEntries() {
-        const list = document.getElementById("entriesList");
-        const emptyGuide = document.getElementById("emptyGuide");
-        const resultsMeta = document.getElementById("resultsMeta");
-        const query = document.getElementById("searchInput").value || "";
-        const { matchedEntries, matchGrades, terms } = searchEntries(query);
-
-        if (resultsMeta) {
-          resultsMeta.textContent = terms.length > 0
-            ? `${matchedEntries.length} 件ヒット`
-            : `${entries.length} 件登録`;
-        }
-
-        if (!list) return;
-        list.innerHTML = "";
-
-        if (entries.length === 0) {
-          emptyGuide.hidden = false;
-          emptyGuide.textContent = "まだ登録がありません。追加ボタンから登録してください。";
-          return;
-        }
-
-        if (matchedEntries.length === 0) {
-          emptyGuide.hidden = false;
-          emptyGuide.textContent = "一致する項目がありません。検索語を調整してください。";
-          return;
-        }
-
-        emptyGuide.hidden = true;
-
-        matchedEntries.forEach((entry) => {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = `md-chip-button md-chip-button--${matchGrades.get(entry.id) || "weak"}`;
-          button.dataset.entryId = entry.id;
-          button.innerHTML = `<span class="md-chip-label">${escapeHtml(entry.title)}</span>`;
-          button.addEventListener("click", () => openDetailDialog(entry.id));
-          list.appendChild(button);
-        });
-      }
-
-      function openDialog(dialog) {
-        if (dialog && typeof dialog.showModal === "function") {
-          dialog.showModal();
-        }
-      }
-
-      function closeDialog(dialog) {
-        if (dialog && dialog.open && typeof dialog.close === "function") {
-          dialog.close();
-        }
-      }
-
-      function resetEntryForm() {
-        editingId = "";
-        document.getElementById("entryDialogTitle").textContent = "URLメモを追加";
-        document.getElementById("titleInput").value = "";
-        document.getElementById("urlInput").value = "";
-        document.getElementById("keywordsInput").value = "";
-        document.getElementById("memoInput").value = "";
-      }
-
-      function openCreateDialog() {
-        resetEntryForm();
-        openDialog(document.getElementById("entryDialog"));
-      }
-
-      function openEditDialog(entryId) {
-        const entry = entries.find((item) => item.id === entryId);
-        if (!entry) return;
-        editingId = entry.id;
-        document.getElementById("entryDialogTitle").textContent = "URLメモを更新";
-        document.getElementById("titleInput").value = entry.title;
-        document.getElementById("urlInput").value = entry.url;
-        document.getElementById("keywordsInput").value = entry.keywords.join(", ");
-        document.getElementById("memoInput").value = entry.memo;
-        openDialog(document.getElementById("entryDialog"));
-      }
-
-      function saveCurrentEntry() {
-        const title = String(document.getElementById("titleInput").value || "").trim();
-        const url = normalizeUrl(document.getElementById("urlInput").value || "");
-        const keywords = parseKeywords(document.getElementById("keywordsInput").value || "");
-        const memo = String(document.getElementById("memoInput").value || "").trim();
-        if (!title) {
-          alert("タイトルを入力してください。");
-          return;
-        }
-        if (!url) {
-          alert("URL を入力してください。");
-          return;
-        }
-        if (editingId) {
-          entries = entries.map((entry) => (
-            entry.id === editingId
-              ? { ...entry, title, url, keywords, memo }
-              : entry
-          ));
-          showToast("URLメモを更新しました");
-        } else {
-          entries.unshift({
-            id: createId(),
-            title,
-            url,
-            keywords,
-            memo,
-            createdAt: Date.now(),
-            lastAccessedAt: 0
-          });
-          showToast("URLメモを追加しました");
-        }
-        saveEntries();
-        renderEntries();
-        closeDialog(document.getElementById("entryDialog"));
-      }
-
-      function openDetailDialog(entryId) {
-        const entry = entries.find((item) => item.id === entryId);
-        if (!entry) return;
-        selectedId = entry.id;
-        document.getElementById("detailDialogTitle").textContent = entry.title;
-        document.getElementById("detailTitle").value = entry.title;
-        document.getElementById("detailUrl").value = entry.url;
-        document.getElementById("detailMemo").value = entry.memo || "未記入";
-        const keywordsNode = document.getElementById("detailKeywords");
-        keywordsNode.innerHTML = "";
-        if (entry.keywords.length === 0) {
-          keywordsNode.textContent = "未設定";
-        } else {
-          entry.keywords.forEach((keyword) => {
-            const chip = document.createElement("button");
-            chip.type = "button";
-            chip.className = "md-keyword-chip";
-            chip.textContent = keyword;
-            chip.addEventListener("click", () => applyKeywordSearch(keyword));
-            keywordsNode.appendChild(chip);
-          });
-        }
-        openDialog(document.getElementById("detailDialog"));
-      }
-
-      function applyKeywordSearch(keyword) {
-        const searchInput = document.getElementById("searchInput");
-        searchInput.value = String(keyword || "").trim();
-        closeDialog(document.getElementById("detailDialog"));
-        renderEntries();
-        searchInput.focus();
-      }
-
-      function markAccessed(entryId) {
-        entries = entries.map((entry) => (
-          entry.id === entryId
-            ? { ...entry, lastAccessedAt: Date.now() }
-            : entry
-        ));
-        saveEntries();
-      }
-
-      function openSelectedUrl() {
-        const entry = entries.find((item) => item.id === selectedId);
-        if (!entry) return;
-        markAccessed(entry.id);
-        renderEntries();
-        window.open(entry.url, "_blank", "noopener,noreferrer");
-        openDetailDialog(entry.id);
-      }
-
-      function deleteSelectedEntry() {
-        const entry = entries.find((item) => item.id === selectedId);
-        if (!entry) return;
-        if (!window.confirm(`「${entry.title}」を削除しますか？`)) {
-          return;
-        }
-        entries = entries.filter((item) => item.id !== entry.id);
-        saveEntries();
-        renderEntries();
-        closeDialog(document.getElementById("detailDialog"));
-        showToast("URLメモを削除しました");
-      }
-
-      function exportEntries() {
-        const payload = {
-          version: EXPORT_VERSION,
-          exportedAt: new Date().toISOString(),
-          entries
-        };
-        const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: "application/json;charset=utf-8" });
-        const objectUrl = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        const now = new Date();
-        const stamp = [
-          now.getFullYear(),
-          String(now.getMonth() + 1).padStart(2, "0"),
-          String(now.getDate()).padStart(2, "0"),
-          "-",
-          String(now.getHours()).padStart(2, "0"),
-          String(now.getMinutes()).padStart(2, "0"),
-          String(now.getSeconds()).padStart(2, "0")
-        ].join("");
-        link.href = objectUrl;
-        link.download = `url-memo-export-${stamp}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
-        showToast("一覧を JSON でエクスポートしました");
-      }
-
-      async function importEntriesFromFile(file) {
-        if (!file) return;
-        try {
-          const parsed = JSON.parse(await file.text());
-          if (!parsed || Number(parsed.version) !== EXPORT_VERSION || !Array.isArray(parsed.entries)) {
-            showToast("JSON の読み込みに失敗しました");
-            return;
-          }
-          const importedEntries = parsed.entries.map(normalizeEntry).filter(isValidEntry);
-          entries = importedEntries.length > 0 ? importedEntries : createDefaultEntries();
-          saveEntries();
-          renderEntries();
-          showToast("一覧を JSON から取り込みました");
-        } catch (_) {
-          showToast("JSON の読み込みに失敗しました");
-        }
-      }
-
-      function clearAllEntries() {
-        if (!window.confirm("URLメモをすべて削除しますか？")) {
-          return;
-        }
-        entries = [];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-        selectedId = "";
-        renderEntries();
-        showToast("URLメモをすべて削除しました");
-      }
-
-      function bindEvents() {
-        document.getElementById("searchInput").addEventListener("input", renderEntries);
-        document.getElementById("openCreateDialogBtn").addEventListener("click", openCreateDialog);
-        document.getElementById("saveEntryBtn").addEventListener("click", saveCurrentEntry);
-        document.getElementById("closeEntryDialogBtn").addEventListener("click", () => closeDialog(document.getElementById("entryDialog")));
-        document.getElementById("closeDetailDialogBtn").addEventListener("click", () => closeDialog(document.getElementById("detailDialog")));
-        document.getElementById("editEntryBtn").addEventListener("click", () => {
-          closeDialog(document.getElementById("detailDialog"));
-          openEditDialog(selectedId);
-        });
-        document.getElementById("deleteEntryBtn").addEventListener("click", deleteSelectedEntry);
-        document.getElementById("openUrlBtn").addEventListener("click", openSelectedUrl);
-        document.getElementById("openUrlInlineBtn").addEventListener("click", openSelectedUrl);
-        document.getElementById("exportEntriesBtn").addEventListener("click", exportEntries);
-        document.getElementById("importEntriesBtn").addEventListener("click", () => document.getElementById("importEntriesInput").click());
-        document.getElementById("clearEntriesBtn").addEventListener("click", clearAllEntries);
-        document.getElementById("importEntriesInput").addEventListener("change", async (event) => {
-          const file = event.target.files && event.target.files[0];
-          await importEntriesFromFile(file);
-          event.target.value = "";
-        });
-        const entryDialog = document.getElementById("entryDialog");
-        const detailDialog = document.getElementById("detailDialog");
-        [entryDialog, detailDialog].forEach((dialog) => {
-          dialog.addEventListener("click", (event) => {
-            if (event.target === dialog) {
-              closeDialog(dialog);
-            }
-          });
-        });
-      }
-
-      function initialize() {
-        entries = loadEntries();
-        bindEvents();
-        renderEntries();
-      }
-
-      document.addEventListener("DOMContentLoaded", initialize);
-    })();
-  </script>
+  
   <script>
 (()=>{function s(o,e,t,r){var i=arguments.length,n=i<3?e:r===null?r=Object.getOwnPropertyDescriptor(e,t):r,a;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")n=Reflect.decorate(o,e,t,r);else for(var d=o.length-1;d>=0;d--)(a=o[d])&&(n=(i<3?a(n):i>3?a(e,t,n):a(e,t))||n);return i>3&&n&&Object.defineProperty(e,t,n),n}var E=o=>(e,t)=>{t!==void 0?t.addInitializer(()=>{customElements.define(o,e)}):customElements.define(o,e)};var Qe=globalThis,et=Qe.ShadowRoot&&(Qe.ShadyCSS===void 0||Qe.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,Bt=Symbol(),$r=new WeakMap,Ne=class{constructor(e,t,r){if(this._$cssResult$=!0,r!==Bt)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o,t=this.t;if(et&&e===void 0){let r=t!==void 0&&t.length===1;r&&(e=$r.get(t)),e===void 0&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),r&&$r.set(t,e))}return e}toString(){return this.cssText}},Tr=o=>new Ne(typeof o=="string"?o:o+"",void 0,Bt),g=(o,...e)=>{let t=o.length===1?o[0]:e.reduce((r,i,n)=>r+(a=>{if(a._$cssResult$===!0)return a.cssText;if(typeof a=="number")return a;throw Error("Value passed to 'css' function must be a 'css' function result: "+a+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+o[n+1],o[0]);return new Ne(t,o,Bt)},Sr=(o,e)=>{if(et)o.adoptedStyleSheets=e.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(let t of e){let r=document.createElement("style"),i=Qe.litNonce;i!==void 0&&r.setAttribute("nonce",i),r.textContent=t.cssText,o.appendChild(r)}},Ft=et?o=>o:o=>o instanceof CSSStyleSheet?(e=>{let t="";for(let r of e.cssRules)t+=r.cssText;return Tr(t)})(o):o;var{is:Io,defineProperty:ko,getOwnPropertyDescriptor:Oo,getOwnPropertyNames:Ro,getOwnPropertySymbols:Po,getPrototypeOf:Lo}=Object,ce=globalThis,Ir=ce.trustedTypes,Do=Ir?Ir.emptyScript:"",zo=ce.reactiveElementPolyfillSupport,Be=(o,e)=>o,Fe={toAttribute(o,e){switch(e){case Boolean:o=o?Do:null;break;case Object:case Array:o=o==null?o:JSON.stringify(o)}return o},fromAttribute(o,e){let t=o;switch(e){case Boolean:t=o!==null;break;case Number:t=o===null?null:Number(o);break;case Object:case Array:try{t=JSON.parse(o)}catch{t=null}}return t}},tt=(o,e)=>!Io(o,e),kr={attribute:!0,type:String,converter:Fe,reflect:!1,useDefault:!1,hasChanged:tt};Symbol.metadata??(Symbol.metadata=Symbol("metadata")),ce.litPropertyMetadata??(ce.litPropertyMetadata=new WeakMap);var re=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??(this.l=[])).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=kr){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){let r=Symbol(),i=this.getPropertyDescriptor(e,r,t);i!==void 0&&ko(this.prototype,e,i)}}static getPropertyDescriptor(e,t,r){let{get:i,set:n}=Oo(this.prototype,e)??{get(){return this[t]},set(a){this[t]=a}};return{get:i,set(a){let d=i?.call(this);n?.call(this,a),this.requestUpdate(e,d,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??kr}static _$Ei(){if(this.hasOwnProperty(Be("elementProperties")))return;let e=Lo(this);e.finalize(),e.l!==void 0&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(Be("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(Be("properties"))){let t=this.properties,r=[...Ro(t),...Po(t)];for(let i of r)this.createProperty(i,t[i])}let e=this[Symbol.metadata];if(e!==null){let t=litPropertyMetadata.get(e);if(t!==void 0)for(let[r,i]of t)this.elementProperties.set(r,i)}this._$Eh=new Map;for(let[t,r]of this.elementProperties){let i=this._$Eu(t,r);i!==void 0&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){let t=[];if(Array.isArray(e)){let r=new Set(e.flat(1/0).reverse());for(let i of r)t.unshift(Ft(i))}else e!==void 0&&t.push(Ft(e));return t}static _$Eu(e,t){let r=t.attribute;return r===!1?void 0:typeof r=="string"?r:typeof e=="string"?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??(this._$EO=new Set)).add(e),this.renderRoot!==void 0&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){let e=new Map,t=this.constructor.elementProperties;for(let r of t.keys())this.hasOwnProperty(r)&&(e.set(r,this[r]),delete this[r]);e.size>0&&(this._$Ep=e)}createRenderRoot(){let e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return Sr(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,r){this._$AK(e,r)}_$ET(e,t){let r=this.constructor.elementProperties.get(e),i=this.constructor._$Eu(e,r);if(i!==void 0&&r.reflect===!0){let n=(r.converter?.toAttribute!==void 0?r.converter:Fe).toAttribute(t,r.type);this._$Em=e,n==null?this.removeAttribute(i):this.setAttribute(i,n),this._$Em=null}}_$AK(e,t){let r=this.constructor,i=r._$Eh.get(e);if(i!==void 0&&this._$Em!==i){let n=r.getPropertyOptions(i),a=typeof n.converter=="function"?{fromAttribute:n.converter}:n.converter?.fromAttribute!==void 0?n.converter:Fe;this._$Em=i;let d=a.fromAttribute(t,n.type);this[i]=d??this._$Ej?.get(i)??d,this._$Em=null}}requestUpdate(e,t,r,i=!1,n){if(e!==void 0){let a=this.constructor;if(i===!1&&(n=this[e]),r??(r=a.getPropertyOptions(e)),!((r.hasChanged??tt)(n,t)||r.useDefault&&r.reflect&&n===this._$Ej?.get(e)&&!this.hasAttribute(a._$Eu(e,r))))return;this.C(e,t,r)}this.isUpdatePending===!1&&(this._$ES=this._$EP())}C(e,t,{useDefault:r,reflect:i,wrapped:n},a){r&&!(this._$Ej??(this._$Ej=new Map)).has(e)&&(this._$Ej.set(e,a??t??this[e]),n!==!0||a!==void 0)||(this._$AL.has(e)||(this.hasUpdated||r||(t=void 0),this._$AL.set(e,t)),i===!0&&this._$Em!==e&&(this._$Eq??(this._$Eq=new Set)).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}let e=this.scheduleUpdate();return e!=null&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??(this.renderRoot=this.createRenderRoot()),this._$Ep){for(let[i,n]of this._$Ep)this[i]=n;this._$Ep=void 0}let r=this.constructor.elementProperties;if(r.size>0)for(let[i,n]of r){let{wrapped:a}=n,d=this[i];a!==!0||this._$AL.has(i)||d===void 0||this.C(i,void 0,n,d)}}let e=!1,t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(r=>r.hostUpdate?.()),this.update(t)):this._$EM()}catch(r){throw e=!1,this._$EM(),r}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&(this._$Eq=this._$Eq.forEach(t=>this._$ET(t,this[t]))),this._$EM()}updated(e){}firstUpdated(e){}};re.elementStyles=[],re.shadowRootOptions={mode:"open"},re[Be("elementProperties")]=new Map,re[Be("finalized")]=new Map,zo?.({ReactiveElement:re}),(ce.reactiveElementVersions??(ce.reactiveElementVersions=[])).push("2.1.2");var Mo={attribute:!0,type:String,converter:Fe,reflect:!1,hasChanged:tt},No=(o=Mo,e,t)=>{let{kind:r,metadata:i}=t,n=globalThis.litPropertyMetadata.get(i);if(n===void 0&&globalThis.litPropertyMetadata.set(i,n=new Map),r==="setter"&&((o=Object.create(o)).wrapped=!0),n.set(t.name,o),r==="accessor"){let{name:a}=t;return{set(d){let c=e.get.call(this);e.set.call(this,d),this.requestUpdate(a,c,o,!0,d)},init(d){return d!==void 0&&this.C(a,void 0,o,d),d}}}if(r==="setter"){let{name:a}=t;return function(d){let c=this[a];e.call(this,d),this.requestUpdate(a,c,o,!0,d)}}throw Error("Unsupported decorator location: "+r)};function l(o){return(e,t)=>typeof t=="object"?No(o,e,t):((r,i,n)=>{let a=i.hasOwnProperty(n);return i.constructor.createProperty(n,r),a?Object.getOwnPropertyDescriptor(i,n):void 0})(o,e,t)}function k(o){return l({...o,state:!0,attribute:!1})}var Q=(o,e,t)=>(t.configurable=!0,t.enumerable=!0,Reflect.decorate&&typeof e!="object"&&Object.defineProperty(o,e,t),t);function S(o,e){return(t,r,i)=>{let n=a=>a.renderRoot?.querySelector(o)??null;if(e){let{get:a,set:d}=typeof r=="object"?t:i??(()=>{let c=Symbol();return{get(){return this[c]},set(h){this[c]=h}}})();return Q(t,r,{get(){let c=a.call(this);return c===void 0&&(c=n(this),(c!==null||this.hasUpdated)&&d.call(this,c)),c}})}return Q(t,r,{get(){return n(this)}})}}var Bo;function Or(o){return(e,t)=>Q(e,t,{get(){return(this.renderRoot??Bo??(Bo=document.createDocumentFragment())).querySelectorAll(o)}})}function N(o){return(e,t)=>{let{slot:r,selector:i}=o??{},n="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){let a=this.renderRoot?.querySelector(n),d=a?.assignedElements(o)??[];return i===void 0?d:d.filter(c=>c.matches(i))}})}}function rt(o){return(e,t)=>{let{slot:r}=o??{},i="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){return this.renderRoot?.querySelector(i)?.assignedNodes(o)??[]}})}}var qe=globalThis,Rr=o=>o,ot=qe.trustedTypes,Pr=ot?ot.createPolicy("lit-html",{createHTML:o=>o}):void 0,qt="$lit$",oe=`lit$${Math.random().toFixed(9).slice(2)}$`,Vt="?"+oe,Fo=`<${Vt}>`,_e=document,Ve=()=>_e.createComment(""),He=o=>o===null||typeof o!="object"&&typeof o!="function",Ht=Array.isArray,Br=o=>Ht(o)||typeof o?.[Symbol.iterator]=="function",Ut=`[ 	
 \f\r]`,Ue=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,Lr=/-->/g,Dr=/>/g,ye=RegExp(`>|${Ut}(?:([^\\s"'>=/]+)(${Ut}*=${Ut}*(?:[^ 	
@@ -4654,6 +3737,924 @@ if (!customElements.get("lht-page-hero")) {
 if (!customElements.get("lht-page-menu")) {
   customElements.define("lht-page-menu", LhtPageMenu);
 }
+  </script>
+
+  <script>
+(() => {
+    const STORAGE_KEY = "urlMemo.entries";
+    const EXPORT_VERSION = 1;
+    const DEFAULT_ENTRIES_PAYLOAD = {
+        version: 1,
+        exportedAt: "2026-03-16T12:16:31.448Z",
+        entries: [
+            {
+                id: "urlmemo-1773652733420-mu6zre",
+                title: "instagram",
+                url: "https://www.instagram.com/toshikiiga/",
+                memo: "インスタグラム",
+                keywords: [
+                    "instagram",
+                    "igapyon"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-1773652689762-rumm80",
+                title: "github",
+                url: "https://github.com/igapyon?tab=repositories",
+                memo: "GitHub リポジトリ一覧",
+                keywords: [
+                    "github",
+                    "igapyon",
+                    "いがぴょん",
+                    "repository",
+                    "リポジトリ"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-1773652636580-ye6ael",
+                title: "日記ウェブページv3",
+                url: "https://www.igapyon.jp/igapyon/diary/",
+                memo: "いがぴょんの日記ウェブページv3。",
+                keywords: [
+                    "igapyon",
+                    "blog",
+                    "いがぴょん",
+                    "伊賀敏樹",
+                    "日記",
+                    "v3"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-1773652554462-yf33jq",
+                title: "igapyon",
+                url: "https://www.igapyon.jp/",
+                memo: "igapyon のホームページトップ",
+                keywords: [
+                    "igapyon",
+                    "いがぴょん",
+                    "伊賀敏樹"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-local-html-tools",
+                title: "local-html-tools",
+                url: "https://igapyon.github.io/local-html-tools/",
+                memo: "ローカルHTMLツール集 (Single-file Web App)",
+                keywords: [
+                    "local-html-tools",
+                    "LLM",
+                    "prompt"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-mikuscore",
+                title: "mikuscore",
+                url: "https://igapyon.github.io/mikuscore/mikuscore.html",
+                memo: "MusicXML 中心の譜面フォーマット変換ソフト (Single-file Web App)",
+                keywords: [
+                    "mikuscore",
+                    "musicxml",
+                    "midi",
+                    "abc"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-starship-sim",
+                title: "starship-sim",
+                url: "https://igapyon.github.io/starship-sim/",
+                memo: "2次元宇宙戦闘シミュレーション (Single-file Web App)",
+                keywords: [
+                    "starship-sim"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-klondike",
+                title: "Klondike",
+                url: "https://www.igapyon.jp/apps/klondike.html",
+                memo: "ソリティア/クロンダイク (Single-file Web App)",
+                keywords: [
+                    "Klondike",
+                    "solitaire"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-analogclocket",
+                title: "AnalogClocket",
+                url: "https://igapyon.github.io/AnalogClocket/",
+                memo: "シンプルで実用的なアナログ時計 (Single-file Web App)",
+                keywords: [
+                    "analog",
+                    "clock"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-sql-formatter",
+                title: "sql-formatter",
+                url: "https://igapyon.github.io/sql-formatter/",
+                memo: "SQLフォーマッター (Single-file Web App)",
+                keywords: [
+                    "sql",
+                    "formatter",
+                    "ansi"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-svg-part-editor",
+                title: "svg-part-editor",
+                url: "https://igapyon.github.io/svg-part-editor/",
+                memo: "ミニマルな SVG エディタ。開発中  (Single-file Web App)",
+                keywords: [
+                    "svg",
+                    "part",
+                    "editor"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-remindy",
+                title: "Remindy",
+                url: "https://github.com/igapyon/remindy",
+                memo: "Windows 11向けのデスクトップ用リマインダーツール。",
+                keywords: [
+                    "remind"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-scheduly",
+                title: "Scheduly",
+                url: "https://github.com/igapyon/scheduly",
+                memo: "iCalendar連携のスケジュール調整アプリ。BETA公開中。",
+                keywords: [
+                    "schedule",
+                    "ical"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-chatgpt",
+                title: "ChatGPT",
+                url: "https://chatgpt.com/",
+                memo: "チャットジーピーティー",
+                keywords: [
+                    "chatgpt",
+                    "openai",
+                    "ai",
+                    "gpt"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-claude",
+                title: "Claude",
+                url: "https://claude.ai/",
+                memo: "",
+                keywords: [
+                    "claude",
+                    "anthropic",
+                    "ai",
+                    "クロード",
+                    "クロコ"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-gemini",
+                title: "Google Gemini",
+                url: "https://gemini.google.com/",
+                memo: "",
+                keywords: [
+                    "gemini",
+                    "google",
+                    "ai",
+                    "ジェミニ"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-perplexity",
+                title: "Perplexity",
+                url: "https://www.perplexity.ai/",
+                memo: "",
+                keywords: [
+                    "perplexity",
+                    "ai",
+                    "search",
+                    "パープレ"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-google",
+                title: "Google",
+                url: "https://www.google.com/",
+                memo: "",
+                keywords: [
+                    "google",
+                    "search",
+                    "グーグル",
+                    "検索",
+                    "ぐぐる"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-gmail",
+                title: "Gmail",
+                url: "https://mail.google.com/",
+                memo: "",
+                keywords: [
+                    "gmail",
+                    "google",
+                    "mail",
+                    "email",
+                    "ジーメール"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-google-calendar",
+                title: "Google Calendar",
+                url: "https://calendar.google.com/",
+                memo: "",
+                keywords: [
+                    "google",
+                    "calendar",
+                    "schedule",
+                    "グーグル",
+                    "カレンダー"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-youtube",
+                title: "YouTube",
+                url: "https://www.youtube.com/",
+                memo: "",
+                keywords: [
+                    "youtube",
+                    "video",
+                    "google",
+                    "ユーチューブ"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-amazon-jp",
+                title: "amazon",
+                url: "https://www.amazon.co.jp/",
+                memo: "",
+                keywords: [
+                    "amazon",
+                    "shopping",
+                    "ec",
+                    "アマゾン",
+                    "密林"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-soundhouse",
+                title: "サウンドハウス",
+                url: "https://www.soundhouse.co.jp/",
+                memo: "",
+                keywords: [
+                    "サウンドハウス",
+                    "楽器",
+                    "音響",
+                    "dtm",
+                    "soundhouse"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-twitter",
+                title: "X (Twitter)",
+                url: "https://www.twitter.com/",
+                memo: "",
+                keywords: [
+                    "x",
+                    "twitter",
+                    "sns",
+                    "エックス",
+                    "ツイッター"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-facebook",
+                title: "facebook",
+                url: "https://www.facebook.com/",
+                memo: "",
+                keywords: [
+                    "facebook",
+                    "sns",
+                    "meta",
+                    "フェースブック",
+                    "顔本"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-musicxml40",
+                title: "MusicXML 4.0",
+                url: "https://www.w3.org/2021/06/musicxml40/",
+                memo: "",
+                keywords: [
+                    "musicxml",
+                    "w3c",
+                    "楽譜",
+                    "仕様"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-certum",
+                title: "Certum",
+                url: "https://www.certum.eu/en/",
+                memo: "",
+                keywords: [
+                    "certum",
+                    "ssl",
+                    "code signing",
+                    "electronic signature"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-danime",
+                title: "dアニメストア",
+                url: "https://animestore.docomo.ne.jp/",
+                memo: "",
+                keywords: [
+                    "dアニメストア",
+                    "アニメ",
+                    "docomo",
+                    "配信"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-nhk",
+                title: "NHK",
+                url: "https://www.nhk.or.jp/",
+                memo: "",
+                keywords: [
+                    "nhk",
+                    "日本放送協会",
+                    "放送",
+                    "エヌエッチケー"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-ekitan",
+                title: "駅探",
+                url: "https://ekitan.com/",
+                memo: "",
+                keywords: [
+                    "駅探",
+                    "乗り換え",
+                    "時刻表",
+                    "交通",
+                    "えきたん"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            },
+            {
+                id: "urlmemo-default-tenkijp",
+                title: "tenki",
+                url: "https://tenki.jp/",
+                memo: "",
+                keywords: [
+                    "tenki.jp",
+                    "天気",
+                    "地震",
+                    "台風"
+                ],
+                createdAt: 1773500400000,
+                lastAccessedAt: 1773500400000
+            }
+        ]
+    };
+    let entries = [];
+    let editingId = "";
+    let selectedId = "";
+    function getElement(id) {
+        const element = document.getElementById(id);
+        if (!element) {
+            throw new Error(`Element not found: ${id}`);
+        }
+        return element;
+    }
+    function getDialog(id) {
+        return getElement(id);
+    }
+    function getInput(id) {
+        return getElement(id);
+    }
+    function getTextArea(id) {
+        return getElement(id);
+    }
+    function showToast(message) {
+        const toast = document.getElementById("toast");
+        const toastWithShow = toast;
+        if (toastWithShow && typeof toastWithShow.show === "function") {
+            toastWithShow.show(message, 2200);
+        }
+    }
+    function createId() {
+        return `urlmemo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    }
+    function normalizeUrl(url) {
+        return String(url || "").trim();
+    }
+    function parseKeywords(value) {
+        if (Array.isArray(value)) {
+            return value.map((item) => String(item || "").trim()).filter(Boolean);
+        }
+        return String(value || "")
+            .split(/[,\n]/)
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+    function escapeHtml(text) {
+        return String(text || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+    function normalizeEntry(raw) {
+        const now = Date.now();
+        return {
+            id: raw && raw.id ? String(raw.id) : createId(),
+            title: String((raw === null || raw === void 0 ? void 0 : raw.title) || "").trim(),
+            url: normalizeUrl(raw === null || raw === void 0 ? void 0 : raw.url),
+            memo: String((raw === null || raw === void 0 ? void 0 : raw.memo) || "").trim(),
+            keywords: parseKeywords(raw === null || raw === void 0 ? void 0 : raw.keywords),
+            createdAt: Number((raw === null || raw === void 0 ? void 0 : raw.createdAt) || now),
+            lastAccessedAt: Number((raw === null || raw === void 0 ? void 0 : raw.lastAccessedAt) || 0)
+        };
+    }
+    function createDefaultEntries() {
+        const seenUrls = new Set();
+        return DEFAULT_ENTRIES_PAYLOAD.entries
+            .map(normalizeEntry)
+            .filter(isValidEntry)
+            .filter((entry) => {
+            const normalizedUrl = normalizeUrl(entry.url);
+            if (seenUrls.has(normalizedUrl)) {
+                return false;
+            }
+            seenUrls.add(normalizedUrl);
+            return true;
+        });
+    }
+    function isValidEntry(entry) {
+        return !!(entry && entry.title && entry.url);
+    }
+    function loadEntries() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw)
+                return createDefaultEntries();
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed))
+                return createDefaultEntries();
+            const loadedEntries = parsed.map((entry) => normalizeEntry(entry)).filter(isValidEntry);
+            return loadedEntries.length > 0 ? loadedEntries : createDefaultEntries();
+        }
+        catch (_) {
+            return createDefaultEntries();
+        }
+    }
+    function saveEntries() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+    function normalizeKanaForSearch(value) {
+        return value.replace(/[\u3041-\u3096]/g, (char) => String.fromCharCode(char.charCodeAt(0) + 0x60));
+    }
+    function normalizeToken(value) {
+        return normalizeKanaForSearch(String(value || ""))
+            .normalize("NFKC")
+            .trim()
+            .toLowerCase();
+    }
+    function buildSearchIndex(entry) {
+        const titleTokens = [entry.title].map(normalizeToken).filter(Boolean);
+        const keywordTokens = entry.keywords.map(normalizeToken).filter(Boolean);
+        const memoTokens = entry.memo.split(/\s+/).map(normalizeToken).filter(Boolean);
+        const urlTokens = [entry.url].map(normalizeToken).filter(Boolean);
+        return {
+            entry,
+            titleTokens,
+            keywordTokens,
+            memoTokens,
+            urlTokens
+        };
+    }
+    function matchesAllTerms(tokens, terms) {
+        if (terms.length === 0) {
+            return true;
+        }
+        return terms.every((term) => tokens.some((token) => token.includes(term)));
+    }
+    function calculateMatchScore(tokens, terms) {
+        if (terms.length === 0) {
+            return 0;
+        }
+        let score = 0;
+        for (const term of terms) {
+            let bestScoreForTerm = 0;
+            for (const token of tokens) {
+                if (!token.includes(term) || token.length === 0) {
+                    continue;
+                }
+                const currentScore = term.length / token.length;
+                if (currentScore > bestScoreForTerm) {
+                    bestScoreForTerm = currentScore;
+                }
+            }
+            score += bestScoreForTerm;
+        }
+        return score;
+    }
+    function sortByLastAccessedDesc(items) {
+        return [...items].sort((left, right) => {
+            const rightLast = Number(right.lastAccessedAt || 0);
+            const leftLast = Number(left.lastAccessedAt || 0);
+            if (rightLast !== leftLast) {
+                return rightLast - leftLast;
+            }
+            return Number(right.createdAt || 0) - Number(left.createdAt || 0);
+        });
+    }
+    function sortByScore(items, terms, tokenBuilder) {
+        return [...items].sort((left, right) => {
+            const rightScore = calculateMatchScore(tokenBuilder(right), terms);
+            const leftScore = calculateMatchScore(tokenBuilder(left), terms);
+            if (rightScore !== leftScore) {
+                return rightScore - leftScore;
+            }
+            const rightLast = Number(right.lastAccessedAt || 0);
+            const leftLast = Number(left.lastAccessedAt || 0);
+            if (rightLast !== leftLast) {
+                return rightLast - leftLast;
+            }
+            return String(left.title).localeCompare(String(right.title), "ja");
+        });
+    }
+    function mergeEntryGroups(groups) {
+        const merged = [];
+        const seenIds = new Set();
+        for (const group of groups) {
+            for (const entry of group) {
+                if (seenIds.has(entry.id)) {
+                    continue;
+                }
+                seenIds.add(entry.id);
+                merged.push(entry);
+            }
+        }
+        return merged;
+    }
+    function searchEntries(query) {
+        const searchIndexes = entries.map(buildSearchIndex);
+        const terms = String(query || "")
+            .trim()
+            .split(/\s+/)
+            .map(normalizeToken)
+            .filter(Boolean);
+        if (terms.length === 0) {
+            const sorted = sortByLastAccessedDesc(entries);
+            return {
+                matchedEntries: sorted,
+                matchGrades: new Map(sorted.map((entry) => [entry.id, "medium"])),
+                terms
+            };
+        }
+        const titleMatches = sortByScore(searchIndexes.filter((index) => matchesAllTerms(index.titleTokens, terms)).map((index) => index.entry), terms, (entry) => buildSearchIndex(entry).titleTokens);
+        const keywordMatches = sortByScore(searchIndexes.filter((index) => matchesAllTerms(index.keywordTokens, terms)).map((index) => index.entry), terms, (entry) => buildSearchIndex(entry).keywordTokens);
+        const memoMatches = sortByScore(searchIndexes.filter((index) => matchesAllTerms(index.memoTokens, terms)).map((index) => index.entry), terms, (entry) => buildSearchIndex(entry).memoTokens);
+        const urlMatches = sortByScore(searchIndexes.filter((index) => matchesAllTerms(index.urlTokens, terms)).map((index) => index.entry), terms, (entry) => buildSearchIndex(entry).urlTokens);
+        const matchedEntries = mergeEntryGroups([titleMatches, keywordMatches, memoMatches, urlMatches]);
+        const matchGrades = new Map();
+        for (const entry of urlMatches) {
+            matchGrades.set(entry.id, "weak");
+        }
+        for (const entry of memoMatches) {
+            matchGrades.set(entry.id, "weak");
+        }
+        for (const entry of keywordMatches) {
+            matchGrades.set(entry.id, "medium");
+        }
+        for (const entry of titleMatches) {
+            matchGrades.set(entry.id, "strong");
+        }
+        return { matchedEntries, matchGrades, terms };
+    }
+    function renderEntries() {
+        const list = getElement("entriesList");
+        const emptyGuide = getElement("emptyGuide");
+        const resultsMeta = getElement("resultsMeta");
+        const query = getInput("searchInput").value || "";
+        const { matchedEntries, matchGrades, terms } = searchEntries(query);
+        if (resultsMeta) {
+            resultsMeta.textContent = terms.length > 0
+                ? `${matchedEntries.length} 件ヒット`
+                : `${entries.length} 件登録`;
+        }
+        list.innerHTML = "";
+        if (entries.length === 0) {
+            emptyGuide.hidden = false;
+            emptyGuide.textContent = "まだ登録がありません。追加ボタンから登録してください。";
+            return;
+        }
+        if (matchedEntries.length === 0) {
+            emptyGuide.hidden = false;
+            emptyGuide.textContent = "一致する項目がありません。検索語を調整してください。";
+            return;
+        }
+        emptyGuide.hidden = true;
+        matchedEntries.forEach((entry) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = `md-chip-button md-chip-button--${matchGrades.get(entry.id) || "weak"}`;
+            button.dataset.entryId = entry.id;
+            button.innerHTML = `<span class="md-chip-label">${escapeHtml(entry.title)}</span>`;
+            button.addEventListener("click", () => openDetailDialog(entry.id));
+            list.appendChild(button);
+        });
+    }
+    function openDialog(dialog) {
+        if (dialog && typeof dialog.showModal === "function") {
+            dialog.showModal();
+        }
+    }
+    function closeDialog(dialog) {
+        if (dialog && dialog.open && typeof dialog.close === "function") {
+            dialog.close();
+        }
+    }
+    function resetEntryForm() {
+        editingId = "";
+        getElement("entryDialogTitle").textContent = "URLメモを追加";
+        getInput("titleInput").value = "";
+        getInput("urlInput").value = "";
+        getInput("keywordsInput").value = "";
+        getTextArea("memoInput").value = "";
+    }
+    function openCreateDialog() {
+        resetEntryForm();
+        openDialog(getDialog("entryDialog"));
+    }
+    function openEditDialog(entryId) {
+        const entry = entries.find((item) => item.id === entryId);
+        if (!entry)
+            return;
+        editingId = entry.id;
+        getElement("entryDialogTitle").textContent = "URLメモを更新";
+        getInput("titleInput").value = entry.title;
+        getInput("urlInput").value = entry.url;
+        getInput("keywordsInput").value = entry.keywords.join(", ");
+        getTextArea("memoInput").value = entry.memo;
+        openDialog(getDialog("entryDialog"));
+    }
+    function saveCurrentEntry() {
+        const title = String(getInput("titleInput").value || "").trim();
+        const url = normalizeUrl(getInput("urlInput").value || "");
+        const keywords = parseKeywords(getInput("keywordsInput").value || "");
+        const memo = String(getTextArea("memoInput").value || "").trim();
+        if (!title) {
+            alert("タイトルを入力してください。");
+            return;
+        }
+        if (!url) {
+            alert("URL を入力してください。");
+            return;
+        }
+        if (editingId) {
+            entries = entries.map((entry) => (entry.id === editingId
+                ? { ...entry, title, url, keywords, memo }
+                : entry));
+            showToast("URLメモを更新しました");
+        }
+        else {
+            entries.unshift({
+                id: createId(),
+                title,
+                url,
+                keywords,
+                memo,
+                createdAt: Date.now(),
+                lastAccessedAt: 0
+            });
+            showToast("URLメモを追加しました");
+        }
+        saveEntries();
+        renderEntries();
+        closeDialog(getDialog("entryDialog"));
+    }
+    function openDetailDialog(entryId) {
+        const entry = entries.find((item) => item.id === entryId);
+        if (!entry)
+            return;
+        selectedId = entry.id;
+        getElement("detailDialogTitle").textContent = entry.title;
+        getInput("detailTitle").value = entry.title;
+        getInput("detailUrl").value = entry.url;
+        getTextArea("detailMemo").value = entry.memo || "未記入";
+        const keywordsNode = getElement("detailKeywords");
+        keywordsNode.innerHTML = "";
+        if (entry.keywords.length === 0) {
+            keywordsNode.textContent = "未設定";
+        }
+        else {
+            entry.keywords.forEach((keyword) => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = "md-keyword-chip";
+                chip.textContent = keyword;
+                chip.addEventListener("click", () => applyKeywordSearch(keyword));
+                keywordsNode.appendChild(chip);
+            });
+        }
+        openDialog(getDialog("detailDialog"));
+    }
+    function applyKeywordSearch(keyword) {
+        const searchInput = getInput("searchInput");
+        searchInput.value = String(keyword || "").trim();
+        closeDialog(getDialog("detailDialog"));
+        renderEntries();
+        searchInput.focus();
+    }
+    function markAccessed(entryId) {
+        entries = entries.map((entry) => (entry.id === entryId
+            ? { ...entry, lastAccessedAt: Date.now() }
+            : entry));
+        saveEntries();
+    }
+    function openSelectedUrl() {
+        const entry = entries.find((item) => item.id === selectedId);
+        if (!entry)
+            return;
+        markAccessed(entry.id);
+        renderEntries();
+        window.open(entry.url, "_blank", "noopener,noreferrer");
+        openDetailDialog(entry.id);
+    }
+    function deleteSelectedEntry() {
+        const entry = entries.find((item) => item.id === selectedId);
+        if (!entry)
+            return;
+        if (!window.confirm(`「${entry.title}」を削除しますか？`)) {
+            return;
+        }
+        entries = entries.filter((item) => item.id !== entry.id);
+        saveEntries();
+        renderEntries();
+        closeDialog(getDialog("detailDialog"));
+        showToast("URLメモを削除しました");
+    }
+    function exportEntries() {
+        const payload = {
+            version: EXPORT_VERSION,
+            exportedAt: new Date().toISOString(),
+            entries
+        };
+        const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: "application/json;charset=utf-8" });
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        const now = new Date();
+        const stamp = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, "0"),
+            String(now.getDate()).padStart(2, "0"),
+            "-",
+            String(now.getHours()).padStart(2, "0"),
+            String(now.getMinutes()).padStart(2, "0"),
+            String(now.getSeconds()).padStart(2, "0")
+        ].join("");
+        link.href = objectUrl;
+        link.download = `url-memo-export-${stamp}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+        showToast("一覧を JSON でエクスポートしました");
+    }
+    async function importEntriesFromFile(file) {
+        if (!file)
+            return;
+        try {
+            const parsed = JSON.parse(await file.text());
+            if (!parsed || Number(parsed.version) !== EXPORT_VERSION || !Array.isArray(parsed.entries)) {
+                showToast("JSON の読み込みに失敗しました");
+                return;
+            }
+            const importedEntries = parsed.entries.map((entry) => normalizeEntry(entry)).filter(isValidEntry);
+            entries = importedEntries.length > 0 ? importedEntries : createDefaultEntries();
+            saveEntries();
+            renderEntries();
+            showToast("一覧を JSON から取り込みました");
+        }
+        catch (_) {
+            showToast("JSON の読み込みに失敗しました");
+        }
+    }
+    function clearAllEntries() {
+        if (!window.confirm("URLメモをすべて削除しますか？")) {
+            return;
+        }
+        entries = [];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        selectedId = "";
+        renderEntries();
+        showToast("URLメモをすべて削除しました");
+    }
+    function bindEvents() {
+        getInput("searchInput").addEventListener("input", renderEntries);
+        getElement("openCreateDialogBtn").addEventListener("click", openCreateDialog);
+        getElement("saveEntryBtn").addEventListener("click", saveCurrentEntry);
+        getElement("closeEntryDialogBtn").addEventListener("click", () => closeDialog(getDialog("entryDialog")));
+        getElement("closeDetailDialogBtn").addEventListener("click", () => closeDialog(getDialog("detailDialog")));
+        getElement("editEntryBtn").addEventListener("click", () => {
+            closeDialog(getDialog("detailDialog"));
+            openEditDialog(selectedId);
+        });
+        getElement("deleteEntryBtn").addEventListener("click", deleteSelectedEntry);
+        getElement("openUrlBtn").addEventListener("click", openSelectedUrl);
+        getElement("openUrlInlineBtn").addEventListener("click", openSelectedUrl);
+        getElement("exportEntriesBtn").addEventListener("click", exportEntries);
+        getElement("importEntriesBtn").addEventListener("click", () => getInput("importEntriesInput").click());
+        getElement("clearEntriesBtn").addEventListener("click", clearAllEntries);
+        getInput("importEntriesInput").addEventListener("change", async (event) => {
+            const input = event.target;
+            const file = (input === null || input === void 0 ? void 0 : input.files) && input.files[0];
+            await importEntriesFromFile(file);
+            if (input) {
+                input.value = "";
+            }
+        });
+        const entryDialog = getDialog("entryDialog");
+        const detailDialog = getDialog("detailDialog");
+        [entryDialog, detailDialog].forEach((dialog) => {
+            dialog.addEventListener("click", (event) => {
+                if (event.target === dialog) {
+                    closeDialog(dialog);
+                }
+            });
+        });
+    }
+    function initialize() {
+        entries = loadEntries();
+        bindEvents();
+        renderEntries();
+    }
+    document.addEventListener("DOMContentLoaded", initialize);
+})();
   </script>
 </body>
 </html>
