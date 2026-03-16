@@ -1297,6 +1297,10 @@ async function initializePromptPage() {
 
   function getDefinitionSearchGroup(definition: PromptDefinition | null) {
     const labelCode = getDefinitionLabelCode(definition);
+    const pSeriesMatch = labelCode.match(/^P\d+-\d+$/);
+    if (pSeriesMatch) {
+      return labelCode;
+    }
     const match = labelCode.match(/^([A-Z]\d+)/);
     return match ? match[1] : "";
   }

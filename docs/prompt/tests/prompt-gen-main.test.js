@@ -835,7 +835,6 @@ describe("prompt-gen main", () => {
 
     promptSearch.value = "P1001-500";
     promptSearch.dispatchEvent(new Event("input"));
-    document.querySelector(".md-chip-button").click();
 
     expect(hallucinationGuard.value).toBe("none");
     expect(promptOutput.textContent).toContain("○事実誤認を避けるため、次のルールを意識してください。");
@@ -843,7 +842,6 @@ describe("prompt-gen main", () => {
 
     promptSearch.value = "P1001-501";
     promptSearch.dispatchEvent(new Event("input"));
-    document.querySelector(".md-chip-button").click();
 
     expect(hallucinationGuard.value).toBe("none");
     expect(promptOutput.textContent).toContain("○ハルシネーション防止のため、次のルールに従ってください。");
@@ -857,7 +855,6 @@ describe("prompt-gen main", () => {
 
     promptSearch.value = "P1001-502";
     promptSearch.dispatchEvent(new Event("input"));
-    document.querySelector(".md-chip-button").click();
 
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、あなた自身の判断として内容を見直してください。");
     expect(promptOutput.textContent).toContain("`自己判断メモ` セクション");
@@ -871,7 +868,6 @@ describe("prompt-gen main", () => {
 
     promptSearch.value = "P1001-503";
     promptSearch.dispatchEvent(new Event("input"));
-    document.querySelector(".md-chip-button").click();
 
     expect(promptOutput.textContent).toContain("`最小差分で割り切った点`");
     expect(promptOutput.textContent).toContain("`あなたが本来志向していた理想形`");
@@ -886,14 +882,12 @@ describe("prompt-gen main", () => {
 
     promptSearch.value = "P1001-001";
     promptSearch.dispatchEvent(new Event("input"));
-    document.querySelector(".md-chip-button").click();
 
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。");
     expect(promptOutput.textContent).toContain("`誤解表現レビュー` セクション");
 
     promptSearch.value = "P1001-011";
     promptSearch.dispatchEvent(new Event("input"));
-    document.querySelector(".md-chip-button").click();
 
     expect(promptOutput.textContent).toContain("○回答案を作成したあと、誤解を招く表現がないかを観点として見直してください。");
     expect(promptOutput.textContent).not.toContain("`誤解表現レビュー` セクション");
@@ -1212,7 +1206,7 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("A simplified cute illustration of `ぶどう`");
   });
 
-  it("fills the empty search field with the parent numeric code when a candidate is clicked", async () => {
+  it("fills the search field with the parent code on the first candidate click", async () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
@@ -1249,6 +1243,48 @@ describe("prompt-gen main", () => {
     );
     a501Button.click();
     expect(promptSearch.value).toBe("A5");
+  });
+
+  it("auto-selects a single matching candidate", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptOutputTitle = document.getElementById("promptOutputTitle");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "P1005-007";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
+    expect(document.querySelector(".md-chip-button").classList.contains("is-active")).toBe(true);
+    expect(promptOutputTitle.textContent).toContain("P1005-007:");
+    expect(promptOutput.textContent).toContain("攻撃面を洗い出してください。");
+  });
+
+  it("uses the full P-series code when a selected P prompt is clicked again", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptOutputTitle = document.getElementById("promptOutputTitle");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "P1005";
+    promptSearch.dispatchEvent(new Event("input"));
+    const p1005Button = [...document.querySelectorAll(".md-chip-button")].find((button) =>
+      button.querySelector(".md-chip-label").textContent.includes("P1005-007:")
+    );
+    p1005Button.click();
+
+    expect(promptSearch.value).toBe("P1005");
+
+    p1005Button.click();
+
+    expect(promptSearch.value).toBe("P1005-007");
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
+    expect(document.querySelector(".md-chip-button .md-chip-label").textContent).toContain("P1005-007:");
+    expect(document.querySelector(".md-chip-button").classList.contains("is-active")).toBe(true);
+    expect(promptOutputTitle.textContent).toContain("P1005-007:");
+    expect(promptOutput.textContent).toContain("攻撃面を洗い出してください。");
   });
 
   it("applies commit query parameter and generates output on load", async () => {

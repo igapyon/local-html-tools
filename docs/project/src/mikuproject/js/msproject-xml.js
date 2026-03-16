@@ -2,6 +2,12 @@
     const SAMPLE_XML = `<?xml version="1.0" encoding="UTF-8"?>
 <Project xmlns="http://schemas.microsoft.com/project">
   <Name>Sample Project</Name>
+  <Title>Sample Project Title</Title>
+  <Company>Local HTML Tools</Company>
+  <Author>Toshiki Iga</Author>
+  <CreationDate>2026-03-16T08:30:00</CreationDate>
+  <LastSaved>2026-03-16T09:10:00</LastSaved>
+  <SaveVersion>14</SaveVersion>
   <CurrentDate>2026-03-16T09:00:00</CurrentDate>
   <StartDate>2026-03-16T09:00:00</StartDate>
   <FinishDate>2026-03-20T18:00:00</FinishDate>
@@ -11,12 +17,161 @@
   <MinutesPerDay>480</MinutesPerDay>
   <MinutesPerWeek>2400</MinutesPerWeek>
   <DaysPerMonth>20</DaysPerMonth>
+  <StatusDate>2026-03-19T09:00:00</StatusDate>
+  <WeekStartDay>1</WeekStartDay>
+  <WorkFormat>2</WorkFormat>
+  <DurationFormat>7</DurationFormat>
+  <CurrencyCode>JPY</CurrencyCode>
+  <CurrencyDigits>0</CurrencyDigits>
+  <CurrencySymbol>¥</CurrencySymbol>
+  <CurrencySymbolPosition>0</CurrencySymbolPosition>
+  <FYStartDate>2026-04-01T00:00:00</FYStartDate>
+  <FiscalYearStart>1</FiscalYearStart>
+  <CriticalSlackLimit>0</CriticalSlackLimit>
+  <DefaultTaskType>1</DefaultTaskType>
+  <DefaultFixedCostAccrual>2</DefaultFixedCostAccrual>
+  <DefaultStandardRate>5000/h</DefaultStandardRate>
+  <DefaultOvertimeRate>7000/h</DefaultOvertimeRate>
+  <DefaultTaskEVMethod>0</DefaultTaskEVMethod>
+  <NewTaskStartDate>0</NewTaskStartDate>
+  <NewTasksAreManual>0</NewTasksAreManual>
+  <NewTasksEffortDriven>1</NewTasksEffortDriven>
+  <NewTasksEstimated>1</NewTasksEstimated>
+  <ActualsInSync>0</ActualsInSync>
+  <EditableActualCosts>1</EditableActualCosts>
+  <HonorConstraints>1</HonorConstraints>
+  <InsertedProjectsLikeSummary>1</InsertedProjectsLikeSummary>
+  <MultipleCriticalPaths>0</MultipleCriticalPaths>
+  <TaskUpdatesResource>1</TaskUpdatesResource>
+  <UpdateManuallyScheduledTasksWhenEditingLinks>0</UpdateManuallyScheduledTasksWhenEditingLinks>
   <CalendarUID>1</CalendarUID>
+  <OutlineCodes>
+    <OutlineCode>
+      <FieldID>188743731</FieldID>
+      <FieldName>Outline Code1</FieldName>
+      <Alias>Phase</Alias>
+      <OnlyTableValues>1</OnlyTableValues>
+      <Enterprise>0</Enterprise>
+      <ResourceSubstitutionEnabled>0</ResourceSubstitutionEnabled>
+      <LeafOnly>0</LeafOnly>
+      <AllLevelsRequired>0</AllLevelsRequired>
+      <Masks>
+        <Mask>
+          <Level>1</Level>
+          <Mask>*</Mask>
+          <Length>0</Length>
+          <Sequence>0</Sequence>
+        </Mask>
+      </Masks>
+      <Values>
+        <Value>
+          <Value>PLAN</Value>
+          <Description>Planning</Description>
+        </Value>
+        <Value>
+          <Value>BUILD</Value>
+          <Description>Implementation</Description>
+        </Value>
+      </Values>
+    </OutlineCode>
+  </OutlineCodes>
+  <WBSMasks>
+    <WBSMask>
+      <Level>1</Level>
+      <Mask>A</Mask>
+      <Length>1</Length>
+      <Sequence>1</Sequence>
+    </WBSMask>
+    <WBSMask>
+      <Level>2</Level>
+      <Mask>00</Mask>
+      <Length>2</Length>
+      <Sequence>1</Sequence>
+    </WBSMask>
+  </WBSMasks>
+  <ExtendedAttributes>
+    <ExtendedAttribute>
+      <FieldID>188743734</FieldID>
+      <FieldName>Text1</FieldName>
+      <Alias>Owner</Alias>
+      <CalculationType>0</CalculationType>
+      <RestrictValues>0</RestrictValues>
+      <AppendNewValues>1</AppendNewValues>
+    </ExtendedAttribute>
+  </ExtendedAttributes>
   <Calendars>
     <Calendar>
       <UID>1</UID>
       <Name>Standard</Name>
       <IsBaseCalendar>1</IsBaseCalendar>
+      <IsBaselineCalendar>1</IsBaselineCalendar>
+      <Exceptions>
+        <Exception>
+          <Name>Holiday</Name>
+          <FromDate>2026-03-20T00:00:00</FromDate>
+          <ToDate>2026-03-20T23:59:59</ToDate>
+          <DayWorking>0</DayWorking>
+          <WorkingTimes>
+            <WorkingTime>
+              <FromTime>09:00:00</FromTime>
+              <ToTime>12:00:00</ToTime>
+            </WorkingTime>
+          </WorkingTimes>
+        </Exception>
+      </Exceptions>
+      <WeekDays>
+        <WeekDay>
+          <DayType>2</DayType>
+          <DayWorking>1</DayWorking>
+          <WorkingTimes>
+            <WorkingTime>
+              <FromTime>09:00:00</FromTime>
+              <ToTime>12:00:00</ToTime>
+            </WorkingTime>
+            <WorkingTime>
+              <FromTime>13:00:00</FromTime>
+              <ToTime>18:00:00</ToTime>
+            </WorkingTime>
+          </WorkingTimes>
+        </WeekDay>
+      </WeekDays>
+    </Calendar>
+    <Calendar>
+      <UID>2</UID>
+      <Name>Development</Name>
+      <IsBaseCalendar>0</IsBaseCalendar>
+      <BaseCalendarUID>1</BaseCalendarUID>
+      <WorkWeeks>
+        <WorkWeek>
+          <Name>Spring Sprint</Name>
+          <FromDate>2026-03-16T00:00:00</FromDate>
+          <ToDate>2026-03-31T23:59:59</ToDate>
+          <WeekDays>
+            <WeekDay>
+              <DayType>2</DayType>
+              <DayWorking>1</DayWorking>
+              <WorkingTimes>
+                <WorkingTime>
+                  <FromTime>10:00:00</FromTime>
+                  <ToTime>18:00:00</ToTime>
+                </WorkingTime>
+              </WorkingTimes>
+            </WeekDay>
+          </WeekDays>
+        </WorkWeek>
+      </WorkWeeks>
+      <WeekDays>
+        <WeekDay>
+          <DayType>6</DayType>
+          <DayWorking>1</DayWorking>
+          <WorkingTimes>
+            <WorkingTime>
+              <FromTime>10:00:00</FromTime>
+              <ToTime>15:00:00</ToTime>
+            </WorkingTime>
+          </WorkingTimes>
+        </WeekDay>
+      </WeekDays>
     </Calendar>
   </Calendars>
   <Tasks>
@@ -26,12 +181,29 @@
       <Name>Project Summary</Name>
       <OutlineLevel>1</OutlineLevel>
       <OutlineNumber>1</OutlineNumber>
+      <WBS>1</WBS>
+      <Type>1</Type>
+      <CalendarUID>1</CalendarUID>
+      <Priority>500</Priority>
       <Start>2026-03-16T09:00:00</Start>
       <Finish>2026-03-20T18:00:00</Finish>
       <Duration>PT40H0M0S</Duration>
+      <StartVariance>PT0H0M0S</StartVariance>
+      <FinishVariance>PT0H0M0S</FinishVariance>
+      <Work>PT40H0M0S</Work>
+      <WorkVariance>PT0H0M0S</WorkVariance>
+      <TotalSlack>PT0H0M0S</TotalSlack>
+      <FreeSlack>PT0H0M0S</FreeSlack>
+      <Cost>200000</Cost>
+      <ActualCost>100000</ActualCost>
+      <RemainingCost>100000</RemainingCost>
+      <RemainingWork>PT20H0M0S</RemainingWork>
+      <ActualWork>PT20H0M0S</ActualWork>
       <Milestone>0</Milestone>
       <Summary>1</Summary>
+      <Critical>0</Critical>
       <PercentComplete>50</PercentComplete>
+      <PercentWorkComplete>50</PercentWorkComplete>
     </Task>
     <Task>
       <UID>2</UID>
@@ -39,15 +211,51 @@
       <Name>Design</Name>
       <OutlineLevel>2</OutlineLevel>
       <OutlineNumber>1.1</OutlineNumber>
+      <WBS>1.1</WBS>
+      <Type>1</Type>
+      <CalendarUID>1</CalendarUID>
+      <Priority>500</Priority>
       <Start>2026-03-16T09:00:00</Start>
       <Finish>2026-03-17T18:00:00</Finish>
       <Duration>PT16H0M0S</Duration>
       <ActualStart>2026-03-16T09:00:00</ActualStart>
       <ActualFinish>2026-03-17T18:00:00</ActualFinish>
+      <StartVariance>PT0H0M0S</StartVariance>
+      <FinishVariance>PT0H0M0S</FinishVariance>
+      <Work>PT16H0M0S</Work>
+      <WorkVariance>PT0H0M0S</WorkVariance>
+      <TotalSlack>PT0H0M0S</TotalSlack>
+      <FreeSlack>PT0H0M0S</FreeSlack>
+      <Cost>80000</Cost>
+      <ActualCost>80000</ActualCost>
+      <RemainingCost>0</RemainingCost>
+      <RemainingWork>PT0H0M0S</RemainingWork>
+      <ActualWork>PT16H0M0S</ActualWork>
       <Milestone>0</Milestone>
       <Summary>0</Summary>
+      <Critical>0</Critical>
       <PercentComplete>100</PercentComplete>
+      <PercentWorkComplete>100</PercentWorkComplete>
       <Notes>Design completed</Notes>
+      <ExtendedAttribute>
+        <FieldID>188743734</FieldID>
+        <Value>Miku</Value>
+      </ExtendedAttribute>
+      <Baseline>
+        <Number>0</Number>
+        <Start>2026-03-16T09:00:00</Start>
+        <Finish>2026-03-17T18:00:00</Finish>
+        <Work>PT16H0M0S</Work>
+        <Cost>80000</Cost>
+      </Baseline>
+      <TimephasedData>
+        <Type>1</Type>
+        <UID>2</UID>
+        <Start>2026-03-16T09:00:00</Start>
+        <Finish>2026-03-16T18:00:00</Finish>
+        <Unit>2</Unit>
+        <Value>PT8H0M0S</Value>
+      </TimephasedData>
     </Task>
     <Task>
       <UID>3</UID>
@@ -55,14 +263,32 @@
       <Name>Implementation</Name>
       <OutlineLevel>2</OutlineLevel>
       <OutlineNumber>1.2</OutlineNumber>
+      <WBS>1.2</WBS>
+      <Type>1</Type>
+      <CalendarUID>1</CalendarUID>
+      <Priority>700</Priority>
       <Start>2026-03-18T09:00:00</Start>
       <Finish>2026-03-20T18:00:00</Finish>
       <Duration>PT24H0M0S</Duration>
+      <Deadline>2026-03-21T18:00:00</Deadline>
+      <StartVariance>PT0H0M0S</StartVariance>
+      <FinishVariance>PT0H0M0S</FinishVariance>
+      <Work>PT24H0M0S</Work>
+      <WorkVariance>PT0H0M0S</WorkVariance>
+      <TotalSlack>PT4H0M0S</TotalSlack>
+      <FreeSlack>PT2H0M0S</FreeSlack>
+      <Cost>120000</Cost>
+      <ActualCost>0</ActualCost>
+      <RemainingCost>120000</RemainingCost>
+      <RemainingWork>PT24H0M0S</RemainingWork>
+      <ActualWork>PT0H0M0S</ActualWork>
       <ConstraintType>4</ConstraintType>
       <ConstraintDate>2026-03-18T09:00:00</ConstraintDate>
       <Milestone>0</Milestone>
       <Summary>0</Summary>
+      <Critical>1</Critical>
       <PercentComplete>0</PercentComplete>
+      <PercentWorkComplete>0</PercentWorkComplete>
       <Notes>Implementation starts after design</Notes>
       <PredecessorLink>
         <PredecessorUID>2</PredecessorUID>
@@ -79,7 +305,40 @@
       <Type>1</Type>
       <Initials>MK</Initials>
       <Group>Engineering</Group>
+      <WorkGroup>0</WorkGroup>
       <MaxUnits>1</MaxUnits>
+      <CalendarUID>2</CalendarUID>
+      <StandardRate>5000/h</StandardRate>
+      <StandardRateFormat>2</StandardRateFormat>
+      <OvertimeRate>7000/h</OvertimeRate>
+      <OvertimeRateFormat>2</OvertimeRateFormat>
+      <CostPerUse>1000</CostPerUse>
+      <Work>PT40H0M0S</Work>
+      <ActualWork>PT20H0M0S</ActualWork>
+      <RemainingWork>PT20H0M0S</RemainingWork>
+      <Cost>200000</Cost>
+      <ActualCost>100000</ActualCost>
+      <RemainingCost>100000</RemainingCost>
+      <PercentWorkComplete>50</PercentWorkComplete>
+      <ExtendedAttribute>
+        <FieldID>188743737</FieldID>
+        <Value>Platform Team</Value>
+      </ExtendedAttribute>
+      <Baseline>
+        <Number>0</Number>
+        <Start>2026-03-16T09:00:00</Start>
+        <Finish>2026-03-20T18:00:00</Finish>
+        <Work>PT40H0M0S</Work>
+        <Cost>200000</Cost>
+      </Baseline>
+      <TimephasedData>
+        <Type>1</Type>
+        <UID>1</UID>
+        <Start>2026-03-16T09:00:00</Start>
+        <Finish>2026-03-16T18:00:00</Finish>
+        <Unit>2</Unit>
+        <Value>PT8H0M0S</Value>
+      </TimephasedData>
     </Resource>
   </Resources>
   <Assignments>
@@ -89,8 +348,40 @@
       <ResourceUID>1</ResourceUID>
       <Start>2026-03-16T09:00:00</Start>
       <Finish>2026-03-17T18:00:00</Finish>
+      <StartVariance>PT0H0M0S</StartVariance>
+      <FinishVariance>PT0H0M0S</FinishVariance>
+      <Delay>PT0H0M0S</Delay>
+      <Milestone>0</Milestone>
+      <WorkContour>0</WorkContour>
       <Units>1</Units>
       <Work>PT16H0M0S</Work>
+      <Cost>80000</Cost>
+      <ActualCost>40000</ActualCost>
+      <RemainingCost>40000</RemainingCost>
+      <PercentWorkComplete>50</PercentWorkComplete>
+      <OvertimeWork>PT2H0M0S</OvertimeWork>
+      <ActualOvertimeWork>PT1H0M0S</ActualOvertimeWork>
+      <ActualWork>PT8H0M0S</ActualWork>
+      <RemainingWork>PT8H0M0S</RemainingWork>
+      <ExtendedAttribute>
+        <FieldID>255852547</FieldID>
+        <Value>Design Slot</Value>
+      </ExtendedAttribute>
+      <Baseline>
+        <Number>0</Number>
+        <Start>2026-03-16T09:00:00</Start>
+        <Finish>2026-03-17T18:00:00</Finish>
+        <Work>PT16H0M0S</Work>
+        <Cost>80000</Cost>
+      </Baseline>
+      <TimephasedData>
+        <Type>1</Type>
+        <UID>1</UID>
+        <Start>2026-03-16T09:00:00</Start>
+        <Finish>2026-03-16T18:00:00</Finish>
+        <Unit>2</Unit>
+        <Value>PT8H0M0S</Value>
+      </TimephasedData>
     </Assignment>
     <Assignment>
       <UID>2</UID>
@@ -98,8 +389,21 @@
       <ResourceUID>1</ResourceUID>
       <Start>2026-03-18T09:00:00</Start>
       <Finish>2026-03-20T18:00:00</Finish>
+      <StartVariance>PT0H0M0S</StartVariance>
+      <FinishVariance>PT0H0M0S</FinishVariance>
+      <Delay>PT0H0M0S</Delay>
+      <Milestone>0</Milestone>
+      <WorkContour>0</WorkContour>
       <Units>1</Units>
       <Work>PT24H0M0S</Work>
+      <Cost>120000</Cost>
+      <ActualCost>0</ActualCost>
+      <RemainingCost>120000</RemainingCost>
+      <PercentWorkComplete>0</PercentWorkComplete>
+      <OvertimeWork>PT0H0M0S</OvertimeWork>
+      <ActualOvertimeWork>PT0H0M0S</ActualOvertimeWork>
+      <ActualWork>PT0H0M0S</ActualWork>
+      <RemainingWork>PT24H0M0S</RemainingWork>
     </Assignment>
   </Assignments>
 </Project>`;
@@ -121,6 +425,95 @@
         const timestamp = Date.parse(value);
         return Number.isFinite(timestamp) ? timestamp : null;
     }
+    function parseWeekDays(parent) {
+        var _a;
+        return Array.from(((_a = parent.getElementsByTagName("WeekDays")[0]) === null || _a === void 0 ? void 0 : _a.getElementsByTagName("WeekDay")) || []).map((weekDay) => {
+            var _a;
+            return ({
+                dayType: parseNumber(textContent(weekDay, "DayType"), 0),
+                dayWorking: parseBoolean(textContent(weekDay, "DayWorking")),
+                workingTimes: Array.from(((_a = weekDay.getElementsByTagName("WorkingTimes")[0]) === null || _a === void 0 ? void 0 : _a.getElementsByTagName("WorkingTime")) || []).map((workingTime) => ({
+                    fromTime: textContent(workingTime, "FromTime"),
+                    toTime: textContent(workingTime, "ToTime")
+                }))
+            });
+        });
+    }
+    function appendWeekDays(doc, parent, weekDays) {
+        if (weekDays.length === 0) {
+            return;
+        }
+        const weekDaysElement = doc.createElement("WeekDays");
+        for (const weekDay of weekDays) {
+            const weekDayElement = doc.createElement("WeekDay");
+            appendTextElement(doc, weekDayElement, "DayType", weekDay.dayType);
+            appendTextElement(doc, weekDayElement, "DayWorking", weekDay.dayWorking);
+            if (weekDay.workingTimes.length > 0) {
+                const workingTimesElement = doc.createElement("WorkingTimes");
+                for (const workingTime of weekDay.workingTimes) {
+                    const workingTimeElement = doc.createElement("WorkingTime");
+                    appendTextElement(doc, workingTimeElement, "FromTime", workingTime.fromTime);
+                    appendTextElement(doc, workingTimeElement, "ToTime", workingTime.toTime);
+                    workingTimesElement.appendChild(workingTimeElement);
+                }
+                weekDayElement.appendChild(workingTimesElement);
+            }
+            weekDaysElement.appendChild(weekDayElement);
+        }
+        parent.appendChild(weekDaysElement);
+    }
+    function parseWorkingTimes(parent) {
+        var _a;
+        return Array.from(((_a = parent.getElementsByTagName("WorkingTimes")[0]) === null || _a === void 0 ? void 0 : _a.getElementsByTagName("WorkingTime")) || []).map((workingTime) => ({
+            fromTime: textContent(workingTime, "FromTime"),
+            toTime: textContent(workingTime, "ToTime")
+        }));
+    }
+    function appendWorkingTimes(doc, parent, workingTimes) {
+        if (workingTimes.length === 0) {
+            return;
+        }
+        const workingTimesElement = doc.createElement("WorkingTimes");
+        for (const workingTime of workingTimes) {
+            const workingTimeElement = doc.createElement("WorkingTime");
+            appendTextElement(doc, workingTimeElement, "FromTime", workingTime.fromTime);
+            appendTextElement(doc, workingTimeElement, "ToTime", workingTime.toTime);
+            workingTimesElement.appendChild(workingTimeElement);
+        }
+        parent.appendChild(workingTimesElement);
+    }
+    function parseOutlineCodeMasks(parent) {
+        const masksElement = parent.getElementsByTagName("Masks")[0];
+        if (!masksElement) {
+            return [];
+        }
+        return Array.from(masksElement.children)
+            .filter((child) => child.tagName === "Mask")
+            .map((mask) => ({
+            level: parseNumber(textContent(mask, "Level"), 0),
+            mask: textContent(mask, "Mask") || undefined,
+            length: textContent(mask, "Length") ? parseNumber(textContent(mask, "Length"), 0) : undefined,
+            sequence: textContent(mask, "Sequence") ? parseNumber(textContent(mask, "Sequence"), 0) : undefined
+        }));
+    }
+    function parseOutlineCodeValues(parent) {
+        const valuesElement = parent.getElementsByTagName("Values")[0];
+        if (!valuesElement) {
+            return [];
+        }
+        return Array.from(valuesElement.children)
+            .filter((child) => child.tagName === "Value")
+            .map((value) => ({
+            value: textContent(value, "Value"),
+            description: textContent(value, "Description") || undefined
+        }));
+    }
+    function isPlaceholderUid(value) {
+        return String(value || "").trim() === "0";
+    }
+    function isUnassignedResourceUid(value) {
+        return String(value || "").trim() === "-65535";
+    }
     function parseXmlDocument(xmlText) {
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlText, "application/xml");
@@ -131,7 +524,7 @@
         return xml;
     }
     function importMsProjectXml(xmlText) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e, _f, _g;
         const xml = parseXmlDocument(xmlText);
         const projectElement = xml.documentElement;
         const calendars = Array.from(((_a = projectElement.getElementsByTagName("Calendars")[0]) === null || _a === void 0 ? void 0 : _a.getElementsByTagName("Calendar")) || []);
@@ -141,6 +534,12 @@
         return {
             project: {
                 name: textContent(projectElement, "Name"),
+                title: textContent(projectElement, "Title") || undefined,
+                author: textContent(projectElement, "Author") || undefined,
+                company: textContent(projectElement, "Company") || undefined,
+                creationDate: textContent(projectElement, "CreationDate") || undefined,
+                lastSaved: textContent(projectElement, "LastSaved") || undefined,
+                saveVersion: textContent(projectElement, "SaveVersion") ? parseNumber(textContent(projectElement, "SaveVersion"), 0) : undefined,
                 currentDate: textContent(projectElement, "CurrentDate") || undefined,
                 startDate: textContent(projectElement, "StartDate"),
                 finishDate: textContent(projectElement, "FinishDate"),
@@ -150,30 +549,139 @@
                 minutesPerDay: textContent(projectElement, "MinutesPerDay") ? parseNumber(textContent(projectElement, "MinutesPerDay"), 0) : undefined,
                 minutesPerWeek: textContent(projectElement, "MinutesPerWeek") ? parseNumber(textContent(projectElement, "MinutesPerWeek"), 0) : undefined,
                 daysPerMonth: textContent(projectElement, "DaysPerMonth") ? parseNumber(textContent(projectElement, "DaysPerMonth"), 0) : undefined,
-                calendarUID: textContent(projectElement, "CalendarUID") || undefined
+                statusDate: textContent(projectElement, "StatusDate") || undefined,
+                weekStartDay: textContent(projectElement, "WeekStartDay") ? parseNumber(textContent(projectElement, "WeekStartDay"), 0) : undefined,
+                workFormat: textContent(projectElement, "WorkFormat") ? parseNumber(textContent(projectElement, "WorkFormat"), 0) : undefined,
+                durationFormat: textContent(projectElement, "DurationFormat") ? parseNumber(textContent(projectElement, "DurationFormat"), 0) : undefined,
+                currencyCode: textContent(projectElement, "CurrencyCode") || undefined,
+                currencyDigits: textContent(projectElement, "CurrencyDigits") ? parseNumber(textContent(projectElement, "CurrencyDigits"), 0) : undefined,
+                currencySymbol: textContent(projectElement, "CurrencySymbol") || undefined,
+                currencySymbolPosition: textContent(projectElement, "CurrencySymbolPosition") ? parseNumber(textContent(projectElement, "CurrencySymbolPosition"), 0) : undefined,
+                fyStartDate: textContent(projectElement, "FYStartDate") || undefined,
+                fiscalYearStart: textContent(projectElement, "FiscalYearStart") ? parseBoolean(textContent(projectElement, "FiscalYearStart")) : undefined,
+                criticalSlackLimit: textContent(projectElement, "CriticalSlackLimit") ? parseNumber(textContent(projectElement, "CriticalSlackLimit"), 0) : undefined,
+                defaultTaskType: textContent(projectElement, "DefaultTaskType") ? parseNumber(textContent(projectElement, "DefaultTaskType"), 0) : undefined,
+                defaultFixedCostAccrual: textContent(projectElement, "DefaultFixedCostAccrual") ? parseNumber(textContent(projectElement, "DefaultFixedCostAccrual"), 0) : undefined,
+                defaultStandardRate: textContent(projectElement, "DefaultStandardRate") || undefined,
+                defaultOvertimeRate: textContent(projectElement, "DefaultOvertimeRate") || undefined,
+                defaultTaskEVMethod: textContent(projectElement, "DefaultTaskEVMethod") ? parseNumber(textContent(projectElement, "DefaultTaskEVMethod"), 0) : undefined,
+                newTaskStartDate: textContent(projectElement, "NewTaskStartDate") ? parseNumber(textContent(projectElement, "NewTaskStartDate"), 0) : undefined,
+                newTasksAreManual: textContent(projectElement, "NewTasksAreManual") ? parseBoolean(textContent(projectElement, "NewTasksAreManual")) : undefined,
+                newTasksEffortDriven: textContent(projectElement, "NewTasksEffortDriven") ? parseBoolean(textContent(projectElement, "NewTasksEffortDriven")) : undefined,
+                newTasksEstimated: textContent(projectElement, "NewTasksEstimated") ? parseBoolean(textContent(projectElement, "NewTasksEstimated")) : undefined,
+                actualsInSync: textContent(projectElement, "ActualsInSync") ? parseBoolean(textContent(projectElement, "ActualsInSync")) : undefined,
+                editableActualCosts: textContent(projectElement, "EditableActualCosts") ? parseBoolean(textContent(projectElement, "EditableActualCosts")) : undefined,
+                honorConstraints: textContent(projectElement, "HonorConstraints") ? parseBoolean(textContent(projectElement, "HonorConstraints")) : undefined,
+                insertedProjectsLikeSummary: textContent(projectElement, "InsertedProjectsLikeSummary") ? parseBoolean(textContent(projectElement, "InsertedProjectsLikeSummary")) : undefined,
+                multipleCriticalPaths: textContent(projectElement, "MultipleCriticalPaths") ? parseBoolean(textContent(projectElement, "MultipleCriticalPaths")) : undefined,
+                taskUpdatesResource: textContent(projectElement, "TaskUpdatesResource") ? parseBoolean(textContent(projectElement, "TaskUpdatesResource")) : undefined,
+                updateManuallyScheduledTasksWhenEditingLinks: textContent(projectElement, "UpdateManuallyScheduledTasksWhenEditingLinks") ? parseBoolean(textContent(projectElement, "UpdateManuallyScheduledTasksWhenEditingLinks")) : undefined,
+                calendarUID: textContent(projectElement, "CalendarUID") || undefined,
+                outlineCodes: Array.from(((_e = projectElement.getElementsByTagName("OutlineCodes")[0]) === null || _e === void 0 ? void 0 : _e.getElementsByTagName("OutlineCode")) || []).map((outlineCode) => ({
+                    fieldID: textContent(outlineCode, "FieldID") || undefined,
+                    fieldName: textContent(outlineCode, "FieldName") || undefined,
+                    alias: textContent(outlineCode, "Alias") || undefined,
+                    onlyTableValues: textContent(outlineCode, "OnlyTableValues") ? parseBoolean(textContent(outlineCode, "OnlyTableValues")) : undefined,
+                    enterprise: textContent(outlineCode, "Enterprise") ? parseBoolean(textContent(outlineCode, "Enterprise")) : undefined,
+                    resourceSubstitutionEnabled: textContent(outlineCode, "ResourceSubstitutionEnabled") ? parseBoolean(textContent(outlineCode, "ResourceSubstitutionEnabled")) : undefined,
+                    leafOnly: textContent(outlineCode, "LeafOnly") ? parseBoolean(textContent(outlineCode, "LeafOnly")) : undefined,
+                    allLevelsRequired: textContent(outlineCode, "AllLevelsRequired") ? parseBoolean(textContent(outlineCode, "AllLevelsRequired")) : undefined,
+                    masks: parseOutlineCodeMasks(outlineCode),
+                    values: parseOutlineCodeValues(outlineCode)
+                })),
+                wbsMasks: Array.from(((_f = projectElement.getElementsByTagName("WBSMasks")[0]) === null || _f === void 0 ? void 0 : _f.getElementsByTagName("WBSMask")) || []).map((wbsMask) => ({
+                    level: parseNumber(textContent(wbsMask, "Level"), 0),
+                    mask: textContent(wbsMask, "Mask") || undefined,
+                    length: textContent(wbsMask, "Length") ? parseNumber(textContent(wbsMask, "Length"), 0) : undefined,
+                    sequence: textContent(wbsMask, "Sequence") ? parseNumber(textContent(wbsMask, "Sequence"), 0) : undefined
+                })),
+                extendedAttributes: Array.from(((_g = projectElement.getElementsByTagName("ExtendedAttributes")[0]) === null || _g === void 0 ? void 0 : _g.getElementsByTagName("ExtendedAttribute")) || []).map((attribute) => ({
+                    fieldID: textContent(attribute, "FieldID") || undefined,
+                    fieldName: textContent(attribute, "FieldName") || undefined,
+                    alias: textContent(attribute, "Alias") || undefined,
+                    calculationType: textContent(attribute, "CalculationType") ? parseNumber(textContent(attribute, "CalculationType"), 0) : undefined,
+                    restrictValues: textContent(attribute, "RestrictValues") ? parseBoolean(textContent(attribute, "RestrictValues")) : undefined,
+                    appendNewValues: textContent(attribute, "AppendNewValues") ? parseBoolean(textContent(attribute, "AppendNewValues")) : undefined
+                }))
             },
-            calendars: calendars.map((calendar) => ({
-                uid: textContent(calendar, "UID"),
-                name: textContent(calendar, "Name"),
-                isBaseCalendar: parseBoolean(textContent(calendar, "IsBaseCalendar"))
-            })),
+            calendars: calendars.map((calendar) => {
+                var _a, _b;
+                return ({
+                    uid: textContent(calendar, "UID"),
+                    name: textContent(calendar, "Name"),
+                    isBaseCalendar: parseBoolean(textContent(calendar, "IsBaseCalendar")),
+                    isBaselineCalendar: textContent(calendar, "IsBaselineCalendar") ? parseBoolean(textContent(calendar, "IsBaselineCalendar")) : undefined,
+                    baseCalendarUID: textContent(calendar, "BaseCalendarUID") || undefined,
+                    weekDays: parseWeekDays(calendar),
+                    exceptions: Array.from(((_a = calendar.getElementsByTagName("Exceptions")[0]) === null || _a === void 0 ? void 0 : _a.getElementsByTagName("Exception")) || []).map((exception) => ({
+                        name: textContent(exception, "Name") || undefined,
+                        fromDate: textContent(exception, "FromDate") || undefined,
+                        toDate: textContent(exception, "ToDate") || undefined,
+                        dayWorking: textContent(exception, "DayWorking") ? parseBoolean(textContent(exception, "DayWorking")) : undefined,
+                        workingTimes: parseWorkingTimes(exception)
+                    })),
+                    workWeeks: Array.from(((_b = calendar.getElementsByTagName("WorkWeeks")[0]) === null || _b === void 0 ? void 0 : _b.getElementsByTagName("WorkWeek")) || []).map((workWeek) => ({
+                        name: textContent(workWeek, "Name") || undefined,
+                        fromDate: textContent(workWeek, "FromDate") || undefined,
+                        toDate: textContent(workWeek, "ToDate") || undefined,
+                        weekDays: parseWeekDays(workWeek)
+                    }))
+                });
+            }),
             tasks: tasks.map((task) => ({
                 uid: textContent(task, "UID"),
                 id: textContent(task, "ID"),
                 name: textContent(task, "Name"),
                 outlineLevel: parseNumber(textContent(task, "OutlineLevel"), 1),
                 outlineNumber: textContent(task, "OutlineNumber"),
+                wbs: textContent(task, "WBS") || undefined,
+                type: textContent(task, "Type") ? parseNumber(textContent(task, "Type"), 0) : undefined,
+                calendarUID: textContent(task, "CalendarUID") || undefined,
+                priority: textContent(task, "Priority") ? parseNumber(textContent(task, "Priority"), 0) : undefined,
                 start: textContent(task, "Start"),
                 finish: textContent(task, "Finish"),
                 duration: textContent(task, "Duration"),
                 actualStart: textContent(task, "ActualStart") || undefined,
                 actualFinish: textContent(task, "ActualFinish") || undefined,
+                deadline: textContent(task, "Deadline") || undefined,
+                startVariance: textContent(task, "StartVariance") || undefined,
+                finishVariance: textContent(task, "FinishVariance") || undefined,
+                work: textContent(task, "Work") || undefined,
+                workVariance: textContent(task, "WorkVariance") || undefined,
+                totalSlack: textContent(task, "TotalSlack") || undefined,
+                freeSlack: textContent(task, "FreeSlack") || undefined,
+                cost: textContent(task, "Cost") ? parseNumber(textContent(task, "Cost"), 0) : undefined,
+                actualCost: textContent(task, "ActualCost") ? parseNumber(textContent(task, "ActualCost"), 0) : undefined,
+                remainingCost: textContent(task, "RemainingCost") ? parseNumber(textContent(task, "RemainingCost"), 0) : undefined,
+                remainingWork: textContent(task, "RemainingWork") || undefined,
+                actualWork: textContent(task, "ActualWork") || undefined,
                 milestone: parseBoolean(textContent(task, "Milestone")),
                 summary: parseBoolean(textContent(task, "Summary")),
+                critical: textContent(task, "Critical") ? parseBoolean(textContent(task, "Critical")) : undefined,
                 percentComplete: parseNumber(textContent(task, "PercentComplete"), 0),
+                percentWorkComplete: textContent(task, "PercentWorkComplete") ? parseNumber(textContent(task, "PercentWorkComplete"), 0) : undefined,
                 notes: textContent(task, "Notes") || undefined,
                 constraintType: textContent(task, "ConstraintType") ? parseNumber(textContent(task, "ConstraintType"), 0) : undefined,
                 constraintDate: textContent(task, "ConstraintDate") || undefined,
+                extendedAttributes: Array.from(task.getElementsByTagName("ExtendedAttribute")).map((attribute) => ({
+                    fieldID: textContent(attribute, "FieldID") || undefined,
+                    value: textContent(attribute, "Value") || undefined
+                })),
+                baselines: Array.from(task.getElementsByTagName("Baseline")).map((baseline) => ({
+                    number: textContent(baseline, "Number") ? parseNumber(textContent(baseline, "Number"), 0) : undefined,
+                    start: textContent(baseline, "Start") || undefined,
+                    finish: textContent(baseline, "Finish") || undefined,
+                    work: textContent(baseline, "Work") || undefined,
+                    cost: textContent(baseline, "Cost") ? parseNumber(textContent(baseline, "Cost"), 0) : undefined
+                })),
+                timephasedData: Array.from(task.getElementsByTagName("TimephasedData")).map((timephasedData) => ({
+                    type: textContent(timephasedData, "Type") ? parseNumber(textContent(timephasedData, "Type"), 0) : undefined,
+                    uid: textContent(timephasedData, "UID") || undefined,
+                    start: textContent(timephasedData, "Start") || undefined,
+                    finish: textContent(timephasedData, "Finish") || undefined,
+                    unit: textContent(timephasedData, "Unit") ? parseNumber(textContent(timephasedData, "Unit"), 0) : undefined,
+                    value: textContent(timephasedData, "Value") || undefined
+                })),
                 predecessors: Array.from(task.getElementsByTagName("PredecessorLink")).map((link) => ({
                     predecessorUid: textContent(link, "PredecessorUID"),
                     type: parseNumber(textContent(link, "Type"), 0),
@@ -187,7 +695,40 @@
                 type: parseNumber(textContent(resource, "Type"), 0),
                 initials: textContent(resource, "Initials") || undefined,
                 group: textContent(resource, "Group") || undefined,
-                maxUnits: textContent(resource, "MaxUnits") ? parseNumber(textContent(resource, "MaxUnits"), 0) : undefined
+                workGroup: textContent(resource, "WorkGroup") ? parseNumber(textContent(resource, "WorkGroup"), 0) : undefined,
+                maxUnits: textContent(resource, "MaxUnits") ? parseNumber(textContent(resource, "MaxUnits"), 0) : undefined,
+                calendarUID: textContent(resource, "CalendarUID") || undefined,
+                standardRate: textContent(resource, "StandardRate") || undefined,
+                standardRateFormat: textContent(resource, "StandardRateFormat") ? parseNumber(textContent(resource, "StandardRateFormat"), 0) : undefined,
+                overtimeRate: textContent(resource, "OvertimeRate") || undefined,
+                overtimeRateFormat: textContent(resource, "OvertimeRateFormat") ? parseNumber(textContent(resource, "OvertimeRateFormat"), 0) : undefined,
+                costPerUse: textContent(resource, "CostPerUse") ? parseNumber(textContent(resource, "CostPerUse"), 0) : undefined,
+                work: textContent(resource, "Work") || undefined,
+                actualWork: textContent(resource, "ActualWork") || undefined,
+                remainingWork: textContent(resource, "RemainingWork") || undefined,
+                cost: textContent(resource, "Cost") ? parseNumber(textContent(resource, "Cost"), 0) : undefined,
+                actualCost: textContent(resource, "ActualCost") ? parseNumber(textContent(resource, "ActualCost"), 0) : undefined,
+                remainingCost: textContent(resource, "RemainingCost") ? parseNumber(textContent(resource, "RemainingCost"), 0) : undefined,
+                percentWorkComplete: textContent(resource, "PercentWorkComplete") ? parseNumber(textContent(resource, "PercentWorkComplete"), 0) : undefined,
+                extendedAttributes: Array.from(resource.getElementsByTagName("ExtendedAttribute")).map((attribute) => ({
+                    fieldID: textContent(attribute, "FieldID") || undefined,
+                    value: textContent(attribute, "Value") || undefined
+                })),
+                baselines: Array.from(resource.getElementsByTagName("Baseline")).map((baseline) => ({
+                    number: textContent(baseline, "Number") ? parseNumber(textContent(baseline, "Number"), 0) : undefined,
+                    start: textContent(baseline, "Start") || undefined,
+                    finish: textContent(baseline, "Finish") || undefined,
+                    work: textContent(baseline, "Work") || undefined,
+                    cost: textContent(baseline, "Cost") ? parseNumber(textContent(baseline, "Cost"), 0) : undefined
+                })),
+                timephasedData: Array.from(resource.getElementsByTagName("TimephasedData")).map((timephasedData) => ({
+                    type: textContent(timephasedData, "Type") ? parseNumber(textContent(timephasedData, "Type"), 0) : undefined,
+                    uid: textContent(timephasedData, "UID") || undefined,
+                    start: textContent(timephasedData, "Start") || undefined,
+                    finish: textContent(timephasedData, "Finish") || undefined,
+                    unit: textContent(timephasedData, "Unit") ? parseNumber(textContent(timephasedData, "Unit"), 0) : undefined,
+                    value: textContent(timephasedData, "Value") || undefined
+                }))
             })),
             assignments: assignments.map((assignment) => ({
                 uid: textContent(assignment, "UID"),
@@ -195,8 +736,40 @@
                 resourceUid: textContent(assignment, "ResourceUID"),
                 start: textContent(assignment, "Start") || undefined,
                 finish: textContent(assignment, "Finish") || undefined,
+                startVariance: textContent(assignment, "StartVariance") || undefined,
+                finishVariance: textContent(assignment, "FinishVariance") || undefined,
+                delay: textContent(assignment, "Delay") || undefined,
+                milestone: textContent(assignment, "Milestone") ? parseBoolean(textContent(assignment, "Milestone")) : undefined,
+                workContour: textContent(assignment, "WorkContour") ? parseNumber(textContent(assignment, "WorkContour"), 0) : undefined,
                 units: parseNumber(textContent(assignment, "Units"), 0),
-                work: textContent(assignment, "Work") || undefined
+                work: textContent(assignment, "Work") || undefined,
+                cost: textContent(assignment, "Cost") ? parseNumber(textContent(assignment, "Cost"), 0) : undefined,
+                actualCost: textContent(assignment, "ActualCost") ? parseNumber(textContent(assignment, "ActualCost"), 0) : undefined,
+                remainingCost: textContent(assignment, "RemainingCost") ? parseNumber(textContent(assignment, "RemainingCost"), 0) : undefined,
+                percentWorkComplete: textContent(assignment, "PercentWorkComplete") ? parseNumber(textContent(assignment, "PercentWorkComplete"), 0) : undefined,
+                overtimeWork: textContent(assignment, "OvertimeWork") || undefined,
+                actualOvertimeWork: textContent(assignment, "ActualOvertimeWork") || undefined,
+                actualWork: textContent(assignment, "ActualWork") || undefined,
+                remainingWork: textContent(assignment, "RemainingWork") || undefined,
+                extendedAttributes: Array.from(assignment.getElementsByTagName("ExtendedAttribute")).map((attribute) => ({
+                    fieldID: textContent(attribute, "FieldID") || undefined,
+                    value: textContent(attribute, "Value") || undefined
+                })),
+                baselines: Array.from(assignment.getElementsByTagName("Baseline")).map((baseline) => ({
+                    number: textContent(baseline, "Number") ? parseNumber(textContent(baseline, "Number"), 0) : undefined,
+                    start: textContent(baseline, "Start") || undefined,
+                    finish: textContent(baseline, "Finish") || undefined,
+                    work: textContent(baseline, "Work") || undefined,
+                    cost: textContent(baseline, "Cost") ? parseNumber(textContent(baseline, "Cost"), 0) : undefined
+                })),
+                timephasedData: Array.from(assignment.getElementsByTagName("TimephasedData")).map((timephasedData) => ({
+                    type: textContent(timephasedData, "Type") ? parseNumber(textContent(timephasedData, "Type"), 0) : undefined,
+                    uid: textContent(timephasedData, "UID") || undefined,
+                    start: textContent(timephasedData, "Start") || undefined,
+                    finish: textContent(timephasedData, "Finish") || undefined,
+                    unit: textContent(timephasedData, "Unit") ? parseNumber(textContent(timephasedData, "Unit"), 0) : undefined,
+                    value: textContent(timephasedData, "Value") || undefined
+                }))
             }))
         };
     }
@@ -238,6 +811,12 @@
         const project = doc.documentElement;
         project.setAttribute("xmlns", "http://schemas.microsoft.com/project");
         appendTextElement(doc, project, "Name", model.project.name);
+        appendTextElement(doc, project, "Title", model.project.title);
+        appendTextElement(doc, project, "Company", model.project.company);
+        appendTextElement(doc, project, "Author", model.project.author);
+        appendTextElement(doc, project, "CreationDate", model.project.creationDate);
+        appendTextElement(doc, project, "LastSaved", model.project.lastSaved);
+        appendTextElement(doc, project, "SaveVersion", model.project.saveVersion);
         appendTextElement(doc, project, "CurrentDate", model.project.currentDate);
         appendTextElement(doc, project, "StartDate", model.project.startDate);
         appendTextElement(doc, project, "FinishDate", model.project.finishDate);
@@ -247,13 +826,132 @@
         appendTextElement(doc, project, "MinutesPerDay", model.project.minutesPerDay);
         appendTextElement(doc, project, "MinutesPerWeek", model.project.minutesPerWeek);
         appendTextElement(doc, project, "DaysPerMonth", model.project.daysPerMonth);
+        appendTextElement(doc, project, "StatusDate", model.project.statusDate);
+        appendTextElement(doc, project, "WeekStartDay", model.project.weekStartDay);
+        appendTextElement(doc, project, "WorkFormat", model.project.workFormat);
+        appendTextElement(doc, project, "DurationFormat", model.project.durationFormat);
+        appendTextElement(doc, project, "CurrencyCode", model.project.currencyCode);
+        appendTextElement(doc, project, "CurrencyDigits", model.project.currencyDigits);
+        appendTextElement(doc, project, "CurrencySymbol", model.project.currencySymbol);
+        appendTextElement(doc, project, "CurrencySymbolPosition", model.project.currencySymbolPosition);
+        appendTextElement(doc, project, "FYStartDate", model.project.fyStartDate);
+        appendTextElement(doc, project, "FiscalYearStart", model.project.fiscalYearStart);
+        appendTextElement(doc, project, "CriticalSlackLimit", model.project.criticalSlackLimit);
+        appendTextElement(doc, project, "DefaultTaskType", model.project.defaultTaskType);
+        appendTextElement(doc, project, "DefaultFixedCostAccrual", model.project.defaultFixedCostAccrual);
+        appendTextElement(doc, project, "DefaultStandardRate", model.project.defaultStandardRate);
+        appendTextElement(doc, project, "DefaultOvertimeRate", model.project.defaultOvertimeRate);
+        appendTextElement(doc, project, "DefaultTaskEVMethod", model.project.defaultTaskEVMethod);
+        appendTextElement(doc, project, "NewTaskStartDate", model.project.newTaskStartDate);
+        appendTextElement(doc, project, "NewTasksAreManual", model.project.newTasksAreManual);
+        appendTextElement(doc, project, "NewTasksEffortDriven", model.project.newTasksEffortDriven);
+        appendTextElement(doc, project, "NewTasksEstimated", model.project.newTasksEstimated);
+        appendTextElement(doc, project, "ActualsInSync", model.project.actualsInSync);
+        appendTextElement(doc, project, "EditableActualCosts", model.project.editableActualCosts);
+        appendTextElement(doc, project, "HonorConstraints", model.project.honorConstraints);
+        appendTextElement(doc, project, "InsertedProjectsLikeSummary", model.project.insertedProjectsLikeSummary);
+        appendTextElement(doc, project, "MultipleCriticalPaths", model.project.multipleCriticalPaths);
+        appendTextElement(doc, project, "TaskUpdatesResource", model.project.taskUpdatesResource);
+        appendTextElement(doc, project, "UpdateManuallyScheduledTasksWhenEditingLinks", model.project.updateManuallyScheduledTasksWhenEditingLinks);
         appendTextElement(doc, project, "CalendarUID", model.project.calendarUID);
+        if (model.project.outlineCodes.length > 0) {
+            const outlineCodesElement = doc.createElement("OutlineCodes");
+            for (const outlineCode of model.project.outlineCodes) {
+                const outlineCodeElement = doc.createElement("OutlineCode");
+                appendTextElement(doc, outlineCodeElement, "FieldID", outlineCode.fieldID);
+                appendTextElement(doc, outlineCodeElement, "FieldName", outlineCode.fieldName);
+                appendTextElement(doc, outlineCodeElement, "Alias", outlineCode.alias);
+                appendTextElement(doc, outlineCodeElement, "OnlyTableValues", outlineCode.onlyTableValues);
+                appendTextElement(doc, outlineCodeElement, "Enterprise", outlineCode.enterprise);
+                appendTextElement(doc, outlineCodeElement, "ResourceSubstitutionEnabled", outlineCode.resourceSubstitutionEnabled);
+                appendTextElement(doc, outlineCodeElement, "LeafOnly", outlineCode.leafOnly);
+                appendTextElement(doc, outlineCodeElement, "AllLevelsRequired", outlineCode.allLevelsRequired);
+                if (outlineCode.masks.length > 0) {
+                    const masksElement = doc.createElement("Masks");
+                    for (const mask of outlineCode.masks) {
+                        const maskElement = doc.createElement("Mask");
+                        appendTextElement(doc, maskElement, "Level", mask.level);
+                        appendTextElement(doc, maskElement, "Mask", mask.mask);
+                        appendTextElement(doc, maskElement, "Length", mask.length);
+                        appendTextElement(doc, maskElement, "Sequence", mask.sequence);
+                        masksElement.appendChild(maskElement);
+                    }
+                    outlineCodeElement.appendChild(masksElement);
+                }
+                if (outlineCode.values.length > 0) {
+                    const valuesElement = doc.createElement("Values");
+                    for (const value of outlineCode.values) {
+                        const valueElement = doc.createElement("Value");
+                        appendTextElement(doc, valueElement, "Value", value.value);
+                        appendTextElement(doc, valueElement, "Description", value.description);
+                        valuesElement.appendChild(valueElement);
+                    }
+                    outlineCodeElement.appendChild(valuesElement);
+                }
+                outlineCodesElement.appendChild(outlineCodeElement);
+            }
+            project.appendChild(outlineCodesElement);
+        }
+        if (model.project.wbsMasks.length > 0) {
+            const wbsMasksElement = doc.createElement("WBSMasks");
+            for (const wbsMask of model.project.wbsMasks) {
+                const wbsMaskElement = doc.createElement("WBSMask");
+                appendTextElement(doc, wbsMaskElement, "Level", wbsMask.level);
+                appendTextElement(doc, wbsMaskElement, "Mask", wbsMask.mask);
+                appendTextElement(doc, wbsMaskElement, "Length", wbsMask.length);
+                appendTextElement(doc, wbsMaskElement, "Sequence", wbsMask.sequence);
+                wbsMasksElement.appendChild(wbsMaskElement);
+            }
+            project.appendChild(wbsMasksElement);
+        }
+        if (model.project.extendedAttributes.length > 0) {
+            const extendedAttributesElement = doc.createElement("ExtendedAttributes");
+            for (const attribute of model.project.extendedAttributes) {
+                const extendedAttributeElement = doc.createElement("ExtendedAttribute");
+                appendTextElement(doc, extendedAttributeElement, "FieldID", attribute.fieldID);
+                appendTextElement(doc, extendedAttributeElement, "FieldName", attribute.fieldName);
+                appendTextElement(doc, extendedAttributeElement, "Alias", attribute.alias);
+                appendTextElement(doc, extendedAttributeElement, "CalculationType", attribute.calculationType);
+                appendTextElement(doc, extendedAttributeElement, "RestrictValues", attribute.restrictValues);
+                appendTextElement(doc, extendedAttributeElement, "AppendNewValues", attribute.appendNewValues);
+                extendedAttributesElement.appendChild(extendedAttributeElement);
+            }
+            project.appendChild(extendedAttributesElement);
+        }
         const calendarsElement = doc.createElement("Calendars");
         for (const calendar of model.calendars) {
             const calendarElement = doc.createElement("Calendar");
             appendTextElement(doc, calendarElement, "UID", calendar.uid);
             appendTextElement(doc, calendarElement, "Name", calendar.name);
             appendTextElement(doc, calendarElement, "IsBaseCalendar", calendar.isBaseCalendar);
+            appendTextElement(doc, calendarElement, "IsBaselineCalendar", calendar.isBaselineCalendar);
+            appendTextElement(doc, calendarElement, "BaseCalendarUID", calendar.baseCalendarUID);
+            if (calendar.exceptions.length > 0) {
+                const exceptionsElement = doc.createElement("Exceptions");
+                for (const exception of calendar.exceptions) {
+                    const exceptionElement = doc.createElement("Exception");
+                    appendTextElement(doc, exceptionElement, "Name", exception.name);
+                    appendTextElement(doc, exceptionElement, "FromDate", exception.fromDate);
+                    appendTextElement(doc, exceptionElement, "ToDate", exception.toDate);
+                    appendTextElement(doc, exceptionElement, "DayWorking", exception.dayWorking);
+                    appendWorkingTimes(doc, exceptionElement, exception.workingTimes);
+                    exceptionsElement.appendChild(exceptionElement);
+                }
+                calendarElement.appendChild(exceptionsElement);
+            }
+            if (calendar.workWeeks.length > 0) {
+                const workWeeksElement = doc.createElement("WorkWeeks");
+                for (const workWeek of calendar.workWeeks) {
+                    const workWeekElement = doc.createElement("WorkWeek");
+                    appendTextElement(doc, workWeekElement, "Name", workWeek.name);
+                    appendTextElement(doc, workWeekElement, "FromDate", workWeek.fromDate);
+                    appendTextElement(doc, workWeekElement, "ToDate", workWeek.toDate);
+                    appendWeekDays(doc, workWeekElement, workWeek.weekDays);
+                    workWeeksElement.appendChild(workWeekElement);
+                }
+                calendarElement.appendChild(workWeeksElement);
+            }
+            appendWeekDays(doc, calendarElement, calendar.weekDays);
             calendarsElement.appendChild(calendarElement);
         }
         project.appendChild(calendarsElement);
@@ -265,17 +963,60 @@
             appendTextElement(doc, taskElement, "Name", task.name);
             appendTextElement(doc, taskElement, "OutlineLevel", task.outlineLevel);
             appendTextElement(doc, taskElement, "OutlineNumber", task.outlineNumber);
+            appendTextElement(doc, taskElement, "WBS", task.wbs);
+            appendTextElement(doc, taskElement, "Type", task.type);
+            appendTextElement(doc, taskElement, "CalendarUID", task.calendarUID);
+            appendTextElement(doc, taskElement, "Priority", task.priority);
             appendTextElement(doc, taskElement, "Start", task.start);
             appendTextElement(doc, taskElement, "Finish", task.finish);
             appendTextElement(doc, taskElement, "Duration", task.duration);
             appendTextElement(doc, taskElement, "ActualStart", task.actualStart);
             appendTextElement(doc, taskElement, "ActualFinish", task.actualFinish);
+            appendTextElement(doc, taskElement, "Deadline", task.deadline);
+            appendTextElement(doc, taskElement, "StartVariance", task.startVariance);
+            appendTextElement(doc, taskElement, "FinishVariance", task.finishVariance);
+            appendTextElement(doc, taskElement, "Work", task.work);
+            appendTextElement(doc, taskElement, "WorkVariance", task.workVariance);
+            appendTextElement(doc, taskElement, "TotalSlack", task.totalSlack);
+            appendTextElement(doc, taskElement, "FreeSlack", task.freeSlack);
+            appendTextElement(doc, taskElement, "Cost", task.cost);
+            appendTextElement(doc, taskElement, "ActualCost", task.actualCost);
+            appendTextElement(doc, taskElement, "RemainingCost", task.remainingCost);
+            appendTextElement(doc, taskElement, "RemainingWork", task.remainingWork);
+            appendTextElement(doc, taskElement, "ActualWork", task.actualWork);
             appendTextElement(doc, taskElement, "ConstraintType", task.constraintType);
             appendTextElement(doc, taskElement, "ConstraintDate", task.constraintDate);
             appendTextElement(doc, taskElement, "Milestone", task.milestone);
             appendTextElement(doc, taskElement, "Summary", task.summary);
+            appendTextElement(doc, taskElement, "Critical", task.critical);
             appendTextElement(doc, taskElement, "PercentComplete", task.percentComplete);
+            appendTextElement(doc, taskElement, "PercentWorkComplete", task.percentWorkComplete);
             appendTextElement(doc, taskElement, "Notes", task.notes);
+            for (const attribute of task.extendedAttributes) {
+                const extendedAttributeElement = doc.createElement("ExtendedAttribute");
+                appendTextElement(doc, extendedAttributeElement, "FieldID", attribute.fieldID);
+                appendTextElement(doc, extendedAttributeElement, "Value", attribute.value);
+                taskElement.appendChild(extendedAttributeElement);
+            }
+            for (const baseline of task.baselines) {
+                const baselineElement = doc.createElement("Baseline");
+                appendTextElement(doc, baselineElement, "Number", baseline.number);
+                appendTextElement(doc, baselineElement, "Start", baseline.start);
+                appendTextElement(doc, baselineElement, "Finish", baseline.finish);
+                appendTextElement(doc, baselineElement, "Work", baseline.work);
+                appendTextElement(doc, baselineElement, "Cost", baseline.cost);
+                taskElement.appendChild(baselineElement);
+            }
+            for (const timephasedData of task.timephasedData) {
+                const timephasedDataElement = doc.createElement("TimephasedData");
+                appendTextElement(doc, timephasedDataElement, "Type", timephasedData.type);
+                appendTextElement(doc, timephasedDataElement, "UID", timephasedData.uid);
+                appendTextElement(doc, timephasedDataElement, "Start", timephasedData.start);
+                appendTextElement(doc, timephasedDataElement, "Finish", timephasedData.finish);
+                appendTextElement(doc, timephasedDataElement, "Unit", timephasedData.unit);
+                appendTextElement(doc, timephasedDataElement, "Value", timephasedData.value);
+                taskElement.appendChild(timephasedDataElement);
+            }
             for (const predecessor of task.predecessors) {
                 const predecessorElement = doc.createElement("PredecessorLink");
                 appendTextElement(doc, predecessorElement, "PredecessorUID", predecessor.predecessorUid);
@@ -295,7 +1036,46 @@
             appendTextElement(doc, resourceElement, "Type", resource.type);
             appendTextElement(doc, resourceElement, "Initials", resource.initials);
             appendTextElement(doc, resourceElement, "Group", resource.group);
+            appendTextElement(doc, resourceElement, "WorkGroup", resource.workGroup);
             appendTextElement(doc, resourceElement, "MaxUnits", resource.maxUnits);
+            appendTextElement(doc, resourceElement, "CalendarUID", resource.calendarUID);
+            appendTextElement(doc, resourceElement, "StandardRate", resource.standardRate);
+            appendTextElement(doc, resourceElement, "StandardRateFormat", resource.standardRateFormat);
+            appendTextElement(doc, resourceElement, "OvertimeRate", resource.overtimeRate);
+            appendTextElement(doc, resourceElement, "OvertimeRateFormat", resource.overtimeRateFormat);
+            appendTextElement(doc, resourceElement, "CostPerUse", resource.costPerUse);
+            appendTextElement(doc, resourceElement, "Work", resource.work);
+            appendTextElement(doc, resourceElement, "ActualWork", resource.actualWork);
+            appendTextElement(doc, resourceElement, "RemainingWork", resource.remainingWork);
+            appendTextElement(doc, resourceElement, "Cost", resource.cost);
+            appendTextElement(doc, resourceElement, "ActualCost", resource.actualCost);
+            appendTextElement(doc, resourceElement, "RemainingCost", resource.remainingCost);
+            appendTextElement(doc, resourceElement, "PercentWorkComplete", resource.percentWorkComplete);
+            for (const attribute of resource.extendedAttributes) {
+                const extendedAttributeElement = doc.createElement("ExtendedAttribute");
+                appendTextElement(doc, extendedAttributeElement, "FieldID", attribute.fieldID);
+                appendTextElement(doc, extendedAttributeElement, "Value", attribute.value);
+                resourceElement.appendChild(extendedAttributeElement);
+            }
+            for (const baseline of resource.baselines) {
+                const baselineElement = doc.createElement("Baseline");
+                appendTextElement(doc, baselineElement, "Number", baseline.number);
+                appendTextElement(doc, baselineElement, "Start", baseline.start);
+                appendTextElement(doc, baselineElement, "Finish", baseline.finish);
+                appendTextElement(doc, baselineElement, "Work", baseline.work);
+                appendTextElement(doc, baselineElement, "Cost", baseline.cost);
+                resourceElement.appendChild(baselineElement);
+            }
+            for (const timephasedData of resource.timephasedData) {
+                const timephasedDataElement = doc.createElement("TimephasedData");
+                appendTextElement(doc, timephasedDataElement, "Type", timephasedData.type);
+                appendTextElement(doc, timephasedDataElement, "UID", timephasedData.uid);
+                appendTextElement(doc, timephasedDataElement, "Start", timephasedData.start);
+                appendTextElement(doc, timephasedDataElement, "Finish", timephasedData.finish);
+                appendTextElement(doc, timephasedDataElement, "Unit", timephasedData.unit);
+                appendTextElement(doc, timephasedDataElement, "Value", timephasedData.value);
+                resourceElement.appendChild(timephasedDataElement);
+            }
             resourcesElement.appendChild(resourceElement);
         }
         project.appendChild(resourcesElement);
@@ -307,8 +1087,46 @@
             appendTextElement(doc, assignmentElement, "ResourceUID", assignment.resourceUid);
             appendTextElement(doc, assignmentElement, "Start", assignment.start);
             appendTextElement(doc, assignmentElement, "Finish", assignment.finish);
+            appendTextElement(doc, assignmentElement, "StartVariance", assignment.startVariance);
+            appendTextElement(doc, assignmentElement, "FinishVariance", assignment.finishVariance);
+            appendTextElement(doc, assignmentElement, "Delay", assignment.delay);
+            appendTextElement(doc, assignmentElement, "Milestone", assignment.milestone);
+            appendTextElement(doc, assignmentElement, "WorkContour", assignment.workContour);
             appendTextElement(doc, assignmentElement, "Units", assignment.units);
             appendTextElement(doc, assignmentElement, "Work", assignment.work);
+            appendTextElement(doc, assignmentElement, "Cost", assignment.cost);
+            appendTextElement(doc, assignmentElement, "ActualCost", assignment.actualCost);
+            appendTextElement(doc, assignmentElement, "RemainingCost", assignment.remainingCost);
+            appendTextElement(doc, assignmentElement, "PercentWorkComplete", assignment.percentWorkComplete);
+            appendTextElement(doc, assignmentElement, "OvertimeWork", assignment.overtimeWork);
+            appendTextElement(doc, assignmentElement, "ActualOvertimeWork", assignment.actualOvertimeWork);
+            appendTextElement(doc, assignmentElement, "ActualWork", assignment.actualWork);
+            appendTextElement(doc, assignmentElement, "RemainingWork", assignment.remainingWork);
+            for (const attribute of assignment.extendedAttributes) {
+                const extendedAttributeElement = doc.createElement("ExtendedAttribute");
+                appendTextElement(doc, extendedAttributeElement, "FieldID", attribute.fieldID);
+                appendTextElement(doc, extendedAttributeElement, "Value", attribute.value);
+                assignmentElement.appendChild(extendedAttributeElement);
+            }
+            for (const baseline of assignment.baselines) {
+                const baselineElement = doc.createElement("Baseline");
+                appendTextElement(doc, baselineElement, "Number", baseline.number);
+                appendTextElement(doc, baselineElement, "Start", baseline.start);
+                appendTextElement(doc, baselineElement, "Finish", baseline.finish);
+                appendTextElement(doc, baselineElement, "Work", baseline.work);
+                appendTextElement(doc, baselineElement, "Cost", baseline.cost);
+                assignmentElement.appendChild(baselineElement);
+            }
+            for (const timephasedData of assignment.timephasedData) {
+                const timephasedDataElement = doc.createElement("TimephasedData");
+                appendTextElement(doc, timephasedDataElement, "Type", timephasedData.type);
+                appendTextElement(doc, timephasedDataElement, "UID", timephasedData.uid);
+                appendTextElement(doc, timephasedDataElement, "Start", timephasedData.start);
+                appendTextElement(doc, timephasedDataElement, "Finish", timephasedData.finish);
+                appendTextElement(doc, timephasedDataElement, "Unit", timephasedData.unit);
+                appendTextElement(doc, timephasedDataElement, "Value", timephasedData.value);
+                assignmentElement.appendChild(timephasedDataElement);
+            }
             assignmentsElement.appendChild(assignmentElement);
         }
         project.appendChild(assignmentsElement);
@@ -328,6 +1146,9 @@
         if (!model.project.name) {
             issues.push({ level: "warning", scope: "project", message: "Project Name が空です" });
         }
+        if (model.project.saveVersion !== undefined && model.project.saveVersion < 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project SaveVersion は 0 以上が望ましいです" });
+        }
         if (!model.project.startDate) {
             issues.push({ level: "warning", scope: "project", message: "Project StartDate が空です" });
         }
@@ -343,14 +1164,135 @@
         if (model.project.daysPerMonth !== undefined && model.project.daysPerMonth <= 0) {
             issues.push({ level: "warning", scope: "project", message: "Project DaysPerMonth は正の値が望ましいです" });
         }
+        if (model.project.weekStartDay !== undefined && (model.project.weekStartDay < 1 || model.project.weekStartDay > 7)) {
+            issues.push({ level: "warning", scope: "project", message: "Project WeekStartDay は 1..7 が望ましいです" });
+        }
+        if (model.project.workFormat !== undefined && model.project.workFormat < 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project WorkFormat は 0 以上が望ましいです" });
+        }
+        if (model.project.durationFormat !== undefined && model.project.durationFormat < 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project DurationFormat は 0 以上が望ましいです" });
+        }
+        if (model.project.currencyDigits !== undefined && model.project.currencyDigits < 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project CurrencyDigits は 0 以上が望ましいです" });
+        }
+        if (model.project.currencySymbolPosition !== undefined && model.project.currencySymbolPosition < 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project CurrencySymbolPosition は 0 以上が望ましいです" });
+        }
+        if (model.project.fyStartDate !== undefined && !parseDateValue(model.project.fyStartDate)) {
+            issues.push({ level: "warning", scope: "project", message: "Project FYStartDate の日付形式が解釈できません" });
+        }
+        if (model.project.criticalSlackLimit !== undefined && model.project.criticalSlackLimit < 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project CriticalSlackLimit は 0 以上が望ましいです" });
+        }
+        if (model.project.defaultTaskType !== undefined && model.project.defaultTaskType < 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project DefaultTaskType は 0 以上が望ましいです" });
+        }
+        if (model.project.defaultFixedCostAccrual !== undefined && model.project.defaultFixedCostAccrual < 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project DefaultFixedCostAccrual は 0 以上が望ましいです" });
+        }
+        if (model.project.defaultTaskEVMethod !== undefined && model.project.defaultTaskEVMethod < 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project DefaultTaskEVMethod は 0 以上が望ましいです" });
+        }
+        if (model.project.newTaskStartDate !== undefined && model.project.newTaskStartDate < 0) {
+            issues.push({ level: "warning", scope: "project", message: "Project NewTaskStartDate は 0 以上が望ましいです" });
+        }
+        for (const outlineCode of model.project.outlineCodes) {
+            if (!outlineCode.fieldID && !outlineCode.fieldName) {
+                issues.push({ level: "warning", scope: "project", message: "Project OutlineCode は FieldID または FieldName を持つことが望ましいです" });
+            }
+            for (const mask of outlineCode.masks) {
+                if (mask.level < 1) {
+                    issues.push({ level: "warning", scope: "project", message: "Project OutlineCode Mask Level は 1 以上が望ましいです" });
+                }
+            }
+        }
+        for (const wbsMask of model.project.wbsMasks) {
+            if (wbsMask.level < 1) {
+                issues.push({ level: "warning", scope: "project", message: "Project WBSMask Level は 1 以上が望ましいです" });
+            }
+        }
+        for (const attribute of model.project.extendedAttributes) {
+            if (!attribute.fieldID && !attribute.fieldName) {
+                issues.push({ level: "warning", scope: "project", message: "Project ExtendedAttribute は FieldID または FieldName を持つことが望ましいです" });
+            }
+            if (attribute.calculationType !== undefined && attribute.calculationType < 0) {
+                issues.push({ level: "warning", scope: "project", message: "Project ExtendedAttribute CalculationType は 0 以上が望ましいです" });
+            }
+        }
         for (const calendar of model.calendars) {
             if (!calendar.uid) {
                 issues.push({ level: "error", scope: "calendars", message: "Calendar UID が空です" });
+            }
+            if (calendar.isBaselineCalendar !== undefined && !calendar.isBaseCalendar && calendar.isBaselineCalendar) {
+                issues.push({
+                    level: "warning",
+                    scope: "calendars",
+                    message: `Calendar IsBaselineCalendar は通常 BaseCalendar と整合していることが望ましいです: UID=${calendar.uid}`
+                });
             }
             if (calendarUidSet.has(calendar.uid)) {
                 issues.push({ level: "error", scope: "calendars", message: `Calendar UID が重複しています: ${calendar.uid}` });
             }
             calendarUidSet.add(calendar.uid);
+            for (const weekDay of calendar.weekDays) {
+                if (weekDay.dayType < 1 || weekDay.dayType > 7) {
+                    issues.push({
+                        level: "warning",
+                        scope: "calendars",
+                        message: `Calendar WeekDay DayType が 1..7 の範囲外です: UID=${calendar.uid}`
+                    });
+                }
+                for (const workingTime of weekDay.workingTimes) {
+                    if (!workingTime.fromTime || !workingTime.toTime) {
+                        issues.push({
+                            level: "warning",
+                            scope: "calendars",
+                            message: `Calendar WorkingTime の時刻が不足しています: UID=${calendar.uid}`
+                        });
+                    }
+                }
+            }
+            for (const exception of calendar.exceptions) {
+                const exceptionFrom = parseDateValue(exception.fromDate);
+                const exceptionTo = parseDateValue(exception.toDate);
+                if (exceptionFrom !== null && exceptionTo !== null && exceptionFrom > exceptionTo) {
+                    issues.push({
+                        level: "warning",
+                        scope: "calendars",
+                        message: `Calendar Exception FromDate が ToDate より後です: UID=${calendar.uid}`
+                    });
+                }
+                for (const workingTime of exception.workingTimes) {
+                    if (!workingTime.fromTime || !workingTime.toTime) {
+                        issues.push({
+                            level: "warning",
+                            scope: "calendars",
+                            message: `Calendar Exception WorkingTime の時刻が不足しています: UID=${calendar.uid}`
+                        });
+                    }
+                }
+            }
+            for (const workWeek of calendar.workWeeks) {
+                const workWeekFrom = parseDateValue(workWeek.fromDate);
+                const workWeekTo = parseDateValue(workWeek.toDate);
+                if (workWeekFrom !== null && workWeekTo !== null && workWeekFrom > workWeekTo) {
+                    issues.push({
+                        level: "warning",
+                        scope: "calendars",
+                        message: `Calendar WorkWeek FromDate が ToDate より後です: UID=${calendar.uid}`
+                    });
+                }
+                for (const weekDay of workWeek.weekDays) {
+                    if (weekDay.dayType < 1 || weekDay.dayType > 7) {
+                        issues.push({
+                            level: "warning",
+                            scope: "calendars",
+                            message: `Calendar WorkWeek DayType が 1..7 の範囲外です: UID=${calendar.uid}`
+                        });
+                    }
+                }
+            }
         }
         if (model.project.calendarUID && !calendarUidSet.has(model.project.calendarUID)) {
             issues.push({
@@ -358,6 +1300,15 @@
                 scope: "project",
                 message: `Project CalendarUID が既存 Calendar を指していません: ${model.project.calendarUID}`
             });
+        }
+        for (const calendar of model.calendars) {
+            if (calendar.baseCalendarUID && !calendarUidSet.has(calendar.baseCalendarUID)) {
+                issues.push({
+                    level: "warning",
+                    scope: "calendars",
+                    message: `Calendar BaseCalendarUID が既存 Calendar を指していません: UID=${calendar.uid}`
+                });
+            }
         }
         for (const task of model.tasks) {
             if (!task.uid) {
@@ -367,7 +1318,9 @@
                 issues.push({ level: "error", scope: "tasks", message: `Task ID が空です: ${task.name || "(無名)"}` });
             }
             if (!task.name) {
-                issues.push({ level: "error", scope: "tasks", message: `Task Name が空です: UID=${task.uid || "(なし)"}` });
+                if (!isPlaceholderUid(task.uid)) {
+                    issues.push({ level: "warning", scope: "tasks", message: `Task Name が空です: UID=${task.uid || "(なし)"}` });
+                }
             }
             if (taskIdSet.has(task.id)) {
                 issues.push({ level: "error", scope: "tasks", message: `Task ID が重複しています: ${task.id}` });
@@ -379,10 +1332,10 @@
             if (!task.finish) {
                 issues.push({ level: "warning", scope: "tasks", message: `Task Finish が空です: UID=${task.uid}` });
             }
-            if (task.outlineLevel < 1) {
+            if (task.outlineLevel < 1 && !isPlaceholderUid(task.uid)) {
                 issues.push({ level: "error", scope: "tasks", message: `Task OutlineLevel が不正です: UID=${task.uid}` });
             }
-            if (task.outlineNumber) {
+            if (task.outlineNumber && !isPlaceholderUid(task.uid)) {
                 const outlineParts = task.outlineNumber.split(".").filter(Boolean);
                 if (outlineParts.length !== task.outlineLevel) {
                     issues.push({
@@ -399,15 +1352,31 @@
                     message: `Task PercentComplete が 0..100 の範囲外です: UID=${task.uid}`
                 });
             }
+            if (task.percentWorkComplete !== undefined &&
+                (task.percentWorkComplete < 0 || task.percentWorkComplete > 100)) {
+                issues.push({
+                    level: "warning",
+                    scope: "tasks",
+                    message: `Task PercentWorkComplete が 0..100 の範囲外です: UID=${task.uid}`
+                });
+            }
             const taskStart = parseDateValue(task.start);
             const taskFinish = parseDateValue(task.finish);
             const taskActualStart = parseDateValue(task.actualStart);
             const taskActualFinish = parseDateValue(task.actualFinish);
+            const taskDeadline = parseDateValue(task.deadline);
             if (taskStart !== null && taskFinish !== null && taskStart > taskFinish) {
                 issues.push({
                     level: "warning",
                     scope: "tasks",
                     message: `Task Start が Finish より後です: UID=${task.uid}`
+                });
+            }
+            if (taskFinish !== null && taskDeadline !== null && taskFinish > taskDeadline) {
+                issues.push({
+                    level: "warning",
+                    scope: "tasks",
+                    message: `Task Finish が Deadline より後です: UID=${task.uid}`
                 });
             }
             if (taskActualStart !== null && taskActualFinish !== null && taskActualStart > taskActualFinish) {
@@ -420,19 +1389,141 @@
             if (taskUidSet.has(task.uid)) {
                 issues.push({ level: "error", scope: "tasks", message: `Task UID が重複しています: ${task.uid}` });
             }
+            for (const attribute of task.extendedAttributes) {
+                if (!attribute.fieldID) {
+                    issues.push({ level: "warning", scope: "tasks", message: `Task ExtendedAttribute に FieldID がありません: UID=${task.uid}` });
+                }
+            }
+            for (const baseline of task.baselines) {
+                if (baseline.number !== undefined && baseline.number < 0) {
+                    issues.push({ level: "warning", scope: "tasks", message: `Task Baseline Number は 0 以上が望ましいです: UID=${task.uid}` });
+                }
+                const baselineStart = parseDateValue(baseline.start);
+                const baselineFinish = parseDateValue(baseline.finish);
+                if (baselineStart !== null && baselineFinish !== null && baselineStart > baselineFinish) {
+                    issues.push({ level: "warning", scope: "tasks", message: `Task Baseline Start が Finish より後です: UID=${task.uid}` });
+                }
+            }
+            for (const timephasedData of task.timephasedData) {
+                if (timephasedData.type !== undefined && timephasedData.type < 0) {
+                    issues.push({ level: "warning", scope: "tasks", message: `Task TimephasedData Type は 0 以上が望ましいです: UID=${task.uid}` });
+                }
+                const timephasedStart = parseDateValue(timephasedData.start);
+                const timephasedFinish = parseDateValue(timephasedData.finish);
+                if (timephasedStart !== null && timephasedFinish !== null && timephasedStart > timephasedFinish) {
+                    issues.push({ level: "warning", scope: "tasks", message: `Task TimephasedData Start が Finish より後です: UID=${task.uid}` });
+                }
+            }
             taskUidSet.add(task.uid);
+            if (task.priority !== undefined && (task.priority < 0 || task.priority > 1000)) {
+                issues.push({
+                    level: "warning",
+                    scope: "tasks",
+                    message: `Task Priority が 0..1000 の範囲外です: UID=${task.uid}`
+                });
+            }
+            if (task.cost !== undefined && task.cost < 0) {
+                issues.push({ level: "warning", scope: "tasks", message: `Task Cost が負値です: UID=${task.uid}` });
+            }
+            if (task.actualCost !== undefined && task.actualCost < 0) {
+                issues.push({ level: "warning", scope: "tasks", message: `Task ActualCost が負値です: UID=${task.uid}` });
+            }
+            if (task.remainingCost !== undefined && task.remainingCost < 0) {
+                issues.push({ level: "warning", scope: "tasks", message: `Task RemainingCost が負値です: UID=${task.uid}` });
+            }
         }
         for (const resource of model.resources) {
             if (!resource.uid) {
                 issues.push({ level: "error", scope: "resources", message: "Resource UID が空です" });
             }
             if (!resource.name) {
-                issues.push({ level: "warning", scope: "resources", message: `Resource Name が空です: UID=${resource.uid || "(なし)"}` });
+                if (!isPlaceholderUid(resource.uid)) {
+                    issues.push({ level: "warning", scope: "resources", message: `Resource Name が空です: UID=${resource.uid || "(なし)"}` });
+                }
             }
             if (resourceUidSet.has(resource.uid)) {
                 issues.push({ level: "error", scope: "resources", message: `Resource UID が重複しています: ${resource.uid}` });
             }
             resourceUidSet.add(resource.uid);
+            if (resource.calendarUID && !calendarUidSet.has(resource.calendarUID)) {
+                issues.push({
+                    level: "warning",
+                    scope: "resources",
+                    message: `Resource CalendarUID が既存 Calendar を指していません: UID=${resource.uid || "(なし)"}`
+                });
+            }
+            if (resource.workGroup !== undefined && resource.workGroup < 0) {
+                issues.push({
+                    level: "warning",
+                    scope: "resources",
+                    message: `Resource WorkGroup は 0 以上が望ましいです: UID=${resource.uid || "(なし)"}`
+                });
+            }
+            if (resource.overtimeRateFormat !== undefined && resource.overtimeRateFormat < 0) {
+                issues.push({
+                    level: "warning",
+                    scope: "resources",
+                    message: `Resource OvertimeRateFormat は 0 以上が望ましいです: UID=${resource.uid || "(なし)"}`
+                });
+            }
+            if (resource.cost !== undefined && resource.cost < 0) {
+                issues.push({ level: "warning", scope: "resources", message: `Resource Cost が負値です: UID=${resource.uid || "(なし)"}` });
+            }
+            if (resource.actualCost !== undefined && resource.actualCost < 0) {
+                issues.push({ level: "warning", scope: "resources", message: `Resource ActualCost が負値です: UID=${resource.uid || "(なし)"}` });
+            }
+            if (resource.remainingCost !== undefined && resource.remainingCost < 0) {
+                issues.push({ level: "warning", scope: "resources", message: `Resource RemainingCost が負値です: UID=${resource.uid || "(なし)"}` });
+            }
+            if (resource.percentWorkComplete !== undefined &&
+                (resource.percentWorkComplete < 0 || resource.percentWorkComplete > 100)) {
+                issues.push({
+                    level: "warning",
+                    scope: "resources",
+                    message: `Resource PercentWorkComplete が 0..100 の範囲外です: UID=${resource.uid || "(なし)"}`
+                });
+            }
+            for (const attribute of resource.extendedAttributes) {
+                if (!attribute.fieldID) {
+                    issues.push({ level: "warning", scope: "resources", message: `Resource ExtendedAttribute に FieldID がありません: UID=${resource.uid || "(なし)"}` });
+                }
+            }
+            for (const baseline of resource.baselines) {
+                if (baseline.number !== undefined && baseline.number < 0) {
+                    issues.push({
+                        level: "warning",
+                        scope: "resources",
+                        message: `Resource Baseline Number は 0 以上が望ましいです: UID=${resource.uid || "(なし)"}`
+                    });
+                }
+                const baselineStart = parseDateValue(baseline.start);
+                const baselineFinish = parseDateValue(baseline.finish);
+                if (baselineStart !== null && baselineFinish !== null && baselineStart > baselineFinish) {
+                    issues.push({
+                        level: "warning",
+                        scope: "resources",
+                        message: `Resource Baseline Start が Finish より後です: UID=${resource.uid || "(なし)"}`
+                    });
+                }
+            }
+            for (const timephasedData of resource.timephasedData) {
+                if (timephasedData.type !== undefined && timephasedData.type < 0) {
+                    issues.push({
+                        level: "warning",
+                        scope: "resources",
+                        message: `Resource TimephasedData Type は 0 以上が望ましいです: UID=${resource.uid || "(なし)"}`
+                    });
+                }
+                const timephasedStart = parseDateValue(timephasedData.start);
+                const timephasedFinish = parseDateValue(timephasedData.finish);
+                if (timephasedStart !== null && timephasedFinish !== null && timephasedStart > timephasedFinish) {
+                    issues.push({
+                        level: "warning",
+                        scope: "resources",
+                        message: `Resource TimephasedData Start が Finish より後です: UID=${resource.uid || "(なし)"}`
+                    });
+                }
+            }
         }
         for (const task of model.tasks) {
             for (const predecessor of task.predecessors) {
@@ -456,7 +1547,7 @@
                     message: `Assignment TaskUID が既存 Task を指していません: ${assignment.taskUid}`
                 });
             }
-            if (!resourceUidSet.has(assignment.resourceUid)) {
+            if (!resourceUidSet.has(assignment.resourceUid) && !isUnassignedResourceUid(assignment.resourceUid)) {
                 issues.push({
                     level: "error",
                     scope: "assignments",
@@ -483,6 +1574,115 @@
                     level: "warning",
                     scope: "assignments",
                     message: `Assignment Units が負値です: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+            if (assignment.cost !== undefined && assignment.cost < 0) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment Cost が負値です: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+            if (assignment.actualCost !== undefined && assignment.actualCost < 0) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment ActualCost が負値です: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+            if (assignment.remainingCost !== undefined && assignment.remainingCost < 0) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment RemainingCost が負値です: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+            if (assignment.percentWorkComplete !== undefined &&
+                (assignment.percentWorkComplete < 0 || assignment.percentWorkComplete > 100)) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment PercentWorkComplete が 0..100 の範囲外です: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+            if (assignment.overtimeWork !== undefined && !assignment.overtimeWork) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment OvertimeWork が空です: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+            if (assignment.actualOvertimeWork !== undefined && !assignment.actualOvertimeWork) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment ActualOvertimeWork が空です: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+            if (assignment.workContour !== undefined && assignment.workContour < 0) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment WorkContour は 0 以上が望ましいです: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+            if (assignment.startVariance !== undefined && !assignment.startVariance) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment StartVariance が空です: UID=${assignment.uid || "(なし)"}`
+                });
+            }
+            for (const attribute of assignment.extendedAttributes) {
+                if (!attribute.fieldID) {
+                    issues.push({
+                        level: "warning",
+                        scope: "assignments",
+                        message: `Assignment ExtendedAttribute に FieldID がありません: UID=${assignment.uid || "(なし)"}`
+                    });
+                }
+            }
+            for (const baseline of assignment.baselines) {
+                if (baseline.number !== undefined && baseline.number < 0) {
+                    issues.push({
+                        level: "warning",
+                        scope: "assignments",
+                        message: `Assignment Baseline Number は 0 以上が望ましいです: UID=${assignment.uid || "(なし)"}`
+                    });
+                }
+                const baselineStart = parseDateValue(baseline.start);
+                const baselineFinish = parseDateValue(baseline.finish);
+                if (baselineStart !== null && baselineFinish !== null && baselineStart > baselineFinish) {
+                    issues.push({
+                        level: "warning",
+                        scope: "assignments",
+                        message: `Assignment Baseline Start が Finish より後です: UID=${assignment.uid || "(なし)"}`
+                    });
+                }
+            }
+            for (const timephasedData of assignment.timephasedData) {
+                if (timephasedData.type !== undefined && timephasedData.type < 0) {
+                    issues.push({
+                        level: "warning",
+                        scope: "assignments",
+                        message: `Assignment TimephasedData Type は 0 以上が望ましいです: UID=${assignment.uid || "(なし)"}`
+                    });
+                }
+                const timephasedStart = parseDateValue(timephasedData.start);
+                const timephasedFinish = parseDateValue(timephasedData.finish);
+                if (timephasedStart !== null && timephasedFinish !== null && timephasedStart > timephasedFinish) {
+                    issues.push({
+                        level: "warning",
+                        scope: "assignments",
+                        message: `Assignment TimephasedData Start が Finish より後です: UID=${assignment.uid || "(なし)"}`
+                    });
+                }
+            }
+            if (assignment.finishVariance !== undefined && !assignment.finishVariance) {
+                issues.push({
+                    level: "warning",
+                    scope: "assignments",
+                    message: `Assignment FinishVariance が空です: UID=${assignment.uid || "(なし)"}`
                 });
             }
         }

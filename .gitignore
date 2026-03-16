@@ -14,3 +14,6 @@ filelist.txt
 
 # AGENTS
 .claude
+
+# Local project data
+docs/project/local-data/
