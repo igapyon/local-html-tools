@@ -446,17 +446,12 @@
 
     function buildPseudoSquashUrl(entry) {
       const params = new URLSearchParams();
-      const memoKey = buildMemoKey(entry.repoUrl, entry.baseBranch);
-      const memoText = String(memos[memoKey]?.memo || "").trim();
       params.set("repoUrl", entry.repoUrl);
       params.set("baseBranch", entry.baseBranch);
       params.set("baseScope", entry.baseScope);
       params.set("workBranch", entry.compareBranch);
       params.set("remoteName", entry.remoteName);
       params.set("useCurrentBranch", entry.compareUseHead ? "true" : "false");
-      if (memoText) {
-        params.set("defaultCommitMessage", memoText);
-      }
       return `git-pseudo-squash.html?${params.toString()}`;
     }
 
