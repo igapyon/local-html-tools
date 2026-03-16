@@ -676,6 +676,11 @@ async function initializePromptPage() {
         button.dataset.matchGrade = grade;
         button.classList.add(`md-chip-button--${grade}`);
         button.addEventListener("click", () => {
+            const wasActive = selectedPrompt === definition.id && button.classList.contains("is-active");
+            if (wasActive) {
+                searchPromptGroup(definition);
+                return;
+            }
             void selectPrompt(definition.id, button, { autoCopy: true });
         });
         const label = document.createElement("span");
@@ -1022,6 +1027,21 @@ async function initializePromptPage() {
         const labelCode = getDefinitionLabelCode(definition);
         const match = labelCode.match(/^[A-Z](\d+)/);
         return match ? match[1] : "";
+    }
+    function getDefinitionSearchGroup(definition) {
+        const labelCode = getDefinitionLabelCode(definition);
+        const match = labelCode.match(/^([A-Z]\d+)/);
+        return match ? match[1] : "";
+    }
+    function searchPromptGroup(definition) {
+        const searchGroup = getDefinitionSearchGroup(definition);
+        if (!searchGroup) {
+            return;
+        }
+        selectedPrompt = "";
+        promptSearch.value = searchGroup;
+        promptSearch.dispatchEvent(new Event("input"));
+        promptSearch.focus();
     }
     function buildShareLink() {
         const url = new URL(window.location.href);

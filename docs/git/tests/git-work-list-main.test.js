@@ -720,6 +720,28 @@ describe("git-work-list main", () => {
     expect(document.querySelector(".md-entry-memo-preview")).toBeNull();
   });
 
+  it("uses the first 10 memo characters as title for url-only entries", () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "u1",
+        entryType: "url",
+        repoUrl: "https://example.com/articles/123",
+        createdAt: 1
+      }
+    ]));
+    localStorage.setItem("gitWorkList.memos", JSON.stringify({
+      "https://example.com/articles/123::": {
+        memo: "これはURLメモのタイトル候補です",
+        gitCurrentDir: ""
+      }
+    }));
+
+    bootPage();
+
+    expect(document.querySelector(".md-entry-title").textContent).toBe("これはURLメモのタ");
+    expect(document.querySelector(".md-entry-url").textContent).toBe("https://example.com/articles/123");
+  });
+
   it("copies git current directory from the parent card action", async () => {
     localStorage.setItem("gitWorkList.entries", JSON.stringify([
       {

@@ -2424,6 +2424,13 @@ class LhtTextFieldHelp extends HTMLElement {
       field.required = true;
       field.setAttribute("required", "");
     }
+    if (this.hasAttribute("readonly")) {
+      if (this._isFallbackTextField) {
+        field.readOnly = true;
+      } else {
+        field.setAttribute("readonly", "");
+      }
+    }
     if (this.hasAttribute("disabled")) field.disabled = true;
 
     if (isClearable) {
