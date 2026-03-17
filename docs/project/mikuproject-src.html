@@ -28,6 +28,7 @@
         <button id="importXmlBtn" type="button" class="md-button md-button--surface">XML Import</button>
         <button id="parseXmlBtn" type="button" class="md-button md-button--surface">XML を解析</button>
         <button id="exportXmlBtn" type="button" class="md-button md-button--surface">XML を再生成</button>
+        <button id="exportMermaidBtn" type="button" class="md-button md-button--surface">Mermaid を生成</button>
         <button id="downloadXmlBtn" type="button" class="md-button md-button--surface">XML Export</button>
         <button id="roundTripBtn" type="button" class="md-button md-button--surface">再読込テスト</button>
         <input id="importXmlInput" type="file" accept=".xml,text/xml,application/xml" class="md-hidden" />
@@ -67,7 +68,15 @@
         <lht-text-field-help field-id="modelOutput" label="内部モデル(JSON)" rows="16" readonly></lht-text-field-help>
       </div>
 
+      <div class="md-form-grid">
+        <lht-text-field-help field-id="mermaidOutput" label="Mermaid gantt" rows="12" readonly></lht-text-field-help>
+      </div>
+
       <div class="md-preview-grid">
+        <section class="md-preview-card">
+          <h3 class="md-preview-card__title">Project</h3>
+          <div id="projectPreview" class="md-preview-list"></div>
+        </section>
         <section class="md-preview-card">
           <h3 class="md-preview-card__title">Tasks</h3>
           <div id="taskPreview" class="md-preview-list"></div>

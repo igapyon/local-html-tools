@@ -28,6 +28,8 @@
 - [横展開] music/git 以外の全アプリでも `lht-preview-output`（プレビュー表示＋コピー導線）を適用し、表示領域の重複実装を共通化する
 - [横展開] music/git 以外の全アプリでも `lht-command-block`（コマンド表示ブロック）を適用し、コマンド表示・コピー導線を共通化する
 - [ffmpeg] `docs/ffmpeg/ffmpeg-youtube-mkv-gen.html` を YouTube 専用命名から汎用寄りへ再設計する（ツール名・説明文・spec・出力プリセット差分の整理）
+- [mikuproject][仕様検討] `CSV + ParentID` を「まず押さえるべき、よくある交換形式」の第1候補として整理する。最小列は `ID / ParentID / Name`、実用候補は `Start / Finish / PredecessorID / Resource / PercentComplete / WBS` を含めて比較する
+- [mikuproject][仕様検討] `Mermaid + gantt` を可視化・共有向けの片方向エクスポート候補として整理する。`ProjectModel -> Mermaid gantt` の最小出力対象を `Task / Milestone / Start / Finish / Predecessor` 中心で定義し、落ちる情報を明記する
 - [ルール横展開] 表示制御属性は `active` に統一し、既存の `md-hidden` / `md-visible` 依存を段階的に削減する
 - [ルール横展開] API命名規約を統一する（表示系は `show/hide`、内容消去系は `show/clear`）
 - [運用スタイル] 新規実装は上記 `lht-cmn` コンポーネント + ルール準拠を必須とし、既存画面は「触るタイミングで順次置換」を原則に進める
@@ -62,6 +64,150 @@
 - [music] `docs/music/*` の「ファイルを選択」操作を、Material Design のよくあるパターン（Filled ボタン + 選択ファイル名表示）で目立たせる
 - [優先度高] Git 以外も含む全アプリで、狭幅端末の不要な右スクロール（謎の右余白）を発火させない。特殊な個別対応ではなく `lht` 共通ルール（`lht-help-tooltip` と `.md-page`）を優先して適用し、残件のみ個別調整する
 - なんの変哲もないカレンダアプリが欲しい
+- [xlsx2md][人手作業] fixture 用 Excel ブックを追加する
+  - `docs/xlsx2md/tests/fixtures/formula/formula-basic-sample01.xlsx`
+  - 目的: 基本数式
+  - 作り方: 1シート
+  - 作り方: 単純参照 `=A1`
+  - 作り方: 四則演算 `=A1+B1`
+  - 作り方: `IF`
+  - 作り方: `SUM`
+  - 作り方: `COUNTIF`
+  - 作り方: `TEXT`
+  - 作り方: `DATE`
+  - 作り方: `VALUE`
+  - 作り方: すべて cached value が入るように普通に保存
+  - `docs/xlsx2md/tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+  - 目的: 複数シート参照
+  - 作り方: 2シート以上
+  - 作り方: `Sheet1` から `Sheet2!B3` を参照
+  - 作り方: `'日本語シート'!C4` も入れる
+  - 作り方: `SUM(Sheet2!A1:B2)` も入れる
+  - 作り方: シート名に空白や日本語を含めるとよい
+  - `docs/xlsx2md/tests/fixtures/formula/formula-shared-sample01.xlsx`
+  - 目的: shared formula
+  - 作り方: 1シート
+  - 作り方: 連番列を作る
+  - 作り方: たとえば `B2 = B1+1` を下へオートフィル
+  - 作り方: 10行くらいで十分
+  - 作り方: Excel のオートフィルで shared formula になりやすい
+  - `docs/xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
+  - 目的: definedNames
+  - 作り方: Workbook スコープ名前定義を1つ
+  - 作り方: Sheet スコープ名前定義を1つ
+  - 作り方: 単一セル名と範囲名の両方を作る
+  - 作り方: 数式でその名前を参照する
+  - 作り方: `=BaseName`
+  - 作り方: `=SUM(BaseRange)`
+  - `docs/xlsx2md/tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
+  - 目的: 地の文と表の判定
+  - 作り方: 上部に地の文を数行
+  - 作り方: 少し離れた場所に表を1つ
+  - 作り方: さらに下に注記を1行
+  - 作り方: 地の文は罫線なし
+  - 作り方: 表は罫線あり
+  - 作り方: 「見出しっぽい太字テキスト」も1つ入れる
+  - `docs/xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
+  - 目的: 画像抽出
+  - 作り方: 1シート
+  - 作り方: 適当な PNG を1枚貼る
+  - 作り方: 表の近くに置く
+  - 作り方: 可能なら2枚目も別位置に置く
+  - 作り方: サイズ変更してもよい
+  - `docs/xlsx2md/tests/fixtures/edge/edge-empty-sample01.xlsx`
+  - 目的: 空系の境界
+  - 作り方: 1シート
+  - 作り方: ほぼ空
+  - 作り方: 1セルだけ値あり
+  - 作り方: 空行や空列が多い
+  - 作り方: 壊れないことを見るため
+  - `docs/xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
+  - 目的: ファイル名サニタイズ
+  - 作り方: シート名に記号を含める
+  - 作り方: 例: `A/B:C*D?E`
+  - 作り方: 中身は簡単な表1つでよい
+  - 共通ルール: できるだけ1ファイル1目的
+  - 共通ルール: 1シートで済むなら1シート
+  - 共通ルール: 値は少なく、意図は明確に
+  - 共通ルール: 見出しセルに「何を試しているか」を書く
+  - 共通ルール: 可能ならファイル名に `sample01` を付ける
+  - 共通ルール: 普通に Excel 保存して cached value を残す
+  - 共通ルール: 未計算保存を試したいものだけ別ファイルに分ける
+  - セル配置案: `formula-basic-sample01.xlsx`
+  - セル配置案: `A1` にタイトル `基本数式サンプル`
+  - セル配置案: `A3:B10` に値入力欄
+  - セル配置案: `A3=base1`, `B3=10`
+  - セル配置案: `A4=base2`, `B4=5`
+  - セル配置案: `A5=ref`, `B5==B3`
+  - セル配置案: `A6=arith`, `B6==B3+B4`
+  - セル配置案: `A7=if`, `B7==IF(B3>B4,\"OK\",\"NG\")`
+  - セル配置案: `A8=sum`, `B8==SUM(B3:B4)`
+  - セル配置案: `A9=countif`, `B9==COUNTIF(B3:B4,\">7\")`
+  - セル配置案: `A10=text`, `B10==TEXT(B3,\"0000\")`
+  - セル配置案: `D3:E5` に日付系
+  - セル配置案: `D3=date`, `E3==DATE(2024,3,17)`
+  - セル配置案: `D4=value_num`, `E4==VALUE(\"1,234.5\")`
+  - セル配置案: `D5=value_date`, `E5==VALUE(\"2024/03/17\")`
+  - セル配置案: すべて通常保存して cached value を残す
+  - セル配置案: `formula-crosssheet-sample01.xlsx`
+  - セル配置案: `Sheet1`、`Sheet2`、`日本語シート` の3シート構成
+  - セル配置案: `Sheet2!A1=1`, `B1=2`, `A2=3`, `B2=4`, `B3=CrossValue`
+  - セル配置案: `日本語シート!C4=日本語参照値`
+  - セル配置案: `Sheet1!A1` にタイトル `複数シート参照サンプル`
+  - セル配置案: `Sheet1!A3=sheet2_ref`, `B3==Sheet2!B3`
+  - セル配置案: `Sheet1!A4=jp_sheet_ref`, `B4=='日本語シート'!C4`
+  - セル配置案: `Sheet1!A5=sum_range`, `B5==SUM(Sheet2!A1:B2)`
+  - セル配置案: シート名に空白を試すなら `Sheet 2` へ変更して追加式を1つ置く
+  - セル配置案: `formula-shared-sample01.xlsx`
+  - セル配置案: `A1=No`, `B1=連番`
+  - セル配置案: `A2:A11` に `1..10`
+  - セル配置案: `B2=1`
+  - セル配置案: `B3==B2+1` を `B11` までオートフィル
+  - セル配置案: `D1` にタイトル `shared formula サンプル`
+  - セル配置案: オートフィルで shared formula 化されるよう、コピー貼り付けではなくドラッグで増やす
+  - セル配置案: `named-range-sample01.xlsx`
+  - セル配置案: シートは `Summary` と `Other` の2枚
+  - セル配置案: `Summary!A1` にタイトル `definedNames サンプル`
+  - セル配置案: `Summary!A3=BaseName元`, `B3=Base`
+  - セル配置案: `Summary!A4=BaseRange1`, `B4=10`
+  - セル配置案: `Summary!A5=BaseRange2`, `B5=20`
+  - セル配置案: workbook スコープで `BaseName=Summary!$B$3`
+  - セル配置案: workbook スコープで `BaseRange=Summary!$B$4:$B$5`
+  - セル配置案: `Other!A1=LocalCross元`, `B2=CrossRef`
+  - セル配置案: `Other` シートスコープで `LocalCross=Other!$B$2`
+  - セル配置案: `Summary!D3==BaseName`
+  - セル配置案: `Summary!D4==SUM(BaseRange)`
+  - セル配置案: `Other!D2==LocalCross`
+  - セル配置案: `narrative-vs-table-sample01.xlsx`
+  - セル配置案: `A1` に太字タイトル `地の文と表の判定`
+  - セル配置案: `A3=この設計書は受注入力画面を説明する。`
+  - セル配置案: `A4=外部システムとの連携条件を以下に示す。`
+  - セル配置案: `A5=本文は罫線なしのままにする。`
+  - セル配置案: `B8:F11` に罫線あり表
+  - セル配置案: `B8=項番`, `C8=項目名称`, `D8=物理名`, `E8=初期値`, `F8=備考`
+  - セル配置案: `B9:F11` に2-3行のデータ
+  - セル配置案: `A13=※注記: この表はサンプルです。`
+  - セル配置案: `A7` に太字見出し `項目一覧`
+  - セル配置案: `image-basic-sample01.xlsx`
+  - セル配置案: `A1` にタイトル `画像抽出サンプル`
+  - セル配置案: `B3:F6` に簡単な表
+  - セル配置案: 画像1枚目を `C8` 付近へ配置
+  - セル配置案: 可能なら画像2枚目を `F8` または `C15` 付近へ配置
+  - セル配置案: 画像の近くに `A7=画像サンプル` のような説明セルを置く
+  - セル配置案: サイズ変更ありの画像を1枚含めてもよい
+  - セル配置案: `edge-empty-sample01.xlsx`
+  - セル配置案: `A1` にタイトル `空系境界サンプル`
+  - セル配置案: 値は `C7=only-value` の1セルだけ
+  - セル配置案: 行や列は広めに空けたまま保存する
+  - セル配置案: 罫線・結合・画像は入れない
+  - セル配置案: `edge-weird-sheetname-sample01.xlsx`
+  - セル配置案: シート名は `A_B_C_D_E` ではなく、実際に許される範囲で記号を含める
+  - セル配置案: Excel で禁止される `/ \\ ? * : [ ]` は使えないので、代わりに空白・日本語・`-`・`&`・`.` などでサニタイズ確認を行う
+  - セル配置案: 例: シート名 `A B-東京&大阪.01`
+  - セル配置案: `A1:E4` に簡単な表1つ
+  - セル配置案: `A1=項番`, `B1=名称`, `C1=値`, `D1=備考`
+  - セル配置案: `A2:D4` に2-3行のデータ
+  - セル配置案: 必要なら別ファイルで「長いシート名」確認も追加する
 
 # DONE
 

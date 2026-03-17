@@ -45,6 +45,26 @@ STEP 1 の完了条件は次のとおり。
 - 出力した XML を再読込しても例外にならない
 - `xml -> model -> xml -> model` の往復後に、主要フィールドが保持されている
 
+## 現時点の実装メモ
+
+現時点では、STEP 1 の確認をしやすくするために、次の補助表示を持つ。
+
+- `Project / Tasks / Resources / Assignments / Calendars` の件数サマリ
+- 内部モデルの JSON 表示
+- `Project / Tasks / Resources / Assignments / Calendars` の preview 表示
+- validation メッセージ表示
+
+preview / validation の現状メモ:
+
+- project は `OutlineCodes / WBSMasks / ExtendedAttributes` の代表値を preview で追えるようにする
+- task / resource / assignment は参照先の名前つきで追えるようにする
+- calendar は `Project / Task / Resource / BaseCalendar` からの参照関係を追えるようにする
+- validation は `UID` だけでなく、可能な範囲で名前つきで追えるようにする
+
+注意:
+
+- これらは STEP 1 の主目的そのものではなく、意味的ラウンドトリップを確認しやすくするための補助機能である
+
 ## STEP 1 の入力データ前提
 
 `MS Project` 実機を保有していないため、STEP 1 の入力データ前提は次のとおりとする。

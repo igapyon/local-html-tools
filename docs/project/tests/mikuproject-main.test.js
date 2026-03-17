@@ -40,6 +40,7 @@ function mountDom() {
     <button id="importXmlBtn" type="button">XML Import</button>
     <button id="parseXmlBtn" type="button">XML を解析</button>
     <button id="exportXmlBtn" type="button">XML を再生成</button>
+    <button id="exportMermaidBtn" type="button">Mermaid を生成</button>
     <button id="downloadXmlBtn" type="button">XML Export</button>
     <button id="roundTripBtn" type="button">再読込テスト</button>
     <input id="importXmlInput" type="file" />
@@ -52,9 +53,12 @@ function mountDom() {
     <div id="summaryAssignmentCount"></div>
     <div id="summaryCalendarCount"></div>
     <textarea id="modelOutput"></textarea>
+    <textarea id="mermaidOutput"></textarea>
+    <div id="projectPreview"></div>
     <div id="taskPreview"></div>
     <div id="resourcePreview"></div>
     <div id="assignmentPreview"></div>
+    <div id="calendarPreview"></div>
     <div id="toast"></div>
   `;
   const toast = document.getElementById("toast");
@@ -220,18 +224,42 @@ describe("mikuproject main", () => {
     expect(document.getElementById("modelOutput").value).toContain("\"value\": \"Design Slot\"");
     expect(document.getElementById("modelOutput").value).toContain("\"cost\": 80000");
     expect(document.getElementById("modelOutput").value).toContain("\"unit\": 2");
+    expect(document.getElementById("projectPreview").textContent).toContain("Sample Project");
+    expect(document.getElementById("projectPreview").textContent).toContain("Title=Sample Project Title");
+    expect(document.getElementById("projectPreview").textContent).toContain("Author=Toshiki Iga / Company=Local HTML Tools");
+    expect(document.getElementById("projectPreview").textContent).toContain("Calendar=1 (Standard)");
+    expect(document.getElementById("projectPreview").textContent).toContain("OutlineCodes=1 / WBSMasks=2 / Ext=1");
+    expect(document.getElementById("projectPreview").textContent).toContain("OutlineCode1=FieldID=188743731 / FieldName=Outline Code1 / Alias=Phase");
+    expect(document.getElementById("projectPreview").textContent).toContain("WBSMask1=Level=1 / Mask=A / Length=1 / Sequence=1");
+    expect(document.getElementById("projectPreview").textContent).toContain("Ext1=FieldID=188743734 / FieldName=Text1 / Alias=Owner");
     expect(document.getElementById("taskPreview").textContent).toContain("Implementation");
+    expect(document.getElementById("taskPreview").textContent).toContain("Calendar=1 (Standard)");
     expect(document.getElementById("taskPreview").textContent).toContain("Ext=1 / Baselines=1 / Timephased=1");
+    expect(document.getElementById("taskPreview").textContent).toContain("Ext1=FieldID=188743734 / Value=Miku");
     expect(document.getElementById("taskPreview").textContent).toContain("Baseline1=#0 2026-03-16T09:00:00 -> 2026-03-17T18:00:00");
     expect(document.getElementById("taskPreview").textContent).toContain("Timephased1=Type=1 2026-03-16T09:00:00 -> 2026-03-16T18:00:00");
     expect(document.getElementById("resourcePreview").textContent).toContain("Engineering");
+    expect(document.getElementById("resourcePreview").textContent).toContain("Calendar=2 (Development)");
     expect(document.getElementById("resourcePreview").textContent).toContain("Ext=1 / Baselines=1 / Timephased=1");
+    expect(document.getElementById("resourcePreview").textContent).toContain("Ext1=FieldID=188743737 / Value=Platform Team");
     expect(document.getElementById("resourcePreview").textContent).toContain("Baseline1=#0 2026-03-16T09:00:00 -> 2026-03-20T18:00:00");
     expect(document.getElementById("resourcePreview").textContent).toContain("Timephased1=Type=1 2026-03-16T09:00:00 -> 2026-03-16T18:00:00");
-    expect(document.getElementById("assignmentPreview").textContent).toContain("TaskUID=2");
+    expect(document.getElementById("assignmentPreview").textContent).toContain("Task=2 (Design)");
+    expect(document.getElementById("assignmentPreview").textContent).toContain("Resource=1 (Miku)");
     expect(document.getElementById("assignmentPreview").textContent).toContain("Ext=1 / Baselines=1 / Timephased=1");
+    expect(document.getElementById("assignmentPreview").textContent).toContain("Ext1=FieldID=255852547 / Value=Design Slot");
     expect(document.getElementById("assignmentPreview").textContent).toContain("Baseline1=#0 2026-03-16T09:00:00 -> 2026-03-17T18:00:00");
     expect(document.getElementById("assignmentPreview").textContent).toContain("Timephased1=Type=1 2026-03-16T09:00:00 -> 2026-03-16T18:00:00");
+    expect(document.getElementById("calendarPreview").textContent).toContain("Standard");
+    expect(document.getElementById("calendarPreview").textContent).toContain("Base=1 / Baseline=1 / BaseCalendarUID=-");
+    expect(document.getElementById("calendarPreview").textContent).toContain("WeekDays=1 / Exceptions=1 / WorkWeeks=0");
+    expect(document.getElementById("calendarPreview").textContent).toContain("Refs=Project=1 / Tasks=3 / Resources=0 / BaseOf=1");
+    expect(document.getElementById("calendarPreview").textContent).toContain("WeekDay1=DayType=2 / Working=1 / Times=09:00:00-12:00:00, 13:00:00-18:00:00");
+    expect(document.getElementById("calendarPreview").textContent).toContain("Exception1=Holiday 2026-03-20T00:00:00 -> 2026-03-20T23:59:59 / Working=0");
+    expect(document.getElementById("calendarPreview").textContent).toContain("Development");
+    expect(document.getElementById("calendarPreview").textContent).toContain("Base=0 / Baseline=0 / BaseCalendarUID=1");
+    expect(document.getElementById("calendarPreview").textContent).toContain("Refs=Project=0 / Tasks=0 / Resources=1 / BaseOf=0");
+    expect(document.getElementById("calendarPreview").textContent).toContain("WorkWeek1=Spring Sprint 2026-03-16T00:00:00 -> 2026-03-31T23:59:59 / WeekDays=1");
   });
 
   it("exports xml from the current model", () => {
@@ -382,6 +410,23 @@ describe("mikuproject main", () => {
     expect(xmlText).toContain("<Unit>2</Unit>");
   });
 
+  it("exports mermaid gantt from the current model", () => {
+    bootPage();
+
+    document.getElementById("parseXmlBtn").click();
+    document.getElementById("exportMermaidBtn").click();
+
+    const mermaidText = document.getElementById("mermaidOutput").value;
+    expect(mermaidText).toContain("gantt");
+    expect(mermaidText).toContain("title Sample Project");
+    expect(mermaidText).toContain("dateFormat YYYY-MM-DDTHH:mm:ss");
+    expect(mermaidText).toContain("section Project Summary");
+    expect(mermaidText).toContain("Design :done, task_2, 2026-03-16T09:00:00, 2026-03-17T18:00:00");
+    expect(mermaidText).toContain("Implementation :crit, task_3, 2026-03-18T09:00:00, 2026-03-20T18:00:00");
+    expect(mermaidText).toContain("%% dependency: task_3 after task_2");
+    expect(document.getElementById("statusMessage").textContent).toContain("Mermaid gantt を生成しました");
+  });
+
   it("passes round-trip check", () => {
     bootPage();
 
@@ -438,6 +483,10 @@ describe("mikuproject main", () => {
 
     expect(document.getElementById("statusMessage").textContent).toContain("Assignment ResourceUID");
     expect(document.getElementById("validationIssues").textContent).toContain("Assignment ResourceUID");
+    expect(document.getElementById("validationIssues").textContent).toContain("UID=1");
+    expect(document.getElementById("validationIssues").textContent).toContain("TaskUID=2");
+    expect(document.getElementById("validationIssues").textContent).toContain("Design");
+    expect(document.getElementById("validationIssues").textContent).toContain("ResourceUID=99");
   });
 
   it("reports validation error when project calendar does not exist", () => {
@@ -452,6 +501,21 @@ describe("mikuproject main", () => {
     expect(document.getElementById("statusMessage").textContent).toContain("検証で");
     expect(document.getElementById("validationIssues").textContent).toContain("Project");
     expect(document.getElementById("validationIssues").textContent).toContain("Project CalendarUID");
+  });
+
+  it("reports validation warning when task calendar does not exist", () => {
+    bootPage();
+
+    document.getElementById("xmlInput").value = document.getElementById("xmlInput").value.replace(
+      "<CalendarUID>1</CalendarUID>\n      <Priority>700</Priority>",
+      "<CalendarUID>99</CalendarUID>\n      <Priority>700</Priority>"
+    );
+    document.getElementById("parseXmlBtn").click();
+
+    expect(document.getElementById("statusMessage").textContent).toContain("検証で");
+    expect(document.getElementById("validationIssues").textContent).toContain("Task CalendarUID");
+    expect(document.getElementById("validationIssues").textContent).toContain("UID=3");
+    expect(document.getElementById("validationIssues").textContent).toContain("Implementation");
   });
 
   it("reports validation warning when percent complete is out of range", () => {
@@ -476,6 +540,23 @@ describe("mikuproject main", () => {
     document.getElementById("parseXmlBtn").click();
 
     expect(document.getElementById("validationIssues").textContent).toContain("Task Start が Finish より後");
+  });
+
+  it("reports validation error when predecessor references a missing task", () => {
+    bootPage();
+
+    document.getElementById("xmlInput").value = document.getElementById("xmlInput").value.replace(
+      "<PredecessorUID>2</PredecessorUID>",
+      "<PredecessorUID>99</PredecessorUID>"
+    );
+    document.getElementById("parseXmlBtn").click();
+    document.getElementById("roundTripBtn").click();
+
+    expect(document.getElementById("statusMessage").textContent).toContain("PredecessorUID");
+    expect(document.getElementById("validationIssues").textContent).toContain("PredecessorUID");
+    expect(document.getElementById("validationIssues").textContent).toContain("UID=3");
+    expect(document.getElementById("validationIssues").textContent).toContain("Implementation");
+    expect(document.getElementById("validationIssues").textContent).toContain("TaskUID=99");
   });
 
   it("round-trips the minimal xml sample", () => {
@@ -762,6 +843,44 @@ describe("mikuproject main", () => {
     expect(reparsedModel.calendars[0].workWeeks[0].name).toBe("Sprint 1");
     expect(reparsedModel.calendars[0].workWeeks[0].weekDays[0].dayType).toBe(2);
     expect(reparsedModel.calendars[0].workWeeks[0].weekDays[0].workingTimes[0].toTime).toBe("17:00:00");
+  });
+
+  it("warns when calendar baseCalendarUID points to itself", () => {
+    const xmlTools = bootXmlModule();
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<Project xmlns="http://schemas.microsoft.com/project">
+  <Name>Self Base Calendar Project</Name>
+  <StartDate>2026-03-16T09:00:00</StartDate>
+  <FinishDate>2026-03-16T18:00:00</FinishDate>
+  <ScheduleFromStart>1</ScheduleFromStart>
+  <Calendars>
+    <Calendar>
+      <UID>1</UID>
+      <Name>Loop Calendar</Name>
+      <IsBaseCalendar>0</IsBaseCalendar>
+      <BaseCalendarUID>1</BaseCalendarUID>
+    </Calendar>
+  </Calendars>
+  <Tasks>
+    <Task>
+      <UID>1</UID>
+      <ID>1</ID>
+      <Name>Task</Name>
+      <OutlineLevel>1</OutlineLevel>
+      <OutlineNumber>1</OutlineNumber>
+      <Start>2026-03-16T09:00:00</Start>
+      <Finish>2026-03-16T18:00:00</Finish>
+      <Duration>PT8H0M0S</Duration>
+      <Milestone>0</Milestone>
+      <Summary>0</Summary>
+      <PercentComplete>0</PercentComplete>
+    </Task>
+  </Tasks>
+</Project>`;
+
+    const issues = xmlTools.validateProjectModel(xmlTools.importMsProjectXml(xml));
+
+    expect(issues.some((issue) => issue.message.includes("BaseCalendarUID が自身を指しています"))).toBe(true);
   });
 
   it("round-trips resource and assignment practical fields", () => {

@@ -514,6 +514,32 @@
     function isUnassignedResourceUid(value) {
         return String(value || "").trim() === "-65535";
     }
+    function describeTask(task) {
+        return `UID=${task.uid}${task.name ? ` (${task.name})` : ""}`;
+    }
+    function describeResource(resource) {
+        return `UID=${resource.uid || "(なし)"}${resource.name ? ` (${resource.name})` : ""}`;
+    }
+    function describeCalendar(calendar) {
+        return `UID=${calendar.uid}${calendar.name ? ` (${calendar.name})` : ""}`;
+    }
+    function describeAssignment(assignment) {
+        return `UID=${assignment.uid || "(なし)"}`;
+    }
+    function describeTaskRef(model, taskUid) {
+        if (!taskUid) {
+            return "TaskUID=(なし)";
+        }
+        const task = model.tasks.find((item) => item.uid === taskUid);
+        return task ? `TaskUID=${taskUid}${task.name ? ` (${task.name})` : ""}` : `TaskUID=${taskUid}`;
+    }
+    function describeResourceRef(model, resourceUid) {
+        if (!resourceUid) {
+            return "ResourceUID=(なし)";
+        }
+        const resource = model.resources.find((item) => item.uid === resourceUid);
+        return resource ? `ResourceUID=${resourceUid}${resource.name ? ` (${resource.name})` : ""}` : `ResourceUID=${resourceUid}`;
+    }
     function parseXmlDocument(xmlText) {
         const parser = new DOMParser();
         const xml = parser.parseFromString(xmlText, "application/xml");
@@ -522,6 +548,70 @@
             throw new Error("XML の解析に失敗しました");
         }
         return xml;
+    }
+    function normalizeMermaidText(value, fallback) {
+        const text = String(value || fallback).replace(/[:#,]/g, " ").replace(/\s+/g, " ").trim();
+        return text || fallback;
+    }
+    function buildTaskSectionMap(tasks, projectName) {
+        const sectionMap = new Map();
+        const summaryStack = [];
+        for (const task of tasks) {
+            while (summaryStack.length > 0 && task.outlineLevel <= summaryStack[summaryStack.length - 1].outlineLevel) {
+                summaryStack.pop();
+            }
+            if (task.summary) {
+                summaryStack.push(task);
+                continue;
+            }
+            const sectionName = summaryStack.length > 0
+                ? normalizeMermaidText(summaryStack[summaryStack.length - 1].name, "Summary")
+                : normalizeMermaidText(projectName, "Tasks");
+            sectionMap.set(task.uid, sectionName);
+        }
+        return sectionMap;
+    }
+    function exportMermaidGantt(model) {
+        const lines = [
+            "gantt",
+            `  title ${normalizeMermaidText(model.project.name, "Project")}`,
+            "  dateFormat YYYY-MM-DDTHH:mm:ss",
+            "  axisFormat %m/%d"
+        ];
+        const sectionMap = buildTaskSectionMap(model.tasks, model.project.name);
+        const exportedTasks = model.tasks.filter((task) => !task.summary && task.start && task.finish);
+        let currentSection = "";
+        for (const task of exportedTasks) {
+            const section = sectionMap.get(task.uid) || "Tasks";
+            if (section !== currentSection) {
+                currentSection = section;
+                lines.push(`  section ${section}`);
+            }
+            const tags = [];
+            if (task.critical) {
+                tags.push("crit");
+            }
+            if (task.milestone) {
+                tags.push("milestone");
+            }
+            else if (task.percentComplete >= 100) {
+                tags.push("done");
+            }
+            else if (task.percentComplete > 0) {
+                tags.push("active");
+            }
+            const taskId = `task_${String(task.uid || task.id || "x").replace(/[^A-Za-z0-9_]/g, "_")}`;
+            const fields = [...tags, taskId, task.start, task.finish].filter(Boolean);
+            lines.push(`  ${normalizeMermaidText(task.name, `Task ${task.uid}`)} :${fields.join(", ")}`);
+            for (const predecessor of task.predecessors) {
+                lines.push(`  %% dependency: ${taskId} after task_${String(predecessor.predecessorUid).replace(/[^A-Za-z0-9_]/g, "_")}`);
+            }
+        }
+        if (exportedTasks.length === 0) {
+            lines.push("  section Tasks");
+            lines.push("  No tasks :milestone, empty_0, 1970-01-01T00:00:00, 1970-01-01T00:00:00");
+        }
+        return `${lines.join("\n")}\n`;
     }
     function importMsProjectXml(xmlText) {
         var _a, _b, _c, _d, _e, _f, _g;
@@ -1228,7 +1318,7 @@
                 issues.push({
                     level: "warning",
                     scope: "calendars",
-                    message: `Calendar IsBaselineCalendar は通常 BaseCalendar と整合していることが望ましいです: UID=${calendar.uid}`
+                    message: `Calendar IsBaselineCalendar は通常 BaseCalendar と整合していることが望ましいです: ${describeCalendar(calendar)}`
                 });
             }
             if (calendarUidSet.has(calendar.uid)) {
@@ -1240,7 +1330,7 @@
                     issues.push({
                         level: "warning",
                         scope: "calendars",
-                        message: `Calendar WeekDay DayType が 1..7 の範囲外です: UID=${calendar.uid}`
+                        message: `Calendar WeekDay DayType が 1..7 の範囲外です: ${describeCalendar(calendar)}`
                     });
                 }
                 for (const workingTime of weekDay.workingTimes) {
@@ -1248,7 +1338,7 @@
                         issues.push({
                             level: "warning",
                             scope: "calendars",
-                            message: `Calendar WorkingTime の時刻が不足しています: UID=${calendar.uid}`
+                            message: `Calendar WorkingTime の時刻が不足しています: ${describeCalendar(calendar)}`
                         });
                     }
                 }
@@ -1260,7 +1350,7 @@
                     issues.push({
                         level: "warning",
                         scope: "calendars",
-                        message: `Calendar Exception FromDate が ToDate より後です: UID=${calendar.uid}`
+                        message: `Calendar Exception FromDate が ToDate より後です: ${describeCalendar(calendar)}`
                     });
                 }
                 for (const workingTime of exception.workingTimes) {
@@ -1268,7 +1358,7 @@
                         issues.push({
                             level: "warning",
                             scope: "calendars",
-                            message: `Calendar Exception WorkingTime の時刻が不足しています: UID=${calendar.uid}`
+                            message: `Calendar Exception WorkingTime の時刻が不足しています: ${describeCalendar(calendar)}`
                         });
                     }
                 }
@@ -1280,7 +1370,7 @@
                     issues.push({
                         level: "warning",
                         scope: "calendars",
-                        message: `Calendar WorkWeek FromDate が ToDate より後です: UID=${calendar.uid}`
+                        message: `Calendar WorkWeek FromDate が ToDate より後です: ${describeCalendar(calendar)}`
                     });
                 }
                 for (const weekDay of workWeek.weekDays) {
@@ -1288,7 +1378,7 @@
                         issues.push({
                             level: "warning",
                             scope: "calendars",
-                            message: `Calendar WorkWeek DayType が 1..7 の範囲外です: UID=${calendar.uid}`
+                            message: `Calendar WorkWeek DayType が 1..7 の範囲外です: ${describeCalendar(calendar)}`
                         });
                     }
                 }
@@ -1306,7 +1396,14 @@
                 issues.push({
                     level: "warning",
                     scope: "calendars",
-                    message: `Calendar BaseCalendarUID が既存 Calendar を指していません: UID=${calendar.uid}`
+                    message: `Calendar BaseCalendarUID が既存 Calendar を指していません: ${describeCalendar(calendar)}`
+                });
+            }
+            if (calendar.baseCalendarUID && calendar.baseCalendarUID === calendar.uid) {
+                issues.push({
+                    level: "warning",
+                    scope: "calendars",
+                    message: `Calendar BaseCalendarUID が自身を指しています: ${describeCalendar(calendar)}`
                 });
             }
         }
@@ -1319,7 +1416,7 @@
             }
             if (!task.name) {
                 if (!isPlaceholderUid(task.uid)) {
-                    issues.push({ level: "warning", scope: "tasks", message: `Task Name が空です: UID=${task.uid || "(なし)"}` });
+                    issues.push({ level: "warning", scope: "tasks", message: `Task Name が空です: ${describeTask(task)}` });
                 }
             }
             if (taskIdSet.has(task.id)) {
@@ -1327,13 +1424,20 @@
             }
             taskIdSet.add(task.id);
             if (!task.start) {
-                issues.push({ level: "warning", scope: "tasks", message: `Task Start が空です: UID=${task.uid}` });
+                issues.push({ level: "warning", scope: "tasks", message: `Task Start が空です: ${describeTask(task)}` });
             }
             if (!task.finish) {
-                issues.push({ level: "warning", scope: "tasks", message: `Task Finish が空です: UID=${task.uid}` });
+                issues.push({ level: "warning", scope: "tasks", message: `Task Finish が空です: ${describeTask(task)}` });
             }
             if (task.outlineLevel < 1 && !isPlaceholderUid(task.uid)) {
-                issues.push({ level: "error", scope: "tasks", message: `Task OutlineLevel が不正です: UID=${task.uid}` });
+                issues.push({ level: "error", scope: "tasks", message: `Task OutlineLevel が不正です: ${describeTask(task)}` });
+            }
+            if (task.calendarUID && !calendarUidSet.has(task.calendarUID)) {
+                issues.push({
+                    level: "warning",
+                    scope: "tasks",
+                    message: `Task CalendarUID が既存 Calendar を指していません: ${describeTask(task)}`
+                });
             }
             if (task.outlineNumber && !isPlaceholderUid(task.uid)) {
                 const outlineParts = task.outlineNumber.split(".").filter(Boolean);
@@ -1341,7 +1445,7 @@
                     issues.push({
                         level: "warning",
                         scope: "tasks",
-                        message: `Task OutlineNumber と OutlineLevel の整合が取れていません: UID=${task.uid}`
+                        message: `Task OutlineNumber と OutlineLevel の整合が取れていません: ${describeTask(task)}`
                     });
                 }
             }
@@ -1349,7 +1453,7 @@
                 issues.push({
                     level: "warning",
                     scope: "tasks",
-                    message: `Task PercentComplete が 0..100 の範囲外です: UID=${task.uid}`
+                    message: `Task PercentComplete が 0..100 の範囲外です: ${describeTask(task)}`
                 });
             }
             if (task.percentWorkComplete !== undefined &&
@@ -1357,7 +1461,7 @@
                 issues.push({
                     level: "warning",
                     scope: "tasks",
-                    message: `Task PercentWorkComplete が 0..100 の範囲外です: UID=${task.uid}`
+                    message: `Task PercentWorkComplete が 0..100 の範囲外です: ${describeTask(task)}`
                 });
             }
             const taskStart = parseDateValue(task.start);
@@ -1369,21 +1473,21 @@
                 issues.push({
                     level: "warning",
                     scope: "tasks",
-                    message: `Task Start が Finish より後です: UID=${task.uid}`
+                    message: `Task Start が Finish より後です: ${describeTask(task)}`
                 });
             }
             if (taskFinish !== null && taskDeadline !== null && taskFinish > taskDeadline) {
                 issues.push({
                     level: "warning",
                     scope: "tasks",
-                    message: `Task Finish が Deadline より後です: UID=${task.uid}`
+                    message: `Task Finish が Deadline より後です: ${describeTask(task)}`
                 });
             }
             if (taskActualStart !== null && taskActualFinish !== null && taskActualStart > taskActualFinish) {
                 issues.push({
                     level: "warning",
                     scope: "tasks",
-                    message: `Task ActualStart が ActualFinish より後です: UID=${task.uid}`
+                    message: `Task ActualStart が ActualFinish より後です: ${describeTask(task)}`
                 });
             }
             if (taskUidSet.has(task.uid)) {
@@ -1391,27 +1495,27 @@
             }
             for (const attribute of task.extendedAttributes) {
                 if (!attribute.fieldID) {
-                    issues.push({ level: "warning", scope: "tasks", message: `Task ExtendedAttribute に FieldID がありません: UID=${task.uid}` });
+                    issues.push({ level: "warning", scope: "tasks", message: `Task ExtendedAttribute に FieldID がありません: ${describeTask(task)}` });
                 }
             }
             for (const baseline of task.baselines) {
                 if (baseline.number !== undefined && baseline.number < 0) {
-                    issues.push({ level: "warning", scope: "tasks", message: `Task Baseline Number は 0 以上が望ましいです: UID=${task.uid}` });
+                    issues.push({ level: "warning", scope: "tasks", message: `Task Baseline Number は 0 以上が望ましいです: ${describeTask(task)}` });
                 }
                 const baselineStart = parseDateValue(baseline.start);
                 const baselineFinish = parseDateValue(baseline.finish);
                 if (baselineStart !== null && baselineFinish !== null && baselineStart > baselineFinish) {
-                    issues.push({ level: "warning", scope: "tasks", message: `Task Baseline Start が Finish より後です: UID=${task.uid}` });
+                    issues.push({ level: "warning", scope: "tasks", message: `Task Baseline Start が Finish より後です: ${describeTask(task)}` });
                 }
             }
             for (const timephasedData of task.timephasedData) {
                 if (timephasedData.type !== undefined && timephasedData.type < 0) {
-                    issues.push({ level: "warning", scope: "tasks", message: `Task TimephasedData Type は 0 以上が望ましいです: UID=${task.uid}` });
+                    issues.push({ level: "warning", scope: "tasks", message: `Task TimephasedData Type は 0 以上が望ましいです: ${describeTask(task)}` });
                 }
                 const timephasedStart = parseDateValue(timephasedData.start);
                 const timephasedFinish = parseDateValue(timephasedData.finish);
                 if (timephasedStart !== null && timephasedFinish !== null && timephasedStart > timephasedFinish) {
-                    issues.push({ level: "warning", scope: "tasks", message: `Task TimephasedData Start が Finish より後です: UID=${task.uid}` });
+                    issues.push({ level: "warning", scope: "tasks", message: `Task TimephasedData Start が Finish より後です: ${describeTask(task)}` });
                 }
             }
             taskUidSet.add(task.uid);
@@ -1419,17 +1523,17 @@
                 issues.push({
                     level: "warning",
                     scope: "tasks",
-                    message: `Task Priority が 0..1000 の範囲外です: UID=${task.uid}`
+                    message: `Task Priority が 0..1000 の範囲外です: ${describeTask(task)}`
                 });
             }
             if (task.cost !== undefined && task.cost < 0) {
-                issues.push({ level: "warning", scope: "tasks", message: `Task Cost が負値です: UID=${task.uid}` });
+                issues.push({ level: "warning", scope: "tasks", message: `Task Cost が負値です: ${describeTask(task)}` });
             }
             if (task.actualCost !== undefined && task.actualCost < 0) {
-                issues.push({ level: "warning", scope: "tasks", message: `Task ActualCost が負値です: UID=${task.uid}` });
+                issues.push({ level: "warning", scope: "tasks", message: `Task ActualCost が負値です: ${describeTask(task)}` });
             }
             if (task.remainingCost !== undefined && task.remainingCost < 0) {
-                issues.push({ level: "warning", scope: "tasks", message: `Task RemainingCost が負値です: UID=${task.uid}` });
+                issues.push({ level: "warning", scope: "tasks", message: `Task RemainingCost が負値です: ${describeTask(task)}` });
             }
         }
         for (const resource of model.resources) {
@@ -1438,7 +1542,7 @@
             }
             if (!resource.name) {
                 if (!isPlaceholderUid(resource.uid)) {
-                    issues.push({ level: "warning", scope: "resources", message: `Resource Name が空です: UID=${resource.uid || "(なし)"}` });
+                    issues.push({ level: "warning", scope: "resources", message: `Resource Name が空です: ${describeResource(resource)}` });
                 }
             }
             if (resourceUidSet.has(resource.uid)) {
@@ -1449,43 +1553,43 @@
                 issues.push({
                     level: "warning",
                     scope: "resources",
-                    message: `Resource CalendarUID が既存 Calendar を指していません: UID=${resource.uid || "(なし)"}`
+                    message: `Resource CalendarUID が既存 Calendar を指していません: ${describeResource(resource)}`
                 });
             }
             if (resource.workGroup !== undefined && resource.workGroup < 0) {
                 issues.push({
                     level: "warning",
                     scope: "resources",
-                    message: `Resource WorkGroup は 0 以上が望ましいです: UID=${resource.uid || "(なし)"}`
+                    message: `Resource WorkGroup は 0 以上が望ましいです: ${describeResource(resource)}`
                 });
             }
             if (resource.overtimeRateFormat !== undefined && resource.overtimeRateFormat < 0) {
                 issues.push({
                     level: "warning",
                     scope: "resources",
-                    message: `Resource OvertimeRateFormat は 0 以上が望ましいです: UID=${resource.uid || "(なし)"}`
+                    message: `Resource OvertimeRateFormat は 0 以上が望ましいです: ${describeResource(resource)}`
                 });
             }
             if (resource.cost !== undefined && resource.cost < 0) {
-                issues.push({ level: "warning", scope: "resources", message: `Resource Cost が負値です: UID=${resource.uid || "(なし)"}` });
+                issues.push({ level: "warning", scope: "resources", message: `Resource Cost が負値です: ${describeResource(resource)}` });
             }
             if (resource.actualCost !== undefined && resource.actualCost < 0) {
-                issues.push({ level: "warning", scope: "resources", message: `Resource ActualCost が負値です: UID=${resource.uid || "(なし)"}` });
+                issues.push({ level: "warning", scope: "resources", message: `Resource ActualCost が負値です: ${describeResource(resource)}` });
             }
             if (resource.remainingCost !== undefined && resource.remainingCost < 0) {
-                issues.push({ level: "warning", scope: "resources", message: `Resource RemainingCost が負値です: UID=${resource.uid || "(なし)"}` });
+                issues.push({ level: "warning", scope: "resources", message: `Resource RemainingCost が負値です: ${describeResource(resource)}` });
             }
             if (resource.percentWorkComplete !== undefined &&
                 (resource.percentWorkComplete < 0 || resource.percentWorkComplete > 100)) {
                 issues.push({
                     level: "warning",
                     scope: "resources",
-                    message: `Resource PercentWorkComplete が 0..100 の範囲外です: UID=${resource.uid || "(なし)"}`
+                    message: `Resource PercentWorkComplete が 0..100 の範囲外です: ${describeResource(resource)}`
                 });
             }
             for (const attribute of resource.extendedAttributes) {
                 if (!attribute.fieldID) {
-                    issues.push({ level: "warning", scope: "resources", message: `Resource ExtendedAttribute に FieldID がありません: UID=${resource.uid || "(なし)"}` });
+                    issues.push({ level: "warning", scope: "resources", message: `Resource ExtendedAttribute に FieldID がありません: ${describeResource(resource)}` });
                 }
             }
             for (const baseline of resource.baselines) {
@@ -1493,7 +1597,7 @@
                     issues.push({
                         level: "warning",
                         scope: "resources",
-                        message: `Resource Baseline Number は 0 以上が望ましいです: UID=${resource.uid || "(なし)"}`
+                        message: `Resource Baseline Number は 0 以上が望ましいです: ${describeResource(resource)}`
                     });
                 }
                 const baselineStart = parseDateValue(baseline.start);
@@ -1502,7 +1606,7 @@
                     issues.push({
                         level: "warning",
                         scope: "resources",
-                        message: `Resource Baseline Start が Finish より後です: UID=${resource.uid || "(なし)"}`
+                        message: `Resource Baseline Start が Finish より後です: ${describeResource(resource)}`
                     });
                 }
             }
@@ -1511,7 +1615,7 @@
                     issues.push({
                         level: "warning",
                         scope: "resources",
-                        message: `Resource TimephasedData Type は 0 以上が望ましいです: UID=${resource.uid || "(なし)"}`
+                        message: `Resource TimephasedData Type は 0 以上が望ましいです: ${describeResource(resource)}`
                     });
                 }
                 const timephasedStart = parseDateValue(timephasedData.start);
@@ -1520,7 +1624,7 @@
                     issues.push({
                         level: "warning",
                         scope: "resources",
-                        message: `Resource TimephasedData Start が Finish より後です: UID=${resource.uid || "(なし)"}`
+                        message: `Resource TimephasedData Start が Finish より後です: ${describeResource(resource)}`
                     });
                 }
             }
@@ -1531,7 +1635,7 @@
                     issues.push({
                         level: "error",
                         scope: "tasks",
-                        message: `PredecessorUID が既存 Task を指していません: task=${task.uid}, predecessor=${predecessor.predecessorUid}`
+                        message: `PredecessorUID が既存 Task を指していません: ${describeTask(task)}, ${describeTaskRef(model, predecessor.predecessorUid)}`
                     });
                 }
             }
@@ -1544,21 +1648,21 @@
                 issues.push({
                     level: "error",
                     scope: "assignments",
-                    message: `Assignment TaskUID が既存 Task を指していません: ${assignment.taskUid}`
+                    message: `Assignment TaskUID が既存 Task を指していません: ${describeAssignment(assignment)}, ${describeTaskRef(model, assignment.taskUid)}`
                 });
             }
             if (!resourceUidSet.has(assignment.resourceUid) && !isUnassignedResourceUid(assignment.resourceUid)) {
                 issues.push({
                     level: "error",
                     scope: "assignments",
-                    message: `Assignment ResourceUID が既存 Resource を指していません: ${assignment.resourceUid}`
+                    message: `Assignment ResourceUID が既存 Resource を指していません: ${describeAssignment(assignment)}, ${describeTaskRef(model, assignment.taskUid)}, ${describeResourceRef(model, assignment.resourceUid)}`
                 });
             }
             if (!assignment.start) {
-                issues.push({ level: "warning", scope: "assignments", message: `Assignment Start が空です: UID=${assignment.uid || "(なし)"}` });
+                issues.push({ level: "warning", scope: "assignments", message: `Assignment Start が空です: ${describeAssignment(assignment)}` });
             }
             if (!assignment.finish) {
-                issues.push({ level: "warning", scope: "assignments", message: `Assignment Finish が空です: UID=${assignment.uid || "(なし)"}` });
+                issues.push({ level: "warning", scope: "assignments", message: `Assignment Finish が空です: ${describeAssignment(assignment)}` });
             }
             const assignmentStart = parseDateValue(assignment.start);
             const assignmentFinish = parseDateValue(assignment.finish);
@@ -1566,35 +1670,35 @@
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment Start が Finish より後です: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment Start が Finish より後です: ${describeAssignment(assignment)}`
                 });
             }
             if (assignment.units !== undefined && assignment.units < 0) {
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment Units が負値です: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment Units が負値です: ${describeAssignment(assignment)}`
                 });
             }
             if (assignment.cost !== undefined && assignment.cost < 0) {
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment Cost が負値です: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment Cost が負値です: ${describeAssignment(assignment)}`
                 });
             }
             if (assignment.actualCost !== undefined && assignment.actualCost < 0) {
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment ActualCost が負値です: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment ActualCost が負値です: ${describeAssignment(assignment)}`
                 });
             }
             if (assignment.remainingCost !== undefined && assignment.remainingCost < 0) {
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment RemainingCost が負値です: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment RemainingCost が負値です: ${describeAssignment(assignment)}`
                 });
             }
             if (assignment.percentWorkComplete !== undefined &&
@@ -1602,35 +1706,35 @@
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment PercentWorkComplete が 0..100 の範囲外です: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment PercentWorkComplete が 0..100 の範囲外です: ${describeAssignment(assignment)}`
                 });
             }
             if (assignment.overtimeWork !== undefined && !assignment.overtimeWork) {
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment OvertimeWork が空です: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment OvertimeWork が空です: ${describeAssignment(assignment)}`
                 });
             }
             if (assignment.actualOvertimeWork !== undefined && !assignment.actualOvertimeWork) {
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment ActualOvertimeWork が空です: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment ActualOvertimeWork が空です: ${describeAssignment(assignment)}`
                 });
             }
             if (assignment.workContour !== undefined && assignment.workContour < 0) {
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment WorkContour は 0 以上が望ましいです: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment WorkContour は 0 以上が望ましいです: ${describeAssignment(assignment)}`
                 });
             }
             if (assignment.startVariance !== undefined && !assignment.startVariance) {
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment StartVariance が空です: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment StartVariance が空です: ${describeAssignment(assignment)}`
                 });
             }
             for (const attribute of assignment.extendedAttributes) {
@@ -1638,7 +1742,7 @@
                     issues.push({
                         level: "warning",
                         scope: "assignments",
-                        message: `Assignment ExtendedAttribute に FieldID がありません: UID=${assignment.uid || "(なし)"}`
+                        message: `Assignment ExtendedAttribute に FieldID がありません: ${describeAssignment(assignment)}`
                     });
                 }
             }
@@ -1647,7 +1751,7 @@
                     issues.push({
                         level: "warning",
                         scope: "assignments",
-                        message: `Assignment Baseline Number は 0 以上が望ましいです: UID=${assignment.uid || "(なし)"}`
+                        message: `Assignment Baseline Number は 0 以上が望ましいです: ${describeAssignment(assignment)}`
                     });
                 }
                 const baselineStart = parseDateValue(baseline.start);
@@ -1656,7 +1760,7 @@
                     issues.push({
                         level: "warning",
                         scope: "assignments",
-                        message: `Assignment Baseline Start が Finish より後です: UID=${assignment.uid || "(なし)"}`
+                        message: `Assignment Baseline Start が Finish より後です: ${describeAssignment(assignment)}`
                     });
                 }
             }
@@ -1665,7 +1769,7 @@
                     issues.push({
                         level: "warning",
                         scope: "assignments",
-                        message: `Assignment TimephasedData Type は 0 以上が望ましいです: UID=${assignment.uid || "(なし)"}`
+                        message: `Assignment TimephasedData Type は 0 以上が望ましいです: ${describeAssignment(assignment)}`
                     });
                 }
                 const timephasedStart = parseDateValue(timephasedData.start);
@@ -1674,7 +1778,7 @@
                     issues.push({
                         level: "warning",
                         scope: "assignments",
-                        message: `Assignment TimephasedData Start が Finish より後です: UID=${assignment.uid || "(なし)"}`
+                        message: `Assignment TimephasedData Start が Finish より後です: ${describeAssignment(assignment)}`
                     });
                 }
             }
@@ -1682,7 +1786,7 @@
                 issues.push({
                     level: "warning",
                     scope: "assignments",
-                    message: `Assignment FinishVariance が空です: UID=${assignment.uid || "(なし)"}`
+                    message: `Assignment FinishVariance が空です: ${describeAssignment(assignment)}`
                 });
             }
         }
@@ -1693,6 +1797,7 @@
         parseXmlDocument,
         importMsProjectXml,
         exportMsProjectXml,
+        exportMermaidGantt,
         normalizeProjectModel,
         validateProjectModel
     };
