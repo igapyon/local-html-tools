@@ -6,6 +6,7 @@
     | { type: "string"; value: string; }
     | { type: "boolean"; value: boolean; raw: string; }
     | { type: "error"; value: string; }
+    | { type: "array_constant"; rows: FormulaAstNode[][]; }
     | { type: "name"; name: string; }
     | { type: "scoped_name"; sheet: string; name: string; }
     | { type: "cell"; ref: string; sheet: string | null; }
@@ -69,8 +70,18 @@
   }
 
   function parseMultiplicative(state: ParserState): FormulaAstNode {
-    let left = parseUnary(state);
+    let left = parseIntersection(state);
     while (matchOperator(state, ["*", "/"])) {
+      const operator = consume(state).value;
+      const right = parseIntersection(state);
+      left = { type: "binary_op", operator, left, right };
+    }
+    return left;
+  }
+
+  function parseIntersection(state: ParserState): FormulaAstNode {
+    let left = parseUnary(state);
+    while (matchOperator(state, [" "])) {
       const operator = consume(state).value;
       const right = parseUnary(state);
       left = { type: "binary_op", operator, left, right };
@@ -92,7 +103,7 @@
 
   function parsePostfix(state: ParserState): FormulaAstNode {
     let node = parsePrimary(state);
-    while (matchOperator(state, ["%"])) {
+    while (matchOperator(state, ["%", "#"])) {
       const operator = consume(state).value;
       node = {
         type: "postfix_op",
@@ -141,6 +152,10 @@
         type: "error",
         value: token.value
       };
+    }
+
+    if (token.type === "lbrace") {
+      return parseArrayConstant(state);
     }
 
     if (token.type === "lparen") {
@@ -225,18 +240,23 @@
   }
 
   function readStructuredReferenceSegment(state: ParserState): string {
-    const parts: string[] = [];
+    let text = "";
     while (peek(state) && peek(state)?.type !== "rbracket") {
       const token = consume(state);
-      if (!token || !["identifier", "quoted_identifier", "cell", "error", "number", "boolean"].includes(token.type)) {
+      if (!token || !["identifier", "quoted_identifier", "cell", "error", "number", "boolean", "operator"].includes(token.type)) {
         throw new Error(`Expected structured reference column, got ${token?.value ?? "EOF"}`);
       }
-      parts.push(token.value);
+      if (token.type === "operator" && token.value !== "#" && token.value !== " ") {
+        throw new Error(`Expected structured reference column, got ${token.value}`);
+      }
+      text += token.value;
     }
-    if (!parts.length) {
+    if (!text.length) {
       throw new Error("Expected structured reference column, got EOF");
     }
-    return parts.join(" ");
+    return text.startsWith("#")
+      ? `#${text.slice(1).replace(/\s+/g, " ").trim()}`
+      : text;
   }
 
   function parseFunctionCall(state: ParserState, name: string): FormulaAstNode {
@@ -252,6 +272,29 @@
       type: "function_call",
       name,
       args
+    };
+  }
+
+  function parseArrayConstant(state: ParserState): FormulaAstNode {
+    expect(state, "lbrace");
+    const rows: FormulaAstNode[][] = [];
+    if (peek(state)?.type !== "rbrace") {
+      while (true) {
+        const row: FormulaAstNode[] = [];
+        row.push(parseComparison(state));
+        while (matchAndConsume(state, "comma")) {
+          row.push(parseComparison(state));
+        }
+        rows.push(row);
+        if (!matchAndConsume(state, "semicolon")) {
+          break;
+        }
+      }
+    }
+    expect(state, "rbrace");
+    return {
+      type: "array_constant",
+      rows
     };
   }
 

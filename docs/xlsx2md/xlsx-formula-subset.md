@@ -116,6 +116,7 @@
   - `-`
 - 後置演算
   - `%`
+  - `#`
 - 二項演算
   - `+`
   - `-`
@@ -213,7 +214,9 @@
   - `REDUCE`
   - `SCAN`
 - 動的配列の完全対応
+  - ただし最小対応として、`A1#` のような spill 演算子は parser / evaluator で扱える
 - 配列定数の完全対応
+  - ただし最小対応として、`{1,2;3,4}` や `{1+2,A1;DATE(2024,3,17),4}` のような配列定数は parser / evaluator で扱える
 - 名前管理や参照スタイルの完全互換
 - volatile 関数の完全再計算
   - `NOW`
@@ -304,6 +307,12 @@ Primary
 2. `AST evaluator` で評価する
 3. 既存の文字列ベース evaluator は互換用 fallback とする
 
+補足:
+
+- `dynamic array / spill` については、`A1#` の parser / evaluator / core 側の入口までは追加済み
+- ただし runtime では `f@ref` を使う都合上、現時点では `t="array"` を spill と見なさない保守的な扱いにしている
+- 実ブックでの厳密な判定は、dynamic array 実例 fixture を追加してから詰める
+
 ## 導入ステップ案
 
 ### Step 1
@@ -332,6 +341,13 @@ Primary
   - row qualifier 付き structured reference
     - `チェックリスト[[#This Row],[数量]]`
     - `タスク[[#This Row],[完了?]]`
+  - 配列定数の最小対応
+    - `{1,2;3,4}`
+    - `{1+2,A1;DATE(2024,3,17),4}`
+  - spill 演算子の最小対応
+    - `A1#`
+  - `space intersection` の最小対応
+    - `A1:C3 B2:D4`
 
 ### Step 3
 
@@ -429,8 +445,8 @@ Primary
 - `XLOOKUP` の binary search `search_mode=2/-2` は最小対応済み
 - 近似一致の境界条件や未ソート範囲をどこまで扱うか
 - 既存の文字列ベース resolver と AST evaluator の優先順をどこまで入れ替えるか
-- `space` intersection を扱うか
-- 配列定数をどの段階で扱うか
+- `space` intersection の完全対応をどこまで扱うか
+- 配列定数の完全対応をどの段階で扱うか
 - `TODAY` / `NOW` を cached value 専用に留めるか
 - `ClosedXML.Parser` の ABNF をどこまで文書上へ写経するか
 

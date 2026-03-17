@@ -12,6 +12,8 @@
                 return ast.value;
             case "error":
                 return ast.value;
+            case "array_constant":
+                return ast.rows.map((row) => row.map((item) => evaluateFormulaAst(item, context)));
             case "cell":
                 return context.resolveCell ? context.resolveCell(ast.ref, ast.sheet) : null;
             case "name":
@@ -31,8 +33,14 @@
             case "unary_op":
                 return evaluateUnaryOp(ast.operator, evaluateFormulaAst(ast.operand, context));
             case "postfix_op":
+                if (ast.operator === "#" && ast.operand.type === "cell") {
+                    return context.resolveSpill ? context.resolveSpill(ast.operand.ref, ast.operand.sheet) : null;
+                }
                 return evaluatePostfixOp(ast.operator, evaluateFormulaAst(ast.operand, context));
             case "binary_op":
+                if (ast.operator === " ") {
+                    return evaluateIntersectionAst(ast, context);
+                }
                 return evaluateBinaryOp(ast.operator, evaluateFormulaAst(ast.left, context), evaluateFormulaAst(ast.right, context));
             case "function_call":
                 return evaluateFunctionCall(ast.name, ast.args, context);
@@ -56,6 +64,32 @@
             evaluateFormulaAst(ast.start, context),
             evaluateFormulaAst(ast.end, context)
         ];
+    }
+    function evaluateIntersectionAst(ast, context) {
+        var _a, _b, _c, _d;
+        const leftArea = toCellArea(ast.left);
+        const rightArea = toCellArea(ast.right);
+        if (!leftArea || !rightArea) {
+            throw new Error("Unsupported intersection operands");
+        }
+        const leftSheet = (_b = (_a = leftArea.sheet) !== null && _a !== void 0 ? _a : rightArea.sheet) !== null && _b !== void 0 ? _b : null;
+        const rightSheet = (_d = (_c = rightArea.sheet) !== null && _c !== void 0 ? _c : leftArea.sheet) !== null && _d !== void 0 ? _d : null;
+        if (leftSheet !== rightSheet) {
+            return "#NULL!";
+        }
+        const startRow = Math.max(leftArea.startRow, rightArea.startRow);
+        const endRow = Math.min(leftArea.endRow, rightArea.endRow);
+        const startCol = Math.max(leftArea.startCol, rightArea.startCol);
+        const endCol = Math.min(leftArea.endCol, rightArea.endCol);
+        if (startRow > endRow || startCol > endCol) {
+            return "#NULL!";
+        }
+        const startRef = `${colToLetters(startCol)}${startRow}`;
+        const endRef = `${colToLetters(endCol)}${endRow}`;
+        if (context.resolveRange) {
+            return context.resolveRange(startRef, endRef, leftSheet);
+        }
+        return [[`${startRef}:${endRef}`]];
     }
     function evaluateUnaryOp(operator, operand) {
         const numericValue = toNumber(operand);
@@ -100,6 +134,64 @@
             default:
                 throw new Error(`Unsupported binary operator: ${operator}`);
         }
+    }
+    function toCellArea(node) {
+        var _a, _b;
+        if (node.type === "cell") {
+            const position = parseCellRef(node.ref);
+            if (!position) {
+                return null;
+            }
+            return {
+                sheet: node.sheet,
+                startRow: position.row,
+                endRow: position.row,
+                startCol: position.col,
+                endCol: position.col
+            };
+        }
+        if (node.type === "range" && node.start.type === "cell" && node.end.type === "cell") {
+            const start = parseCellRef(node.start.ref);
+            const end = parseCellRef(node.end.ref);
+            if (!start || !end) {
+                return null;
+            }
+            return {
+                sheet: (_b = (_a = node.start.sheet) !== null && _a !== void 0 ? _a : node.end.sheet) !== null && _b !== void 0 ? _b : null,
+                startRow: Math.min(start.row, end.row),
+                endRow: Math.max(start.row, end.row),
+                startCol: Math.min(start.col, end.col),
+                endCol: Math.max(start.col, end.col)
+            };
+        }
+        return null;
+    }
+    function parseCellRef(ref) {
+        const match = String(ref).toUpperCase().match(/^\$?([A-Z]{1,3})\$?(\d+)$/);
+        if (!match) {
+            return null;
+        }
+        return {
+            col: lettersToCol(match[1]),
+            row: Number(match[2])
+        };
+    }
+    function lettersToCol(letters) {
+        let value = 0;
+        for (const char of letters) {
+            value = value * 26 + (char.charCodeAt(0) - 64);
+        }
+        return value;
+    }
+    function colToLetters(column) {
+        let current = column;
+        let result = "";
+        while (current > 0) {
+            const remainder = (current - 1) % 26;
+            result = String.fromCharCode(65 + remainder) + result;
+            current = Math.floor((current - 1) / 26);
+        }
+        return result;
     }
     function evaluateFunctionCall(name, args, context) {
         const upperName = name.toUpperCase();

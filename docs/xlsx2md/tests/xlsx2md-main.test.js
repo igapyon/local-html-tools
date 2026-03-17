@@ -207,6 +207,7 @@ describe("xlsx2md core", () => {
     expect(markdownFile.summary.merges).toBe(2);
     expect(markdownFile.summary.images).toBe(0);
     expect(markdownFile.summary.formulaDiagnostics).toHaveLength(27);
+    expect(markdownFile.summary.formulaDiagnostics.some((diagnostic) => diagnostic.source === "cached_value")).toBe(true);
     expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual([
       "B12-F17",
       "B19-F24",
@@ -413,6 +414,7 @@ describe("xlsx2md core", () => {
     expect(markdownFile.summary.merges).toBe(0);
     expect(markdownFile.summary.images).toBe(0);
     expect(markdownFile.summary.formulaDiagnostics).toHaveLength(9);
+    expect(markdownFile.summary.formulaDiagnostics.every((diagnostic) => diagnostic.source === "cached_value")).toBe(true);
     expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual(["A3-B13"]);
     expect(markdownFile.markdown).toContain("# formula");
     expect(markdownFile.markdown).toContain("Workbook: formula-basic-sample01.xlsx");
@@ -484,6 +486,7 @@ describe("xlsx2md core", () => {
     expect(sheet1File.summary.tables).toBe(1);
     expect(sheet1File.summary.tableScores.map((detail) => detail.range)).toEqual(["A3-B5"]);
     expect(sheet1File.summary.formulaDiagnostics).toHaveLength(3);
+    expect(sheet1File.summary.formulaDiagnostics.every((diagnostic) => diagnostic.source === "cached_value")).toBe(true);
     expect(sheet1File.markdown).toContain("# Sheet1");
     expect(sheet1File.markdown).toContain("Workbook: formula-crosssheet-sample01.xlsx");
     expect(sheet1File.markdown).toContain("| sheet2_ref | CrossValue |");
@@ -700,6 +703,7 @@ describe("xlsx2md core", () => {
     expect(summaryFile.summary.tables).toBe(1);
     expect(summaryFile.summary.tableScores.map((detail) => detail.range)).toEqual(["A3-B5"]);
     expect(summaryFile.summary.formulaDiagnostics).toHaveLength(2);
+    expect(summaryFile.summary.formulaDiagnostics.every((diagnostic) => diagnostic.source === "cached_value")).toBe(true);
     expect(summaryFile.markdown).toContain("# Summary");
     expect(summaryFile.markdown).toContain("Workbook: named-range-sample01.xlsx");
     expect(summaryFile.markdown).toContain("| BaseName元 | Base |");
@@ -1591,5 +1595,192 @@ describe("xlsx2md core", () => {
     });
 
     expect(markdownFile.markdown).toContain("| ¥ - | ¥ - |");
+  });
+
+  it("includes formula resolution source in diagnostics", () => {
+    const api = bootCore();
+    const workbook = { name: "source.xlsx" };
+    const sheet = {
+      name: "Formula Source",
+      index: 1,
+      path: "xl/worksheets/sheet1.xml",
+      merges: [],
+      tables: [],
+      images: [],
+      maxRow: 2,
+      maxCol: 2,
+      cells: [
+        { row: 1, col: 1, address: "A1", valueType: "str", rawValue: "label", outputValue: "label", formulaText: "", resolutionStatus: null, resolutionSource: null, cachedValueState: null, styleIndex: 0, borders: { top: true, bottom: true, left: true, right: true }, numFmtId: 0, formatCode: "General", spillRef: "" },
+        { row: 1, col: 2, address: "B1", valueType: "formula", rawValue: "2", outputValue: "2", formulaText: "=1+1", resolutionStatus: "resolved", resolutionSource: "ast_evaluator", cachedValueState: "absent", styleIndex: 0, borders: { top: true, bottom: true, left: true, right: true }, numFmtId: 0, formatCode: "General", spillRef: "" },
+        { row: 2, col: 1, address: "A2", valueType: "formula", rawValue: "=UNKNOWN(A1)", outputValue: "=UNKNOWN(A1)", formulaText: "=UNKNOWN(A1)", resolutionStatus: "fallback_formula", resolutionSource: "formula_text", cachedValueState: "absent", styleIndex: 0, borders: { top: true, bottom: true, left: true, right: true }, numFmtId: 0, formatCode: "General", spillRef: "" },
+        { row: 2, col: 2, address: "B2", valueType: "formula", rawValue: "#REF!", outputValue: "=[other.xlsx]Sheet1!A1", formulaText: "=[other.xlsx]Sheet1!A1", resolutionStatus: "unsupported_external", resolutionSource: "external_unsupported", cachedValueState: "absent", styleIndex: 0, borders: { top: true, bottom: true, left: true, right: true }, numFmtId: 0, formatCode: "General", spillRef: "" }
+      ]
+    };
+
+    const markdownFile = api.convertSheetToMarkdown(workbook, sheet, {
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true,
+      treatFirstRowAsHeader: true
+    });
+
+    expect(markdownFile.summary.formulaDiagnostics).toEqual([
+      { address: "B1", formulaText: "=1+1", status: "resolved", source: "ast_evaluator", outputValue: "2" },
+      { address: "A2", formulaText: "=UNKNOWN(A1)", status: "fallback_formula", source: "formula_text", outputValue: "=UNKNOWN(A1)" },
+      { address: "B2", formulaText: "=[other.xlsx]Sheet1!A1", status: "unsupported_external", source: "external_unsupported", outputValue: "=[other.xlsx]Sheet1!A1" }
+    ]);
+  });
+
+  it("does not treat wide sparse merge-heavy layout regions as tables", () => {
+    const api = bootCore();
+    const workbook = { name: "layout.xlsx" };
+    const cells = [];
+    for (let row = 1; row <= 5; row += 1) {
+      for (let col = 1; col <= 12; col += 1) {
+        const address = `${String.fromCharCode(64 + col)}${row}`;
+        let outputValue = "";
+        if (col === 1) outputValue = `label${row}`;
+        if (row === 4 && col === 8) outputValue = "終了日時";
+        cells.push({
+          row,
+          col,
+          address,
+          valueType: outputValue ? "str" : "n",
+          rawValue: outputValue,
+          outputValue,
+          formulaText: "",
+          resolutionStatus: null,
+          resolutionSource: null,
+          styleIndex: 0,
+          borders: { top: true, bottom: true, left: true, right: true },
+          numFmtId: 0,
+          formatCode: "General",
+          formulaType: "",
+          spillRef: ""
+        });
+      }
+    }
+    const sheet = {
+      name: "Layout",
+      index: 1,
+      path: "xl/worksheets/sheet1.xml",
+      merges: [
+        { startRow: 1, startCol: 2, endRow: 1, endCol: 12, ref: "B1:L1" },
+        { startRow: 2, startCol: 2, endRow: 2, endCol: 12, ref: "B2:L2" },
+        { startRow: 3, startCol: 2, endRow: 3, endCol: 12, ref: "B3:L3" },
+        { startRow: 4, startCol: 2, endRow: 4, endCol: 7, ref: "B4:G4" },
+        { startRow: 4, startCol: 8, endRow: 4, endCol: 12, ref: "H4:L4" },
+        { startRow: 5, startCol: 2, endRow: 5, endCol: 12, ref: "B5:L5" }
+      ],
+      tables: [],
+      images: [],
+      maxRow: 5,
+      maxCol: 12,
+      cells
+    };
+
+    const markdownFile = api.convertSheetToMarkdown(workbook, sheet, {
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true,
+      treatFirstRowAsHeader: true
+    });
+
+    expect(markdownFile.summary.tableScores).toHaveLength(0);
+    expect(markdownFile.markdown).not.toContain("### 表001");
+    expect(markdownFile.markdown).toContain("label1");
+    expect(markdownFile.markdown).toContain("終了日時");
+  });
+
+  it("splits distant same-row narrative cells into separate blocks", () => {
+    const api = bootCore();
+    const workbook = { name: "narrative-gap.xlsx" };
+    const sheet = {
+      name: "Layout",
+      index: 1,
+      path: "xl/worksheets/sheet1.xml",
+      merges: [],
+      tables: [],
+      images: [],
+      maxRow: 1,
+      maxCol: 10,
+      cells: [
+        {
+          row: 1, col: 1, address: "A1", valueType: "str", rawValue: "イベント チェックリスト", outputValue: "イベント チェックリスト",
+          formulaText: "", resolutionStatus: null, resolutionSource: null, styleIndex: 0,
+          borders: { top: false, bottom: false, left: false, right: false }, numFmtId: 0, formatCode: "General", formulaType: "", spillRef: ""
+        },
+        {
+          row: 1, col: 8, address: "H1", valueType: "str", rawValue: "イベント カテゴリ", outputValue: "イベント カテゴリ",
+          formulaText: "", resolutionStatus: null, resolutionSource: null, styleIndex: 0,
+          borders: { top: false, bottom: false, left: false, right: false }, numFmtId: 0, formatCode: "General", formulaType: "", spillRef: ""
+        }
+      ]
+    };
+
+    const markdownFile = api.convertSheetToMarkdown(workbook, sheet, {
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true,
+      treatFirstRowAsHeader: true
+    });
+
+    expect(markdownFile.summary.narrativeBlocks).toBe(2);
+    expect(markdownFile.markdown).toContain("### イベント チェックリスト");
+    expect(markdownFile.markdown).toContain("### イベント カテゴリ");
+    expect(markdownFile.markdown).not.toContain("イベント チェックリスト イベント カテゴリ");
+  });
+
+  it("treats empty-string cached formula results as cached", async () => {
+    const api = bootCore();
+    const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Sheet1" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>`;
+    const workbookRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+</Relationships>`;
+    const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetData>
+    <row r="1">
+      <c r="A1"><f>IF(1=1,"","X")</f><v></v></c>
+    </row>
+  </sheetData>
+</worksheet>`;
+
+    const zip = createStoredZip([
+      { name: "[Content_Types].xml", data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+</Types>` },
+      { name: "xl/workbook.xml", data: workbookXml },
+      { name: "xl/_rels/workbook.xml.rels", data: workbookRelsXml },
+      { name: "xl/worksheets/sheet1.xml", data: sheetXml }
+    ]);
+
+    const workbook = await api.parseWorkbook(zip, "empty-cache.xlsx");
+    const cell = workbook.sheets[0].cells.find((entry) => entry.address === "A1");
+    const markdownFile = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    })[0];
+
+    expect(cell?.rawValue).toBe("");
+    expect(cell?.outputValue).toBe("");
+    expect(cell?.resolutionStatus).toBe("resolved");
+    expect(cell?.resolutionSource).toBe("cached_value");
+    expect(cell?.cachedValueState).toBe("present_empty");
+    expect(markdownFile.summary.formulaDiagnostics).toEqual([
+      { address: "A1", formulaText: "=IF(1=1,\"\",\"X\")", status: "resolved", source: "cached_value", outputValue: "" }
+    ]);
   });
 });

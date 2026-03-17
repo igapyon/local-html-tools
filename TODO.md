@@ -91,6 +91,12 @@
   - 作り方: たとえば `B2 = B1+1` を下へオートフィル
   - 作り方: 10行くらいで十分
   - 作り方: Excel のオートフィルで shared formula になりやすい
+  - `docs/xlsx2md/tests/fixtures/formula/formula-spill-sample01.xlsx`
+  - 目的: dynamic array / spill
+  - 作り方: 1シート
+  - 作り方: `=A4:A6` のような式を実際に spill させる
+  - 作り方: 可能なら `=SUM(C4#)` のような参照側も置く
+  - 作り方: dynamic array が有効な Excel で保存し、`f@ref` が残る形を期待する
   - `docs/xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
   - 目的: definedNames
   - 作り方: Workbook スコープ名前定義を1つ
@@ -165,6 +171,12 @@
   - セル配置案: `B3==B2+1` を `B11` までオートフィル
   - セル配置案: `D1` にタイトル `shared formula サンプル`
   - セル配置案: オートフィルで shared formula 化されるよう、コピー貼り付けではなくドラッグで増やす
+  - セル配置案: `formula-spill-sample01.xlsx`
+  - セル配置案: `A1` にタイトル `spill サンプル`
+  - セル配置案: `A3=src1`, `A4=1`, `A5=2`, `A6=3`
+  - セル配置案: `C3=spill_ref`, `C4==A4:A6`
+  - セル配置案: `E3=spill_sum`, `E4==SUM(C4#)`
+  - セル配置案: Excel 上で実際に spill した状態で保存する
   - セル配置案: `named-range-sample01.xlsx`
   - セル配置案: シートは `Summary` と `Other` の2枚
   - セル配置案: `Summary!A1` にタイトル `definedNames サンプル`
@@ -222,7 +234,7 @@
   - `docs/xlsx2md/src/xlsx2md/ts/formula/tokenizer.ts`
   - `docs/xlsx2md/src/xlsx2md/ts/formula/parser.ts`
   - `docs/xlsx2md/tests/xlsx2md-formula-parser.test.js`
-  - 絶対参照、sheet-scope name、error constant、row qualifier 付き structured reference まで対応済み
+  - 絶対参照、sheet-scope name、error constant、row qualifier 付き structured reference、配列定数の最小対応、`space intersection` の最小対応、`A1#` のような spill 演算子の最小対応まで対応済み
 - [xlsx2md][formula] Step 3 の最小 evaluator 土台を追加済み
   - `docs/xlsx2md/src/xlsx2md/ts/formula/evaluator.ts`
   - `docs/xlsx2md/src/xlsx2md/ts/core.ts` から限定的な AST フックを追加済み
@@ -244,7 +256,7 @@
     - `XLOOKUP` の binary search `search_mode=2/-2` の境界条件を必要に応じて詰める
     - 実データ頻出関数を AST evaluator 側へさらに寄せる
 - [xlsx2md][未対応整理] 数式未対応
-  - `space intersection`
+  - `space intersection` の完全対応
   - 配列定数の完全対応
   - dynamic array / spill の完全対応
   - `LAMBDA / LET / MAP / REDUCE / SCAN`
@@ -255,10 +267,15 @@
   - `セクション分割ブロック` の導入
   - `カレンダー / ボード / ダッシュボード系` シートの専用扱い
   - レイアウト中心シートの完全再現は対象外であり、`セクション / 表 / リスト / 画像` 分解で扱う
+  - `イベント プランナー` のようなフォーム風罫線領域は、現時点では保守的に扱う。表として残す場合もあるが、横に広く疎で merge が多い領域は narrative / section 側へ寄せてよい。将来 `フォームブロック / 入力パネル` へ改善する可能性あり
+- [xlsx2md][仕様整理] `セクション分割ブロック` の基本仕様は `xlsx2md-spec.md` へ追記済み。次段は実装導入順の決定
+- [xlsx2md][実装メモ] `core.ts` に no-op の `extractSectionBlocks(...)` を追加済み。将来は `convertSheetToMarkdown(...)` の Markdown 組み立て直前で利用する
 - [xlsx2md][未対応整理] 方針未確定
   - `XLOOKUP` 近似一致や binary search を未ソート範囲でどう扱うか
   - `ROW / COLUMN` の文脈なし引数なし形をどう扱うか
-  - 配列定数をどの段階で AST 側へ入れるか
+  - 配列定数をどこまで Excel 互換で広げるか
+  - `A1#` のような spill 演算子を、runtime でどこまで実解決するか
+  - `f@ref` を spill と array formula でどう見分けるか
   - `TODAY / NOW` を cached value 専用に留めるか
   - `existing resolver` から AST evaluator へ、どこまで段階移行したら縮小判断するか
 - [引継][xlsx2md] `local-data` の実データ差分レビューを開始
@@ -280,8 +297,8 @@
   - `narrative/narrative-vs-table-sample01.xlsx`
   - `edge/edge-empty-sample01.xlsx`
   - `edge/edge-weird-sheetname-sample01.xlsx`
-  - 現在の `docs/xlsx2md/tests/xlsx2md-main.test.js` は `23 tests` 成功
-  - 現在の `docs/xlsx2md/tests/xlsx2md-formula-parser.test.js` は `45 tests` 成功
+  - 現在の `docs/xlsx2md/tests/xlsx2md-main.test.js` は `24 tests` 成功
+  - 現在の `docs/xlsx2md/tests/xlsx2md-formula-parser.test.js` は `56 tests` 成功
   - 最後に反映済みの実装:
   - 数式セルの `cached value` と再解決値にも表示形式を再適用
   - 出力ファイル名サニタイズを強化

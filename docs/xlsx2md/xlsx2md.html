@@ -1284,7 +1284,6 @@ lht-index-card-link {
 .md-summary-item-head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 8px;
   flex-wrap: wrap;
 }
@@ -1294,6 +1293,22 @@ lht-index-card-link {
   font-size: 0.86rem;
   font-weight: 700;
   color: #0b4f8a;
+}
+
+.md-summary-item-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.md-summary-item-badges {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+  max-width: 100%;
 }
 
 .md-summary-item-status {
@@ -1333,6 +1348,36 @@ lht-index-card-link {
 }
 
 .md-summary-item-status--unknown {
+  background: #d9e2ec;
+  color: #334e68;
+}
+
+.md-summary-item-status--source-cached {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.md-summary-item-status--source-ast {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.md-summary-item-status--source-legacy {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.md-summary-item-status--source-formula {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.md-summary-item-status--source-external {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.md-summary-item-status--source-unknown {
   background: #d9e2ec;
   color: #334e68;
 }
@@ -3670,13 +3715,27 @@ if (!customElements.get("lht-page-menu")) {
     const IDENTIFIER_START_RE = /[\p{L}_\\$]/u;
     const IDENTIFIER_PART_RE = /[\p{L}\p{N}_.\\$?]/u;
     function tokenizeFormula(input) {
+        var _a, _b;
         const source = normalizeFormulaInput(input);
         const tokens = [];
         let index = 0;
         while (index < source.length) {
             const char = source[index];
             if (/\s/.test(char)) {
-                index += 1;
+                const whitespaceStart = index;
+                while (index < source.length && /\s/.test(source[index])) {
+                    index += 1;
+                }
+                const previousToken = (_a = tokens[tokens.length - 1]) !== null && _a !== void 0 ? _a : null;
+                const nextChar = (_b = source[index]) !== null && _b !== void 0 ? _b : "";
+                if (shouldEmitIntersectionOperator(previousToken, nextChar)) {
+                    tokens.push({
+                        type: "operator",
+                        value: " ",
+                        start: whitespaceStart,
+                        end: index
+                    });
+                }
                 continue;
             }
             const start = index;
@@ -3703,14 +3762,24 @@ if (!customElements.get("lht-page-menu")) {
                 continue;
             }
             if (char === "#") {
-                const parsed = readErrorLiteral(source, index);
+                if (shouldReadErrorLiteral(source, index)) {
+                    const parsed = readErrorLiteral(source, index);
+                    tokens.push({
+                        type: "error",
+                        value: parsed.value,
+                        start,
+                        end: parsed.end
+                    });
+                    index = parsed.end;
+                    continue;
+                }
                 tokens.push({
-                    type: "error",
-                    value: parsed.value,
+                    type: "operator",
+                    value: "#",
                     start,
-                    end: parsed.end
+                    end: start + 1
                 });
-                index = parsed.end;
+                index += 1;
                 continue;
             }
             if (/[0-9.]/.test(char)) {
@@ -3726,7 +3795,7 @@ if (!customElements.get("lht-page-menu")) {
                     continue;
                 }
             }
-            if ("(),:![]".includes(char)) {
+            if ("(),;:{}![]".includes(char)) {
                 tokens.push({
                     type: punctuationTypeFor(char),
                     value: char,
@@ -3830,8 +3899,14 @@ if (!customElements.get("lht-page-menu")) {
                 return "lparen";
             case ")":
                 return "rparen";
+            case "{":
+                return "lbrace";
+            case "}":
+                return "rbrace";
             case ",":
                 return "comma";
+            case ";":
+                return "semicolon";
             case ":":
                 return "colon";
             case "!":
@@ -3850,7 +3925,27 @@ if (!customElements.get("lht-page-menu")) {
             return twoChar;
         }
         const oneChar = source[start];
-        return "+-*/&=<>%".includes(oneChar) ? oneChar : null;
+        return "+-*/&=<>%#".includes(oneChar) ? oneChar : null;
+    }
+    function shouldReadErrorLiteral(source, start) {
+        return /^#(?:N\/A|REF!|VALUE!|NULL!|NUM!|NAME\?|DIV\/0!|CALC!|SPILL!|GETTING_DATA)/i.test(source.slice(start));
+    }
+    function shouldEmitIntersectionOperator(previousToken, nextChar) {
+        if (!previousToken) {
+            return false;
+        }
+        const leftTokenTypes = new Set([
+            "cell",
+            "identifier",
+            "quoted_identifier",
+            "rparen",
+            "rbracket",
+            "rbrace"
+        ]);
+        if (!leftTokenTypes.has(previousToken.type)) {
+            return false;
+        }
+        return nextChar === "'" || nextChar === "(" || isIdentifierStart(nextChar);
     }
     function isIdentifierStart(char) {
         return IDENTIFIER_START_RE.test(char);
@@ -3920,8 +4015,17 @@ if (!customElements.get("lht-page-menu")) {
         return left;
     }
     function parseMultiplicative(state) {
-        let left = parseUnary(state);
+        let left = parseIntersection(state);
         while (matchOperator(state, ["*", "/"])) {
+            const operator = consume(state).value;
+            const right = parseIntersection(state);
+            left = { type: "binary_op", operator, left, right };
+        }
+        return left;
+    }
+    function parseIntersection(state) {
+        let left = parseUnary(state);
+        while (matchOperator(state, [" "])) {
             const operator = consume(state).value;
             const right = parseUnary(state);
             left = { type: "binary_op", operator, left, right };
@@ -3941,7 +4045,7 @@ if (!customElements.get("lht-page-menu")) {
     }
     function parsePostfix(state) {
         let node = parsePrimary(state);
-        while (matchOperator(state, ["%"])) {
+        while (matchOperator(state, ["%", "#"])) {
             const operator = consume(state).value;
             node = {
                 type: "postfix_op",
@@ -3985,6 +4089,9 @@ if (!customElements.get("lht-page-menu")) {
                 type: "error",
                 value: token.value
             };
+        }
+        if (token.type === "lbrace") {
+            return parseArrayConstant(state);
         }
         if (token.type === "lparen") {
             consume(state);
@@ -4060,18 +4167,23 @@ if (!customElements.get("lht-page-menu")) {
     }
     function readStructuredReferenceSegment(state) {
         var _a, _b;
-        const parts = [];
+        let text = "";
         while (peek(state) && ((_a = peek(state)) === null || _a === void 0 ? void 0 : _a.type) !== "rbracket") {
             const token = consume(state);
-            if (!token || !["identifier", "quoted_identifier", "cell", "error", "number", "boolean"].includes(token.type)) {
+            if (!token || !["identifier", "quoted_identifier", "cell", "error", "number", "boolean", "operator"].includes(token.type)) {
                 throw new Error(`Expected structured reference column, got ${(_b = token === null || token === void 0 ? void 0 : token.value) !== null && _b !== void 0 ? _b : "EOF"}`);
             }
-            parts.push(token.value);
+            if (token.type === "operator" && token.value !== "#" && token.value !== " ") {
+                throw new Error(`Expected structured reference column, got ${token.value}`);
+            }
+            text += token.value;
         }
-        if (!parts.length) {
+        if (!text.length) {
             throw new Error("Expected structured reference column, got EOF");
         }
-        return parts.join(" ");
+        return text.startsWith("#")
+            ? `#${text.slice(1).replace(/\s+/g, " ").trim()}`
+            : text;
     }
     function parseFunctionCall(state, name) {
         var _a;
@@ -4087,6 +4199,29 @@ if (!customElements.get("lht-page-menu")) {
             type: "function_call",
             name,
             args
+        };
+    }
+    function parseArrayConstant(state) {
+        var _a;
+        expect(state, "lbrace");
+        const rows = [];
+        if (((_a = peek(state)) === null || _a === void 0 ? void 0 : _a.type) !== "rbrace") {
+            while (true) {
+                const row = [];
+                row.push(parseComparison(state));
+                while (matchAndConsume(state, "comma")) {
+                    row.push(parseComparison(state));
+                }
+                rows.push(row);
+                if (!matchAndConsume(state, "semicolon")) {
+                    break;
+                }
+            }
+        }
+        expect(state, "rbrace");
+        return {
+            type: "array_constant",
+            rows
         };
     }
     function parseRangeEndpoint(state, defaultSheet) {
@@ -4160,6 +4295,8 @@ if (!customElements.get("lht-page-menu")) {
                 return ast.value;
             case "error":
                 return ast.value;
+            case "array_constant":
+                return ast.rows.map((row) => row.map((item) => evaluateFormulaAst(item, context)));
             case "cell":
                 return context.resolveCell ? context.resolveCell(ast.ref, ast.sheet) : null;
             case "name":
@@ -4179,8 +4316,14 @@ if (!customElements.get("lht-page-menu")) {
             case "unary_op":
                 return evaluateUnaryOp(ast.operator, evaluateFormulaAst(ast.operand, context));
             case "postfix_op":
+                if (ast.operator === "#" && ast.operand.type === "cell") {
+                    return context.resolveSpill ? context.resolveSpill(ast.operand.ref, ast.operand.sheet) : null;
+                }
                 return evaluatePostfixOp(ast.operator, evaluateFormulaAst(ast.operand, context));
             case "binary_op":
+                if (ast.operator === " ") {
+                    return evaluateIntersectionAst(ast, context);
+                }
                 return evaluateBinaryOp(ast.operator, evaluateFormulaAst(ast.left, context), evaluateFormulaAst(ast.right, context));
             case "function_call":
                 return evaluateFunctionCall(ast.name, ast.args, context);
@@ -4204,6 +4347,32 @@ if (!customElements.get("lht-page-menu")) {
             evaluateFormulaAst(ast.start, context),
             evaluateFormulaAst(ast.end, context)
         ];
+    }
+    function evaluateIntersectionAst(ast, context) {
+        var _a, _b, _c, _d;
+        const leftArea = toCellArea(ast.left);
+        const rightArea = toCellArea(ast.right);
+        if (!leftArea || !rightArea) {
+            throw new Error("Unsupported intersection operands");
+        }
+        const leftSheet = (_b = (_a = leftArea.sheet) !== null && _a !== void 0 ? _a : rightArea.sheet) !== null && _b !== void 0 ? _b : null;
+        const rightSheet = (_d = (_c = rightArea.sheet) !== null && _c !== void 0 ? _c : leftArea.sheet) !== null && _d !== void 0 ? _d : null;
+        if (leftSheet !== rightSheet) {
+            return "#NULL!";
+        }
+        const startRow = Math.max(leftArea.startRow, rightArea.startRow);
+        const endRow = Math.min(leftArea.endRow, rightArea.endRow);
+        const startCol = Math.max(leftArea.startCol, rightArea.startCol);
+        const endCol = Math.min(leftArea.endCol, rightArea.endCol);
+        if (startRow > endRow || startCol > endCol) {
+            return "#NULL!";
+        }
+        const startRef = `${colToLetters(startCol)}${startRow}`;
+        const endRef = `${colToLetters(endCol)}${endRow}`;
+        if (context.resolveRange) {
+            return context.resolveRange(startRef, endRef, leftSheet);
+        }
+        return [[`${startRef}:${endRef}`]];
     }
     function evaluateUnaryOp(operator, operand) {
         const numericValue = toNumber(operand);
@@ -4248,6 +4417,64 @@ if (!customElements.get("lht-page-menu")) {
             default:
                 throw new Error(`Unsupported binary operator: ${operator}`);
         }
+    }
+    function toCellArea(node) {
+        var _a, _b;
+        if (node.type === "cell") {
+            const position = parseCellRef(node.ref);
+            if (!position) {
+                return null;
+            }
+            return {
+                sheet: node.sheet,
+                startRow: position.row,
+                endRow: position.row,
+                startCol: position.col,
+                endCol: position.col
+            };
+        }
+        if (node.type === "range" && node.start.type === "cell" && node.end.type === "cell") {
+            const start = parseCellRef(node.start.ref);
+            const end = parseCellRef(node.end.ref);
+            if (!start || !end) {
+                return null;
+            }
+            return {
+                sheet: (_b = (_a = node.start.sheet) !== null && _a !== void 0 ? _a : node.end.sheet) !== null && _b !== void 0 ? _b : null,
+                startRow: Math.min(start.row, end.row),
+                endRow: Math.max(start.row, end.row),
+                startCol: Math.min(start.col, end.col),
+                endCol: Math.max(start.col, end.col)
+            };
+        }
+        return null;
+    }
+    function parseCellRef(ref) {
+        const match = String(ref).toUpperCase().match(/^\$?([A-Z]{1,3})\$?(\d+)$/);
+        if (!match) {
+            return null;
+        }
+        return {
+            col: lettersToCol(match[1]),
+            row: Number(match[2])
+        };
+    }
+    function lettersToCol(letters) {
+        let value = 0;
+        for (const char of letters) {
+            value = value * 26 + (char.charCodeAt(0) - 64);
+        }
+        return value;
+    }
+    function colToLetters(column) {
+        let current = column;
+        let result = "";
+        while (current > 0) {
+            const remainder = (current - 1) % 26;
+            result = String.fromCharCode(65 + remainder) + result;
+            current = Math.floor((current - 1) / 26);
+        }
+        return result;
     }
     function evaluateFunctionCall(name, args, context) {
         const upperName = name.toUpperCase();
@@ -5862,7 +6089,7 @@ if (!customElements.get("lht-page-menu")) {
         }
         return null;
     }
-    function applyResolvedFormulaValue(cell, resolvedValue) {
+    function applyResolvedFormulaValue(cell, resolvedValue, resolutionSource = "legacy_resolver") {
         const rawValue = String(resolvedValue || "");
         const formattedValue = formatCellDisplayValue(rawValue, {
             borders: cell.borders,
@@ -5872,6 +6099,7 @@ if (!customElements.get("lht-page-menu")) {
         cell.rawValue = rawValue;
         cell.outputValue = formattedValue !== null && formattedValue !== void 0 ? formattedValue : rawValue;
         cell.resolutionStatus = "resolved";
+        cell.resolutionSource = resolutionSource;
     }
     function parseDateLikeParts(value) {
         const trimmed = String(value || "").trim();
@@ -6138,8 +6366,16 @@ if (!customElements.get("lht-page-menu")) {
     }
     function extractCellOutputValue(cellElement, sharedStrings, cellStyle, formulaOverride = "") {
         const type = (cellElement.getAttribute("t") || "").trim();
-        const valueText = getTextContent(cellElement.getElementsByTagName("v")[0]);
+        const valueNode = cellElement.getElementsByTagName("v")[0] || null;
+        const valueText = getTextContent(valueNode);
         const formulaText = formulaOverride || getTextContent(cellElement.getElementsByTagName("f")[0]);
+        const cachedValueState = !formulaText
+            ? null
+            : !valueNode
+                ? "absent"
+                : valueText === ""
+                    ? "present_empty"
+                    : "present_nonempty";
         if (formulaText) {
             const normalizedFormula = formulaText.startsWith("=") ? formulaText : `=${formulaText}`;
             if (/\[[^\]]+\.xlsx\]/i.test(normalizedFormula)) {
@@ -6148,17 +6384,21 @@ if (!customElements.get("lht-page-menu")) {
                     rawValue: valueText || normalizedFormula,
                     outputValue: normalizedFormula,
                     formulaText: normalizedFormula,
-                    resolutionStatus: "unsupported_external"
+                    resolutionStatus: "unsupported_external",
+                    resolutionSource: "external_unsupported",
+                    cachedValueState
                 };
             }
-            if (valueText) {
+            if (valueNode) {
                 const formattedValue = formatCellDisplayValue(valueText, cellStyle);
                 return {
                     valueType: type || "formula",
                     rawValue: valueText,
                     outputValue: formattedValue !== null && formattedValue !== void 0 ? formattedValue : valueText,
                     formulaText: normalizedFormula,
-                    resolutionStatus: "resolved"
+                    resolutionStatus: "resolved",
+                    resolutionSource: "cached_value",
+                    cachedValueState
                 };
             }
             return {
@@ -6166,7 +6406,9 @@ if (!customElements.get("lht-page-menu")) {
                 rawValue: normalizedFormula,
                 outputValue: normalizedFormula,
                 formulaText: normalizedFormula,
-                resolutionStatus: "fallback_formula"
+                resolutionStatus: "fallback_formula",
+                resolutionSource: "formula_text",
+                cachedValueState
             };
         }
         if (type === "s") {
@@ -6176,7 +6418,9 @@ if (!customElements.get("lht-page-menu")) {
                 rawValue: valueText,
                 outputValue: sharedStrings[sharedIndex] || "",
                 formulaText: "",
-                resolutionStatus: null
+                resolutionStatus: null,
+                resolutionSource: null,
+                cachedValueState: null
             };
         }
         if (type === "inlineStr") {
@@ -6186,7 +6430,9 @@ if (!customElements.get("lht-page-menu")) {
                 rawValue: inlineText,
                 outputValue: inlineText,
                 formulaText: "",
-                resolutionStatus: null
+                resolutionStatus: null,
+                resolutionSource: null,
+                cachedValueState: null
             };
         }
         if (type === "b") {
@@ -6195,7 +6441,9 @@ if (!customElements.get("lht-page-menu")) {
                 rawValue: valueText,
                 outputValue: valueText === "1" ? "TRUE" : "FALSE",
                 formulaText: "",
-                resolutionStatus: null
+                resolutionStatus: null,
+                resolutionSource: null,
+                cachedValueState: null
             };
         }
         if (type === "str" || type === "e") {
@@ -6204,7 +6452,9 @@ if (!customElements.get("lht-page-menu")) {
                 rawValue: valueText,
                 outputValue: valueText,
                 formulaText: "",
-                resolutionStatus: null
+                resolutionStatus: null,
+                resolutionSource: null,
+                cachedValueState: null
             };
         }
         if (valueText) {
@@ -6215,7 +6465,9 @@ if (!customElements.get("lht-page-menu")) {
                     rawValue: valueText,
                     outputValue: formattedValue,
                     formulaText: "",
-                    resolutionStatus: null
+                    resolutionStatus: null,
+                    resolutionSource: null,
+                    cachedValueState: null
                 };
             }
         }
@@ -6224,7 +6476,9 @@ if (!customElements.get("lht-page-menu")) {
             rawValue: valueText,
             outputValue: valueText,
             formulaText: "",
-            resolutionStatus: null
+            resolutionStatus: null,
+            resolutionSource: null,
+            cachedValueState: null
         };
     }
     function shiftReferenceAddress(addressText, rowOffset, colOffset) {
@@ -6394,9 +6648,9 @@ if (!customElements.get("lht-page-menu")) {
                 resolvingKeys.add(key);
                 try {
                     try {
-                        const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue, undefined, undefined, cell.address);
-                        if (evaluated != null) {
-                            applyResolvedFormulaValue(cell, evaluated);
+                        const result = tryResolveFormulaExpressionDetailed(cell.formulaText, sheetName, resolveCellValue, undefined, undefined, cell.address);
+                        if ((result === null || result === void 0 ? void 0 : result.value) != null) {
+                            applyResolvedFormulaValue(cell, result.value, result.source || "legacy_resolver");
                         }
                     }
                     catch (error) {
@@ -6528,6 +6782,38 @@ if (!customElements.get("lht-page-menu")) {
                 end: `${colLetters}${lastDataRow}`
             };
         }
+        function resolveSpillRange(sheetName, address) {
+            var _a;
+            const normalizedAddress = normalizeFormulaAddress(address);
+            const cell = ((_a = cellMaps.get(sheetName)) === null || _a === void 0 ? void 0 : _a.get(normalizedAddress)) || null;
+            if (!cell) {
+                return null;
+            }
+            if (cell.formulaType === "array") {
+                return { sheetName, start: normalizedAddress, end: normalizedAddress };
+            }
+            const spillRef = String(cell.spillRef || "").trim();
+            if (!spillRef) {
+                return { sheetName, start: normalizedAddress, end: normalizedAddress };
+            }
+            const directRange = parseQualifiedRangeReference(spillRef, sheetName);
+            if (directRange) {
+                return directRange;
+            }
+            if (/^[A-Za-z]+\d+:[A-Za-z]+\d+$/.test(spillRef)) {
+                const [start, end] = spillRef.split(":");
+                return {
+                    sheetName,
+                    start: normalizeFormulaAddress(start),
+                    end: normalizeFormulaAddress(end)
+                };
+            }
+            if (/^[A-Za-z]+\d+$/.test(spillRef)) {
+                const only = normalizeFormulaAddress(spillRef);
+                return { sheetName, start: only, end: only };
+            }
+            return { sheetName, start: normalizedAddress, end: normalizedAddress };
+        }
         function resolveRangeEntries(sheetName, rangeText) {
             const range = parseRangeAddress(rangeText);
             if (!range) {
@@ -6568,18 +6854,38 @@ if (!customElements.get("lht-page-menu")) {
             resolveStructuredRange
         };
     }
-    function tryResolveFormulaExpression(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries, currentAddress) {
+    function tryResolveFormulaExpressionDetailed(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries, currentAddress) {
         const normalized = String(formulaText || "").trim().replace(/^=/, "");
         if (!normalized)
             return null;
         const directDefinedNameValue = (resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(currentSheetName, normalized)) || null;
         if (directDefinedNameValue != null) {
-            return directDefinedNameValue;
+            return {
+                value: directDefinedNameValue,
+                source: "legacy_resolver"
+            };
         }
         const astResolved = tryResolveFormulaExpressionWithAst(normalized, currentSheetName, resolveCellValue, resolveRangeEntries, currentAddress);
         if (astResolved != null) {
-            return astResolved;
+            return {
+                value: astResolved,
+                source: "ast_evaluator"
+            };
         }
+        const legacyResolved = tryResolveFormulaExpressionLegacy(normalized, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
+        if (legacyResolved == null) {
+            return null;
+        }
+        return {
+            value: legacyResolved,
+            source: "legacy_resolver"
+        };
+    }
+    function tryResolveFormulaExpression(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries, currentAddress) {
+        var _a, _b;
+        return (_b = (_a = tryResolveFormulaExpressionDetailed(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries, currentAddress)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : null;
+    }
+    function tryResolveFormulaExpressionLegacy(normalized, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
         const ifResult = tryResolveIfFunction(normalized, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
         if (ifResult != null) {
             return ifResult;
@@ -6726,6 +7032,16 @@ if (!customElements.get("lht-page-menu")) {
                         return [];
                     }
                     return createFormulaAstRangeMatrix(sheet || currentSheetName, normalizeFormulaAddress(startRef), normalizeFormulaAddress(endRef), resolveRangeEntries);
+                },
+                resolveSpill(ref, sheet) {
+                    if (!resolveRangeEntries) {
+                        return [];
+                    }
+                    const spillRange = resolveSpillRange(sheet || currentSheetName, ref);
+                    if (!spillRange) {
+                        return [];
+                    }
+                    return createFormulaAstRangeMatrix(spillRange.sheetName, spillRange.start, spillRange.end, resolveRangeEntries);
                 },
                 currentCellRef: currentAddress ? normalizeFormulaAddress(currentAddress) : undefined
             });
@@ -8113,6 +8429,7 @@ if (!customElements.get("lht-page-menu")) {
         return tokens;
     }
     function resolveSimpleFormulaReferences(workbook) {
+        var _a, _b;
         const resolver = buildFormulaResolver(workbook);
         resolveDefinedNameScalarValue = resolver.resolveDefinedNameValue;
         resolveDefinedNameRangeRef = resolver.resolveDefinedNameRange;
@@ -8132,14 +8449,17 @@ if (!customElements.get("lht-page-menu")) {
                         if (reference) {
                             const targetValue = String(resolver.resolveCellValue(reference.sheetName, reference.address) || "").trim();
                             if (targetValue) {
-                                applyResolvedFormulaValue(cell, targetValue);
+                                applyResolvedFormulaValue(cell, targetValue, "legacy_resolver");
                                 resolvedInPass += 1;
                                 continue;
                             }
                         }
                         let evaluated = null;
+                        let evaluatedSource = null;
                         try {
-                            evaluated = tryResolveFormulaExpression(cell.formulaText, sheet.name, resolver.resolveCellValue, resolver.resolveRangeValues, resolver.resolveRangeEntries, cell.address);
+                            const result = tryResolveFormulaExpressionDetailed(cell.formulaText, sheet.name, resolver.resolveCellValue, resolver.resolveRangeValues, resolver.resolveRangeEntries, cell.address);
+                            evaluated = (_a = result === null || result === void 0 ? void 0 : result.value) !== null && _a !== void 0 ? _a : null;
+                            evaluatedSource = (_b = result === null || result === void 0 ? void 0 : result.source) !== null && _b !== void 0 ? _b : null;
                         }
                         catch (error) {
                             if (!(error instanceof Error) || error.message !== "__FORMULA_UNRESOLVED__") {
@@ -8147,7 +8467,7 @@ if (!customElements.get("lht-page-menu")) {
                             }
                         }
                         if (evaluated != null) {
-                            applyResolvedFormulaValue(cell, evaluated);
+                            applyResolvedFormulaValue(cell, evaluated, evaluatedSource || "legacy_resolver");
                             resolvedInPass += 1;
                         }
                     }
@@ -8182,6 +8502,7 @@ if (!customElements.get("lht-page-menu")) {
             let formulaOverride = "";
             const formulaElement = cellElement.getElementsByTagName("f")[0] || null;
             const formulaType = (formulaElement === null || formulaElement === void 0 ? void 0 : formulaElement.getAttribute("t")) || "";
+            const spillRef = (formulaElement === null || formulaElement === void 0 ? void 0 : formulaElement.getAttribute("ref")) || "";
             const sharedIndex = (formulaElement === null || formulaElement === void 0 ? void 0 : formulaElement.getAttribute("si")) || "";
             const formulaText = getTextContent(formulaElement);
             if (formulaType === "shared" && sharedIndex) {
@@ -8207,10 +8528,14 @@ if (!customElements.get("lht-page-menu")) {
                 outputValue: output.outputValue,
                 formulaText: output.formulaText,
                 resolutionStatus: output.resolutionStatus,
+                resolutionSource: output.resolutionSource,
+                cachedValueState: output.cachedValueState,
                 styleIndex,
                 borders: cellStyle.borders,
                 numFmtId: cellStyle.numFmtId,
-                formatCode: cellStyle.formatCode
+                formatCode: cellStyle.formatCode,
+                formulaType,
+                spillRef
             };
         });
         const merges = Array.from(doc.getElementsByTagName("mergeCell")).map((mergeElement) => parseRangeRef(mergeElement.getAttribute("ref") || ""));
@@ -8303,7 +8628,6 @@ if (!customElements.get("lht-page-menu")) {
         return tables.some((table) => row >= table.startRow && row <= table.endRow && col >= table.startCol && col <= table.endCol);
     }
     function extractNarrativeBlocks(sheet, tables, options = {}) {
-        var _a;
         const rowMap = new Map();
         for (const cell of sheet.cells) {
             if (!cell.outputValue)
@@ -8320,38 +8644,66 @@ if (!customElements.get("lht-page-menu")) {
         let previousRow = -100;
         for (const rowNumber of rowNumbers) {
             const cells = (rowMap.get(rowNumber) || []).slice().sort((a, b) => a.col - b.col);
-            const rowText = cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean).join(" ").trim();
-            if (!rowText)
-                continue;
-            const startCol = ((_a = cells[0]) === null || _a === void 0 ? void 0 : _a.col) || 1;
-            if (!current || rowNumber - previousRow > 1 || Math.abs(startCol - current.startCol) > 3) {
-                current = {
-                    startRow: rowNumber,
-                    startCol,
-                    endRow: rowNumber,
-                    lines: [rowText],
-                    items: [{
-                            row: rowNumber,
-                            startCol,
-                            text: rowText,
-                            cellValues: cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean)
-                        }]
-                };
-                blocks.push(current);
+            const rowSegments = splitNarrativeRowSegments(cells, options);
+            for (const segment of rowSegments) {
+                const rowText = segment.values.join(" ").trim();
+                if (!rowText)
+                    continue;
+                const startCol = segment.startCol;
+                if (!current || rowNumber - previousRow > 1 || Math.abs(startCol - current.startCol) > 3) {
+                    current = {
+                        startRow: rowNumber,
+                        startCol,
+                        endRow: rowNumber,
+                        lines: [rowText],
+                        items: [{
+                                row: rowNumber,
+                                startCol,
+                                text: rowText,
+                                cellValues: segment.values
+                            }]
+                    };
+                    blocks.push(current);
+                }
+                else {
+                    current.lines.push(rowText);
+                    current.endRow = rowNumber;
+                    current.items.push({
+                        row: rowNumber,
+                        startCol,
+                        text: rowText,
+                        cellValues: segment.values
+                    });
+                }
+                previousRow = rowNumber;
             }
-            else {
-                current.lines.push(rowText);
-                current.endRow = rowNumber;
-                current.items.push({
-                    row: rowNumber,
-                    startCol,
-                    text: rowText,
-                    cellValues: cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean)
-                });
-            }
-            previousRow = rowNumber;
         }
         return blocks;
+    }
+    function splitNarrativeRowSegments(cells, options) {
+        const segments = [];
+        let current = null;
+        for (const cell of cells) {
+            const value = formatCellForMarkdown(cell, options).trim();
+            if (!value)
+                continue;
+            if (!current || cell.col - current.lastCol > 4) {
+                current = {
+                    startCol: cell.col,
+                    values: [value],
+                    lastCol: cell.col
+                };
+                segments.push(current);
+            }
+            else {
+                current.values.push(value);
+                current.lastCol = cell.col;
+            }
+        }
+        return segments.map((segment) => ({
+            startCol: segment.startCol,
+            values: segment.values
+        }));
     }
     function isNarrativeListCandidate(item) {
         const text = String(item.text || "").trim();
@@ -8436,6 +8788,84 @@ if (!customElements.get("lht-page-menu")) {
         }
         return parts.join("\n\n");
     }
+    function isSectionHeadingNarrativeBlock(block) {
+        var _a;
+        if (!block || !block.items || block.items.length !== 1) {
+            return false;
+        }
+        const text = String(((_a = block.items[0]) === null || _a === void 0 ? void 0 : _a.text) || "").trim();
+        if (!text)
+            return false;
+        if (text.length > 32)
+            return false;
+        if (/[。．:：]$/.test(text))
+            return false;
+        if (/^[\-*#]/.test(text))
+            return false;
+        return true;
+    }
+    function extractSectionBlocks(sheet, tables, narrativeBlocks) {
+        const anchors = [];
+        for (const block of narrativeBlocks) {
+            anchors.push({
+                startRow: block.startRow,
+                startCol: block.startCol,
+                endRow: block.endRow,
+                endCol: Math.max(block.startCol, ...block.items.map((item) => item.startCol))
+            });
+        }
+        for (const table of tables) {
+            anchors.push({
+                startRow: table.startRow,
+                startCol: table.startCol,
+                endRow: table.endRow,
+                endCol: table.endCol
+            });
+        }
+        for (const image of sheet.images) {
+            const anchor = parseCellAddress(image.anchor);
+            if (anchor.row > 0 && anchor.col > 0) {
+                anchors.push({
+                    startRow: anchor.row,
+                    startCol: anchor.col,
+                    endRow: anchor.row,
+                    endCol: anchor.col
+                });
+            }
+        }
+        if (anchors.length === 0) {
+            return [];
+        }
+        anchors.sort((left, right) => {
+            if (left.startRow !== right.startRow)
+                return left.startRow - right.startRow;
+            return left.startCol - right.startCol;
+        });
+        const sections = [];
+        let current = null;
+        let previousEndRow = -100;
+        const verticalGapThreshold = 4;
+        for (const anchor of anchors) {
+            const gap = anchor.startRow - previousEndRow;
+            if (!current || gap > verticalGapThreshold) {
+                current = {
+                    startRow: anchor.startRow,
+                    startCol: anchor.startCol,
+                    endRow: anchor.endRow,
+                    endCol: anchor.endCol
+                };
+                sections.push(current);
+            }
+            else {
+                current.startRow = Math.min(current.startRow, anchor.startRow);
+                current.startCol = Math.min(current.startCol, anchor.startCol);
+                current.endRow = Math.max(current.endRow, anchor.endRow);
+                current.endCol = Math.max(current.endCol, anchor.endCol);
+            }
+            previousEndRow = Math.max(previousEndRow, anchor.endRow);
+        }
+        return sections;
+    }
     function collectTableSeedCells(sheet) {
         return sheet.cells.filter((cell) => {
             const hasValue = !!String(cell.outputValue || "").trim();
@@ -8518,6 +8948,9 @@ if (!customElements.get("lht-page-menu")) {
                 score += TABLE_SCORE_WEIGHTS.mergeHeavyPenalty;
                 reasons.push(`結合セル多 (${TABLE_SCORE_WEIGHTS.mergeHeavyPenalty})`);
             }
+            if (mergedArea >= 2 && rowCount <= 6 && colCount >= 10 && density < 0.25) {
+                continue;
+            }
             const avgTextLength = component
                 .filter((entry) => entry.outputValue.trim())
                 .reduce((sum, entry) => sum + entry.outputValue.trim().length, 0) / Math.max(1, component.filter((entry) => entry.outputValue.trim()).length);
@@ -8560,13 +8993,19 @@ if (!customElements.get("lht-page-menu")) {
         applyMergeTokens(rows, sheet.merges, candidate.startRow, candidate.startCol, candidate.endRow, candidate.endCol);
         let normalizedRows = rows;
         if (options.removeEmptyRows !== false) {
-            normalizedRows = normalizedRows.filter((row) => row.some((cell) => String(cell || "").trim() !== ""));
+            normalizedRows = normalizedRows.filter((row) => row.some((cell) => isMeaningfulMarkdownCell(cell)));
         }
         if (options.removeEmptyColumns !== false && normalizedRows.length > 0) {
-            const keepColumnFlags = normalizedRows[0].map((_, colIndex) => normalizedRows.some((row) => String(row[colIndex] || "").trim() !== ""));
+            const keepColumnFlags = normalizedRows[0].map((_, colIndex) => normalizedRows.some((row) => isMeaningfulMarkdownCell(row[colIndex])));
             normalizedRows = normalizedRows.map((row) => row.filter((_cell, colIndex) => keepColumnFlags[colIndex]));
         }
         return normalizedRows;
+    }
+    function isMeaningfulMarkdownCell(value) {
+        const text = String(value || "").trim();
+        if (!text)
+            return false;
+        return text !== "[MERGED←]" && text !== "[MERGED↑]";
     }
     function applyMergeTokens(matrix, merges, startRow, startCol, endRow, endCol) {
         for (const merge of merges) {
@@ -8630,12 +9069,14 @@ if (!customElements.get("lht-page-menu")) {
         const treatFirstRowAsHeader = options.treatFirstRowAsHeader !== false;
         const tables = detectTableCandidates(sheet);
         const narrativeBlocks = extractNarrativeBlocks(sheet, tables, options);
+        const sectionBlocks = extractSectionBlocks(sheet, tables, narrativeBlocks);
         const formulaDiagnostics = sheet.cells
             .filter((cell) => !!cell.formulaText && cell.resolutionStatus !== null)
             .map((cell) => ({
             address: cell.address,
             formulaText: cell.formulaText,
             status: cell.resolutionStatus,
+            source: cell.resolutionSource,
             outputValue: cell.outputValue
         }));
         const sections = [];
@@ -8643,7 +9084,9 @@ if (!customElements.get("lht-page-menu")) {
             sections.push({
                 sortRow: block.startRow,
                 sortCol: block.startCol,
-                markdown: `${renderNarrativeBlock(block)}\n`
+                markdown: `${renderNarrativeBlock(block)}\n`,
+                kind: "narrative",
+                narrativeBlock: block
             });
         }
         let tableCounter = 1;
@@ -8655,7 +9098,8 @@ if (!customElements.get("lht-page-menu")) {
             sections.push({
                 sortRow: table.startRow,
                 sortCol: table.startCol,
-                markdown: `### 表${String(tableCounter).padStart(3, "0")} (${formatRange(table.startRow, table.startCol, table.endRow, table.endCol)})\n\n${tableMarkdown}\n`
+                markdown: `### 表${String(tableCounter).padStart(3, "0")} (${formatRange(table.startRow, table.startCol, table.endRow, table.endCol)})\n\n${tableMarkdown}\n`,
+                kind: "table"
             });
             tableCounter += 1;
         }
@@ -8664,7 +9108,36 @@ if (!customElements.get("lht-page-menu")) {
                 return left.sortRow - right.sortRow;
             return left.sortCol - right.sortCol;
         });
-        const body = sections.map((section) => section.markdown.trimEnd()).join("\n\n").trim();
+        const groupedSections = (sectionBlocks.length > 0 ? sectionBlocks : [{
+                startRow: -1,
+                startCol: -1,
+                endRow: Number.MAX_SAFE_INTEGER,
+                endCol: Number.MAX_SAFE_INTEGER
+            }]).map((block) => ({
+            block,
+            entries: sections.filter((section) => section.sortRow >= block.startRow
+                && section.sortRow <= block.endRow
+                && section.sortCol >= block.startCol
+                && section.sortCol <= block.endCol)
+        })).filter((group) => group.entries.length > 0);
+        const body = groupedSections
+            .map((group) => {
+            const entries = group.entries.map((entry) => {
+                var _a, _b;
+                if (entry.kind === "narrative" && isSectionHeadingNarrativeBlock(entry.narrativeBlock)) {
+                    const headingText = String(((_b = (_a = entry.narrativeBlock) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.text) || "").trim();
+                    return {
+                        ...entry,
+                        markdown: `### ${headingText}\n`
+                    };
+                }
+                return entry;
+            });
+            return entries.map((section) => section.markdown.trimEnd()).join("\n\n").trim();
+        })
+            .filter(Boolean)
+            .join("\n\n---\n\n")
+            .trim();
         const imageSection = sheet.images.length > 0
             ? [
                 "",
@@ -8696,6 +9169,7 @@ if (!customElements.get("lht-page-menu")) {
             markdown,
             summary: {
                 outputMode: options.outputMode || "display",
+                sections: sectionBlocks.length,
                 tables: tables.length,
                 narrativeBlocks: narrativeBlocks.length,
                 merges: sheet.merges.length,
@@ -8720,6 +9194,7 @@ if (!customElements.get("lht-page-menu")) {
         return [
             `出力ファイル: ${markdownFile.fileName}`,
             `出力モード: ${markdownFile.summary.outputMode}`,
+            `セクション: ${markdownFile.summary.sections}`,
             `表: ${markdownFile.summary.tables}`,
             `地の文ブロック: ${markdownFile.summary.narrativeBlocks}`,
             `結合セル範囲: ${markdownFile.summary.merges}`,
@@ -8917,6 +9392,40 @@ if (!customElements.get("lht-page-menu")) {
             return 2;
         return 3;
     }
+    function getFormulaSourceLabel(source) {
+        if (source === "cached_value")
+            return "cached";
+        if (source === "ast_evaluator")
+            return "ast";
+        if (source === "legacy_resolver")
+            return "legacy";
+        if (source === "formula_text")
+            return "formula";
+        if (source === "external_unsupported")
+            return "external";
+        return "unknown";
+    }
+    function renderFormulaSourceCounts(file) {
+        const counts = {
+            cached: 0,
+            ast: 0,
+            legacy: 0,
+            formula: 0,
+            external: 0,
+            unknown: 0
+        };
+        file.summary.formulaDiagnostics.forEach((diagnostic) => {
+            counts[getFormulaSourceLabel(diagnostic.source)] += 1;
+        });
+        return [
+            counts.cached > 0 ? `cached ${counts.cached}` : "",
+            counts.ast > 0 ? `ast ${counts.ast}` : "",
+            counts.legacy > 0 ? `legacy ${counts.legacy}` : "",
+            counts.formula > 0 ? `formula ${counts.formula}` : "",
+            counts.external > 0 ? `external ${counts.external}` : "",
+            counts.unknown > 0 ? `unknown ${counts.unknown}` : ""
+        ].filter(Boolean).join(" / ");
+    }
     function renderFormulaSummary(files) {
         const sheetsWithDiagnostics = files.filter((file) => file.summary.formulaDiagnostics.length > 0);
         if (sheetsWithDiagnostics.length === 0) {
@@ -8926,15 +9435,19 @@ if (!customElements.get("lht-page-menu")) {
         const totalResolved = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => getFormulaStatusLabel(diagnostic.status) === "resolved").length), 0);
         const totalFallback = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => getFormulaStatusLabel(diagnostic.status) === "fallback").length), 0);
         const totalUnsupported = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => getFormulaStatusLabel(diagnostic.status) === "unsupported").length), 0);
-        return `<div class="md-summary-overview">全体 ${totalDiagnostics}件 / resolved ${totalResolved} / fallback ${totalFallback} / unsupported ${totalUnsupported}</div>${sheetsWithDiagnostics.map((file) => {
+        const totalCached = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => diagnostic.source === "cached_value").length), 0);
+        const totalAst = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => diagnostic.source === "ast_evaluator").length), 0);
+        const totalLegacy = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => diagnostic.source === "legacy_resolver").length), 0);
+        const totalFormula = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => diagnostic.source === "formula_text").length), 0);
+        return `<div class="md-summary-overview">全体 ${totalDiagnostics}件 / cached ${totalCached} / ast ${totalAst} / legacy ${totalLegacy} / formula ${totalFormula} / resolved ${totalResolved} / fallback ${totalFallback} / unsupported ${totalUnsupported}</div>${sheetsWithDiagnostics.map((file) => {
             const items = [...file.summary.formulaDiagnostics].sort((left, right) => {
                 const priorityDiff = getFormulaStatusPriority(left.status) - getFormulaStatusPriority(right.status);
                 if (priorityDiff !== 0) {
                     return priorityDiff;
                 }
                 return left.address.localeCompare(right.address);
-            }).map((diagnostic) => (`<div class="md-summary-item"><div class="md-summary-item-head"><span class="md-summary-item-title">${escapeHtml(diagnostic.address)}</span><span class="md-summary-item-status md-summary-item-status--${escapeHtml(getFormulaStatusLabel(diagnostic.status))}">${escapeHtml(getFormulaStatusLabel(diagnostic.status))}</span></div><div class="md-summary-item-body">${escapeHtml(`${diagnostic.formulaText} => ${diagnostic.outputValue}`)}</div></div>`)).join("");
-            return `<section class="md-summary-group"><div class="md-summary-group-head"><h3 class="md-summary-group-title">${escapeHtml(file.sheetName)}</h3><span class="md-summary-group-count">${file.summary.formulaDiagnostics.length}件</span></div><div class="md-summary-group-meta">${escapeHtml(renderFormulaStatusCounts(file))}</div>${items}</section>`;
+            }).map((diagnostic) => (`<div class="md-summary-item"><div class="md-summary-item-head"><span class="md-summary-item-title">${escapeHtml(diagnostic.address)}</span><span class="md-summary-item-badges"><span class="md-summary-item-status md-summary-item-status--source-${escapeHtml(getFormulaSourceLabel(diagnostic.source))}">${escapeHtml(getFormulaSourceLabel(diagnostic.source))}</span><span class="md-summary-item-status md-summary-item-status--${escapeHtml(getFormulaStatusLabel(diagnostic.status))}">${escapeHtml(getFormulaStatusLabel(diagnostic.status))}</span></span></div><div class="md-summary-item-body">${escapeHtml(`${diagnostic.formulaText} => ${diagnostic.outputValue}`)}</div></div>`)).join("");
+            return `<section class="md-summary-group"><div class="md-summary-group-head"><h3 class="md-summary-group-title">${escapeHtml(file.sheetName)}</h3><span class="md-summary-group-count">${file.summary.formulaDiagnostics.length}件</span></div><div class="md-summary-group-meta">${escapeHtml(renderFormulaSourceCounts(file))}</div><div class="md-summary-group-meta">${escapeHtml(renderFormulaStatusCounts(file))}</div>${items}</section>`;
         }).join("")}`;
     }
     function renderAnalysisSummary(files, workbookName) {
