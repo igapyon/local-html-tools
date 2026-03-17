@@ -554,6 +554,41 @@ STEP 1 では、次は非目標とする。
 - `Task / Assignment` の `Cost / ActualCost / RemainingCost` の round-trip
 - round-trip テスト
 
+## Mermaid gantt 出力メモ
+
+現時点では、確認・共有向けの補助出力として `ProjectModel -> Mermaid gantt` の片方向出力を持つ。
+
+目的:
+
+- `MS Project XML` の全情報保持ではなく、task の時系列と大まかな依存関係を軽量に共有する
+- `mikuproject` 内部モデルの内容を、Mermaid 対応環境へ持ち出しやすくする
+
+現時点の出力方針:
+
+- summary task は `section` として扱う
+- summary ではない task のうち、`Start` と `Finish` を持つものを gantt のタスク行として出力する
+- `critical=true` は `crit` として出力する
+- `milestone=true` は `milestone` として出力する
+- `percentComplete >= 100` は `done` として出力する
+- task 名や title は Mermaid で壊れやすい一部記号を簡易正規化して出力する
+- predecessor は現時点では Mermaid 行へ直接埋め込まず、コメント行で補助出力する
+
+現時点で意図的に落とすもの:
+
+- `Resources`
+- `Assignments`
+- `Calendars`
+- `Baseline`
+- `TimephasedData`
+- コスト系の詳細
+- `PredecessorLink` の完全表現
+
+注意:
+
+- これはあくまで片方向の補助出力であり、`Mermaid gantt -> ProjectModel` の往復は対象外とする
+- 現時点の dependency 表現はコメント保持であり、Mermaid 側のネイティブ dependency 記法へ完全には落としていない
+- どの情報を落としているかは、将来の `CSV + ParentID` 等の交換形式検討と切り分けて扱う
+
 ## 次に決めること
 
 STEP 1 の次の検討項目:
