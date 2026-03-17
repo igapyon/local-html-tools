@@ -288,6 +288,10 @@
     getElement<HTMLElement>("markdownOutput").textContent = markdown;
   }
 
+  function createMarkdownChunkLabel(fileName: string): string {
+    return String(fileName || "").replace(/\.md$/i, "");
+  }
+
   function clearError(): void {
     const errorAlert = getElement<HTMLElement>("errorAlert") as HTMLElement & { clear?: () => void };
     if (typeof errorAlert.clear === "function") {
@@ -337,7 +341,9 @@
       updatePreviewModeBanner(getSelectedOutputMode());
       return;
     }
-    const combinedMarkdown = currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n");
+    const combinedMarkdown = currentFiles
+      .map((file) => `<!-- ${createMarkdownChunkLabel(file.fileName)} -->\n${file.markdown}`)
+      .join("\n\n");
     const outputMode = currentFiles[0]?.summary.outputMode || "display";
     updatePreviewModeBanner(outputMode);
     setSummaryHtml(renderAnalysisSummary(currentFiles, currentWorkbook?.name || "workbook.xlsx"));
@@ -354,7 +360,9 @@
     const suffix = outputMode === "display" ? "" : `_${outputMode}`;
     return {
       fileName: `${(currentWorkbook?.name || "workbook").replace(/\.xlsx$/i, "")}_all${suffix}.md`,
-      content: currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n")
+      content: currentFiles
+        .map((file) => `<!-- ${createMarkdownChunkLabel(file.fileName)} -->\n${file.markdown}`)
+        .join("\n\n")
     };
   }
 
@@ -396,6 +404,23 @@
     showToast("ZIP を保存しました");
   }
 
+  function convertCurrentWorkbook(showSuccessToast = true): void {
+    clearError();
+    if (!currentWorkbook) {
+      showError("先に xlsx ファイルを読み込んでください");
+      return;
+    }
+    try {
+      currentFiles = xlsx2md.convertWorkbookToMarkdownFiles(currentWorkbook, getOptions());
+      renderCurrentSelection();
+      if (showSuccessToast) {
+        showToast("Markdown を生成しました");
+      }
+    } catch (error) {
+      showError(error instanceof Error ? error.message : "Markdown 生成に失敗しました");
+    }
+  }
+
   async function loadWorkbookFromFile(file: File): Promise<void> {
     clearError();
     setLoading(true, "xlsx を読み込んでいます");
@@ -403,13 +428,8 @@
       const arrayBuffer = await file.arrayBuffer();
       currentWorkbook = await xlsx2md.parseWorkbook(arrayBuffer, file.name);
       currentFiles = [];
-      setSummaryText(`${file.name} を読み込みました。変換ボタンを押してください。`);
-      setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
-      setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
-      setPreviewMarkdown("");
-      getElement<HTMLButtonElement>("downloadBtn").disabled = true;
-      getElement<HTMLButtonElement>("exportZipBtn").disabled = true;
-      showToast("xlsx を読み込みました");
+      convertCurrentWorkbook(false);
+      showToast("xlsx を読み込み、Markdown を生成しました");
     } catch (error) {
       currentWorkbook = null;
       currentFiles = [];
@@ -436,18 +456,7 @@
 
   function bindActions(): void {
     getElement<HTMLButtonElement>("convertBtn").addEventListener("click", () => {
-      clearError();
-      if (!currentWorkbook) {
-        showError("先に xlsx ファイルを読み込んでください");
-        return;
-      }
-      try {
-        currentFiles = xlsx2md.convertWorkbookToMarkdownFiles(currentWorkbook, getOptions());
-        renderCurrentSelection();
-        showToast("Markdown を生成しました");
-      } catch (error) {
-        showError(error instanceof Error ? error.message : "Markdown 生成に失敗しました");
-      }
+      convertCurrentWorkbook(true);
     });
     getElement<HTMLButtonElement>("downloadBtn").addEventListener("click", () => {
       downloadCurrentMarkdown();

@@ -396,51 +396,142 @@
         return (_d = source[columnNumber - 1]) !== null && _d !== void 0 ? _d : null;
     }
     function evaluateVLookup(args, context) {
-        var _a;
+        var _a, _b, _c;
         const lookupValue = evaluateFormulaAst(args[0], context);
         const table = normalizeToMatrix(evaluateFormulaAst(args[1], context));
         const columnNumber = Math.max(1, Math.floor(toNumber(evaluateFormulaAst(args[2], context))));
-        const approximate = args[3] ? toBoolean(evaluateFormulaAst(args[3], context)) : false;
+        const approximate = args[3] ? toBoolean(evaluateFormulaAst(args[3], context)) : true;
         if (approximate) {
-            throw new Error("Approximate VLOOKUP is not supported");
+            let matchedRow = null;
+            for (const row of table) {
+                if (looselyEquals(row[0], lookupValue)) {
+                    return (_a = row[columnNumber - 1]) !== null && _a !== void 0 ? _a : "#N/A";
+                }
+                if (compareValues(row[0], lookupValue) <= 0) {
+                    matchedRow = row;
+                }
+            }
+            return matchedRow ? (_b = matchedRow[columnNumber - 1]) !== null && _b !== void 0 ? _b : "#N/A" : "#N/A";
         }
         for (const row of table) {
             if (looselyEquals(row[0], lookupValue)) {
-                return (_a = row[columnNumber - 1]) !== null && _a !== void 0 ? _a : "#N/A";
+                return (_c = row[columnNumber - 1]) !== null && _c !== void 0 ? _c : "#N/A";
             }
         }
         return "#N/A";
     }
     function evaluateHLookup(args, context) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d, _e;
         const lookupValue = evaluateFormulaAst(args[0], context);
         const table = normalizeToMatrix(evaluateFormulaAst(args[1], context));
         const rowNumber = Math.max(1, Math.floor(toNumber(evaluateFormulaAst(args[2], context))));
-        const approximate = args[3] ? toBoolean(evaluateFormulaAst(args[3], context)) : false;
-        if (approximate) {
-            throw new Error("Approximate HLOOKUP is not supported");
-        }
+        const approximate = args[3] ? toBoolean(evaluateFormulaAst(args[3], context)) : true;
         const headerRow = (_a = table[0]) !== null && _a !== void 0 ? _a : [];
         const targetRow = (_b = table[rowNumber - 1]) !== null && _b !== void 0 ? _b : [];
+        if (approximate) {
+            let matchedIndex = -1;
+            for (let index = 0; index < headerRow.length; index += 1) {
+                if (looselyEquals(headerRow[index], lookupValue)) {
+                    return (_c = targetRow[index]) !== null && _c !== void 0 ? _c : "#N/A";
+                }
+                if (compareValues(headerRow[index], lookupValue) <= 0) {
+                    matchedIndex = index;
+                }
+            }
+            return matchedIndex >= 0 ? (_d = targetRow[matchedIndex]) !== null && _d !== void 0 ? _d : "#N/A" : "#N/A";
+        }
         for (let index = 0; index < headerRow.length; index += 1) {
             if (looselyEquals(headerRow[index], lookupValue)) {
-                return (_c = targetRow[index]) !== null && _c !== void 0 ? _c : "#N/A";
+                return (_e = targetRow[index]) !== null && _e !== void 0 ? _e : "#N/A";
             }
         }
         return "#N/A";
     }
     function evaluateXLookup(args, context) {
-        var _a;
+        var _a, _b, _c, _d, _e;
         const lookupValue = evaluateFormulaAst(args[0], context);
         const lookupArray = flattenValues(evaluateFormulaAst(args[1], context));
         const returnArray = flattenValues(evaluateFormulaAst(args[2], context));
         const notFoundValue = args[3] ? evaluateFormulaAst(args[3], context) : "#N/A";
-        for (let index = 0; index < lookupArray.length; index += 1) {
+        const matchMode = args[4] ? Math.trunc(toNumber(evaluateFormulaAst(args[4], context))) : 0;
+        const searchMode = args[5] ? Math.trunc(toNumber(evaluateFormulaAst(args[5], context))) : 1;
+        if (searchMode === 2 || searchMode === -2) {
+            const matchedIndex = findXLookupBinaryIndex(lookupArray, lookupValue, matchMode, searchMode);
+            return matchedIndex >= 0 ? (_a = returnArray[matchedIndex]) !== null && _a !== void 0 ? _a : notFoundValue : notFoundValue;
+        }
+        const indices = searchMode === -1
+            ? Array.from({ length: lookupArray.length }, (_, index) => lookupArray.length - 1 - index)
+            : Array.from({ length: lookupArray.length }, (_, index) => index);
+        for (const index of indices) {
             if (looselyEquals(lookupArray[index], lookupValue)) {
-                return (_a = returnArray[index]) !== null && _a !== void 0 ? _a : notFoundValue;
+                return (_b = returnArray[index]) !== null && _b !== void 0 ? _b : notFoundValue;
             }
         }
+        if (matchMode === 2) {
+            const matcher = createExcelWildcardMatcher(lookupValue);
+            if (!matcher) {
+                return notFoundValue;
+            }
+            for (const index of indices) {
+                if (matcher(toText(lookupArray[index]))) {
+                    return (_c = returnArray[index]) !== null && _c !== void 0 ? _c : notFoundValue;
+                }
+            }
+            return notFoundValue;
+        }
+        if (matchMode === -1) {
+            let matchedIndex = -1;
+            for (const index of indices) {
+                if (compareValues(lookupArray[index], lookupValue) <= 0) {
+                    matchedIndex = index;
+                    if (searchMode === -1) {
+                        break;
+                    }
+                }
+            }
+            return matchedIndex >= 0 ? (_d = returnArray[matchedIndex]) !== null && _d !== void 0 ? _d : notFoundValue : notFoundValue;
+        }
+        if (matchMode === 1) {
+            let matchedIndex = -1;
+            for (const index of indices) {
+                if (compareValues(lookupArray[index], lookupValue) >= 0) {
+                    matchedIndex = index;
+                    break;
+                }
+            }
+            return matchedIndex >= 0 ? (_e = returnArray[matchedIndex]) !== null && _e !== void 0 ? _e : notFoundValue : notFoundValue;
+        }
         return notFoundValue;
+    }
+    function findXLookupBinaryIndex(lookupArray, lookupValue, matchMode, searchMode) {
+        const descending = searchMode === -2;
+        let low = 0;
+        let high = lookupArray.length - 1;
+        let fallbackIndex = -1;
+        while (low <= high) {
+            const mid = Math.floor((low + high) / 2);
+            const compare = compareValues(lookupArray[mid], lookupValue);
+            if (looselyEquals(lookupArray[mid], lookupValue)) {
+                return mid;
+            }
+            if (matchMode === -1) {
+                if (compare <= 0 && (fallbackIndex < 0 || compareValues(lookupArray[mid], lookupArray[fallbackIndex]) > 0)) {
+                    fallbackIndex = mid;
+                }
+            }
+            else if (matchMode === 1) {
+                if (compare >= 0 && (fallbackIndex < 0 || compareValues(lookupArray[mid], lookupArray[fallbackIndex]) < 0)) {
+                    fallbackIndex = mid;
+                }
+            }
+            if ((!descending && compare < 0) || (descending && compare > 0)) {
+                low = mid + 1;
+            }
+            else {
+                high = mid - 1;
+            }
+        }
+        return fallbackIndex;
     }
     function evaluateText(args, context) {
         const value = evaluateFormulaAst(args[0], context);
@@ -467,6 +558,36 @@
             return `${parts.year}${separator}${parts.month}${separator}${parts.day}`;
         }
         return toText(value);
+    }
+    function createExcelWildcardMatcher(patternValue) {
+        const pattern = toText(patternValue);
+        if (!pattern) {
+            return null;
+        }
+        let regexText = "^";
+        for (let index = 0; index < pattern.length; index += 1) {
+            const char = pattern[index];
+            if (char === "~" && index + 1 < pattern.length) {
+                regexText += escapeRegExp(pattern[index + 1]);
+                index += 1;
+                continue;
+            }
+            if (char === "*") {
+                regexText += ".*";
+                continue;
+            }
+            if (char === "?") {
+                regexText += ".";
+                continue;
+            }
+            regexText += escapeRegExp(char);
+        }
+        regexText += "$";
+        const regex = new RegExp(regexText, "i");
+        return (value) => regex.test(String(value !== null && value !== void 0 ? value : ""));
+    }
+    function escapeRegExp(value) {
+        return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
     function evaluateToday(context) {
         var _a;

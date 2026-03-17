@@ -40,6 +40,40 @@
 
 この方針により、`xlsx2md` は Excel 数式の完全互換ではなく、Markdown 変換に必要な範囲での実務的な補完を目指す。
 
+### 数式解決の優先順
+
+`xlsx2md` における数式解決は、現在は次の優先順を前提とする。
+
+1. `cached value`
+2. `AST evaluator`
+3. 従来の文字列ベース resolver
+4. `fallback_formula` または式文字列保持
+
+補足:
+
+- `cached value` が存在する場合は、それを最優先で採用する
+- `cached value` が欠損している場合のみ、`AST evaluator` を先に試す
+- `AST evaluator` で未対応、または評価不能な場合は、従来の文字列ベース resolver へフォールバックする
+- それでも解けない場合に限り、`fallback_formula` として保持する
+
+この順序により、既存の実装資産を活かしながら、対応済みサブセットを段階的に AST 側へ寄せる。
+
+### 既存 resolver の位置づけ
+
+既存の文字列ベース resolver は、当面は削除対象ではない。
+
+- 現時点では、`AST evaluator` が未対応の式を救うための互換 fallback として必要である
+- `local-data` の実戦ブックで、想定外の式や Excel 特有の揺れに対する安全装置として機能する
+- したがって、短期的には「安全のために残す」方針を採る
+
+一方で、中長期的な方向性は次の通りである。
+
+- 主要ケースは `AST evaluator` 側へ段階的に寄せる
+- `existing resolver` の担当範囲は観測しながら縮小する
+- 実データ上で依存が薄くなった段階で、互換 fallback として最小限へ絞る
+
+要するに、`existing resolver` は今は必要だが、将来的には主役ではなく後方互換の安全装置へ寄せていく。
+
 ## 対応対象
 
 ### 1. 基本トークン
@@ -258,7 +292,8 @@ Primary
 ### 現行方針
 
 - `cached value` を最優先
-- 解ける式だけを自前解決
+- `cached value` 欠損時は `AST evaluator` を先に試す
+- `AST evaluator` が未対応または失敗時のみ、従来の文字列ベース resolver を使う
 - 解けない式は `fallback_formula`
 
 ### 次段方針
@@ -388,7 +423,11 @@ Primary
 
 - `ROW / COLUMN` の引数なし形は、現在セル参照が分かる文脈でのみ AST evaluator が対応する
 - 文脈なしでの `ROW() / COLUMN()` をどう扱うか
-- `VLOOKUP / HLOOKUP` の近似一致をどう扱うか
+- `VLOOKUP / HLOOKUP` の近似一致は AST evaluator で最小対応済み
+- `XLOOKUP` の `match_mode / search_mode` は最小対応済み
+- `XLOOKUP` の wildcard `match_mode=2` は最小対応済み
+- `XLOOKUP` の binary search `search_mode=2/-2` は最小対応済み
+- 近似一致の境界条件や未ソート範囲をどこまで扱うか
 - 既存の文字列ベース resolver と AST evaluator の優先順をどこまで入れ替えるか
 - `space` intersection を扱うか
 - 配列定数をどの段階で扱うか

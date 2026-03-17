@@ -96,18 +96,22 @@ limitations under the License.
         <lht-error-alert id="errorAlert"></lht-error-alert>
       </section>
 
-      <section class="md-section md-grid md-grid--result">
-        <div class="md-panel md-stack-sm">
-          <h2 class="md-section-title">解析サマリー</h2>
-          <div id="analysisSummary" class="md-summary-list">まだ変換していません。</div>
-        </div>
-
+      <section class="md-section md-stack-md">
         <div class="md-panel md-stack-sm">
           <h2 class="md-section-title">Markdown</h2>
           <div id="previewModeBanner" class="md-caption" hidden>`raw` / `both` モードでは、表示値以外の情報を含む場合があります。</div>
           <lht-preview-output id="markdownPreview" preview-id="markdownOutput" preview-tag="pre" placeholder="ここに Markdown が表示されます"></lht-preview-output>
         </div>
       </section>
+
+      <details class="md-section md-accordion">
+        <summary class="md-accordion-summary">
+          <span class="md-section-title">解析サマリー</span>
+        </summary>
+        <div class="md-accordion-body">
+          <div id="analysisSummary" class="md-summary-list">まだ変換していません。</div>
+        </div>
+      </details>
 
       <details class="md-section md-accordion">
         <summary class="md-accordion-summary">
