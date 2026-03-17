@@ -104,6 +104,8 @@ docs/
 ├── text/                # テキスト系ツール
 ├── life/                # 生活系ツール
 ├── link/                # URL加工系ツール
+├── project/             # MS Project XML 入出力実験ツール
+├── xlsx2md/             # Excel から Markdown への変換ツール（構想中）
 └── password/            # パスワード生成ツール
 ```
 
@@ -206,6 +208,40 @@ docs/
   - `docs/text/*.html` は直接編集しない
   - 変更は `*-src.html` を編集する
   - PRには生成済み `docs/text/*.html` を含める
+
+### xlsx2md 運用（src編集 + 生成）
+
+- 対象: `docs/xlsx2md/xlsx2md.html`
+- 配布: `docs/xlsx2md/xlsx2md.html`（単一HTML、生成物）
+- 開発:
+  - `docs/xlsx2md/xlsx2md-src.html`
+  - `docs/xlsx2md/src/xlsx2md/css/app.css`
+  - `docs/xlsx2md/src/xlsx2md/ts/*.ts`
+  - `docs/xlsx2md/tests/xlsx2md-main.test.js`
+- ビルド: `npm run build:xlsx2md`（`scripts/build-xlsx2md.mjs`）
+- ルール:
+  - `docs/xlsx2md/xlsx2md.html` は直接編集しない
+  - 変更は `xlsx2md-src.html` と `src/xlsx2md/` 配下を編集する
+  - `scripts/build-xlsx2md.mjs` は `ts -> js` を行ってから single-file の `xlsx2md.html` を生成する
+  - PRには生成済み `docs/xlsx2md/xlsx2md.html` を含める
+
+### project 運用（src編集 + 生成）
+
+- 対象: `docs/project/mikuproject.html`
+- 配布: `docs/project/mikuproject.html`（単一HTML、生成物）
+- 開発:
+  - `docs/project/mikuproject-src.html`
+  - `docs/project/src/mikuproject/css/app.css`
+  - `docs/project/src/mikuproject/ts/*.ts`
+  - `docs/project/tests/mikuproject-main.test.js`
+  - `docs/project/mikuproject-spec.md`
+  - `docs/project/mikuproject-gap-notes.md`
+- ビルド: `npm run build:project`（`scripts/build-project.mjs`）
+- ルール:
+  - `docs/project/mikuproject.html` は直接編集しない
+  - 変更は `mikuproject-src.html` と `src/mikuproject/` 配下を編集する
+  - `scripts/build-project.mjs` は `ts -> js` を行ってから single-file の `mikuproject.html` を生成する
+  - PRには生成済み `docs/project/mikuproject.html` を含める
 
 ### img 運用（src編集 + 生成）
 
@@ -328,6 +364,13 @@ URL加工系ツールです。
 - **text-viewer.html**: テキストをペーストして、読みやすく表示します。マークダウン形式にも対応しています。
 - **text-processing.html**: 改行付きテキストを半角空白区切りに変換します。
 
+## xlsx2md
+
+Excel から Markdown への変換ツール用の独立カテゴリです。
+
+- **xlsx2md.html**: Excel 設計書 (`.xlsx`) をローカルで解析し、地の文・表・結合セル情報を保ちながら Markdown へ変換します。
+- 配置は `docs/xlsx2md/` とし、`text` カテゴリから独立して運用します。
+
 ## life
 
 生活系ツールです。
@@ -348,7 +391,7 @@ Git補助ツールです。
 
 ## GitHub Pages
 
-GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/diagram/`、`docs/music/`、`docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/` 配下にあります。  
+GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/diagram/`、`docs/music/`、`docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/`、`docs/xlsx2md/` 配下にあります。  
 公開URL: https://igapyon.github.io/local-html-tools/
 
 ## Third-Party Notices

@@ -47,6 +47,87 @@
         }
         return `Type=${(_a = timephasedData.type) !== null && _a !== void 0 ? _a : "-"} ${timephasedData.start || "-"} -> ${timephasedData.finish || "-"} / Unit=${(_b = timephasedData.unit) !== null && _b !== void 0 ? _b : "-"} / Value=${timephasedData.value || "-"}`;
     }
+    function formatFirstExtendedAttributeSummary(item) {
+        const attribute = item.extendedAttributes[0];
+        if (!attribute) {
+            return "-";
+        }
+        return `FieldID=${attribute.fieldID || "-"} / Value=${attribute.value || "-"}`;
+    }
+    function formatFirstProjectExtendedAttributeSummary(project) {
+        const attribute = project.extendedAttributes[0];
+        if (!attribute) {
+            return "-";
+        }
+        return `FieldID=${attribute.fieldID || "-"} / FieldName=${attribute.fieldName || "-"} / Alias=${attribute.alias || "-"}`;
+    }
+    function formatFirstOutlineCodeSummary(project) {
+        const outlineCode = project.outlineCodes[0];
+        if (!outlineCode) {
+            return "-";
+        }
+        return `FieldID=${outlineCode.fieldID || "-"} / FieldName=${outlineCode.fieldName || "-"} / Alias=${outlineCode.alias || "-"}`;
+    }
+    function formatFirstWbsMaskSummary(project) {
+        var _a, _b;
+        const wbsMask = project.wbsMasks[0];
+        if (!wbsMask) {
+            return "-";
+        }
+        return `Level=${wbsMask.level} / Mask=${wbsMask.mask || "-"} / Length=${(_a = wbsMask.length) !== null && _a !== void 0 ? _a : "-"} / Sequence=${(_b = wbsMask.sequence) !== null && _b !== void 0 ? _b : "-"}`;
+    }
+    function formatCalendarWeekDaySummary(calendar) {
+        const weekDay = calendar.weekDays[0];
+        if (!weekDay) {
+            return "-";
+        }
+        const workingTimes = weekDay.workingTimes.length > 0
+            ? weekDay.workingTimes.map((item) => `${item.fromTime}-${item.toTime}`).join(", ")
+            : "-";
+        return `DayType=${weekDay.dayType} / Working=${weekDay.dayWorking ? 1 : 0} / Times=${workingTimes}`;
+    }
+    function formatCalendarExceptionSummary(calendar) {
+        const exception = calendar.exceptions[0];
+        if (!exception) {
+            return "-";
+        }
+        return `${exception.name || "(no name)"} ${exception.fromDate || "-"} -> ${exception.toDate || "-"} / Working=${exception.dayWorking ? 1 : 0}`;
+    }
+    function formatCalendarWorkWeekSummary(calendar) {
+        const workWeek = calendar.workWeeks[0];
+        if (!workWeek) {
+            return "-";
+        }
+        return `${workWeek.name || "(no name)"} ${workWeek.fromDate || "-"} -> ${workWeek.toDate || "-"} / WeekDays=${workWeek.weekDays.length}`;
+    }
+    function formatCalendarReferenceSummary(model, calendar) {
+        const projectRefs = model.project.calendarUID === calendar.uid ? 1 : 0;
+        const taskRefs = model.tasks.filter((task) => task.calendarUID === calendar.uid).length;
+        const resourceRefs = model.resources.filter((resource) => resource.calendarUID === calendar.uid).length;
+        const baseRefs = model.calendars.filter((item) => item.baseCalendarUID === calendar.uid).length;
+        return `Project=${projectRefs} / Tasks=${taskRefs} / Resources=${resourceRefs} / BaseOf=${baseRefs}`;
+    }
+    function formatCalendarLink(model, calendarUID) {
+        if (!calendarUID) {
+            return "-";
+        }
+        const calendar = model.calendars.find((item) => item.uid === calendarUID);
+        return calendar ? `${calendarUID} (${calendar.name || "(no name)"})` : `${calendarUID} (missing)`;
+    }
+    function formatTaskLink(model, taskUID) {
+        if (!taskUID) {
+            return "-";
+        }
+        const task = model.tasks.find((item) => item.uid === taskUID);
+        return task ? `${taskUID} (${task.name || "(no name)"})` : `${taskUID} (missing)`;
+    }
+    function formatResourceLink(model, resourceUID) {
+        if (!resourceUID) {
+            return "-";
+        }
+        const resource = model.resources.find((item) => item.uid === resourceUID);
+        return resource ? `${resourceUID} (${resource.name || "(no name)"})` : `${resourceUID} (missing)`;
+    }
     function renderValidationIssues(issues) {
         const container = getElement("validationIssues");
         if (issues.length === 0) {
@@ -90,14 +171,29 @@
         getElement("summaryAssignmentCount").textContent = String((model === null || model === void 0 ? void 0 : model.assignments.length) || 0);
         getElement("summaryCalendarCount").textContent = String((model === null || model === void 0 ? void 0 : model.calendars.length) || 0);
         getTextArea("modelOutput").value = model ? JSON.stringify(model, null, 2) : "";
+        renderPreviewList("projectPreview", model ? [`
+      <div class="md-preview-item">
+        <div class="md-preview-item__title">${model.project.name || "(no name)"}</div>
+        <div class="md-preview-item__meta">Title=${model.project.title || "-"}
+Author=${model.project.author || "-"} / Company=${model.project.company || "-"}
+Start=${model.project.startDate || "-"} / Finish=${model.project.finishDate || "-"}
+Calendar=${formatCalendarLink(model, model.project.calendarUID)}
+OutlineCodes=${model.project.outlineCodes.length} / WBSMasks=${model.project.wbsMasks.length} / Ext=${model.project.extendedAttributes.length}
+OutlineCode1=${formatFirstOutlineCodeSummary(model.project)}
+WBSMask1=${formatFirstWbsMaskSummary(model.project)}
+Ext1=${formatFirstProjectExtendedAttributeSummary(model.project)}</div>
+      </div>
+    `] : []);
         renderPreviewList("taskPreview", model ? model.tasks.map((task) => `
       <div class="md-preview-item">
         <div class="md-preview-item__title">${task.name || "(no name)"}</div>
         <div class="md-preview-item__meta">UID=${task.uid} / ID=${task.id} / Outline=${task.outlineNumber || task.outlineLevel}
+Calendar=${formatCalendarLink(model, task.calendarUID)}
 Start=${task.start || "-"}
 Finish=${task.finish || "-"}
 Predecessors=${task.predecessors.map((item) => item.predecessorUid).join(", ") || "-"}
 Ext=${task.extendedAttributes.length} / Baselines=${task.baselines.length} / Timephased=${task.timephasedData.length}
+Ext1=${formatFirstExtendedAttributeSummary(task)}
 Baseline1=${formatFirstBaselineSummary(task)}
 Timephased1=${formatFirstTimephasedSummary(task)}</div>
       </div>
@@ -108,7 +204,9 @@ Timephased1=${formatFirstTimephasedSummary(task)}</div>
         <div class="md-preview-item__meta">UID=${resource.uid} / ID=${resource.id}
 Initials=${resource.initials || "-"}
 Group=${resource.group || "-"}
+Calendar=${formatCalendarLink(model, resource.calendarUID)}
 Ext=${resource.extendedAttributes.length} / Baselines=${resource.baselines.length} / Timephased=${resource.timephasedData.length}
+Ext1=${formatFirstExtendedAttributeSummary(resource)}
 Baseline1=${formatFirstBaselineSummary(resource)}
 Timephased1=${formatFirstTimephasedSummary(resource)}</div>
       </div>
@@ -116,13 +214,26 @@ Timephased1=${formatFirstTimephasedSummary(resource)}</div>
         renderPreviewList("assignmentPreview", model ? model.assignments.map((assignment) => `
       <div class="md-preview-item">
         <div class="md-preview-item__title">Assignment ${assignment.uid || "-"}</div>
-        <div class="md-preview-item__meta">TaskUID=${assignment.taskUid}
-ResourceUID=${assignment.resourceUid}
+        <div class="md-preview-item__meta">Task=${formatTaskLink(model, assignment.taskUid)}
+Resource=${formatResourceLink(model, assignment.resourceUid)}
 Start=${assignment.start || "-"}
 Finish=${assignment.finish || "-"}
 Ext=${assignment.extendedAttributes.length} / Baselines=${assignment.baselines.length} / Timephased=${assignment.timephasedData.length}
+Ext1=${formatFirstExtendedAttributeSummary(assignment)}
 Baseline1=${formatFirstBaselineSummary(assignment)}
 Timephased1=${formatFirstTimephasedSummary(assignment)}</div>
+      </div>
+    `) : []);
+        renderPreviewList("calendarPreview", model ? model.calendars.map((calendar) => `
+      <div class="md-preview-item">
+        <div class="md-preview-item__title">${calendar.name || "(no name)"}</div>
+        <div class="md-preview-item__meta">UID=${calendar.uid}
+Base=${calendar.isBaseCalendar ? 1 : 0} / Baseline=${calendar.isBaselineCalendar ? 1 : 0} / BaseCalendarUID=${calendar.baseCalendarUID || "-"}
+WeekDays=${calendar.weekDays.length} / Exceptions=${calendar.exceptions.length} / WorkWeeks=${calendar.workWeeks.length}
+Refs=${formatCalendarReferenceSummary(model, calendar)}
+WeekDay1=${formatCalendarWeekDaySummary(calendar)}
+Exception1=${formatCalendarExceptionSummary(calendar)}
+WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
       </div>
     `) : []);
     }
@@ -161,6 +272,15 @@ Timephased1=${formatFirstTimephasedSummary(assignment)}</div>
         renderValidationIssues([]);
         setStatus("内部モデルから XML を再生成しました");
         showToast("XML を再生成しました");
+    }
+    function exportCurrentMermaid() {
+        if (!currentModel) {
+            setStatus("内部モデルがありません");
+            return;
+        }
+        getTextArea("mermaidOutput").value = mikuprojectXml.exportMermaidGantt(currentModel);
+        setStatus("内部モデルから Mermaid gantt を生成しました");
+        showToast("Mermaid を生成しました");
     }
     function downloadCurrentXml() {
         const xmlText = getTextArea("xmlInput").value.trim();
@@ -229,6 +349,14 @@ Timephased1=${formatFirstTimephasedSummary(assignment)}</div>
             }
             catch (error) {
                 setStatus(error instanceof Error ? error.message : "XML 再生成に失敗しました");
+            }
+        });
+        getElement("exportMermaidBtn").addEventListener("click", () => {
+            try {
+                exportCurrentMermaid();
+            }
+            catch (error) {
+                setStatus(error instanceof Error ? error.message : "Mermaid 生成に失敗しました");
             }
         });
         getElement("downloadXmlBtn").addEventListener("click", () => {

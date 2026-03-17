@@ -144,7 +144,12 @@
 
 優先度が高そう:
 
-- `Project CalendarUID` と calendar 実体の整合運用
+- 直近の高優先候補は消化済み
+
+メモ:
+
+- `Project CalendarUID` と calendar 実体の整合 validation は追加済み
+- preview で `OutlineCodes / WBSMasks / ExtendedAttributes` の代表値を追えるようにした
 
 後回し候補:
 
@@ -155,7 +160,13 @@
 
 優先度が高そう:
 
-- `Task CalendarUID` に紐づくカレンダー差分の扱い
+- `Task CalendarUID` に紐づくカレンダー差分の可視化は前進済み
+
+メモ:
+
+- `Task CalendarUID` の存在 validation は追加済み
+- preview で task ごとの calendar 名を表示するようにした
+- predecessor の validation は task 名つきで追えるようにした
 
 実例で頻出だが重い:
 
@@ -176,6 +187,11 @@
 
 - 直近の高優先候補は消化済み
 
+メモ:
+
+- preview で resource ごとの calendar 名を表示するようにした
+- validation 文言は resource 名つきで追いやすくした
+
 実例で頻出だが重い:
 
 - `Baseline`
@@ -186,6 +202,11 @@
 優先度が高そう:
 
 - 直近の高優先候補は消化済み
+
+メモ:
+
+- preview で assignment から task/resource 名を追えるようにした
+- validation 文言は assignment UID と既知の task/resource 名を併記するようにした
 
 実例で頻出だが重い:
 
@@ -208,6 +229,12 @@
 
 - 直近の高優先候補は消化済み
 
+メモ:
+
+- calendarPreview を追加済み
+- `Project / Task / Resource / BaseCalendar` からの参照数を preview で見えるようにした
+- `BaseCalendarUID` の自己参照 warning を追加済み
+
 後回し候補:
 
 - 直近の軽量候補は消化済み
@@ -216,14 +243,14 @@
 
 現時点での優先順:
 
-1. `Calendar` の実用項目
-   - 実例 XML の calendar 差分パターン整理
-2. `Resource / Assignment` の次段候補
-   - preview / validation の detail 表示強化
-3. `Task` の次段候補
-   - preview / validation の detail 表示強化
-4. `Project` の次段候補
-   - project 以外の `ExtendedAttributes`
+1. 実例 XML ベースの `Calendar` 差分整理
+   - task/resource ごとの calendar 差分が実例でどう使われるかを棚卸しする
+2. `ExtendedAttributes` の次段整理
+   - project 以外の `ExtendedAttributes` をどこまで保持・表示するかを決める
+3. preview / validation の最終整形
+   - 現状でかなり揃ったので、残る文言や導線を必要最小限で整える
+4. 重い構造の着手判断
+   - `Baseline` / `TimephasedData` を STEP 2 に含めるか別段に切るかを決める
 
 ## 後回しでよいもの
 
@@ -239,3 +266,4 @@
 - STEP 2 は、まず「実例で頻出し、意味が分かりやすく、XML 往復しやすい項目」から拾うのがよい
 - `Baseline` や `TimephasedData` は重要だが、構造が重いため別段階が自然
 - 実例 XML を読む限り、parser 自体よりも「どこまでを内部モデルで保持するか」の整理が次の主題
+- preview / validation の detail 表示強化は一段進んだので、次は実例 XML を見ながら保持方針を詰める段階
