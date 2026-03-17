@@ -6,13 +6,27 @@
     const IDENTIFIER_START_RE = /[\p{L}_\\$]/u;
     const IDENTIFIER_PART_RE = /[\p{L}\p{N}_.\\$?]/u;
     function tokenizeFormula(input) {
+        var _a, _b;
         const source = normalizeFormulaInput(input);
         const tokens = [];
         let index = 0;
         while (index < source.length) {
             const char = source[index];
             if (/\s/.test(char)) {
-                index += 1;
+                const whitespaceStart = index;
+                while (index < source.length && /\s/.test(source[index])) {
+                    index += 1;
+                }
+                const previousToken = (_a = tokens[tokens.length - 1]) !== null && _a !== void 0 ? _a : null;
+                const nextChar = (_b = source[index]) !== null && _b !== void 0 ? _b : "";
+                if (shouldEmitIntersectionOperator(previousToken, nextChar)) {
+                    tokens.push({
+                        type: "operator",
+                        value: " ",
+                        start: whitespaceStart,
+                        end: index
+                    });
+                }
                 continue;
             }
             const start = index;
@@ -39,14 +53,24 @@
                 continue;
             }
             if (char === "#") {
-                const parsed = readErrorLiteral(source, index);
+                if (shouldReadErrorLiteral(source, index)) {
+                    const parsed = readErrorLiteral(source, index);
+                    tokens.push({
+                        type: "error",
+                        value: parsed.value,
+                        start,
+                        end: parsed.end
+                    });
+                    index = parsed.end;
+                    continue;
+                }
                 tokens.push({
-                    type: "error",
-                    value: parsed.value,
+                    type: "operator",
+                    value: "#",
                     start,
-                    end: parsed.end
+                    end: start + 1
                 });
-                index = parsed.end;
+                index += 1;
                 continue;
             }
             if (/[0-9.]/.test(char)) {
@@ -62,7 +86,7 @@
                     continue;
                 }
             }
-            if ("(),:![]".includes(char)) {
+            if ("(),;:{}![]".includes(char)) {
                 tokens.push({
                     type: punctuationTypeFor(char),
                     value: char,
@@ -166,8 +190,14 @@
                 return "lparen";
             case ")":
                 return "rparen";
+            case "{":
+                return "lbrace";
+            case "}":
+                return "rbrace";
             case ",":
                 return "comma";
+            case ";":
+                return "semicolon";
             case ":":
                 return "colon";
             case "!":
@@ -186,7 +216,27 @@
             return twoChar;
         }
         const oneChar = source[start];
-        return "+-*/&=<>%".includes(oneChar) ? oneChar : null;
+        return "+-*/&=<>%#".includes(oneChar) ? oneChar : null;
+    }
+    function shouldReadErrorLiteral(source, start) {
+        return /^#(?:N\/A|REF!|VALUE!|NULL!|NUM!|NAME\?|DIV\/0!|CALC!|SPILL!|GETTING_DATA)/i.test(source.slice(start));
+    }
+    function shouldEmitIntersectionOperator(previousToken, nextChar) {
+        if (!previousToken) {
+            return false;
+        }
+        const leftTokenTypes = new Set([
+            "cell",
+            "identifier",
+            "quoted_identifier",
+            "rparen",
+            "rbracket",
+            "rbrace"
+        ]);
+        if (!leftTokenTypes.has(previousToken.type)) {
+            return false;
+        }
+        return nextChar === "'" || nextChar === "(" || isIdentifierStart(nextChar);
     }
     function isIdentifierStart(char) {
         return IDENTIFIER_START_RE.test(char);

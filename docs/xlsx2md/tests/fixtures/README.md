@@ -112,6 +112,26 @@
 - 補足:
   - コピー貼り付けではなく、Excel のオートフィルで増やす
 
+### `formula/formula-spill-sample01.xlsx`
+
+- 目的: dynamic array / spill
+- 構成: 1シート
+- セル配置案:
+  - `A1`: `spill サンプル`
+  - `A3`: `src1`
+  - `A4`: `1`
+  - `A5`: `2`
+  - `A6`: `3`
+  - `C3`: `spill_ref`
+  - `C4`: `=A4:A6`
+  - 可能なら、Excel が dynamic array として保存する形で `C4#` を参照する式も追加
+  - `E3`: `spill_sum`
+  - `E4`: `=SUM(C4#)`
+- 補足:
+  - Excel で実際に spill させて保存する
+  - もし `=A4:A6` だけで spill しない場合は、Microsoft 365 / Excel for web で dynamic array が有効な状態で作成する
+  - 可能なら worksheet XML の `f@ref` が残ることを確認したい
+
 ### `named-range/named-range-sample01.xlsx`
 
 - 目的: `definedNames`

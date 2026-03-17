@@ -142,6 +142,40 @@
             return 2;
         return 3;
     }
+    function getFormulaSourceLabel(source) {
+        if (source === "cached_value")
+            return "cached";
+        if (source === "ast_evaluator")
+            return "ast";
+        if (source === "legacy_resolver")
+            return "legacy";
+        if (source === "formula_text")
+            return "formula";
+        if (source === "external_unsupported")
+            return "external";
+        return "unknown";
+    }
+    function renderFormulaSourceCounts(file) {
+        const counts = {
+            cached: 0,
+            ast: 0,
+            legacy: 0,
+            formula: 0,
+            external: 0,
+            unknown: 0
+        };
+        file.summary.formulaDiagnostics.forEach((diagnostic) => {
+            counts[getFormulaSourceLabel(diagnostic.source)] += 1;
+        });
+        return [
+            counts.cached > 0 ? `cached ${counts.cached}` : "",
+            counts.ast > 0 ? `ast ${counts.ast}` : "",
+            counts.legacy > 0 ? `legacy ${counts.legacy}` : "",
+            counts.formula > 0 ? `formula ${counts.formula}` : "",
+            counts.external > 0 ? `external ${counts.external}` : "",
+            counts.unknown > 0 ? `unknown ${counts.unknown}` : ""
+        ].filter(Boolean).join(" / ");
+    }
     function renderFormulaSummary(files) {
         const sheetsWithDiagnostics = files.filter((file) => file.summary.formulaDiagnostics.length > 0);
         if (sheetsWithDiagnostics.length === 0) {
@@ -151,15 +185,19 @@
         const totalResolved = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => getFormulaStatusLabel(diagnostic.status) === "resolved").length), 0);
         const totalFallback = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => getFormulaStatusLabel(diagnostic.status) === "fallback").length), 0);
         const totalUnsupported = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => getFormulaStatusLabel(diagnostic.status) === "unsupported").length), 0);
-        return `<div class="md-summary-overview">全体 ${totalDiagnostics}件 / resolved ${totalResolved} / fallback ${totalFallback} / unsupported ${totalUnsupported}</div>${sheetsWithDiagnostics.map((file) => {
+        const totalCached = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => diagnostic.source === "cached_value").length), 0);
+        const totalAst = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => diagnostic.source === "ast_evaluator").length), 0);
+        const totalLegacy = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => diagnostic.source === "legacy_resolver").length), 0);
+        const totalFormula = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => diagnostic.source === "formula_text").length), 0);
+        return `<div class="md-summary-overview">全体 ${totalDiagnostics}件 / cached ${totalCached} / ast ${totalAst} / legacy ${totalLegacy} / formula ${totalFormula} / resolved ${totalResolved} / fallback ${totalFallback} / unsupported ${totalUnsupported}</div>${sheetsWithDiagnostics.map((file) => {
             const items = [...file.summary.formulaDiagnostics].sort((left, right) => {
                 const priorityDiff = getFormulaStatusPriority(left.status) - getFormulaStatusPriority(right.status);
                 if (priorityDiff !== 0) {
                     return priorityDiff;
                 }
                 return left.address.localeCompare(right.address);
-            }).map((diagnostic) => (`<div class="md-summary-item"><div class="md-summary-item-head"><span class="md-summary-item-title">${escapeHtml(diagnostic.address)}</span><span class="md-summary-item-status md-summary-item-status--${escapeHtml(getFormulaStatusLabel(diagnostic.status))}">${escapeHtml(getFormulaStatusLabel(diagnostic.status))}</span></div><div class="md-summary-item-body">${escapeHtml(`${diagnostic.formulaText} => ${diagnostic.outputValue}`)}</div></div>`)).join("");
-            return `<section class="md-summary-group"><div class="md-summary-group-head"><h3 class="md-summary-group-title">${escapeHtml(file.sheetName)}</h3><span class="md-summary-group-count">${file.summary.formulaDiagnostics.length}件</span></div><div class="md-summary-group-meta">${escapeHtml(renderFormulaStatusCounts(file))}</div>${items}</section>`;
+            }).map((diagnostic) => (`<div class="md-summary-item"><div class="md-summary-item-head"><span class="md-summary-item-title">${escapeHtml(diagnostic.address)}</span><span class="md-summary-item-badges"><span class="md-summary-item-status md-summary-item-status--source-${escapeHtml(getFormulaSourceLabel(diagnostic.source))}">${escapeHtml(getFormulaSourceLabel(diagnostic.source))}</span><span class="md-summary-item-status md-summary-item-status--${escapeHtml(getFormulaStatusLabel(diagnostic.status))}">${escapeHtml(getFormulaStatusLabel(diagnostic.status))}</span></span></div><div class="md-summary-item-body">${escapeHtml(`${diagnostic.formulaText} => ${diagnostic.outputValue}`)}</div></div>`)).join("");
+            return `<section class="md-summary-group"><div class="md-summary-group-head"><h3 class="md-summary-group-title">${escapeHtml(file.sheetName)}</h3><span class="md-summary-group-count">${file.summary.formulaDiagnostics.length}件</span></div><div class="md-summary-group-meta">${escapeHtml(renderFormulaSourceCounts(file))}</div><div class="md-summary-group-meta">${escapeHtml(renderFormulaStatusCounts(file))}</div>${items}</section>`;
         }).join("")}`;
     }
     function renderAnalysisSummary(files, workbookName) {

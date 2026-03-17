@@ -208,7 +208,6 @@
 .md-summary-item-head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 8px;
   flex-wrap: wrap;
 }
@@ -218,6 +217,22 @@
   font-size: 0.86rem;
   font-weight: 700;
   color: #0b4f8a;
+}
+
+.md-summary-item-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.md-summary-item-badges {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+  max-width: 100%;
 }
 
 .md-summary-item-status {
@@ -257,6 +272,36 @@
 }
 
 .md-summary-item-status--unknown {
+  background: #d9e2ec;
+  color: #334e68;
+}
+
+.md-summary-item-status--source-cached {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.md-summary-item-status--source-ast {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.md-summary-item-status--source-legacy {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.md-summary-item-status--source-formula {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.md-summary-item-status--source-external {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.md-summary-item-status--source-unknown {
   background: #d9e2ec;
   color: #334e68;
 }

@@ -40,8 +40,17 @@
         return left;
     }
     function parseMultiplicative(state) {
-        let left = parseUnary(state);
+        let left = parseIntersection(state);
         while (matchOperator(state, ["*", "/"])) {
+            const operator = consume(state).value;
+            const right = parseIntersection(state);
+            left = { type: "binary_op", operator, left, right };
+        }
+        return left;
+    }
+    function parseIntersection(state) {
+        let left = parseUnary(state);
+        while (matchOperator(state, [" "])) {
             const operator = consume(state).value;
             const right = parseUnary(state);
             left = { type: "binary_op", operator, left, right };
@@ -61,7 +70,7 @@
     }
     function parsePostfix(state) {
         let node = parsePrimary(state);
-        while (matchOperator(state, ["%"])) {
+        while (matchOperator(state, ["%", "#"])) {
             const operator = consume(state).value;
             node = {
                 type: "postfix_op",
@@ -105,6 +114,9 @@
                 type: "error",
                 value: token.value
             };
+        }
+        if (token.type === "lbrace") {
+            return parseArrayConstant(state);
         }
         if (token.type === "lparen") {
             consume(state);
@@ -180,18 +192,23 @@
     }
     function readStructuredReferenceSegment(state) {
         var _a, _b;
-        const parts = [];
+        let text = "";
         while (peek(state) && ((_a = peek(state)) === null || _a === void 0 ? void 0 : _a.type) !== "rbracket") {
             const token = consume(state);
-            if (!token || !["identifier", "quoted_identifier", "cell", "error", "number", "boolean"].includes(token.type)) {
+            if (!token || !["identifier", "quoted_identifier", "cell", "error", "number", "boolean", "operator"].includes(token.type)) {
                 throw new Error(`Expected structured reference column, got ${(_b = token === null || token === void 0 ? void 0 : token.value) !== null && _b !== void 0 ? _b : "EOF"}`);
             }
-            parts.push(token.value);
+            if (token.type === "operator" && token.value !== "#" && token.value !== " ") {
+                throw new Error(`Expected structured reference column, got ${token.value}`);
+            }
+            text += token.value;
         }
-        if (!parts.length) {
+        if (!text.length) {
             throw new Error("Expected structured reference column, got EOF");
         }
-        return parts.join(" ");
+        return text.startsWith("#")
+            ? `#${text.slice(1).replace(/\s+/g, " ").trim()}`
+            : text;
     }
     function parseFunctionCall(state, name) {
         var _a;
@@ -207,6 +224,29 @@
             type: "function_call",
             name,
             args
+        };
+    }
+    function parseArrayConstant(state) {
+        var _a;
+        expect(state, "lbrace");
+        const rows = [];
+        if (((_a = peek(state)) === null || _a === void 0 ? void 0 : _a.type) !== "rbrace") {
+            while (true) {
+                const row = [];
+                row.push(parseComparison(state));
+                while (matchAndConsume(state, "comma")) {
+                    row.push(parseComparison(state));
+                }
+                rows.push(row);
+                if (!matchAndConsume(state, "semicolon")) {
+                    break;
+                }
+            }
+        }
+        expect(state, "rbrace");
+        return {
+            type: "array_constant",
+            rows
         };
     }
     function parseRangeEndpoint(state, defaultSheet) {

@@ -11,7 +11,10 @@
     | "quoted_identifier"
     | "lparen"
     | "rparen"
+    | "lbrace"
+    | "rbrace"
     | "comma"
+    | "semicolon"
     | "colon"
     | "bang"
     | "lbracket"
@@ -38,7 +41,20 @@
       const char = source[index];
 
       if (/\s/.test(char)) {
-        index += 1;
+        const whitespaceStart = index;
+        while (index < source.length && /\s/.test(source[index])) {
+          index += 1;
+        }
+        const previousToken = tokens[tokens.length - 1] ?? null;
+        const nextChar = source[index] ?? "";
+        if (shouldEmitIntersectionOperator(previousToken, nextChar)) {
+          tokens.push({
+            type: "operator",
+            value: " ",
+            start: whitespaceStart,
+            end: index
+          });
+        }
         continue;
       }
 
@@ -69,14 +85,24 @@
       }
 
       if (char === "#") {
-        const parsed = readErrorLiteral(source, index);
+        if (shouldReadErrorLiteral(source, index)) {
+          const parsed = readErrorLiteral(source, index);
+          tokens.push({
+            type: "error",
+            value: parsed.value,
+            start,
+            end: parsed.end
+          });
+          index = parsed.end;
+          continue;
+        }
         tokens.push({
-          type: "error",
-          value: parsed.value,
+          type: "operator",
+          value: "#",
           start,
-          end: parsed.end
+          end: start + 1
         });
-        index = parsed.end;
+        index += 1;
         continue;
       }
 
@@ -94,7 +120,7 @@
         }
       }
 
-      if ("(),:![]".includes(char)) {
+      if ("(),;:{}![]".includes(char)) {
         tokens.push({
           type: punctuationTypeFor(char),
           value: char,
@@ -208,8 +234,14 @@
         return "lparen";
       case ")":
         return "rparen";
+      case "{":
+        return "lbrace";
+      case "}":
+        return "rbrace";
       case ",":
         return "comma";
+      case ";":
+        return "semicolon";
       case ":":
         return "colon";
       case "!":
@@ -229,7 +261,29 @@
       return twoChar;
     }
     const oneChar = source[start];
-    return "+-*/&=<>%".includes(oneChar) ? oneChar : null;
+    return "+-*/&=<>%#".includes(oneChar) ? oneChar : null;
+  }
+
+  function shouldReadErrorLiteral(source: string, start: number) {
+    return /^#(?:N\/A|REF!|VALUE!|NULL!|NUM!|NAME\?|DIV\/0!|CALC!|SPILL!|GETTING_DATA)/i.test(source.slice(start));
+  }
+
+  function shouldEmitIntersectionOperator(previousToken: FormulaToken | null, nextChar: string) {
+    if (!previousToken) {
+      return false;
+    }
+    const leftTokenTypes = new Set([
+      "cell",
+      "identifier",
+      "quoted_identifier",
+      "rparen",
+      "rbracket",
+      "rbrace"
+    ]);
+    if (!leftTokenTypes.has(previousToken.type)) {
+      return false;
+    }
+    return nextChar === "'" || nextChar === "(" || isIdentifierStart(nextChar);
   }
 
   function isIdentifierStart(char: string) {

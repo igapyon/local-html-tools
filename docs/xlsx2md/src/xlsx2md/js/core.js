@@ -590,7 +590,7 @@
         }
         return null;
     }
-    function applyResolvedFormulaValue(cell, resolvedValue) {
+    function applyResolvedFormulaValue(cell, resolvedValue, resolutionSource = "legacy_resolver") {
         const rawValue = String(resolvedValue || "");
         const formattedValue = formatCellDisplayValue(rawValue, {
             borders: cell.borders,
@@ -600,6 +600,7 @@
         cell.rawValue = rawValue;
         cell.outputValue = formattedValue !== null && formattedValue !== void 0 ? formattedValue : rawValue;
         cell.resolutionStatus = "resolved";
+        cell.resolutionSource = resolutionSource;
     }
     function parseDateLikeParts(value) {
         const trimmed = String(value || "").trim();
@@ -866,8 +867,16 @@
     }
     function extractCellOutputValue(cellElement, sharedStrings, cellStyle, formulaOverride = "") {
         const type = (cellElement.getAttribute("t") || "").trim();
-        const valueText = getTextContent(cellElement.getElementsByTagName("v")[0]);
+        const valueNode = cellElement.getElementsByTagName("v")[0] || null;
+        const valueText = getTextContent(valueNode);
         const formulaText = formulaOverride || getTextContent(cellElement.getElementsByTagName("f")[0]);
+        const cachedValueState = !formulaText
+            ? null
+            : !valueNode
+                ? "absent"
+                : valueText === ""
+                    ? "present_empty"
+                    : "present_nonempty";
         if (formulaText) {
             const normalizedFormula = formulaText.startsWith("=") ? formulaText : `=${formulaText}`;
             if (/\[[^\]]+\.xlsx\]/i.test(normalizedFormula)) {
@@ -876,17 +885,21 @@
                     rawValue: valueText || normalizedFormula,
                     outputValue: normalizedFormula,
                     formulaText: normalizedFormula,
-                    resolutionStatus: "unsupported_external"
+                    resolutionStatus: "unsupported_external",
+                    resolutionSource: "external_unsupported",
+                    cachedValueState
                 };
             }
-            if (valueText) {
+            if (valueNode) {
                 const formattedValue = formatCellDisplayValue(valueText, cellStyle);
                 return {
                     valueType: type || "formula",
                     rawValue: valueText,
                     outputValue: formattedValue !== null && formattedValue !== void 0 ? formattedValue : valueText,
                     formulaText: normalizedFormula,
-                    resolutionStatus: "resolved"
+                    resolutionStatus: "resolved",
+                    resolutionSource: "cached_value",
+                    cachedValueState
                 };
             }
             return {
@@ -894,7 +907,9 @@
                 rawValue: normalizedFormula,
                 outputValue: normalizedFormula,
                 formulaText: normalizedFormula,
-                resolutionStatus: "fallback_formula"
+                resolutionStatus: "fallback_formula",
+                resolutionSource: "formula_text",
+                cachedValueState
             };
         }
         if (type === "s") {
@@ -904,7 +919,9 @@
                 rawValue: valueText,
                 outputValue: sharedStrings[sharedIndex] || "",
                 formulaText: "",
-                resolutionStatus: null
+                resolutionStatus: null,
+                resolutionSource: null,
+                cachedValueState: null
             };
         }
         if (type === "inlineStr") {
@@ -914,7 +931,9 @@
                 rawValue: inlineText,
                 outputValue: inlineText,
                 formulaText: "",
-                resolutionStatus: null
+                resolutionStatus: null,
+                resolutionSource: null,
+                cachedValueState: null
             };
         }
         if (type === "b") {
@@ -923,7 +942,9 @@
                 rawValue: valueText,
                 outputValue: valueText === "1" ? "TRUE" : "FALSE",
                 formulaText: "",
-                resolutionStatus: null
+                resolutionStatus: null,
+                resolutionSource: null,
+                cachedValueState: null
             };
         }
         if (type === "str" || type === "e") {
@@ -932,7 +953,9 @@
                 rawValue: valueText,
                 outputValue: valueText,
                 formulaText: "",
-                resolutionStatus: null
+                resolutionStatus: null,
+                resolutionSource: null,
+                cachedValueState: null
             };
         }
         if (valueText) {
@@ -943,7 +966,9 @@
                     rawValue: valueText,
                     outputValue: formattedValue,
                     formulaText: "",
-                    resolutionStatus: null
+                    resolutionStatus: null,
+                    resolutionSource: null,
+                    cachedValueState: null
                 };
             }
         }
@@ -952,7 +977,9 @@
             rawValue: valueText,
             outputValue: valueText,
             formulaText: "",
-            resolutionStatus: null
+            resolutionStatus: null,
+            resolutionSource: null,
+            cachedValueState: null
         };
     }
     function shiftReferenceAddress(addressText, rowOffset, colOffset) {
@@ -1122,9 +1149,9 @@
                 resolvingKeys.add(key);
                 try {
                     try {
-                        const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue, undefined, undefined, cell.address);
-                        if (evaluated != null) {
-                            applyResolvedFormulaValue(cell, evaluated);
+                        const result = tryResolveFormulaExpressionDetailed(cell.formulaText, sheetName, resolveCellValue, undefined, undefined, cell.address);
+                        if ((result === null || result === void 0 ? void 0 : result.value) != null) {
+                            applyResolvedFormulaValue(cell, result.value, result.source || "legacy_resolver");
                         }
                     }
                     catch (error) {
@@ -1256,6 +1283,38 @@
                 end: `${colLetters}${lastDataRow}`
             };
         }
+        function resolveSpillRange(sheetName, address) {
+            var _a;
+            const normalizedAddress = normalizeFormulaAddress(address);
+            const cell = ((_a = cellMaps.get(sheetName)) === null || _a === void 0 ? void 0 : _a.get(normalizedAddress)) || null;
+            if (!cell) {
+                return null;
+            }
+            if (cell.formulaType === "array") {
+                return { sheetName, start: normalizedAddress, end: normalizedAddress };
+            }
+            const spillRef = String(cell.spillRef || "").trim();
+            if (!spillRef) {
+                return { sheetName, start: normalizedAddress, end: normalizedAddress };
+            }
+            const directRange = parseQualifiedRangeReference(spillRef, sheetName);
+            if (directRange) {
+                return directRange;
+            }
+            if (/^[A-Za-z]+\d+:[A-Za-z]+\d+$/.test(spillRef)) {
+                const [start, end] = spillRef.split(":");
+                return {
+                    sheetName,
+                    start: normalizeFormulaAddress(start),
+                    end: normalizeFormulaAddress(end)
+                };
+            }
+            if (/^[A-Za-z]+\d+$/.test(spillRef)) {
+                const only = normalizeFormulaAddress(spillRef);
+                return { sheetName, start: only, end: only };
+            }
+            return { sheetName, start: normalizedAddress, end: normalizedAddress };
+        }
         function resolveRangeEntries(sheetName, rangeText) {
             const range = parseRangeAddress(rangeText);
             if (!range) {
@@ -1296,18 +1355,38 @@
             resolveStructuredRange
         };
     }
-    function tryResolveFormulaExpression(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries, currentAddress) {
+    function tryResolveFormulaExpressionDetailed(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries, currentAddress) {
         const normalized = String(formulaText || "").trim().replace(/^=/, "");
         if (!normalized)
             return null;
         const directDefinedNameValue = (resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(currentSheetName, normalized)) || null;
         if (directDefinedNameValue != null) {
-            return directDefinedNameValue;
+            return {
+                value: directDefinedNameValue,
+                source: "legacy_resolver"
+            };
         }
         const astResolved = tryResolveFormulaExpressionWithAst(normalized, currentSheetName, resolveCellValue, resolveRangeEntries, currentAddress);
         if (astResolved != null) {
-            return astResolved;
+            return {
+                value: astResolved,
+                source: "ast_evaluator"
+            };
         }
+        const legacyResolved = tryResolveFormulaExpressionLegacy(normalized, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
+        if (legacyResolved == null) {
+            return null;
+        }
+        return {
+            value: legacyResolved,
+            source: "legacy_resolver"
+        };
+    }
+    function tryResolveFormulaExpression(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries, currentAddress) {
+        var _a, _b;
+        return (_b = (_a = tryResolveFormulaExpressionDetailed(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries, currentAddress)) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : null;
+    }
+    function tryResolveFormulaExpressionLegacy(normalized, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
         const ifResult = tryResolveIfFunction(normalized, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
         if (ifResult != null) {
             return ifResult;
@@ -1454,6 +1533,16 @@
                         return [];
                     }
                     return createFormulaAstRangeMatrix(sheet || currentSheetName, normalizeFormulaAddress(startRef), normalizeFormulaAddress(endRef), resolveRangeEntries);
+                },
+                resolveSpill(ref, sheet) {
+                    if (!resolveRangeEntries) {
+                        return [];
+                    }
+                    const spillRange = resolveSpillRange(sheet || currentSheetName, ref);
+                    if (!spillRange) {
+                        return [];
+                    }
+                    return createFormulaAstRangeMatrix(spillRange.sheetName, spillRange.start, spillRange.end, resolveRangeEntries);
                 },
                 currentCellRef: currentAddress ? normalizeFormulaAddress(currentAddress) : undefined
             });
@@ -2841,6 +2930,7 @@
         return tokens;
     }
     function resolveSimpleFormulaReferences(workbook) {
+        var _a, _b;
         const resolver = buildFormulaResolver(workbook);
         resolveDefinedNameScalarValue = resolver.resolveDefinedNameValue;
         resolveDefinedNameRangeRef = resolver.resolveDefinedNameRange;
@@ -2860,14 +2950,17 @@
                         if (reference) {
                             const targetValue = String(resolver.resolveCellValue(reference.sheetName, reference.address) || "").trim();
                             if (targetValue) {
-                                applyResolvedFormulaValue(cell, targetValue);
+                                applyResolvedFormulaValue(cell, targetValue, "legacy_resolver");
                                 resolvedInPass += 1;
                                 continue;
                             }
                         }
                         let evaluated = null;
+                        let evaluatedSource = null;
                         try {
-                            evaluated = tryResolveFormulaExpression(cell.formulaText, sheet.name, resolver.resolveCellValue, resolver.resolveRangeValues, resolver.resolveRangeEntries, cell.address);
+                            const result = tryResolveFormulaExpressionDetailed(cell.formulaText, sheet.name, resolver.resolveCellValue, resolver.resolveRangeValues, resolver.resolveRangeEntries, cell.address);
+                            evaluated = (_a = result === null || result === void 0 ? void 0 : result.value) !== null && _a !== void 0 ? _a : null;
+                            evaluatedSource = (_b = result === null || result === void 0 ? void 0 : result.source) !== null && _b !== void 0 ? _b : null;
                         }
                         catch (error) {
                             if (!(error instanceof Error) || error.message !== "__FORMULA_UNRESOLVED__") {
@@ -2875,7 +2968,7 @@
                             }
                         }
                         if (evaluated != null) {
-                            applyResolvedFormulaValue(cell, evaluated);
+                            applyResolvedFormulaValue(cell, evaluated, evaluatedSource || "legacy_resolver");
                             resolvedInPass += 1;
                         }
                     }
@@ -2910,6 +3003,7 @@
             let formulaOverride = "";
             const formulaElement = cellElement.getElementsByTagName("f")[0] || null;
             const formulaType = (formulaElement === null || formulaElement === void 0 ? void 0 : formulaElement.getAttribute("t")) || "";
+            const spillRef = (formulaElement === null || formulaElement === void 0 ? void 0 : formulaElement.getAttribute("ref")) || "";
             const sharedIndex = (formulaElement === null || formulaElement === void 0 ? void 0 : formulaElement.getAttribute("si")) || "";
             const formulaText = getTextContent(formulaElement);
             if (formulaType === "shared" && sharedIndex) {
@@ -2935,10 +3029,14 @@
                 outputValue: output.outputValue,
                 formulaText: output.formulaText,
                 resolutionStatus: output.resolutionStatus,
+                resolutionSource: output.resolutionSource,
+                cachedValueState: output.cachedValueState,
                 styleIndex,
                 borders: cellStyle.borders,
                 numFmtId: cellStyle.numFmtId,
-                formatCode: cellStyle.formatCode
+                formatCode: cellStyle.formatCode,
+                formulaType,
+                spillRef
             };
         });
         const merges = Array.from(doc.getElementsByTagName("mergeCell")).map((mergeElement) => parseRangeRef(mergeElement.getAttribute("ref") || ""));
@@ -3031,7 +3129,6 @@
         return tables.some((table) => row >= table.startRow && row <= table.endRow && col >= table.startCol && col <= table.endCol);
     }
     function extractNarrativeBlocks(sheet, tables, options = {}) {
-        var _a;
         const rowMap = new Map();
         for (const cell of sheet.cells) {
             if (!cell.outputValue)
@@ -3048,38 +3145,66 @@
         let previousRow = -100;
         for (const rowNumber of rowNumbers) {
             const cells = (rowMap.get(rowNumber) || []).slice().sort((a, b) => a.col - b.col);
-            const rowText = cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean).join(" ").trim();
-            if (!rowText)
-                continue;
-            const startCol = ((_a = cells[0]) === null || _a === void 0 ? void 0 : _a.col) || 1;
-            if (!current || rowNumber - previousRow > 1 || Math.abs(startCol - current.startCol) > 3) {
-                current = {
-                    startRow: rowNumber,
-                    startCol,
-                    endRow: rowNumber,
-                    lines: [rowText],
-                    items: [{
-                            row: rowNumber,
-                            startCol,
-                            text: rowText,
-                            cellValues: cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean)
-                        }]
-                };
-                blocks.push(current);
+            const rowSegments = splitNarrativeRowSegments(cells, options);
+            for (const segment of rowSegments) {
+                const rowText = segment.values.join(" ").trim();
+                if (!rowText)
+                    continue;
+                const startCol = segment.startCol;
+                if (!current || rowNumber - previousRow > 1 || Math.abs(startCol - current.startCol) > 3) {
+                    current = {
+                        startRow: rowNumber,
+                        startCol,
+                        endRow: rowNumber,
+                        lines: [rowText],
+                        items: [{
+                                row: rowNumber,
+                                startCol,
+                                text: rowText,
+                                cellValues: segment.values
+                            }]
+                    };
+                    blocks.push(current);
+                }
+                else {
+                    current.lines.push(rowText);
+                    current.endRow = rowNumber;
+                    current.items.push({
+                        row: rowNumber,
+                        startCol,
+                        text: rowText,
+                        cellValues: segment.values
+                    });
+                }
+                previousRow = rowNumber;
             }
-            else {
-                current.lines.push(rowText);
-                current.endRow = rowNumber;
-                current.items.push({
-                    row: rowNumber,
-                    startCol,
-                    text: rowText,
-                    cellValues: cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean)
-                });
-            }
-            previousRow = rowNumber;
         }
         return blocks;
+    }
+    function splitNarrativeRowSegments(cells, options) {
+        const segments = [];
+        let current = null;
+        for (const cell of cells) {
+            const value = formatCellForMarkdown(cell, options).trim();
+            if (!value)
+                continue;
+            if (!current || cell.col - current.lastCol > 4) {
+                current = {
+                    startCol: cell.col,
+                    values: [value],
+                    lastCol: cell.col
+                };
+                segments.push(current);
+            }
+            else {
+                current.values.push(value);
+                current.lastCol = cell.col;
+            }
+        }
+        return segments.map((segment) => ({
+            startCol: segment.startCol,
+            values: segment.values
+        }));
     }
     function isNarrativeListCandidate(item) {
         const text = String(item.text || "").trim();
@@ -3164,6 +3289,84 @@
         }
         return parts.join("\n\n");
     }
+    function isSectionHeadingNarrativeBlock(block) {
+        var _a;
+        if (!block || !block.items || block.items.length !== 1) {
+            return false;
+        }
+        const text = String(((_a = block.items[0]) === null || _a === void 0 ? void 0 : _a.text) || "").trim();
+        if (!text)
+            return false;
+        if (text.length > 32)
+            return false;
+        if (/[。．:：]$/.test(text))
+            return false;
+        if (/^[\-*#]/.test(text))
+            return false;
+        return true;
+    }
+    function extractSectionBlocks(sheet, tables, narrativeBlocks) {
+        const anchors = [];
+        for (const block of narrativeBlocks) {
+            anchors.push({
+                startRow: block.startRow,
+                startCol: block.startCol,
+                endRow: block.endRow,
+                endCol: Math.max(block.startCol, ...block.items.map((item) => item.startCol))
+            });
+        }
+        for (const table of tables) {
+            anchors.push({
+                startRow: table.startRow,
+                startCol: table.startCol,
+                endRow: table.endRow,
+                endCol: table.endCol
+            });
+        }
+        for (const image of sheet.images) {
+            const anchor = parseCellAddress(image.anchor);
+            if (anchor.row > 0 && anchor.col > 0) {
+                anchors.push({
+                    startRow: anchor.row,
+                    startCol: anchor.col,
+                    endRow: anchor.row,
+                    endCol: anchor.col
+                });
+            }
+        }
+        if (anchors.length === 0) {
+            return [];
+        }
+        anchors.sort((left, right) => {
+            if (left.startRow !== right.startRow)
+                return left.startRow - right.startRow;
+            return left.startCol - right.startCol;
+        });
+        const sections = [];
+        let current = null;
+        let previousEndRow = -100;
+        const verticalGapThreshold = 4;
+        for (const anchor of anchors) {
+            const gap = anchor.startRow - previousEndRow;
+            if (!current || gap > verticalGapThreshold) {
+                current = {
+                    startRow: anchor.startRow,
+                    startCol: anchor.startCol,
+                    endRow: anchor.endRow,
+                    endCol: anchor.endCol
+                };
+                sections.push(current);
+            }
+            else {
+                current.startRow = Math.min(current.startRow, anchor.startRow);
+                current.startCol = Math.min(current.startCol, anchor.startCol);
+                current.endRow = Math.max(current.endRow, anchor.endRow);
+                current.endCol = Math.max(current.endCol, anchor.endCol);
+            }
+            previousEndRow = Math.max(previousEndRow, anchor.endRow);
+        }
+        return sections;
+    }
     function collectTableSeedCells(sheet) {
         return sheet.cells.filter((cell) => {
             const hasValue = !!String(cell.outputValue || "").trim();
@@ -3246,6 +3449,9 @@
                 score += TABLE_SCORE_WEIGHTS.mergeHeavyPenalty;
                 reasons.push(`結合セル多 (${TABLE_SCORE_WEIGHTS.mergeHeavyPenalty})`);
             }
+            if (mergedArea >= 2 && rowCount <= 6 && colCount >= 10 && density < 0.25) {
+                continue;
+            }
             const avgTextLength = component
                 .filter((entry) => entry.outputValue.trim())
                 .reduce((sum, entry) => sum + entry.outputValue.trim().length, 0) / Math.max(1, component.filter((entry) => entry.outputValue.trim()).length);
@@ -3288,13 +3494,19 @@
         applyMergeTokens(rows, sheet.merges, candidate.startRow, candidate.startCol, candidate.endRow, candidate.endCol);
         let normalizedRows = rows;
         if (options.removeEmptyRows !== false) {
-            normalizedRows = normalizedRows.filter((row) => row.some((cell) => String(cell || "").trim() !== ""));
+            normalizedRows = normalizedRows.filter((row) => row.some((cell) => isMeaningfulMarkdownCell(cell)));
         }
         if (options.removeEmptyColumns !== false && normalizedRows.length > 0) {
-            const keepColumnFlags = normalizedRows[0].map((_, colIndex) => normalizedRows.some((row) => String(row[colIndex] || "").trim() !== ""));
+            const keepColumnFlags = normalizedRows[0].map((_, colIndex) => normalizedRows.some((row) => isMeaningfulMarkdownCell(row[colIndex])));
             normalizedRows = normalizedRows.map((row) => row.filter((_cell, colIndex) => keepColumnFlags[colIndex]));
         }
         return normalizedRows;
+    }
+    function isMeaningfulMarkdownCell(value) {
+        const text = String(value || "").trim();
+        if (!text)
+            return false;
+        return text !== "[MERGED←]" && text !== "[MERGED↑]";
     }
     function applyMergeTokens(matrix, merges, startRow, startCol, endRow, endCol) {
         for (const merge of merges) {
@@ -3358,12 +3570,14 @@
         const treatFirstRowAsHeader = options.treatFirstRowAsHeader !== false;
         const tables = detectTableCandidates(sheet);
         const narrativeBlocks = extractNarrativeBlocks(sheet, tables, options);
+        const sectionBlocks = extractSectionBlocks(sheet, tables, narrativeBlocks);
         const formulaDiagnostics = sheet.cells
             .filter((cell) => !!cell.formulaText && cell.resolutionStatus !== null)
             .map((cell) => ({
             address: cell.address,
             formulaText: cell.formulaText,
             status: cell.resolutionStatus,
+            source: cell.resolutionSource,
             outputValue: cell.outputValue
         }));
         const sections = [];
@@ -3371,7 +3585,9 @@
             sections.push({
                 sortRow: block.startRow,
                 sortCol: block.startCol,
-                markdown: `${renderNarrativeBlock(block)}\n`
+                markdown: `${renderNarrativeBlock(block)}\n`,
+                kind: "narrative",
+                narrativeBlock: block
             });
         }
         let tableCounter = 1;
@@ -3383,7 +3599,8 @@
             sections.push({
                 sortRow: table.startRow,
                 sortCol: table.startCol,
-                markdown: `### 表${String(tableCounter).padStart(3, "0")} (${formatRange(table.startRow, table.startCol, table.endRow, table.endCol)})\n\n${tableMarkdown}\n`
+                markdown: `### 表${String(tableCounter).padStart(3, "0")} (${formatRange(table.startRow, table.startCol, table.endRow, table.endCol)})\n\n${tableMarkdown}\n`,
+                kind: "table"
             });
             tableCounter += 1;
         }
@@ -3392,7 +3609,36 @@
                 return left.sortRow - right.sortRow;
             return left.sortCol - right.sortCol;
         });
-        const body = sections.map((section) => section.markdown.trimEnd()).join("\n\n").trim();
+        const groupedSections = (sectionBlocks.length > 0 ? sectionBlocks : [{
+                startRow: -1,
+                startCol: -1,
+                endRow: Number.MAX_SAFE_INTEGER,
+                endCol: Number.MAX_SAFE_INTEGER
+            }]).map((block) => ({
+            block,
+            entries: sections.filter((section) => section.sortRow >= block.startRow
+                && section.sortRow <= block.endRow
+                && section.sortCol >= block.startCol
+                && section.sortCol <= block.endCol)
+        })).filter((group) => group.entries.length > 0);
+        const body = groupedSections
+            .map((group) => {
+            const entries = group.entries.map((entry) => {
+                var _a, _b;
+                if (entry.kind === "narrative" && isSectionHeadingNarrativeBlock(entry.narrativeBlock)) {
+                    const headingText = String(((_b = (_a = entry.narrativeBlock) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.text) || "").trim();
+                    return {
+                        ...entry,
+                        markdown: `### ${headingText}\n`
+                    };
+                }
+                return entry;
+            });
+            return entries.map((section) => section.markdown.trimEnd()).join("\n\n").trim();
+        })
+            .filter(Boolean)
+            .join("\n\n---\n\n")
+            .trim();
         const imageSection = sheet.images.length > 0
             ? [
                 "",
@@ -3424,6 +3670,7 @@
             markdown,
             summary: {
                 outputMode: options.outputMode || "display",
+                sections: sectionBlocks.length,
                 tables: tables.length,
                 narrativeBlocks: narrativeBlocks.length,
                 merges: sheet.merges.length,
@@ -3448,6 +3695,7 @@
         return [
             `出力ファイル: ${markdownFile.fileName}`,
             `出力モード: ${markdownFile.summary.outputMode}`,
+            `セクション: ${markdownFile.summary.sections}`,
             `表: ${markdownFile.summary.tables}`,
             `地の文ブロック: ${markdownFile.summary.narrativeBlocks}`,
             `結合セル範囲: ${markdownFile.summary.merges}`,

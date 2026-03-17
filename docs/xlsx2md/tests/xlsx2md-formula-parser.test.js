@@ -57,6 +57,48 @@ describe("xlsx2md formula parser", () => {
     ]);
   });
 
+  it("tokenizes spill postfix operator", () => {
+    const api = bootFormulaParser();
+    const tokens = api.tokenizeFormula("=A1#");
+
+    expect(tokens.map((token) => `${token.type}:${token.value}`)).toEqual([
+      "cell:A1",
+      "operator:#"
+    ]);
+  });
+
+  it("tokenizes array constants", () => {
+    const api = bootFormulaParser();
+    const tokens = api.tokenizeFormula("={1,2;3,4}");
+
+    expect(tokens.map((token) => `${token.type}:${token.value}`)).toEqual([
+      "lbrace:{",
+      "number:1",
+      "comma:,",
+      "number:2",
+      "semicolon:;",
+      "number:3",
+      "comma:,",
+      "number:4",
+      "rbrace:}"
+    ]);
+  });
+
+  it("tokenizes space intersection", () => {
+    const api = bootFormulaParser();
+    const tokens = api.tokenizeFormula("=A1:C3 B2:D4");
+
+    expect(tokens.map((token) => `${token.type}:${token.value}`)).toEqual([
+      "cell:A1",
+      "colon::",
+      "cell:C3",
+      "operator: ",
+      "cell:B2",
+      "colon::",
+      "cell:D4"
+    ]);
+  });
+
   it("tokenizes absolute cell references", () => {
     const api = bootFormulaParser();
     const tokens = api.tokenizeFormula("=$A$1+A$2+$H3");
@@ -119,6 +161,96 @@ describe("xlsx2md formula parser", () => {
           ref: "B1",
           sheet: null
         }
+      }
+    });
+  });
+
+  it("parses spill postfix into AST", () => {
+    const api = bootFormulaParser();
+    const ast = api.parseFormula("=A1#");
+
+    expect(ast).toEqual({
+      type: "postfix_op",
+      operator: "#",
+      operand: {
+        type: "cell",
+        ref: "A1",
+        sheet: null
+      }
+    });
+  });
+
+  it("parses array constants into AST", () => {
+    const api = bootFormulaParser();
+    const ast = api.parseFormula("={1,2;3,4}");
+
+    expect(ast).toEqual({
+      type: "array_constant",
+      rows: [
+        [
+          { type: "number", value: 1, raw: "1" },
+          { type: "number", value: 2, raw: "2" }
+        ],
+        [
+          { type: "number", value: 3, raw: "3" },
+          { type: "number", value: 4, raw: "4" }
+        ]
+      ]
+    });
+  });
+
+  it("parses array constants with expressions into AST", () => {
+    const api = bootFormulaParser();
+    const ast = api.parseFormula("={1+2,A1;DATE(2024,3,17),4}");
+
+    expect(ast).toEqual({
+      type: "array_constant",
+      rows: [
+        [
+          {
+            type: "binary_op",
+            operator: "+",
+            left: { type: "number", value: 1, raw: "1" },
+            right: { type: "number", value: 2, raw: "2" }
+          },
+          {
+            type: "cell",
+            ref: "A1",
+            sheet: null
+          }
+        ],
+        [
+          {
+            type: "function_call",
+            name: "DATE",
+            args: [
+              { type: "number", value: 2024, raw: "2024" },
+              { type: "number", value: 3, raw: "3" },
+              { type: "number", value: 17, raw: "17" }
+            ]
+          },
+          { type: "number", value: 4, raw: "4" }
+        ]
+      ]
+    });
+  });
+
+  it("parses space intersection into AST", () => {
+    const api = bootFormulaParser();
+    const ast = api.parseFormula("=A1:C3 B2:D4");
+
+    expect(ast).toEqual({
+      type: "binary_op",
+      operator: " ",
+      left: {
+        type: "range",
+        start: { type: "cell", ref: "A1", sheet: null },
+        end: { type: "cell", ref: "C3", sheet: null }
+      },
+      right: {
+        type: "range",
+        start: { type: "cell", ref: "B2", sheet: null },
+        end: { type: "cell", ref: "D4", sheet: null }
       }
     });
   });
@@ -319,6 +451,26 @@ describe("xlsx2md formula parser", () => {
     expect(value).toBe(0.12);
   });
 
+  it("evaluates spill postfix via AST", () => {
+    const api = bootFormulaParser();
+    const value = api.evaluateFormulaAst(api.parseFormula("=A1#"), {
+      resolveSpill(ref, sheet) {
+        if (ref === "A1" && sheet === null) {
+          return [
+            [1, 2],
+            [3, 4]
+          ];
+        }
+        return null;
+      }
+    });
+
+    expect(value).toEqual([
+      [1, 2],
+      [3, 4]
+    ]);
+  });
+
   it("evaluates DATE and VALUE via AST", () => {
     const api = bootFormulaParser();
     const dateValue = api.evaluateFormulaAst(api.parseFormula("=DATE(2024,3,17)"));
@@ -346,6 +498,58 @@ describe("xlsx2md formula parser", () => {
     expect(sumValue).toBe(65);
     expect(substituteAll).toBe("A-X-X");
     expect(substituteOne).toBe("A-B-X");
+  });
+
+  it("evaluates array constants via AST", () => {
+    const api = bootFormulaParser();
+    const arrayValue = api.evaluateFormulaAst(api.parseFormula("={1,2;3,4}"));
+    const sumValue = api.evaluateFormulaAst(api.parseFormula("=SUM({1,2;3,4})"));
+
+    expect(arrayValue).toEqual([
+      [1, 2],
+      [3, 4]
+    ]);
+    expect(sumValue).toBe(10);
+  });
+
+  it("evaluates array constants with expressions via AST", () => {
+    const api = bootFormulaParser();
+    const value = api.evaluateFormulaAst(
+      api.parseFormula("={1+2,A1;DATE(2024,3,17),4}"),
+      {
+        resolveCell(ref) {
+          if (ref === "A1") {
+            return 10;
+          }
+          return null;
+        }
+      }
+    );
+
+    expect(value).toEqual([
+      [3, 10],
+      [45368, 4]
+    ]);
+  });
+
+  it("evaluates space intersection via AST", () => {
+    const api = bootFormulaParser();
+    const value = api.evaluateFormulaAst(api.parseFormula("=A1:C3 B2:D4"), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "B2" && endRef === "C3") {
+          return [
+            [22, 23],
+            [32, 33]
+          ];
+        }
+        return [];
+      }
+    });
+
+    expect(value).toEqual([
+      [22, 23],
+      [32, 33]
+    ]);
   });
 
   it("evaluates SUMPRODUCT via AST", () => {

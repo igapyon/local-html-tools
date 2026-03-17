@@ -15,6 +15,8 @@
   };
 
   type FormulaResolutionStatus = "resolved" | "fallback_formula" | "unsupported_external" | null;
+  type FormulaResolutionSource = "cached_value" | "ast_evaluator" | "legacy_resolver" | "formula_text" | "external_unsupported" | null;
+  type CachedValueState = "present_nonempty" | "present_empty" | "absent" | null;
 
   type ParsedCell = {
     address: string;
@@ -25,10 +27,14 @@
     outputValue: string;
     formulaText: string;
     resolutionStatus: FormulaResolutionStatus;
+    resolutionSource: FormulaResolutionSource;
+    cachedValueState: CachedValueState;
     styleIndex: number;
     borders: BorderFlags;
     numFmtId: number;
     formatCode: string;
+    formulaType: string;
+    spillRef: string;
   };
 
   type CellStyleInfo = {
@@ -107,6 +113,7 @@
     address: string;
     formulaText: string;
     status: FormulaResolutionStatus;
+    source: FormulaResolutionSource;
     outputValue: string;
   };
 
@@ -123,6 +130,13 @@
     }[];
   };
 
+  type SectionBlock = {
+    startRow: number;
+    startCol: number;
+    endRow: number;
+    endCol: number;
+  };
+
   type MarkdownOptions = {
     treatFirstRowAsHeader?: boolean;
     trimText?: boolean;
@@ -137,6 +151,7 @@
     markdown: string;
     summary: {
       outputMode: "display" | "raw" | "both";
+      sections: number;
       tables: number;
       narrativeBlocks: number;
       merges: number;
@@ -792,7 +807,11 @@
     return null;
   }
 
-  function applyResolvedFormulaValue(cell: ParsedCell, resolvedValue: string): void {
+  function applyResolvedFormulaValue(
+    cell: ParsedCell,
+    resolvedValue: string,
+    resolutionSource: FormulaResolutionSource = "legacy_resolver"
+  ): void {
     const rawValue = String(resolvedValue || "");
     const formattedValue = formatCellDisplayValue(rawValue, {
       borders: cell.borders,
@@ -802,6 +821,7 @@
     cell.rawValue = rawValue;
     cell.outputValue = formattedValue ?? rawValue;
     cell.resolutionStatus = "resolved";
+    cell.resolutionSource = resolutionSource;
   }
 
   function parseDateLikeParts(value: string): {
@@ -1114,10 +1134,20 @@
     outputValue: string;
     formulaText: string;
     resolutionStatus: FormulaResolutionStatus;
+    resolutionSource: FormulaResolutionSource;
+    cachedValueState: CachedValueState;
   } {
     const type = (cellElement.getAttribute("t") || "").trim();
-    const valueText = getTextContent(cellElement.getElementsByTagName("v")[0]);
+    const valueNode = cellElement.getElementsByTagName("v")[0] || null;
+    const valueText = getTextContent(valueNode);
     const formulaText = formulaOverride || getTextContent(cellElement.getElementsByTagName("f")[0]);
+    const cachedValueState: CachedValueState = !formulaText
+      ? null
+      : !valueNode
+        ? "absent"
+        : valueText === ""
+          ? "present_empty"
+          : "present_nonempty";
     if (formulaText) {
       const normalizedFormula = formulaText.startsWith("=") ? formulaText : `=${formulaText}`;
       if (/\[[^\]]+\.xlsx\]/i.test(normalizedFormula)) {
@@ -1126,17 +1156,21 @@
           rawValue: valueText || normalizedFormula,
           outputValue: normalizedFormula,
           formulaText: normalizedFormula,
-          resolutionStatus: "unsupported_external"
+          resolutionStatus: "unsupported_external",
+          resolutionSource: "external_unsupported",
+          cachedValueState
         };
       }
-      if (valueText) {
+      if (valueNode) {
         const formattedValue = formatCellDisplayValue(valueText, cellStyle);
         return {
           valueType: type || "formula",
           rawValue: valueText,
           outputValue: formattedValue ?? valueText,
           formulaText: normalizedFormula,
-          resolutionStatus: "resolved"
+          resolutionStatus: "resolved",
+          resolutionSource: "cached_value",
+          cachedValueState
         };
       }
       return {
@@ -1144,7 +1178,9 @@
         rawValue: normalizedFormula,
         outputValue: normalizedFormula,
         formulaText: normalizedFormula,
-        resolutionStatus: "fallback_formula"
+        resolutionStatus: "fallback_formula",
+        resolutionSource: "formula_text",
+        cachedValueState
       };
     }
 
@@ -1155,7 +1191,9 @@
         rawValue: valueText,
         outputValue: sharedStrings[sharedIndex] || "",
         formulaText: "",
-        resolutionStatus: null
+        resolutionStatus: null,
+        resolutionSource: null,
+        cachedValueState: null
       };
     }
     if (type === "inlineStr") {
@@ -1165,7 +1203,9 @@
         rawValue: inlineText,
         outputValue: inlineText,
         formulaText: "",
-        resolutionStatus: null
+        resolutionStatus: null,
+        resolutionSource: null,
+        cachedValueState: null
       };
     }
     if (type === "b") {
@@ -1174,7 +1214,9 @@
         rawValue: valueText,
         outputValue: valueText === "1" ? "TRUE" : "FALSE",
         formulaText: "",
-        resolutionStatus: null
+        resolutionStatus: null,
+        resolutionSource: null,
+        cachedValueState: null
       };
     }
     if (type === "str" || type === "e") {
@@ -1183,7 +1225,9 @@
         rawValue: valueText,
         outputValue: valueText,
         formulaText: "",
-        resolutionStatus: null
+        resolutionStatus: null,
+        resolutionSource: null,
+        cachedValueState: null
       };
     }
     if (valueText) {
@@ -1194,7 +1238,9 @@
           rawValue: valueText,
           outputValue: formattedValue,
           formulaText: "",
-          resolutionStatus: null
+          resolutionStatus: null,
+          resolutionSource: null,
+          cachedValueState: null
         };
       }
     }
@@ -1203,7 +1249,9 @@
       rawValue: valueText,
       outputValue: valueText,
       formulaText: "",
-      resolutionStatus: null
+      resolutionStatus: null,
+      resolutionSource: null,
+      cachedValueState: null
     };
   }
 
@@ -1391,9 +1439,16 @@
         resolvingKeys.add(key);
         try {
           try {
-            const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue, undefined, undefined, cell.address);
-            if (evaluated != null) {
-              applyResolvedFormulaValue(cell, evaluated);
+            const result = tryResolveFormulaExpressionDetailed(
+              cell.formulaText,
+              sheetName,
+              resolveCellValue,
+              undefined,
+              undefined,
+              cell.address
+            );
+            if (result?.value != null) {
+              applyResolvedFormulaValue(cell, result.value, result.source || "legacy_resolver");
             }
           } catch (error) {
             if (!(error instanceof Error) || error.message !== "__FORMULA_UNRESOLVED__") {
@@ -1532,6 +1587,38 @@
       };
     }
 
+    function resolveSpillRange(sheetName: string, address: string): { sheetName: string; start: string; end: string } | null {
+      const normalizedAddress = normalizeFormulaAddress(address);
+      const cell = cellMaps.get(sheetName)?.get(normalizedAddress) || null;
+      if (!cell) {
+        return null;
+      }
+      if (cell.formulaType === "array") {
+        return { sheetName, start: normalizedAddress, end: normalizedAddress };
+      }
+      const spillRef = String(cell.spillRef || "").trim();
+      if (!spillRef) {
+        return { sheetName, start: normalizedAddress, end: normalizedAddress };
+      }
+      const directRange = parseQualifiedRangeReference(spillRef, sheetName);
+      if (directRange) {
+        return directRange;
+      }
+      if (/^[A-Za-z]+\d+:[A-Za-z]+\d+$/.test(spillRef)) {
+        const [start, end] = spillRef.split(":");
+        return {
+          sheetName,
+          start: normalizeFormulaAddress(start),
+          end: normalizeFormulaAddress(end)
+        };
+      }
+      if (/^[A-Za-z]+\d+$/.test(spillRef)) {
+        const only = normalizeFormulaAddress(spillRef);
+        return { sheetName, start: only, end: only };
+      }
+      return { sheetName, start: normalizedAddress, end: normalizedAddress };
+    }
+
     function resolveRangeEntries(sheetName: string, rangeText: string): { rawValues: string[]; numericValues: number[] } {
       const range = parseRangeAddress(rangeText);
       if (!range) {
@@ -1574,19 +1661,22 @@
     };
   }
 
-  function tryResolveFormulaExpression(
+  function tryResolveFormulaExpressionDetailed(
     formulaText: string,
     currentSheetName: string,
     resolveCellValue: (sheetName: string, address: string) => string,
     resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] },
     currentAddress?: string
-  ): string | null {
+  ): { value: string; source: FormulaResolutionSource } | null {
     const normalized = String(formulaText || "").trim().replace(/^=/, "");
     if (!normalized) return null;
     const directDefinedNameValue = resolveDefinedNameScalarValue?.(currentSheetName, normalized) || null;
     if (directDefinedNameValue != null) {
-      return directDefinedNameValue;
+      return {
+        value: directDefinedNameValue,
+        source: "legacy_resolver"
+      };
     }
     const astResolved = tryResolveFormulaExpressionWithAst(
       normalized,
@@ -1596,8 +1686,52 @@
       currentAddress
     );
     if (astResolved != null) {
-      return astResolved;
+      return {
+        value: astResolved,
+        source: "ast_evaluator"
+      };
     }
+    const legacyResolved = tryResolveFormulaExpressionLegacy(
+      normalized,
+      currentSheetName,
+      resolveCellValue,
+      resolveRangeValues,
+      resolveRangeEntries
+    );
+    if (legacyResolved == null) {
+      return null;
+    }
+    return {
+      value: legacyResolved,
+      source: "legacy_resolver"
+    };
+  }
+
+  function tryResolveFormulaExpression(
+    formulaText: string,
+    currentSheetName: string,
+    resolveCellValue: (sheetName: string, address: string) => string,
+    resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
+    resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] },
+    currentAddress?: string
+  ): string | null {
+    return tryResolveFormulaExpressionDetailed(
+      formulaText,
+      currentSheetName,
+      resolveCellValue,
+      resolveRangeValues,
+      resolveRangeEntries,
+      currentAddress
+    )?.value ?? null;
+  }
+
+  function tryResolveFormulaExpressionLegacy(
+    normalized: string,
+    currentSheetName: string,
+    resolveCellValue: (sheetName: string, address: string) => string,
+    resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
+    resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
+  ): string | null {
     const ifResult = tryResolveIfFunction(normalized, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
     if (ifResult != null) {
       return ifResult;
@@ -1833,6 +1967,21 @@
             sheet || currentSheetName,
             normalizeFormulaAddress(startRef),
             normalizeFormulaAddress(endRef),
+            resolveRangeEntries
+          );
+        },
+        resolveSpill(ref: string, sheet: string | null) {
+          if (!resolveRangeEntries) {
+            return [];
+          }
+          const spillRange = resolveSpillRange(sheet || currentSheetName, ref);
+          if (!spillRange) {
+            return [];
+          }
+          return createFormulaAstRangeMatrix(
+            spillRange.sheetName,
+            spillRange.start,
+            spillRange.end,
             resolveRangeEntries
           );
         },
@@ -3512,14 +3661,15 @@
             if (reference) {
               const targetValue = String(resolver.resolveCellValue(reference.sheetName, reference.address) || "").trim();
               if (targetValue) {
-                applyResolvedFormulaValue(cell, targetValue);
+                applyResolvedFormulaValue(cell, targetValue, "legacy_resolver");
                 resolvedInPass += 1;
                 continue;
               }
             }
             let evaluated: string | null = null;
+            let evaluatedSource: FormulaResolutionSource = null;
             try {
-              evaluated = tryResolveFormulaExpression(
+              const result = tryResolveFormulaExpressionDetailed(
                 cell.formulaText,
                 sheet.name,
                 resolver.resolveCellValue,
@@ -3527,13 +3677,15 @@
                 resolver.resolveRangeEntries,
                 cell.address
               );
+              evaluated = result?.value ?? null;
+              evaluatedSource = result?.source ?? null;
             } catch (error) {
               if (!(error instanceof Error) || error.message !== "__FORMULA_UNRESOLVED__") {
                 throw error;
               }
             }
             if (evaluated != null) {
-              applyResolvedFormulaValue(cell, evaluated);
+              applyResolvedFormulaValue(cell, evaluated, evaluatedSource || "legacy_resolver");
               resolvedInPass += 1;
             }
           }
@@ -3575,6 +3727,7 @@
       let formulaOverride = "";
       const formulaElement = cellElement.getElementsByTagName("f")[0] || null;
       const formulaType = formulaElement?.getAttribute("t") || "";
+      const spillRef = formulaElement?.getAttribute("ref") || "";
       const sharedIndex = formulaElement?.getAttribute("si") || "";
       const formulaText = getTextContent(formulaElement);
       if (formulaType === "shared" && sharedIndex) {
@@ -3596,13 +3749,17 @@
         col: position.col,
         valueType: output.valueType,
         rawValue: output.rawValue,
-        outputValue: output.outputValue,
-        formulaText: output.formulaText,
-        resolutionStatus: output.resolutionStatus,
-        styleIndex,
-        borders: cellStyle.borders,
+                outputValue: output.outputValue,
+                formulaText: output.formulaText,
+                resolutionStatus: output.resolutionStatus,
+                resolutionSource: output.resolutionSource,
+                cachedValueState: output.cachedValueState,
+                styleIndex,
+                borders: cellStyle.borders,
         numFmtId: cellStyle.numFmtId,
-        formatCode: cellStyle.formatCode
+        formatCode: cellStyle.formatCode,
+        formulaType,
+        spillRef
       } satisfies ParsedCell;
     });
     const merges = Array.from(doc.getElementsByTagName("mergeCell")).map((mergeElement) => parseRangeRef(mergeElement.getAttribute("ref") || ""));
@@ -3710,37 +3867,64 @@
 
     for (const rowNumber of rowNumbers) {
       const cells = (rowMap.get(rowNumber) || []).slice().sort((a, b) => a.col - b.col);
-      const rowText = cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean).join(" ").trim();
-      if (!rowText) continue;
-      const startCol = cells[0]?.col || 1;
-      if (!current || rowNumber - previousRow > 1 || Math.abs(startCol - current.startCol) > 3) {
-        current = {
-          startRow: rowNumber,
-          startCol,
-          endRow: rowNumber,
-          lines: [rowText],
-          items: [{
+      const rowSegments = splitNarrativeRowSegments(cells, options);
+      for (const segment of rowSegments) {
+        const rowText = segment.values.join(" ").trim();
+        if (!rowText) continue;
+        const startCol = segment.startCol;
+        if (!current || rowNumber - previousRow > 1 || Math.abs(startCol - current.startCol) > 3) {
+          current = {
+            startRow: rowNumber,
+            startCol,
+            endRow: rowNumber,
+            lines: [rowText],
+            items: [{
+              row: rowNumber,
+              startCol,
+              text: rowText,
+              cellValues: segment.values
+            }]
+          };
+          blocks.push(current);
+        } else {
+          current.lines.push(rowText);
+          current.endRow = rowNumber;
+          current.items.push({
             row: rowNumber,
             startCol,
             text: rowText,
-            cellValues: cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean)
-          }]
-        };
-        blocks.push(current);
-      } else {
-        current.lines.push(rowText);
-        current.endRow = rowNumber;
-        current.items.push({
-          row: rowNumber,
-          startCol,
-          text: rowText,
-          cellValues: cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean)
-        });
+            cellValues: segment.values
+          });
+        }
+        previousRow = rowNumber;
       }
-      previousRow = rowNumber;
     }
 
     return blocks;
+  }
+
+  function splitNarrativeRowSegments(cells: ParsedCell[], options: MarkdownOptions): Array<{ startCol: number; values: string[] }> {
+    const segments: Array<{ startCol: number; values: string[] }> = [];
+    let current: { startCol: number; values: string[]; lastCol: number } | null = null;
+    for (const cell of cells) {
+      const value = formatCellForMarkdown(cell, options).trim();
+      if (!value) continue;
+      if (!current || cell.col - current.lastCol > 4) {
+        current = {
+          startCol: cell.col,
+          values: [value],
+          lastCol: cell.col
+        };
+        segments.push(current);
+      } else {
+        current.values.push(value);
+        current.lastCol = cell.col;
+      }
+    }
+    return segments.map((segment) => ({
+      startCol: segment.startCol,
+      values: segment.values
+    }));
   }
 
   function isNarrativeListCandidate(item: NarrativeBlock["items"][number]): boolean {
@@ -3826,6 +4010,86 @@
       index = proseEnd;
     }
     return parts.join("\n\n");
+  }
+
+  function isSectionHeadingNarrativeBlock(block: NarrativeBlock | null | undefined): boolean {
+    if (!block || !block.items || block.items.length !== 1) {
+      return false;
+    }
+    const text = String(block.items[0]?.text || "").trim();
+    if (!text) return false;
+    if (text.length > 32) return false;
+    if (/[。．:：]$/.test(text)) return false;
+    if (/^[\-*#]/.test(text)) return false;
+    return true;
+  }
+
+  function extractSectionBlocks(sheet: ParsedSheet, tables: TableCandidate[], narrativeBlocks: NarrativeBlock[]): SectionBlock[] {
+    const anchors: Array<{ startRow: number; startCol: number; endRow: number; endCol: number }> = [];
+
+    for (const block of narrativeBlocks) {
+      anchors.push({
+        startRow: block.startRow,
+        startCol: block.startCol,
+        endRow: block.endRow,
+        endCol: Math.max(block.startCol, ...block.items.map((item) => item.startCol))
+      });
+    }
+
+    for (const table of tables) {
+      anchors.push({
+        startRow: table.startRow,
+        startCol: table.startCol,
+        endRow: table.endRow,
+        endCol: table.endCol
+      });
+    }
+
+    for (const image of sheet.images) {
+      const anchor = parseCellAddress(image.anchor);
+      if (anchor.row > 0 && anchor.col > 0) {
+        anchors.push({
+          startRow: anchor.row,
+          startCol: anchor.col,
+          endRow: anchor.row,
+          endCol: anchor.col
+        });
+      }
+    }
+
+    if (anchors.length === 0) {
+      return [];
+    }
+    anchors.sort((left, right) => {
+      if (left.startRow !== right.startRow) return left.startRow - right.startRow;
+      return left.startCol - right.startCol;
+    });
+
+    const sections: SectionBlock[] = [];
+    let current: SectionBlock | null = null;
+    let previousEndRow = -100;
+    const verticalGapThreshold = 4;
+
+    for (const anchor of anchors) {
+      const gap = anchor.startRow - previousEndRow;
+      if (!current || gap > verticalGapThreshold) {
+        current = {
+          startRow: anchor.startRow,
+          startCol: anchor.startCol,
+          endRow: anchor.endRow,
+          endCol: anchor.endCol
+        };
+        sections.push(current);
+      } else {
+        current.startRow = Math.min(current.startRow, anchor.startRow);
+        current.startCol = Math.min(current.startCol, anchor.startCol);
+        current.endRow = Math.max(current.endRow, anchor.endRow);
+        current.endCol = Math.max(current.endCol, anchor.endCol);
+      }
+      previousEndRow = Math.max(previousEndRow, anchor.endRow);
+    }
+
+    return sections;
   }
 
   function collectTableSeedCells(sheet: ParsedSheet): ParsedCell[] {
@@ -3915,6 +4179,10 @@
         reasons.push(`結合セル多 (${TABLE_SCORE_WEIGHTS.mergeHeavyPenalty})`);
       }
 
+      if (mergedArea >= 2 && rowCount <= 6 && colCount >= 10 && density < 0.25) {
+        continue;
+      }
+
       const avgTextLength = component
         .filter((entry) => entry.outputValue.trim())
         .reduce((sum, entry) => sum + entry.outputValue.trim().length, 0) / Math.max(1, component.filter((entry) => entry.outputValue.trim()).length);
@@ -3960,13 +4228,19 @@
 
     let normalizedRows = rows;
     if (options.removeEmptyRows !== false) {
-      normalizedRows = normalizedRows.filter((row) => row.some((cell) => String(cell || "").trim() !== ""));
+      normalizedRows = normalizedRows.filter((row) => row.some((cell) => isMeaningfulMarkdownCell(cell)));
     }
     if (options.removeEmptyColumns !== false && normalizedRows.length > 0) {
-      const keepColumnFlags = normalizedRows[0].map((_, colIndex) => normalizedRows.some((row) => String(row[colIndex] || "").trim() !== ""));
+      const keepColumnFlags = normalizedRows[0].map((_, colIndex) => normalizedRows.some((row) => isMeaningfulMarkdownCell(row[colIndex])));
       normalizedRows = normalizedRows.map((row) => row.filter((_cell, colIndex) => keepColumnFlags[colIndex]));
     }
     return normalizedRows;
+  }
+
+  function isMeaningfulMarkdownCell(value: string): boolean {
+    const text = String(value || "").trim();
+    if (!text) return false;
+    return text !== "[MERGED←]" && text !== "[MERGED↑]";
   }
 
   function applyMergeTokens(
@@ -4046,21 +4320,31 @@
     const treatFirstRowAsHeader = options.treatFirstRowAsHeader !== false;
     const tables = detectTableCandidates(sheet);
     const narrativeBlocks = extractNarrativeBlocks(sheet, tables, options);
+    const sectionBlocks = extractSectionBlocks(sheet, tables, narrativeBlocks);
     const formulaDiagnostics = sheet.cells
       .filter((cell) => !!cell.formulaText && cell.resolutionStatus !== null)
       .map((cell) => ({
         address: cell.address,
         formulaText: cell.formulaText,
         status: cell.resolutionStatus,
+        source: cell.resolutionSource,
         outputValue: cell.outputValue
       }));
-    const sections: Array<{ sortRow: number; sortCol: number; markdown: string }> = [];
+    const sections: Array<{
+      sortRow: number;
+      sortCol: number;
+      markdown: string;
+      kind: "narrative" | "table";
+      narrativeBlock?: NarrativeBlock;
+    }> = [];
 
     for (const block of narrativeBlocks) {
       sections.push({
         sortRow: block.startRow,
         sortCol: block.startCol,
-        markdown: `${renderNarrativeBlock(block)}\n`
+        markdown: `${renderNarrativeBlock(block)}\n`,
+        kind: "narrative",
+        narrativeBlock: block
       });
     }
 
@@ -4072,7 +4356,8 @@
       sections.push({
         sortRow: table.startRow,
         sortCol: table.startCol,
-        markdown: `### 表${String(tableCounter).padStart(3, "0")} (${formatRange(table.startRow, table.startCol, table.endRow, table.endCol)})\n\n${tableMarkdown}\n`
+        markdown: `### 表${String(tableCounter).padStart(3, "0")} (${formatRange(table.startRow, table.startCol, table.endRow, table.endCol)})\n\n${tableMarkdown}\n`,
+        kind: "table"
       });
       tableCounter += 1;
     }
@@ -4081,8 +4366,38 @@
       if (left.sortRow !== right.sortRow) return left.sortRow - right.sortRow;
       return left.sortCol - right.sortCol;
     });
+    const groupedSections = (sectionBlocks.length > 0 ? sectionBlocks : [{
+      startRow: -1,
+      startCol: -1,
+      endRow: Number.MAX_SAFE_INTEGER,
+      endCol: Number.MAX_SAFE_INTEGER
+    }]).map((block) => ({
+      block,
+      entries: sections.filter((section) =>
+        section.sortRow >= block.startRow
+        && section.sortRow <= block.endRow
+        && section.sortCol >= block.startCol
+        && section.sortCol <= block.endCol
+      )
+    })).filter((group) => group.entries.length > 0);
 
-    const body = sections.map((section) => section.markdown.trimEnd()).join("\n\n").trim();
+    const body = groupedSections
+      .map((group) => {
+        const entries = group.entries.map((entry) => {
+          if (entry.kind === "narrative" && isSectionHeadingNarrativeBlock(entry.narrativeBlock)) {
+            const headingText = String(entry.narrativeBlock?.items[0]?.text || "").trim();
+            return {
+              ...entry,
+              markdown: `### ${headingText}\n`
+            };
+          }
+          return entry;
+        });
+        return entries.map((section) => section.markdown.trimEnd()).join("\n\n").trim();
+      })
+      .filter(Boolean)
+      .join("\n\n---\n\n")
+      .trim();
     const imageSection = sheet.images.length > 0
       ? [
         "",
@@ -4115,6 +4430,7 @@
       markdown,
       summary: {
         outputMode: options.outputMode || "display",
+        sections: sectionBlocks.length,
         tables: tables.length,
         narrativeBlocks: narrativeBlocks.length,
         merges: sheet.merges.length,
@@ -4141,6 +4457,7 @@
     return [
       `出力ファイル: ${markdownFile.fileName}`,
       `出力モード: ${markdownFile.summary.outputMode}`,
+      `セクション: ${markdownFile.summary.sections}`,
       `表: ${markdownFile.summary.tables}`,
       `地の文ブロック: ${markdownFile.summary.narrativeBlocks}`,
       `結合セル範囲: ${markdownFile.summary.merges}`,
