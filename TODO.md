@@ -218,6 +218,22 @@
   - `formula/formula-shared-sample01.xlsx`
   - `image/image-basic-sample01.xlsx`
   - `named-range/named-range-sample01.xlsx`
+- [引継][xlsx2md] `local-data` の実データ差分レビューを開始
+  - 重点対象は `docs/xlsx2md/local-data-review.md` を参照
+  - 優先順:
+    - `TF0ffdef.../計算` の fallback `5` 特定
+     - `TFc2b640.../イベント プランナー` の多画像・多結合差分確認
+     - `TF97739.../月間プランナー` の merge 多用差分確認
+   - 人手確認があると助かるもの:
+     - 代表シートの Excel スクリーンショット
+     - 条件付き書式やアイコン列の意味説明
+- [xlsx2md][仕様整理] レイアウト中心シートは見た目再現ではなく、`セクション / 表 / リスト / 画像` への分解を優先する方針を維持する
+- [xlsx2md][次段検討] `セクション分割ブロック` の導入を検討する
+  - 対象候補: 入力パネル、概要カード、見出し付きの広い merge 領域
+- [xlsx2md][次段検討] `カレンダー / ボード / ダッシュボード系` シートを通常の表とは別カテゴリで扱う
+  - 対象候補: `TF97739.../月間プランナー`
+  - 対象候補: `TFc2b640.../イベント プランナー`
+  - 対象候補: `TF0ffdef.../老後資金プランナー`
   - `narrative/narrative-vs-table-sample01.xlsx`
   - `edge/edge-empty-sample01.xlsx`
   - `edge/edge-weird-sheetname-sample01.xlsx`

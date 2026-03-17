@@ -1139,7 +1139,12 @@
             }
             if (cell.formulaText) {
                 if (cell.resolutionStatus === "resolved") {
-                    return String(cell.rawValue || cell.outputValue || "");
+                    const rawValue = String(cell.rawValue || "");
+                    const outputValue = String(cell.outputValue || "");
+                    if (rawValue && rawValue !== cell.formulaText) {
+                        return rawValue;
+                    }
+                    return outputValue || rawValue;
                 }
                 const rawValue = String(cell.rawValue || "");
                 const outputValue = String(cell.outputValue || "");
@@ -1172,7 +1177,53 @@
             const formulaText = lookupDefinedNameFormula(sheetName, name);
             if (!formulaText)
                 return null;
-            return parseQualifiedRangeReference(formulaText.replace(/^=/, ""), sheetName);
+            const normalized = formulaText.replace(/^=/, "").trim();
+            const directRange = parseQualifiedRangeReference(normalized, sheetName);
+            if (directRange) {
+                return directRange;
+            }
+            const separatorIndex = findTopLevelOperatorIndex(normalized, ":");
+            if (separatorIndex <= 0) {
+                return null;
+            }
+            const leftText = normalized.slice(0, separatorIndex).trim();
+            const rightText = normalized.slice(separatorIndex + 1).trim();
+            const startRef = parseSimpleFormulaReference(`=${leftText}`, sheetName);
+            const indexCall = parseWholeFunctionCall(rightText, ["INDEX"]);
+            if (!startRef || !indexCall) {
+                return null;
+            }
+            const args = splitFormulaArguments(indexCall.argsText.trim());
+            if (args.length < 2 || args.length > 3) {
+                return null;
+            }
+            const rangeRef = parseQualifiedRangeReference(args[0], sheetName);
+            const rowIndex = Number(resolveScalarFormulaValue(args[1], sheetName, resolveCellValue, (targetSheetName, rangeText) => resolveRangeEntries(targetSheetName, rangeText).numericValues, resolveRangeEntries));
+            const colIndex = args.length === 3
+                ? Number(resolveScalarFormulaValue(args[2], sheetName, resolveCellValue, (targetSheetName, rangeText) => resolveRangeEntries(targetSheetName, rangeText).numericValues, resolveRangeEntries))
+                : 1;
+            if (!rangeRef || Number.isNaN(rowIndex) || Number.isNaN(colIndex) || rowIndex < 1 || colIndex < 1) {
+                return null;
+            }
+            const rangeStart = parseCellAddress(rangeRef.start);
+            const rangeEnd = parseCellAddress(rangeRef.end);
+            if (!rangeStart.row || !rangeStart.col || !rangeEnd.row || !rangeEnd.col) {
+                return null;
+            }
+            const startRow = Math.min(rangeStart.row, rangeEnd.row);
+            const endRow = Math.max(rangeStart.row, rangeEnd.row);
+            const startCol = Math.min(rangeStart.col, rangeEnd.col);
+            const endCol = Math.max(rangeStart.col, rangeEnd.col);
+            const targetRow = startRow + Math.trunc(rowIndex) - 1;
+            const targetCol = startCol + Math.trunc(colIndex) - 1;
+            if (targetRow > endRow || targetCol > endCol) {
+                return null;
+            }
+            return {
+                sheetName: startRef.sheetName,
+                start: startRef.address,
+                end: `${colToLetters(targetCol)}${targetRow}`
+            };
         }
         function resolveStructuredRange(sheetName, text) {
             const match = String(text || "").trim().match(/^(.+?)\[([^\]]+)\]$/);
@@ -1807,6 +1858,39 @@
         }
         return null;
     }
+    function findTopLevelOperatorIndex(expression, operator) {
+        const target = String(operator || "");
+        if (!target)
+            return -1;
+        let depth = 0;
+        let inSingleQuote = false;
+        let inDoubleQuote = false;
+        for (let i = 0; i <= expression.length - target.length; i += 1) {
+            const ch = expression[i];
+            if (ch === "'" && !inDoubleQuote) {
+                inSingleQuote = !inSingleQuote;
+                continue;
+            }
+            if (ch === "\"" && !inSingleQuote) {
+                inDoubleQuote = !inDoubleQuote;
+                continue;
+            }
+            if (inSingleQuote || inDoubleQuote)
+                continue;
+            if (ch === "(") {
+                depth += 1;
+                continue;
+            }
+            if (ch === ")") {
+                depth = Math.max(0, depth - 1);
+                continue;
+            }
+            if (depth === 0 && expression.slice(i, i + target.length) === target) {
+                return i;
+            }
+        }
+        return -1;
+    }
     function splitConcatenationExpression(expression) {
         const parts = [];
         let start = 0;
@@ -1909,14 +1993,14 @@
                 i += 1;
                 continue;
             }
-            if (!/[A-Za-z_]/.test(ch)) {
+            if (!/[\p{L}_]/u.test(ch)) {
                 result += ch;
                 i += 1;
                 continue;
             }
             const start = i;
             i += 1;
-            while (i < expression.length && /[A-Za-z0-9_.]/.test(expression[i])) {
+            while (i < expression.length && /[\p{L}\p{N}_.]/u.test(expression[i])) {
                 i += 1;
             }
             const token = expression.slice(start, i);
@@ -2270,7 +2354,7 @@
         return null;
     }
     function tryResolveStringFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
-        const call = parseWholeFunctionCall(normalizedFormula, ["LEFT", "RIGHT", "MID", "LEN", "TRIM", "SUBSTITUTE", "REPLACE"]);
+        const call = parseWholeFunctionCall(normalizedFormula, ["LEFT", "RIGHT", "MID", "LEN", "TRIM", "SUBSTITUTE", "REPLACE", "REPT"]);
         if (!call)
             return null;
         const fnName = call.name;
@@ -2362,6 +2446,33 @@
             const startIndex = Math.max(0, Math.trunc(start) - 1);
             const length = Math.max(0, Math.trunc(count));
             return source.slice(0, startIndex) + replacement + source.slice(startIndex + length);
+        }
+        if (fnName === "REPT") {
+            if (args.length !== 2)
+                return null;
+            const source = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
+            const countValue = resolveScalarFormulaValue(args[1], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
+            if (source == null)
+                return null;
+            const normalizedCount = countValue == null
+                ? (() => {
+                    const evaluatedCondition = evaluateFormulaCondition(args[1], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
+                    if (evaluatedCondition == null) {
+                        return null;
+                    }
+                    return evaluatedCondition ? "TRUE" : "FALSE";
+                })()
+                : countValue.trim().toUpperCase();
+            if (normalizedCount == null)
+                return null;
+            const count = normalizedCount === "TRUE"
+                ? 1
+                : normalizedCount === "FALSE"
+                    ? 0
+                    : Number(countValue);
+            if (!Number.isFinite(count))
+                return null;
+            return source.repeat(Math.max(0, Math.trunc(count)));
         }
         return null;
     }
