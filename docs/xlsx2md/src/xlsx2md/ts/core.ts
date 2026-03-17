@@ -70,6 +70,7 @@
     merges: MergeRange[];
     tables: ParsedTable[];
     images: ParsedImageAsset[];
+    charts: ParsedChartAsset[];
     maxRow: number;
     maxCol: number;
   };
@@ -81,6 +82,19 @@
     anchor: string;
     data: Uint8Array;
     mediaPath: string;
+  };
+
+  type ParsedChartAsset = {
+    sheetName: string;
+    anchor: string;
+    chartPath: string;
+    title: string;
+    chartType: string;
+    series: {
+      name: string;
+      categoriesRef: string;
+      valuesRef: string;
+    }[];
   };
 
   type ParsedWorkbook = {
@@ -156,6 +170,7 @@
       narrativeBlocks: number;
       merges: number;
       images: number;
+      charts: number;
       cells: number;
       tableScores: TableScoreDetail[];
       formulaDiagnostics: FormulaDiagnostic[];
@@ -1121,6 +1136,104 @@
     }
 
     return imageAssets;
+  }
+
+  function parseChartType(chartDoc: Document): string {
+    const typeMap: Array<{ localName: string; label: string }> = [
+      { localName: "barChart", label: "棒グラフ" },
+      { localName: "lineChart", label: "折れ線グラフ" },
+      { localName: "pieChart", label: "円グラフ" },
+      { localName: "doughnutChart", label: "ドーナツグラフ" },
+      { localName: "areaChart", label: "面グラフ" },
+      { localName: "scatterChart", label: "散布図" },
+      { localName: "radarChart", label: "レーダーチャート" },
+      { localName: "bubbleChart", label: "バブルチャート" }
+    ];
+    const matched = typeMap
+      .filter((entry) => getElementsByLocalName(chartDoc, entry.localName).length > 0)
+      .map((entry) => entry.label);
+    if (matched.length === 0) return "グラフ";
+    if (matched.length === 1) return matched[0];
+    return `${matched.join(" + ")} (複合)`;
+  }
+
+  function parseChartTitle(chartDoc: Document): string {
+    const richText = getElementsByLocalName(chartDoc, "t")
+      .map((node) => getTextContent(node))
+      .filter(Boolean);
+    if (richText.length > 0) {
+      return richText.join("").trim();
+    }
+    return "";
+  }
+
+  function parseChartSeries(chartDoc: Document): ParsedChartAsset["series"] {
+    return getElementsByLocalName(chartDoc, "ser").map((seriesNode) => {
+      const nameRef = getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "tx") || seriesNode, "f");
+      const nameValue = getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "tx") || seriesNode, "v");
+      const nameText = getElementsByLocalName(getFirstChildByLocalName(seriesNode, "tx") || seriesNode, "t")
+        .map((node) => getTextContent(node))
+        .join("")
+        .trim();
+      const catRef = getFirstChildByLocalName(getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "cat") || seriesNode, "strRef") || seriesNode, "f")
+        || getFirstChildByLocalName(getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "cat") || seriesNode, "numRef") || seriesNode, "f");
+      const valRef = getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "val") || seriesNode, "f")
+        || getFirstChildByLocalName(getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "val") || seriesNode, "numRef") || seriesNode, "f");
+      return {
+        name: nameText || getTextContent(nameValue) || getTextContent(nameRef) || "系列",
+        categoriesRef: getTextContent(catRef),
+        valuesRef: getTextContent(valRef)
+      };
+    });
+  }
+
+  function parseDrawingCharts(
+    files: Map<string, Uint8Array>,
+    sheetName: string,
+    sheetPath: string
+  ): ParsedChartAsset[] {
+    const sheetRels = parseRelationships(files, buildRelsPath(sheetPath), sheetPath);
+    const charts: ParsedChartAsset[] = [];
+
+    for (const drawingPath of sheetRels.values()) {
+      if (!/\/drawings\/.+\.xml$/i.test(drawingPath)) continue;
+      const drawingBytes = files.get(drawingPath);
+      if (!drawingBytes) continue;
+      const drawingDoc = xmlToDocument(decodeXmlText(drawingBytes));
+      const drawingRels = parseRelationships(files, buildRelsPath(drawingPath), drawingPath);
+      const anchors = getElementsByLocalName(drawingDoc, "oneCellAnchor").concat(getElementsByLocalName(drawingDoc, "twoCellAnchor"));
+
+      for (const anchor of anchors) {
+        const from = getFirstChildByLocalName(anchor, "from");
+        const colNode = getFirstChildByLocalName(from || anchor, "col");
+        const rowNode = getFirstChildByLocalName(from || anchor, "row");
+        const col = Number(getTextContent(colNode)) + 1;
+        const row = Number(getTextContent(rowNode)) + 1;
+        if (!Number.isFinite(col) || !Number.isFinite(row) || col <= 0 || row <= 0) {
+          continue;
+        }
+
+        const chartNode = getFirstChildByLocalName(anchor, "graphicFrame");
+        const chartRef = getElementsByLocalName(chartNode || anchor, "chart")[0] || null;
+        const relId = chartRef?.getAttribute("r:id") || chartRef?.getAttribute("id") || "";
+        const chartPath = drawingRels.get(relId) || "";
+        if (!chartPath) continue;
+        const chartBytes = files.get(chartPath);
+        if (!chartBytes) continue;
+        const chartDoc = xmlToDocument(decodeXmlText(chartBytes));
+
+        charts.push({
+          sheetName,
+          anchor: `${colToLetters(col)}${row}`,
+          chartPath,
+          title: parseChartTitle(chartDoc),
+          chartType: parseChartType(chartDoc),
+          series: parseChartSeries(chartDoc)
+        });
+      }
+    }
+
+    return charts;
   }
 
   function extractCellOutputValue(
@@ -3765,6 +3878,7 @@
     const merges = Array.from(doc.getElementsByTagName("mergeCell")).map((mergeElement) => parseRangeRef(mergeElement.getAttribute("ref") || ""));
     const tables = parseWorksheetTables(files, doc, sheetName, sheetPath);
     const images = parseDrawingImages(files, sheetName, sheetPath);
+    const charts = parseDrawingCharts(files, sheetName, sheetPath);
     let maxRow = 0;
     let maxCol = 0;
     for (const cell of cells) {
@@ -3783,6 +3897,7 @@
       merges,
       tables,
       images,
+      charts,
       maxRow,
       maxCol
     };
@@ -4025,6 +4140,7 @@
   }
 
   function extractSectionBlocks(sheet: ParsedSheet, tables: TableCandidate[], narrativeBlocks: NarrativeBlock[]): SectionBlock[] {
+    const charts = sheet.charts || [];
     const anchors: Array<{ startRow: number; startCol: number; endRow: number; endCol: number }> = [];
 
     for (const block of narrativeBlocks) {
@@ -4047,6 +4163,18 @@
 
     for (const image of sheet.images) {
       const anchor = parseCellAddress(image.anchor);
+      if (anchor.row > 0 && anchor.col > 0) {
+        anchors.push({
+          startRow: anchor.row,
+          startCol: anchor.col,
+          endRow: anchor.row,
+          endCol: anchor.col
+        });
+      }
+    }
+
+    for (const chart of charts) {
+      const anchor = parseCellAddress(chart.anchor);
       if (anchor.row > 0 && anchor.col > 0) {
         anchors.push({
           startRow: anchor.row,
@@ -4317,6 +4445,7 @@
   }
 
   function convertSheetToMarkdown(workbook: ParsedWorkbook, sheet: ParsedSheet, options: MarkdownOptions = {}): MarkdownFile {
+    const charts = sheet.charts || [];
     const treatFirstRowAsHeader = options.treatFirstRowAsHeader !== false;
     const tables = detectTableCandidates(sheet);
     const narrativeBlocks = extractNarrativeBlocks(sheet, tables, options);
@@ -4411,6 +4540,33 @@
         ].join("\n"))
       ].join("\n")
       : "";
+    const chartSection = charts.length > 0
+      ? [
+        "",
+        "## グラフ",
+        "",
+        ...charts.map((chart, index) => {
+          const lines = [
+            `### グラフ${String(index + 1).padStart(3, "0")} (${chart.anchor})`,
+            `- タイトル: ${chart.title || "(なし)"}`,
+            `- 種別: ${chart.chartType}`
+          ];
+          if (chart.series.length > 0) {
+            lines.push("- 系列:");
+            for (const series of chart.series) {
+              lines.push(`  - ${series.name}`);
+              if (series.categoriesRef) {
+                lines.push(`    - categories: ${series.categoriesRef}`);
+              }
+              if (series.valuesRef) {
+                lines.push(`    - values: ${series.valuesRef}`);
+              }
+            }
+          }
+          return lines.join("\n");
+        })
+      ].join("\n")
+      : "";
     const markdown = [
       `# ${sheet.name}`,
       "",
@@ -4421,6 +4577,7 @@
       "## 本文",
       "",
       body || "_抽出できる本文はありませんでした。_",
+      chartSection,
       imageSection
     ].join("\n");
 
@@ -4435,6 +4592,7 @@
         narrativeBlocks: narrativeBlocks.length,
         merges: sheet.merges.length,
         images: sheet.images.length,
+        charts: charts.length,
         cells: sheet.cells.length,
         tableScores: tables.map((table) => ({
           range: formatRange(table.startRow, table.startCol, table.endRow, table.endCol),
@@ -4462,6 +4620,7 @@
       `地の文ブロック: ${markdownFile.summary.narrativeBlocks}`,
       `結合セル範囲: ${markdownFile.summary.merges}`,
       `画像: ${markdownFile.summary.images}`,
+      `グラフ: ${markdownFile.summary.charts}`,
       `解析セル数: ${markdownFile.summary.cells}`,
       `数式 resolved: ${resolvedCount}`,
       `数式 fallback_formula: ${fallbackCount}`,
