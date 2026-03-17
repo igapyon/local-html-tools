@@ -1122,7 +1122,7 @@
                 resolvingKeys.add(key);
                 try {
                     try {
-                        const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue);
+                        const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue, undefined, undefined, cell.address);
                         if (evaluated != null) {
                             applyResolvedFormulaValue(cell, evaluated);
                         }
@@ -1296,13 +1296,17 @@
             resolveStructuredRange
         };
     }
-    function tryResolveFormulaExpression(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
+    function tryResolveFormulaExpression(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries, currentAddress) {
         const normalized = String(formulaText || "").trim().replace(/^=/, "");
         if (!normalized)
             return null;
         const directDefinedNameValue = (resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(currentSheetName, normalized)) || null;
         if (directDefinedNameValue != null) {
             return directDefinedNameValue;
+        }
+        const astResolved = tryResolveFormulaExpressionWithAst(normalized, currentSheetName, resolveCellValue, resolveRangeEntries, currentAddress);
+        if (astResolved != null) {
+            return astResolved;
         }
         const ifResult = tryResolveIfFunction(normalized, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
         if (ifResult != null) {
@@ -1394,6 +1398,126 @@
             }
             return null;
         }
+    }
+    function tryResolveFormulaExpressionWithAst(expression, currentSheetName, resolveCellValue, resolveRangeEntries, currentAddress) {
+        const formulaApi = globalThis.__xlsx2mdFormula;
+        if (!(formulaApi === null || formulaApi === void 0 ? void 0 : formulaApi.parseFormula) || !(formulaApi === null || formulaApi === void 0 ? void 0 : formulaApi.evaluateFormulaAst)) {
+            return null;
+        }
+        try {
+            const ast = formulaApi.parseFormula(`=${expression}`);
+            const evaluated = formulaApi.evaluateFormulaAst(ast, {
+                resolveCell(ref, sheet) {
+                    return coerceFormulaAstScalar(resolveCellValue(sheet || currentSheetName, normalizeFormulaAddress(ref)));
+                },
+                resolveName(name) {
+                    var _a, _b, _c;
+                    const scopedRef = parseSheetScopedDefinedNameReference(name, currentSheetName);
+                    if (scopedRef) {
+                        const scopedValue = (_a = resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(scopedRef.sheetName, scopedRef.name)) !== null && _a !== void 0 ? _a : null;
+                        if (scopedValue != null) {
+                            return coerceFormulaAstScalar(scopedValue);
+                        }
+                    }
+                    const scalarValue = (_b = resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(currentSheetName, name)) !== null && _b !== void 0 ? _b : null;
+                    if (scalarValue != null) {
+                        return coerceFormulaAstScalar(scalarValue);
+                    }
+                    const rangeRef = (_c = resolveDefinedNameRangeRef === null || resolveDefinedNameRangeRef === void 0 ? void 0 : resolveDefinedNameRangeRef(currentSheetName, name)) !== null && _c !== void 0 ? _c : null;
+                    if (rangeRef && resolveRangeEntries) {
+                        return createFormulaAstRangeMatrix(rangeRef.sheetName, rangeRef.start, rangeRef.end, resolveRangeEntries);
+                    }
+                    return null;
+                },
+                resolveScopedName(sheet, name) {
+                    var _a, _b;
+                    const scopedValue = (_a = resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(sheet, name)) !== null && _a !== void 0 ? _a : null;
+                    if (scopedValue != null) {
+                        return coerceFormulaAstScalar(scopedValue);
+                    }
+                    const rangeRef = (_b = resolveDefinedNameRangeRef === null || resolveDefinedNameRangeRef === void 0 ? void 0 : resolveDefinedNameRangeRef(sheet, name)) !== null && _b !== void 0 ? _b : null;
+                    if (rangeRef && resolveRangeEntries) {
+                        return createFormulaAstRangeMatrix(rangeRef.sheetName, rangeRef.start, rangeRef.end, resolveRangeEntries);
+                    }
+                    return null;
+                },
+                resolveStructuredRef(table, column) {
+                    var _a;
+                    const rangeRef = (_a = resolveStructuredRangeRef === null || resolveStructuredRangeRef === void 0 ? void 0 : resolveStructuredRangeRef(currentSheetName, `${table}[${column}]`)) !== null && _a !== void 0 ? _a : null;
+                    if (!rangeRef || !resolveRangeEntries) {
+                        return null;
+                    }
+                    return createFormulaAstRangeMatrix(rangeRef.sheetName, rangeRef.start, rangeRef.end, resolveRangeEntries);
+                },
+                resolveRange(startRef, endRef, sheet) {
+                    if (!resolveRangeEntries) {
+                        return [];
+                    }
+                    return createFormulaAstRangeMatrix(sheet || currentSheetName, normalizeFormulaAddress(startRef), normalizeFormulaAddress(endRef), resolveRangeEntries);
+                },
+                currentCellRef: currentAddress ? normalizeFormulaAddress(currentAddress) : undefined
+            });
+            return serializeFormulaAstResult(evaluated);
+        }
+        catch (_error) {
+            return null;
+        }
+    }
+    function coerceFormulaAstScalar(value) {
+        const trimmed = String(value || "").trim();
+        if (!trimmed) {
+            return "";
+        }
+        if (trimmed === "TRUE") {
+            return true;
+        }
+        if (trimmed === "FALSE") {
+            return false;
+        }
+        const numeric = Number(trimmed.replace(/,/g, ""));
+        if (!Number.isNaN(numeric)) {
+            return numeric;
+        }
+        return trimmed;
+    }
+    function createFormulaAstRangeMatrix(sheetName, startAddress, endAddress, resolveRangeEntries) {
+        const range = parseRangeAddress(`${normalizeFormulaAddress(startAddress)}:${normalizeFormulaAddress(endAddress)}`);
+        if (!range) {
+            return [];
+        }
+        const start = parseCellAddress(range.start);
+        const end = parseCellAddress(range.end);
+        if (!start.row || !start.col || !end.row || !end.col) {
+            return [];
+        }
+        const startRow = Math.min(start.row, end.row);
+        const endRow = Math.max(start.row, end.row);
+        const startCol = Math.min(start.col, end.col);
+        const endCol = Math.max(start.col, end.col);
+        const entries = resolveRangeEntries(sheetName, `${range.start}:${range.end}`).rawValues;
+        const matrix = [];
+        let index = 0;
+        for (let row = startRow; row <= endRow; row += 1) {
+            const rowValues = [];
+            for (let col = startCol; col <= endCol; col += 1) {
+                rowValues.push(coerceFormulaAstScalar(entries[index] || ""));
+                index += 1;
+            }
+            matrix.push(rowValues);
+        }
+        return matrix;
+    }
+    function serializeFormulaAstResult(value) {
+        if (value == null) {
+            return null;
+        }
+        if (Array.isArray(value)) {
+            return null;
+        }
+        if (typeof value === "boolean") {
+            return value ? "TRUE" : "FALSE";
+        }
+        return String(value);
     }
     function tryResolveIfFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
         const call = parseWholeFunctionCall(normalizedFormula, ["IF"]);
@@ -2743,7 +2867,7 @@
                         }
                         let evaluated = null;
                         try {
-                            evaluated = tryResolveFormulaExpression(cell.formulaText, sheet.name, resolver.resolveCellValue, resolver.resolveRangeValues, resolver.resolveRangeEntries);
+                            evaluated = tryResolveFormulaExpression(cell.formulaText, sheet.name, resolver.resolveCellValue, resolver.resolveRangeValues, resolver.resolveRangeEntries, cell.address);
                         }
                         catch (error) {
                             if (!(error instanceof Error) || error.message !== "__FORMULA_UNRESOLVED__") {

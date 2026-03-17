@@ -18,6 +18,7 @@
 - `raw` / `both` で保存する Markdown や ZIP は、ファイル名にモードサフィックスを付けて区別できるようにする
 - 保存ファイル名は安全側へサニタイズし、シート名の空白や一部記号をそのまま使わないことがある
 - 表候補外の縦並び短文は、地の文として連結せず箇条書きへ変換することがある
+- 数式は `cached value` を優先し、自前 evaluator は未計算保存や欠損時の補助として扱う
 
 ## 使い方
 
@@ -93,6 +94,8 @@ docs/xlsx2md/
 
 実装前の整理メモは [xlsx2md-spec.md](./xlsx2md-spec.md) を参照してください。
 
+Excel 数式サブセットの設計メモは [xlsx-formula-subset.md](/Users/igapyon/Documents/git/local-html-tools/docs/xlsx2md/xlsx-formula-subset.md) を参照してください。
+
 fixture 用 Excel ブックの作成メモは [tests/fixtures/README.md](/Users/igapyon/Documents/git/local-html-tools/docs/xlsx2md/tests/fixtures/README.md) を参照してください。
 
 git に入れない実データや一時検証用の `.xlsx` は `docs/xlsx2md/local-data/` に配置します。このディレクトリは `.gitignore` 対象です。
@@ -100,3 +103,20 @@ git に入れない実データや一時検証用の `.xlsx` は `docs/xlsx2md/l
 `docs/xlsx2md/local-data/` で使う一部サンプルの取得元メモ:
 
 - Microsoft Create planner / tracker templates: <https://excel.cloud.microsoft/create/ja/planner-tracker-templates/>
+
+## 数式文法の参照
+
+Excel 数式の文法整理の参考資料として、`ClosedXML.Parser` の ABNF を参照します。
+
+- 取得元リポジトリ: <https://github.com/ClosedXML/ClosedXML.Parser>
+- 参照ファイル: `MS-XLSX-parser-grammar.abnf`
+- ローカル配置先: [references/MS-XLSX-parser-grammar.abnf](/Users/igapyon/Documents/git/local-html-tools/docs/xlsx2md/references/MS-XLSX-parser-grammar.abnf)
+- 利用目的: `xlsx2md` における Excel 数式サブセット文法の整理と、将来の AST ベース実装検討のための参照
+
+ライセンス確認メモ:
+
+- `ClosedXML.Parser` は MIT License として公開されている
+
+謝辞:
+
+- Excel 数式文法の参照資料を公開している `ClosedXML.Parser` プロジェクトに感謝します

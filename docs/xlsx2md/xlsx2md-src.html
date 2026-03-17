@@ -40,60 +40,51 @@ limitations under the License.
 
       <section class="md-section md-stack-md">
         <h2 class="md-section-title">入力</h2>
-        <div class="md-grid md-grid--input">
-          <div class="md-panel md-stack-sm">
-            <lht-file-select
-              input-id="xlsxFileInput"
-              button-id="xlsxFileSelectBtn"
-              file-name-id="xlsxFileName"
-              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              button-label="xlsx ファイルを選択"
-              placeholder="未選択"
-              show-file-name>
-            </lht-file-select>
-            <div class="md-caption">ローカルで処理します。サーバ送信は行いません。</div>
-          </div>
+        <div class="md-panel md-stack-sm">
+          <lht-file-select
+            input-id="xlsxFileInput"
+            button-id="xlsxFileSelectBtn"
+            file-name-id="xlsxFileName"
+            accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            button-label="xlsx ファイルを選択"
+            placeholder="未選択"
+            show-file-name>
+          </lht-file-select>
+          <div class="md-caption">ローカルで処理します。サーバ送信は行いません。変換は常に全シートを対象に行います。</div>
+        </div>
+      </section>
 
-          <div class="md-panel md-stack-sm">
-            <lht-select-help field-id="sheetSelect" label="対象シート" help-text="読み込んだ Workbook から変換対象のシートを選択します。`全シート` はプレビュー上で連結表示します。">
+      <details class="md-section md-accordion">
+        <summary class="md-accordion-summary">
+          <span class="md-section-title">変換設定</span>
+        </summary>
+        <div class="md-accordion-body md-stack-md">
+          <div class="md-grid md-grid--options">
+            <lht-select-help field-id="outputModeSelect" label="出力モード" help-text="Markdown に表示値を出すか、raw 値を出すかを選択します。既定は Excel 表示寄りの `display` です。">
               <script type="application/json" slot="options">
                 [
-                  { "value": "", "label": "xlsx を読み込んでください", "selected": true }
+                  { "value": "display", "label": "display: 表示値優先", "selected": true },
+                  { "value": "raw", "label": "raw: 内部値優先" },
+                  { "value": "both", "label": "both: 両方表示" }
                 ]
               </script>
             </lht-select-help>
-            <div id="sheetSummary" class="md-summary-chip">Workbook 未読込</div>
+            <lht-switch-help switch-id="headerRowEnabled" label="先頭行をヘッダーとして扱う" help-label="ヘッダー行の説明" checked>
+              表の1行目を Markdown テーブルのヘッダー行として扱います。
+            </lht-switch-help>
+            <lht-switch-help switch-id="trimTextEnabled" label="前後空白を trim する" help-label="trim の説明" checked>
+              文字列セルの前後空白を取り除きます。
+            </lht-switch-help>
+            <lht-switch-help switch-id="removeEmptyRowsEnabled" label="空行を除外する" help-label="空行除外の説明" checked>
+              表や地の文の中で、値のない行を可能な限り除外します。
+            </lht-switch-help>
+            <lht-switch-help switch-id="removeEmptyColumnsEnabled" label="空列を除外する" help-label="空列除外の説明" checked>
+              表の中で、値のない列を可能な限り除外します。
+            </lht-switch-help>
           </div>
+          <div id="outputModeNotice" class="md-caption">`display` は Excel の表示値寄りで出力します。</div>
         </div>
-      </section>
-
-      <section class="md-section md-stack-md">
-        <h2 class="md-section-title">変換設定</h2>
-        <div class="md-grid md-grid--options">
-          <lht-select-help field-id="outputModeSelect" label="出力モード" help-text="Markdown に表示値を出すか、raw 値を出すかを選択します。既定は Excel 表示寄りの `display` です。">
-            <script type="application/json" slot="options">
-              [
-                { "value": "display", "label": "display: 表示値優先", "selected": true },
-                { "value": "raw", "label": "raw: 内部値優先" },
-                { "value": "both", "label": "both: 両方表示" }
-              ]
-            </script>
-          </lht-select-help>
-          <lht-switch-help switch-id="headerRowEnabled" label="先頭行をヘッダーとして扱う" help-label="ヘッダー行の説明" checked>
-            表の1行目を Markdown テーブルのヘッダー行として扱います。
-          </lht-switch-help>
-          <lht-switch-help switch-id="trimTextEnabled" label="前後空白を trim する" help-label="trim の説明" checked>
-            文字列セルの前後空白を取り除きます。
-          </lht-switch-help>
-          <lht-switch-help switch-id="removeEmptyRowsEnabled" label="空行を除外する" help-label="空行除外の説明" checked>
-            表や地の文の中で、値のない行を可能な限り除外します。
-          </lht-switch-help>
-          <lht-switch-help switch-id="removeEmptyColumnsEnabled" label="空列を除外する" help-label="空列除外の説明" checked>
-            表の中で、値のない列を可能な限り除外します。
-          </lht-switch-help>
-        </div>
-        <div id="outputModeNotice" class="md-caption">`display` は Excel の表示値寄りで出力します。</div>
-      </section>
+      </details>
 
       <section class="md-section md-stack-md">
         <div class="md-actions">
@@ -118,36 +109,47 @@ limitations under the License.
         </div>
       </section>
 
-      <section class="md-section">
-        <div class="md-panel md-stack-sm">
-          <h2 class="md-section-title">表候補スコア</h2>
-          <div class="md-legend">
-            <span class="md-summary-item-status md-summary-item-status--strong">strong</span>
-            <span class="md-caption">7点以上の強い表候補</span>
-            <span class="md-summary-item-status md-summary-item-status--candidate">candidate</span>
-            <span class="md-caption">4-6点の表候補</span>
+      <details class="md-section md-accordion">
+        <summary class="md-accordion-summary">
+          <span class="md-section-title">表候補スコア</span>
+        </summary>
+        <div class="md-accordion-body">
+          <div class="md-panel md-stack-sm">
+            <div class="md-legend">
+              <span class="md-summary-item-status md-summary-item-status--strong">strong</span>
+              <span class="md-caption">7点以上の強い表候補</span>
+              <span class="md-summary-item-status md-summary-item-status--candidate">candidate</span>
+              <span class="md-caption">4-6点の表候補</span>
+            </div>
+            <div id="scoreSummary" class="md-summary-list">まだ変換していません。</div>
           </div>
-          <div id="scoreSummary" class="md-summary-list">まだ変換していません。</div>
         </div>
-      </section>
+      </details>
 
-      <section class="md-section">
-        <div class="md-panel md-stack-sm">
-          <h2 class="md-section-title">数式診断</h2>
-          <div class="md-legend">
-            <span class="md-summary-item-status md-summary-item-status--resolved">resolved</span>
-            <span class="md-summary-item-status md-summary-item-status--fallback">fallback</span>
-            <span class="md-summary-item-status md-summary-item-status--unsupported">unsupported</span>
-            <span class="md-caption">解決済み / フォールバック / 未対応外部参照</span>
+      <details class="md-section md-accordion">
+        <summary class="md-accordion-summary">
+          <span class="md-section-title">数式診断</span>
+        </summary>
+        <div class="md-accordion-body">
+          <div class="md-panel md-stack-sm">
+            <div class="md-legend">
+              <span class="md-summary-item-status md-summary-item-status--resolved">resolved</span>
+              <span class="md-summary-item-status md-summary-item-status--fallback">fallback</span>
+              <span class="md-summary-item-status md-summary-item-status--unsupported">unsupported</span>
+              <span class="md-caption">解決済み / フォールバック / 未対応外部参照</span>
+            </div>
+            <div id="formulaSummary" class="md-summary-list">まだ変換していません。</div>
           </div>
-          <div id="formulaSummary" class="md-summary-list">まだ変換していません。</div>
         </div>
-      </section>
+      </details>
 
       <lht-toast id="toast"></lht-toast>
     </section>
   </main>
 
+  <script src="src/xlsx2md/js/formula/tokenizer.js"></script>
+  <script src="src/xlsx2md/js/formula/parser.js"></script>
+  <script src="src/xlsx2md/js/formula/evaluator.js"></script>
   <script src="src/xlsx2md/js/core.js"></script>
   <script src="src/xlsx2md/js/main.js"></script>
 </body>

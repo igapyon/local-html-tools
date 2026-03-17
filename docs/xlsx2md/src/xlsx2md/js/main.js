@@ -45,9 +45,6 @@
     function setSummaryText(message) {
         setSummaryHtml(`<div class="md-summary-empty">${escapeHtml(message)}</div>`);
     }
-    function setSheetSummary(message) {
-        getElement("sheetSummary").textContent = message;
-    }
     function setScoreSummaryHtml(html) {
         getElement("scoreSummary").innerHTML = html;
     }
@@ -258,40 +255,8 @@
             overlay.removeAttribute("active");
         }
     }
-    function updateSheetOptions() {
-        const select = getElement("sheetSelect");
-        if (!currentWorkbook || currentWorkbook.sheets.length === 0) {
-            if (typeof select.setOptions === "function") {
-                select.setOptions([{ value: "", label: "xlsx を読み込んでください", selected: true }]);
-            }
-            setSheetSummary("Workbook 未読込");
-            return;
-        }
-        const options = [
-            { value: "__all__", label: "全シート", selected: true },
-            ...currentWorkbook.sheets.map((sheet) => ({
-                value: String(sheet.name),
-                label: String(sheet.name)
-            }))
-        ];
-        if (typeof select.setOptions === "function") {
-            select.setOptions(options);
-        }
-        setSheetSummary(`${currentWorkbook.name} / ${currentWorkbook.sheets.length} sheets / 全シート`);
-    }
-    function updateSheetSelectionSummary(selectedValue) {
-        if (!currentWorkbook) {
-            setSheetSummary("Workbook 未読込");
-            return;
-        }
-        if (!selectedValue || selectedValue === "__all__") {
-            setSheetSummary(`${currentWorkbook.name} / ${currentWorkbook.sheets.length} sheets / 全シート`);
-            return;
-        }
-        setSheetSummary(`${currentWorkbook.name} / ${currentWorkbook.sheets.length} sheets / ${selectedValue}`);
-    }
     function renderCurrentSelection() {
-        var _a, _b;
+        var _a;
         if (!currentFiles.length) {
             setSummaryText("まだ変換していません。");
             setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
@@ -300,60 +265,25 @@
             updatePreviewModeBanner(getSelectedOutputMode());
             return;
         }
-        const select = getElement("sheetSelect");
-        const selectedValue = typeof select.getValue === "function"
-            ? select.getValue()
-            : ((_a = document.getElementById("sheetSelect")) === null || _a === void 0 ? void 0 : _a.value) || "__all__";
-        updateSheetSelectionSummary(selectedValue);
-        if (!selectedValue || selectedValue === "__all__") {
-            const combinedMarkdown = currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n");
-            const outputMode = ((_b = currentFiles[0]) === null || _b === void 0 ? void 0 : _b.summary.outputMode) || "display";
-            updatePreviewModeBanner(outputMode);
-            setSummaryHtml(renderAnalysisSummary(currentFiles, (currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook.xlsx"));
-            setScoreSummaryHtml(renderScoreSummary(currentFiles));
-            setFormulaSummaryHtml(renderFormulaSummary(currentFiles));
-            setPreviewMarkdown(combinedMarkdown);
-            getElement("downloadBtn").disabled = false;
-            getElement("exportZipBtn").disabled = false;
-            return;
-        }
-        const matched = currentFiles.find((file) => file.sheetName === selectedValue);
-        if (!matched) {
-            setSummaryText("選択シートの出力が見つかりません。");
-            setPreviewMarkdown("");
-            updatePreviewModeBanner(getSelectedOutputMode());
-            return;
-        }
-        updatePreviewModeBanner(matched.summary.outputMode);
-        setSummaryHtml(renderAnalysisSummary([matched], (currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook.xlsx"));
-        setScoreSummaryHtml(renderScoreSummary([matched]));
-        setFormulaSummaryHtml(renderFormulaSummary([matched]));
-        setPreviewMarkdown(matched.markdown);
+        const combinedMarkdown = currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n");
+        const outputMode = ((_a = currentFiles[0]) === null || _a === void 0 ? void 0 : _a.summary.outputMode) || "display";
+        updatePreviewModeBanner(outputMode);
+        setSummaryHtml(renderAnalysisSummary(currentFiles, (currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook.xlsx"));
+        setScoreSummaryHtml(renderScoreSummary(currentFiles));
+        setFormulaSummaryHtml(renderFormulaSummary(currentFiles));
+        setPreviewMarkdown(combinedMarkdown);
         getElement("downloadBtn").disabled = false;
         getElement("exportZipBtn").disabled = false;
     }
     function getSelectedFileForDownload() {
-        var _a, _b;
+        var _a;
         if (!currentFiles.length)
             return null;
-        const select = getElement("sheetSelect");
-        const selectedValue = typeof select.getValue === "function"
-            ? select.getValue()
-            : ((_a = document.getElementById("sheetSelect")) === null || _a === void 0 ? void 0 : _a.value) || "__all__";
-        if (!selectedValue || selectedValue === "__all__") {
-            const outputMode = ((_b = currentFiles[0]) === null || _b === void 0 ? void 0 : _b.summary.outputMode) || "display";
-            const suffix = outputMode === "display" ? "" : `_${outputMode}`;
-            return {
-                fileName: `${((currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook").replace(/\.xlsx$/i, "")}_all${suffix}.md`,
-                content: currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n")
-            };
-        }
-        const matched = currentFiles.find((file) => file.sheetName === selectedValue);
-        if (!matched)
-            return null;
+        const outputMode = ((_a = currentFiles[0]) === null || _a === void 0 ? void 0 : _a.summary.outputMode) || "display";
+        const suffix = outputMode === "display" ? "" : `_${outputMode}`;
         return {
-            fileName: matched.fileName,
-            content: matched.markdown
+            fileName: `${((currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook").replace(/\.xlsx$/i, "")}_all${suffix}.md`,
+            content: currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n")
         };
     }
     function downloadCurrentMarkdown() {
@@ -400,7 +330,6 @@
             const arrayBuffer = await file.arrayBuffer();
             currentWorkbook = await xlsx2md.parseWorkbook(arrayBuffer, file.name);
             currentFiles = [];
-            updateSheetOptions();
             setSummaryText(`${file.name} を読み込みました。変換ボタンを押してください。`);
             setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
             setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
@@ -412,7 +341,6 @@
         catch (error) {
             currentWorkbook = null;
             currentFiles = [];
-            updateSheetOptions();
             setSummaryText("Workbook の読込に失敗しました。");
             setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
             setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
@@ -457,9 +385,6 @@
         getElement("exportZipBtn").addEventListener("click", () => {
             downloadExportZip();
         });
-        getElement("sheetSelect").addEventListener("change", () => {
-            renderCurrentSelection();
-        });
         getElement("outputModeSelect").addEventListener("change", () => {
             const mode = getSelectedOutputMode();
             updateOutputModeNotice(mode);
@@ -471,7 +396,6 @@
     function initialize() {
         clearError();
         setSummaryText("まだ変換していません。");
-        setSheetSummary("Workbook 未読込");
         setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
         setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
         setPreviewMarkdown("");
@@ -479,7 +403,6 @@
         updatePreviewModeBanner(getSelectedOutputMode());
         getElement("downloadBtn").disabled = true;
         getElement("exportZipBtn").disabled = true;
-        updateSheetOptions();
         bindFileInput();
         bindActions();
     }

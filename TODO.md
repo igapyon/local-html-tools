@@ -218,6 +218,29 @@
   - `formula/formula-shared-sample01.xlsx`
   - `image/image-basic-sample01.xlsx`
   - `named-range/named-range-sample01.xlsx`
+- [xlsx2md][formula] Step 2 の最小 parser 土台を追加済み
+  - `docs/xlsx2md/src/xlsx2md/ts/formula/tokenizer.ts`
+  - `docs/xlsx2md/src/xlsx2md/ts/formula/parser.ts`
+  - `docs/xlsx2md/tests/xlsx2md-formula-parser.test.js`
+  - 絶対参照、sheet-scope name、error constant、row qualifier 付き structured reference まで対応済み
+- [xlsx2md][formula] Step 3 の最小 evaluator 土台を追加済み
+  - `docs/xlsx2md/src/xlsx2md/ts/formula/evaluator.ts`
+  - `docs/xlsx2md/src/xlsx2md/ts/core.ts` から限定的な AST フックを追加済み
+  - 失敗時は従来の文字列ベース resolver へフォールバック
+  - 現在の対応範囲:
+    - 条件・論理: `IF / IFERROR / AND / OR / NOT`
+    - 参照: `INDEX / MATCH / VLOOKUP / HLOOKUP / XLOOKUP`
+    - 集計: `SUM / SUMPRODUCT / AVERAGE / MIN / MAX / COUNT / COUNTA / COUNTIF / COUNTIFS / SUMIF / SUMIFS / AVERAGEIF / AVERAGEIFS / SUBTOTAL(一部)`
+    - 文字列: `TEXT / LEFT / RIGHT / MID / LEN / LOWER / TRIM / SUBSTITUTE / REPLACE / REPT / UPPER / CONCATENATE / FIND / SEARCH`
+    - 日付・数値: `DATE / VALUE / DATEVALUE / TODAY / WEEKDAY / YEAR / MONTH / DAY / ROW / COLUMN / EDATE / EOMONTH / ROUND / ROUNDUP / ROUNDDOWN / INT / ABS`
+    - 判定: `ISBLANK / ISNUMBER / ISTEXT / ISERROR / ISNA / NA`
+- [xlsx2md][formula] 次段タスク
+  - `scripts/observe-xlsx2md-formulas.mjs` による観測を継続し、AST evaluator 側へ寄せる関数群を整理する
+  - 既存の文字列ベース evaluator と AST evaluator の使い分け方針を決める
+  - 次候補:
+    - `ROW / COLUMN` の引数なし形を AST 側でどう扱うか整理
+    - 近似一致付き `VLOOKUP / HLOOKUP` をどうするか整理
+    - 実データ頻出関数を AST evaluator 側へさらに寄せる
 - [引継][xlsx2md] `local-data` の実データ差分レビューを開始
   - 重点対象は `docs/xlsx2md/local-data-review.md` を参照
   - 優先順:
@@ -237,11 +260,13 @@
   - `narrative/narrative-vs-table-sample01.xlsx`
   - `edge/edge-empty-sample01.xlsx`
   - `edge/edge-weird-sheetname-sample01.xlsx`
-  - 現在の `docs/xlsx2md/tests/xlsx2md-main.test.js` は `21 tests` 成功
+  - 現在の `docs/xlsx2md/tests/xlsx2md-main.test.js` は `23 tests` 成功
+  - 現在の `docs/xlsx2md/tests/xlsx2md-formula-parser.test.js` は `39 tests` 成功
   - 最後に反映済みの実装:
   - 数式セルの `cached value` と再解決値にも表示形式を再適用
   - 出力ファイル名サニタイズを強化
   - `edge-weird-sheetname` の保存名は現状 `A B-東京&大阪.01 -> A_B-東京_大阪.01`
+  - `local-data` 観測上は parser 観点で全対象 `ast_ng 0`
   - 次回再開時の優先候補:
   - `docs/xlsx2md/xlsx2md-spec.md` に保存名サニタイズ規則を明文化
   - `docs/xlsx2md/README.md` に保存名サニタイズ例を追記
