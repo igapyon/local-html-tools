@@ -208,6 +208,37 @@
   - セル配置案: `A1=項番`, `B1=名称`, `C1=値`, `D1=備考`
   - セル配置案: `A2:D4` に2-3行のデータ
   - セル配置案: 必要なら別ファイルで「長いシート名」確認も追加する
+- [引継][xlsx2md] fixture ベースの実ファイル調整は一段落
+  - fixture 固定済み:
+  - `xlsx2md-basic-sample01.xlsx`
+  - `display/display-format-sample01.xlsx`
+  - `merge/merge-pattern-sample01.xlsx`
+  - `formula/formula-basic-sample01.xlsx`
+  - `formula/formula-crosssheet-sample01.xlsx`
+  - `formula/formula-shared-sample01.xlsx`
+  - `image/image-basic-sample01.xlsx`
+  - `named-range/named-range-sample01.xlsx`
+  - `narrative/narrative-vs-table-sample01.xlsx`
+  - `edge/edge-empty-sample01.xlsx`
+  - `edge/edge-weird-sheetname-sample01.xlsx`
+  - 現在の `docs/xlsx2md/tests/xlsx2md-main.test.js` は `21 tests` 成功
+  - 最後に反映済みの実装:
+  - 数式セルの `cached value` と再解決値にも表示形式を再適用
+  - 出力ファイル名サニタイズを強化
+  - `edge-weird-sheetname` の保存名は現状 `A B-東京&大阪.01 -> A_B-東京_大阪.01`
+  - 次回再開時の優先候補:
+  - `docs/xlsx2md/xlsx2md-spec.md` に保存名サニタイズ規則を明文化
+  - `docs/xlsx2md/README.md` に保存名サニタイズ例を追記
+  - `display / raw / both` と数式日付表示の現状挙動を spec へ反映
+  - UI の `formulaDiagnostics` / `tableScores` 表示を見直す
+  - まず最初に見るファイル:
+  - `docs/xlsx2md/src/xlsx2md/ts/core.ts`
+  - `docs/xlsx2md/tests/xlsx2md-main.test.js`
+  - `docs/xlsx2md/xlsx2md-spec.md`
+  - `docs/xlsx2md/README.md`
+  - 最後に確認したコマンド:
+  - `npm run build:xlsx2md`
+  - `npm run test:unit -- docs/xlsx2md/tests/xlsx2md-main.test.js`
 
 # DONE
 
@@ -218,20 +249,42 @@
 - `Resource`: `ExtendedAttribute / Baseline / TimephasedData` と各種実務項目
 - `Assignment`: `ExtendedAttribute / Baseline / TimephasedData` と各種実務項目
 - `Calendar`: `BaseCalendarUID / WeekDays / WorkingTimes / Exceptions / WorkWeeks / IsBaselineCalendar`
-- [引継][mikuproject] プレビュー表示は `Tasks / Resources / Assignments` について、件数だけでなく `ExtendedAttributes / Baselines / TimephasedData` の件数と先頭要約を表示するところまで対応済み
+- [引継][mikuproject] プレビュー表示は `Project / Tasks / Resources / Assignments / Calendars` まで拡張済み
+- `Project`: `OutlineCodes / WBSMasks / ExtendedAttributes` の代表値を preview 表示
+- `Tasks / Resources / Assignments`: `ExtendedAttributes / Baselines / TimephasedData` の件数と先頭要約を preview 表示
+- `Tasks / Resources / Assignments`: 参照先の task/resource/calendar 名を preview で追えるように対応済み
+- `Calendars`: `Project / Task / Resource / BaseCalendar` からの参照数を preview で表示するところまで対応済み
 - [引継][mikuproject] 仕様メモは [docs/project/mikuproject-spec.md](/Users/igapyon/Documents/git/local-html-tools/docs/project/mikuproject-spec.md)、ギャップ整理は [docs/project/mikuproject-gap-notes.md](/Users/igapyon/Documents/git/local-html-tools/docs/project/mikuproject-gap-notes.md) に反映済み
 - [引継][mikuproject] `docs/project/local-data/` は Git 管理しない一時 XML 置き場として利用する前提
 - [引継][mikuproject] `open-msp-viewer` のサンプルを参照元として利用した旨と感謝メモは `mikuproject-spec.md` に記載済み
+- [引継][mikuproject] validation 文言は `Task / Resource / Assignment / Calendar` について、可能な範囲で名前つきで追えるように整理済み
+- [引継][mikuproject] `Task CalendarUID` 不整合、`Calendar BaseCalendarUID` 自己参照、`PredecessorUID` 不整合の validation を追加済み
+- [引継][mikuproject] `Mermaid + gantt` の片方向補助出力を追加済み
+- UI には `Mermaid を生成` ボタンと `Mermaid gantt` 出力欄を追加済み
+- 現時点の Mermaid 出力は `ProjectModel -> Mermaid gantt` のみで、summary task は `section`、dependency はコメント保持
+- [引継][mikuproject] `CSV + ParentID` は「まず押さえるべき、よくある交換形式」の第1候補として spec/gap notes/TODO に整理開始済み
+- `ProjectModel -> CSV + ParentID` の出力と `CSV + ParentID -> ProjectModel` の最小逆変換を追加済み
+- UI には `CSV を生成` / `CSV を解析` ボタンと `CSV + ParentID` 入出力欄を追加済み
+- 現時点の CSV 出力列は `ID / ParentID / WBS / Name / Start / Finish / PredecessorID / Resource / PercentComplete / PercentWorkComplete / Milestone / Summary / Critical / Type / Priority / Work / CalendarUID / ConstraintType / ConstraintDate / Deadline / Notes`
+- 逆変換は `ID / ParentID / Name` 必須で、`WBS / Start / Finish / PredecessorID / Resource / PercentComplete / PercentWorkComplete / Milestone / Summary / Critical / Type / Priority / Work / CalendarUID / ConstraintType / ConstraintDate / Deadline / Notes` を最小復元する
+- `PredecessorID / Resource` は `|` に加えて `,` `;` `、` 区切りも受け、trim と重複除去を行う
+- `ID` 重複、空 `Name`、自己参照 / 欠落 / 循環 `ParentID` は import error として扱う
 - [引継][mikuproject] 最後に確認できていたコマンド:
 - `npm run build:project`
 - `npx vitest run docs/project/tests/mikuproject-main.test.js`
-- [引継][mikuproject] 上記確認時点では `docs/project/tests/mikuproject-main.test.js` は `22 tests` すべて成功
+- [引継][mikuproject] 上記確認時点では `docs/project/tests/mikuproject-main.test.js` は `35 tests` すべて成功
 - [引継][mikuproject] 次回再開時の最初の確認候補:
 - `git status --short`
 - `npm run build:project`
 - `npx vitest run docs/project/tests/mikuproject-main.test.js`
-- [引継][mikuproject][未完了着手] `docs/project/mikuproject-src.html` には `Calendars` プレビューカード追加を開始済み
-- [引継][mikuproject][未完了着手] 次回は [docs/project/src/mikuproject/ts/main.ts](/Users/igapyon/Documents/git/local-html-tools/docs/project/src/mikuproject/ts/main.ts) の描画処理と [docs/project/tests/mikuproject-main.test.js](/Users/igapyon/Documents/git/local-html-tools/docs/project/tests/mikuproject-main.test.js) の確認項目を追従させてから再ビルド・再テストすると復帰しやすい
+- [引継][mikuproject][次候補] `Mermaid gantt` の dependency 表現を Mermaid ネイティブ記法へどこまで寄せるか整理する
+- [引継][mikuproject][次候補] 当面の方針は `single CSV` 継続。次に進むなら `Mermaid gantt` を育てるか、`single CSV` の task 列をさらに詰める
+- [引継][mikuproject][Mermaid] `単一 predecessor + FS + lagなし + 変換可能 duration` のみ `after ...` で部分ネイティブ化済み
+- [引継][mikuproject][Mermaid] 複雑ケースは task 名つき comment へ逃がし、`type=...` と `lag=2h` のような短い表現を出すところまで対応済み
+- [引継][mikuproject][Mermaid] `lag` ありケースには `Ship ~= after Prep + 2h` のような pseudo comment も追加済み
+- [引継][mikuproject][Mermaid][残件] pseudo comment の表現をこのまま固定するか、より Mermaid っぽい擬似表現へ寄せるかを決める
+- [引継][mikuproject][Mermaid][残件] 複数 predecessor / 非FS / duration 変換不能ケースの comment 文言を最終整形する
+- [引継][mikuproject][次候補] `tasks.csv / resources.csv / assignments.csv` の最小仕様草案は記載済み。複数 CSV へ切り替えるのは、同名 resource 衝突や多重 assignment の lossless 保持が必要になった時点
 
 - [引継] `docs/prompt/prompt-gen` を段階的に整理済み
 - `docs/prompt/prompt-gen-src.html` の巨大 inline CSS / JS は外出し済み

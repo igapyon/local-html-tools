@@ -20,6 +20,7 @@
     address: string;
     row: number;
     col: number;
+    valueType: string;
     rawValue: string;
     outputValue: string;
     formulaText: string;
@@ -44,12 +45,24 @@
     ref: string;
   };
 
+  type ParsedTable = {
+    sheetName: string;
+    name: string;
+    displayName: string;
+    start: string;
+    end: string;
+    columns: string[];
+    headerRowCount: number;
+    totalsRowCount: number;
+  };
+
   type ParsedSheet = {
     name: string;
     index: number;
     path: string;
     cells: ParsedCell[];
     merges: MergeRange[];
+    tables: ParsedTable[];
     images: ParsedImageAsset[];
     maxRow: number;
     maxCol: number;
@@ -102,6 +115,12 @@
     startCol: number;
     endRow: number;
     lines: string[];
+    items: {
+      row: number;
+      startCol: number;
+      text: string;
+      cellValues: string[];
+    }[];
   };
 
   type MarkdownOptions = {
@@ -145,6 +164,7 @@
   const crcTable = buildCrc32Table();
   let resolveDefinedNameScalarValue: ((sheetName: string, name: string) => string | null) | null = null;
   let resolveDefinedNameRangeRef: ((sheetName: string, name: string) => { sheetName: string; start: string; end: string } | null) | null = null;
+  let resolveStructuredRangeRef: ((sheetName: string, text: string) => { sheetName: string; start: string; end: string } | null) | null = null;
   const BUILTIN_FORMAT_CODES: Record<number, string> = {
     0: "General",
     1: "0",
@@ -657,11 +677,45 @@
     return rawValue.split("").join(" ");
   }
 
+  function splitFormatSections(formatCode: string): string[] {
+    const sections: string[] = [];
+    let current = "";
+    let inQuotes = false;
+    for (let index = 0; index < formatCode.length; index += 1) {
+      const char = formatCode[index];
+      if (char === "\"") {
+        inQuotes = !inQuotes;
+        current += char;
+        continue;
+      }
+      if (char === ";" && !inQuotes) {
+        sections.push(current);
+        current = "";
+        continue;
+      }
+      current += char;
+    }
+    sections.push(current);
+    return sections;
+  }
+
+  function formatZeroSection(section: string): string | null {
+    const normalizedSection = String(section || "");
+    if (!normalizedSection) return null;
+    const compact = normalizedSection.replace(/_.|\\.|[*?]/g, "").trim();
+    const hasDashLiteral = /"-"|(^|[^a-z0-9])-($|[^a-z0-9])/i.test(compact);
+    if (!hasDashLiteral) return null;
+    if (compact.includes("¥")) return "¥ -";
+    if (compact.includes("$")) return "$ -";
+    return "-";
+  }
+
   function formatCellDisplayValue(rawValue: string, cellStyle: CellStyleInfo): string | null {
     if (rawValue === "") return null;
     const numericValue = Number(rawValue);
     const formatCode = normalizeNumericFormatCode(cellStyle.formatCode);
     const normalized = formatCode.toLowerCase();
+    const formatSections = splitFormatSections(formatCode);
 
     if (!Number.isNaN(numericValue) && isDateFormatCode(formatCode)) {
       const parts = excelSerialToDateParts(numericValue);
@@ -686,6 +740,13 @@
 
     if (Number.isNaN(numericValue)) {
       return null;
+    }
+
+    if (numericValue === 0 && formatSections[2]) {
+      const zeroText = formatZeroSection(formatSections[2]);
+      if (zeroText) {
+        return zeroText;
+      }
     }
 
     if (normalized.includes("%")) {
@@ -731,6 +792,18 @@
     return null;
   }
 
+  function applyResolvedFormulaValue(cell: ParsedCell, resolvedValue: string): void {
+    const rawValue = String(resolvedValue || "");
+    const formattedValue = formatCellDisplayValue(rawValue, {
+      borders: cell.borders,
+      numFmtId: cell.numFmtId,
+      formatCode: cell.formatCode
+    });
+    cell.rawValue = rawValue;
+    cell.outputValue = formattedValue ?? rawValue;
+    cell.resolutionStatus = "resolved";
+  }
+
   function parseDateLikeParts(value: string): {
     yyyy: string;
     mm: string;
@@ -744,16 +817,62 @@
     if (!Number.isNaN(numericValue)) {
       return excelSerialToDateParts(numericValue);
     }
-    const isoMatch = trimmed.match(/^(\d{4})[-/](\d{2})[-/](\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
-    if (!isoMatch) return null;
-    return {
-      yyyy: isoMatch[1],
-      mm: isoMatch[2],
-      dd: isoMatch[3],
-      hh: isoMatch[4] || "00",
-      mi: isoMatch[5] || "00",
-      ss: isoMatch[6] || "00"
-    };
+    const isoMatch = trimmed.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/);
+    if (isoMatch) {
+      return {
+        yyyy: isoMatch[1],
+        mm: isoMatch[2].padStart(2, "0"),
+        dd: isoMatch[3].padStart(2, "0"),
+        hh: (isoMatch[4] || "00").padStart(2, "0"),
+        mi: (isoMatch[5] || "00").padStart(2, "0"),
+        ss: (isoMatch[6] || "00").padStart(2, "0")
+      };
+    }
+    const japaneseMatch = trimmed.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日(?:\s*(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/);
+    if (japaneseMatch) {
+      return {
+        yyyy: japaneseMatch[1],
+        mm: japaneseMatch[2].padStart(2, "0"),
+        dd: japaneseMatch[3].padStart(2, "0"),
+        hh: (japaneseMatch[4] || "00").padStart(2, "0"),
+        mi: (japaneseMatch[5] || "00").padStart(2, "0"),
+        ss: (japaneseMatch[6] || "00").padStart(2, "0")
+      };
+    }
+    const japaneseYearMonthMatch = trimmed.match(/^(\d{4})年(\d{1,2})月$/);
+    if (japaneseYearMonthMatch) {
+      return {
+        yyyy: japaneseYearMonthMatch[1],
+        mm: japaneseYearMonthMatch[2].padStart(2, "0"),
+        dd: "01",
+        hh: "00",
+        mi: "00",
+        ss: "00"
+      };
+    }
+    const japaneseMonthDayMatch = trimmed.match(/^(\d{1,2})月(\d{1,2})日$/);
+    if (japaneseMonthDayMatch) {
+      return {
+        yyyy: "2000",
+        mm: japaneseMonthDayMatch[1].padStart(2, "0"),
+        dd: japaneseMonthDayMatch[2].padStart(2, "0"),
+        hh: "00",
+        mi: "00",
+        ss: "00"
+      };
+    }
+    const isoYearMonthMatch = trimmed.match(/^(\d{4})[-/](\d{1,2})$/);
+    if (isoYearMonthMatch) {
+      return {
+        yyyy: isoYearMonthMatch[1],
+        mm: isoYearMonthMatch[2].padStart(2, "0"),
+        dd: "01",
+        hh: "00",
+        mi: "00",
+        ss: "00"
+      };
+    }
+    return null;
   }
 
   function datePartsToExcelSerial(
@@ -883,6 +1002,51 @@
     return match ? match[1].toLowerCase() : "bin";
   }
 
+  function normalizeStructuredTableKey(value: string): string {
+    return String(value || "").normalize("NFKC").trim().toUpperCase();
+  }
+
+  function parseWorksheetTables(
+    files: Map<string, Uint8Array>,
+    worksheetDoc: Document,
+    sheetName: string,
+    sheetPath: string
+  ): ParsedTable[] {
+    const sheetRels = parseRelationships(files, buildRelsPath(sheetPath), sheetPath);
+    const tablePartElements = getElementsByLocalName(worksheetDoc, "tablePart");
+    const tables: ParsedTable[] = [];
+
+    for (const tablePartElement of tablePartElements) {
+      const relId = tablePartElement.getAttribute("r:id") || tablePartElement.getAttribute("id") || "";
+      if (!relId) continue;
+      const tablePath = sheetRels.get(relId) || "";
+      if (!tablePath) continue;
+      const tableBytes = files.get(tablePath);
+      if (!tableBytes) continue;
+      const tableDoc = xmlToDocument(decodeXmlText(tableBytes));
+      const tableElement = getElementsByLocalName(tableDoc, "table")[0] || null;
+      if (!tableElement) continue;
+      const ref = tableElement.getAttribute("ref") || "";
+      const range = parseRangeAddress(ref);
+      if (!range) continue;
+      const columns = getElementsByLocalName(tableElement, "tableColumn")
+        .map((columnElement) => String(columnElement.getAttribute("name") || "").trim())
+        .filter(Boolean);
+      tables.push({
+        sheetName,
+        name: tableElement.getAttribute("name") || "",
+        displayName: tableElement.getAttribute("displayName") || tableElement.getAttribute("name") || "",
+        start: range.start,
+        end: range.end,
+        columns,
+        headerRowCount: Number(tableElement.getAttribute("headerRowCount") || 1) || 1,
+        totalsRowCount: Number(tableElement.getAttribute("totalsRowCount") || 0) || 0
+      });
+    }
+
+    return tables;
+  }
+
   function createSafeSheetAssetDir(sheetName: string): string {
     return sheetName.replace(/[\\/:*?"<>|]+/g, "_").trim() || "Sheet";
   }
@@ -945,6 +1109,7 @@
     cellStyle: CellStyleInfo,
     formulaOverride = ""
   ): {
+    valueType: string;
     rawValue: string;
     outputValue: string;
     formulaText: string;
@@ -957,6 +1122,7 @@
       const normalizedFormula = formulaText.startsWith("=") ? formulaText : `=${formulaText}`;
       if (/\[[^\]]+\.xlsx\]/i.test(normalizedFormula)) {
         return {
+          valueType: type || "formula",
           rawValue: valueText || normalizedFormula,
           outputValue: normalizedFormula,
           formulaText: normalizedFormula,
@@ -964,14 +1130,17 @@
         };
       }
       if (valueText) {
+        const formattedValue = formatCellDisplayValue(valueText, cellStyle);
         return {
+          valueType: type || "formula",
           rawValue: valueText,
-          outputValue: valueText,
+          outputValue: formattedValue ?? valueText,
           formulaText: normalizedFormula,
           resolutionStatus: "resolved"
         };
       }
       return {
+        valueType: type || "formula",
         rawValue: normalizedFormula,
         outputValue: normalizedFormula,
         formulaText: normalizedFormula,
@@ -982,6 +1151,7 @@
     if (type === "s") {
       const sharedIndex = Number(valueText || 0);
       return {
+        valueType: type,
         rawValue: valueText,
         outputValue: sharedStrings[sharedIndex] || "",
         formulaText: "",
@@ -991,6 +1161,7 @@
     if (type === "inlineStr") {
       const inlineText = Array.from(cellElement.getElementsByTagName("t")).map((node) => getTextContent(node)).join("");
       return {
+        valueType: type,
         rawValue: inlineText,
         outputValue: inlineText,
         formulaText: "",
@@ -999,6 +1170,7 @@
     }
     if (type === "b") {
       return {
+        valueType: type,
         rawValue: valueText,
         outputValue: valueText === "1" ? "TRUE" : "FALSE",
         formulaText: "",
@@ -1007,6 +1179,7 @@
     }
     if (type === "str" || type === "e") {
       return {
+        valueType: type,
         rawValue: valueText,
         outputValue: valueText,
         formulaText: "",
@@ -1017,6 +1190,7 @@
       const formattedValue = formatCellDisplayValue(valueText, cellStyle);
       if (formattedValue !== null) {
         return {
+          valueType: type,
           rawValue: valueText,
           outputValue: formattedValue,
           formulaText: "",
@@ -1025,6 +1199,7 @@
       }
     }
     return {
+      valueType: type,
       rawValue: valueText,
       outputValue: valueText,
       formulaText: "",
@@ -1097,6 +1272,31 @@
     return null;
   }
 
+  function parseSheetScopedDefinedNameReference(
+    expression: string,
+    currentSheetName: string
+  ): { sheetName: string; name: string } | null {
+    const normalizedExpression = String(expression || "").trim();
+    const quotedSheetMatch = normalizedExpression.match(/^'((?:[^']|'')+)'!([A-Za-z_][A-Za-z0-9_.]*)$/);
+    if (quotedSheetMatch) {
+      return {
+        sheetName: normalizeFormulaSheetName(quotedSheetMatch[1].replace(/''/g, "'")),
+        name: quotedSheetMatch[2]
+      };
+    }
+    const sheetMatch = normalizedExpression.match(/^([^'=][^!]*)!([A-Za-z_][A-Za-z0-9_.]*)$/);
+    if (!sheetMatch) {
+      return null;
+    }
+    if (/^\$?[A-Z]+\$?\d+$/i.test(sheetMatch[2])) {
+      return null;
+    }
+    return {
+      sheetName: normalizeFormulaSheetName(sheetMatch[1] || currentSheetName),
+      name: sheetMatch[2]
+    };
+  }
+
   function normalizeFormulaSheetName(rawName: string): string {
     return String(rawName || "").replace(/^'/, "").replace(/'$/, "").replace(/''/g, "'");
   }
@@ -1130,7 +1330,8 @@
       if (!name || name.startsWith("_xlnm.")) continue;
       const formulaText = getTextContent(element).trim();
       if (!formulaText) continue;
-      const localSheetId = Number(element.getAttribute("localSheetId") || "");
+      const localSheetIdText = element.getAttribute("localSheetId");
+      const localSheetId = localSheetIdText == null || localSheetIdText === "" ? Number.NaN : Number(localSheetIdText);
       result.push({
         name,
         formulaText: formulaText.startsWith("=") ? formulaText : `=${formulaText}`,
@@ -1143,6 +1344,7 @@
   function buildFormulaResolver(workbook: ParsedWorkbook) {
     const sheetMap = new Map<string, ParsedSheet>();
     const cellMaps = new Map<string, Map<string, ParsedCell>>();
+    const tableMap = new Map<string, ParsedTable>();
     for (const sheet of workbook.sheets) {
       sheetMap.set(sheet.name, sheet);
       const cellMap = new Map<string, ParsedCell>();
@@ -1150,6 +1352,14 @@
         cellMap.set(cell.address.toUpperCase(), cell);
       }
       cellMaps.set(sheet.name, cellMap);
+      for (const table of sheet.tables) {
+        if (table.name) {
+          tableMap.set(normalizeStructuredTableKey(table.name), table);
+        }
+        if (table.displayName) {
+          tableMap.set(normalizeStructuredTableKey(table.displayName), table);
+        }
+      }
     }
 
     const resolvingKeys = new Set<string>();
@@ -1170,7 +1380,8 @@
 
     function resolveCellValue(sheetName: string, address: string): string {
       const sheet = sheetMap.get(sheetName);
-      const cell = sheet ? cellMaps.get(sheetName)?.get(address.toUpperCase()) : null;
+      if (!sheet) return "#REF!";
+      const cell = cellMaps.get(sheetName)?.get(address.toUpperCase()) || null;
       if (!cell) return "";
       const key = `${sheetName}!${address.toUpperCase()}`;
       if (resolvingKeys.has(key)) {
@@ -1179,17 +1390,38 @@
       if (cell.formulaText && (!cell.outputValue || cell.resolutionStatus !== "resolved")) {
         resolvingKeys.add(key);
         try {
-          const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue);
-          if (evaluated != null) {
-            cell.outputValue = evaluated;
-            cell.rawValue = evaluated;
-            cell.resolutionStatus = "resolved";
+          try {
+            const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue);
+            if (evaluated != null) {
+              applyResolvedFormulaValue(cell, evaluated);
+            }
+          } catch (error) {
+            if (!(error instanceof Error) || error.message !== "__FORMULA_UNRESOLVED__") {
+              throw error;
+            }
           }
         } finally {
           resolvingKeys.delete(key);
         }
       }
-      return String(cell.outputValue || "");
+      if (cell.formulaText) {
+        if (cell.resolutionStatus === "resolved") {
+          return String(cell.rawValue || cell.outputValue || "");
+        }
+        const rawValue = String(cell.rawValue || "");
+        const outputValue = String(cell.outputValue || "");
+        if (rawValue && rawValue !== cell.formulaText) {
+          return rawValue;
+        }
+        if (outputValue && outputValue !== cell.formulaText) {
+          return outputValue;
+        }
+        return "";
+      }
+      if (["s", "inlineStr", "str", "e", "b"].includes(cell.valueType)) {
+        return String(cell.outputValue || cell.rawValue || "");
+      }
+      return String(cell.rawValue || cell.outputValue || "");
     }
 
     function resolveDefinedNameValue(sheetName: string, name: string): string | null {
@@ -1210,6 +1442,33 @@
       return parseQualifiedRangeReference(formulaText.replace(/^=/, ""), sheetName);
     }
 
+    function resolveStructuredRange(sheetName: string, text: string): { sheetName: string; start: string; end: string } | null {
+      const match = String(text || "").trim().match(/^(.+?)\[([^\]]+)\]$/);
+      if (!match) return null;
+      const tableKey = normalizeStructuredTableKey(match[1].replace(/^'(.*)'$/, "$1"));
+      const columnKey = normalizeStructuredTableKey(match[2]);
+      if (!tableKey || !columnKey || columnKey.startsWith("#") || columnKey.startsWith("@")) {
+        return null;
+      }
+      const table = tableMap.get(tableKey);
+      if (!table) return null;
+      const columnIndex = table.columns.findIndex((columnName) => normalizeStructuredTableKey(columnName) === columnKey);
+      if (columnIndex < 0) return null;
+      const startAddress = parseCellAddress(table.start);
+      const endAddress = parseCellAddress(table.end);
+      if (!startAddress.row || !startAddress.col || !endAddress.row || !endAddress.col) return null;
+      const firstDataRow = Math.min(startAddress.row, endAddress.row) + Math.max(0, table.headerRowCount);
+      const lastDataRow = Math.max(startAddress.row, endAddress.row) - Math.max(0, table.totalsRowCount);
+      if (firstDataRow > lastDataRow) return null;
+      const col = Math.min(startAddress.col, endAddress.col) + columnIndex;
+      const colLetters = colToLetters(col);
+      return {
+        sheetName: table.sheetName || sheetName,
+        start: `${colLetters}${firstDataRow}`,
+        end: `${colLetters}${lastDataRow}`
+      };
+    }
+
     function resolveRangeEntries(sheetName: string, rangeText: string): { rawValues: string[]; numericValues: number[] } {
       const range = parseRangeAddress(rangeText);
       if (!range) {
@@ -1218,7 +1477,7 @@
       const start = parseCellAddress(range.start);
       const end = parseCellAddress(range.end);
       if (!start.row || !start.col || !end.row || !end.col) {
-        return [];
+        return { rawValues: [], numericValues: [] };
       }
       const startRow = Math.min(start.row, end.row);
       const endRow = Math.max(start.row, end.row);
@@ -1247,7 +1506,8 @@
       resolveRangeValues: (sheetName: string, rangeText: string) => resolveRangeEntries(sheetName, rangeText).numericValues,
       resolveRangeEntries,
       resolveDefinedNameValue,
-      resolveDefinedNameRange
+      resolveDefinedNameRange,
+      resolveStructuredRange
     };
   }
 
@@ -1374,7 +1634,7 @@
       return null;
     }
 
-    const replaced = normalized.replace(
+    const replacedRefs = normalized.replace(
       /(?:'((?:[^']|'')+)'|([A-Za-z0-9_ ]+))!(\$?[A-Z]+\$?\d+)|(\$?[A-Z]+\$?\d+)/g,
       (_full, quotedSheet, plainSheet, qualifiedAddress, localAddress) => {
         const sheetName = qualifiedAddress
@@ -1389,13 +1649,27 @@
         return String(numericValue);
       }
     );
+    const replaced = replaceNumericDefinedNames(
+      replacedRefs,
+      currentSheetName,
+      resolveCellValue,
+      resolveRangeValues,
+      resolveRangeEntries
+    );
+    const replacedFunctions = replaceEmbeddedNumericFunctions(
+      replaced,
+      currentSheetName,
+      resolveCellValue,
+      resolveRangeValues,
+      resolveRangeEntries
+    );
 
-    if (!/^[0-9+\-*/().\s]+$/.test(replaced)) {
+    if (!/^[0-9+\-*/().\s]+$/.test(replacedFunctions)) {
       return null;
     }
 
     try {
-      const value = evaluateArithmeticExpression(replaced);
+      const value = evaluateArithmeticExpression(replacedFunctions);
       if (!Number.isFinite(value)) {
         return null;
       }
@@ -1416,9 +1690,9 @@
     resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
   ): string | null {
-    const match = normalizedFormula.match(/^IF\((.+)\)$/i);
-    if (!match) return null;
-    const args = splitFormulaArguments(match[1].trim());
+    const call = parseWholeFunctionCall(normalizedFormula, ["IF"]);
+    if (!call) return null;
+    const args = splitFormulaArguments(call.argsText.trim());
     if (args.length !== 3) return null;
     const condition = evaluateFormulaCondition(args[0], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
     if (condition == null) return null;
@@ -1438,9 +1712,9 @@
     resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
   ): string | null {
-    const match = normalizedFormula.match(/^IFERROR\((.+)\)$/i);
-    if (!match) return null;
-    const args = splitFormulaArguments(match[1].trim());
+    const call = parseWholeFunctionCall(normalizedFormula, ["IFERROR"]);
+    if (!call) return null;
+    const args = splitFormulaArguments(call.argsText.trim());
     if (args.length !== 2) return null;
     const primary = resolveScalarFormulaValue(
       args[0],
@@ -1468,10 +1742,10 @@
     resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
   ): string | null {
-    const match = normalizedFormula.match(/^(AND|OR|NOT)\((.+)\)$/i);
-    if (!match) return null;
-    const functionName = match[1].toUpperCase();
-    const args = splitFormulaArguments(match[2].trim());
+    const call = parseWholeFunctionCall(normalizedFormula, ["AND", "OR", "NOT"]);
+    if (!call) return null;
+    const functionName = call.name;
+    const args = splitFormulaArguments(call.argsText.trim());
     if (functionName === "NOT") {
       if (args.length !== 1) return null;
       const value = evaluateFormulaCondition(args[0], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
@@ -1482,14 +1756,24 @@
     const evaluations = args.map((arg) =>
       evaluateFormulaCondition(arg, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries)
     );
-    if (evaluations.some((value) => value == null)) {
-      return null;
-    }
-    const booleans = evaluations as boolean[];
     if (functionName === "AND") {
+      if (evaluations.some((value) => value === false)) {
+        return "FALSE";
+      }
+      if (evaluations.some((value) => value == null)) {
+        return null;
+      }
+      const booleans = evaluations as boolean[];
       return booleans.every(Boolean) ? "TRUE" : "FALSE";
     }
     if (functionName === "OR") {
+      if (evaluations.some((value) => value === true)) {
+        return "TRUE";
+      }
+      if (evaluations.some((value) => value == null)) {
+        return null;
+      }
+      const booleans = evaluations as boolean[];
       return booleans.some(Boolean) ? "TRUE" : "FALSE";
     }
     return null;
@@ -1502,9 +1786,9 @@
     resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
   ): string | null {
-    const match = normalizedFormula.match(/^TEXT\((.+)\)$/i);
-    if (!match) return null;
-    const args = splitFormulaArguments(match[1].trim());
+    const call = parseWholeFunctionCall(normalizedFormula, ["TEXT"]);
+    if (!call) return null;
+    const args = splitFormulaArguments(call.argsText.trim());
     if (args.length !== 2) return null;
     const value = resolveScalarFormulaValue(
       args[0],
@@ -1529,9 +1813,9 @@
     currentSheetName: string,
     resolveCellValue: (sheetName: string, address: string) => string
   ): string | null {
-    const xlookupMatch = normalizedFormula.match(/^XLOOKUP\((.+)\)$/i);
-    if (xlookupMatch) {
-      const args = splitFormulaArguments(xlookupMatch[1].trim());
+    const xlookupCall = parseWholeFunctionCall(normalizedFormula, ["XLOOKUP"]);
+    if (xlookupCall) {
+      const args = splitFormulaArguments(xlookupCall.argsText.trim());
       if (args.length < 3 || args.length > 6) return null;
       const lookupValue = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue);
       const lookupRange = parseQualifiedRangeReference(args[1], currentSheetName);
@@ -1555,7 +1839,7 @@
       for (let index = 0; index < lookupCells.length; index += 1) {
         const value = lookupCells[index];
         if (value === lookupValue || (!Number.isNaN(Number(value)) && !Number.isNaN(Number(lookupValue)) && Number(value) === Number(lookupValue))) {
-          return returnCells[index] === "" ? null : returnCells[index];
+          return returnCells[index] ?? "";
         }
       }
       if (args.length >= 4) {
@@ -1564,9 +1848,9 @@
       return null;
     }
 
-    const matchMatch = normalizedFormula.match(/^MATCH\((.+)\)$/i);
-    if (matchMatch) {
-      const args = splitFormulaArguments(matchMatch[1].trim());
+    const matchCall = parseWholeFunctionCall(normalizedFormula, ["MATCH"]);
+    if (matchCall) {
+      const args = splitFormulaArguments(matchCall.argsText.trim());
       if (args.length < 2 || args.length > 3) return null;
       const lookupValue = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue);
       const rangeRef = parseQualifiedRangeReference(args[1], currentSheetName);
@@ -1588,9 +1872,9 @@
       return null;
     }
 
-    const indexMatch = normalizedFormula.match(/^INDEX\((.+)\)$/i);
-    if (indexMatch) {
-      const args = splitFormulaArguments(indexMatch[1].trim());
+    const indexCall = parseWholeFunctionCall(normalizedFormula, ["INDEX"]);
+    if (indexCall) {
+      const args = splitFormulaArguments(indexCall.argsText.trim());
       if (args.length < 2 || args.length > 3) return null;
       const rangeRef = parseQualifiedRangeReference(args[0], currentSheetName);
       const rowIndex = Number(resolveScalarFormulaValue(args[1], currentSheetName, resolveCellValue));
@@ -1608,13 +1892,12 @@
       const targetRow = startRow + Math.trunc(rowIndex) - 1;
       const targetCol = startCol + Math.trunc(colIndex) - 1;
       if (targetRow > endRow || targetCol > endCol) return null;
-      const result = resolveCellValue(rangeRef.sheetName, `${colToLetters(targetCol)}${targetRow}`);
-      return result === "" ? null : result;
+      return resolveCellValue(rangeRef.sheetName, `${colToLetters(targetCol)}${targetRow}`);
     }
 
-    const hlookupMatch = normalizedFormula.match(/^HLOOKUP\((.+)\)$/i);
-    if (hlookupMatch) {
-      const args = splitFormulaArguments(hlookupMatch[1].trim());
+    const hlookupCall = parseWholeFunctionCall(normalizedFormula, ["HLOOKUP"]);
+    if (hlookupCall) {
+      const args = splitFormulaArguments(hlookupCall.argsText.trim());
       if (args.length < 3 || args.length > 4) return null;
       const lookupValue = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue);
       const rangeRef = parseQualifiedRangeReference(args[1], currentSheetName);
@@ -1642,16 +1925,15 @@
         const keyValue = resolveCellValue(rangeRef.sheetName, `${colToLetters(col)}${startRow}`);
         if (keyValue === "") continue;
         if (keyValue === lookupValue || (!Number.isNaN(Number(keyValue)) && !Number.isNaN(Number(lookupValue)) && Number(keyValue) === Number(lookupValue))) {
-          const result = resolveCellValue(rangeRef.sheetName, `${colToLetters(col)}${targetRow}`);
-          return result === "" ? null : result;
+          return resolveCellValue(rangeRef.sheetName, `${colToLetters(col)}${targetRow}`);
         }
       }
       return null;
     }
 
-    const match = normalizedFormula.match(/^VLOOKUP\((.+)\)$/i);
-    if (!match) return null;
-    const args = splitFormulaArguments(match[1].trim());
+    const call = parseWholeFunctionCall(normalizedFormula, ["VLOOKUP"]);
+    if (!call) return null;
+    const args = splitFormulaArguments(call.argsText.trim());
     if (args.length < 3 || args.length > 4) return null;
     const lookupValue = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue);
     const rangeRef = parseQualifiedRangeReference(args[1], currentSheetName);
@@ -1680,8 +1962,7 @@
       const keyValue = resolveCellValue(rangeRef.sheetName, `${colToLetters(startCol)}${row}`);
       if (keyValue === "") continue;
       if (keyValue === lookupValue || (!Number.isNaN(Number(keyValue)) && !Number.isNaN(Number(lookupValue)) && Number(keyValue) === Number(lookupValue))) {
-        const result = resolveCellValue(rangeRef.sheetName, `${colToLetters(targetCol)}${row}`);
-        return result === "" ? null : result;
+        return resolveCellValue(rangeRef.sheetName, `${colToLetters(targetCol)}${row}`);
       }
     }
     return null;
@@ -1694,11 +1975,13 @@
     resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
   ): string | null {
-    const match = normalizedFormula.match(/^(YEAR|MONTH|DAY)\((.+)\)$/i);
-    if (!match) return null;
-    const fnName = match[1].toUpperCase();
-    const args = splitFormulaArguments(match[2].trim());
-    if (args.length !== 1) return null;
+    const call = parseWholeFunctionCall(normalizedFormula, ["YEAR", "MONTH", "DAY", "WEEKDAY"]);
+    if (!call) return null;
+    const fnName = call.name;
+    const args = splitFormulaArguments(call.argsText.trim());
+    if ((fnName === "WEEKDAY" && (args.length < 1 || args.length > 2)) || (fnName !== "WEEKDAY" && args.length !== 1)) {
+      return null;
+    }
     const value = resolveScalarFormulaValue(
       args[0],
       currentSheetName,
@@ -1712,6 +1995,17 @@
     if (fnName === "YEAR") return String(Number(parts.yyyy));
     if (fnName === "MONTH") return String(Number(parts.mm));
     if (fnName === "DAY") return String(Number(parts.dd));
+    if (fnName === "WEEKDAY") {
+      const returnType = args.length === 2
+        ? resolveNumericFormulaArgument(args[1], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries)
+        : 1;
+      if (returnType == null) return null;
+      const weekday = new Date(Date.UTC(Number(parts.yyyy), Number(parts.mm) - 1, Number(parts.dd))).getUTCDay();
+      if (Math.trunc(returnType) === 2) {
+        return String(weekday === 0 ? 7 : weekday);
+      }
+      return String(weekday + 1);
+    }
     return null;
   }
 
@@ -1722,10 +2016,10 @@
     resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
   ): string | null {
-    const match = normalizedFormula.match(/^(ISBLANK|ISNUMBER|ISTEXT|ISERROR|ISNA)\((.+)\)$/i);
-    if (!match) return null;
-    const fnName = match[1].toUpperCase();
-    const args = splitFormulaArguments(match[2].trim());
+    const call = parseWholeFunctionCall(normalizedFormula, ["ISBLANK", "ISNUMBER", "ISTEXT", "ISERROR", "ISNA"]);
+    if (!call) return null;
+    const fnName = call.name;
+    const args = splitFormulaArguments(call.argsText.trim());
     if (args.length !== 1) return null;
 
     if (fnName === "ISBLANK") {
@@ -1770,6 +2064,7 @@
       return "FALSE";
     }
     if (fnName === "ISNUMBER") {
+      if (value.trim() === "") return "FALSE";
       return !Number.isNaN(Number(value)) ? "TRUE" : "FALSE";
     }
     if (fnName === "ISTEXT") {
@@ -1788,9 +2083,9 @@
     resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
   ): string | null {
-    const match = normalizedFormula.match(/^CHOOSE\((.+)\)$/i);
-    if (!match) return null;
-    const args = splitFormulaArguments(match[1].trim());
+    const call = parseWholeFunctionCall(normalizedFormula, ["CHOOSE"]);
+    if (!call) return null;
+    const args = splitFormulaArguments(call.argsText.trim());
     if (args.length < 2) return null;
     const indexValue = resolveNumericFormulaArgument(
       args[0],
@@ -1973,6 +2268,147 @@
     return parts.every(Boolean) ? parts : null;
   }
 
+  function parseWholeFunctionCall(
+    expression: string,
+    allowedNames: string[]
+  ): { name: string; argsText: string } | null {
+    const trimmed = String(expression || "").trim();
+    const nameMatch = trimmed.match(/^([A-Z][A-Z0-9]*)\(/i);
+    if (!nameMatch) return null;
+    const name = nameMatch[1].toUpperCase();
+    if (!allowedNames.includes(name)) return null;
+    let depth = 0;
+    let inSingleQuote = false;
+    let inDoubleQuote = false;
+    for (let i = name.length; i < trimmed.length; i += 1) {
+      const ch = trimmed[i];
+      if (ch === "'" && !inDoubleQuote) {
+        inSingleQuote = !inSingleQuote;
+        continue;
+      }
+      if (ch === "\"" && !inSingleQuote) {
+        inDoubleQuote = !inDoubleQuote;
+        continue;
+      }
+      if (inSingleQuote || inDoubleQuote) continue;
+      if (ch === "(") {
+        depth += 1;
+        continue;
+      }
+      if (ch !== ")") continue;
+      depth -= 1;
+      if (depth > 0) continue;
+      if (depth < 0 || i !== trimmed.length - 1) return null;
+      return {
+        name,
+        argsText: trimmed.slice(name.length + 1, i)
+      };
+    }
+    return null;
+  }
+
+  function replaceNumericDefinedNames(
+    expression: string,
+    currentSheetName: string,
+    resolveCellValue: (sheetName: string, address: string) => string,
+    resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
+    resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
+  ): string {
+    let result = "";
+    let i = 0;
+    let inSingleQuote = false;
+    let inDoubleQuote = false;
+    while (i < expression.length) {
+      const ch = expression[i];
+      if (ch === "'" && !inDoubleQuote) {
+        inSingleQuote = !inSingleQuote;
+        result += ch;
+        i += 1;
+        continue;
+      }
+      if (ch === "\"" && !inSingleQuote) {
+        inDoubleQuote = !inDoubleQuote;
+        result += ch;
+        i += 1;
+        continue;
+      }
+      if (inSingleQuote || inDoubleQuote) {
+        result += ch;
+        i += 1;
+        continue;
+      }
+      if (!/[A-Za-z_]/.test(ch)) {
+        result += ch;
+        i += 1;
+        continue;
+      }
+      const start = i;
+      i += 1;
+      while (i < expression.length && /[A-Za-z0-9_.]/.test(expression[i])) {
+        i += 1;
+      }
+      const token = expression.slice(start, i);
+      const nextChar = expression[i] || "";
+      if (nextChar === "(") {
+        result += token;
+        continue;
+      }
+      const scalar = resolveDefinedNameScalarValue?.(currentSheetName, token) || null;
+      if (scalar != null) {
+        const numeric = Number(scalar);
+        if (!Number.isNaN(numeric)) {
+          result += String(numeric);
+          continue;
+        }
+      }
+      result += token;
+    }
+    return result;
+  }
+
+  function replaceEmbeddedNumericFunctions(
+    expression: string,
+    currentSheetName: string,
+    resolveCellValue: (sheetName: string, address: string) => string,
+    resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
+    resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
+  ): string {
+    let current = expression;
+    let changed = true;
+    while (changed) {
+      changed = false;
+      current = current.replace(/[A-Z][A-Z0-9]*\([^()]*\)/gi, (segment) => {
+        const resolved = tryResolveNumericFunction(
+          segment,
+          currentSheetName,
+          resolveCellValue,
+          resolveRangeValues,
+          resolveRangeEntries
+        )
+          ?? tryResolveDatePartFunction(
+            segment,
+            currentSheetName,
+            resolveCellValue,
+            resolveRangeValues,
+            resolveRangeEntries
+          )
+          ?? tryResolveAggregateFunction(segment, currentSheetName, resolveRangeValues, resolveRangeEntries)
+          ?? tryResolveConditionalAggregateFunction(segment, currentSheetName, resolveCellValue)
+          ?? tryResolveLookupFunction(segment, currentSheetName, resolveCellValue);
+        if (resolved == null) {
+          return segment;
+        }
+        const numericValue = Number(resolved);
+        if (Number.isNaN(numericValue)) {
+          return segment;
+        }
+        changed = true;
+        return String(numericValue);
+      });
+    }
+    return current;
+  }
+
   function resolveScalarFormulaValue(
     expression: string,
     currentSheetName: string,
@@ -1992,8 +2428,14 @@
     }
     const simpleRef = parseSimpleFormulaReference(`=${trimmed}`, currentSheetName);
     if (simpleRef) {
-      const value = resolveCellValue(simpleRef.sheetName, simpleRef.address);
-      return value === "" ? null : value;
+      return resolveCellValue(simpleRef.sheetName, simpleRef.address);
+    }
+    const scopedDefinedNameRef = parseSheetScopedDefinedNameReference(trimmed, currentSheetName);
+    if (scopedDefinedNameRef) {
+      const scopedValue = resolveDefinedNameScalarValue?.(scopedDefinedNameRef.sheetName, scopedDefinedNameRef.name) || null;
+      if (scopedValue != null) {
+        return scopedValue;
+      }
     }
     const definedNameValue = resolveDefinedNameScalarValue?.(currentSheetName, trimmed) || null;
     if (definedNameValue != null) {
@@ -2012,10 +2454,10 @@
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
   ): string | null {
     if (!resolveRangeValues || !resolveRangeEntries) return null;
-    const match = normalizedFormula.match(/^(SUM|AVERAGE|MIN|MAX|COUNT|COUNTA)\((.+)\)$/i);
-    if (!match) return null;
-    const fnName = match[1].toUpperCase();
-    const argText = match[2].trim();
+    const call = parseWholeFunctionCall(normalizedFormula, ["SUM", "AVERAGE", "MIN", "MAX", "COUNT", "COUNTA"]);
+    if (!call) return null;
+    const fnName = call.name;
+    const argText = call.argsText.trim();
     const args = splitFormulaArguments(argText);
     if (args.length === 0) {
       return null;
@@ -2055,9 +2497,9 @@
     currentSheetName: string,
     resolveCellValue: (sheetName: string, address: string) => string
   ): string | null {
-    const averageifsMatch = normalizedFormula.match(/^AVERAGEIFS\((.+)\)$/i);
-    if (averageifsMatch) {
-      const args = splitFormulaArguments(averageifsMatch[1].trim());
+    const averageifsCall = parseWholeFunctionCall(normalizedFormula, ["AVERAGEIFS"]);
+    if (averageifsCall) {
+      const args = splitFormulaArguments(averageifsCall.argsText.trim());
       if (args.length < 3 || args.length % 2 === 0) return null;
       const averageRange = parseQualifiedRangeReference(args[0], currentSheetName);
       if (!averageRange) return null;
@@ -2087,9 +2529,9 @@
       return count > 0 ? String(sum / count) : null;
     }
 
-    const sumifsMatch = normalizedFormula.match(/^SUMIFS\((.+)\)$/i);
-    if (sumifsMatch) {
-      const args = splitFormulaArguments(sumifsMatch[1].trim());
+    const sumifsCall = parseWholeFunctionCall(normalizedFormula, ["SUMIFS"]);
+    if (sumifsCall) {
+      const args = splitFormulaArguments(sumifsCall.argsText.trim());
       if (args.length < 3 || args.length % 2 === 0) return null;
       const sumRange = parseQualifiedRangeReference(args[0], currentSheetName);
       if (!sumRange) return null;
@@ -2117,9 +2559,9 @@
       return String(sum);
     }
 
-    const countifsMatch = normalizedFormula.match(/^COUNTIFS\((.+)\)$/i);
-    if (countifsMatch) {
-      const args = splitFormulaArguments(countifsMatch[1].trim());
+    const countifsCall = parseWholeFunctionCall(normalizedFormula, ["COUNTIFS"]);
+    if (countifsCall) {
+      const args = splitFormulaArguments(countifsCall.argsText.trim());
       if (args.length < 2 || args.length % 2 !== 0) return null;
       const rangeCriteriaPairs = [];
       for (let index = 0; index < args.length; index += 2) {
@@ -2141,10 +2583,10 @@
       return String(count);
     }
 
-    const match = normalizedFormula.match(/^(COUNTIF|SUMIF|AVERAGEIF)\((.+)\)$/i);
-    if (!match) return null;
-    const fnName = match[1].toUpperCase();
-    const args = splitFormulaArguments(match[2].trim());
+    const call = parseWholeFunctionCall(normalizedFormula, ["COUNTIF", "SUMIF", "AVERAGEIF"]);
+    if (!call) return null;
+    const fnName = call.name;
+    const args = splitFormulaArguments(call.argsText.trim());
     if ((fnName === "COUNTIF" && args.length !== 2) || ((fnName === "SUMIF" || fnName === "AVERAGEIF") && args.length !== 2 && args.length !== 3)) {
       return null;
     }
@@ -2190,11 +2632,25 @@
     resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
   ): string | null {
-    const match = normalizedFormula.match(/^(ROUND|ROUNDUP|ROUNDDOWN|INT|DATE|VALUE)\((.+)\)$/i);
-    if (!match) return null;
-    const fnName = match[1].toUpperCase();
-    const args = splitFormulaArguments(match[2].trim());
-    if (fnName === "VALUE") {
+    const call = parseWholeFunctionCall(normalizedFormula, ["ROUND", "ROUNDUP", "ROUNDDOWN", "INT", "DATE", "VALUE", "DATEVALUE", "ROW", "COLUMN", "EOMONTH"]);
+    if (!call) return null;
+    const fnName = call.name;
+    const args = splitFormulaArguments(call.argsText.trim());
+    if (fnName === "ROW" || fnName === "COLUMN") {
+      if (args.length !== 1) return null;
+      const rangeRef = parseQualifiedRangeReference(args[0], currentSheetName);
+      if (rangeRef) {
+        const start = parseCellAddress(rangeRef.start);
+        if (!start.row || !start.col) return null;
+        return String(fnName === "ROW" ? start.row : start.col);
+      }
+      const simpleRef = parseSimpleFormulaReference(`=${args[0]}`, currentSheetName);
+      if (!simpleRef) return null;
+      const parsed = parseCellAddress(simpleRef.address);
+      if (!parsed.row || !parsed.col) return null;
+      return String(fnName === "ROW" ? parsed.row : parsed.col);
+    }
+    if (fnName === "VALUE" || fnName === "DATEVALUE") {
       if (args.length !== 1) return null;
       const source = resolveScalarFormulaValue(
         args[0],
@@ -2232,6 +2688,32 @@
       );
       if (year == null || month == null || day == null) return null;
       const serial = datePartsToExcelSerial(Math.trunc(year), Math.trunc(month), Math.trunc(day));
+      return serial == null ? null : String(serial);
+    }
+    if (fnName === "EOMONTH") {
+      if (args.length !== 2) return null;
+      const startValue = resolveScalarFormulaValue(
+        args[0],
+        currentSheetName,
+        resolveCellValue,
+        resolveRangeValues,
+        resolveRangeEntries
+      );
+      const monthOffset = resolveNumericFormulaArgument(
+        args[1],
+        currentSheetName,
+        resolveCellValue,
+        resolveRangeValues,
+        resolveRangeEntries
+      );
+      if (startValue == null || monthOffset == null) return null;
+      const parts = parseDateLikeParts(startValue);
+      if (!parts) return null;
+      const baseYear = Number(parts.yyyy);
+      const baseMonthIndex = Number(parts.mm) - 1 + Math.trunc(monthOffset);
+      const targetYear = baseYear + Math.floor(baseMonthIndex / 12);
+      const targetMonth = ((baseMonthIndex % 12) + 12) % 12 + 1;
+      const serial = datePartsToExcelSerial(targetYear, targetMonth + 1, 0);
       return serial == null ? null : String(serial);
     }
     if (fnName === "INT") {
@@ -2288,10 +2770,10 @@
     resolveRangeValues?: (sheetName: string, rangeText: string) => number[],
     resolveRangeEntries?: (sheetName: string, rangeText: string) => { rawValues: string[]; numericValues: number[] }
   ): string | null {
-    const match = normalizedFormula.match(/^(LEFT|RIGHT|MID|LEN|TRIM|SUBSTITUTE|REPLACE)\((.+)\)$/i);
-    if (!match) return null;
-    const fnName = match[1].toUpperCase();
-    const args = splitFormulaArguments(match[2].trim());
+    const call = parseWholeFunctionCall(normalizedFormula, ["LEFT", "RIGHT", "MID", "LEN", "TRIM", "SUBSTITUTE", "REPLACE"]);
+    if (!call) return null;
+    const fnName = call.name;
+    const args = splitFormulaArguments(call.argsText.trim());
     if (fnName === "LEN" || fnName === "TRIM") {
       if (args.length !== 1) return null;
       const source = resolveScalarFormulaValue(
@@ -2598,6 +3080,17 @@
     const qualifiedRangeMatch = argText.match(/^(?:'((?:[^']|'')+)'|([^'=][^!]*))!(\$?[A-Z]+\$?\d+:\$?[A-Z]+\$?\d+)$/i);
     const localRangeMatch = argText.match(/^(\$?[A-Z]+\$?\d+:\$?[A-Z]+\$?\d+)$/i);
     if (!qualifiedRangeMatch && !localRangeMatch) {
+      const scopedDefinedName = parseSheetScopedDefinedNameReference(String(argText || "").trim(), currentSheetName);
+      if (scopedDefinedName) {
+        const scopedRange = resolveDefinedNameRangeRef?.(scopedDefinedName.sheetName, scopedDefinedName.name) || null;
+        if (scopedRange) {
+          return scopedRange;
+        }
+      }
+      const structuredRange = resolveStructuredRangeRef?.(currentSheetName, String(argText || "").trim()) || null;
+      if (structuredRange) {
+        return structuredRange;
+      }
       const definedRange = resolveDefinedNameRangeRef?.(currentSheetName, String(argText || "").trim()) || null;
       if (definedRange) {
         return definedRange;
@@ -2708,39 +3201,52 @@
     const resolver = buildFormulaResolver(workbook);
     resolveDefinedNameScalarValue = resolver.resolveDefinedNameValue;
     resolveDefinedNameRangeRef = resolver.resolveDefinedNameRange;
+    resolveStructuredRangeRef = resolver.resolveStructuredRange;
     try {
-      for (const sheet of workbook.sheets) {
-        for (const cell of sheet.cells) {
-          if (!cell.formulaText) continue;
-          if (cell.resolutionStatus === "unsupported_external") continue;
-          if (cell.resolutionStatus === "resolved" && cell.outputValue !== "") continue;
-          const reference = parseSimpleFormulaReference(cell.formulaText, sheet.name);
-          if (reference) {
-            const targetValue = String(resolver.resolveCellValue(reference.sheetName, reference.address) || "").trim();
-            if (targetValue) {
-              cell.outputValue = targetValue;
-              cell.rawValue = targetValue;
-              cell.resolutionStatus = "resolved";
-              continue;
+      for (let pass = 0; pass < 8; pass += 1) {
+        let resolvedInPass = 0;
+        for (const sheet of workbook.sheets) {
+          for (const cell of sheet.cells) {
+            if (!cell.formulaText) continue;
+            if (cell.resolutionStatus === "unsupported_external") continue;
+            if (cell.resolutionStatus === "resolved") continue;
+            const reference = parseSimpleFormulaReference(cell.formulaText, sheet.name);
+            if (reference) {
+              const targetValue = String(resolver.resolveCellValue(reference.sheetName, reference.address) || "").trim();
+              if (targetValue) {
+                applyResolvedFormulaValue(cell, targetValue);
+                resolvedInPass += 1;
+                continue;
+              }
+            }
+            let evaluated: string | null = null;
+            try {
+              evaluated = tryResolveFormulaExpression(
+                cell.formulaText,
+                sheet.name,
+                resolver.resolveCellValue,
+                resolver.resolveRangeValues,
+                resolver.resolveRangeEntries
+              );
+            } catch (error) {
+              if (!(error instanceof Error) || error.message !== "__FORMULA_UNRESOLVED__") {
+                throw error;
+              }
+            }
+            if (evaluated != null) {
+              applyResolvedFormulaValue(cell, evaluated);
+              resolvedInPass += 1;
             }
           }
-          const evaluated = tryResolveFormulaExpression(
-            cell.formulaText,
-            sheet.name,
-            resolver.resolveCellValue,
-            resolver.resolveRangeValues,
-            resolver.resolveRangeEntries
-          );
-          if (evaluated != null) {
-            cell.outputValue = evaluated;
-            cell.rawValue = evaluated;
-            cell.resolutionStatus = "resolved";
-          }
+        }
+        if (resolvedInPass === 0) {
+          break;
         }
       }
     } finally {
       resolveDefinedNameScalarValue = null;
       resolveDefinedNameRangeRef = null;
+      resolveStructuredRangeRef = null;
     }
   }
 
@@ -2789,6 +3295,7 @@
         address,
         row: position.row,
         col: position.col,
+        valueType: output.valueType,
         rawValue: output.rawValue,
         outputValue: output.outputValue,
         formulaText: output.formulaText,
@@ -2800,6 +3307,7 @@
       } satisfies ParsedCell;
     });
     const merges = Array.from(doc.getElementsByTagName("mergeCell")).map((mergeElement) => parseRangeRef(mergeElement.getAttribute("ref") || ""));
+    const tables = parseWorksheetTables(files, doc, sheetName, sheetPath);
     const images = parseDrawingImages(files, sheetName, sheetPath);
     let maxRow = 0;
     let maxCol = 0;
@@ -2817,6 +3325,7 @@
       path: sheetPath,
       cells,
       merges,
+      tables,
       images,
       maxRow,
       maxCol
@@ -2848,6 +3357,8 @@
       sharedStrings,
       definedNames
     };
+    resolveSimpleFormulaReferences(workbook);
+    resolveSimpleFormulaReferences(workbook);
     resolveSimpleFormulaReferences(workbook);
     return workbook;
   }
@@ -2908,17 +3419,114 @@
           startRow: rowNumber,
           startCol,
           endRow: rowNumber,
-          lines: [rowText]
+          lines: [rowText],
+          items: [{
+            row: rowNumber,
+            startCol,
+            text: rowText,
+            cellValues: cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean)
+          }]
         };
         blocks.push(current);
       } else {
         current.lines.push(rowText);
         current.endRow = rowNumber;
+        current.items.push({
+          row: rowNumber,
+          startCol,
+          text: rowText,
+          cellValues: cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean)
+        });
       }
       previousRow = rowNumber;
     }
 
     return blocks;
+  }
+
+  function isNarrativeListCandidate(item: NarrativeBlock["items"][number]): boolean {
+    const text = String(item.text || "").trim();
+    if (!text || text.length < 4 || text.length > 140) return false;
+    if (item.cellValues.length >= 2) {
+      const marker = String(item.cellValues[0] || "").trim();
+      const content = item.cellValues.slice(1).join(" ").trim();
+      if (!content || content.length < 4) return false;
+      if (marker.length <= 6) return true;
+    }
+    if (item.cellValues.length === 1) {
+      if (/[:：]$/.test(text)) return false;
+      if (/[。．]$/.test(text) && text.length < 18) return false;
+      return true;
+    }
+    return false;
+  }
+
+  function formatNarrativeListItem(item: NarrativeBlock["items"][number]): string {
+    const values = item.cellValues.map((value) => String(value || "").trim()).filter(Boolean);
+    if (values.length >= 2) {
+      const marker = values[0];
+      const content = values.slice(1).join(" ").trim();
+      if (/^(x|X|✓|✔|☑)$/u.test(marker)) {
+        return `- [x] ${content}`;
+      }
+      if (/^(□|☐)$/u.test(marker)) {
+        return `- [ ] ${content}`;
+      }
+      return `- ${content}`;
+    }
+    const text = String(item.text || "").trim();
+    const checkedMatch = text.match(/^(x|X|✓|✔|☑)\s+(.+)$/u);
+    if (checkedMatch) {
+      return `- [x] ${checkedMatch[2].trim()}`;
+    }
+    const uncheckedMatch = text.match(/^(□|☐)\s+(.+)$/u);
+    if (uncheckedMatch) {
+      return `- [ ] ${uncheckedMatch[2].trim()}`;
+    }
+    return `- ${text}`;
+  }
+
+  function renderNarrativeBlock(block: NarrativeBlock): string {
+    if (!block.items || block.items.length === 0) {
+      return block.lines.join("\n");
+    }
+    const parts: string[] = [];
+    let index = 0;
+    while (index < block.items.length) {
+      let runEnd = index;
+      while (
+        runEnd < block.items.length
+        && isNarrativeListCandidate(block.items[runEnd])
+        && (runEnd === index || block.items[runEnd].row === block.items[runEnd - 1].row + 1)
+      ) {
+        runEnd += 1;
+      }
+      const runLength = runEnd - index;
+      if (runLength >= 4) {
+        parts.push(block.items.slice(index, runEnd).map((item) => formatNarrativeListItem(item)).join("\n"));
+        index = runEnd;
+        continue;
+      }
+      let proseEnd = index;
+      while (proseEnd < block.items.length) {
+        const nextRunStart = proseEnd;
+        let candidateEnd = nextRunStart;
+        while (
+          candidateEnd < block.items.length
+          && isNarrativeListCandidate(block.items[candidateEnd])
+          && (candidateEnd === nextRunStart || block.items[candidateEnd].row === block.items[candidateEnd - 1].row + 1)
+        ) {
+          candidateEnd += 1;
+        }
+        if (candidateEnd - nextRunStart >= 4) {
+          break;
+        }
+        proseEnd += 1;
+      }
+      parts.push(block.items.slice(index, proseEnd).map((item) => item.text).join("\n"));
+      index = proseEnd;
+    }
+    return parts.join("\n\n");
   }
 
   function collectTableSeedCells(sheet: ParsedSheet): ParsedCell[] {
@@ -3118,10 +3726,21 @@
     sheetName: string,
     outputMode: "display" | "raw" | "both" = "display"
   ): string {
-    const bookBase = workbookName.replace(/\.xlsx$/i, "");
-    const safeSheetName = sheetName.replace(/[\\/:*?"<>|]+/g, "_").trim() || `Sheet${sheetIndex}`;
+    const bookBase = sanitizeFileNameSegment(workbookName.replace(/\.xlsx$/i, ""), "workbook");
+    const safeSheetName = sanitizeFileNameSegment(sheetName, `Sheet${sheetIndex}`);
     const suffix = outputMode === "display" ? "" : `_${outputMode}`;
     return `${bookBase}_${String(sheetIndex).padStart(3, "0")}_${safeSheetName}${suffix}.md`;
+  }
+
+  function sanitizeFileNameSegment(value: string, fallback: string): string {
+    const normalized = String(value || "").normalize("NFKC");
+    const sanitized = normalized
+      .replace(/[\\/:*?"<>|]/g, "_")
+      .replace(/\s+/g, "_")
+      .replace(/[^\p{L}\p{N}._-]+/gu, "_")
+      .replace(/_+/g, "_")
+      .replace(/^[_ .-]+|[_ .-]+$/g, "");
+    return sanitized || fallback;
   }
 
   function convertSheetToMarkdown(workbook: ParsedWorkbook, sheet: ParsedSheet, options: MarkdownOptions = {}): MarkdownFile {
@@ -3142,7 +3761,7 @@
       sections.push({
         sortRow: block.startRow,
         sortCol: block.startCol,
-        markdown: `${block.lines.join("\n")}\n`
+        markdown: `${renderNarrativeBlock(block)}\n`
       });
     }
 

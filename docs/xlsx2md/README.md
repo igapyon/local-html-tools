@@ -16,6 +16,7 @@
 - 自動テストを前提とする
 - 出力モードは `display / raw / both` を扱えるようにする
 - `raw` / `both` で保存する Markdown や ZIP は、ファイル名にモードサフィックスを付けて区別できるようにする
+- 保存ファイル名は安全側へサニタイズし、シート名の空白や一部記号をそのまま使わないことがある
 
 ## 使い方
 
@@ -54,7 +55,20 @@ fraction
 display: 3/4
 raw: 0.75
 both: 3/4 [raw=0.75]
+
+formula-date
+display: 2024/3/17
+raw: 45368
+both: 2024/3/17 [raw=45368]
 ```
+
+## 保存名の扱い
+
+- 保存ファイル名は Workbook 名、シート順、シート名から組み立てる
+- シート名の空白や一部記号は、保存名では `_` に寄せることがある
+- 例:
+  - シート名 `A B-東京&大阪.01`
+  - 保存名 `edge-weird-sheetname-sample01_001_A_B-東京_大阪.01.md`
 
 ## 想定する将来構成
 
@@ -79,3 +93,9 @@ docs/xlsx2md/
 実装前の整理メモは [xlsx2md-spec.md](./xlsx2md-spec.md) を参照してください。
 
 fixture 用 Excel ブックの作成メモは [tests/fixtures/README.md](/Users/igapyon/Documents/git/local-html-tools/docs/xlsx2md/tests/fixtures/README.md) を参照してください。
+
+git に入れない実データや一時検証用の `.xlsx` は `docs/xlsx2md/local-data/` に配置します。このディレクトリは `.gitignore` 対象です。
+
+`docs/xlsx2md/local-data/` で使う一部サンプルの取得元メモ:
+
+- Microsoft Create planner / tracker templates: <https://excel.cloud.microsoft/create/ja/planner-tracker-templates/>

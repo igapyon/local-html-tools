@@ -402,7 +402,7 @@ describe("xlsx2md core", () => {
     expect(sheet.cells.find((cell) => cell.address === "B10")?.formulaText).toBe("=TEXT(B3,\"0000\")");
     expect(sheet.cells.find((cell) => cell.address === "B10")?.outputValue).toBe("0010");
     expect(sheet.cells.find((cell) => cell.address === "B11")?.formulaText).toBe("=DATE(2024,3,17)");
-    expect(sheet.cells.find((cell) => cell.address === "B11")?.outputValue).toBe("45368");
+    expect(sheet.cells.find((cell) => cell.address === "B11")?.outputValue).toBe("2024/3/17");
     expect(sheet.cells.find((cell) => cell.address === "B12")?.formulaText).toBe("=VALUE(\"1,234.5\")");
     expect(sheet.cells.find((cell) => cell.address === "B12")?.outputValue).toBe("1234.5");
     expect(sheet.cells.find((cell) => cell.address === "B13")?.formulaText).toBe("=VALUE(\"2024/03/17\")");
@@ -422,7 +422,7 @@ describe("xlsx2md core", () => {
     expect(markdownFile.markdown).toContain("| sum | 15 |");
     expect(markdownFile.markdown).toContain("| countif | 1 |");
     expect(markdownFile.markdown).toContain("| text | 0010 |");
-    expect(markdownFile.markdown).toContain("| date | 45368 |");
+    expect(markdownFile.markdown).toContain("| date | 2024/3/17 |");
     expect(markdownFile.markdown).toContain("| value_num | 1234.5 |");
     expect(markdownFile.markdown).toContain("| value_date | 45368 |");
   });
@@ -657,12 +657,12 @@ describe("xlsx2md core", () => {
       {
         name: "BaseName",
         formulaText: "=Summary!$B$3",
-        localSheetName: "Summary"
+        localSheetName: null
       },
       {
         name: "BaseRange",
         formulaText: "=Summary!$B$4:$B$5",
-        localSheetName: "Summary"
+        localSheetName: null
       },
       {
         name: "LocalCross",
@@ -844,7 +844,7 @@ describe("xlsx2md core", () => {
     expect(sheet.cells.find((cell) => cell.address === "C4")?.outputValue).toBe("3月13日");
     expect(sheet.cells.find((cell) => cell.address === "D4")?.outputValue).toBe("何かの登録日");
 
-    expect(markdownFile.fileName).toBe("edge-weird-sheetname-sample01_001_A B-東京&大阪.01.md");
+    expect(markdownFile.fileName).toBe("edge-weird-sheetname-sample01_001_A_B-東京_大阪.01.md");
     expect(markdownFile.summary.tables).toBe(1);
     expect(markdownFile.summary.merges).toBe(0);
     expect(markdownFile.summary.images).toBe(0);
@@ -901,6 +901,45 @@ describe("xlsx2md core", () => {
     expect(blocks).toHaveLength(1);
     expect(blocks[0].lines.join("\n")).toContain("このシステムは 受注を管理します。");
     expect(blocks[0].lines.join("\n")).toContain("外部IFと連携します。");
+  });
+
+  it("renders list-like narrative rows as markdown bullets", () => {
+    const api = bootCore();
+    const workbook = { name: "todo.xlsx" };
+    const sheet = {
+      name: "To Do リスト",
+      index: 1,
+      path: "xl/worksheets/sheet1.xml",
+      merges: [],
+      tables: [],
+      images: [],
+      maxRow: 8,
+      maxCol: 2,
+      cells: [
+        { row: 1, col: 1, address: "A1", valueType: "str", rawValue: "To Do リスト", outputValue: "To Do リスト", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: false, bottom: false, left: false, right: false }, numFmtId: 0, formatCode: "General" },
+        { row: 2, col: 1, address: "A2", valueType: "str", rawValue: "学校が始まる前に確認します", outputValue: "学校が始まる前に確認します", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: false, bottom: false, left: false, right: false }, numFmtId: 0, formatCode: "General" },
+        { row: 3, col: 1, address: "A3", valueType: "str", rawValue: "完了 タスク", outputValue: "完了 タスク", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: false, bottom: false, left: false, right: false }, numFmtId: 0, formatCode: "General" },
+        { row: 4, col: 1, address: "A4", valueType: "str", rawValue: "x 登録フォームに記入する", outputValue: "x 登録フォームに記入する", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: false, bottom: false, left: false, right: false }, numFmtId: 0, formatCode: "General" },
+        { row: 5, col: 1, address: "A5", valueType: "str", rawValue: "健康診断をスケジュールする", outputValue: "健康診断をスケジュールする", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: false, bottom: false, left: false, right: false }, numFmtId: 0, formatCode: "General" },
+        { row: 6, col: 1, address: "A6", valueType: "str", rawValue: "予防接種を確認する", outputValue: "予防接種を確認する", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: false, bottom: false, left: false, right: false }, numFmtId: 0, formatCode: "General" },
+        { row: 7, col: 1, address: "A7", valueType: "str", rawValue: "教師に会う", outputValue: "教師に会う", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: false, bottom: false, left: false, right: false }, numFmtId: 0, formatCode: "General" }
+      ]
+    };
+
+    const markdownFile = api.convertSheetToMarkdown(workbook, sheet, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+
+    expect(markdownFile.markdown).toContain("To Do リスト");
+    expect(markdownFile.markdown).toContain("学校が始まる前に確認します");
+    expect(markdownFile.markdown).toContain("完了 タスク");
+    expect(markdownFile.markdown).toContain("- [x] 登録フォームに記入する");
+    expect(markdownFile.markdown).toContain("- 健康診断をスケジュールする");
+    expect(markdownFile.markdown).toContain("- 予防接種を確認する");
+    expect(markdownFile.markdown).toContain("- 教師に会う");
   });
 
   it("parses a minimal workbook and converts a sheet to markdown", async () => {
@@ -1522,5 +1561,35 @@ describe("xlsx2md core", () => {
     expect(summarySheet.cells.find((cell) => cell.address === "AO1")?.outputValue).toBe("EMPTY");
     expect(summarySheet.cells.find((cell) => cell.address === "AP1")?.outputValue).toBe("TRUE");
     expect(summarySheet.cells.find((cell) => cell.address === "AQ1")?.outputValue).toBe("TRUE");
+  });
+
+  it("renders accounting zero format as dash instead of currency zero", () => {
+    const api = bootCore();
+    const workbook = { name: "accounting.xlsx" };
+    const sheet = {
+      name: "Summary",
+      index: 1,
+      path: "xl/worksheets/sheet1.xml",
+      merges: [],
+      tables: [],
+      images: [],
+      maxRow: 2,
+      maxCol: 2,
+      cells: [
+        { row: 1, col: 1, address: "A1", valueType: "str", rawValue: "費用", outputValue: "費用", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: true, bottom: true, left: true, right: true }, numFmtId: 0, formatCode: "General" },
+        { row: 1, col: 2, address: "B1", valueType: "str", rawValue: "合計費用", outputValue: "合計費用", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: true, bottom: true, left: true, right: true }, numFmtId: 0, formatCode: "General" },
+        { row: 2, col: 1, address: "A2", valueType: "n", rawValue: "0", outputValue: "¥ -", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: true, bottom: true, left: true, right: true }, numFmtId: 44, formatCode: "_ \"¥\"* #,##0.00_ ;_ \"¥\"* \\-#,##0.00_ ;_ \"¥\"* \"-\"??_ ;_ @_ " },
+        { row: 2, col: 2, address: "B2", valueType: "n", rawValue: "0", outputValue: "¥ -", formulaText: "", resolutionStatus: null, styleIndex: 0, borders: { top: true, bottom: true, left: true, right: true }, numFmtId: 44, formatCode: "_ \"¥\"* #,##0.00_ ;_ \"¥\"* \\-#,##0.00_ ;_ \"¥\"* \"-\"??_ ;_ @_ " }
+      ]
+    };
+
+    const markdownFile = api.convertSheetToMarkdown(workbook, sheet, {
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true,
+      treatFirstRowAsHeader: true
+    });
+
+    expect(markdownFile.markdown).toContain("| ¥ - | ¥ - |");
   });
 });
