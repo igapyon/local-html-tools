@@ -1103,6 +1103,46 @@ lht-index-card-link {
   margin-top: 28px;
 }
 
+.md-accordion {
+  margin-top: 28px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.md-accordion[open] {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.md-accordion-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.md-accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.md-accordion-summary::after {
+  content: "▾";
+  color: #52606d;
+  font-size: 0.92rem;
+  transition: transform 0.18s ease;
+}
+
+.md-accordion[open] .md-accordion-summary::after {
+  transform: rotate(180deg);
+}
+
+.md-accordion-body {
+  padding: 0 18px 18px;
+}
+
 .md-section-title {
   margin: 0;
   font-size: 1.08rem;
@@ -1381,60 +1421,51 @@ lht-preview-output {
 
       <section class="md-section md-stack-md">
         <h2 class="md-section-title">入力</h2>
-        <div class="md-grid md-grid--input">
-          <div class="md-panel md-stack-sm">
-            <lht-file-select
-              input-id="xlsxFileInput"
-              button-id="xlsxFileSelectBtn"
-              file-name-id="xlsxFileName"
-              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              button-label="xlsx ファイルを選択"
-              placeholder="未選択"
-              show-file-name>
-            </lht-file-select>
-            <div class="md-caption">ローカルで処理します。サーバ送信は行いません。</div>
-          </div>
+        <div class="md-panel md-stack-sm">
+          <lht-file-select
+            input-id="xlsxFileInput"
+            button-id="xlsxFileSelectBtn"
+            file-name-id="xlsxFileName"
+            accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            button-label="xlsx ファイルを選択"
+            placeholder="未選択"
+            show-file-name>
+          </lht-file-select>
+          <div class="md-caption">ローカルで処理します。サーバ送信は行いません。変換は常に全シートを対象に行います。</div>
+        </div>
+      </section>
 
-          <div class="md-panel md-stack-sm">
-            <lht-select-help field-id="sheetSelect" label="対象シート" help-text="読み込んだ Workbook から変換対象のシートを選択します。`全シート` はプレビュー上で連結表示します。">
+      <details class="md-section md-accordion">
+        <summary class="md-accordion-summary">
+          <span class="md-section-title">変換設定</span>
+        </summary>
+        <div class="md-accordion-body md-stack-md">
+          <div class="md-grid md-grid--options">
+            <lht-select-help field-id="outputModeSelect" label="出力モード" help-text="Markdown に表示値を出すか、raw 値を出すかを選択します。既定は Excel 表示寄りの `display` です。">
               <script type="application/json" slot="options">
                 [
-                  { "value": "", "label": "xlsx を読み込んでください", "selected": true }
+                  { "value": "display", "label": "display: 表示値優先", "selected": true },
+                  { "value": "raw", "label": "raw: 内部値優先" },
+                  { "value": "both", "label": "both: 両方表示" }
                 ]
               </script>
             </lht-select-help>
-            <div id="sheetSummary" class="md-summary-chip">Workbook 未読込</div>
+            <lht-switch-help switch-id="headerRowEnabled" label="先頭行をヘッダーとして扱う" help-label="ヘッダー行の説明" checked>
+              表の1行目を Markdown テーブルのヘッダー行として扱います。
+            </lht-switch-help>
+            <lht-switch-help switch-id="trimTextEnabled" label="前後空白を trim する" help-label="trim の説明" checked>
+              文字列セルの前後空白を取り除きます。
+            </lht-switch-help>
+            <lht-switch-help switch-id="removeEmptyRowsEnabled" label="空行を除外する" help-label="空行除外の説明" checked>
+              表や地の文の中で、値のない行を可能な限り除外します。
+            </lht-switch-help>
+            <lht-switch-help switch-id="removeEmptyColumnsEnabled" label="空列を除外する" help-label="空列除外の説明" checked>
+              表の中で、値のない列を可能な限り除外します。
+            </lht-switch-help>
           </div>
+          <div id="outputModeNotice" class="md-caption">`display` は Excel の表示値寄りで出力します。</div>
         </div>
-      </section>
-
-      <section class="md-section md-stack-md">
-        <h2 class="md-section-title">変換設定</h2>
-        <div class="md-grid md-grid--options">
-          <lht-select-help field-id="outputModeSelect" label="出力モード" help-text="Markdown に表示値を出すか、raw 値を出すかを選択します。既定は Excel 表示寄りの `display` です。">
-            <script type="application/json" slot="options">
-              [
-                { "value": "display", "label": "display: 表示値優先", "selected": true },
-                { "value": "raw", "label": "raw: 内部値優先" },
-                { "value": "both", "label": "both: 両方表示" }
-              ]
-            </script>
-          </lht-select-help>
-          <lht-switch-help switch-id="headerRowEnabled" label="先頭行をヘッダーとして扱う" help-label="ヘッダー行の説明" checked>
-            表の1行目を Markdown テーブルのヘッダー行として扱います。
-          </lht-switch-help>
-          <lht-switch-help switch-id="trimTextEnabled" label="前後空白を trim する" help-label="trim の説明" checked>
-            文字列セルの前後空白を取り除きます。
-          </lht-switch-help>
-          <lht-switch-help switch-id="removeEmptyRowsEnabled" label="空行を除外する" help-label="空行除外の説明" checked>
-            表や地の文の中で、値のない行を可能な限り除外します。
-          </lht-switch-help>
-          <lht-switch-help switch-id="removeEmptyColumnsEnabled" label="空列を除外する" help-label="空列除外の説明" checked>
-            表の中で、値のない列を可能な限り除外します。
-          </lht-switch-help>
-        </div>
-        <div id="outputModeNotice" class="md-caption">`display` は Excel の表示値寄りで出力します。</div>
-      </section>
+      </details>
 
       <section class="md-section md-stack-md">
         <div class="md-actions">
@@ -1459,36 +1490,47 @@ lht-preview-output {
         </div>
       </section>
 
-      <section class="md-section">
-        <div class="md-panel md-stack-sm">
-          <h2 class="md-section-title">表候補スコア</h2>
-          <div class="md-legend">
-            <span class="md-summary-item-status md-summary-item-status--strong">strong</span>
-            <span class="md-caption">7点以上の強い表候補</span>
-            <span class="md-summary-item-status md-summary-item-status--candidate">candidate</span>
-            <span class="md-caption">4-6点の表候補</span>
+      <details class="md-section md-accordion">
+        <summary class="md-accordion-summary">
+          <span class="md-section-title">表候補スコア</span>
+        </summary>
+        <div class="md-accordion-body">
+          <div class="md-panel md-stack-sm">
+            <div class="md-legend">
+              <span class="md-summary-item-status md-summary-item-status--strong">strong</span>
+              <span class="md-caption">7点以上の強い表候補</span>
+              <span class="md-summary-item-status md-summary-item-status--candidate">candidate</span>
+              <span class="md-caption">4-6点の表候補</span>
+            </div>
+            <div id="scoreSummary" class="md-summary-list">まだ変換していません。</div>
           </div>
-          <div id="scoreSummary" class="md-summary-list">まだ変換していません。</div>
         </div>
-      </section>
+      </details>
 
-      <section class="md-section">
-        <div class="md-panel md-stack-sm">
-          <h2 class="md-section-title">数式診断</h2>
-          <div class="md-legend">
-            <span class="md-summary-item-status md-summary-item-status--resolved">resolved</span>
-            <span class="md-summary-item-status md-summary-item-status--fallback">fallback</span>
-            <span class="md-summary-item-status md-summary-item-status--unsupported">unsupported</span>
-            <span class="md-caption">解決済み / フォールバック / 未対応外部参照</span>
+      <details class="md-section md-accordion">
+        <summary class="md-accordion-summary">
+          <span class="md-section-title">数式診断</span>
+        </summary>
+        <div class="md-accordion-body">
+          <div class="md-panel md-stack-sm">
+            <div class="md-legend">
+              <span class="md-summary-item-status md-summary-item-status--resolved">resolved</span>
+              <span class="md-summary-item-status md-summary-item-status--fallback">fallback</span>
+              <span class="md-summary-item-status md-summary-item-status--unsupported">unsupported</span>
+              <span class="md-caption">解決済み / フォールバック / 未対応外部参照</span>
+            </div>
+            <div id="formulaSummary" class="md-summary-list">まだ変換していません。</div>
           </div>
-          <div id="formulaSummary" class="md-summary-list">まだ変換していません。</div>
         </div>
-      </section>
+      </details>
 
       <lht-toast id="toast"></lht-toast>
     </section>
   </main>
 
+  
+  
+  
   
   
   <script>
@@ -3616,6 +3658,1493 @@ if (!customElements.get("lht-page-menu")) {
   </script>
 
   <script>
+(function initXlsx2mdFormulaTokenizer(global) {
+    var _a;
+    var _b;
+    const api = ((_a = (_b = global).__xlsx2mdFormula) !== null && _a !== void 0 ? _a : (_b.__xlsx2mdFormula = {}));
+    const CELL_REF_RE = /^\$?[A-Za-z]{1,3}\$?\d+$/;
+    const IDENTIFIER_START_RE = /[\p{L}_\\$]/u;
+    const IDENTIFIER_PART_RE = /[\p{L}\p{N}_.\\$?]/u;
+    function tokenizeFormula(input) {
+        const source = normalizeFormulaInput(input);
+        const tokens = [];
+        let index = 0;
+        while (index < source.length) {
+            const char = source[index];
+            if (/\s/.test(char)) {
+                index += 1;
+                continue;
+            }
+            const start = index;
+            if (char === "\"") {
+                const parsed = readStringLiteral(source, index);
+                tokens.push({
+                    type: "string",
+                    value: parsed.value,
+                    start,
+                    end: parsed.end
+                });
+                index = parsed.end;
+                continue;
+            }
+            if (char === "'") {
+                const parsed = readQuotedIdentifier(source, index);
+                tokens.push({
+                    type: "quoted_identifier",
+                    value: parsed.value,
+                    start,
+                    end: parsed.end
+                });
+                index = parsed.end;
+                continue;
+            }
+            if (char === "#") {
+                const parsed = readErrorLiteral(source, index);
+                tokens.push({
+                    type: "error",
+                    value: parsed.value,
+                    start,
+                    end: parsed.end
+                });
+                index = parsed.end;
+                continue;
+            }
+            if (/[0-9.]/.test(char)) {
+                const parsed = readNumberLiteral(source, index);
+                if (parsed) {
+                    tokens.push({
+                        type: "number",
+                        value: parsed.value,
+                        start,
+                        end: parsed.end
+                    });
+                    index = parsed.end;
+                    continue;
+                }
+            }
+            if ("(),:![]".includes(char)) {
+                tokens.push({
+                    type: punctuationTypeFor(char),
+                    value: char,
+                    start,
+                    end: start + 1
+                });
+                index += 1;
+                continue;
+            }
+            const operator = readOperator(source, index);
+            if (operator) {
+                tokens.push({
+                    type: "operator",
+                    value: operator,
+                    start,
+                    end: start + operator.length
+                });
+                index += operator.length;
+                continue;
+            }
+            if (isIdentifierStart(char)) {
+                const parsed = readIdentifierLike(source, index);
+                const upperValue = parsed.value.toUpperCase();
+                tokens.push({
+                    type: upperValue === "TRUE" || upperValue === "FALSE"
+                        ? "boolean"
+                        : isCellReference(parsed.value)
+                            ? "cell"
+                            : "identifier",
+                    value: parsed.value,
+                    start,
+                    end: parsed.end
+                });
+                index = parsed.end;
+                continue;
+            }
+            throw new Error(`Unexpected formula token at ${index}: ${char}`);
+        }
+        return tokens;
+    }
+    function normalizeFormulaInput(input) {
+        return input.startsWith("=") ? input.slice(1) : input;
+    }
+    function readStringLiteral(source, start) {
+        let index = start + 1;
+        let value = "";
+        while (index < source.length) {
+            const char = source[index];
+            if (char === "\"") {
+                if (source[index + 1] === "\"") {
+                    value += "\"";
+                    index += 2;
+                    continue;
+                }
+                return { value, end: index + 1 };
+            }
+            value += char;
+            index += 1;
+        }
+        throw new Error(`Unterminated string literal at ${start}`);
+    }
+    function readQuotedIdentifier(source, start) {
+        let index = start + 1;
+        let value = "";
+        while (index < source.length) {
+            const char = source[index];
+            if (char === "'") {
+                if (source[index + 1] === "'") {
+                    value += "'";
+                    index += 2;
+                    continue;
+                }
+                return { value, end: index + 1 };
+            }
+            value += char;
+            index += 1;
+        }
+        throw new Error(`Unterminated quoted identifier at ${start}`);
+    }
+    function readErrorLiteral(source, start) {
+        let index = start + 1;
+        while (index < source.length && /[A-Za-z0-9/!?#]/.test(source[index])) {
+            index += 1;
+        }
+        return { value: source.slice(start, index), end: index };
+    }
+    function readNumberLiteral(source, start) {
+        const slice = source.slice(start);
+        const match = slice.match(/^(?:\d+\.\d*|\.\d+|\d+)(?:[Ee][+\-]?\d+)?/);
+        if (!match) {
+            return null;
+        }
+        return {
+            value: match[0],
+            end: start + match[0].length
+        };
+    }
+    function punctuationTypeFor(char) {
+        switch (char) {
+            case "(":
+                return "lparen";
+            case ")":
+                return "rparen";
+            case ",":
+                return "comma";
+            case ":":
+                return "colon";
+            case "!":
+                return "bang";
+            case "[":
+                return "lbracket";
+            case "]":
+                return "rbracket";
+            default:
+                throw new Error(`Unknown punctuation: ${char}`);
+        }
+    }
+    function readOperator(source, start) {
+        const twoChar = source.slice(start, start + 2);
+        if (twoChar === "<>" || twoChar === "<=" || twoChar === ">=") {
+            return twoChar;
+        }
+        const oneChar = source[start];
+        return "+-*/&=<>%".includes(oneChar) ? oneChar : null;
+    }
+    function isIdentifierStart(char) {
+        return IDENTIFIER_START_RE.test(char);
+    }
+    function isIdentifierPart(char) {
+        return IDENTIFIER_PART_RE.test(char);
+    }
+    function readIdentifierLike(source, start) {
+        let index = start;
+        while (index < source.length && isIdentifierPart(source[index])) {
+            index += 1;
+        }
+        return {
+            value: source.slice(start, index),
+            end: index
+        };
+    }
+    function isCellReference(value) {
+        return CELL_REF_RE.test(value);
+    }
+    api.tokenizeFormula = tokenizeFormula;
+    api.normalizeFormulaInput = normalizeFormulaInput;
+    api.isCellReference = isCellReference;
+})(globalThis);
+  </script>
+
+  <script>
+(function initXlsx2mdFormulaParser(global) {
+    var _a;
+    var _b;
+    const api = ((_a = (_b = global).__xlsx2mdFormula) !== null && _a !== void 0 ? _a : (_b.__xlsx2mdFormula = {}));
+    function parseFormula(input) {
+        var _a;
+        const tokens = api.tokenizeFormula(input);
+        const state = { tokens, index: 0 };
+        const ast = parseComparison(state);
+        if (peek(state)) {
+            throw new Error(`Unexpected trailing token: ${(_a = peek(state)) === null || _a === void 0 ? void 0 : _a.value}`);
+        }
+        return ast;
+    }
+    function parseComparison(state) {
+        let left = parseConcat(state);
+        while (matchOperator(state, ["=", "<>", "<", "<=", ">", ">="])) {
+            const operator = consume(state).value;
+            const right = parseConcat(state);
+            left = { type: "binary_op", operator, left, right };
+        }
+        return left;
+    }
+    function parseConcat(state) {
+        let left = parseAdditive(state);
+        while (matchOperator(state, ["&"])) {
+            const operator = consume(state).value;
+            const right = parseAdditive(state);
+            left = { type: "binary_op", operator, left, right };
+        }
+        return left;
+    }
+    function parseAdditive(state) {
+        let left = parseMultiplicative(state);
+        while (matchOperator(state, ["+", "-"])) {
+            const operator = consume(state).value;
+            const right = parseMultiplicative(state);
+            left = { type: "binary_op", operator, left, right };
+        }
+        return left;
+    }
+    function parseMultiplicative(state) {
+        let left = parseUnary(state);
+        while (matchOperator(state, ["*", "/"])) {
+            const operator = consume(state).value;
+            const right = parseUnary(state);
+            left = { type: "binary_op", operator, left, right };
+        }
+        return left;
+    }
+    function parseUnary(state) {
+        if (matchOperator(state, ["+", "-"])) {
+            const operator = consume(state).value;
+            return {
+                type: "unary_op",
+                operator,
+                operand: parseUnary(state)
+            };
+        }
+        return parsePostfix(state);
+    }
+    function parsePostfix(state) {
+        let node = parsePrimary(state);
+        while (matchOperator(state, ["%"])) {
+            const operator = consume(state).value;
+            node = {
+                type: "postfix_op",
+                operator,
+                operand: node
+            };
+        }
+        return node;
+    }
+    function parsePrimary(state) {
+        const token = peek(state);
+        if (!token) {
+            throw new Error("Unexpected end of formula");
+        }
+        if (token.type === "number") {
+            consume(state);
+            return {
+                type: "number",
+                value: Number(token.value),
+                raw: token.value
+            };
+        }
+        if (token.type === "string") {
+            consume(state);
+            return {
+                type: "string",
+                value: token.value
+            };
+        }
+        if (token.type === "boolean") {
+            consume(state);
+            return {
+                type: "boolean",
+                value: token.value.toUpperCase() === "TRUE",
+                raw: token.value
+            };
+        }
+        if (token.type === "error") {
+            consume(state);
+            return {
+                type: "error",
+                value: token.value
+            };
+        }
+        if (token.type === "lparen") {
+            consume(state);
+            const expression = parseComparison(state);
+            expect(state, "rparen");
+            return expression;
+        }
+        if (token.type === "identifier" || token.type === "cell" || token.type === "quoted_identifier") {
+            return parseReferenceLike(state);
+        }
+        throw new Error(`Unexpected token in formula: ${token.value}`);
+    }
+    function parseReferenceLike(state) {
+        var _a, _b, _c, _d, _e, _f;
+        const first = consume(state);
+        if (first.type === "identifier" && ((_a = peek(state)) === null || _a === void 0 ? void 0 : _a.type) === "lparen") {
+            return parseFunctionCall(state, first.value);
+        }
+        if ((first.type === "identifier" || first.type === "quoted_identifier") && ((_b = peek(state)) === null || _b === void 0 ? void 0 : _b.type) === "lbracket") {
+            return parseStructuredReference(state, first.value);
+        }
+        if (((_c = peek(state)) === null || _c === void 0 ? void 0 : _c.type) === "bang") {
+            consume(state);
+            const next = consume(state);
+            if (!next || (next.type !== "cell" && next.type !== "identifier")) {
+                throw new Error(`Expected reference after !, got ${(_d = next === null || next === void 0 ? void 0 : next.value) !== null && _d !== void 0 ? _d : "EOF"}`);
+            }
+            let node = next.type === "cell"
+                ? { type: "cell", ref: next.value, sheet: first.value }
+                : { type: "scoped_name", sheet: first.value, name: next.value };
+            if (((_e = peek(state)) === null || _e === void 0 ? void 0 : _e.type) === "colon") {
+                consume(state);
+                const end = parseRangeEndpoint(state, first.value);
+                node = { type: "range", start: node, end };
+            }
+            return node;
+        }
+        if (first.type === "cell") {
+            const cellNode = { type: "cell", ref: first.value, sheet: null };
+            if (((_f = peek(state)) === null || _f === void 0 ? void 0 : _f.type) === "colon") {
+                consume(state);
+                const end = parseRangeEndpoint(state, null);
+                return { type: "range", start: cellNode, end };
+            }
+            return cellNode;
+        }
+        return { type: "name", name: first.value };
+    }
+    function parseStructuredReference(state, tableName) {
+        expect(state, "lbracket");
+        if (matchAndConsume(state, "lbracket")) {
+            const qualifier = readStructuredReferenceSegment(state);
+            expect(state, "rbracket");
+            expect(state, "comma");
+            expect(state, "lbracket");
+            const column = readStructuredReferenceSegment(state);
+            expect(state, "rbracket");
+            expect(state, "rbracket");
+            return {
+                type: "structured_ref",
+                table: tableName,
+                qualifier,
+                column
+            };
+        }
+        const column = readStructuredReferenceSegment(state);
+        expect(state, "rbracket");
+        return {
+            type: "structured_ref",
+            table: tableName,
+            column
+        };
+    }
+    function readStructuredReferenceSegment(state) {
+        var _a, _b;
+        const parts = [];
+        while (peek(state) && ((_a = peek(state)) === null || _a === void 0 ? void 0 : _a.type) !== "rbracket") {
+            const token = consume(state);
+            if (!token || !["identifier", "quoted_identifier", "cell", "error", "number", "boolean"].includes(token.type)) {
+                throw new Error(`Expected structured reference column, got ${(_b = token === null || token === void 0 ? void 0 : token.value) !== null && _b !== void 0 ? _b : "EOF"}`);
+            }
+            parts.push(token.value);
+        }
+        if (!parts.length) {
+            throw new Error("Expected structured reference column, got EOF");
+        }
+        return parts.join(" ");
+    }
+    function parseFunctionCall(state, name) {
+        var _a;
+        expect(state, "lparen");
+        const args = [];
+        if (((_a = peek(state)) === null || _a === void 0 ? void 0 : _a.type) !== "rparen") {
+            do {
+                args.push(parseComparison(state));
+            } while (matchAndConsume(state, "comma"));
+        }
+        expect(state, "rparen");
+        return {
+            type: "function_call",
+            name,
+            args
+        };
+    }
+    function parseRangeEndpoint(state, defaultSheet) {
+        var _a;
+        const token = consume(state);
+        if (!token || (token.type !== "cell" && token.type !== "identifier")) {
+            throw new Error(`Expected range endpoint, got ${(_a = token === null || token === void 0 ? void 0 : token.value) !== null && _a !== void 0 ? _a : "EOF"}`);
+        }
+        if (token.type === "cell") {
+            return {
+                type: "cell",
+                ref: token.value,
+                sheet: defaultSheet
+            };
+        }
+        return {
+            type: defaultSheet ? "scoped_name" : "name",
+            ...(defaultSheet
+                ? { sheet: defaultSheet, name: token.value }
+                : { name: token.value })
+        };
+    }
+    function peek(state) {
+        var _a;
+        return (_a = state.tokens[state.index]) !== null && _a !== void 0 ? _a : null;
+    }
+    function consume(state) {
+        var _a;
+        const token = (_a = state.tokens[state.index]) !== null && _a !== void 0 ? _a : null;
+        if (token) {
+            state.index += 1;
+        }
+        return token;
+    }
+    function expect(state, type) {
+        var _a;
+        const token = consume(state);
+        if (!token || token.type !== type) {
+            throw new Error(`Expected ${type}, got ${(_a = token === null || token === void 0 ? void 0 : token.type) !== null && _a !== void 0 ? _a : "EOF"}`);
+        }
+        return token;
+    }
+    function matchOperator(state, operators) {
+        const token = peek(state);
+        return (token === null || token === void 0 ? void 0 : token.type) === "operator" && operators.includes(token.value);
+    }
+    function matchAndConsume(state, type) {
+        var _a;
+        if (((_a = peek(state)) === null || _a === void 0 ? void 0 : _a.type) === type) {
+            consume(state);
+            return true;
+        }
+        return false;
+    }
+    api.parseFormula = parseFormula;
+})(globalThis);
+  </script>
+
+  <script>
+(function initXlsx2mdFormulaEvaluator(global) {
+    var _a;
+    var _b;
+    const api = ((_a = (_b = global).__xlsx2mdFormula) !== null && _a !== void 0 ? _a : (_b.__xlsx2mdFormula = {}));
+    function evaluateFormulaAst(ast, context = {}) {
+        switch (ast.type) {
+            case "number":
+                return ast.value;
+            case "string":
+                return ast.value;
+            case "boolean":
+                return ast.value;
+            case "error":
+                return ast.value;
+            case "cell":
+                return context.resolveCell ? context.resolveCell(ast.ref, ast.sheet) : null;
+            case "name":
+                return context.resolveName ? context.resolveName(ast.name) : null;
+            case "scoped_name":
+                if (context.resolveScopedName) {
+                    return context.resolveScopedName(ast.sheet, ast.name);
+                }
+                return context.resolveName ? context.resolveName(`${ast.sheet}!${ast.name}`) : null;
+            case "range":
+                return evaluateRangeAst(ast, context);
+            case "structured_ref":
+                if (ast.qualifier) {
+                    return null;
+                }
+                return context.resolveStructuredRef ? context.resolveStructuredRef(ast.table, ast.column) : null;
+            case "unary_op":
+                return evaluateUnaryOp(ast.operator, evaluateFormulaAst(ast.operand, context));
+            case "postfix_op":
+                return evaluatePostfixOp(ast.operator, evaluateFormulaAst(ast.operand, context));
+            case "binary_op":
+                return evaluateBinaryOp(ast.operator, evaluateFormulaAst(ast.left, context), evaluateFormulaAst(ast.right, context));
+            case "function_call":
+                return evaluateFunctionCall(ast.name, ast.args, context);
+            default:
+                throw new Error(`Unsupported AST node: ${ast.type}`);
+        }
+    }
+    function evaluateRangeAst(ast, context) {
+        var _a, _b;
+        if (ast.start.type === "cell" && ast.end.type === "cell") {
+            const sheet = (_b = (_a = ast.start.sheet) !== null && _a !== void 0 ? _a : ast.end.sheet) !== null && _b !== void 0 ? _b : null;
+            if (context.resolveRange) {
+                return context.resolveRange(ast.start.ref, ast.end.ref, sheet);
+            }
+            return [
+                evaluateFormulaAst(ast.start, context),
+                evaluateFormulaAst(ast.end, context)
+            ];
+        }
+        return [
+            evaluateFormulaAst(ast.start, context),
+            evaluateFormulaAst(ast.end, context)
+        ];
+    }
+    function evaluateUnaryOp(operator, operand) {
+        const numericValue = toNumber(operand);
+        if (operator === "+") {
+            return numericValue;
+        }
+        if (operator === "-") {
+            return -numericValue;
+        }
+        throw new Error(`Unsupported unary operator: ${operator}`);
+    }
+    function evaluatePostfixOp(operator, operand) {
+        if (operator === "%") {
+            return toNumber(operand) / 100;
+        }
+        throw new Error(`Unsupported postfix operator: ${operator}`);
+    }
+    function evaluateBinaryOp(operator, left, right) {
+        switch (operator) {
+            case "+":
+                return toNumber(left) + toNumber(right);
+            case "-":
+                return toNumber(left) - toNumber(right);
+            case "*":
+                return toNumber(left) * toNumber(right);
+            case "/":
+                return toNumber(left) / toNumber(right);
+            case "&":
+                return `${toText(left)}${toText(right)}`;
+            case "=":
+                return looselyEquals(left, right);
+            case "<>":
+                return !looselyEquals(left, right);
+            case "<":
+                return compareValues(left, right) < 0;
+            case "<=":
+                return compareValues(left, right) <= 0;
+            case ">":
+                return compareValues(left, right) > 0;
+            case ">=":
+                return compareValues(left, right) >= 0;
+            default:
+                throw new Error(`Unsupported binary operator: ${operator}`);
+        }
+    }
+    function evaluateFunctionCall(name, args, context) {
+        const upperName = name.toUpperCase();
+        switch (upperName) {
+            case "IF":
+                return evaluateIf(args, context);
+            case "IFERROR":
+                return evaluateIfError(args, context);
+            case "AND":
+                return evaluateAnd(args, context);
+            case "OR":
+                return evaluateOr(args, context);
+            case "NOT":
+                return evaluateNot(args, context);
+            case "DATE":
+                return evaluateDate(args, context);
+            case "VALUE":
+                return evaluateValue(args, context);
+            case "ROUND":
+                return evaluateRound(args, context, "round");
+            case "ROUNDUP":
+                return evaluateRound(args, context, "up");
+            case "ROUNDDOWN":
+                return evaluateRound(args, context, "down");
+            case "INT":
+                return evaluateInt(args, context);
+            case "ABS":
+                return evaluateAbs(args, context);
+            case "SUM":
+                return evaluateSum(args, context);
+            case "SUMPRODUCT":
+                return evaluateSumProduct(args, context);
+            case "REPT":
+                return evaluateRept(args, context);
+            case "SUBSTITUTE":
+                return evaluateSubstitute(args, context);
+            case "MATCH":
+                return evaluateMatch(args, context);
+            case "INDEX":
+                return evaluateIndex(args, context);
+            case "VLOOKUP":
+                return evaluateVLookup(args, context);
+            case "HLOOKUP":
+                return evaluateHLookup(args, context);
+            case "XLOOKUP":
+                return evaluateXLookup(args, context);
+            case "TEXT":
+                return evaluateText(args, context);
+            case "TODAY":
+                return evaluateToday(context);
+            case "WEEKDAY":
+                return evaluateWeekday(args, context);
+            case "DATEVALUE":
+                return evaluateDateValue(args, context);
+            case "LEN":
+                return evaluateLen(args, context);
+            case "LOWER":
+                return evaluateLower(args, context);
+            case "FIND":
+                return evaluateFind(args, context, false);
+            case "SEARCH":
+                return evaluateFind(args, context, true);
+            case "LEFT":
+                return evaluateLeft(args, context);
+            case "RIGHT":
+                return evaluateRight(args, context);
+            case "MID":
+                return evaluateMid(args, context);
+            case "TRIM":
+                return evaluateTrim(args, context);
+            case "REPLACE":
+                return evaluateReplace(args, context);
+            case "DAY":
+                return evaluateDay(args, context);
+            case "MONTH":
+                return evaluateMonth(args, context);
+            case "YEAR":
+                return evaluateYear(args, context);
+            case "SUBTOTAL":
+                return evaluateSubtotal(args, context);
+            case "UPPER":
+                return evaluateUpper(args, context);
+            case "CONCATENATE":
+                return evaluateConcatenate(args, context);
+            case "ISBLANK":
+                return evaluateIsBlank(args, context);
+            case "ISNUMBER":
+                return evaluateIsNumber(args, context);
+            case "ISTEXT":
+                return evaluateIsText(args, context);
+            case "ISERROR":
+                return evaluateIsError(args, context);
+            case "ISNA":
+                return evaluateIsNa(args, context);
+            case "NA":
+                return evaluateNa();
+            case "MIN":
+                return evaluateMin(args, context);
+            case "MAX":
+                return evaluateMax(args, context);
+            case "AVERAGE":
+                return evaluateAverage(args, context);
+            case "COLUMN":
+                return evaluateColumn(args, context);
+            case "ROW":
+                return evaluateRow(args, context);
+            case "EDATE":
+                return evaluateEDate(args, context);
+            case "EOMONTH":
+                return evaluateEoMonth(args, context);
+            case "COUNTIF":
+                return evaluateCountIf(args, context);
+            case "COUNTIFS":
+                return evaluateCountIfs(args, context);
+            case "COUNT":
+                return evaluateCount(args, context);
+            case "COUNTA":
+                return evaluateCountA(args, context);
+            case "SUMIF":
+                return evaluateSumIf(args, context);
+            case "SUMIFS":
+                return evaluateSumIfs(args, context);
+            case "AVERAGEIF":
+                return evaluateAverageIf(args, context);
+            case "AVERAGEIFS":
+                return evaluateAverageIfs(args, context);
+            default:
+                throw new Error(`Unsupported formula function: ${name}`);
+        }
+    }
+    function evaluateIf(args, context) {
+        const condition = toBoolean(evaluateFormulaAst(args[0], context));
+        if (condition) {
+            return args[1] ? evaluateFormulaAst(args[1], context) : true;
+        }
+        return args[2] ? evaluateFormulaAst(args[2], context) : false;
+    }
+    function evaluateIfError(args, context) {
+        const primary = evaluateFormulaAst(args[0], context);
+        if (isFormulaError(primary)) {
+            return args[1] ? evaluateFormulaAst(args[1], context) : "";
+        }
+        return primary;
+    }
+    function evaluateAnd(args, context) {
+        return args.every((arg) => toBoolean(evaluateFormulaAst(arg, context)));
+    }
+    function evaluateOr(args, context) {
+        return args.some((arg) => toBoolean(evaluateFormulaAst(arg, context)));
+    }
+    function evaluateNot(args, context) {
+        return !toBoolean(evaluateFormulaAst(args[0], context));
+    }
+    function evaluateDate(args, context) {
+        const year = toNumber(evaluateFormulaAst(args[0], context));
+        const month = toNumber(evaluateFormulaAst(args[1], context));
+        const day = toNumber(evaluateFormulaAst(args[2], context));
+        return excelSerialFromDate(year, month, day);
+    }
+    function evaluateValue(args, context) {
+        const rawValue = evaluateFormulaAst(args[0], context);
+        if (typeof rawValue === "number") {
+            return rawValue;
+        }
+        const text = toText(rawValue).trim();
+        if (!text) {
+            return 0;
+        }
+        const dateValue = parseDateLikeString(text);
+        if (dateValue !== null) {
+            return dateValue;
+        }
+        const normalized = text.replace(/,/g, "");
+        const parsed = Number(normalized);
+        if (!Number.isNaN(parsed)) {
+            return parsed;
+        }
+        throw new Error(`Unsupported VALUE input: ${text}`);
+    }
+    function evaluateRound(args, context, mode) {
+        const value = toNumber(evaluateFormulaAst(args[0], context));
+        const digits = args[1] ? Math.trunc(toNumber(evaluateFormulaAst(args[1], context))) : 0;
+        const factor = Math.pow(10, digits);
+        const scaled = value * factor;
+        if (mode === "round") {
+            return Math.round(scaled) / factor;
+        }
+        if (mode === "up") {
+            return (scaled >= 0 ? Math.ceil(scaled) : Math.floor(scaled)) / factor;
+        }
+        return (scaled >= 0 ? Math.floor(scaled) : Math.ceil(scaled)) / factor;
+    }
+    function evaluateInt(args, context) {
+        return Math.floor(toNumber(evaluateFormulaAst(args[0], context)));
+    }
+    function evaluateAbs(args, context) {
+        return Math.abs(toNumber(evaluateFormulaAst(args[0], context)));
+    }
+    function evaluateSum(args, context) {
+        return args
+            .flatMap((arg) => flattenValues(evaluateFormulaAst(arg, context)))
+            .reduce((sum, value) => sum + toNumber(value), 0);
+    }
+    function evaluateSumProduct(args, context) {
+        var _a;
+        const vectors = args.map((arg) => flattenValues(evaluateFormulaAst(arg, context)));
+        if (!vectors.length) {
+            return 0;
+        }
+        const lengths = vectors.map((vector) => vector.length);
+        const maxLength = Math.max(...lengths);
+        const normalized = vectors.map((vector) => {
+            if (vector.length === maxLength) {
+                return vector;
+            }
+            if (vector.length === 1) {
+                return Array.from({ length: maxLength }, () => vector[0]);
+            }
+            throw new Error("SUMPRODUCT arguments must have the same length");
+        });
+        let total = 0;
+        for (let index = 0; index < maxLength; index += 1) {
+            let product = 1;
+            for (const vector of normalized) {
+                product *= toNumber((_a = vector[index]) !== null && _a !== void 0 ? _a : 0);
+            }
+            total += product;
+        }
+        return total;
+    }
+    function evaluateRept(args, context) {
+        const text = toText(evaluateFormulaAst(args[0], context));
+        const countValue = evaluateFormulaAst(args[1], context);
+        const count = Math.max(0, Math.floor(toNumber(countValue)));
+        return text.repeat(count);
+    }
+    function evaluateSubstitute(args, context) {
+        const text = toText(evaluateFormulaAst(args[0], context));
+        const oldText = toText(evaluateFormulaAst(args[1], context));
+        const newText = toText(evaluateFormulaAst(args[2], context));
+        const instanceNum = args[3] ? Math.floor(toNumber(evaluateFormulaAst(args[3], context))) : null;
+        if (!oldText) {
+            return text;
+        }
+        if (!instanceNum || instanceNum < 1) {
+            return text.split(oldText).join(newText);
+        }
+        let occurrence = 0;
+        let searchIndex = 0;
+        let result = "";
+        while (true) {
+            const foundIndex = text.indexOf(oldText, searchIndex);
+            if (foundIndex === -1) {
+                result += text.slice(searchIndex);
+                break;
+            }
+            occurrence += 1;
+            result += text.slice(searchIndex, foundIndex);
+            if (occurrence === instanceNum) {
+                result += newText;
+            }
+            else {
+                result += oldText;
+            }
+            searchIndex = foundIndex + oldText.length;
+        }
+        return result;
+    }
+    function evaluateMatch(args, context) {
+        const lookupValue = evaluateFormulaAst(args[0], context);
+        const lookupArray = flattenValues(evaluateFormulaAst(args[1], context));
+        for (let index = 0; index < lookupArray.length; index += 1) {
+            if (looselyEquals(lookupArray[index], lookupValue)) {
+                return index + 1;
+            }
+        }
+        return "#N/A";
+    }
+    function evaluateIndex(args, context) {
+        var _a, _b, _c, _d;
+        const source = evaluateFormulaAst(args[0], context);
+        const rowNumber = args[1] ? Math.max(1, Math.floor(toNumber(evaluateFormulaAst(args[1], context)))) : 1;
+        const columnNumber = args[2] ? Math.max(1, Math.floor(toNumber(evaluateFormulaAst(args[2], context)))) : 1;
+        if (!Array.isArray(source)) {
+            return source;
+        }
+        if (source.length > 0 && Array.isArray(source[0])) {
+            const row = (_a = source[rowNumber - 1]) !== null && _a !== void 0 ? _a : [];
+            return (_b = row[columnNumber - 1]) !== null && _b !== void 0 ? _b : null;
+        }
+        if (columnNumber === 1) {
+            return (_c = source[rowNumber - 1]) !== null && _c !== void 0 ? _c : null;
+        }
+        return (_d = source[columnNumber - 1]) !== null && _d !== void 0 ? _d : null;
+    }
+    function evaluateVLookup(args, context) {
+        var _a;
+        const lookupValue = evaluateFormulaAst(args[0], context);
+        const table = normalizeToMatrix(evaluateFormulaAst(args[1], context));
+        const columnNumber = Math.max(1, Math.floor(toNumber(evaluateFormulaAst(args[2], context))));
+        const approximate = args[3] ? toBoolean(evaluateFormulaAst(args[3], context)) : false;
+        if (approximate) {
+            throw new Error("Approximate VLOOKUP is not supported");
+        }
+        for (const row of table) {
+            if (looselyEquals(row[0], lookupValue)) {
+                return (_a = row[columnNumber - 1]) !== null && _a !== void 0 ? _a : "#N/A";
+            }
+        }
+        return "#N/A";
+    }
+    function evaluateHLookup(args, context) {
+        var _a, _b, _c;
+        const lookupValue = evaluateFormulaAst(args[0], context);
+        const table = normalizeToMatrix(evaluateFormulaAst(args[1], context));
+        const rowNumber = Math.max(1, Math.floor(toNumber(evaluateFormulaAst(args[2], context))));
+        const approximate = args[3] ? toBoolean(evaluateFormulaAst(args[3], context)) : false;
+        if (approximate) {
+            throw new Error("Approximate HLOOKUP is not supported");
+        }
+        const headerRow = (_a = table[0]) !== null && _a !== void 0 ? _a : [];
+        const targetRow = (_b = table[rowNumber - 1]) !== null && _b !== void 0 ? _b : [];
+        for (let index = 0; index < headerRow.length; index += 1) {
+            if (looselyEquals(headerRow[index], lookupValue)) {
+                return (_c = targetRow[index]) !== null && _c !== void 0 ? _c : "#N/A";
+            }
+        }
+        return "#N/A";
+    }
+    function evaluateXLookup(args, context) {
+        var _a;
+        const lookupValue = evaluateFormulaAst(args[0], context);
+        const lookupArray = flattenValues(evaluateFormulaAst(args[1], context));
+        const returnArray = flattenValues(evaluateFormulaAst(args[2], context));
+        const notFoundValue = args[3] ? evaluateFormulaAst(args[3], context) : "#N/A";
+        for (let index = 0; index < lookupArray.length; index += 1) {
+            if (looselyEquals(lookupArray[index], lookupValue)) {
+                return (_a = returnArray[index]) !== null && _a !== void 0 ? _a : notFoundValue;
+            }
+        }
+        return notFoundValue;
+    }
+    function evaluateText(args, context) {
+        const value = evaluateFormulaAst(args[0], context);
+        const format = toText(evaluateFormulaAst(args[1], context)).toLowerCase();
+        if (format === "0000") {
+            const number = Math.floor(Math.abs(toNumber(value)));
+            const sign = toNumber(value) < 0 ? "-" : "";
+            return `${sign}${String(number).padStart(4, "0")}`;
+        }
+        if (format === "0" || format === "0.0" || format === "0.00") {
+            const digits = format.includes(".") ? format.split(".")[1].length : 0;
+            return toNumber(value).toFixed(digits);
+        }
+        if (format === "#,##0" || format === "#,##0.00") {
+            const digits = format.includes(".") ? format.split(".")[1].length : 0;
+            return toNumber(value).toLocaleString("en-US", {
+                minimumFractionDigits: digits,
+                maximumFractionDigits: digits
+            });
+        }
+        if (format === "yyyy/mm/dd" || format === "yyyy-mm-dd") {
+            const parts = excelSerialToDateParts(toNumber(value));
+            const separator = format.includes("/") ? "/" : "-";
+            return `${parts.year}${separator}${parts.month}${separator}${parts.day}`;
+        }
+        return toText(value);
+    }
+    function evaluateToday(context) {
+        var _a;
+        const now = (_a = context.currentDate) !== null && _a !== void 0 ? _a : new Date();
+        return excelSerialFromDate(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate());
+    }
+    function evaluateWeekday(args, context) {
+        const serial = toNumber(evaluateFormulaAst(args[0], context));
+        const returnType = args[1] ? Math.max(1, Math.floor(toNumber(evaluateFormulaAst(args[1], context)))) : 1;
+        const excelEpoch = Date.UTC(1899, 11, 30);
+        const utcDate = new Date(excelEpoch + Math.floor(serial) * 86400000);
+        const jsDay = utcDate.getUTCDay(); // 0=Sun..6=Sat
+        switch (returnType) {
+            case 1:
+                return jsDay + 1;
+            case 2:
+                return jsDay === 0 ? 7 : jsDay;
+            case 3:
+                return jsDay === 0 ? 6 : jsDay - 1;
+            default:
+                return jsDay + 1;
+        }
+    }
+    function evaluateDateValue(args, context) {
+        const text = toText(evaluateFormulaAst(args[0], context)).trim();
+        const dateValue = parseDateLikeString(text);
+        if (dateValue === null) {
+            throw new Error(`Unsupported DATEVALUE input: ${text}`);
+        }
+        return dateValue;
+    }
+    function evaluateLen(args, context) {
+        return toText(evaluateFormulaAst(args[0], context)).length;
+    }
+    function evaluateLower(args, context) {
+        return toText(evaluateFormulaAst(args[0], context)).toLowerCase();
+    }
+    function evaluateFind(args, context, ignoreCase) {
+        const findTextRaw = toText(evaluateFormulaAst(args[0], context));
+        const withinTextRaw = toText(evaluateFormulaAst(args[1], context));
+        const start = args[2] ? Math.max(1, Math.floor(toNumber(evaluateFormulaAst(args[2], context)))) : 1;
+        const findText = ignoreCase ? findTextRaw.toLowerCase() : findTextRaw;
+        const withinText = ignoreCase ? withinTextRaw.toLowerCase() : withinTextRaw;
+        const index = withinText.indexOf(findText, start - 1);
+        return index === -1 ? "#VALUE!" : index + 1;
+    }
+    function evaluateLeft(args, context) {
+        const text = toText(evaluateFormulaAst(args[0], context));
+        const count = args[1] ? Math.max(0, Math.floor(toNumber(evaluateFormulaAst(args[1], context)))) : 1;
+        return text.slice(0, count);
+    }
+    function evaluateRight(args, context) {
+        const text = toText(evaluateFormulaAst(args[0], context));
+        const count = args[1] ? Math.max(0, Math.floor(toNumber(evaluateFormulaAst(args[1], context)))) : 1;
+        return count === 0 ? "" : text.slice(-count);
+    }
+    function evaluateMid(args, context) {
+        const text = toText(evaluateFormulaAst(args[0], context));
+        const start = Math.max(1, Math.floor(toNumber(evaluateFormulaAst(args[1], context))));
+        const count = Math.max(0, Math.floor(toNumber(evaluateFormulaAst(args[2], context))));
+        return text.slice(start - 1, start - 1 + count);
+    }
+    function evaluateTrim(args, context) {
+        const text = toText(evaluateFormulaAst(args[0], context));
+        return text.trim().replace(/\s+/g, " ");
+    }
+    function evaluateReplace(args, context) {
+        const text = toText(evaluateFormulaAst(args[0], context));
+        const start = Math.max(1, Math.floor(toNumber(evaluateFormulaAst(args[1], context))));
+        const count = Math.max(0, Math.floor(toNumber(evaluateFormulaAst(args[2], context))));
+        const newText = toText(evaluateFormulaAst(args[3], context));
+        const prefix = text.slice(0, start - 1);
+        const suffix = text.slice(start - 1 + count);
+        return `${prefix}${newText}${suffix}`;
+    }
+    function evaluateDay(args, context) {
+        const serial = coerceDateSerial(evaluateFormulaAst(args[0], context));
+        return excelSerialToDateParts(serial).day;
+    }
+    function evaluateMonth(args, context) {
+        const serial = coerceDateSerial(evaluateFormulaAst(args[0], context));
+        return excelSerialToDateParts(serial).month;
+    }
+    function evaluateYear(args, context) {
+        const serial = coerceDateSerial(evaluateFormulaAst(args[0], context));
+        return excelSerialToDateParts(serial).year;
+    }
+    function evaluateSubtotal(args, context) {
+        const functionNum = Math.floor(toNumber(evaluateFormulaAst(args[0], context)));
+        const values = args.slice(1).flatMap((arg) => flattenValues(evaluateFormulaAst(arg, context)));
+        switch (functionNum) {
+            case 1:
+            case 101:
+                return values.length ? values.reduce((sum, value) => sum + toNumber(value), 0) / values.length : "#DIV/0!";
+            case 4:
+            case 104:
+                return values.reduce((max, value) => Math.max(max, toNumber(value)), Number.NEGATIVE_INFINITY);
+            case 5:
+            case 105:
+                return values.reduce((min, value) => Math.min(min, toNumber(value)), Number.POSITIVE_INFINITY);
+            case 9:
+            case 109:
+                return values.reduce((sum, value) => sum + toNumber(value), 0);
+            default:
+                throw new Error(`Unsupported SUBTOTAL function_num: ${functionNum}`);
+        }
+    }
+    function evaluateUpper(args, context) {
+        return toText(evaluateFormulaAst(args[0], context)).toUpperCase();
+    }
+    function evaluateConcatenate(args, context) {
+        return args.map((arg) => toText(evaluateFormulaAst(arg, context))).join("");
+    }
+    function evaluateIsBlank(args, context) {
+        const value = evaluateFormulaAst(args[0], context);
+        return value === null || value === undefined || value === "";
+    }
+    function evaluateIsNumber(args, context) {
+        const value = evaluateFormulaAst(args[0], context);
+        if (typeof value === "number") {
+            return true;
+        }
+        if (typeof value === "string") {
+            if (!value.trim()) {
+                return false;
+            }
+            const parsed = Number(value.replace(/,/g, ""));
+            return !Number.isNaN(parsed);
+        }
+        return false;
+    }
+    function evaluateIsText(args, context) {
+        const value = evaluateFormulaAst(args[0], context);
+        return typeof value === "string";
+    }
+    function evaluateIsError(args, context) {
+        return isFormulaError(evaluateFormulaAst(args[0], context));
+    }
+    function evaluateIsNa(args, context) {
+        return evaluateFormulaAst(args[0], context) === "#N/A";
+    }
+    function evaluateNa() {
+        return "#N/A";
+    }
+    function evaluateMin(args, context) {
+        const values = args.flatMap((arg) => flattenValues(evaluateFormulaAst(arg, context))).map((value) => toNumber(value));
+        return values.length ? Math.min(...values) : 0;
+    }
+    function evaluateMax(args, context) {
+        const values = args.flatMap((arg) => flattenValues(evaluateFormulaAst(arg, context))).map((value) => toNumber(value));
+        return values.length ? Math.max(...values) : 0;
+    }
+    function evaluateAverage(args, context) {
+        const values = args.flatMap((arg) => flattenValues(evaluateFormulaAst(arg, context))).map((value) => toNumber(value));
+        if (!values.length) {
+            return "#DIV/0!";
+        }
+        return values.reduce((sum, value) => sum + value, 0) / values.length;
+    }
+    function evaluateColumn(args, context) {
+        if (!args.length) {
+            if (context.currentCellRef) {
+                return columnNumberFromRef(context.currentCellRef);
+            }
+            throw new Error("COLUMN without explicit reference is not supported");
+        }
+        const node = args[0];
+        if (node.type === "cell") {
+            return columnNumberFromRef(node.ref);
+        }
+        if (node.type === "range" && node.start.type === "cell") {
+            return columnNumberFromRef(node.start.ref);
+        }
+        const value = evaluateFormulaAst(node, context);
+        if (typeof value === "string" && /\$?[A-Za-z]{1,3}\$?\d+/.test(value)) {
+            return columnNumberFromRef(value);
+        }
+        throw new Error("Unsupported COLUMN argument");
+    }
+    function evaluateRow(args, context) {
+        if (!args.length) {
+            if (context.currentCellRef) {
+                return rowNumberFromRef(context.currentCellRef);
+            }
+            throw new Error("ROW without explicit reference is not supported");
+        }
+        const node = args[0];
+        if (node.type === "cell") {
+            return rowNumberFromRef(node.ref);
+        }
+        if (node.type === "range" && node.start.type === "cell") {
+            return rowNumberFromRef(node.start.ref);
+        }
+        const value = evaluateFormulaAst(node, context);
+        if (typeof value === "string" && /\$?[A-Za-z]{1,3}\$?\d+/.test(value)) {
+            return rowNumberFromRef(value);
+        }
+        throw new Error("Unsupported ROW argument");
+    }
+    function evaluateEDate(args, context) {
+        const startSerial = coerceDateSerial(evaluateFormulaAst(args[0], context));
+        const months = Math.trunc(toNumber(evaluateFormulaAst(args[1], context)));
+        const parts = excelSerialToDateParts(startSerial);
+        const jsDate = new Date(Date.UTC(parts.year, parts.month - 1 + months, parts.day));
+        return excelSerialFromDate(jsDate.getUTCFullYear(), jsDate.getUTCMonth() + 1, jsDate.getUTCDate());
+    }
+    function evaluateEoMonth(args, context) {
+        const startSerial = coerceDateSerial(evaluateFormulaAst(args[0], context));
+        const months = Math.trunc(toNumber(evaluateFormulaAst(args[1], context)));
+        const parts = excelSerialToDateParts(startSerial);
+        const jsDate = new Date(Date.UTC(parts.year, parts.month + months, 0));
+        return excelSerialFromDate(jsDate.getUTCFullYear(), jsDate.getUTCMonth() + 1, jsDate.getUTCDate());
+    }
+    function evaluateCountIf(args, context) {
+        const values = flattenValues(evaluateFormulaAst(args[0], context));
+        const criteria = toText(evaluateFormulaAst(args[1], context));
+        return values.filter((value) => matchesCriteria(value, criteria)).length;
+    }
+    function evaluateCount(args, context) {
+        return args
+            .flatMap((arg) => flattenValues(evaluateFormulaAst(arg, context)))
+            .filter((value) => isCountableNumber(value))
+            .length;
+    }
+    function evaluateCountA(args, context) {
+        return args
+            .flatMap((arg) => flattenValues(evaluateFormulaAst(arg, context)))
+            .filter((value) => value !== null && value !== undefined && String(value) !== "")
+            .length;
+    }
+    function evaluateSumIf(args, context) {
+        var _a;
+        const criteriaValues = flattenValues(evaluateFormulaAst(args[0], context));
+        const criteria = toText(evaluateFormulaAst(args[1], context));
+        const sumValues = args[2]
+            ? flattenValues(evaluateFormulaAst(args[2], context))
+            : criteriaValues;
+        let total = 0;
+        for (let index = 0; index < criteriaValues.length; index += 1) {
+            if (matchesCriteria(criteriaValues[index], criteria)) {
+                total += toNumber((_a = sumValues[index]) !== null && _a !== void 0 ? _a : 0);
+            }
+        }
+        return total;
+    }
+    function evaluateCountIfs(args, context) {
+        const criteriaPairs = [];
+        for (let index = 0; index + 1 < args.length; index += 2) {
+            criteriaPairs.push({
+                values: flattenValues(evaluateFormulaAst(args[index], context)),
+                criteria: toText(evaluateFormulaAst(args[index + 1], context))
+            });
+        }
+        const maxLength = criteriaPairs.reduce((max, pair) => Math.max(max, pair.values.length), 0);
+        let count = 0;
+        for (let index = 0; index < maxLength; index += 1) {
+            const matched = criteriaPairs.every((pair) => matchesCriteria(pair.values[index], pair.criteria));
+            if (matched) {
+                count += 1;
+            }
+        }
+        return count;
+    }
+    function evaluateSumIfs(args, context) {
+        var _a;
+        const sumValues = flattenValues(evaluateFormulaAst(args[0], context));
+        const criteriaPairs = [];
+        for (let index = 1; index + 1 < args.length; index += 2) {
+            criteriaPairs.push({
+                values: flattenValues(evaluateFormulaAst(args[index], context)),
+                criteria: toText(evaluateFormulaAst(args[index + 1], context))
+            });
+        }
+        let total = 0;
+        for (let index = 0; index < sumValues.length; index += 1) {
+            const matched = criteriaPairs.every((pair) => matchesCriteria(pair.values[index], pair.criteria));
+            if (matched) {
+                total += toNumber((_a = sumValues[index]) !== null && _a !== void 0 ? _a : 0);
+            }
+        }
+        return total;
+    }
+    function evaluateAverageIf(args, context) {
+        var _a;
+        const criteriaValues = flattenValues(evaluateFormulaAst(args[0], context));
+        const criteria = toText(evaluateFormulaAst(args[1], context));
+        const averageValues = args[2]
+            ? flattenValues(evaluateFormulaAst(args[2], context))
+            : criteriaValues;
+        let total = 0;
+        let count = 0;
+        for (let index = 0; index < criteriaValues.length; index += 1) {
+            if (matchesCriteria(criteriaValues[index], criteria)) {
+                total += toNumber((_a = averageValues[index]) !== null && _a !== void 0 ? _a : 0);
+                count += 1;
+            }
+        }
+        return count === 0 ? "#DIV/0!" : total / count;
+    }
+    function evaluateAverageIfs(args, context) {
+        var _a;
+        const averageValues = flattenValues(evaluateFormulaAst(args[0], context));
+        const criteriaPairs = [];
+        for (let index = 1; index + 1 < args.length; index += 2) {
+            criteriaPairs.push({
+                values: flattenValues(evaluateFormulaAst(args[index], context)),
+                criteria: toText(evaluateFormulaAst(args[index + 1], context))
+            });
+        }
+        let total = 0;
+        let count = 0;
+        for (let index = 0; index < averageValues.length; index += 1) {
+            const matched = criteriaPairs.every((pair) => matchesCriteria(pair.values[index], pair.criteria));
+            if (matched) {
+                total += toNumber((_a = averageValues[index]) !== null && _a !== void 0 ? _a : 0);
+                count += 1;
+            }
+        }
+        return count === 0 ? "#DIV/0!" : total / count;
+    }
+    function excelSerialFromDate(year, month, day) {
+        const utcDate = Date.UTC(year, month - 1, day);
+        const excelEpoch = Date.UTC(1899, 11, 30);
+        return Math.floor((utcDate - excelEpoch) / 86400000);
+    }
+    function excelSerialToDateParts(serial) {
+        const excelEpoch = Date.UTC(1899, 11, 30);
+        const utcDate = new Date(excelEpoch + Math.floor(serial) * 86400000);
+        return {
+            year: utcDate.getUTCFullYear(),
+            month: utcDate.getUTCMonth() + 1,
+            day: utcDate.getUTCDate()
+        };
+    }
+    function parseDateLikeString(value) {
+        const normalized = value.replace(/[年\/.-]/g, "/").replace(/月/g, "/").replace(/日/g, "");
+        const match = normalized.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+        if (!match) {
+            return null;
+        }
+        return excelSerialFromDate(Number(match[1]), Number(match[2]), Number(match[3]));
+    }
+    function coerceDateSerial(value) {
+        if (typeof value === "number") {
+            return value;
+        }
+        const text = toText(value).trim();
+        const parsed = parseDateLikeString(text);
+        if (parsed !== null) {
+            return parsed;
+        }
+        return toNumber(value);
+    }
+    function columnNumberFromRef(ref) {
+        const match = String(ref).match(/\$?([A-Za-z]{1,3})\$?\d+/);
+        if (!match) {
+            throw new Error(`Invalid cell reference for COLUMN: ${ref}`);
+        }
+        const letters = match[1].toUpperCase();
+        let number = 0;
+        for (const char of letters) {
+            number = number * 26 + (char.charCodeAt(0) - 64);
+        }
+        return number;
+    }
+    function rowNumberFromRef(ref) {
+        const match = String(ref).match(/\$?[A-Za-z]{1,3}\$?(\d+)/);
+        if (!match) {
+            throw new Error(`Invalid cell reference for ROW: ${ref}`);
+        }
+        return Number(match[1]);
+    }
+    function toBoolean(value) {
+        if (typeof value === "boolean") {
+            return value;
+        }
+        if (typeof value === "number") {
+            return value !== 0;
+        }
+        if (typeof value === "string") {
+            if (!value) {
+                return false;
+            }
+            const upper = value.toUpperCase();
+            if (upper === "TRUE") {
+                return true;
+            }
+            if (upper === "FALSE") {
+                return false;
+            }
+            return true;
+        }
+        if (Array.isArray(value)) {
+            return value.length > 0;
+        }
+        return Boolean(value);
+    }
+    function toNumber(value) {
+        if (typeof value === "number") {
+            return value;
+        }
+        if (typeof value === "boolean") {
+            return value ? 1 : 0;
+        }
+        if (typeof value === "string") {
+            const normalized = value.replace(/,/g, "");
+            const parsed = Number(normalized);
+            if (!Number.isNaN(parsed)) {
+                return parsed;
+            }
+            if (value.toUpperCase() === "TRUE") {
+                return 1;
+            }
+            if (value.toUpperCase() === "FALSE") {
+                return 0;
+            }
+        }
+        if (Array.isArray(value)) {
+            return value.length;
+        }
+        return 0;
+    }
+    function toText(value) {
+        if (value === null || value === undefined) {
+            return "";
+        }
+        if (Array.isArray(value)) {
+            return value.map((item) => toText(item)).join(":");
+        }
+        return String(value);
+    }
+    function flattenValues(value) {
+        if (!Array.isArray(value)) {
+            return [value];
+        }
+        if (value.length > 0 && Array.isArray(value[0])) {
+            return value.flat();
+        }
+        return value;
+    }
+    function normalizeToMatrix(value) {
+        if (!Array.isArray(value)) {
+            return [[value]];
+        }
+        if (value.length > 0 && Array.isArray(value[0])) {
+            return value;
+        }
+        return [value];
+    }
+    function matchesCriteria(value, criteria) {
+        const trimmedCriteria = criteria.trim();
+        const match = trimmedCriteria.match(/^(<=|>=|<>|=|<|>)(.*)$/);
+        if (!match) {
+            return looselyEquals(value, trimmedCriteria);
+        }
+        const operator = match[1];
+        const rightRaw = match[2].trim();
+        const leftNumeric = toNumber(value);
+        const rightNumeric = Number(rightRaw.replace(/,/g, ""));
+        if (!Number.isNaN(leftNumeric) && !Number.isNaN(rightNumeric)) {
+            switch (operator) {
+                case "<":
+                    return leftNumeric < rightNumeric;
+                case "<=":
+                    return leftNumeric <= rightNumeric;
+                case ">":
+                    return leftNumeric > rightNumeric;
+                case ">=":
+                    return leftNumeric >= rightNumeric;
+                case "=":
+                    return leftNumeric === rightNumeric;
+                case "<>":
+                    return leftNumeric !== rightNumeric;
+            }
+        }
+        const leftText = toText(value);
+        switch (operator) {
+            case "=":
+                return leftText === rightRaw;
+            case "<>":
+                return leftText !== rightRaw;
+            case "<":
+                return leftText < rightRaw;
+            case "<=":
+                return leftText <= rightRaw;
+            case ">":
+                return leftText > rightRaw;
+            case ">=":
+                return leftText >= rightRaw;
+            default:
+                return false;
+        }
+    }
+    function isCountableNumber(value) {
+        if (typeof value === "number") {
+            return true;
+        }
+        if (typeof value === "string") {
+            const trimmed = value.trim();
+            if (!trimmed) {
+                return false;
+            }
+            return !Number.isNaN(Number(trimmed.replace(/,/g, "")));
+        }
+        return false;
+    }
+    function isFormulaError(value) {
+        return typeof value === "string" && /^#(?:N\/A|REF!|VALUE!|DIV\/0!|NAME\?|NUM!|NULL!)/.test(value);
+    }
+    function looselyEquals(left, right) {
+        if (typeof left === "number" || typeof right === "number") {
+            return toNumber(left) === toNumber(right);
+        }
+        if (typeof left === "boolean" || typeof right === "boolean") {
+            return toBoolean(left) === toBoolean(right);
+        }
+        return toText(left) === toText(right);
+    }
+    function compareValues(left, right) {
+        if (typeof left === "number" || typeof right === "number") {
+            return toNumber(left) - toNumber(right);
+        }
+        const leftText = toText(left);
+        const rightText = toText(right);
+        if (leftText === rightText) {
+            return 0;
+        }
+        return leftText < rightText ? -1 : 1;
+    }
+    api.evaluateFormulaAst = evaluateFormulaAst;
+})(globalThis);
+  </script>
+
+  <script>
 (() => {
     const EMPTY_BORDERS = {
         top: false,
@@ -4740,7 +6269,7 @@ if (!customElements.get("lht-page-menu")) {
                 resolvingKeys.add(key);
                 try {
                     try {
-                        const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue);
+                        const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue, undefined, undefined, cell.address);
                         if (evaluated != null) {
                             applyResolvedFormulaValue(cell, evaluated);
                         }
@@ -4914,13 +6443,17 @@ if (!customElements.get("lht-page-menu")) {
             resolveStructuredRange
         };
     }
-    function tryResolveFormulaExpression(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
+    function tryResolveFormulaExpression(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries, currentAddress) {
         const normalized = String(formulaText || "").trim().replace(/^=/, "");
         if (!normalized)
             return null;
         const directDefinedNameValue = (resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(currentSheetName, normalized)) || null;
         if (directDefinedNameValue != null) {
             return directDefinedNameValue;
+        }
+        const astResolved = tryResolveFormulaExpressionWithAst(normalized, currentSheetName, resolveCellValue, resolveRangeEntries, currentAddress);
+        if (astResolved != null) {
+            return astResolved;
         }
         const ifResult = tryResolveIfFunction(normalized, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
         if (ifResult != null) {
@@ -5012,6 +6545,126 @@ if (!customElements.get("lht-page-menu")) {
             }
             return null;
         }
+    }
+    function tryResolveFormulaExpressionWithAst(expression, currentSheetName, resolveCellValue, resolveRangeEntries, currentAddress) {
+        const formulaApi = globalThis.__xlsx2mdFormula;
+        if (!(formulaApi === null || formulaApi === void 0 ? void 0 : formulaApi.parseFormula) || !(formulaApi === null || formulaApi === void 0 ? void 0 : formulaApi.evaluateFormulaAst)) {
+            return null;
+        }
+        try {
+            const ast = formulaApi.parseFormula(`=${expression}`);
+            const evaluated = formulaApi.evaluateFormulaAst(ast, {
+                resolveCell(ref, sheet) {
+                    return coerceFormulaAstScalar(resolveCellValue(sheet || currentSheetName, normalizeFormulaAddress(ref)));
+                },
+                resolveName(name) {
+                    var _a, _b, _c;
+                    const scopedRef = parseSheetScopedDefinedNameReference(name, currentSheetName);
+                    if (scopedRef) {
+                        const scopedValue = (_a = resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(scopedRef.sheetName, scopedRef.name)) !== null && _a !== void 0 ? _a : null;
+                        if (scopedValue != null) {
+                            return coerceFormulaAstScalar(scopedValue);
+                        }
+                    }
+                    const scalarValue = (_b = resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(currentSheetName, name)) !== null && _b !== void 0 ? _b : null;
+                    if (scalarValue != null) {
+                        return coerceFormulaAstScalar(scalarValue);
+                    }
+                    const rangeRef = (_c = resolveDefinedNameRangeRef === null || resolveDefinedNameRangeRef === void 0 ? void 0 : resolveDefinedNameRangeRef(currentSheetName, name)) !== null && _c !== void 0 ? _c : null;
+                    if (rangeRef && resolveRangeEntries) {
+                        return createFormulaAstRangeMatrix(rangeRef.sheetName, rangeRef.start, rangeRef.end, resolveRangeEntries);
+                    }
+                    return null;
+                },
+                resolveScopedName(sheet, name) {
+                    var _a, _b;
+                    const scopedValue = (_a = resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(sheet, name)) !== null && _a !== void 0 ? _a : null;
+                    if (scopedValue != null) {
+                        return coerceFormulaAstScalar(scopedValue);
+                    }
+                    const rangeRef = (_b = resolveDefinedNameRangeRef === null || resolveDefinedNameRangeRef === void 0 ? void 0 : resolveDefinedNameRangeRef(sheet, name)) !== null && _b !== void 0 ? _b : null;
+                    if (rangeRef && resolveRangeEntries) {
+                        return createFormulaAstRangeMatrix(rangeRef.sheetName, rangeRef.start, rangeRef.end, resolveRangeEntries);
+                    }
+                    return null;
+                },
+                resolveStructuredRef(table, column) {
+                    var _a;
+                    const rangeRef = (_a = resolveStructuredRangeRef === null || resolveStructuredRangeRef === void 0 ? void 0 : resolveStructuredRangeRef(currentSheetName, `${table}[${column}]`)) !== null && _a !== void 0 ? _a : null;
+                    if (!rangeRef || !resolveRangeEntries) {
+                        return null;
+                    }
+                    return createFormulaAstRangeMatrix(rangeRef.sheetName, rangeRef.start, rangeRef.end, resolveRangeEntries);
+                },
+                resolveRange(startRef, endRef, sheet) {
+                    if (!resolveRangeEntries) {
+                        return [];
+                    }
+                    return createFormulaAstRangeMatrix(sheet || currentSheetName, normalizeFormulaAddress(startRef), normalizeFormulaAddress(endRef), resolveRangeEntries);
+                },
+                currentCellRef: currentAddress ? normalizeFormulaAddress(currentAddress) : undefined
+            });
+            return serializeFormulaAstResult(evaluated);
+        }
+        catch (_error) {
+            return null;
+        }
+    }
+    function coerceFormulaAstScalar(value) {
+        const trimmed = String(value || "").trim();
+        if (!trimmed) {
+            return "";
+        }
+        if (trimmed === "TRUE") {
+            return true;
+        }
+        if (trimmed === "FALSE") {
+            return false;
+        }
+        const numeric = Number(trimmed.replace(/,/g, ""));
+        if (!Number.isNaN(numeric)) {
+            return numeric;
+        }
+        return trimmed;
+    }
+    function createFormulaAstRangeMatrix(sheetName, startAddress, endAddress, resolveRangeEntries) {
+        const range = parseRangeAddress(`${normalizeFormulaAddress(startAddress)}:${normalizeFormulaAddress(endAddress)}`);
+        if (!range) {
+            return [];
+        }
+        const start = parseCellAddress(range.start);
+        const end = parseCellAddress(range.end);
+        if (!start.row || !start.col || !end.row || !end.col) {
+            return [];
+        }
+        const startRow = Math.min(start.row, end.row);
+        const endRow = Math.max(start.row, end.row);
+        const startCol = Math.min(start.col, end.col);
+        const endCol = Math.max(start.col, end.col);
+        const entries = resolveRangeEntries(sheetName, `${range.start}:${range.end}`).rawValues;
+        const matrix = [];
+        let index = 0;
+        for (let row = startRow; row <= endRow; row += 1) {
+            const rowValues = [];
+            for (let col = startCol; col <= endCol; col += 1) {
+                rowValues.push(coerceFormulaAstScalar(entries[index] || ""));
+                index += 1;
+            }
+            matrix.push(rowValues);
+        }
+        return matrix;
+    }
+    function serializeFormulaAstResult(value) {
+        if (value == null) {
+            return null;
+        }
+        if (Array.isArray(value)) {
+            return null;
+        }
+        if (typeof value === "boolean") {
+            return value ? "TRUE" : "FALSE";
+        }
+        return String(value);
     }
     function tryResolveIfFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
         const call = parseWholeFunctionCall(normalizedFormula, ["IF"]);
@@ -6361,7 +8014,7 @@ if (!customElements.get("lht-page-menu")) {
                         }
                         let evaluated = null;
                         try {
-                            evaluated = tryResolveFormulaExpression(cell.formulaText, sheet.name, resolver.resolveCellValue, resolver.resolveRangeValues, resolver.resolveRangeEntries);
+                            evaluated = tryResolveFormulaExpression(cell.formulaText, sheet.name, resolver.resolveCellValue, resolver.resolveRangeValues, resolver.resolveRangeEntries, cell.address);
                         }
                         catch (error) {
                             if (!(error instanceof Error) || error.message !== "__FORMULA_UNRESOLVED__") {
@@ -7042,9 +8695,6 @@ if (!customElements.get("lht-page-menu")) {
     function setSummaryText(message) {
         setSummaryHtml(`<div class="md-summary-empty">${escapeHtml(message)}</div>`);
     }
-    function setSheetSummary(message) {
-        getElement("sheetSummary").textContent = message;
-    }
     function setScoreSummaryHtml(html) {
         getElement("scoreSummary").innerHTML = html;
     }
@@ -7255,40 +8905,8 @@ if (!customElements.get("lht-page-menu")) {
             overlay.removeAttribute("active");
         }
     }
-    function updateSheetOptions() {
-        const select = getElement("sheetSelect");
-        if (!currentWorkbook || currentWorkbook.sheets.length === 0) {
-            if (typeof select.setOptions === "function") {
-                select.setOptions([{ value: "", label: "xlsx を読み込んでください", selected: true }]);
-            }
-            setSheetSummary("Workbook 未読込");
-            return;
-        }
-        const options = [
-            { value: "__all__", label: "全シート", selected: true },
-            ...currentWorkbook.sheets.map((sheet) => ({
-                value: String(sheet.name),
-                label: String(sheet.name)
-            }))
-        ];
-        if (typeof select.setOptions === "function") {
-            select.setOptions(options);
-        }
-        setSheetSummary(`${currentWorkbook.name} / ${currentWorkbook.sheets.length} sheets / 全シート`);
-    }
-    function updateSheetSelectionSummary(selectedValue) {
-        if (!currentWorkbook) {
-            setSheetSummary("Workbook 未読込");
-            return;
-        }
-        if (!selectedValue || selectedValue === "__all__") {
-            setSheetSummary(`${currentWorkbook.name} / ${currentWorkbook.sheets.length} sheets / 全シート`);
-            return;
-        }
-        setSheetSummary(`${currentWorkbook.name} / ${currentWorkbook.sheets.length} sheets / ${selectedValue}`);
-    }
     function renderCurrentSelection() {
-        var _a, _b;
+        var _a;
         if (!currentFiles.length) {
             setSummaryText("まだ変換していません。");
             setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
@@ -7297,60 +8915,25 @@ if (!customElements.get("lht-page-menu")) {
             updatePreviewModeBanner(getSelectedOutputMode());
             return;
         }
-        const select = getElement("sheetSelect");
-        const selectedValue = typeof select.getValue === "function"
-            ? select.getValue()
-            : ((_a = document.getElementById("sheetSelect")) === null || _a === void 0 ? void 0 : _a.value) || "__all__";
-        updateSheetSelectionSummary(selectedValue);
-        if (!selectedValue || selectedValue === "__all__") {
-            const combinedMarkdown = currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n");
-            const outputMode = ((_b = currentFiles[0]) === null || _b === void 0 ? void 0 : _b.summary.outputMode) || "display";
-            updatePreviewModeBanner(outputMode);
-            setSummaryHtml(renderAnalysisSummary(currentFiles, (currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook.xlsx"));
-            setScoreSummaryHtml(renderScoreSummary(currentFiles));
-            setFormulaSummaryHtml(renderFormulaSummary(currentFiles));
-            setPreviewMarkdown(combinedMarkdown);
-            getElement("downloadBtn").disabled = false;
-            getElement("exportZipBtn").disabled = false;
-            return;
-        }
-        const matched = currentFiles.find((file) => file.sheetName === selectedValue);
-        if (!matched) {
-            setSummaryText("選択シートの出力が見つかりません。");
-            setPreviewMarkdown("");
-            updatePreviewModeBanner(getSelectedOutputMode());
-            return;
-        }
-        updatePreviewModeBanner(matched.summary.outputMode);
-        setSummaryHtml(renderAnalysisSummary([matched], (currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook.xlsx"));
-        setScoreSummaryHtml(renderScoreSummary([matched]));
-        setFormulaSummaryHtml(renderFormulaSummary([matched]));
-        setPreviewMarkdown(matched.markdown);
+        const combinedMarkdown = currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n");
+        const outputMode = ((_a = currentFiles[0]) === null || _a === void 0 ? void 0 : _a.summary.outputMode) || "display";
+        updatePreviewModeBanner(outputMode);
+        setSummaryHtml(renderAnalysisSummary(currentFiles, (currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook.xlsx"));
+        setScoreSummaryHtml(renderScoreSummary(currentFiles));
+        setFormulaSummaryHtml(renderFormulaSummary(currentFiles));
+        setPreviewMarkdown(combinedMarkdown);
         getElement("downloadBtn").disabled = false;
         getElement("exportZipBtn").disabled = false;
     }
     function getSelectedFileForDownload() {
-        var _a, _b;
+        var _a;
         if (!currentFiles.length)
             return null;
-        const select = getElement("sheetSelect");
-        const selectedValue = typeof select.getValue === "function"
-            ? select.getValue()
-            : ((_a = document.getElementById("sheetSelect")) === null || _a === void 0 ? void 0 : _a.value) || "__all__";
-        if (!selectedValue || selectedValue === "__all__") {
-            const outputMode = ((_b = currentFiles[0]) === null || _b === void 0 ? void 0 : _b.summary.outputMode) || "display";
-            const suffix = outputMode === "display" ? "" : `_${outputMode}`;
-            return {
-                fileName: `${((currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook").replace(/\.xlsx$/i, "")}_all${suffix}.md`,
-                content: currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n")
-            };
-        }
-        const matched = currentFiles.find((file) => file.sheetName === selectedValue);
-        if (!matched)
-            return null;
+        const outputMode = ((_a = currentFiles[0]) === null || _a === void 0 ? void 0 : _a.summary.outputMode) || "display";
+        const suffix = outputMode === "display" ? "" : `_${outputMode}`;
         return {
-            fileName: matched.fileName,
-            content: matched.markdown
+            fileName: `${((currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook").replace(/\.xlsx$/i, "")}_all${suffix}.md`,
+            content: currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n")
         };
     }
     function downloadCurrentMarkdown() {
@@ -7397,7 +8980,6 @@ if (!customElements.get("lht-page-menu")) {
             const arrayBuffer = await file.arrayBuffer();
             currentWorkbook = await xlsx2md.parseWorkbook(arrayBuffer, file.name);
             currentFiles = [];
-            updateSheetOptions();
             setSummaryText(`${file.name} を読み込みました。変換ボタンを押してください。`);
             setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
             setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
@@ -7409,7 +8991,6 @@ if (!customElements.get("lht-page-menu")) {
         catch (error) {
             currentWorkbook = null;
             currentFiles = [];
-            updateSheetOptions();
             setSummaryText("Workbook の読込に失敗しました。");
             setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
             setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
@@ -7454,9 +9035,6 @@ if (!customElements.get("lht-page-menu")) {
         getElement("exportZipBtn").addEventListener("click", () => {
             downloadExportZip();
         });
-        getElement("sheetSelect").addEventListener("change", () => {
-            renderCurrentSelection();
-        });
         getElement("outputModeSelect").addEventListener("change", () => {
             const mode = getSelectedOutputMode();
             updateOutputModeNotice(mode);
@@ -7468,7 +9046,6 @@ if (!customElements.get("lht-page-menu")) {
     function initialize() {
         clearError();
         setSummaryText("まだ変換していません。");
-        setSheetSummary("Workbook 未読込");
         setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
         setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
         setPreviewMarkdown("");
@@ -7476,7 +9053,6 @@ if (!customElements.get("lht-page-menu")) {
         updatePreviewModeBanner(getSelectedOutputMode());
         getElement("downloadBtn").disabled = true;
         getElement("exportZipBtn").disabled = true;
-        updateSheetOptions();
         bindFileInput();
         bindActions();
     }
