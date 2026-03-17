@@ -285,6 +285,112 @@ describe("xlsx2md core", () => {
     expect(markdownFile.markdown).toContain("| 12 | 和暦 | value12 | 令和8年3月17日 | 和暦 |");
   });
 
+  it("extracts chart metadata blocks from drawing charts", async () => {
+    const api = bootCore();
+    const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <sheets>
+          <sheet name="ChartSheet" sheetId="1" r:id="rId1"/>
+        </sheets>
+      </workbook>`;
+    const workbookRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+        <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+      </Relationships>`;
+    const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <sheetData>
+          <row r="1"><c r="A1" t="inlineStr"><is><t>Chart Sample</t></is></c></row>
+        </sheetData>
+        <drawing r:id="rId1"/>
+      </worksheet>`;
+    const sheetRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+        <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/>
+      </Relationships>`;
+    const drawingXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <xdr:twoCellAnchor>
+          <xdr:from><xdr:col>1</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>17</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
+          <xdr:to><xdr:col>7</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>34</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>
+          <xdr:graphicFrame>
+            <xdr:nvGraphicFramePr><xdr:cNvPr id="2" name="Chart 1"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr>
+            <xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm>
+            <a:graphic>
+              <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">
+                <c:chart r:id="rId1"/>
+              </a:graphicData>
+            </a:graphic>
+          </xdr:graphicFrame>
+          <xdr:clientData/>
+        </xdr:twoCellAnchor>
+      </xdr:wsDr>`;
+    const drawingRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+        <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart" Target="../charts/chart1.xml"/>
+      </Relationships>`;
+    const chartXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+        <c:chart>
+          <c:title><c:tx><c:rich><a:p><a:r><a:t>Sample Sales Chart</a:t></a:r></a:p></c:rich></c:tx></c:title>
+          <c:plotArea>
+            <c:barChart>
+              <c:ser>
+                <c:tx><c:v>Series A</c:v></c:tx>
+                <c:cat><c:strRef><c:f>ChartSheet!$B$3:$B$6</c:f></c:strRef></c:cat>
+                <c:val><c:numRef><c:f>ChartSheet!$E$3:$E$6</c:f></c:numRef></c:val>
+              </c:ser>
+              <c:ser>
+                <c:tx><c:v>Series B</c:v></c:tx>
+                <c:cat><c:strRef><c:f>ChartSheet!$B$3:$B$6</c:f></c:strRef></c:cat>
+                <c:val><c:numRef><c:f>ChartSheet!$D$3:$D$6</c:f></c:numRef></c:val>
+              </c:ser>
+            </c:barChart>
+          </c:plotArea>
+        </c:chart>
+      </c:chartSpace>`;
+    const arrayBuffer = createStoredZip([
+      { name: "[Content_Types].xml", data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+          <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+          <Default Extension="xml" ContentType="application/xml"/>
+        </Types>` },
+      { name: "_rels/.rels", data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+          <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+        </Relationships>` },
+      { name: "xl/workbook.xml", data: workbookXml },
+      { name: "xl/_rels/workbook.xml.rels", data: workbookRels },
+      { name: "xl/worksheets/sheet1.xml", data: sheetXml },
+      { name: "xl/worksheets/_rels/sheet1.xml.rels", data: sheetRels },
+      { name: "xl/drawings/drawing1.xml", data: drawingXml },
+      { name: "xl/drawings/_rels/drawing1.xml.rels", data: drawingRels },
+      { name: "xl/charts/chart1.xml", data: chartXml }
+    ]);
+
+    const workbook = await api.parseWorkbook(arrayBuffer, "chart-sample.xlsx");
+    const markdownFile = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    })[0];
+
+    expect(workbook.sheets[0].charts).toHaveLength(1);
+    expect(workbook.sheets[0].charts[0].anchor).toBe("B18");
+    expect(workbook.sheets[0].charts[0].title).toBe("Sample Sales Chart");
+    expect(workbook.sheets[0].charts[0].chartType).toContain("棒グラフ");
+    expect(workbook.sheets[0].charts[0].series).toHaveLength(2);
+    expect(markdownFile.summary.charts).toBe(1);
+    expect(markdownFile.markdown).toContain("## グラフ");
+    expect(markdownFile.markdown).toContain("### グラフ001 (B18)");
+    expect(markdownFile.markdown).toContain("- タイトル: Sample Sales Chart");
+    expect(markdownFile.markdown).toContain("- 種別: 棒グラフ");
+    expect(markdownFile.markdown).toContain("  - Series A");
+    expect(markdownFile.markdown).toContain("    - categories: ChartSheet!$B$3:$B$6");
+    expect(markdownFile.markdown).toContain("    - values: ChartSheet!$E$3:$E$6");
+  });
+
   it("parses the merge-pattern fixture workbook with concrete merge expectations", async () => {
     const api = bootCore();
     const fixtureName = "merge-pattern-sample01.xlsx";
