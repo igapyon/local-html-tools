@@ -1150,6 +1150,13 @@ lht-index-card-link {
   font-size: 0.86rem;
 }
 
+.md-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .md-summary-chip {
   display: inline-flex;
   align-items: center;
@@ -1169,6 +1176,137 @@ lht-index-card-link {
   line-height: 1.55;
   min-height: 9rem;
   color: #243b53;
+}
+
+.md-summary-overview {
+  margin-bottom: 10px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(230, 240, 255, 0.72);
+  color: #102a43;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.md-summary-group {
+  display: grid;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.md-summary-group:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.md-summary-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.md-summary-group-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #102a43;
+}
+
+.md-summary-group-count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.55rem;
+  padding: 0.05rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(230, 240, 255, 0.95);
+  color: #0b4f8a;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.md-summary-group-meta {
+  font-size: 0.82rem;
+  color: #52606d;
+}
+
+.md-summary-item {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(241, 245, 249, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.md-summary-item-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.md-summary-item-title,
+.md-summary-item-meta {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #0b4f8a;
+}
+
+.md-summary-item-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.6rem;
+  padding: 0.05rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.md-summary-item-status--resolved {
+  background: #d9f99d;
+  color: #3f6212;
+}
+
+.md-summary-item-status--strong {
+  background: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.md-summary-item-status--candidate {
+  background: #e9d5ff;
+  color: #7c3aed;
+}
+
+.md-summary-item-status--fallback {
+  background: #fde68a;
+  color: #92400e;
+}
+
+.md-summary-item-status--unsupported {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.md-summary-item-status--unknown {
+  background: #d9e2ec;
+  color: #334e68;
+}
+
+.md-summary-item-body {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #243b53;
+  word-break: break-word;
+}
+
+.md-summary-empty {
+  color: #52606d;
+  font-size: 0.92rem;
 }
 
 .md-actions {
@@ -1324,6 +1462,12 @@ lht-preview-output {
       <section class="md-section">
         <div class="md-panel md-stack-sm">
           <h2 class="md-section-title">表候補スコア</h2>
+          <div class="md-legend">
+            <span class="md-summary-item-status md-summary-item-status--strong">strong</span>
+            <span class="md-caption">7点以上の強い表候補</span>
+            <span class="md-summary-item-status md-summary-item-status--candidate">candidate</span>
+            <span class="md-caption">4-6点の表候補</span>
+          </div>
           <div id="scoreSummary" class="md-summary-list">まだ変換していません。</div>
         </div>
       </section>
@@ -1331,6 +1475,12 @@ lht-preview-output {
       <section class="md-section">
         <div class="md-panel md-stack-sm">
           <h2 class="md-section-title">数式診断</h2>
+          <div class="md-legend">
+            <span class="md-summary-item-status md-summary-item-status--resolved">resolved</span>
+            <span class="md-summary-item-status md-summary-item-status--fallback">fallback</span>
+            <span class="md-summary-item-status md-summary-item-status--unsupported">unsupported</span>
+            <span class="md-caption">解決済み / フォールバック / 未対応外部参照</span>
+          </div>
           <div id="formulaSummary" class="md-summary-list">まだ変換していません。</div>
         </div>
       </section>
@@ -3478,6 +3628,7 @@ if (!customElements.get("lht-page-menu")) {
     const crcTable = buildCrc32Table();
     let resolveDefinedNameScalarValue = null;
     let resolveDefinedNameRangeRef = null;
+    let resolveStructuredRangeRef = null;
     const BUILTIN_FORMAT_CODES = {
         0: "General",
         1: "0",
@@ -3948,6 +4099,41 @@ if (!customElements.get("lht-page-menu")) {
     function formatDbNum3Pattern(rawValue) {
         return rawValue.split("").join(" ");
     }
+    function splitFormatSections(formatCode) {
+        const sections = [];
+        let current = "";
+        let inQuotes = false;
+        for (let index = 0; index < formatCode.length; index += 1) {
+            const char = formatCode[index];
+            if (char === "\"") {
+                inQuotes = !inQuotes;
+                current += char;
+                continue;
+            }
+            if (char === ";" && !inQuotes) {
+                sections.push(current);
+                current = "";
+                continue;
+            }
+            current += char;
+        }
+        sections.push(current);
+        return sections;
+    }
+    function formatZeroSection(section) {
+        const normalizedSection = String(section || "");
+        if (!normalizedSection)
+            return null;
+        const compact = normalizedSection.replace(/_.|\\.|[*?]/g, "").trim();
+        const hasDashLiteral = /"-"|(^|[^a-z0-9])-($|[^a-z0-9])/i.test(compact);
+        if (!hasDashLiteral)
+            return null;
+        if (compact.includes("¥"))
+            return "¥ -";
+        if (compact.includes("$"))
+            return "$ -";
+        return "-";
+    }
     function formatCellDisplayValue(rawValue, cellStyle) {
         var _a;
         if (rawValue === "")
@@ -3955,6 +4141,7 @@ if (!customElements.get("lht-page-menu")) {
         const numericValue = Number(rawValue);
         const formatCode = normalizeNumericFormatCode(cellStyle.formatCode);
         const normalized = formatCode.toLowerCase();
+        const formatSections = splitFormatSections(formatCode);
         if (!Number.isNaN(numericValue) && isDateFormatCode(formatCode)) {
             const parts = excelSerialToDateParts(numericValue);
             if (!parts)
@@ -3978,6 +4165,12 @@ if (!customElements.get("lht-page-menu")) {
         }
         if (Number.isNaN(numericValue)) {
             return null;
+        }
+        if (numericValue === 0 && formatSections[2]) {
+            const zeroText = formatZeroSection(formatSections[2]);
+            if (zeroText) {
+                return zeroText;
+            }
         }
         if (normalized.includes("%")) {
             const percentPattern = normalized.split(";")[0] || normalized;
@@ -4015,23 +4208,79 @@ if (!customElements.get("lht-page-menu")) {
         }
         return null;
     }
+    function applyResolvedFormulaValue(cell, resolvedValue) {
+        const rawValue = String(resolvedValue || "");
+        const formattedValue = formatCellDisplayValue(rawValue, {
+            borders: cell.borders,
+            numFmtId: cell.numFmtId,
+            formatCode: cell.formatCode
+        });
+        cell.rawValue = rawValue;
+        cell.outputValue = formattedValue !== null && formattedValue !== void 0 ? formattedValue : rawValue;
+        cell.resolutionStatus = "resolved";
+    }
     function parseDateLikeParts(value) {
         const trimmed = String(value || "").trim();
         const numericValue = Number(trimmed);
         if (!Number.isNaN(numericValue)) {
             return excelSerialToDateParts(numericValue);
         }
-        const isoMatch = trimmed.match(/^(\d{4})[-/](\d{2})[-/](\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
-        if (!isoMatch)
-            return null;
-        return {
-            yyyy: isoMatch[1],
-            mm: isoMatch[2],
-            dd: isoMatch[3],
-            hh: isoMatch[4] || "00",
-            mi: isoMatch[5] || "00",
-            ss: isoMatch[6] || "00"
-        };
+        const isoMatch = trimmed.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/);
+        if (isoMatch) {
+            return {
+                yyyy: isoMatch[1],
+                mm: isoMatch[2].padStart(2, "0"),
+                dd: isoMatch[3].padStart(2, "0"),
+                hh: (isoMatch[4] || "00").padStart(2, "0"),
+                mi: (isoMatch[5] || "00").padStart(2, "0"),
+                ss: (isoMatch[6] || "00").padStart(2, "0")
+            };
+        }
+        const japaneseMatch = trimmed.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日(?:\s*(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?$/);
+        if (japaneseMatch) {
+            return {
+                yyyy: japaneseMatch[1],
+                mm: japaneseMatch[2].padStart(2, "0"),
+                dd: japaneseMatch[3].padStart(2, "0"),
+                hh: (japaneseMatch[4] || "00").padStart(2, "0"),
+                mi: (japaneseMatch[5] || "00").padStart(2, "0"),
+                ss: (japaneseMatch[6] || "00").padStart(2, "0")
+            };
+        }
+        const japaneseYearMonthMatch = trimmed.match(/^(\d{4})年(\d{1,2})月$/);
+        if (japaneseYearMonthMatch) {
+            return {
+                yyyy: japaneseYearMonthMatch[1],
+                mm: japaneseYearMonthMatch[2].padStart(2, "0"),
+                dd: "01",
+                hh: "00",
+                mi: "00",
+                ss: "00"
+            };
+        }
+        const japaneseMonthDayMatch = trimmed.match(/^(\d{1,2})月(\d{1,2})日$/);
+        if (japaneseMonthDayMatch) {
+            return {
+                yyyy: "2000",
+                mm: japaneseMonthDayMatch[1].padStart(2, "0"),
+                dd: japaneseMonthDayMatch[2].padStart(2, "0"),
+                hh: "00",
+                mi: "00",
+                ss: "00"
+            };
+        }
+        const isoYearMonthMatch = trimmed.match(/^(\d{4})[-/](\d{1,2})$/);
+        if (isoYearMonthMatch) {
+            return {
+                yyyy: isoYearMonthMatch[1],
+                mm: isoYearMonthMatch[2].padStart(2, "0"),
+                dd: "01",
+                hh: "00",
+                mi: "00",
+                ss: "00"
+            };
+        }
+        return null;
     }
     function datePartsToExcelSerial(year, month, day, hour = 0, minute = 0, second = 0) {
         if (![year, month, day, hour, minute, second].every(Number.isFinite))
@@ -4143,6 +4392,47 @@ if (!customElements.get("lht-page-menu")) {
         const match = mediaPath.match(/\.([a-z0-9]+)$/i);
         return match ? match[1].toLowerCase() : "bin";
     }
+    function normalizeStructuredTableKey(value) {
+        return String(value || "").normalize("NFKC").trim().toUpperCase();
+    }
+    function parseWorksheetTables(files, worksheetDoc, sheetName, sheetPath) {
+        const sheetRels = parseRelationships(files, buildRelsPath(sheetPath), sheetPath);
+        const tablePartElements = getElementsByLocalName(worksheetDoc, "tablePart");
+        const tables = [];
+        for (const tablePartElement of tablePartElements) {
+            const relId = tablePartElement.getAttribute("r:id") || tablePartElement.getAttribute("id") || "";
+            if (!relId)
+                continue;
+            const tablePath = sheetRels.get(relId) || "";
+            if (!tablePath)
+                continue;
+            const tableBytes = files.get(tablePath);
+            if (!tableBytes)
+                continue;
+            const tableDoc = xmlToDocument(decodeXmlText(tableBytes));
+            const tableElement = getElementsByLocalName(tableDoc, "table")[0] || null;
+            if (!tableElement)
+                continue;
+            const ref = tableElement.getAttribute("ref") || "";
+            const range = parseRangeAddress(ref);
+            if (!range)
+                continue;
+            const columns = getElementsByLocalName(tableElement, "tableColumn")
+                .map((columnElement) => String(columnElement.getAttribute("name") || "").trim())
+                .filter(Boolean);
+            tables.push({
+                sheetName,
+                name: tableElement.getAttribute("name") || "",
+                displayName: tableElement.getAttribute("displayName") || tableElement.getAttribute("name") || "",
+                start: range.start,
+                end: range.end,
+                columns,
+                headerRowCount: Number(tableElement.getAttribute("headerRowCount") || 1) || 1,
+                totalsRowCount: Number(tableElement.getAttribute("totalsRowCount") || 0) || 0
+            });
+        }
+        return tables;
+    }
     function createSafeSheetAssetDir(sheetName) {
         return sheetName.replace(/[\\/:*?"<>|]+/g, "_").trim() || "Sheet";
     }
@@ -4200,6 +4490,7 @@ if (!customElements.get("lht-page-menu")) {
             const normalizedFormula = formulaText.startsWith("=") ? formulaText : `=${formulaText}`;
             if (/\[[^\]]+\.xlsx\]/i.test(normalizedFormula)) {
                 return {
+                    valueType: type || "formula",
                     rawValue: valueText || normalizedFormula,
                     outputValue: normalizedFormula,
                     formulaText: normalizedFormula,
@@ -4207,14 +4498,17 @@ if (!customElements.get("lht-page-menu")) {
                 };
             }
             if (valueText) {
+                const formattedValue = formatCellDisplayValue(valueText, cellStyle);
                 return {
+                    valueType: type || "formula",
                     rawValue: valueText,
-                    outputValue: valueText,
+                    outputValue: formattedValue !== null && formattedValue !== void 0 ? formattedValue : valueText,
                     formulaText: normalizedFormula,
                     resolutionStatus: "resolved"
                 };
             }
             return {
+                valueType: type || "formula",
                 rawValue: normalizedFormula,
                 outputValue: normalizedFormula,
                 formulaText: normalizedFormula,
@@ -4224,6 +4518,7 @@ if (!customElements.get("lht-page-menu")) {
         if (type === "s") {
             const sharedIndex = Number(valueText || 0);
             return {
+                valueType: type,
                 rawValue: valueText,
                 outputValue: sharedStrings[sharedIndex] || "",
                 formulaText: "",
@@ -4233,6 +4528,7 @@ if (!customElements.get("lht-page-menu")) {
         if (type === "inlineStr") {
             const inlineText = Array.from(cellElement.getElementsByTagName("t")).map((node) => getTextContent(node)).join("");
             return {
+                valueType: type,
                 rawValue: inlineText,
                 outputValue: inlineText,
                 formulaText: "",
@@ -4241,6 +4537,7 @@ if (!customElements.get("lht-page-menu")) {
         }
         if (type === "b") {
             return {
+                valueType: type,
                 rawValue: valueText,
                 outputValue: valueText === "1" ? "TRUE" : "FALSE",
                 formulaText: "",
@@ -4249,6 +4546,7 @@ if (!customElements.get("lht-page-menu")) {
         }
         if (type === "str" || type === "e") {
             return {
+                valueType: type,
                 rawValue: valueText,
                 outputValue: valueText,
                 formulaText: "",
@@ -4259,6 +4557,7 @@ if (!customElements.get("lht-page-menu")) {
             const formattedValue = formatCellDisplayValue(valueText, cellStyle);
             if (formattedValue !== null) {
                 return {
+                    valueType: type,
                     rawValue: valueText,
                     outputValue: formattedValue,
                     formulaText: "",
@@ -4267,6 +4566,7 @@ if (!customElements.get("lht-page-menu")) {
             }
         }
         return {
+            valueType: type,
             rawValue: valueText,
             outputValue: valueText,
             formulaText: "",
@@ -4334,6 +4634,27 @@ if (!customElements.get("lht-page-menu")) {
         }
         return null;
     }
+    function parseSheetScopedDefinedNameReference(expression, currentSheetName) {
+        const normalizedExpression = String(expression || "").trim();
+        const quotedSheetMatch = normalizedExpression.match(/^'((?:[^']|'')+)'!([A-Za-z_][A-Za-z0-9_.]*)$/);
+        if (quotedSheetMatch) {
+            return {
+                sheetName: normalizeFormulaSheetName(quotedSheetMatch[1].replace(/''/g, "'")),
+                name: quotedSheetMatch[2]
+            };
+        }
+        const sheetMatch = normalizedExpression.match(/^([^'=][^!]*)!([A-Za-z_][A-Za-z0-9_.]*)$/);
+        if (!sheetMatch) {
+            return null;
+        }
+        if (/^\$?[A-Z]+\$?\d+$/i.test(sheetMatch[2])) {
+            return null;
+        }
+        return {
+            sheetName: normalizeFormulaSheetName(sheetMatch[1] || currentSheetName),
+            name: sheetMatch[2]
+        };
+    }
     function normalizeFormulaSheetName(rawName) {
         return String(rawName || "").replace(/^'/, "").replace(/'$/, "").replace(/''/g, "'");
     }
@@ -4359,7 +4680,8 @@ if (!customElements.get("lht-page-menu")) {
             const formulaText = getTextContent(element).trim();
             if (!formulaText)
                 continue;
-            const localSheetId = Number(element.getAttribute("localSheetId") || "");
+            const localSheetIdText = element.getAttribute("localSheetId");
+            const localSheetId = localSheetIdText == null || localSheetIdText === "" ? Number.NaN : Number(localSheetIdText);
             result.push({
                 name,
                 formulaText: formulaText.startsWith("=") ? formulaText : `=${formulaText}`,
@@ -4371,6 +4693,7 @@ if (!customElements.get("lht-page-menu")) {
     function buildFormulaResolver(workbook) {
         const sheetMap = new Map();
         const cellMaps = new Map();
+        const tableMap = new Map();
         for (const sheet of workbook.sheets) {
             sheetMap.set(sheet.name, sheet);
             const cellMap = new Map();
@@ -4378,6 +4701,14 @@ if (!customElements.get("lht-page-menu")) {
                 cellMap.set(cell.address.toUpperCase(), cell);
             }
             cellMaps.set(sheet.name, cellMap);
+            for (const table of sheet.tables) {
+                if (table.name) {
+                    tableMap.set(normalizeStructuredTableKey(table.name), table);
+                }
+                if (table.displayName) {
+                    tableMap.set(normalizeStructuredTableKey(table.displayName), table);
+                }
+            }
         }
         const resolvingKeys = new Set();
         const definedNameMap = new Map();
@@ -4396,7 +4727,9 @@ if (!customElements.get("lht-page-menu")) {
         function resolveCellValue(sheetName, address) {
             var _a;
             const sheet = sheetMap.get(sheetName);
-            const cell = sheet ? (_a = cellMaps.get(sheetName)) === null || _a === void 0 ? void 0 : _a.get(address.toUpperCase()) : null;
+            if (!sheet)
+                return "#REF!";
+            const cell = ((_a = cellMaps.get(sheetName)) === null || _a === void 0 ? void 0 : _a.get(address.toUpperCase())) || null;
             if (!cell)
                 return "";
             const key = `${sheetName}!${address.toUpperCase()}`;
@@ -4406,18 +4739,40 @@ if (!customElements.get("lht-page-menu")) {
             if (cell.formulaText && (!cell.outputValue || cell.resolutionStatus !== "resolved")) {
                 resolvingKeys.add(key);
                 try {
-                    const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue);
-                    if (evaluated != null) {
-                        cell.outputValue = evaluated;
-                        cell.rawValue = evaluated;
-                        cell.resolutionStatus = "resolved";
+                    try {
+                        const evaluated = tryResolveFormulaExpression(cell.formulaText, sheetName, resolveCellValue);
+                        if (evaluated != null) {
+                            applyResolvedFormulaValue(cell, evaluated);
+                        }
+                    }
+                    catch (error) {
+                        if (!(error instanceof Error) || error.message !== "__FORMULA_UNRESOLVED__") {
+                            throw error;
+                        }
                     }
                 }
                 finally {
                     resolvingKeys.delete(key);
                 }
             }
-            return String(cell.outputValue || "");
+            if (cell.formulaText) {
+                if (cell.resolutionStatus === "resolved") {
+                    return String(cell.rawValue || cell.outputValue || "");
+                }
+                const rawValue = String(cell.rawValue || "");
+                const outputValue = String(cell.outputValue || "");
+                if (rawValue && rawValue !== cell.formulaText) {
+                    return rawValue;
+                }
+                if (outputValue && outputValue !== cell.formulaText) {
+                    return outputValue;
+                }
+                return "";
+            }
+            if (["s", "inlineStr", "str", "e", "b"].includes(cell.valueType)) {
+                return String(cell.outputValue || cell.rawValue || "");
+            }
+            return String(cell.rawValue || cell.outputValue || "");
         }
         function resolveDefinedNameValue(sheetName, name) {
             const formulaText = lookupDefinedNameFormula(sheetName, name);
@@ -4437,6 +4792,37 @@ if (!customElements.get("lht-page-menu")) {
                 return null;
             return parseQualifiedRangeReference(formulaText.replace(/^=/, ""), sheetName);
         }
+        function resolveStructuredRange(sheetName, text) {
+            const match = String(text || "").trim().match(/^(.+?)\[([^\]]+)\]$/);
+            if (!match)
+                return null;
+            const tableKey = normalizeStructuredTableKey(match[1].replace(/^'(.*)'$/, "$1"));
+            const columnKey = normalizeStructuredTableKey(match[2]);
+            if (!tableKey || !columnKey || columnKey.startsWith("#") || columnKey.startsWith("@")) {
+                return null;
+            }
+            const table = tableMap.get(tableKey);
+            if (!table)
+                return null;
+            const columnIndex = table.columns.findIndex((columnName) => normalizeStructuredTableKey(columnName) === columnKey);
+            if (columnIndex < 0)
+                return null;
+            const startAddress = parseCellAddress(table.start);
+            const endAddress = parseCellAddress(table.end);
+            if (!startAddress.row || !startAddress.col || !endAddress.row || !endAddress.col)
+                return null;
+            const firstDataRow = Math.min(startAddress.row, endAddress.row) + Math.max(0, table.headerRowCount);
+            const lastDataRow = Math.max(startAddress.row, endAddress.row) - Math.max(0, table.totalsRowCount);
+            if (firstDataRow > lastDataRow)
+                return null;
+            const col = Math.min(startAddress.col, endAddress.col) + columnIndex;
+            const colLetters = colToLetters(col);
+            return {
+                sheetName: table.sheetName || sheetName,
+                start: `${colLetters}${firstDataRow}`,
+                end: `${colLetters}${lastDataRow}`
+            };
+        }
         function resolveRangeEntries(sheetName, rangeText) {
             const range = parseRangeAddress(rangeText);
             if (!range) {
@@ -4445,7 +4831,7 @@ if (!customElements.get("lht-page-menu")) {
             const start = parseCellAddress(range.start);
             const end = parseCellAddress(range.end);
             if (!start.row || !start.col || !end.row || !end.col) {
-                return [];
+                return { rawValues: [], numericValues: [] };
             }
             const startRow = Math.min(start.row, end.row);
             const endRow = Math.max(start.row, end.row);
@@ -4473,7 +4859,8 @@ if (!customElements.get("lht-page-menu")) {
             resolveRangeValues: (sheetName, rangeText) => resolveRangeEntries(sheetName, rangeText).numericValues,
             resolveRangeEntries,
             resolveDefinedNameValue,
-            resolveDefinedNameRange
+            resolveDefinedNameRange,
+            resolveStructuredRange
         };
     }
     function tryResolveFormulaExpression(formulaText, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
@@ -4543,7 +4930,7 @@ if (!customElements.get("lht-page-menu")) {
         if (/:/.test(normalized)) {
             return null;
         }
-        const replaced = normalized.replace(/(?:'((?:[^']|'')+)'|([A-Za-z0-9_ ]+))!(\$?[A-Z]+\$?\d+)|(\$?[A-Z]+\$?\d+)/g, (_full, quotedSheet, plainSheet, qualifiedAddress, localAddress) => {
+        const replacedRefs = normalized.replace(/(?:'((?:[^']|'')+)'|([A-Za-z0-9_ ]+))!(\$?[A-Z]+\$?\d+)|(\$?[A-Z]+\$?\d+)/g, (_full, quotedSheet, plainSheet, qualifiedAddress, localAddress) => {
             const sheetName = qualifiedAddress
                 ? normalizeFormulaSheetName(quotedSheet || plainSheet || currentSheetName)
                 : currentSheetName;
@@ -4555,11 +4942,13 @@ if (!customElements.get("lht-page-menu")) {
             }
             return String(numericValue);
         });
-        if (!/^[0-9+\-*/().\s]+$/.test(replaced)) {
+        const replaced = replaceNumericDefinedNames(replacedRefs, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
+        const replacedFunctions = replaceEmbeddedNumericFunctions(replaced, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
+        if (!/^[0-9+\-*/().\s]+$/.test(replacedFunctions)) {
             return null;
         }
         try {
-            const value = evaluateArithmeticExpression(replaced);
+            const value = evaluateArithmeticExpression(replacedFunctions);
             if (!Number.isFinite(value)) {
                 return null;
             }
@@ -4574,10 +4963,10 @@ if (!customElements.get("lht-page-menu")) {
         }
     }
     function tryResolveIfFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
-        const match = normalizedFormula.match(/^IF\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["IF"]);
+        if (!call)
             return null;
-        const args = splitFormulaArguments(match[1].trim());
+        const args = splitFormulaArguments(call.argsText.trim());
         if (args.length !== 3)
             return null;
         const condition = evaluateFormulaCondition(args[0], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
@@ -4586,10 +4975,10 @@ if (!customElements.get("lht-page-menu")) {
         return resolveScalarFormulaValue(condition ? args[1] : args[2], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
     }
     function tryResolveIfErrorFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
-        const match = normalizedFormula.match(/^IFERROR\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["IFERROR"]);
+        if (!call)
             return null;
-        const args = splitFormulaArguments(match[1].trim());
+        const args = splitFormulaArguments(call.argsText.trim());
         if (args.length !== 2)
             return null;
         const primary = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
@@ -4599,11 +4988,11 @@ if (!customElements.get("lht-page-menu")) {
         return resolveScalarFormulaValue(args[1], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
     }
     function tryResolveLogicalFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
-        const match = normalizedFormula.match(/^(AND|OR|NOT)\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["AND", "OR", "NOT"]);
+        if (!call)
             return null;
-        const functionName = match[1].toUpperCase();
-        const args = splitFormulaArguments(match[2].trim());
+        const functionName = call.name;
+        const args = splitFormulaArguments(call.argsText.trim());
         if (functionName === "NOT") {
             if (args.length !== 1)
                 return null;
@@ -4615,23 +5004,33 @@ if (!customElements.get("lht-page-menu")) {
         if (args.length === 0)
             return null;
         const evaluations = args.map((arg) => evaluateFormulaCondition(arg, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries));
-        if (evaluations.some((value) => value == null)) {
-            return null;
-        }
-        const booleans = evaluations;
         if (functionName === "AND") {
+            if (evaluations.some((value) => value === false)) {
+                return "FALSE";
+            }
+            if (evaluations.some((value) => value == null)) {
+                return null;
+            }
+            const booleans = evaluations;
             return booleans.every(Boolean) ? "TRUE" : "FALSE";
         }
         if (functionName === "OR") {
+            if (evaluations.some((value) => value === true)) {
+                return "TRUE";
+            }
+            if (evaluations.some((value) => value == null)) {
+                return null;
+            }
+            const booleans = evaluations;
             return booleans.some(Boolean) ? "TRUE" : "FALSE";
         }
         return null;
     }
     function tryResolveTextFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
-        const match = normalizedFormula.match(/^TEXT\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["TEXT"]);
+        if (!call)
             return null;
-        const args = splitFormulaArguments(match[1].trim());
+        const args = splitFormulaArguments(call.argsText.trim());
         if (args.length !== 2)
             return null;
         const value = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
@@ -4641,9 +5040,10 @@ if (!customElements.get("lht-page-menu")) {
         return formatTextFunctionValue(value, formatText);
     }
     function tryResolveLookupFunction(normalizedFormula, currentSheetName, resolveCellValue) {
-        const xlookupMatch = normalizedFormula.match(/^XLOOKUP\((.+)\)$/i);
-        if (xlookupMatch) {
-            const args = splitFormulaArguments(xlookupMatch[1].trim());
+        var _a;
+        const xlookupCall = parseWholeFunctionCall(normalizedFormula, ["XLOOKUP"]);
+        if (xlookupCall) {
+            const args = splitFormulaArguments(xlookupCall.argsText.trim());
             if (args.length < 3 || args.length > 6)
                 return null;
             const lookupValue = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue);
@@ -4670,7 +5070,7 @@ if (!customElements.get("lht-page-menu")) {
             for (let index = 0; index < lookupCells.length; index += 1) {
                 const value = lookupCells[index];
                 if (value === lookupValue || (!Number.isNaN(Number(value)) && !Number.isNaN(Number(lookupValue)) && Number(value) === Number(lookupValue))) {
-                    return returnCells[index] === "" ? null : returnCells[index];
+                    return (_a = returnCells[index]) !== null && _a !== void 0 ? _a : "";
                 }
             }
             if (args.length >= 4) {
@@ -4678,9 +5078,9 @@ if (!customElements.get("lht-page-menu")) {
             }
             return null;
         }
-        const matchMatch = normalizedFormula.match(/^MATCH\((.+)\)$/i);
-        if (matchMatch) {
-            const args = splitFormulaArguments(matchMatch[1].trim());
+        const matchCall = parseWholeFunctionCall(normalizedFormula, ["MATCH"]);
+        if (matchCall) {
+            const args = splitFormulaArguments(matchCall.argsText.trim());
             if (args.length < 2 || args.length > 3)
                 return null;
             const lookupValue = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue);
@@ -4704,9 +5104,9 @@ if (!customElements.get("lht-page-menu")) {
             }
             return null;
         }
-        const indexMatch = normalizedFormula.match(/^INDEX\((.+)\)$/i);
-        if (indexMatch) {
-            const args = splitFormulaArguments(indexMatch[1].trim());
+        const indexCall = parseWholeFunctionCall(normalizedFormula, ["INDEX"]);
+        if (indexCall) {
+            const args = splitFormulaArguments(indexCall.argsText.trim());
             if (args.length < 2 || args.length > 3)
                 return null;
             const rangeRef = parseQualifiedRangeReference(args[0], currentSheetName);
@@ -4728,12 +5128,11 @@ if (!customElements.get("lht-page-menu")) {
             const targetCol = startCol + Math.trunc(colIndex) - 1;
             if (targetRow > endRow || targetCol > endCol)
                 return null;
-            const result = resolveCellValue(rangeRef.sheetName, `${colToLetters(targetCol)}${targetRow}`);
-            return result === "" ? null : result;
+            return resolveCellValue(rangeRef.sheetName, `${colToLetters(targetCol)}${targetRow}`);
         }
-        const hlookupMatch = normalizedFormula.match(/^HLOOKUP\((.+)\)$/i);
-        if (hlookupMatch) {
-            const args = splitFormulaArguments(hlookupMatch[1].trim());
+        const hlookupCall = parseWholeFunctionCall(normalizedFormula, ["HLOOKUP"]);
+        if (hlookupCall) {
+            const args = splitFormulaArguments(hlookupCall.argsText.trim());
             if (args.length < 3 || args.length > 4)
                 return null;
             const lookupValue = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue);
@@ -4766,16 +5165,15 @@ if (!customElements.get("lht-page-menu")) {
                 if (keyValue === "")
                     continue;
                 if (keyValue === lookupValue || (!Number.isNaN(Number(keyValue)) && !Number.isNaN(Number(lookupValue)) && Number(keyValue) === Number(lookupValue))) {
-                    const result = resolveCellValue(rangeRef.sheetName, `${colToLetters(col)}${targetRow}`);
-                    return result === "" ? null : result;
+                    return resolveCellValue(rangeRef.sheetName, `${colToLetters(col)}${targetRow}`);
                 }
             }
             return null;
         }
-        const match = normalizedFormula.match(/^VLOOKUP\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["VLOOKUP"]);
+        if (!call)
             return null;
-        const args = splitFormulaArguments(match[1].trim());
+        const args = splitFormulaArguments(call.argsText.trim());
         if (args.length < 3 || args.length > 4)
             return null;
         const lookupValue = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue);
@@ -4810,20 +5208,20 @@ if (!customElements.get("lht-page-menu")) {
             if (keyValue === "")
                 continue;
             if (keyValue === lookupValue || (!Number.isNaN(Number(keyValue)) && !Number.isNaN(Number(lookupValue)) && Number(keyValue) === Number(lookupValue))) {
-                const result = resolveCellValue(rangeRef.sheetName, `${colToLetters(targetCol)}${row}`);
-                return result === "" ? null : result;
+                return resolveCellValue(rangeRef.sheetName, `${colToLetters(targetCol)}${row}`);
             }
         }
         return null;
     }
     function tryResolveDatePartFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
-        const match = normalizedFormula.match(/^(YEAR|MONTH|DAY)\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["YEAR", "MONTH", "DAY", "WEEKDAY"]);
+        if (!call)
             return null;
-        const fnName = match[1].toUpperCase();
-        const args = splitFormulaArguments(match[2].trim());
-        if (args.length !== 1)
+        const fnName = call.name;
+        const args = splitFormulaArguments(call.argsText.trim());
+        if ((fnName === "WEEKDAY" && (args.length < 1 || args.length > 2)) || (fnName !== "WEEKDAY" && args.length !== 1)) {
             return null;
+        }
         const value = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
         if (value == null)
             return null;
@@ -4836,14 +5234,26 @@ if (!customElements.get("lht-page-menu")) {
             return String(Number(parts.mm));
         if (fnName === "DAY")
             return String(Number(parts.dd));
+        if (fnName === "WEEKDAY") {
+            const returnType = args.length === 2
+                ? resolveNumericFormulaArgument(args[1], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries)
+                : 1;
+            if (returnType == null)
+                return null;
+            const weekday = new Date(Date.UTC(Number(parts.yyyy), Number(parts.mm) - 1, Number(parts.dd))).getUTCDay();
+            if (Math.trunc(returnType) === 2) {
+                return String(weekday === 0 ? 7 : weekday);
+            }
+            return String(weekday + 1);
+        }
         return null;
     }
     function tryResolvePredicateFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
-        const match = normalizedFormula.match(/^(ISBLANK|ISNUMBER|ISTEXT|ISERROR|ISNA)\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["ISBLANK", "ISNUMBER", "ISTEXT", "ISERROR", "ISNA"]);
+        if (!call)
             return null;
-        const fnName = match[1].toUpperCase();
-        const args = splitFormulaArguments(match[2].trim());
+        const fnName = call.name;
+        const args = splitFormulaArguments(call.argsText.trim());
         if (args.length !== 1)
             return null;
         if (fnName === "ISBLANK") {
@@ -4875,6 +5285,8 @@ if (!customElements.get("lht-page-menu")) {
             return "FALSE";
         }
         if (fnName === "ISNUMBER") {
+            if (value.trim() === "")
+                return "FALSE";
             return !Number.isNaN(Number(value)) ? "TRUE" : "FALSE";
         }
         if (fnName === "ISTEXT") {
@@ -4888,10 +5300,10 @@ if (!customElements.get("lht-page-menu")) {
         return null;
     }
     function tryResolveChooseFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
-        const match = normalizedFormula.match(/^CHOOSE\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["CHOOSE"]);
+        if (!call)
             return null;
-        const args = splitFormulaArguments(match[1].trim());
+        const args = splitFormulaArguments(call.argsText.trim());
         if (args.length < 2)
             return null;
         const indexValue = resolveNumericFormulaArgument(args[0], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
@@ -5050,6 +5462,120 @@ if (!customElements.get("lht-page-menu")) {
         parts.push(expression.slice(start).trim());
         return parts.every(Boolean) ? parts : null;
     }
+    function parseWholeFunctionCall(expression, allowedNames) {
+        const trimmed = String(expression || "").trim();
+        const nameMatch = trimmed.match(/^([A-Z][A-Z0-9]*)\(/i);
+        if (!nameMatch)
+            return null;
+        const name = nameMatch[1].toUpperCase();
+        if (!allowedNames.includes(name))
+            return null;
+        let depth = 0;
+        let inSingleQuote = false;
+        let inDoubleQuote = false;
+        for (let i = name.length; i < trimmed.length; i += 1) {
+            const ch = trimmed[i];
+            if (ch === "'" && !inDoubleQuote) {
+                inSingleQuote = !inSingleQuote;
+                continue;
+            }
+            if (ch === "\"" && !inSingleQuote) {
+                inDoubleQuote = !inDoubleQuote;
+                continue;
+            }
+            if (inSingleQuote || inDoubleQuote)
+                continue;
+            if (ch === "(") {
+                depth += 1;
+                continue;
+            }
+            if (ch !== ")")
+                continue;
+            depth -= 1;
+            if (depth > 0)
+                continue;
+            if (depth < 0 || i !== trimmed.length - 1)
+                return null;
+            return {
+                name,
+                argsText: trimmed.slice(name.length + 1, i)
+            };
+        }
+        return null;
+    }
+    function replaceNumericDefinedNames(expression, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
+        let result = "";
+        let i = 0;
+        let inSingleQuote = false;
+        let inDoubleQuote = false;
+        while (i < expression.length) {
+            const ch = expression[i];
+            if (ch === "'" && !inDoubleQuote) {
+                inSingleQuote = !inSingleQuote;
+                result += ch;
+                i += 1;
+                continue;
+            }
+            if (ch === "\"" && !inSingleQuote) {
+                inDoubleQuote = !inDoubleQuote;
+                result += ch;
+                i += 1;
+                continue;
+            }
+            if (inSingleQuote || inDoubleQuote) {
+                result += ch;
+                i += 1;
+                continue;
+            }
+            if (!/[A-Za-z_]/.test(ch)) {
+                result += ch;
+                i += 1;
+                continue;
+            }
+            const start = i;
+            i += 1;
+            while (i < expression.length && /[A-Za-z0-9_.]/.test(expression[i])) {
+                i += 1;
+            }
+            const token = expression.slice(start, i);
+            const nextChar = expression[i] || "";
+            if (nextChar === "(") {
+                result += token;
+                continue;
+            }
+            const scalar = (resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(currentSheetName, token)) || null;
+            if (scalar != null) {
+                const numeric = Number(scalar);
+                if (!Number.isNaN(numeric)) {
+                    result += String(numeric);
+                    continue;
+                }
+            }
+            result += token;
+        }
+        return result;
+    }
+    function replaceEmbeddedNumericFunctions(expression, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
+        let current = expression;
+        let changed = true;
+        while (changed) {
+            changed = false;
+            current = current.replace(/[A-Z][A-Z0-9]*\([^()]*\)/gi, (segment) => {
+                var _a, _b, _c, _d;
+                const resolved = (_d = (_c = (_b = (_a = tryResolveNumericFunction(segment, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries)) !== null && _a !== void 0 ? _a : tryResolveDatePartFunction(segment, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries)) !== null && _b !== void 0 ? _b : tryResolveAggregateFunction(segment, currentSheetName, resolveRangeValues, resolveRangeEntries)) !== null && _c !== void 0 ? _c : tryResolveConditionalAggregateFunction(segment, currentSheetName, resolveCellValue)) !== null && _d !== void 0 ? _d : tryResolveLookupFunction(segment, currentSheetName, resolveCellValue);
+                if (resolved == null) {
+                    return segment;
+                }
+                const numericValue = Number(resolved);
+                if (Number.isNaN(numericValue)) {
+                    return segment;
+                }
+                changed = true;
+                return String(numericValue);
+            });
+        }
+        return current;
+    }
     function resolveScalarFormulaValue(expression, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
         const trimmed = String(expression || "").trim();
         if (!trimmed)
@@ -5064,8 +5590,14 @@ if (!customElements.get("lht-page-menu")) {
         }
         const simpleRef = parseSimpleFormulaReference(`=${trimmed}`, currentSheetName);
         if (simpleRef) {
-            const value = resolveCellValue(simpleRef.sheetName, simpleRef.address);
-            return value === "" ? null : value;
+            return resolveCellValue(simpleRef.sheetName, simpleRef.address);
+        }
+        const scopedDefinedNameRef = parseSheetScopedDefinedNameReference(trimmed, currentSheetName);
+        if (scopedDefinedNameRef) {
+            const scopedValue = (resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(scopedDefinedNameRef.sheetName, scopedDefinedNameRef.name)) || null;
+            if (scopedValue != null) {
+                return scopedValue;
+            }
         }
         const definedNameValue = (resolveDefinedNameScalarValue === null || resolveDefinedNameScalarValue === void 0 ? void 0 : resolveDefinedNameScalarValue(currentSheetName, trimmed)) || null;
         if (definedNameValue != null) {
@@ -5079,11 +5611,11 @@ if (!customElements.get("lht-page-menu")) {
     function tryResolveAggregateFunction(normalizedFormula, currentSheetName, resolveRangeValues, resolveRangeEntries) {
         if (!resolveRangeValues || !resolveRangeEntries)
             return null;
-        const match = normalizedFormula.match(/^(SUM|AVERAGE|MIN|MAX|COUNT|COUNTA)\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["SUM", "AVERAGE", "MIN", "MAX", "COUNT", "COUNTA"]);
+        if (!call)
             return null;
-        const fnName = match[1].toUpperCase();
-        const argText = match[2].trim();
+        const fnName = call.name;
+        const argText = call.argsText.trim();
         const args = splitFormulaArguments(argText);
         if (args.length === 0) {
             return null;
@@ -5118,9 +5650,9 @@ if (!customElements.get("lht-page-menu")) {
         return null;
     }
     function tryResolveConditionalAggregateFunction(normalizedFormula, currentSheetName, resolveCellValue) {
-        const averageifsMatch = normalizedFormula.match(/^AVERAGEIFS\((.+)\)$/i);
-        if (averageifsMatch) {
-            const args = splitFormulaArguments(averageifsMatch[1].trim());
+        const averageifsCall = parseWholeFunctionCall(normalizedFormula, ["AVERAGEIFS"]);
+        if (averageifsCall) {
+            const args = splitFormulaArguments(averageifsCall.argsText.trim());
             if (args.length < 3 || args.length % 2 === 0)
                 return null;
             const averageRange = parseQualifiedRangeReference(args[0], currentSheetName);
@@ -5154,9 +5686,9 @@ if (!customElements.get("lht-page-menu")) {
             }
             return count > 0 ? String(sum / count) : null;
         }
-        const sumifsMatch = normalizedFormula.match(/^SUMIFS\((.+)\)$/i);
-        if (sumifsMatch) {
-            const args = splitFormulaArguments(sumifsMatch[1].trim());
+        const sumifsCall = parseWholeFunctionCall(normalizedFormula, ["SUMIFS"]);
+        if (sumifsCall) {
+            const args = splitFormulaArguments(sumifsCall.argsText.trim());
             if (args.length < 3 || args.length % 2 === 0)
                 return null;
             const sumRange = parseQualifiedRangeReference(args[0], currentSheetName);
@@ -5188,9 +5720,9 @@ if (!customElements.get("lht-page-menu")) {
             }
             return String(sum);
         }
-        const countifsMatch = normalizedFormula.match(/^COUNTIFS\((.+)\)$/i);
-        if (countifsMatch) {
-            const args = splitFormulaArguments(countifsMatch[1].trim());
+        const countifsCall = parseWholeFunctionCall(normalizedFormula, ["COUNTIFS"]);
+        if (countifsCall) {
+            const args = splitFormulaArguments(countifsCall.argsText.trim());
             if (args.length < 2 || args.length % 2 !== 0)
                 return null;
             const rangeCriteriaPairs = [];
@@ -5215,11 +5747,11 @@ if (!customElements.get("lht-page-menu")) {
             }
             return String(count);
         }
-        const match = normalizedFormula.match(/^(COUNTIF|SUMIF|AVERAGEIF)\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["COUNTIF", "SUMIF", "AVERAGEIF"]);
+        if (!call)
             return null;
-        const fnName = match[1].toUpperCase();
-        const args = splitFormulaArguments(match[2].trim());
+        const fnName = call.name;
+        const args = splitFormulaArguments(call.argsText.trim());
         if ((fnName === "COUNTIF" && args.length !== 2) || ((fnName === "SUMIF" || fnName === "AVERAGEIF") && args.length !== 2 && args.length !== 3)) {
             return null;
         }
@@ -5262,12 +5794,30 @@ if (!customElements.get("lht-page-menu")) {
         return count > 0 ? String(sum / count) : null;
     }
     function tryResolveNumericFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
-        const match = normalizedFormula.match(/^(ROUND|ROUNDUP|ROUNDDOWN|INT|DATE|VALUE)\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["ROUND", "ROUNDUP", "ROUNDDOWN", "INT", "DATE", "VALUE", "DATEVALUE", "ROW", "COLUMN", "EOMONTH"]);
+        if (!call)
             return null;
-        const fnName = match[1].toUpperCase();
-        const args = splitFormulaArguments(match[2].trim());
-        if (fnName === "VALUE") {
+        const fnName = call.name;
+        const args = splitFormulaArguments(call.argsText.trim());
+        if (fnName === "ROW" || fnName === "COLUMN") {
+            if (args.length !== 1)
+                return null;
+            const rangeRef = parseQualifiedRangeReference(args[0], currentSheetName);
+            if (rangeRef) {
+                const start = parseCellAddress(rangeRef.start);
+                if (!start.row || !start.col)
+                    return null;
+                return String(fnName === "ROW" ? start.row : start.col);
+            }
+            const simpleRef = parseSimpleFormulaReference(`=${args[0]}`, currentSheetName);
+            if (!simpleRef)
+                return null;
+            const parsed = parseCellAddress(simpleRef.address);
+            if (!parsed.row || !parsed.col)
+                return null;
+            return String(fnName === "ROW" ? parsed.row : parsed.col);
+        }
+        if (fnName === "VALUE" || fnName === "DATEVALUE") {
             if (args.length !== 1)
                 return null;
             const source = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
@@ -5285,6 +5835,23 @@ if (!customElements.get("lht-page-menu")) {
             if (year == null || month == null || day == null)
                 return null;
             const serial = datePartsToExcelSerial(Math.trunc(year), Math.trunc(month), Math.trunc(day));
+            return serial == null ? null : String(serial);
+        }
+        if (fnName === "EOMONTH") {
+            if (args.length !== 2)
+                return null;
+            const startValue = resolveScalarFormulaValue(args[0], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
+            const monthOffset = resolveNumericFormulaArgument(args[1], currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries);
+            if (startValue == null || monthOffset == null)
+                return null;
+            const parts = parseDateLikeParts(startValue);
+            if (!parts)
+                return null;
+            const baseYear = Number(parts.yyyy);
+            const baseMonthIndex = Number(parts.mm) - 1 + Math.trunc(monthOffset);
+            const targetYear = baseYear + Math.floor(baseMonthIndex / 12);
+            const targetMonth = ((baseMonthIndex % 12) + 12) % 12 + 1;
+            const serial = datePartsToExcelSerial(targetYear, targetMonth + 1, 0);
             return serial == null ? null : String(serial);
         }
         if (fnName === "INT") {
@@ -5321,11 +5888,11 @@ if (!customElements.get("lht-page-menu")) {
         return null;
     }
     function tryResolveStringFunction(normalizedFormula, currentSheetName, resolveCellValue, resolveRangeValues, resolveRangeEntries) {
-        const match = normalizedFormula.match(/^(LEFT|RIGHT|MID|LEN|TRIM|SUBSTITUTE|REPLACE)\((.+)\)$/i);
-        if (!match)
+        const call = parseWholeFunctionCall(normalizedFormula, ["LEFT", "RIGHT", "MID", "LEN", "TRIM", "SUBSTITUTE", "REPLACE"]);
+        if (!call)
             return null;
-        const fnName = match[1].toUpperCase();
-        const args = splitFormulaArguments(match[2].trim());
+        const fnName = call.name;
+        const args = splitFormulaArguments(call.argsText.trim());
         if (fnName === "LEN" || fnName === "TRIM") {
             if (args.length !== 1)
                 return null;
@@ -5545,6 +6112,17 @@ if (!customElements.get("lht-page-menu")) {
         const qualifiedRangeMatch = argText.match(/^(?:'((?:[^']|'')+)'|([^'=][^!]*))!(\$?[A-Z]+\$?\d+:\$?[A-Z]+\$?\d+)$/i);
         const localRangeMatch = argText.match(/^(\$?[A-Z]+\$?\d+:\$?[A-Z]+\$?\d+)$/i);
         if (!qualifiedRangeMatch && !localRangeMatch) {
+            const scopedDefinedName = parseSheetScopedDefinedNameReference(String(argText || "").trim(), currentSheetName);
+            if (scopedDefinedName) {
+                const scopedRange = (resolveDefinedNameRangeRef === null || resolveDefinedNameRangeRef === void 0 ? void 0 : resolveDefinedNameRangeRef(scopedDefinedName.sheetName, scopedDefinedName.name)) || null;
+                if (scopedRange) {
+                    return scopedRange;
+                }
+            }
+            const structuredRange = (resolveStructuredRangeRef === null || resolveStructuredRangeRef === void 0 ? void 0 : resolveStructuredRangeRef(currentSheetName, String(argText || "").trim())) || null;
+            if (structuredRange) {
+                return structuredRange;
+            }
             const definedRange = (resolveDefinedNameRangeRef === null || resolveDefinedNameRangeRef === void 0 ? void 0 : resolveDefinedNameRangeRef(currentSheetName, String(argText || "").trim())) || null;
             if (definedRange) {
                 return definedRange;
@@ -5649,37 +6227,51 @@ if (!customElements.get("lht-page-menu")) {
         const resolver = buildFormulaResolver(workbook);
         resolveDefinedNameScalarValue = resolver.resolveDefinedNameValue;
         resolveDefinedNameRangeRef = resolver.resolveDefinedNameRange;
+        resolveStructuredRangeRef = resolver.resolveStructuredRange;
         try {
-            for (const sheet of workbook.sheets) {
-                for (const cell of sheet.cells) {
-                    if (!cell.formulaText)
-                        continue;
-                    if (cell.resolutionStatus === "unsupported_external")
-                        continue;
-                    if (cell.resolutionStatus === "resolved" && cell.outputValue !== "")
-                        continue;
-                    const reference = parseSimpleFormulaReference(cell.formulaText, sheet.name);
-                    if (reference) {
-                        const targetValue = String(resolver.resolveCellValue(reference.sheetName, reference.address) || "").trim();
-                        if (targetValue) {
-                            cell.outputValue = targetValue;
-                            cell.rawValue = targetValue;
-                            cell.resolutionStatus = "resolved";
+            for (let pass = 0; pass < 8; pass += 1) {
+                let resolvedInPass = 0;
+                for (const sheet of workbook.sheets) {
+                    for (const cell of sheet.cells) {
+                        if (!cell.formulaText)
                             continue;
+                        if (cell.resolutionStatus === "unsupported_external")
+                            continue;
+                        if (cell.resolutionStatus === "resolved")
+                            continue;
+                        const reference = parseSimpleFormulaReference(cell.formulaText, sheet.name);
+                        if (reference) {
+                            const targetValue = String(resolver.resolveCellValue(reference.sheetName, reference.address) || "").trim();
+                            if (targetValue) {
+                                applyResolvedFormulaValue(cell, targetValue);
+                                resolvedInPass += 1;
+                                continue;
+                            }
+                        }
+                        let evaluated = null;
+                        try {
+                            evaluated = tryResolveFormulaExpression(cell.formulaText, sheet.name, resolver.resolveCellValue, resolver.resolveRangeValues, resolver.resolveRangeEntries);
+                        }
+                        catch (error) {
+                            if (!(error instanceof Error) || error.message !== "__FORMULA_UNRESOLVED__") {
+                                throw error;
+                            }
+                        }
+                        if (evaluated != null) {
+                            applyResolvedFormulaValue(cell, evaluated);
+                            resolvedInPass += 1;
                         }
                     }
-                    const evaluated = tryResolveFormulaExpression(cell.formulaText, sheet.name, resolver.resolveCellValue, resolver.resolveRangeValues, resolver.resolveRangeEntries);
-                    if (evaluated != null) {
-                        cell.outputValue = evaluated;
-                        cell.rawValue = evaluated;
-                        cell.resolutionStatus = "resolved";
-                    }
+                }
+                if (resolvedInPass === 0) {
+                    break;
                 }
             }
         }
         finally {
             resolveDefinedNameScalarValue = null;
             resolveDefinedNameRangeRef = null;
+            resolveStructuredRangeRef = null;
         }
     }
     function parseWorksheet(files, sheetName, sheetPath, sheetIndex, sharedStrings, cellStyles) {
@@ -5721,6 +6313,7 @@ if (!customElements.get("lht-page-menu")) {
                 address,
                 row: position.row,
                 col: position.col,
+                valueType: output.valueType,
                 rawValue: output.rawValue,
                 outputValue: output.outputValue,
                 formulaText: output.formulaText,
@@ -5732,6 +6325,7 @@ if (!customElements.get("lht-page-menu")) {
             };
         });
         const merges = Array.from(doc.getElementsByTagName("mergeCell")).map((mergeElement) => parseRangeRef(mergeElement.getAttribute("ref") || ""));
+        const tables = parseWorksheetTables(files, doc, sheetName, sheetPath);
         const images = parseDrawingImages(files, sheetName, sheetPath);
         let maxRow = 0;
         let maxCol = 0;
@@ -5753,6 +6347,7 @@ if (!customElements.get("lht-page-menu")) {
             path: sheetPath,
             cells,
             merges,
+            tables,
             images,
             maxRow,
             maxCol
@@ -5783,6 +6378,8 @@ if (!customElements.get("lht-page-menu")) {
             sharedStrings,
             definedNames
         };
+        resolveSimpleFormulaReferences(workbook);
+        resolveSimpleFormulaReferences(workbook);
         resolveSimpleFormulaReferences(workbook);
         return workbook;
     }
@@ -5843,17 +6440,112 @@ if (!customElements.get("lht-page-menu")) {
                     startRow: rowNumber,
                     startCol,
                     endRow: rowNumber,
-                    lines: [rowText]
+                    lines: [rowText],
+                    items: [{
+                            row: rowNumber,
+                            startCol,
+                            text: rowText,
+                            cellValues: cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean)
+                        }]
                 };
                 blocks.push(current);
             }
             else {
                 current.lines.push(rowText);
                 current.endRow = rowNumber;
+                current.items.push({
+                    row: rowNumber,
+                    startCol,
+                    text: rowText,
+                    cellValues: cells.map((cell) => formatCellForMarkdown(cell, options).trim()).filter(Boolean)
+                });
             }
             previousRow = rowNumber;
         }
         return blocks;
+    }
+    function isNarrativeListCandidate(item) {
+        const text = String(item.text || "").trim();
+        if (!text || text.length < 4 || text.length > 140)
+            return false;
+        if (item.cellValues.length >= 2) {
+            const marker = String(item.cellValues[0] || "").trim();
+            const content = item.cellValues.slice(1).join(" ").trim();
+            if (!content || content.length < 4)
+                return false;
+            if (marker.length <= 6)
+                return true;
+        }
+        if (item.cellValues.length === 1) {
+            if (/[:：]$/.test(text))
+                return false;
+            if (/[。．]$/.test(text) && text.length < 18)
+                return false;
+            return true;
+        }
+        return false;
+    }
+    function formatNarrativeListItem(item) {
+        const values = item.cellValues.map((value) => String(value || "").trim()).filter(Boolean);
+        if (values.length >= 2) {
+            const marker = values[0];
+            const content = values.slice(1).join(" ").trim();
+            if (/^(x|X|✓|✔|☑)$/u.test(marker)) {
+                return `- [x] ${content}`;
+            }
+            if (/^(□|☐)$/u.test(marker)) {
+                return `- [ ] ${content}`;
+            }
+            return `- ${content}`;
+        }
+        const text = String(item.text || "").trim();
+        const checkedMatch = text.match(/^(x|X|✓|✔|☑)\s+(.+)$/u);
+        if (checkedMatch) {
+            return `- [x] ${checkedMatch[2].trim()}`;
+        }
+        const uncheckedMatch = text.match(/^(□|☐)\s+(.+)$/u);
+        if (uncheckedMatch) {
+            return `- [ ] ${uncheckedMatch[2].trim()}`;
+        }
+        return `- ${text}`;
+    }
+    function renderNarrativeBlock(block) {
+        if (!block.items || block.items.length === 0) {
+            return block.lines.join("\n");
+        }
+        const parts = [];
+        let index = 0;
+        while (index < block.items.length) {
+            let runEnd = index;
+            while (runEnd < block.items.length
+                && isNarrativeListCandidate(block.items[runEnd])
+                && (runEnd === index || block.items[runEnd].row === block.items[runEnd - 1].row + 1)) {
+                runEnd += 1;
+            }
+            const runLength = runEnd - index;
+            if (runLength >= 4) {
+                parts.push(block.items.slice(index, runEnd).map((item) => formatNarrativeListItem(item)).join("\n"));
+                index = runEnd;
+                continue;
+            }
+            let proseEnd = index;
+            while (proseEnd < block.items.length) {
+                const nextRunStart = proseEnd;
+                let candidateEnd = nextRunStart;
+                while (candidateEnd < block.items.length
+                    && isNarrativeListCandidate(block.items[candidateEnd])
+                    && (candidateEnd === nextRunStart || block.items[candidateEnd].row === block.items[candidateEnd - 1].row + 1)) {
+                    candidateEnd += 1;
+                }
+                if (candidateEnd - nextRunStart >= 4) {
+                    break;
+                }
+                proseEnd += 1;
+            }
+            parts.push(block.items.slice(index, proseEnd).map((item) => item.text).join("\n"));
+            index = proseEnd;
+        }
+        return parts.join("\n\n");
     }
     function collectTableSeedCells(sheet) {
         return sheet.cells.filter((cell) => {
@@ -6029,10 +6721,20 @@ if (!customElements.get("lht-page-menu")) {
         return lines.join("\n");
     }
     function createOutputFileName(workbookName, sheetIndex, sheetName, outputMode = "display") {
-        const bookBase = workbookName.replace(/\.xlsx$/i, "");
-        const safeSheetName = sheetName.replace(/[\\/:*?"<>|]+/g, "_").trim() || `Sheet${sheetIndex}`;
+        const bookBase = sanitizeFileNameSegment(workbookName.replace(/\.xlsx$/i, ""), "workbook");
+        const safeSheetName = sanitizeFileNameSegment(sheetName, `Sheet${sheetIndex}`);
         const suffix = outputMode === "display" ? "" : `_${outputMode}`;
         return `${bookBase}_${String(sheetIndex).padStart(3, "0")}_${safeSheetName}${suffix}.md`;
+    }
+    function sanitizeFileNameSegment(value, fallback) {
+        const normalized = String(value || "").normalize("NFKC");
+        const sanitized = normalized
+            .replace(/[\\/:*?"<>|]/g, "_")
+            .replace(/\s+/g, "_")
+            .replace(/[^\p{L}\p{N}._-]+/gu, "_")
+            .replace(/_+/g, "_")
+            .replace(/^[_ .-]+|[_ .-]+$/g, "");
+        return sanitized || fallback;
     }
     function convertSheetToMarkdown(workbook, sheet, options = {}) {
         var _a;
@@ -6052,7 +6754,7 @@ if (!customElements.get("lht-page-menu")) {
             sections.push({
                 sortRow: block.startRow,
                 sortCol: block.startCol,
-                markdown: `${block.lines.join("\n")}\n`
+                markdown: `${renderNarrativeBlock(block)}\n`
             });
         }
         let tableCounter = 1;
@@ -6223,17 +6925,148 @@ if (!customElements.get("lht-page-menu")) {
             toast.show(message, 2200);
         }
     }
+    function setSummaryHtml(html) {
+        getElement("analysisSummary").innerHTML = html;
+    }
     function setSummaryText(message) {
-        getElement("analysisSummary").textContent = message;
+        setSummaryHtml(`<div class="md-summary-empty">${escapeHtml(message)}</div>`);
     }
     function setSheetSummary(message) {
         getElement("sheetSummary").textContent = message;
     }
-    function setScoreSummary(message) {
-        getElement("scoreSummary").textContent = message;
+    function setScoreSummaryHtml(html) {
+        getElement("scoreSummary").innerHTML = html;
     }
-    function setFormulaSummary(message) {
-        getElement("formulaSummary").textContent = message;
+    function setFormulaSummaryHtml(html) {
+        getElement("formulaSummary").innerHTML = html;
+    }
+    function escapeHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+    function renderScoreSummary(files) {
+        const sheetsWithScores = files.filter((file) => file.summary.tableScores.length > 0);
+        if (sheetsWithScores.length === 0) {
+            return '<div class="md-summary-empty">表候補はありません。</div>';
+        }
+        const totalScores = sheetsWithScores.reduce((sum, file) => sum + file.summary.tableScores.length, 0);
+        const totalStrong = sheetsWithScores.reduce((sum, file) => (sum + file.summary.tableScores.filter((detail) => getTableScoreLabel(detail.score) === "strong").length), 0);
+        const totalCandidate = sheetsWithScores.reduce((sum, file) => (sum + file.summary.tableScores.filter((detail) => getTableScoreLabel(detail.score) === "candidate").length), 0);
+        return `<div class="md-summary-overview">全体 ${totalScores}件 / strong ${totalStrong} / candidate ${totalCandidate}</div>${sheetsWithScores.map((file) => {
+            const items = [...file.summary.tableScores].sort((left, right) => {
+                if (right.score !== left.score) {
+                    return right.score - left.score;
+                }
+                return left.range.localeCompare(right.range);
+            }).map((detail) => (`<div class="md-summary-item"><div class="md-summary-item-head"><span class="md-summary-item-title">${escapeHtml(detail.range)}</span><span class="md-summary-item-status md-summary-item-status--${escapeHtml(getTableScoreLabel(detail.score))}">${escapeHtml(getTableScoreText(detail.score))}</span></div><div class="md-summary-item-meta">${detail.score}点</div><div class="md-summary-item-body">${escapeHtml(detail.reasons.join(" / "))}</div></div>`)).join("");
+            return `<section class="md-summary-group"><div class="md-summary-group-head"><h3 class="md-summary-group-title">${escapeHtml(file.sheetName)}</h3><span class="md-summary-group-count">${file.summary.tableScores.length}件</span></div><div class="md-summary-group-meta">${escapeHtml(renderTableScoreCounts(file))}</div>${items}</section>`;
+        }).join("")}`;
+    }
+    function getTableScoreLabel(score) {
+        if (score >= 7)
+            return "strong";
+        if (score >= 4)
+            return "candidate";
+        return "unknown";
+    }
+    function getTableScoreText(score) {
+        if (score >= 7)
+            return "strong";
+        if (score >= 4)
+            return "candidate";
+        return "unknown";
+    }
+    function renderTableScoreCounts(file) {
+        const counts = {
+            strong: 0,
+            candidate: 0,
+            unknown: 0
+        };
+        file.summary.tableScores.forEach((detail) => {
+            counts[getTableScoreLabel(detail.score)] += 1;
+        });
+        return [
+            counts.strong > 0 ? `strong ${counts.strong}` : "",
+            counts.candidate > 0 ? `candidate ${counts.candidate}` : "",
+            counts.unknown > 0 ? `unknown ${counts.unknown}` : ""
+        ].filter(Boolean).join(" / ");
+    }
+    function getFormulaStatusLabel(status) {
+        if (status === "resolved")
+            return "resolved";
+        if (status === "fallback_formula")
+            return "fallback";
+        if (status === "unsupported_external")
+            return "unsupported";
+        return "unknown";
+    }
+    function renderFormulaStatusCounts(file) {
+        const counts = {
+            resolved: 0,
+            fallback: 0,
+            unsupported: 0,
+            unknown: 0
+        };
+        file.summary.formulaDiagnostics.forEach((diagnostic) => {
+            counts[getFormulaStatusLabel(diagnostic.status)] += 1;
+        });
+        return [
+            counts.resolved > 0 ? `resolved ${counts.resolved}` : "",
+            counts.fallback > 0 ? `fallback ${counts.fallback}` : "",
+            counts.unsupported > 0 ? `unsupported ${counts.unsupported}` : "",
+            counts.unknown > 0 ? `unknown ${counts.unknown}` : ""
+        ].filter(Boolean).join(" / ");
+    }
+    function getFormulaStatusPriority(status) {
+        const label = getFormulaStatusLabel(status);
+        if (label === "unsupported")
+            return 0;
+        if (label === "fallback")
+            return 1;
+        if (label === "unknown")
+            return 2;
+        return 3;
+    }
+    function renderFormulaSummary(files) {
+        const sheetsWithDiagnostics = files.filter((file) => file.summary.formulaDiagnostics.length > 0);
+        if (sheetsWithDiagnostics.length === 0) {
+            return '<div class="md-summary-empty">数式セルはありません。</div>';
+        }
+        const totalDiagnostics = sheetsWithDiagnostics.reduce((sum, file) => sum + file.summary.formulaDiagnostics.length, 0);
+        const totalResolved = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => getFormulaStatusLabel(diagnostic.status) === "resolved").length), 0);
+        const totalFallback = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => getFormulaStatusLabel(diagnostic.status) === "fallback").length), 0);
+        const totalUnsupported = sheetsWithDiagnostics.reduce((sum, file) => (sum + file.summary.formulaDiagnostics.filter((diagnostic) => getFormulaStatusLabel(diagnostic.status) === "unsupported").length), 0);
+        return `<div class="md-summary-overview">全体 ${totalDiagnostics}件 / resolved ${totalResolved} / fallback ${totalFallback} / unsupported ${totalUnsupported}</div>${sheetsWithDiagnostics.map((file) => {
+            const items = [...file.summary.formulaDiagnostics].sort((left, right) => {
+                const priorityDiff = getFormulaStatusPriority(left.status) - getFormulaStatusPriority(right.status);
+                if (priorityDiff !== 0) {
+                    return priorityDiff;
+                }
+                return left.address.localeCompare(right.address);
+            }).map((diagnostic) => (`<div class="md-summary-item"><div class="md-summary-item-head"><span class="md-summary-item-title">${escapeHtml(diagnostic.address)}</span><span class="md-summary-item-status md-summary-item-status--${escapeHtml(getFormulaStatusLabel(diagnostic.status))}">${escapeHtml(getFormulaStatusLabel(diagnostic.status))}</span></div><div class="md-summary-item-body">${escapeHtml(`${diagnostic.formulaText} => ${diagnostic.outputValue}`)}</div></div>`)).join("");
+            return `<section class="md-summary-group"><div class="md-summary-group-head"><h3 class="md-summary-group-title">${escapeHtml(file.sheetName)}</h3><span class="md-summary-group-count">${file.summary.formulaDiagnostics.length}件</span></div><div class="md-summary-group-meta">${escapeHtml(renderFormulaStatusCounts(file))}</div>${items}</section>`;
+        }).join("")}`;
+    }
+    function renderAnalysisSummary(files, workbookName) {
+        var _a;
+        if (files.length === 0) {
+            return '<div class="md-summary-empty">まだ変換していません。</div>';
+        }
+        const totalTables = files.reduce((sum, file) => sum + file.summary.tables, 0);
+        const totalNarratives = files.reduce((sum, file) => sum + file.summary.narrativeBlocks, 0);
+        const totalMerges = files.reduce((sum, file) => sum + file.summary.merges, 0);
+        const totalImages = files.reduce((sum, file) => sum + file.summary.images, 0);
+        const totalCells = files.reduce((sum, file) => sum + file.summary.cells, 0);
+        const totalFormulas = files.reduce((sum, file) => sum + file.summary.formulaDiagnostics.length, 0);
+        const outputMode = ((_a = files[0]) === null || _a === void 0 ? void 0 : _a.summary.outputMode) || "display";
+        const overview = `<div class="md-summary-overview">Workbook ${escapeHtml(workbookName)} / ${files.length} sheet / mode ${escapeHtml(outputMode)}</div>`;
+        const items = files.map((file) => (`<section class="md-summary-group"><div class="md-summary-group-head"><h3 class="md-summary-group-title">${escapeHtml(file.sheetName)}</h3><span class="md-summary-group-count">${file.summary.cells} cells</span></div><div class="md-summary-group-meta">表 ${file.summary.tables} / 地の文 ${file.summary.narrativeBlocks} / 結合 ${file.summary.merges} / 画像 ${file.summary.images} / 数式 ${file.summary.formulaDiagnostics.length}</div></section>`)).join("");
+        const totals = `<section class="md-summary-group"><div class="md-summary-group-head"><h3 class="md-summary-group-title">全体</h3><span class="md-summary-group-count">${files.length} sheets</span></div><div class="md-summary-group-meta">表 ${totalTables} / 地の文 ${totalNarratives} / 結合 ${totalMerges} / 画像 ${totalImages} / 数式 ${totalFormulas} / 解析セル ${totalCells}</div></section>`;
+        return `${overview}${totals}${items}`;
     }
     function updateOutputModeNotice(mode) {
         const notice = getElement("outputModeNotice");
@@ -6261,16 +7094,6 @@ if (!customElements.get("lht-page-menu")) {
         }
         banner.hidden = true;
         banner.textContent = "";
-    }
-    function formatFormulaDiagnostics(files) {
-        const lines = files.flatMap((file) => {
-            const diagnostics = file.summary.formulaDiagnostics;
-            if (diagnostics.length === 0) {
-                return [];
-            }
-            return diagnostics.map((diagnostic) => (`${file.sheetName} ${diagnostic.address}: [${diagnostic.status}] ${diagnostic.formulaText} => ${diagnostic.outputValue}`));
-        });
-        return lines.join("\n") || "数式セルはありません。";
     }
     function setPreviewMarkdown(markdown) {
         const preview = getElement("markdownPreview");
@@ -6340,14 +7163,25 @@ if (!customElements.get("lht-page-menu")) {
         if (typeof select.setOptions === "function") {
             select.setOptions(options);
         }
-        setSheetSummary(`${currentWorkbook.name} / ${currentWorkbook.sheets.length} sheets`);
+        setSheetSummary(`${currentWorkbook.name} / ${currentWorkbook.sheets.length} sheets / 全シート`);
+    }
+    function updateSheetSelectionSummary(selectedValue) {
+        if (!currentWorkbook) {
+            setSheetSummary("Workbook 未読込");
+            return;
+        }
+        if (!selectedValue || selectedValue === "__all__") {
+            setSheetSummary(`${currentWorkbook.name} / ${currentWorkbook.sheets.length} sheets / 全シート`);
+            return;
+        }
+        setSheetSummary(`${currentWorkbook.name} / ${currentWorkbook.sheets.length} sheets / ${selectedValue}`);
     }
     function renderCurrentSelection() {
         var _a, _b;
         if (!currentFiles.length) {
             setSummaryText("まだ変換していません。");
-            setScoreSummary("まだ変換していません。");
-            setFormulaSummary("まだ変換していません。");
+            setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
+            setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
             setPreviewMarkdown("");
             updatePreviewModeBanner(getSelectedOutputMode());
             return;
@@ -6356,28 +7190,14 @@ if (!customElements.get("lht-page-menu")) {
         const selectedValue = typeof select.getValue === "function"
             ? select.getValue()
             : ((_a = document.getElementById("sheetSelect")) === null || _a === void 0 ? void 0 : _a.value) || "__all__";
+        updateSheetSelectionSummary(selectedValue);
         if (!selectedValue || selectedValue === "__all__") {
             const combinedMarkdown = currentFiles.map((file) => `<!-- ${file.fileName} -->\n${file.markdown}`).join("\n\n");
-            const totalTables = currentFiles.reduce((sum, file) => sum + file.summary.tables, 0);
-            const totalNarratives = currentFiles.reduce((sum, file) => sum + file.summary.narrativeBlocks, 0);
-            const totalMerges = currentFiles.reduce((sum, file) => sum + file.summary.merges, 0);
-            const totalImages = currentFiles.reduce((sum, file) => sum + file.summary.images, 0);
-            const totalCells = currentFiles.reduce((sum, file) => sum + file.summary.cells, 0);
             const outputMode = ((_b = currentFiles[0]) === null || _b === void 0 ? void 0 : _b.summary.outputMode) || "display";
             updatePreviewModeBanner(outputMode);
-            setSummaryText([
-                `出力ファイル数: ${currentFiles.length}`,
-                `出力モード: ${outputMode}`,
-                `表: ${totalTables}`,
-                `地の文ブロック: ${totalNarratives}`,
-                `結合セル範囲: ${totalMerges}`,
-                `画像: ${totalImages}`,
-                `解析セル数: ${totalCells}`
-            ].join("\n"));
-            setScoreSummary(currentFiles
-                .flatMap((file) => file.summary.tableScores.map((detail) => `${file.sheetName} ${detail.range}: ${detail.score}点 / ${detail.reasons.join(", ")}`))
-                .join("\n") || "表候補はありません。");
-            setFormulaSummary(formatFormulaDiagnostics(currentFiles));
+            setSummaryHtml(renderAnalysisSummary(currentFiles, (currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook.xlsx"));
+            setScoreSummaryHtml(renderScoreSummary(currentFiles));
+            setFormulaSummaryHtml(renderFormulaSummary(currentFiles));
             setPreviewMarkdown(combinedMarkdown);
             getElement("downloadBtn").disabled = false;
             getElement("exportZipBtn").disabled = false;
@@ -6391,9 +7211,9 @@ if (!customElements.get("lht-page-menu")) {
             return;
         }
         updatePreviewModeBanner(matched.summary.outputMode);
-        setSummaryText(xlsx2md.createSummaryText(matched));
-        setScoreSummary(matched.summary.tableScores.map((detail) => `${detail.range}: ${detail.score}点 / ${detail.reasons.join(", ")}`).join("\n") || "表候補はありません。");
-        setFormulaSummary(formatFormulaDiagnostics([matched]));
+        setSummaryHtml(renderAnalysisSummary([matched], (currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook.xlsx"));
+        setScoreSummaryHtml(renderScoreSummary([matched]));
+        setFormulaSummaryHtml(renderFormulaSummary([matched]));
         setPreviewMarkdown(matched.markdown);
         getElement("downloadBtn").disabled = false;
         getElement("exportZipBtn").disabled = false;
@@ -6468,8 +7288,8 @@ if (!customElements.get("lht-page-menu")) {
             currentFiles = [];
             updateSheetOptions();
             setSummaryText(`${file.name} を読み込みました。変換ボタンを押してください。`);
-            setScoreSummary("まだ変換していません。");
-            setFormulaSummary("まだ変換していません。");
+            setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
+            setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
             setPreviewMarkdown("");
             getElement("downloadBtn").disabled = true;
             getElement("exportZipBtn").disabled = true;
@@ -6480,8 +7300,8 @@ if (!customElements.get("lht-page-menu")) {
             currentFiles = [];
             updateSheetOptions();
             setSummaryText("Workbook の読込に失敗しました。");
-            setScoreSummary("まだ変換していません。");
-            setFormulaSummary("まだ変換していません。");
+            setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
+            setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
             setPreviewMarkdown("");
             getElement("downloadBtn").disabled = true;
             getElement("exportZipBtn").disabled = true;
@@ -6538,8 +7358,8 @@ if (!customElements.get("lht-page-menu")) {
         clearError();
         setSummaryText("まだ変換していません。");
         setSheetSummary("Workbook 未読込");
-        setScoreSummary("まだ変換していません。");
-        setFormulaSummary("まだ変換していません。");
+        setScoreSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
+        setFormulaSummaryHtml('<div class="md-summary-empty">まだ変換していません。</div>');
         setPreviewMarkdown("");
         updateOutputModeNotice(getSelectedOutputMode());
         updatePreviewModeBanner(getSelectedOutputMode());

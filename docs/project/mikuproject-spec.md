@@ -571,7 +571,10 @@ STEP 1 では、次は非目標とする。
 - `milestone=true` は `milestone` として出力する
 - `percentComplete >= 100` は `done` として出力する
 - task 名や title は Mermaid で壊れやすい一部記号を簡易正規化して出力する
-- predecessor は現時点では Mermaid 行へ直接埋め込まず、コメント行で補助出力する
+- predecessor は、`単一 predecessor` かつ `FS` かつ `lag なし` かつ `duration` を Mermaid 向けへ素直に変換できる task のみ `after ...` でネイティブ出力する
+- 上記に当てはまらない predecessor は、task 名を含むコメント行で補助出力する
+- comment 側の `lag` は、可能な範囲で `2h` のような短い人間向け表現に整形して出力する
+- `lag` がある場合は、`after Prep + 2h` のような擬似読解用 comment も追加する
 
 現時点で意図的に落とすもの:
 
@@ -586,8 +589,167 @@ STEP 1 では、次は非目標とする。
 注意:
 
 - これはあくまで片方向の補助出力であり、`Mermaid gantt -> ProjectModel` の往復は対象外とする
-- 現時点の dependency 表現はコメント保持であり、Mermaid 側のネイティブ dependency 記法へ完全には落としていない
+- 現時点の dependency 表現は部分的にネイティブ化しているが、複数 predecessor、`FS` 以外の link type、lag あり、複雑な duration はコメント保持のままとする
 - どの情報を落としているかは、将来の `CSV + ParentID` 等の交換形式検討と切り分けて扱う
+
+## CSV + ParentID 交換形式メモ
+
+`mikuproject` の次段候補として、`CSV + ParentID` を「まず押さえるべき、よくある交換形式」の第1候補とする。
+
+目的:
+
+- 人が表計算ソフトやスプレッドシートで編集しやすい形を持つ
+- 独自記法を先に増やしすぎず、一般的な交換形式を先に押さえる
+- task 階層を `ParentID` で素直に表現する
+
+最小列候補:
+
+- `ID`
+- `ParentID`
+- `Name`
+
+実用列候補:
+
+- `WBS`
+- `Start`
+- `Finish`
+- `PredecessorID`
+- `Resource`
+- `PercentComplete`
+
+現時点の整理方針:
+
+- まずは単一 CSV を前提に考える
+- task 階層の正本は `ParentID` とし、`WBS` は補助列として扱う候補とする
+- `PredecessorID` は単一値か複数値区切りかを今後決める
+- `Resource` は名前で持つか `ResourceID` で持つかを今後決める
+
+単一 CSV で落ちやすいもの:
+
+- `Assignments` の完全表現
+- `Calendars`
+- `Baseline`
+- `TimephasedData`
+- コスト系の詳細
+
+注意:
+
+- 現時点では仕様草案段階であり、`CSV + ParentID <-> ProjectModel` の完全往復仕様は未確定
+- 将来必要であれば、`tasks.csv / resources.csv / assignments.csv` の複数表構成も比較対象にする
+
+複数 CSV 構成の比較メモ:
+
+- `single CSV` の利点は、人が 1 枚の表で task 階層を編集しやすいこと
+- `single CSV` の弱点は、`Resource` や `Assignment` を task 行へ押し込むため、正規化されず表現が崩れやすいこと
+- `tasks.csv / resources.csv / assignments.csv` の利点は、resource と assignment を独立表現でき、`ResourceID` ベースの安全な往復へ寄せやすいこと
+- `tasks.csv / resources.csv / assignments.csv` の弱点は、人が直接編集するには 1 ファイル増えて分かりにくくなること
+- 現時点では、まず `single CSV` で task 中心の軽量交換を育て、resource / assignment の保持要求が増えた時点で複数 CSV を比較する方針とする
+- その場合の最初の分割候補は `tasks.csv` と `resources.csv` と `assignments.csv` であり、calendar はさらに次段とする
+
+複数 CSV の最小草案:
+
+- `tasks.csv`
+  - 最小列候補: `ID / ParentID / Name`
+  - 実用列候補: `WBS / Start / Finish / PredecessorID / PercentComplete / PercentWorkComplete / Milestone / Summary / Critical / Type / Priority / Work / CalendarUID / ConstraintType / ConstraintDate / Deadline / Notes`
+- `resources.csv`
+  - 最小列候補: `ResourceID / Name`
+  - 実用列候補: `Initials / Group / CalendarUID / MaxUnits / StandardRate / OvertimeRate / CostPerUse`
+- `assignments.csv`
+  - 最小列候補: `AssignmentID / TaskID / ResourceID`
+  - 実用列候補: `Start / Finish / Units / Work / PercentWorkComplete`
+
+草案メモ:
+
+- `tasks.csv` は現在の `single CSV` の task 列をほぼそのまま引き継げる
+- `resources.csv` は name だけでなく `ResourceID` を正本にすることで、同名 resource の衝突を避けやすい
+- `assignments.csv` を分けることで、1 task に複数 resource が割り当たるケースを自然に表現できる
+- 第1段では `calendar` と `baseline/timephased` は複数 CSV にも入れず、別段とする
+- もし複数 CSV に進む場合、最初の実装順は `tasks.csv -> resources.csv -> assignments.csv` が妥当と考える
+
+`tasks.csv` の最小仕様草案:
+
+- 目的は task 階層と task 単体属性を、resource / assignment から切り離して安全に往復すること
+- 正本の階層表現は `ParentID` とし、`WBS` は補助列扱いとする
+- `ID / ParentID / Name` を必須列とする
+- `ID` は CSV 内で一意でなければならない
+- `ParentID` は空文字を root task とみなし、値がある場合は既存 `ID` を指さなければならない
+- `ParentID` の自己参照と循環参照は import error とする
+- `Name` は空不可とする
+- `PredecessorID` は任意列とし、複数値は `|` を正規表現としつつ、import では `,` `;` `、` も受ける
+- `Milestone / Summary / Critical` は `0/1` を正とし、import では `true/false/yes/no` も受ける
+- `PercentComplete / PercentWorkComplete` は `0..100` を想定し、範囲外は validation 対象とする
+- `Start / Finish / ConstraintDate / Deadline` は `MS Project XML` と同じ日時文字列を前提にする
+- `Type / Priority / ConstraintType` は整数列とする
+- `Work` は `PT...` 形式の duration 文字列を前提にする
+
+`tasks.csv` の第1段 scope:
+
+- 含める: 階層、日付、依存、進捗、milestone/summary/critical、主要 task 属性
+- 含めない: `Baseline`, `TimephasedData`, `ExtendedAttributes`, task ごとの cost 詳細
+- `CalendarUID` は保持対象に含めるが、calendar 実体は別表へ分けず参照値扱いに留める
+
+`resources.csv` の最小仕様草案:
+
+- 目的は resource 単体属性を task 行から切り離し、同名 resource を安全に区別できるようにすること
+- 正本の識別子は `ResourceID` とし、`Name` は表示用の主要属性として扱う
+- `ResourceID / Name` を必須列とする
+- `ResourceID` は CSV 内で一意でなければならない
+- `Name` は空不可とする
+- `Name` の重複は直ちに import error とはしないが、運用上は非推奨とする
+- `CalendarUID` は任意列とし、calendar 実体は別表へ分けず参照値扱いに留める
+- `MaxUnits / CostPerUse` は数値列とする
+- `StandardRate / OvertimeRate` は `MS Project XML` と同じ文字列表現を前提にする
+- `Initials / Group` は任意の表示属性とする
+
+`resources.csv` の第1段 scope:
+
+- 含める: 識別子、表示名、group/initials、calendar 参照、基本 rate/cost 属性
+- 含めない: `Baseline`, `TimephasedData`, `ExtendedAttributes`, resource ごとの cost 実績詳細
+- `assignments.csv` が別にある前提で、task との紐付けは `resources.csv` に持たせない
+
+`assignments.csv` の最小仕様草案:
+
+- 目的は task と resource の関係を独立表現し、1 task に複数 resource が付くケースを正規化して扱うこと
+- 正本の識別子は `AssignmentID` とし、参照の正本は `TaskID / ResourceID` とする
+- `AssignmentID / TaskID / ResourceID` を必須列とする
+- `AssignmentID` は CSV 内で一意でなければならない
+- `TaskID` は `tasks.csv` の既存 `ID` を指さなければならない
+- `ResourceID` は `resources.csv` の既存 `ResourceID` を指さなければならない
+- `TaskID / ResourceID` の組が重複する assignment を許すかは未確定だが、第1段では重複非推奨とする
+- `Start / Finish` は任意列とし、assignment 固有の期間がある場合のみ保持する
+- `Units / PercentWorkComplete` は数値列とする
+- `Work` は `PT...` 形式の duration 文字列を前提にする
+
+`assignments.csv` の第1段 scope:
+
+- 含める: task-resource 参照、多重割当、assignment 単体の期間と work/units/進捗
+- 含めない: `Baseline`, `TimephasedData`, `ExtendedAttributes`, assignment ごとの cost 詳細
+- 第1段では `Milestone / Delay / WorkContour / OvertimeWork` などは未保持でもよい
+
+現時点の判断メモ:
+
+- 当面は `single CSV` を主系統として維持する
+- 理由は、いまの利用目的が「軽量な交換・編集」であり、1 枚の表で task 階層を扱える利点がまだ大きいからである
+- `tasks.csv / resources.csv / assignments.csv` は有力な次段候補だが、現時点では仕様草案までに留める
+- `single CSV` から複数 CSV へ切り替える判断条件は、少なくとも次のいずれかを満たしたときとする
+  - 同名 resource を安全に往復したい要求が具体化した
+  - 1 task に複数 resource を持つ assignment を lossless に扱いたい要求が増えた
+  - assignment 単体属性を `single CSV` の task 行へ押し込むのが不自然になった
+  - `ResourceID` 正本での連携が必要になった
+- 逆に、task 中心の軽量編集が主目的である間は `single CSV` の方が実用的とみなす
+
+現時点の実装メモ:
+
+- `ProjectModel -> CSV + ParentID` の出力を持つ
+- 現在の出力列は `ID / ParentID / WBS / Name / Start / Finish / PredecessorID / Resource / PercentComplete / PercentWorkComplete / Milestone / Summary / Critical / Type / Priority / Work / CalendarUID / ConstraintType / ConstraintDate / Deadline / Notes`
+- `PredecessorID` は複数値を `|` 区切りで補助出力する
+- `Resource` は assignment から task 単位で集約した resource 名を補助出力する
+- `CSV + ParentID -> ProjectModel` の最小逆変換を持つ
+- 最小逆変換では `ID / ParentID / Name` を必須とし、`WBS / Start / Finish / PredecessorID / Resource / PercentComplete / PercentWorkComplete / Milestone / Summary / Critical / Type / Priority / Work / CalendarUID / ConstraintType / ConstraintDate / Deadline / Notes` を可能な範囲で復元する
+- 最小逆変換では `PredecessorID / Resource` の複数値区切りとして `|` に加えて `,` `;` `、` を受け付け、trim と重複除去を行う
+- 最小逆変換では `ID` 重複、空 `Name`、自己参照 `ParentID`、欠落 `ParentID`、循環 `ParentID` を import error として扱う
+- UI には `CSV を生成` と `CSV を解析` の両導線を追加済み
+- 現時点では `Project` 詳細、`Calendars`、`Baseline`、`TimephasedData`、assignment 詳細は CSV から完全復元しない
 
 ## 次に決めること
 

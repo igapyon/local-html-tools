@@ -35,7 +35,8 @@
     }
 
     .md-shell {
-      max-width: 980px; margin: 0 auto;
+      width: min(1600px, 100%);
+      margin: 0 auto;
     }
 
     .md-card {
@@ -46,7 +47,10 @@
     }
 
     .md-surface-card {
-      max-width: 48rem; margin: 0 auto; padding: 24px; position: relative;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      position: relative;
     }
 
     .md-headline {

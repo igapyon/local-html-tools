@@ -3,8 +3,10 @@
     __mikuprojectXml?: {
       SAMPLE_XML: string;
       importMsProjectXml: (xmlText: string) => ProjectModel;
+      importCsvParentId: (csvText: string) => ProjectModel;
       exportMsProjectXml: (model: ProjectModel) => string;
       exportMermaidGantt: (model: ProjectModel) => string;
+      exportCsvParentId: (model: ProjectModel) => string;
       normalizeProjectModel: (model: ProjectModel) => ProjectModel;
       validateProjectModel: (model: ProjectModel) => ValidationIssue[];
     };
@@ -14,7 +16,16 @@
     throw new Error("mikuproject XML module is not loaded");
   }
 
+  const mermaidApi = (globalThis as typeof globalThis & {
+    mermaid?: {
+      initialize: (config: Record<string, unknown>) => void;
+      render: (id: string, source: string) => Promise<{ svg: string }>;
+    };
+  }).mermaid;
+
   let currentModel: ProjectModel | null = null;
+  let currentMermaidSvg = "";
+  let mermaidRenderCount = 0;
 
   function getElement<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);
@@ -32,6 +43,89 @@
     const toast = document.getElementById("toast") as (HTMLElement & { show?: (text: string, duration?: number) => void }) | null;
     if (toast && typeof toast.show === "function") {
       toast.show(message, 2200);
+    }
+  }
+
+  function setMermaidError(message: string): void {
+    const errorNode = getElement<HTMLElement>("mermaidSvgError");
+    errorNode.textContent = message;
+    errorNode.classList.remove("md-hidden");
+  }
+
+  function clearMermaidError(): void {
+    const errorNode = getElement<HTMLElement>("mermaidSvgError");
+    errorNode.textContent = "";
+    errorNode.classList.add("md-hidden");
+  }
+
+  function setMermaidPreviewMarkup(markup: string): void {
+    getElement<HTMLElement>("mermaidSvgPreview").innerHTML = markup;
+  }
+
+  function updateMermaidSvgButton(): void {
+    getElement<HTMLButtonElement>("downloadMermaidSvgBtn").disabled = !currentMermaidSvg;
+  }
+
+  function normalizeSvgForXml(svgText: string): string {
+    if (!svgText) {
+      return "";
+    }
+
+    const candidate = svgText
+      .replace(/<br\s*>/gi, "<br/>")
+      .replace(/<br([^/>]*)><\/br>/gi, "<br$1/>");
+
+    try {
+      const parsed = new DOMParser().parseFromString(candidate, "image/svg+xml");
+      if (parsed.querySelector("parsererror")) {
+        return candidate;
+      }
+      return new XMLSerializer().serializeToString(parsed.documentElement);
+    } catch (_error) {
+      return candidate;
+    }
+  }
+
+  function downloadBlob(blob: Blob, filename: string): void {
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  }
+
+  async function renderMermaidPreview(source: string): Promise<void> {
+    if (!mermaidApi) {
+      currentMermaidSvg = "";
+      updateMermaidSvgButton();
+      setMermaidPreviewMarkup(`<div class="md-preview-empty">Mermaid ライブラリを読み込めなかったため、プレビューできません。</div>`);
+      setMermaidError("Mermaid ライブラリが利用できません。");
+      return;
+    }
+
+    clearMermaidError();
+    const renderId = `mikuprojectMermaidRender${++mermaidRenderCount}`;
+    mermaidApi.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "default"
+    });
+
+    try {
+      const result = await mermaidApi.render(renderId, source);
+      currentMermaidSvg = normalizeSvgForXml(result.svg);
+      setMermaidPreviewMarkup(currentMermaidSvg);
+      updateMermaidSvgButton();
+    } catch (error) {
+      currentMermaidSvg = "";
+      updateMermaidSvgButton();
+      setMermaidPreviewMarkup(`<div class="md-preview-empty">Mermaid のプレビューを表示できませんでした。</div>`);
+      const message = error instanceof Error ? error.message : String(error);
+      setMermaidError(`SVG プレビュー生成に失敗しました: ${message}`);
+      throw error;
     }
   }
 
@@ -277,8 +371,12 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     }
     const xmlText = await file.text();
     getTextArea("xmlInput").value = xmlText;
-    setStatus("XML ファイルを読み込みました");
-    showToast("XML を読み込みました");
+    currentModel = mikuprojectXml.importMsProjectXml(xmlText);
+    const issues = mikuprojectXml.validateProjectModel(currentModel);
+    updateSummary(currentModel);
+    renderValidationIssues(issues);
+    setStatus(issues.length > 0 ? `XML ファイルを読み込んで解析しました。検証で ${issues.length} 件の問題があります` : "XML ファイルを読み込んで解析しました");
+    showToast("XML を読み込んで解析しました");
   }
 
   function parseCurrentXml(): void {
@@ -306,14 +404,40 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     showToast("XML を再生成しました");
   }
 
-  function exportCurrentMermaid(): void {
+  async function exportCurrentMermaid(): Promise<void> {
     if (!currentModel) {
       setStatus("内部モデルがありません");
       return;
     }
-    getTextArea("mermaidOutput").value = mikuprojectXml.exportMermaidGantt(currentModel);
-    setStatus("内部モデルから Mermaid gantt を生成しました");
+    const mermaidText = mikuprojectXml.exportMermaidGantt(currentModel);
+    getTextArea("mermaidOutput").value = mermaidText;
+    await renderMermaidPreview(mermaidText);
+    setStatus("内部モデルから Mermaid gantt を生成し、SVG プレビューを更新しました");
     showToast("Mermaid を生成しました");
+  }
+
+  function exportCurrentCsv(): void {
+    if (!currentModel) {
+      setStatus("内部モデルがありません");
+      return;
+    }
+    getTextArea("csvOutput").value = mikuprojectXml.exportCsvParentId(currentModel);
+    setStatus("内部モデルから CSV + ParentID を生成しました");
+    showToast("CSV を生成しました");
+  }
+
+  function parseCurrentCsv(): void {
+    const csvText = getTextArea("csvInput").value.trim();
+    if (!csvText) {
+      setStatus("CSV が空です");
+      return;
+    }
+    currentModel = mikuprojectXml.importCsvParentId(csvText);
+    const issues = mikuprojectXml.validateProjectModel(currentModel);
+    updateSummary(currentModel);
+    renderValidationIssues(issues);
+    setStatus(issues.length > 0 ? `CSV を解析しました。検証で ${issues.length} 件の問題があります` : "CSV + ParentID を内部モデルへ変換しました");
+    showToast("CSV を解析しました");
   }
 
   function downloadCurrentXml(): void {
@@ -341,6 +465,16 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
     setStatus("XML ファイルをエクスポートしました");
     showToast("XML を保存しました");
+  }
+
+  function downloadCurrentMermaidSvg(): void {
+    if (!currentMermaidSvg) {
+      setStatus("出力する SVG がありません");
+      return;
+    }
+    downloadBlob(new Blob([currentMermaidSvg], { type: "image/svg+xml;charset=utf-8" }), "mikuproject-mermaid.svg");
+    setStatus("Mermaid SVG を保存しました");
+    showToast("SVG を保存しました");
   }
 
   function runRoundTripCheck(): void {
@@ -386,10 +520,29 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
       }
     });
     getElement<HTMLButtonElement>("exportMermaidBtn").addEventListener("click", () => {
-      try {
-        exportCurrentMermaid();
-      } catch (error) {
+      void exportCurrentMermaid().catch((error) => {
         setStatus(error instanceof Error ? error.message : "Mermaid 生成に失敗しました");
+      });
+    });
+    getElement<HTMLButtonElement>("downloadMermaidSvgBtn").addEventListener("click", () => {
+      try {
+        downloadCurrentMermaidSvg();
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : "SVG 保存に失敗しました");
+      }
+    });
+    getElement<HTMLButtonElement>("exportCsvBtn").addEventListener("click", () => {
+      try {
+        exportCurrentCsv();
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : "CSV 生成に失敗しました");
+      }
+    });
+    getElement<HTMLButtonElement>("parseCsvBtn").addEventListener("click", () => {
+      try {
+        parseCurrentCsv();
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : "CSV 解析に失敗しました");
       }
     });
     getElement<HTMLButtonElement>("downloadXmlBtn").addEventListener("click", () => {
@@ -425,6 +578,8 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     bindEvents();
     updateSummary(null);
     renderValidationIssues([]);
+    updateMermaidSvgButton();
+    clearMermaidError();
     loadSample();
   }
 

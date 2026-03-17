@@ -41,6 +41,9 @@ function mountDom() {
     <button id="parseXmlBtn" type="button">XML を解析</button>
     <button id="exportXmlBtn" type="button">XML を再生成</button>
     <button id="exportMermaidBtn" type="button">Mermaid を生成</button>
+    <button id="downloadMermaidSvgBtn" type="button" disabled>SVG保存</button>
+    <button id="exportCsvBtn" type="button">CSV を生成</button>
+    <button id="parseCsvBtn" type="button">CSV を解析</button>
     <button id="downloadXmlBtn" type="button">XML Export</button>
     <button id="roundTripBtn" type="button">再読込テスト</button>
     <input id="importXmlInput" type="file" />
@@ -54,6 +57,10 @@ function mountDom() {
     <div id="summaryCalendarCount"></div>
     <textarea id="modelOutput"></textarea>
     <textarea id="mermaidOutput"></textarea>
+    <div id="mermaidSvgError" class="md-hidden"></div>
+    <div id="mermaidSvgPreview"></div>
+    <textarea id="csvOutput"></textarea>
+    <textarea id="csvInput"></textarea>
     <div id="projectPreview"></div>
     <div id="taskPreview"></div>
     <div id="resourcePreview"></div>
@@ -67,6 +74,12 @@ function mountDom() {
 
 function bootPage() {
   mountDom();
+  globalThis.mermaid = {
+    initialize: vi.fn(),
+    render: vi.fn(async (_id, source) => ({
+      svg: `<svg data-source="${String(source).includes("gantt") ? "gantt" : "other"}"></svg>`
+    }))
+  };
   new Function(`${typesCode}\n${msProjectXmlCode}\n${mainCode}`)();
   document.dispatchEvent(new Event("DOMContentLoaded"));
 }
@@ -76,9 +89,15 @@ function bootXmlModule() {
   return globalThis.__mikuprojectXml;
 }
 
+async function flushAsyncWork() {
+  await Promise.resolve();
+  await Promise.resolve();
+}
+
 describe("mikuproject main", () => {
   beforeEach(() => {
     document.body.innerHTML = "";
+    delete globalThis.mermaid;
     Object.defineProperty(URL, "createObjectURL", {
       value: vi.fn(() => "blob:mock"),
       configurable: true
@@ -410,11 +429,12 @@ describe("mikuproject main", () => {
     expect(xmlText).toContain("<Unit>2</Unit>");
   });
 
-  it("exports mermaid gantt from the current model", () => {
+  it("exports mermaid gantt from the current model", async () => {
     bootPage();
 
     document.getElementById("parseXmlBtn").click();
     document.getElementById("exportMermaidBtn").click();
+    await flushAsyncWork();
 
     const mermaidText = document.getElementById("mermaidOutput").value;
     expect(mermaidText).toContain("gantt");
@@ -422,9 +442,132 @@ describe("mikuproject main", () => {
     expect(mermaidText).toContain("dateFormat YYYY-MM-DDTHH:mm:ss");
     expect(mermaidText).toContain("section Project Summary");
     expect(mermaidText).toContain("Design :done, task_2, 2026-03-16T09:00:00, 2026-03-17T18:00:00");
-    expect(mermaidText).toContain("Implementation :crit, task_3, 2026-03-18T09:00:00, 2026-03-20T18:00:00");
-    expect(mermaidText).toContain("%% dependency: task_3 after task_2");
-    expect(document.getElementById("statusMessage").textContent).toContain("Mermaid gantt を生成しました");
+    expect(mermaidText).toContain("Implementation :crit, task_3, after task_2, 24h");
+    expect(mermaidText).toContain("%% dependency(native): Implementation after Design (task_3 after task_2)");
+    expect(document.getElementById("mermaidSvgPreview").innerHTML).toContain("<svg");
+    expect(document.getElementById("downloadMermaidSvgBtn").disabled).toBe(false);
+    expect(document.getElementById("statusMessage").textContent).toContain("SVG プレビューを更新しました");
+  });
+
+  it("keeps complex mermaid dependencies as comments", () => {
+    const xmlTools = bootXmlModule();
+    const model = {
+      project: {
+        name: "Mermaid Complex",
+        startDate: "2026-03-16T09:00:00",
+        finishDate: "2026-03-20T18:00:00",
+        scheduleFromStart: true,
+        outlineCodes: [],
+        wbsMasks: [],
+        extendedAttributes: []
+      },
+      tasks: [
+        {
+          uid: "1",
+          id: "1",
+          name: "Prep",
+          outlineLevel: 1,
+          outlineNumber: "1",
+          start: "2026-03-16T09:00:00",
+          finish: "2026-03-16T18:00:00",
+          duration: "PT8H0M0S",
+          milestone: false,
+          summary: false,
+          percentComplete: 100,
+          predecessors: [],
+          extendedAttributes: [],
+          baselines: [],
+          timephasedData: []
+        },
+        {
+          uid: "2",
+          id: "2",
+          name: "Review",
+          outlineLevel: 1,
+          outlineNumber: "2",
+          start: "2026-03-17T09:00:00",
+          finish: "2026-03-17T18:00:00",
+          duration: "PT8H0M0S",
+          milestone: false,
+          summary: false,
+          percentComplete: 0,
+          predecessors: [],
+          extendedAttributes: [],
+          baselines: [],
+          timephasedData: []
+        },
+        {
+          uid: "3",
+          id: "3",
+          name: "Ship",
+          outlineLevel: 1,
+          outlineNumber: "3",
+          start: "2026-03-18T09:00:00",
+          finish: "2026-03-18T18:00:00",
+          duration: "PT8H0M0S",
+          milestone: false,
+          summary: false,
+          percentComplete: 0,
+          predecessors: [
+            { predecessorUid: "1", type: 1, linkLag: "PT2H0M0S" },
+            { predecessorUid: "2", type: 4 }
+          ],
+          extendedAttributes: [],
+          baselines: [],
+          timephasedData: []
+        }
+      ],
+      resources: [],
+      assignments: [],
+      calendars: []
+    };
+
+    const mermaidText = xmlTools.exportMermaidGantt(model);
+
+    expect(mermaidText).toContain("Ship :task_3, 2026-03-18T09:00:00, 2026-03-18T18:00:00");
+    expect(mermaidText).toContain("%% dependency: Ship after Prep (type=FS, lag=2h) [task_3 after task_1]");
+    expect(mermaidText).toContain("%% dependency(pseudo): Ship ~= after Prep + 2h");
+    expect(mermaidText).toContain("%% dependency: Ship after Review (type=SS) [task_3 after task_2]");
+    expect(mermaidText).toContain("%% dependency(note): Ship has multiple predecessors");
+  });
+
+  it("exports csv with parent id from the current model", () => {
+    bootPage();
+
+    document.getElementById("parseXmlBtn").click();
+    document.getElementById("exportCsvBtn").click();
+
+    const csvText = document.getElementById("csvOutput").value;
+    expect(csvText).toContain("ID,ParentID,WBS,Name,Start,Finish,PredecessorID,Resource,PercentComplete,PercentWorkComplete,Milestone,Summary,Critical,Type,Priority,Work,CalendarUID,ConstraintType,ConstraintDate,Deadline,Notes");
+    expect(csvText).toContain("1,,1,Project Summary,2026-03-16T09:00:00,2026-03-20T18:00:00,,,50,50,0,1,0,1,500,PT40H0M0S,1,,,,");
+    expect(csvText).toContain("2,1,1.1,Design,2026-03-16T09:00:00,2026-03-17T18:00:00,,Miku,100,100,0,0,0,1,500,PT16H0M0S,1,,,,Design completed");
+    expect(csvText).toContain("3,1,1.2,Implementation,2026-03-18T09:00:00,2026-03-20T18:00:00,2,Miku,0,0,0,0,1,1,700,PT24H0M0S,1,4,2026-03-18T09:00:00,2026-03-21T18:00:00,Implementation starts after design");
+    expect(document.getElementById("statusMessage").textContent).toContain("CSV + ParentID を生成しました");
+  });
+
+  it("parses csv with parent id into internal model summary", () => {
+    bootPage();
+
+    document.getElementById("csvInput").value = [
+      "ID,ParentID,WBS,Name,Start,Finish,PredecessorID,Resource,PercentComplete",
+      "1,,1,Project Summary,2026-03-16T09:00:00,2026-03-20T18:00:00,,,50",
+      "2,1,1.1,Design,2026-03-16T09:00:00,2026-03-17T18:00:00,,Miku,100",
+      "3,1,1.2,Implementation,2026-03-18T09:00:00,2026-03-20T18:00:00,2,Miku,0"
+    ].join("\n");
+
+    document.getElementById("parseCsvBtn").click();
+
+    expect(document.getElementById("summaryProjectName").textContent).toBe("CSV Imported Project");
+    expect(document.getElementById("summaryTaskCount").textContent).toBe("3");
+    expect(document.getElementById("summaryResourceCount").textContent).toBe("1");
+    expect(document.getElementById("summaryAssignmentCount").textContent).toBe("2");
+    expect(document.getElementById("modelOutput").value).toContain("\"name\": \"CSV Imported Project\"");
+    expect(document.getElementById("taskPreview").textContent).toContain("Implementation");
+    expect(document.getElementById("taskPreview").textContent).toContain("Predecessors=2");
+    expect(document.getElementById("resourcePreview").textContent).toContain("Miku");
+    expect(document.getElementById("assignmentPreview").textContent).toContain("Task=2 (Design)");
+    expect(document.getElementById("assignmentPreview").textContent).toContain("Resource=1 (Miku)");
+    expect(document.getElementById("statusMessage").textContent).toContain("CSV + ParentID を内部モデルへ変換しました");
   });
 
   it("passes round-trip check", () => {
@@ -456,7 +599,9 @@ describe("mikuproject main", () => {
     await Promise.resolve();
 
     expect(document.getElementById("xmlInput").value).toContain("<Name>Imported</Name>");
-    expect(document.getElementById("statusMessage").textContent).toContain("XML ファイルを読み込みました");
+    expect(document.getElementById("summaryProjectName").textContent).toBe("Imported");
+    expect(document.getElementById("modelOutput").value).toContain("\"name\": \"Imported\"");
+    expect(document.getElementById("statusMessage").textContent).toContain("XML ファイルを読み込んで解析しました");
   });
 
   it("downloads current xml", () => {
@@ -469,6 +614,21 @@ describe("mikuproject main", () => {
     const clickedAnchor = HTMLAnchorElement.prototype.click.mock.instances.at(-1);
     expect(clickedAnchor.download).toBe("mikuproject-export-202603162312.xml");
     expect(document.getElementById("statusMessage").textContent).toContain("XML ファイルをエクスポートしました");
+  });
+
+  it("downloads rendered mermaid svg", async () => {
+    bootPage();
+
+    document.getElementById("parseXmlBtn").click();
+    document.getElementById("exportMermaidBtn").click();
+    await flushAsyncWork();
+    document.getElementById("downloadMermaidSvgBtn").click();
+
+    expect(URL.createObjectURL).toHaveBeenCalled();
+    expect(HTMLAnchorElement.prototype.click).toHaveBeenCalled();
+    const clickedAnchor = HTMLAnchorElement.prototype.click.mock.instances.at(-1);
+    expect(clickedAnchor.download).toBe("mikuproject-mermaid.svg");
+    expect(document.getElementById("statusMessage").textContent).toContain("Mermaid SVG を保存しました");
   });
 
   it("reports validation error when assignment references a missing resource", () => {
@@ -1173,6 +1333,102 @@ describe("mikuproject main", () => {
     expect(reparsedModel.assignments).toHaveLength(1);
     expect(reparsedModel.assignments[0].taskUid).toBe("2");
     expect(xmlTools.validateProjectModel(reparsedModel)).toHaveLength(0);
+  });
+
+  it("imports csv with parent id into a minimal project model", () => {
+    const xmlTools = bootXmlModule();
+    const csv = `ID,ParentID,WBS,Name,Start,Finish,PredecessorID,Resource,PercentComplete
+1,,1,Project Summary,2026-03-16T09:00:00,2026-03-20T18:00:00,,,50
+2,1,1.1,Design,2026-03-16T09:00:00,2026-03-17T18:00:00,,Miku,100
+3,1,1.2,Implementation,2026-03-18T09:00:00,2026-03-20T18:00:00,2,Miku|Rin,0
+4,3,1.2.1,Coding,2026-03-18T09:00:00,2026-03-19T18:00:00,2,Rin,20
+`;
+
+    const model = xmlTools.importCsvParentId(csv);
+
+    expect(model.project.name).toBe("CSV Imported Project");
+    expect(model.tasks).toHaveLength(4);
+    expect(model.tasks[0].summary).toBe(true);
+    expect(model.tasks[1].outlineNumber).toBe("1.1");
+    expect(model.tasks[2].predecessors[0].predecessorUid).toBe("2");
+    expect(model.tasks[3].outlineLevel).toBe(3);
+    expect(model.resources.map((item) => item.name)).toEqual(["Miku", "Rin"]);
+    expect(model.assignments).toHaveLength(4);
+    expect(model.assignments[1].resourceUid).toBe("1");
+    expect(model.assignments[2].resourceUid).toBe("2");
+  });
+
+  it("imports extended task fields in csv with parent id", () => {
+    const xmlTools = bootXmlModule();
+    const csv = `ID,ParentID,WBS,Name,Start,Finish,PredecessorID,Resource,PercentComplete,PercentWorkComplete,Milestone,Summary,Critical,Type,Priority,Work,CalendarUID,ConstraintType,ConstraintDate,Deadline,Notes
+1,,1,Project Summary,2026-03-16T09:00:00,2026-03-20T18:00:00,,,,,1,1,0,1,500,PT40H0M0S,1,,,,Root note
+2,1,1.1,Design,2026-03-16T09:00:00,2026-03-17T18:00:00,,Miku,100,100,0,0,0,1,600,PT16H0M0S,1,,,,Design done
+3,1,1.2,Release,2026-03-20T18:00:00,2026-03-20T18:00:00,2,Miku,100,100,1,0,1,1,700,PT0H0M0S,2,4,2026-03-20T09:00:00,2026-03-21T18:00:00,Release gate
+`;
+
+    const model = xmlTools.importCsvParentId(csv);
+
+    expect(model.tasks[0].summary).toBe(true);
+    expect(model.tasks[0].notes).toBe("Root note");
+    expect(model.tasks[1].percentWorkComplete).toBe(100);
+    expect(model.tasks[1].critical).toBe(false);
+    expect(model.tasks[1].priority).toBe(600);
+    expect(model.tasks[1].work).toBe("PT16H0M0S");
+    expect(model.tasks[2].milestone).toBe(true);
+    expect(model.tasks[2].critical).toBe(true);
+    expect(model.tasks[2].type).toBe(1);
+    expect(model.tasks[2].calendarUID).toBe("2");
+    expect(model.tasks[2].constraintType).toBe(4);
+    expect(model.tasks[2].constraintDate).toBe("2026-03-20T09:00:00");
+    expect(model.tasks[2].deadline).toBe("2026-03-21T18:00:00");
+    expect(model.tasks[2].work).toBe("PT0H0M0S");
+    expect(model.tasks[2].notes).toBe("Release gate");
+  });
+
+  it("normalizes predecessor and resource separators in csv import", () => {
+    const xmlTools = bootXmlModule();
+    const csv = `ID,ParentID,WBS,Name,Start,Finish,PredecessorID,Resource,PercentComplete
+1,,1,Project Summary,2026-03-16T09:00:00,2026-03-20T18:00:00,,,50
+2,1,1.1,Design,2026-03-16T09:00:00,2026-03-17T18:00:00,,Miku,100
+3,1,1.2,Implementation,2026-03-18T09:00:00,2026-03-20T18:00:00,"2, 4; 2","Miku; Rin、Luka| Rin",0
+4,1,1.3,Review,2026-03-20T09:00:00,2026-03-20T18:00:00,,Luka,0
+`;
+
+    const model = xmlTools.importCsvParentId(csv);
+
+    expect(model.tasks[2].predecessors.map((item) => item.predecessorUid)).toEqual(["2", "4"]);
+    expect(model.resources.map((item) => item.name)).toEqual(["Miku", "Rin", "Luka"]);
+    expect(model.assignments.filter((item) => item.taskUid === "3")).toHaveLength(3);
+  });
+
+  it("rejects duplicate id in csv import", () => {
+    const xmlTools = bootXmlModule();
+    const csv = `ID,ParentID,Name
+1,,Root
+1,,Duplicate
+`;
+
+    expect(() => xmlTools.importCsvParentId(csv)).toThrow("CSV の ID が重複しています");
+  });
+
+  it("rejects missing parent id in csv import", () => {
+    const xmlTools = bootXmlModule();
+    const csv = `ID,ParentID,Name
+1,,Root
+2,99,Child
+`;
+
+    expect(() => xmlTools.importCsvParentId(csv)).toThrow("CSV の ParentID が既存 ID を指していません");
+  });
+
+  it("rejects cyclic parent id in csv import", () => {
+    const xmlTools = bootXmlModule();
+    const csv = `ID,ParentID,Name
+1,2,Root
+2,1,Child
+`;
+
+    expect(() => xmlTools.importCsvParentId(csv)).toThrow("CSV の ParentID が循環しています");
   });
 
   it("allows placeholder UID=0 and unassigned ResourceUID=-65535", () => {
