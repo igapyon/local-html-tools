@@ -420,6 +420,218 @@ describe("xlsx2md formula parser", () => {
     expect(xlookupValue).toBe(20);
   });
 
+  it("evaluates XLOOKUP match_mode and search_mode via AST", () => {
+    const api = bootFormulaParser();
+    const nextSmaller = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP(25,A1:A3,B1:B3,"NF",-1)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A3") {
+          return [[10], [20], [30]];
+        }
+        if (startRef === "B1" && endRef === "B3") {
+          return [["A"], ["B"], ["C"]];
+        }
+        return [];
+      }
+    });
+    const nextLarger = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP(25,A1:A3,B1:B3,"NF",1)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A3") {
+          return [[10], [20], [30]];
+        }
+        if (startRef === "B1" && endRef === "B3") {
+          return [["A"], ["B"], ["C"]];
+        }
+        return [];
+      }
+    });
+    const reverseSearch = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP("K2",A1:A4,B1:B4,"NF",0,-1)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A4") {
+          return [["K1"], ["K2"], ["K2"], ["K3"]];
+        }
+        if (startRef === "B1" && endRef === "B4") {
+          return [[10], [20], [200], [30]];
+        }
+        return [];
+      }
+    });
+
+    expect(nextSmaller).toBe("B");
+    expect(nextLarger).toBe("C");
+    expect(reverseSearch).toBe(200);
+  });
+
+  it("evaluates XLOOKUP wildcard match_mode via AST", () => {
+    const api = bootFormulaParser();
+    const wildcardValue = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP("K*",A1:A3,B1:B3,"NF",2)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A3") {
+          return [["K10"], ["AX"], ["K20"]];
+        }
+        if (startRef === "B1" && endRef === "B3") {
+          return [["A"], ["B"], ["C"]];
+        }
+        return [];
+      }
+    });
+    const escapedWildcardValue = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP("K~*",A1:A2,B1:B2,"NF",2)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A2") {
+          return [["K*"], ["K20"]];
+        }
+        if (startRef === "B1" && endRef === "B2") {
+          return [["literal"], ["other"]];
+        }
+        return [];
+      }
+    });
+
+    expect(wildcardValue).toBe("A");
+    expect(escapedWildcardValue).toBe("literal");
+  });
+
+  it("evaluates XLOOKUP binary search modes via AST", () => {
+    const api = bootFormulaParser();
+    const binaryExact = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP(20,A1:A3,B1:B3,"NF",0,2)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A3") {
+          return [[10], [20], [30]];
+        }
+        if (startRef === "B1" && endRef === "B3") {
+          return [["A"], ["B"], ["C"]];
+        }
+        return [];
+      }
+    });
+    const binaryNextSmaller = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP(25,A1:A3,B1:B3,"NF",-1,2)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A3") {
+          return [[10], [20], [30]];
+        }
+        if (startRef === "B1" && endRef === "B3") {
+          return [["A"], ["B"], ["C"]];
+        }
+        return [];
+      }
+    });
+    const binaryDescendingNextLarger = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP(25,A1:A3,B1:B3,"NF",1,-2)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A3") {
+          return [[30], [20], [10]];
+        }
+        if (startRef === "B1" && endRef === "B3") {
+          return [["C"], ["B"], ["A"]];
+        }
+        return [];
+      }
+    });
+
+    expect(binaryExact).toBe("B");
+    expect(binaryNextSmaller).toBe("B");
+    expect(binaryDescendingNextLarger).toBe("C");
+  });
+
+  it("handles XLOOKUP binary search edge cases via AST", () => {
+    const api = bootFormulaParser();
+    const ascendingTooSmall = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP(5,A1:A3,B1:B3,"NF",-1,2)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A3") {
+          return [[10], [20], [30]];
+        }
+        if (startRef === "B1" && endRef === "B3") {
+          return [["A"], ["B"], ["C"]];
+        }
+        return [];
+      }
+    });
+    const descendingTooLarge = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP(35,A1:A3,B1:B3,"NF",1,-2)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A3") {
+          return [[30], [20], [10]];
+        }
+        if (startRef === "B1" && endRef === "B3") {
+          return [["C"], ["B"], ["A"]];
+        }
+        return [];
+      }
+    });
+    const descendingNextSmaller = api.evaluateFormulaAst(api.parseFormula('=XLOOKUP(25,A1:A3,B1:B3,"NF",-1,-2)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "A3") {
+          return [[30], [20], [10]];
+        }
+        if (startRef === "B1" && endRef === "B3") {
+          return [["C"], ["B"], ["A"]];
+        }
+        return [];
+      }
+    });
+
+    expect(ascendingTooSmall).toBe("NF");
+    expect(descendingTooLarge).toBe("NF");
+    expect(descendingNextSmaller).toBe("B");
+  });
+
+  it("evaluates approximate VLOOKUP and HLOOKUP via AST", () => {
+    const api = bootFormulaParser();
+    const vlookupApproxValue = api.evaluateFormulaAst(api.parseFormula("=VLOOKUP(25,A1:B3,2,TRUE)"), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "B3") {
+          return [
+            [10, "A"],
+            [20, "B"],
+            [30, "C"]
+          ];
+        }
+        return [];
+      }
+    });
+    const hlookupApproxValue = api.evaluateFormulaAst(api.parseFormula('=HLOOKUP("K25",A1:C2,2)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "C2") {
+          return [
+            ["K10", "K20", "K30"],
+            ["A", "B", "C"]
+          ];
+        }
+        return [];
+      }
+    });
+
+    expect(vlookupApproxValue).toBe("B");
+    expect(hlookupApproxValue).toBe("B");
+  });
+
+  it("handles approximate VLOOKUP and HLOOKUP edge cases via AST", () => {
+    const api = bootFormulaParser();
+    const vlookupTooSmall = api.evaluateFormulaAst(api.parseFormula("=VLOOKUP(5,A1:B3,2,TRUE)"), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "B3") {
+          return [
+            [10, "A"],
+            [20, "B"],
+            [30, "C"]
+          ];
+        }
+        return [];
+      }
+    });
+    const hlookupExactDefault = api.evaluateFormulaAst(api.parseFormula('=HLOOKUP("K20",A1:C2,2)'), {
+      resolveRange(startRef, endRef) {
+        if (startRef === "A1" && endRef === "C2") {
+          return [
+            ["K10", "K20", "K30"],
+            ["A", "B", "C"]
+          ];
+        }
+        return [];
+      }
+    });
+
+    expect(vlookupTooSmall).toBe("#N/A");
+    expect(hlookupExactDefault).toBe("B");
+  });
+
   it("evaluates EOMONTH via AST", () => {
     const api = bootFormulaParser();
     const eoMonthValue = api.evaluateFormulaAst(api.parseFormula("=EOMONTH(DATE(2024,3,17),1)"));

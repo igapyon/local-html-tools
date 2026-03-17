@@ -236,11 +236,31 @@
     - 判定: `ISBLANK / ISNUMBER / ISTEXT / ISERROR / ISNA / NA`
 - [xlsx2md][formula] 次段タスク
   - `scripts/observe-xlsx2md-formulas.mjs` による観測を継続し、AST evaluator 側へ寄せる関数群を整理する
-  - 既存の文字列ベース evaluator と AST evaluator の使い分け方針を決める
+  - 優先順は `cached value -> AST evaluator -> 既存 resolver -> fallback_formula` で固定
+  - 既存の文字列ベース evaluator は互換 fallback として維持しつつ、AST evaluator 側へ段階移行する
+  - 既存 resolver は現時点では安全装置として必要であり、短期的には削除しない
+  - 中長期的には、実データ観測を踏まえて担当範囲を縮小し、後方互換 fallback へ寄せる
   - 次候補:
-    - `ROW / COLUMN` の引数なし形を AST 側でどう扱うか整理
-    - 近似一致付き `VLOOKUP / HLOOKUP` をどうするか整理
+    - `XLOOKUP` の binary search `search_mode=2/-2` の境界条件を必要に応じて詰める
     - 実データ頻出関数を AST evaluator 側へさらに寄せる
+- [xlsx2md][未対応整理] 数式未対応
+  - `space intersection`
+  - 配列定数の完全対応
+  - dynamic array / spill の完全対応
+  - `LAMBDA / LET / MAP / REDUCE / SCAN`
+  - 完全な `R1C1` 文法
+  - Excel の future function 全般
+  - `NOW` など volatile 関数の完全再計算
+- [xlsx2md][未対応整理] レイアウト未対応
+  - `セクション分割ブロック` の導入
+  - `カレンダー / ボード / ダッシュボード系` シートの専用扱い
+  - レイアウト中心シートの完全再現は対象外であり、`セクション / 表 / リスト / 画像` 分解で扱う
+- [xlsx2md][未対応整理] 方針未確定
+  - `XLOOKUP` 近似一致や binary search を未ソート範囲でどう扱うか
+  - `ROW / COLUMN` の文脈なし引数なし形をどう扱うか
+  - 配列定数をどの段階で AST 側へ入れるか
+  - `TODAY / NOW` を cached value 専用に留めるか
+  - `existing resolver` から AST evaluator へ、どこまで段階移行したら縮小判断するか
 - [引継][xlsx2md] `local-data` の実データ差分レビューを開始
   - 重点対象は `docs/xlsx2md/local-data-review.md` を参照
   - 優先順:
@@ -261,7 +281,7 @@
   - `edge/edge-empty-sample01.xlsx`
   - `edge/edge-weird-sheetname-sample01.xlsx`
   - 現在の `docs/xlsx2md/tests/xlsx2md-main.test.js` は `23 tests` 成功
-  - 現在の `docs/xlsx2md/tests/xlsx2md-formula-parser.test.js` は `39 tests` 成功
+  - 現在の `docs/xlsx2md/tests/xlsx2md-formula-parser.test.js` は `45 tests` 成功
   - 最後に反映済みの実装:
   - 数式セルの `cached value` と再解決値にも表示形式を再適用
   - 出力ファイル名サニタイズを強化
