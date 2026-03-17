@@ -631,6 +631,233 @@ describe("xlsx2md core", () => {
     expect(markdownFile.markdown).toContain("| 10 | 10 |");
   });
 
+  it("parses the named-range fixture workbook with concrete defined-name expectations", async () => {
+    const api = bootCore();
+    const fixtureName = "named-range-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "named-range", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const summarySheet = workbook.sheets[0];
+    const otherSheet = workbook.sheets[1];
+    const summaryFile = files[0];
+    const otherFile = files[1];
+
+    expect(workbook.definedNames).toEqual([
+      {
+        name: "BaseName",
+        formulaText: "=Summary!$B$3",
+        localSheetName: "Summary"
+      },
+      {
+        name: "BaseRange",
+        formulaText: "=Summary!$B$4:$B$5",
+        localSheetName: "Summary"
+      },
+      {
+        name: "LocalCross",
+        formulaText: "=Other!$B$2",
+        localSheetName: "Other"
+      }
+    ]);
+
+    expect(workbook.sheets).toHaveLength(2);
+
+    expect(summarySheet.name).toBe("Summary");
+    expect(summarySheet.maxRow).toBe(13);
+    expect(summarySheet.maxCol).toBe(4);
+    expect(summarySheet.cells).toHaveLength(25);
+    expect(summarySheet.cells.find((cell) => cell.address === "A1")?.outputValue).toBe("definedNames サンプル");
+    expect(summarySheet.cells.find((cell) => cell.address === "B3")?.outputValue).toBe("Base");
+    expect(summarySheet.cells.find((cell) => cell.address === "D3")?.formulaText).toBe("=BaseName");
+    expect(summarySheet.cells.find((cell) => cell.address === "D3")?.outputValue).toBe("Base");
+    expect(summarySheet.cells.find((cell) => cell.address === "D3")?.resolutionStatus).toBe("resolved");
+    expect(summarySheet.cells.find((cell) => cell.address === "D4")?.formulaText).toBe("=SUM(BaseRange)");
+    expect(summarySheet.cells.find((cell) => cell.address === "D4")?.outputValue).toBe("30");
+    expect(summarySheet.cells.find((cell) => cell.address === "D4")?.resolutionStatus).toBe("resolved");
+
+    expect(otherSheet.name).toBe("Other");
+    expect(otherSheet.maxRow).toBe(2);
+    expect(otherSheet.maxCol).toBe(4);
+    expect(otherSheet.cells).toHaveLength(3);
+    expect(otherSheet.cells.find((cell) => cell.address === "A1")?.outputValue).toBe("LocalCross元");
+    expect(otherSheet.cells.find((cell) => cell.address === "B2")?.outputValue).toBe("CrossRef");
+    expect(otherSheet.cells.find((cell) => cell.address === "D2")?.formulaText).toBe("=LocalCross");
+    expect(otherSheet.cells.find((cell) => cell.address === "D2")?.outputValue).toBe("CrossRef");
+    expect(otherSheet.cells.find((cell) => cell.address === "D2")?.resolutionStatus).toBe("resolved");
+
+    expect(summaryFile.fileName).toBe("named-range-sample01_001_Summary.md");
+    expect(summaryFile.summary.tables).toBe(1);
+    expect(summaryFile.summary.tableScores.map((detail) => detail.range)).toEqual(["A3-B5"]);
+    expect(summaryFile.summary.formulaDiagnostics).toHaveLength(2);
+    expect(summaryFile.markdown).toContain("# Summary");
+    expect(summaryFile.markdown).toContain("Workbook: named-range-sample01.xlsx");
+    expect(summaryFile.markdown).toContain("| BaseName元 | Base |");
+    expect(summaryFile.markdown).toContain("| BaseRange1 | 10 |");
+    expect(summaryFile.markdown).toContain("| BaseRange2 | 20 |");
+
+    expect(otherFile.fileName).toBe("named-range-sample01_002_Other.md");
+    expect(otherFile.summary.tables).toBe(0);
+    expect(otherFile.summary.tableScores).toHaveLength(0);
+    expect(otherFile.summary.formulaDiagnostics).toHaveLength(1);
+    expect(otherFile.markdown).toContain("# Other");
+    expect(otherFile.markdown).toContain("LocalCross元");
+    expect(otherFile.markdown).toContain("CrossRef");
+  });
+
+  it("parses the narrative fixture workbook with concrete narrative and table expectations", async () => {
+    const api = bootCore();
+    const fixtureName = "narrative-vs-table-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "narrative", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const sheet = workbook.sheets[0];
+    const markdownFile = files[0];
+
+    expect(workbook.sheets).toHaveLength(1);
+    expect(sheet.name).toBe("narrative-vs-table");
+    expect(sheet.maxRow).toBe(13);
+    expect(sheet.maxCol).toBe(6);
+    expect(sheet.cells).toHaveLength(26);
+    expect(sheet.cells.find((cell) => cell.address === "A1")?.outputValue).toBe("地の文と表の判定");
+    expect(sheet.cells.find((cell) => cell.address === "A3")?.outputValue).toBe("この設計書は受注入力画面を説明する。");
+    expect(sheet.cells.find((cell) => cell.address === "A4")?.outputValue).toBe("外部システムとの連携条件を以下に示す。");
+    expect(sheet.cells.find((cell) => cell.address === "A5")?.outputValue).toBe("本文は罫線なしのままにする。");
+    expect(sheet.cells.find((cell) => cell.address === "A7")?.outputValue).toBe("項目一覧");
+    expect(sheet.cells.find((cell) => cell.address === "B8")?.outputValue).toBe("項番");
+    expect(sheet.cells.find((cell) => cell.address === "F8")?.outputValue).toBe("備考");
+    expect(sheet.cells.find((cell) => cell.address === "B10")?.formulaText).toBe("=B9+1");
+    expect(sheet.cells.find((cell) => cell.address === "B10")?.outputValue).toBe("2");
+    expect(sheet.cells.find((cell) => cell.address === "B11")?.formulaText).toBe("=B10+1");
+    expect(sheet.cells.find((cell) => cell.address === "B11")?.outputValue).toBe("3");
+    expect(sheet.cells.find((cell) => cell.address === "E11")?.outputValue).toBe("3月13日");
+    expect(sheet.cells.find((cell) => cell.address === "B13")?.outputValue).toBe("※注記: この表はサンプルです。");
+
+    expect(markdownFile.fileName).toBe("narrative-vs-table-sample01_001_narrative-vs-table.md");
+    expect(markdownFile.summary.tables).toBe(1);
+    expect(markdownFile.summary.merges).toBe(0);
+    expect(markdownFile.summary.images).toBe(0);
+    expect(markdownFile.summary.formulaDiagnostics).toHaveLength(2);
+    expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual(["B8-F11"]);
+    expect(markdownFile.markdown).toContain("# narrative-vs-table");
+    expect(markdownFile.markdown).toContain("Workbook: narrative-vs-table-sample01.xlsx");
+    expect(markdownFile.markdown).toContain("地の文と表の判定");
+    expect(markdownFile.markdown).toContain("この設計書は受注入力画面を説明する。");
+    expect(markdownFile.markdown).toContain("外部システムとの連携条件を以下に示す。");
+    expect(markdownFile.markdown).toContain("本文は罫線なしのままにする。");
+    expect(markdownFile.markdown).toContain("項目一覧");
+    expect(markdownFile.markdown).toContain("### 表001 (B8-F11)");
+    expect(markdownFile.markdown).toContain("| 項番 | 項目名称 | 物理名 | 初期値 | 備考 |");
+    expect(markdownFile.markdown).toContain("| 1 | コード | code | 101 | 何かのコード |");
+    expect(markdownFile.markdown).toContain("| 3 | 登録日 | entrydate | 3月13日 | 何かの登録日 |");
+    expect(markdownFile.markdown).toContain("※注記: この表はサンプルです。");
+  });
+
+  it("parses the edge-empty fixture workbook with concrete sparse-sheet expectations", async () => {
+    const api = bootCore();
+    const fixtureName = "edge-empty-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "edge", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const sheet = workbook.sheets[0];
+    const markdownFile = files[0];
+
+    expect(workbook.sheets).toHaveLength(1);
+    expect(sheet.name).toBe("edge-empty");
+    expect(sheet.maxRow).toBe(7);
+    expect(sheet.maxCol).toBe(3);
+    expect(sheet.cells).toHaveLength(2);
+    expect(sheet.cells.find((cell) => cell.address === "A1")?.outputValue).toBe("空系境界サンプル");
+    expect(sheet.cells.find((cell) => cell.address === "C7")?.outputValue).toBe("only-value");
+
+    expect(markdownFile.fileName).toBe("edge-empty-sample01_001_edge-empty.md");
+    expect(markdownFile.summary.tables).toBe(0);
+    expect(markdownFile.summary.merges).toBe(0);
+    expect(markdownFile.summary.images).toBe(0);
+    expect(markdownFile.summary.tableScores).toHaveLength(0);
+    expect(markdownFile.markdown).toContain("# edge-empty");
+    expect(markdownFile.markdown).toContain("Workbook: edge-empty-sample01.xlsx");
+    expect(markdownFile.markdown).toContain("空系境界サンプル");
+    expect(markdownFile.markdown).toContain("only-value");
+    expect(markdownFile.markdown).not.toContain("### 表");
+  });
+
+  it("parses the edge-weird-sheetname fixture workbook with concrete sheet-name expectations", async () => {
+    const api = bootCore();
+    const fixtureName = "edge-weird-sheetname-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "edge", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const sheet = workbook.sheets[0];
+    const markdownFile = files[0];
+
+    expect(workbook.sheets).toHaveLength(1);
+    expect(sheet.name).toBe("A B-東京&大阪.01");
+    expect(sheet.maxRow).toBe(4);
+    expect(sheet.maxCol).toBe(4);
+    expect(sheet.cells).toHaveLength(16);
+    expect(sheet.cells.find((cell) => cell.address === "A1")?.outputValue).toBe("項番");
+    expect(sheet.cells.find((cell) => cell.address === "B1")?.outputValue).toBe("名称");
+    expect(sheet.cells.find((cell) => cell.address === "C4")?.outputValue).toBe("3月13日");
+    expect(sheet.cells.find((cell) => cell.address === "D4")?.outputValue).toBe("何かの登録日");
+
+    expect(markdownFile.fileName).toBe("edge-weird-sheetname-sample01_001_A B-東京&大阪.01.md");
+    expect(markdownFile.summary.tables).toBe(1);
+    expect(markdownFile.summary.merges).toBe(0);
+    expect(markdownFile.summary.images).toBe(0);
+    expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual(["A1-D4"]);
+    expect(markdownFile.markdown).toContain("# A B-東京&大阪.01");
+    expect(markdownFile.markdown).toContain("Workbook: edge-weird-sheetname-sample01.xlsx");
+    expect(markdownFile.markdown).toContain("Sheet: A B-東京&大阪.01");
+    expect(markdownFile.markdown).toContain("### 表001 (A1-D4)");
+    expect(markdownFile.markdown).toContain("| 項番 | 名称 | 値 | 備考 |");
+    expect(markdownFile.markdown).toContain("| 1 | コード | 101 | 何かのコード |");
+    expect(markdownFile.markdown).toContain("| 3 | 登録日 | 3月13日 | 何かの登録日 |");
+  });
+
   it("expands merged cells with structural tokens", () => {
     const api = bootCore();
     const matrix = [
