@@ -167,6 +167,21 @@ both: 2024/3/17 [raw=45368]
 - 数式診断での `resolved / fallback / unsupported` と `cached / ast / legacy / formula` 表示
 - 空文字の `cached value` を `cached` とみなす扱い
 
+## 図形 SVG 対応の進め方
+
+- DrawingML 図形は、まず `anchor / name / prstGeom / text / extents / rawEntries` を安定して抽出し、Markdown の `## 図形` セクションへ raw metadata を残すことを優先する
+- そのうえで、SVG 化は `prstGeom` ごとに段階的に追加する
+- 新しい図形を対応させるときは、先に fixture を追加して `rawEntries` と Markdown 出力を固定し、その後で `office-drawing.ts` に renderer を足す
+- SVG 化は完全再現を前提にせず、まずは簡略化した形状でよい
+  - 例: `flowChartDecision -> diamond`
+  - 例: `flowChartInputOutput -> parallelogram`
+  - 例: `rightArrow -> polygon`
+- 既存図形との同型は、できるだけ同じ renderer を再利用する
+  - 例: `rect` と `flowChartProcess`
+  - 例: `roundRect` と `flowChartTerminator`
+- connector、単純矩形、単純矢印のような図形から先に対応し、callout や複雑図形は後段で扱う
+- SmartArt や複雑図形は、当面は raw metadata と fallback を優先し、SVG は無理に広げない
+
 ## 現在の構成イメージ
 
 ```text
