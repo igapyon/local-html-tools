@@ -268,6 +268,10 @@
   - `カレンダー / ボード / ダッシュボード系` シートの専用扱い
   - レイアウト中心シートの完全再現は対象外であり、`セクション / 表 / リスト / 画像` 分解で扱う
   - `イベント プランナー` のようなフォーム風罫線領域は、現時点では保守的に扱う。表として残す場合もあるが、横に広く疎で merge が多い領域は narrative / section 側へ寄せてよい。将来 `フォームブロック / 入力パネル` へ改善する可能性あり
+  - DrawingML の図形 (`xdr:sp` / `xdr:cxnSp` など) は、現時点では安全に無視またはメタデータ抽出に留める
+  - `DrawingML -> SVG` は将来候補
+    - 第一候補の参照 OSS は Microsoft 製の Open XML SDK
+    - まずは `rect / line / arrow / text box` のような単純図形のみを対象にできるか検討する
 - [xlsx2md][仕様整理] `セクション分割ブロック` の基本仕様は `xlsx2md-spec.md` へ追記済み。次段は実装導入順の決定
 - [xlsx2md][実装メモ] `core.ts` に no-op の `extractSectionBlocks(...)` を追加済み。将来は `convertSheetToMarkdown(...)` の Markdown 組み立て直前で利用する
 - [xlsx2md][未対応整理] 方針未確定
