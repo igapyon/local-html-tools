@@ -1,5 +1,8 @@
 # xlsx2md
 
+`xlsx2md` は独立し、現在の正本リポジトリは <https://github.com/igapyon/xlsx2md> です。
+この `docs/xlsx2md/` 配下は、`local-html-tools` 内で管理していた時期の資料・実装控えとして残しています。
+
 `xlsx2md` は、Excel (`.xlsx`) ファイルをローカルで読み込み、Markdown へ変換するための独立カテゴリです。
 
 現時点では、仕様・実装・自動テストをこの配下で独立して進めています。
