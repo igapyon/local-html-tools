@@ -319,17 +319,11 @@
         getElement("exportZipBtn").disabled = false;
     }
     function getSelectedFileForDownload() {
-        var _a;
         if (!currentFiles.length)
             return null;
-        const outputMode = ((_a = currentFiles[0]) === null || _a === void 0 ? void 0 : _a.summary.outputMode) || "display";
-        const suffix = outputMode === "display" ? "" : `_${outputMode}`;
-        return {
-            fileName: `${((currentWorkbook === null || currentWorkbook === void 0 ? void 0 : currentWorkbook.name) || "workbook").replace(/\.xlsx$/i, "")}_all${suffix}.md`,
-            content: currentFiles
-                .map((file) => `<!-- ${createMarkdownChunkLabel(file.fileName)} -->\n${file.markdown}`)
-                .join("\n\n")
-        };
+        if (!currentWorkbook)
+            return null;
+        return xlsx2md.createCombinedMarkdownExportFile(currentWorkbook, currentFiles);
     }
     function downloadCurrentMarkdown() {
         const payload = getSelectedFileForDownload();

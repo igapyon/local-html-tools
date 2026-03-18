@@ -94,6 +94,7 @@
       name: string;
       categoriesRef: string;
       valuesRef: string;
+      axis: "primary" | "secondary";
     }[];
   };
 
@@ -1168,23 +1169,60 @@
   }
 
   function parseChartSeries(chartDoc: Document): ParsedChartAsset["series"] {
-    return getElementsByLocalName(chartDoc, "ser").map((seriesNode) => {
-      const nameRef = getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "tx") || seriesNode, "f");
-      const nameValue = getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "tx") || seriesNode, "v");
-      const nameText = getElementsByLocalName(getFirstChildByLocalName(seriesNode, "tx") || seriesNode, "t")
-        .map((node) => getTextContent(node))
-        .join("")
-        .trim();
-      const catRef = getFirstChildByLocalName(getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "cat") || seriesNode, "strRef") || seriesNode, "f")
-        || getFirstChildByLocalName(getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "cat") || seriesNode, "numRef") || seriesNode, "f");
-      const valRef = getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "val") || seriesNode, "f")
-        || getFirstChildByLocalName(getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "val") || seriesNode, "numRef") || seriesNode, "f");
-      return {
-        name: nameText || getTextContent(nameValue) || getTextContent(nameRef) || "系列",
-        categoriesRef: getTextContent(catRef),
-        valuesRef: getTextContent(valRef)
-      };
-    });
+    const plotArea = getFirstChildByLocalName(chartDoc, "plotArea") || chartDoc.documentElement;
+    const axisPositionById = new Map<string, string>();
+    for (const axisNode of getElementsByLocalName(plotArea, "valAx")) {
+      const axisIdNode = getFirstChildByLocalName(axisNode, "axId");
+      const axisPosNode = getFirstChildByLocalName(axisNode, "axPos");
+      const axisId = axisIdNode?.getAttribute("val") || getTextContent(axisIdNode);
+      const axisPos = axisPosNode?.getAttribute("val") || getTextContent(axisPosNode);
+      if (axisId) {
+        axisPositionById.set(axisId, axisPos || "");
+      }
+    }
+
+    const chartContainerNames = [
+      "barChart",
+      "lineChart",
+      "pieChart",
+      "doughnutChart",
+      "areaChart",
+      "scatterChart",
+      "radarChart",
+      "bubbleChart"
+    ];
+    const series: ParsedChartAsset["series"] = [];
+
+    for (const localName of chartContainerNames) {
+      for (const chartNode of getElementsByLocalName(plotArea, localName)) {
+        const axisIds = getElementsByLocalName(chartNode, "axId")
+          .map((node) => node.getAttribute("val") || getTextContent(node))
+          .filter(Boolean);
+        const isSecondary = axisIds.some((axisId) => axisPositionById.get(axisId) === "r");
+
+        for (const seriesNode of getElementsByLocalName(chartNode, "ser")) {
+          const txNode = getFirstChildByLocalName(seriesNode, "tx") || seriesNode;
+          const nameRef = getFirstChildByLocalName(txNode, "f");
+          const nameValue = getFirstChildByLocalName(txNode, "v");
+          const nameText = getElementsByLocalName(txNode, "t")
+            .map((node) => getTextContent(node))
+            .join("")
+            .trim();
+          const catRef = getFirstChildByLocalName(getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "cat") || seriesNode, "strRef") || seriesNode, "f")
+            || getFirstChildByLocalName(getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "cat") || seriesNode, "numRef") || seriesNode, "f");
+          const valRef = getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "val") || seriesNode, "f")
+            || getFirstChildByLocalName(getFirstChildByLocalName(getFirstChildByLocalName(seriesNode, "val") || seriesNode, "numRef") || seriesNode, "f");
+          series.push({
+            name: nameText || getTextContent(nameValue) || getTextContent(nameRef) || "系列",
+            categoriesRef: getTextContent(catRef),
+            valuesRef: getTextContent(valRef),
+            axis: isSecondary ? "secondary" : "primary"
+          });
+        }
+      }
+    }
+
+    return series;
   }
 
   function parseDrawingCharts(
@@ -4555,6 +4593,9 @@
             lines.push("- 系列:");
             for (const series of chart.series) {
               lines.push(`  - ${series.name}`);
+              if (series.axis === "secondary") {
+                lines.push("    - 軸: 副軸");
+              }
               if (series.categoriesRef) {
                 lines.push(`    - categories: ${series.categoriesRef}`);
               }
@@ -4629,12 +4670,23 @@
     ].join("\n");
   }
 
+  function createCombinedMarkdownExportFile(workbook: ParsedWorkbook, markdownFiles: MarkdownFile[]): { fileName: string; content: string } {
+    const outputMode = markdownFiles[0]?.summary.outputMode || "display";
+    const suffix = outputMode === "display" ? "" : `_${outputMode}`;
+    const fileName = `${String(workbook.name || "workbook").replace(/\.xlsx$/i, "")}${suffix}.md`;
+    const content = markdownFiles
+      .map((markdownFile) => `<!-- ${markdownFile.fileName.replace(/\.md$/i, "")} -->\n${markdownFile.markdown}`)
+      .join("\n\n");
+    return { fileName, content };
+  }
+
   function createExportEntries(workbook: ParsedWorkbook, markdownFiles: MarkdownFile[]): ExportEntry[] {
     const entries: ExportEntry[] = [];
-    for (const markdownFile of markdownFiles) {
+    if (markdownFiles.length > 0) {
+      const combined = createCombinedMarkdownExportFile(workbook, markdownFiles);
       entries.push({
-        name: `output/${markdownFile.fileName}`,
-        data: textEncoder.encode(`${markdownFile.markdown}\n`)
+        name: `output/${combined.fileName}`,
+        data: textEncoder.encode(`${combined.content}\n`)
       });
     }
     for (const sheet of workbook.sheets) {
@@ -4664,6 +4716,7 @@
     convertSheetToMarkdown,
     convertWorkbookToMarkdownFiles,
     createSummaryText,
+    createCombinedMarkdownExportFile,
     createExportEntries,
     createWorkbookExportArchive,
     formatRange,

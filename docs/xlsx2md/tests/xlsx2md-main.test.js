@@ -381,6 +381,7 @@ describe("xlsx2md core", () => {
     expect(workbook.sheets[0].charts[0].title).toBe("Sample Sales Chart");
     expect(workbook.sheets[0].charts[0].chartType).toContain("棒グラフ");
     expect(workbook.sheets[0].charts[0].series).toHaveLength(2);
+    expect(workbook.sheets[0].charts[0].series[0].axis).toBe("primary");
     expect(markdownFile.summary.charts).toBe(1);
     expect(markdownFile.markdown).toContain("## グラフ");
     expect(markdownFile.markdown).toContain("### グラフ001 (B18)");
@@ -682,6 +683,264 @@ describe("xlsx2md core", () => {
     expect(markdownFile.markdown).toContain("### 画像002 (F8)");
     expect(markdownFile.markdown).toContain("- File: assets/image/image_002.png");
     expect(markdownFile.markdown).toContain("![image_002.png](assets/image/image_002.png)");
+  });
+
+  it("parses the image-basic-sample02 fixture workbook with concrete image and chart expectations", async () => {
+    const api = bootCore();
+    const fixtureName = "image-basic-sample02.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "image", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const sheet = workbook.sheets[0];
+    const markdownFile = files[0];
+
+    expect(workbook.sheets).toHaveLength(1);
+    expect(sheet.name).toBe("image");
+    expect(sheet.maxRow).toBe(6);
+    expect(sheet.maxCol).toBe(4);
+    expect(sheet.cells).toHaveLength(13);
+    expect(sheet.images).toHaveLength(1);
+    expect(sheet.charts).toHaveLength(1);
+    expect(sheet.images[0]).toMatchObject({
+      filename: "image_001.png",
+      path: "assets/image/image_001.png",
+      anchor: "H3",
+      mediaPath: "xl/media/image1.png"
+    });
+    expect(sheet.charts[0]).toEqual({
+      sheetName: "image",
+      anchor: "B9",
+      chartPath: "xl/charts/chart1.xml",
+      title: "このグラフのタイトル",
+      chartType: "折れ線グラフ",
+      series: [
+        {
+          name: "値A",
+          categoriesRef: "image!$B$4:$B$6",
+          valuesRef: "image!$C$4:$C$6",
+          axis: "primary"
+        },
+        {
+          name: "値B",
+          categoriesRef: "image!$B$4:$B$6",
+          valuesRef: "image!$D$4:$D$6",
+          axis: "primary"
+        }
+      ]
+    });
+
+    expect(markdownFile.fileName).toBe("image-basic-sample02_001_image.md");
+    expect(markdownFile.summary.tables).toBe(1);
+    expect(markdownFile.summary.images).toBe(1);
+    expect(markdownFile.summary.charts).toBe(1);
+    expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual(["B3-D6"]);
+    expect(markdownFile.markdown).toContain("# image");
+    expect(markdownFile.markdown).toContain("Workbook: image-basic-sample02.xlsx");
+    expect(markdownFile.markdown).toContain("| 項目 | 値A | 値B |");
+    expect(markdownFile.markdown).toContain("| 2024年 | 13,568 | 9,072 |");
+    expect(markdownFile.markdown).toContain("## グラフ");
+    expect(markdownFile.markdown).toContain("### グラフ001 (B9)");
+    expect(markdownFile.markdown).toContain("- タイトル: このグラフのタイトル");
+    expect(markdownFile.markdown).toContain("- 種別: 折れ線グラフ");
+    expect(markdownFile.markdown).toContain("    - values: image!$D$4:$D$6");
+    expect(markdownFile.markdown).toContain("## 画像");
+    expect(markdownFile.markdown).toContain("### 画像001 (H3)");
+    expect(markdownFile.markdown).toContain("- File: assets/image/image_001.png");
+  });
+
+  it("parses the chart-basic fixture workbook with concrete chart expectations", async () => {
+    const api = bootCore();
+    const fixtureName = "chart-basic-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "chart", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const sheet = workbook.sheets[0];
+    const markdownFile = files[0];
+
+    expect(workbook.sheets).toHaveLength(1);
+    expect(sheet.name).toBe("chart-basic");
+    expect(sheet.maxRow).toBe(7);
+    expect(sheet.maxCol).toBe(4);
+    expect(sheet.cells).toHaveLength(16);
+    expect(sheet.images).toHaveLength(0);
+    expect(sheet.charts).toHaveLength(1);
+    expect(sheet.charts[0]).toEqual({
+      sheetName: "chart-basic",
+      anchor: "B10",
+      chartPath: "xl/charts/chart1.xml",
+      title: "棒グラフのグラフ",
+      chartType: "棒グラフ",
+      series: [
+        {
+          name: "値A",
+          categoriesRef: "'chart-basic'!$B$4:$B$7",
+          valuesRef: "'chart-basic'!$C$4:$C$7",
+          axis: "primary"
+        },
+        {
+          name: "値B",
+          categoriesRef: "'chart-basic'!$B$4:$B$7",
+          valuesRef: "'chart-basic'!$D$4:$D$7",
+          axis: "primary"
+        }
+      ]
+    });
+
+    expect(markdownFile.fileName).toBe("chart-basic-sample01_001_chart-basic.md");
+    expect(markdownFile.summary.tables).toBe(1);
+    expect(markdownFile.summary.images).toBe(0);
+    expect(markdownFile.summary.charts).toBe(1);
+    expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual(["B3-D7"]);
+    expect(markdownFile.markdown).toContain("# chart-basic");
+    expect(markdownFile.markdown).toContain("Workbook: chart-basic-sample01.xlsx");
+    expect(markdownFile.markdown).toContain("### グラフ基本サンプル");
+    expect(markdownFile.markdown).toContain("### 表001 (B3-D7)");
+    expect(markdownFile.markdown).toContain("| 項目 | 値A | 値B |");
+    expect(markdownFile.markdown).toContain("| 2027年 | 28,053 | 32,012 |");
+    expect(markdownFile.markdown).toContain("## グラフ");
+    expect(markdownFile.markdown).toContain("### グラフ001 (B10)");
+    expect(markdownFile.markdown).toContain("- タイトル: 棒グラフのグラフ");
+    expect(markdownFile.markdown).toContain("- 種別: 棒グラフ");
+    expect(markdownFile.markdown).toContain("    - categories: 'chart-basic'!$B$4:$B$7");
+    expect(markdownFile.markdown).toContain("    - values: 'chart-basic'!$D$4:$D$7");
+  });
+
+  it("parses the chart-mixed fixture workbook with concrete mixed-chart expectations", async () => {
+    const api = bootCore();
+    const fixtureName = "chart-mixed-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "chart", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const sheet = workbook.sheets[0];
+    const markdownFile = files[0];
+
+    expect(workbook.sheets).toHaveLength(1);
+    expect(sheet.name).toBe("chart-mixed");
+    expect(sheet.maxRow).toBe(8);
+    expect(sheet.maxCol).toBe(5);
+    expect(sheet.cells).toHaveLength(25);
+    expect(sheet.images).toHaveLength(0);
+    expect(sheet.charts).toHaveLength(1);
+    expect(sheet.charts[0]).toEqual({
+      sheetName: "chart-mixed",
+      anchor: "B10",
+      chartPath: "xl/charts/chart1.xml",
+      title: "棒と折れ線",
+      chartType: "棒グラフ + 折れ線グラフ (複合)",
+      series: [
+        {
+          name: "売上",
+          categoriesRef: "'chart-mixed'!$B$4:$B$8",
+          valuesRef: "'chart-mixed'!$C$4:$C$8",
+          axis: "primary"
+        },
+        {
+          name: "割引額",
+          categoriesRef: "'chart-mixed'!$B$4:$B$8",
+          valuesRef: "'chart-mixed'!$D$4:$D$8",
+          axis: "primary"
+        },
+        {
+          name: "利益率",
+          categoriesRef: "'chart-mixed'!$B$4:$B$8",
+          valuesRef: "'chart-mixed'!$E$4:$E$8",
+          axis: "secondary"
+        }
+      ]
+    });
+
+    expect(markdownFile.fileName).toBe("chart-mixed-sample01_001_chart-mixed.md");
+    expect(markdownFile.summary.tables).toBe(1);
+    expect(markdownFile.summary.images).toBe(0);
+    expect(markdownFile.summary.charts).toBe(1);
+    expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual(["B3-E8"]);
+    expect(markdownFile.markdown).toContain("# chart-mixed");
+    expect(markdownFile.markdown).toContain("Workbook: chart-mixed-sample01.xlsx");
+    expect(markdownFile.markdown).toContain("| 項目 | 売上 | 割引額 | 利益率 |");
+    expect(markdownFile.markdown).toContain("| 2028年 | 31,027 | 2,500 | 18% |");
+    expect(markdownFile.markdown).toContain("## グラフ");
+    expect(markdownFile.markdown).toContain("### グラフ001 (B10)");
+    expect(markdownFile.markdown).toContain("- タイトル: 棒と折れ線");
+    expect(markdownFile.markdown).toContain("- 種別: 棒グラフ + 折れ線グラフ (複合)");
+    expect(markdownFile.markdown).toContain("  - 利益率");
+    expect(markdownFile.markdown).toContain("    - 軸: 副軸");
+    expect(markdownFile.markdown).toContain("    - values: 'chart-mixed'!$E$4:$E$8");
+  });
+
+  it("parses the shape-basic fixture workbook without misclassifying drawing shapes", async () => {
+    const api = bootCore();
+    const fixtureName = "shape-basic-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "shape", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const sheet = workbook.sheets[0];
+    const markdownFile = files[0];
+
+    expect(workbook.sheets).toHaveLength(1);
+    expect(sheet.name).toBe("shape-basic");
+    expect(sheet.maxRow).toBe(6);
+    expect(sheet.maxCol).toBe(5);
+    expect(sheet.cells).toHaveLength(17);
+    expect(sheet.images).toHaveLength(0);
+    expect(sheet.charts).toHaveLength(0);
+
+    expect(markdownFile.fileName).toBe("shape-basic-sample01_001_shape-basic.md");
+    expect(markdownFile.summary.tables).toBe(1);
+    expect(markdownFile.summary.images).toBe(0);
+    expect(markdownFile.summary.charts).toBe(0);
+    expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual(["B3-E6"]);
+    expect(markdownFile.markdown).toContain("# shape-basic");
+    expect(markdownFile.markdown).toContain("Workbook: shape-basic-sample01.xlsx");
+    expect(markdownFile.markdown).toContain("### 図形サンプル");
+    expect(markdownFile.markdown).toContain("### 表001 (B3-E6)");
+    expect(markdownFile.markdown).toContain("| 項目 | 値A | 値B | 値C |");
+    expect(markdownFile.markdown).toContain("| 2026年 | 25,051 | 32,012 | 14,850 |");
+    expect(markdownFile.markdown).not.toContain("## 画像");
+    expect(markdownFile.markdown).not.toContain("## グラフ");
   });
 
   it("parses the formula-shared fixture workbook with concrete shared-formula expectations", async () => {
@@ -1232,9 +1491,10 @@ describe("xlsx2md core", () => {
 
     const archive = api.createWorkbookExportArchive(workbook, files);
     const extracted = await api.unzipEntries(archive.buffer.slice(archive.byteOffset, archive.byteOffset + archive.byteLength));
-    expect(extracted.has("output/diagram_001_Summary.md")).toBe(true);
+    expect(extracted.has("output/diagram.md")).toBe(true);
     expect(extracted.has("output/assets/Summary/image_001.png")).toBe(true);
-    const markdownText = new TextDecoder().decode(extracted.get("output/diagram_001_Summary.md"));
+    const markdownText = new TextDecoder().decode(extracted.get("output/diagram.md"));
+    expect(markdownText).toContain("<!-- diagram_001_Summary -->");
     expect(markdownText).toContain("## 画像");
     expect(extracted.get("output/assets/Summary/image_001.png")).toBeDefined();
   });

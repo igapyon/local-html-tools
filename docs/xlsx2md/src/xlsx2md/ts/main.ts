@@ -43,6 +43,7 @@
       parseWorkbook: (arrayBuffer: ArrayBuffer, workbookName?: string) => Promise<ParsedWorkbook & { sheets: Array<Record<string, unknown>> }>;
       convertWorkbookToMarkdownFiles: (workbook: ParsedWorkbook & { sheets: Array<Record<string, unknown>> }, options?: MarkdownOptions) => WorkbookFile[];
       createSummaryText: (file: WorkbookFile) => string;
+      createCombinedMarkdownExportFile: (workbook: ParsedWorkbook & { sheets: Array<Record<string, unknown>> }, files: WorkbookFile[]) => { fileName: string; content: string };
       createWorkbookExportArchive: (workbook: ParsedWorkbook & { sheets: Array<Record<string, unknown>> }, files: WorkbookFile[]) => Uint8Array;
     };
   }).__xlsx2md;
@@ -400,14 +401,8 @@
 
   function getSelectedFileForDownload(): { fileName: string; content: string } | null {
     if (!currentFiles.length) return null;
-    const outputMode = currentFiles[0]?.summary.outputMode || "display";
-    const suffix = outputMode === "display" ? "" : `_${outputMode}`;
-    return {
-      fileName: `${(currentWorkbook?.name || "workbook").replace(/\.xlsx$/i, "")}_all${suffix}.md`,
-      content: currentFiles
-        .map((file) => `<!-- ${createMarkdownChunkLabel(file.fileName)} -->\n${file.markdown}`)
-        .join("\n\n")
-    };
+    if (!currentWorkbook) return null;
+    return xlsx2md.createCombinedMarkdownExportFile(currentWorkbook, currentFiles);
   }
 
   function downloadCurrentMarkdown(): void {

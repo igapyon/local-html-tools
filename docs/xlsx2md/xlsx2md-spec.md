@@ -93,8 +93,7 @@
 
 ```text
 output/
-  sales_001_Summary.md
-  sales_002_Detail.md
+  sales.md
   assets/
     Summary/
       image_001.png
@@ -102,6 +101,9 @@ output/
     Detail/
       image_001.png
 ```
+
+- ブラウザ UI の `Markdown+assets ZIP保存` では、既定で Workbook 単位の連結 Markdown 1 本と `assets/` をまとめて出力する
+- シートごとの分割 Markdown を ZIP に含める方式は、現時点では標準挙動としない
 
 ### 4.4 ファイル命名
 
@@ -112,6 +114,7 @@ output/
 - 例: シート名 `A B-東京&大阪.01` は、保存名で `A_B-東京_大阪.01` のように変換してよい
 - 出力モードが `display` 以外の場合、Markdown 保存名には `_raw` または `_both` のサフィックスを付与してよい
 - 全シート連結保存や ZIP 保存でも、`display` 以外のモードでは同様にモード名サフィックスを付与してよい
+- 連結 Markdown 保存名は `workbook.md` を基本とし、モード付きでは `workbook_raw.md` や `workbook_both.md` としてよい
 
 ## 5. Markdown 出力構造
 
