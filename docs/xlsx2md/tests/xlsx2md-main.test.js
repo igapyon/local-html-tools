@@ -1065,6 +1065,453 @@ describe("xlsx2md core", () => {
     expect(shape3Svg).toContain("<rect");
   });
 
+  it("parses the shape-flowchart fixture workbook with flowchart raw metadata and connector SVG export", async () => {
+    const api = bootCore();
+    const fixtureName = "shape-flowchart-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "shape", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const sheet = workbook.sheets[0];
+    const markdownFile = files[0];
+
+    expect(workbook.sheets).toHaveLength(1);
+    expect(sheet.name).toBe("shape-flowchart");
+    expect(sheet.maxRow).toBe(6);
+    expect(sheet.maxCol).toBe(7);
+    expect(sheet.cells).toHaveLength(18);
+    expect(sheet.images).toHaveLength(0);
+    expect(sheet.charts).toHaveLength(0);
+    expect(sheet.shapes).toHaveLength(7);
+
+    expect(sheet.shapes[0]).toMatchObject({
+      sheetName: "shape-flowchart",
+      anchor: "H3",
+      name: "フローチャート: 端子 2",
+      kind: "図形 (flowChartTerminator)",
+      text: "開始",
+      widthEmu: 1689100,
+      heightEmu: 584200,
+      svgPath: null
+    });
+    expect(sheet.shapes[0].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:nvSpPr/xdr:cNvPr@name", value: "フローチャート: 端子 2" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "flowChartTerminator" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:txBody/a:p/a:r/a:t#text", value: "開始" }
+    ]));
+    expect(sheet.shapes[1]).toMatchObject({
+      anchor: "K3",
+      name: "フローチャート: 処理 5",
+      kind: "図形 (flowChartProcess)",
+      text: "処理",
+      svgPath: null
+    });
+    expect(sheet.shapes[1].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "flowChartProcess" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:txBody/a:p/a:r/a:t#text", value: "処理" }
+    ]));
+    expect(sheet.shapes[2]).toMatchObject({
+      anchor: "N3",
+      name: "フローチャート: 判断 6",
+      kind: "図形 (flowChartDecision)",
+      text: "条件判断",
+      svgPath: null
+    });
+    expect(sheet.shapes[2].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "flowChartDecision" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:txBody/a:p/a:r/a:t#text", value: "条件判断" }
+    ]));
+    expect(sheet.shapes[3]).toMatchObject({
+      anchor: "Q3",
+      name: "フローチャート: データ 7",
+      kind: "図形 (flowChartInputOutput)",
+      text: "データ",
+      svgPath: null
+    });
+    expect(sheet.shapes[3].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "flowChartInputOutput" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:txBody/a:p/a:r/a:t#text", value: "データ" }
+    ]));
+    expect(sheet.shapes[4]).toMatchObject({
+      anchor: "I4",
+      name: "直線矢印コネクタ 9",
+      kind: "直線矢印コネクタ",
+      text: "",
+      svgFilename: "shape_005.svg",
+      svgPath: "assets/shape-flowchart/shape_005.svg"
+    });
+    expect(sheet.shapes[4].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:cxnSp/xdr:spPr/a:prstGeom@prst", value: "straightConnector1" },
+      { key: "xdr:twoCellAnchor/xdr:cxnSp/xdr:nvCxnSpPr/xdr:cNvCxnSpPr/a:endCxn@id", value: "6" }
+    ]));
+
+    expect(markdownFile.fileName).toBe("shape-flowchart-sample01_001_shape-flowchart.md");
+    expect(markdownFile.summary.tables).toBe(1);
+    expect(markdownFile.summary.images).toBe(0);
+    expect(markdownFile.summary.charts).toBe(0);
+    expect(markdownFile.summary.formulaDiagnostics).toHaveLength(0);
+    expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual(["B3-E6"]);
+    expect(markdownFile.markdown).toContain("# shape-flowchart");
+    expect(markdownFile.markdown).toContain("Workbook: shape-flowchart-sample01.xlsx");
+    expect(markdownFile.markdown).toContain("### フローチャート図形サンプル");
+    expect(markdownFile.markdown).toContain("### 表001 (B3-E6)");
+    expect(markdownFile.markdown).toContain("## 図ブロック");
+    expect(markdownFile.markdown).toContain("### 図ブロック001 (H3-S7)");
+    expect(markdownFile.markdown).toContain("- 図形: 図形001, 図形002, 図形003, 図形004, 図形005, 図形006, 図形007");
+    expect(markdownFile.markdown).toContain("## 図形");
+    expect(markdownFile.markdown).toContain("### 図形001 (H3)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `flowChartTerminator`");
+    expect(markdownFile.markdown).toContain("- `a:t#text`: `開始`");
+    expect(markdownFile.markdown).toContain("### 図形003 (N3)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `flowChartDecision`");
+    expect(markdownFile.markdown).toContain("- `a:t#text`: `条件判断`");
+    expect(markdownFile.markdown).toContain("### 図形005 (I4)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `straightConnector1`");
+    expect(markdownFile.markdown).toContain("- `a:endCxn@id`: `6`");
+    expect(markdownFile.markdown).toContain("![shape_005.svg](assets/shape-flowchart/shape_005.svg)");
+    expect(markdownFile.markdown).toContain("![shape_006.svg](assets/shape-flowchart/shape_006.svg)");
+    expect(markdownFile.markdown).toContain("![shape_007.svg](assets/shape-flowchart/shape_007.svg)");
+    expect(markdownFile.markdown).not.toContain("## 画像");
+    expect(markdownFile.markdown).not.toContain("## グラフ");
+  });
+
+  it("exports flowchart connector SVG assets into the markdown+assets archive", async () => {
+    const api = bootCore();
+    const fixtureName = "shape-flowchart-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "shape", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const archive = api.createWorkbookExportArchive(workbook, files);
+    const extracted = await api.unzipEntries(
+      archive.buffer.slice(archive.byteOffset, archive.byteOffset + archive.byteLength)
+    );
+
+    expect(extracted.has("output/shape-flowchart-sample01.md")).toBe(true);
+    expect(extracted.has("output/assets/shape-flowchart/shape_005.svg")).toBe(true);
+    expect(extracted.has("output/assets/shape-flowchart/shape_006.svg")).toBe(true);
+    expect(extracted.has("output/assets/shape-flowchart/shape_007.svg")).toBe(true);
+    expect(extracted.has("output/assets/shape-flowchart/shape_001.svg")).toBe(false);
+
+    const markdownText = new TextDecoder().decode(extracted.get("output/shape-flowchart-sample01.md"));
+    expect(markdownText).toContain("## 図形");
+    expect(markdownText).toContain("![shape_005.svg](assets/shape-flowchart/shape_005.svg)");
+
+    const shape5Svg = new TextDecoder().decode(extracted.get("output/assets/shape-flowchart/shape_005.svg"));
+    const shape6Svg = new TextDecoder().decode(extracted.get("output/assets/shape-flowchart/shape_006.svg"));
+    const shape7Svg = new TextDecoder().decode(extracted.get("output/assets/shape-flowchart/shape_007.svg"));
+    expect(shape5Svg).toContain("<svg");
+    expect(shape5Svg).toContain("<line");
+    expect(shape6Svg).toContain("<svg");
+    expect(shape6Svg).toContain("<line");
+    expect(shape7Svg).toContain("<svg");
+    expect(shape7Svg).toContain("<line");
+  });
+
+  it("parses the shape-block-arrow fixture workbook with block-arrow raw metadata", async () => {
+    const api = bootCore();
+    const fixtureName = "shape-block-arrow-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "shape", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const sheet = workbook.sheets[0];
+    const markdownFile = files[0];
+
+    expect(workbook.sheets).toHaveLength(1);
+    expect(sheet.name).toBe("shape-block-arrow");
+    expect(sheet.maxRow).toBe(6);
+    expect(sheet.maxCol).toBe(7);
+    expect(sheet.cells).toHaveLength(18);
+    expect(sheet.images).toHaveLength(0);
+    expect(sheet.charts).toHaveLength(0);
+    expect(sheet.shapes).toHaveLength(5);
+
+    expect(sheet.shapes[0]).toMatchObject({
+      sheetName: "shape-block-arrow",
+      anchor: "H3",
+      name: "右矢印 22",
+      kind: "図形 (rightArrow)",
+      text: "右矢印",
+      widthEmu: 2108200,
+      heightEmu: 1066800,
+      svgPath: null
+    });
+    expect(sheet.shapes[0].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:nvSpPr/xdr:cNvPr@name", value: "右矢印 22" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "rightArrow" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:txBody/a:p/a:r/a:t#text", value: "右矢印" }
+    ]));
+    expect(sheet.shapes[1]).toMatchObject({
+      anchor: "K3",
+      name: "左右矢印 24",
+      kind: "図形 (leftRightArrow)",
+      text: "",
+      svgPath: null
+    });
+    expect(sheet.shapes[1].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "leftRightArrow" }
+    ]));
+    expect(sheet.shapes[2]).toMatchObject({
+      anchor: "N3",
+      name: "上矢印 25",
+      kind: "図形 (upArrow)",
+      text: "",
+      svgPath: null
+    });
+    expect(sheet.shapes[2].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "upArrow" }
+    ]));
+    expect(sheet.shapes[3]).toMatchObject({
+      anchor: "Q3",
+      name: "U ターン矢印 26",
+      kind: "図形 (uturnArrow)",
+      text: "",
+      svgPath: null
+    });
+    expect(sheet.shapes[3].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "uturnArrow" }
+    ]));
+    expect(sheet.shapes[4]).toMatchObject({
+      anchor: "H8",
+      name: "四方向矢印 27",
+      kind: "図形 (quadArrow)",
+      text: "",
+      svgPath: null
+    });
+    expect(sheet.shapes[4].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "quadArrow" }
+    ]));
+
+    expect(markdownFile.fileName).toBe("shape-block-arrow-sample01_001_shape-block-arrow.md");
+    expect(markdownFile.summary.tables).toBe(1);
+    expect(markdownFile.summary.images).toBe(0);
+    expect(markdownFile.summary.charts).toBe(0);
+    expect(markdownFile.summary.formulaDiagnostics).toHaveLength(0);
+    expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual(["B3-E6"]);
+    expect(markdownFile.markdown).toContain("# shape-block-arrow");
+    expect(markdownFile.markdown).toContain("Workbook: shape-block-arrow-sample01.xlsx");
+    expect(markdownFile.markdown).toContain("### ブロック矢印サンプル");
+    expect(markdownFile.markdown).toContain("## 図ブロック");
+    expect(markdownFile.markdown).toContain("### 図ブロック001 (H3-S14)");
+    expect(markdownFile.markdown).toContain("- 図形: 図形001, 図形002, 図形003, 図形004, 図形005");
+    expect(markdownFile.markdown).toContain("## 図形");
+    expect(markdownFile.markdown).toContain("### 図形001 (H3)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `rightArrow`");
+    expect(markdownFile.markdown).toContain("- `a:t#text`: `右矢印`");
+    expect(markdownFile.markdown).toContain("### 図形002 (K3)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `leftRightArrow`");
+    expect(markdownFile.markdown).toContain("### 図形003 (N3)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `upArrow`");
+    expect(markdownFile.markdown).toContain("### 図形004 (Q3)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `uturnArrow`");
+    expect(markdownFile.markdown).toContain("### 図形005 (H8)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `quadArrow`");
+    expect(markdownFile.markdown).not.toContain("![shape_001.svg]");
+    expect(markdownFile.markdown).not.toContain("## 画像");
+    expect(markdownFile.markdown).not.toContain("## グラフ");
+  });
+
+  it("exports only markdown for the block-arrow fixture archive when no SVG assets are generated", async () => {
+    const api = bootCore();
+    const fixtureName = "shape-block-arrow-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "shape", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const archive = api.createWorkbookExportArchive(workbook, files);
+    const extracted = await api.unzipEntries(
+      archive.buffer.slice(archive.byteOffset, archive.byteOffset + archive.byteLength)
+    );
+
+    expect(extracted.has("output/shape-block-arrow-sample01.md")).toBe(true);
+    expect(Array.from(extracted.keys())).toEqual(["output/shape-block-arrow-sample01.md"]);
+
+    const markdownText = new TextDecoder().decode(extracted.get("output/shape-block-arrow-sample01.md"));
+    expect(markdownText).toContain("## 図形");
+    expect(markdownText).toContain("- `a:prstGeom@prst`: `uturnArrow`");
+    expect(markdownText).not.toContain("![shape_001.svg]");
+  });
+
+  it("parses the shape-callout fixture workbook with callout raw metadata and text extraction", async () => {
+    const api = bootCore();
+    const fixtureName = "shape-callout-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "shape", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const sheet = workbook.sheets[0];
+    const markdownFile = files[0];
+
+    expect(workbook.sheets).toHaveLength(1);
+    expect(sheet.name).toBe("shape-callout");
+    expect(sheet.maxRow).toBe(6);
+    expect(sheet.maxCol).toBe(7);
+    expect(sheet.cells).toHaveLength(18);
+    expect(sheet.images).toHaveLength(0);
+    expect(sheet.charts).toHaveLength(0);
+    expect(sheet.shapes).toHaveLength(4);
+
+    expect(sheet.shapes[0]).toMatchObject({
+      sheetName: "shape-callout",
+      anchor: "H3",
+      name: "角丸四角形吹き出し 2",
+      kind: "図形 (wedgeRoundRectCallout)",
+      text: "角四角",
+      widthEmu: 2374900,
+      heightEmu: 901700,
+      svgPath: null
+    });
+    expect(sheet.shapes[0].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:nvSpPr/xdr:cNvPr@name", value: "角丸四角形吹き出し 2" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "wedgeRoundRectCallout" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:txBody/a:p/a:r/a:t#text", value: "角四角" }
+    ]));
+    expect(sheet.shapes[1]).toMatchObject({
+      anchor: "K3",
+      name: "円形吹き出し 3",
+      kind: "図形 (wedgeEllipseCallout)",
+      text: "楕円",
+      svgPath: null
+    });
+    expect(sheet.shapes[1].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "wedgeEllipseCallout" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:txBody/a:p/a:r/a:t#text", value: "楕円" }
+    ]));
+    expect(sheet.shapes[2]).toMatchObject({
+      anchor: "N3",
+      name: "雲形吹き出し 4",
+      kind: "図形 (cloudCallout)",
+      text: "雲",
+      svgPath: null
+    });
+    expect(sheet.shapes[2].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "cloudCallout" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:txBody/a:p/a:r/a:t#text", value: "雲" }
+    ]));
+    expect(sheet.shapes[3]).toMatchObject({
+      anchor: "H8",
+      name: "強調線吹き出し 1 (枠付き) 1",
+      kind: "図形 (accentBorderCallout1)",
+      text: "注釈",
+      svgPath: null
+    });
+    expect(sheet.shapes[3].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "accentBorderCallout1" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:txBody/a:p/a:r/a:t#text", value: "注釈" }
+    ]));
+
+    expect(markdownFile.fileName).toBe("shape-callout-sample01_001_shape-callout.md");
+    expect(markdownFile.summary.tables).toBe(1);
+    expect(markdownFile.summary.images).toBe(0);
+    expect(markdownFile.summary.charts).toBe(0);
+    expect(markdownFile.summary.formulaDiagnostics).toHaveLength(0);
+    expect(markdownFile.summary.tableScores.map((detail) => detail.range)).toEqual(["B3-E6"]);
+    expect(markdownFile.markdown).toContain("# shape-callout");
+    expect(markdownFile.markdown).toContain("Workbook: shape-callout-sample01.xlsx");
+    expect(markdownFile.markdown).toContain("### 吹き出しサンプル");
+    expect(markdownFile.markdown).toContain("## 図ブロック");
+    expect(markdownFile.markdown).toContain("### 図ブロック001 (H3-P12)");
+    expect(markdownFile.markdown).toContain("- 図形: 図形001, 図形002, 図形003, 図形004");
+    expect(markdownFile.markdown).toContain("## 図形");
+    expect(markdownFile.markdown).toContain("### 図形001 (H3)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `wedgeRoundRectCallout`");
+    expect(markdownFile.markdown).toContain("- `a:t#text`: `角四角`");
+    expect(markdownFile.markdown).toContain("### 図形002 (K3)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `wedgeEllipseCallout`");
+    expect(markdownFile.markdown).toContain("- `a:t#text`: `楕円`");
+    expect(markdownFile.markdown).toContain("### 図形003 (N3)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `cloudCallout`");
+    expect(markdownFile.markdown).toContain("- `a:t#text`: `雲`");
+    expect(markdownFile.markdown).toContain("### 図形004 (H8)");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `accentBorderCallout1`");
+    expect(markdownFile.markdown).toContain("- `a:t#text`: `注釈`");
+    expect(markdownFile.markdown).not.toContain("![shape_001.svg]");
+    expect(markdownFile.markdown).not.toContain("## 画像");
+    expect(markdownFile.markdown).not.toContain("## グラフ");
+  });
+
+  it("exports only markdown for the callout fixture archive when no SVG assets are generated", async () => {
+    const api = bootCore();
+    const fixtureName = "shape-callout-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "shape", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const archive = api.createWorkbookExportArchive(workbook, files);
+    const extracted = await api.unzipEntries(
+      archive.buffer.slice(archive.byteOffset, archive.byteOffset + archive.byteLength)
+    );
+
+    expect(extracted.has("output/shape-callout-sample01.md")).toBe(true);
+    expect(Array.from(extracted.keys())).toEqual(["output/shape-callout-sample01.md"]);
+
+    const markdownText = new TextDecoder().decode(extracted.get("output/shape-callout-sample01.md"));
+    expect(markdownText).toContain("## 図形");
+    expect(markdownText).toContain("- `a:prstGeom@prst`: `cloudCallout`");
+    expect(markdownText).not.toContain("![shape_001.svg]");
+  });
+
   it("parses the formula-shared fixture workbook with concrete shared-formula expectations", async () => {
     const api = bootCore();
     const fixtureName = "formula-shared-sample01.xlsx";
