@@ -16,6 +16,10 @@ if (typeof globalThis.Blob === "undefined" || typeof globalThis.Blob.prototype?.
 }
 globalThis.DecompressionStream ??= NodeDecompressionStream;
 
+const officeDrawingCode = readFileSync(
+  path.resolve(__dirname, "../src/xlsx2md/js/office-drawing.js"),
+  "utf8"
+);
 const coreCode = readFileSync(
   path.resolve(__dirname, "../src/xlsx2md/js/core.js"),
   "utf8"
@@ -23,6 +27,7 @@ const coreCode = readFileSync(
 
 function bootCore() {
   document.body.innerHTML = "";
+  new Function(officeDrawingCode)();
   new Function(coreCode)();
   return globalThis.__xlsx2md;
 }
@@ -927,6 +932,60 @@ describe("xlsx2md core", () => {
     expect(sheet.cells).toHaveLength(17);
     expect(sheet.images).toHaveLength(0);
     expect(sheet.charts).toHaveLength(0);
+    expect(sheet.shapes).toHaveLength(3);
+    expect(sheet.shapes[0]).toMatchObject({
+      sheetName: "shape-basic",
+      anchor: "H3",
+      name: "テキスト ボックス 1",
+      kind: "テキストボックス",
+      text: "テキストボックスの例",
+      widthEmu: 1980029,
+      heightEmu: 392608,
+      elementName: "xdr:sp",
+      svgFilename: "shape_001.svg",
+      svgPath: "assets/shape-basic/shape_001.svg"
+    });
+    expect(sheet.shapes[0].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:oneCellAnchor/xdr:from/xdr:col#text", value: "7" },
+      { key: "xdr:oneCellAnchor/xdr:from/xdr:row#text", value: "2" },
+      { key: "xdr:oneCellAnchor/xdr:sp/xdr:nvSpPr/xdr:cNvPr@name", value: "テキスト ボックス 1" },
+      { key: "xdr:oneCellAnchor/xdr:sp/xdr:nvSpPr/xdr:cNvSpPr@txBox", value: "1" },
+      { key: "xdr:oneCellAnchor/xdr:sp/xdr:txBody/a:p/a:r/a:t#text", value: "テキストボックスの例" }
+    ]));
+    expect(sheet.shapes[1]).toMatchObject({
+      sheetName: "shape-basic",
+      anchor: "H8",
+      name: "直線矢印コネクタ 3",
+      kind: "直線矢印コネクタ",
+      text: "",
+      widthEmu: 1308100,
+      heightEmu: 0,
+      elementName: "xdr:cxnSp",
+      svgFilename: "shape_002.svg",
+      svgPath: "assets/shape-basic/shape_002.svg"
+    });
+    expect(sheet.shapes[1].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:cxnSp/xdr:nvCxnSpPr/xdr:cNvPr@name", value: "直線矢印コネクタ 3" },
+      { key: "xdr:twoCellAnchor/xdr:cxnSp/xdr:spPr/a:prstGeom@prst", value: "straightConnector1" }
+    ]));
+    expect(sheet.shapes[2]).toMatchObject({
+      sheetName: "shape-basic",
+      anchor: "K3",
+      name: "正方形/長方形 4",
+      kind: "長方形",
+      text: "",
+      widthEmu: 1511300,
+      heightEmu: 1155700,
+      elementName: "xdr:sp",
+      svgFilename: "shape_003.svg",
+      svgPath: "assets/shape-basic/shape_003.svg"
+    });
+    expect(sheet.shapes[2].rawEntries).toEqual(expect.arrayContaining([
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:nvSpPr/xdr:cNvPr@name", value: "正方形/長方形 4" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:prstGeom@prst", value: "rect" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:xfrm/a:ext@cx", value: "1511300" },
+      { key: "xdr:twoCellAnchor/xdr:sp/xdr:spPr/a:xfrm/a:ext@cy", value: "1155700" }
+    ]));
 
     expect(markdownFile.fileName).toBe("shape-basic-sample01_001_shape-basic.md");
     expect(markdownFile.summary.tables).toBe(1);
@@ -939,8 +998,71 @@ describe("xlsx2md core", () => {
     expect(markdownFile.markdown).toContain("### 表001 (B3-E6)");
     expect(markdownFile.markdown).toContain("| 項目 | 値A | 値B | 値C |");
     expect(markdownFile.markdown).toContain("| 2026年 | 25,051 | 32,012 | 14,850 |");
+    expect(markdownFile.markdown).toContain("## 図ブロック");
+    expect(markdownFile.markdown).toContain("### 図ブロック001 (");
+    expect(markdownFile.markdown).toContain("- 図形: 図形001, 図形002, 図形003");
+    expect(markdownFile.markdown).toContain("## 図形");
+    expect(markdownFile.markdown).toContain("### 図形001 (H3)");
+    expect(markdownFile.markdown).toContain("- `xdr:oneCellAnchor`");
+    expect(markdownFile.markdown).toContain("    - `xdr:from`");
+        expect(markdownFile.markdown).toContain("        - `xdr:col#text`: `7`");
+    expect(markdownFile.markdown).toContain("    - `xdr:sp`");
+    expect(markdownFile.markdown).toContain("- `xdr:cNvPr@name`: `テキスト ボックス 1`");
+    expect(markdownFile.markdown).toContain("- `a:t#text`: `テキストボックスの例`");
+    expect(markdownFile.markdown).toContain("- SVG: assets/shape-basic/shape_001.svg");
+    expect(markdownFile.markdown).toContain("![shape_001.svg](assets/shape-basic/shape_001.svg)");
+    expect(markdownFile.markdown).toContain("### 図形002 (H8)");
+    expect(markdownFile.markdown).toContain("- `xdr:twoCellAnchor`");
+    expect(markdownFile.markdown).toContain("    - `xdr:cxnSp`");
+    expect(markdownFile.markdown).toContain("- `a:prstGeom@prst`: `straightConnector1`");
+    expect(markdownFile.markdown).toContain("- `a:ext@cx`: `1308100`");
+    expect(markdownFile.markdown).toContain("### 図形003 (K3)");
+    expect(markdownFile.markdown).toContain("- `xdr:cNvPr@name`: `正方形/長方形 4`");
+    expect(markdownFile.markdown).toContain("![shape_003.svg](assets/shape-basic/shape_003.svg)");
     expect(markdownFile.markdown).not.toContain("## 画像");
     expect(markdownFile.markdown).not.toContain("## グラフ");
+  });
+
+  it("exports shape SVG assets into the markdown+assets archive", async () => {
+    const api = bootCore();
+    const fixtureName = "shape-basic-sample01.xlsx";
+    const fixturePath = path.resolve(fixtureDir, "shape", fixtureName);
+    const fixtureBytes = readFileSync(fixturePath);
+    const arrayBuffer = fixtureBytes.buffer.slice(
+      fixtureBytes.byteOffset,
+      fixtureBytes.byteOffset + fixtureBytes.byteLength
+    );
+
+    const workbook = await api.parseWorkbook(arrayBuffer, fixtureName);
+    const files = api.convertWorkbookToMarkdownFiles(workbook, {
+      treatFirstRowAsHeader: true,
+      trimText: true,
+      removeEmptyRows: true,
+      removeEmptyColumns: true
+    });
+    const archive = api.createWorkbookExportArchive(workbook, files);
+    const extracted = await api.unzipEntries(
+      archive.buffer.slice(archive.byteOffset, archive.byteOffset + archive.byteLength)
+    );
+
+    expect(extracted.has("output/shape-basic-sample01.md")).toBe(true);
+    expect(extracted.has("output/assets/shape-basic/shape_001.svg")).toBe(true);
+    expect(extracted.has("output/assets/shape-basic/shape_002.svg")).toBe(true);
+    expect(extracted.has("output/assets/shape-basic/shape_003.svg")).toBe(true);
+
+    const markdownText = new TextDecoder().decode(extracted.get("output/shape-basic-sample01.md"));
+    expect(markdownText).toContain("## 図形");
+    expect(markdownText).toContain("![shape_001.svg](assets/shape-basic/shape_001.svg)");
+
+    const shape1Svg = new TextDecoder().decode(extracted.get("output/assets/shape-basic/shape_001.svg"));
+    const shape2Svg = new TextDecoder().decode(extracted.get("output/assets/shape-basic/shape_002.svg"));
+    const shape3Svg = new TextDecoder().decode(extracted.get("output/assets/shape-basic/shape_003.svg"));
+    expect(shape1Svg).toContain("<svg");
+    expect(shape1Svg).toContain("<text");
+    expect(shape2Svg).toContain("<svg");
+    expect(shape2Svg).toContain("<line");
+    expect(shape3Svg).toContain("<svg");
+    expect(shape3Svg).toContain("<rect");
   });
 
   it("parses the formula-shared fixture workbook with concrete shared-formula expectations", async () => {

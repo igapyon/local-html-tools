@@ -14,29 +14,43 @@
 
 ## 既存 fixture
 
+| ファイル | 主目的 | 対応章 | 主に確認する症状 |
+| --- | --- | --- |
+| `xlsx2md-basic-sample01.xlsx` | 総合サンプル | `xlsx2md-spec.md` 6, 7, 10, 13 | 表と地の文の崩れ、基本 Markdown 差分 |
+| `display/display-format-sample01.xlsx` | 表示形式 | `xlsx2md-spec.md` 12 | `display / raw / both` の見え方差分 |
+| `merge/merge-pattern-sample01.xlsx` | 結合セル | `xlsx2md-spec.md` 13 | `[MERGED←] / [MERGED↑]` の崩れ |
+
 ### ルート直下
 
 - `xlsx2md-basic-sample01.xlsx`
   - 総合サンプル
   - 地の文、表、結合セル、shared formula、表示形式をまとめて確認する
+  - 対応章: `xlsx2md-spec.md` 6, 7, 10, 13
+  - 主に確認する症状: 表と地の文の崩れ、基本 Markdown 差分
 
 ### `display/`
 
 - `display-format-sample01.xlsx`
   - 表示形式専用
   - 数値、通貨、会計、日付、時刻、パーセンテージ、分数、指数、文字列、和暦を確認する
+  - 対応章: `xlsx2md-spec.md` 12
+  - 主に確認する症状: `display / raw / both` の見え方差分
 
 ### `merge/`
 
 - `merge-pattern-sample01.xlsx`
   - 結合セル専用
   - 横結合、縦結合、2x2 結合と `[MERGED←] / [MERGED↑]` を確認する
+  - 対応章: `xlsx2md-spec.md` 13
+  - 主に確認する症状: `[MERGED←] / [MERGED↑]` の崩れ
 
 ## 作成予定 fixture
 
 ### `formula/formula-basic-sample01.xlsx`
 
 - 目的: 基本数式
+- 対応章: `xlsx2md-spec.md` 10, 11
+- 主に確認する症状: `cached / resolved / fallback` の差分
 - 構成: 1シート
 - 含めたい式:
   - `=A1`
@@ -75,6 +89,8 @@
 ### `formula/formula-crosssheet-sample01.xlsx`
 
 - 目的: 複数シート参照
+- 対応章: `xlsx2md-spec.md` 10, 19
+- 主に確認する症状: sheet 参照解決漏れ、参照先ずれ
 - 構成: 2シート以上
 - セル配置案:
   - シート:
@@ -100,6 +116,8 @@
 ### `formula/formula-shared-sample01.xlsx`
 
 - 目的: shared formula
+- 対応章: `xlsx2md-spec.md` 10, 19
+- 主に確認する症状: shared formula 展開漏れ、連番列の崩れ
 - 構成: 1シート
 - セル配置案:
   - `A1`: `No`
@@ -115,6 +133,8 @@
 ### `formula/formula-spill-sample01.xlsx`
 
 - 目的: dynamic array / spill
+- 対応章: `xlsx2md-spec.md` 19
+- 主に確認する症状: spill 解決漏れ、`A1#` 参照崩れ
 - 構成: 1シート
 - セル配置案:
   - `A1`: `spill サンプル`
@@ -135,6 +155,8 @@
 ### `named-range/named-range-sample01.xlsx`
 
 - 目的: `definedNames`
+- 対応章: `xlsx2md-spec.md` 10, 19
+- 主に確認する症状: 名前定義解決漏れ、scope 誤解決
 - 構成: 2シート
 - セル配置案:
   - シート:
@@ -161,6 +183,8 @@
 ### `narrative/narrative-vs-table-sample01.xlsx`
 
 - 目的: 地の文と表の判定
+- 対応章: `xlsx2md-spec.md` 6, 7, 8
+- 主に確認する症状: 表への過剰吸い込み、narrative 二重出力
 - 構成: 1シート
 - セル配置案:
   - `A1`: 太字 `地の文と表の判定`
@@ -176,6 +200,8 @@
 ### `image/image-basic-sample01.xlsx`
 
 - 目的: 画像抽出
+- 対応章: `xlsx2md-spec.md` 14, 15
+- 主に確認する症状: 画像 asset 抽出漏れ、anchor ずれ
 - 構成: 1シート
 - セル配置案:
   - `A1`: `画像抽出サンプル`
@@ -189,6 +215,8 @@
 ### `image/image-basic-sample02.xlsx`
 
 - 目的: 画像とグラフの共存確認
+- 対応章: `xlsx2md-spec.md` 5, 14, 15
+- 主に確認する症状: image / chart の混在崩れ、drawing rels 誤解決
 - 構成: 1シート
 - セル配置案:
   - `A1`: `画像とグラフの共存サンプル`
@@ -208,6 +236,8 @@
 ### `chart/chart-basic-sample01.xlsx`
 
 - 目的: グラフメタデータ抽出の最小確認
+- 対応章: `xlsx2md-spec.md` 5, 15, 19
+- 主に確認する症状: chart title / series / type の欠落
 - 構成: 1シート
 - シート名案:
   - `chart-basic`
@@ -235,6 +265,7 @@
 ### `chart/chart-mixed-sample01.xlsx`
 
 - 目的: 複合グラフ・多系列確認
+- 主に確認する症状: 複合グラフ種別判定漏れ、副軸系列の欠落
 - 構成: 1シート
 - シート名案:
   - `chart-mixed`
@@ -273,6 +304,70 @@
   - 初段では図形の意味抽出までは求めない
   - まずは「壊れない」「誤って画像扱いしない」を確認する
 
+### `shape/shape-flowchart-sample01.xlsx`
+
+- 目的: フローチャート系図形の raw dump / SVG / 図ブロック clustering 確認
+- 構成: 1シート
+- シート名案:
+  - `shape-flowchart`
+- セル配置案:
+  - `A1`: `フローチャート図形サンプル`
+  - `B3:E6`: 簡単な表
+  - `H3` 付近: 開始/終了
+  - `K3` 付近: 処理
+  - `N3` 付近: 条件判断
+  - `Q3` 付近: データ
+  - 各図形の間を connector / 矢印で結ぶ
+- 確認したいこと:
+  - `a:prstGeom@prst` が flowchart 系でも raw dump に残ること
+  - 単純図形として SVG 化できるものがあれば assets に出ること
+  - 近接配置された図形群が 1 つの `図ブロック` にまとまること
+- 補足:
+  - 図形数は 4-6 個程度で十分
+  - テキスト入り図形を 1-2 個含めると確認しやすい
+
+### `shape/shape-block-arrow-sample01.xlsx`
+
+- 目的: ブロック矢印系図形の raw dump / SVG / 図ブロック clustering 確認
+- 構成: 1シート
+- シート名案:
+  - `shape-block-arrow`
+- セル配置案:
+  - `A1`: `ブロック矢印サンプル`
+  - `H3` 付近: 右矢印
+  - `K3` 付近: 左右矢印
+  - `N3` 付近: 上矢印
+  - `Q3` 付近: U ターン矢印 または 曲線矢印
+  - 可能なら `H8` 付近に別系統の矢印を 1-2 個
+- 確認したいこと:
+  - 矢印系 `prstGeom` が raw dump に残ること
+  - 単純矢印として SVG 化できるものがあれば assets に出ること
+  - 上段のまとまりと下段のまとまりが別 `図ブロック` になり得ること
+- 補足:
+  - connector ではなく、Office の「ブロック矢印」を優先する
+  - 方向や形の違いが出るように 4-6 個程度置く
+
+### `shape/shape-callout-sample01.xlsx`
+
+- 目的: 吹き出し系図形の raw dump / テキスト抽出 / 図ブロック clustering 確認
+- 構成: 1シート
+- シート名案:
+  - `shape-callout`
+- セル配置案:
+  - `A1`: `吹き出しサンプル`
+  - `H3` 付近: 角丸吹き出し
+  - `K3` 付近: 楕円吹き出し
+  - `N3` 付近: 雲形吹き出し
+  - 各吹き出しには短いテキストを入れる
+  - 可能なら `H8` 付近に注釈用の別吹き出しを追加
+- 確認したいこと:
+  - `a:t` が図形テキストとして raw dump に残ること
+  - 吹き出し系 shape でも図形テキストを Markdown で読めること
+  - 近接した吹き出し群が 1 つの `図ブロック` にまとまること
+- 補足:
+  - 初段では吹き出し形状そのものの完全 SVG 再現までは求めない
+  - まずは raw dump とテキスト抽出を重視する
+
 ### `edge/edge-empty-sample01.xlsx`
 
 - 目的: 空系の境界
@@ -299,4 +394,4 @@
 
 ## 補足
 
-- さらに細かい方針や広いバックログは [TODO.md](/Users/igapyon/Documents/git/local-html-tools/TODO.md) を参照
+- さらに細かい方針や広いバックログは [TODO.md](../../../TODO.md) を参照

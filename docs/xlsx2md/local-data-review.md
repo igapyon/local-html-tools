@@ -2,6 +2,13 @@
 
 `docs/xlsx2md/local-data/` に置いた実データについて、`xlsx2md` の重点確認対象を整理するメモ。
 
+関連文書:
+
+- 概要と使い方: [README.md](./README.md)
+- 上位仕様と設計方針: [xlsx2md-spec.md](./xlsx2md-spec.md)
+- 現行実装の詳細仕様: [xlsx2md-impl-spec.md](./xlsx2md-impl-spec.md)
+- 数式サブセットの検討メモ: [xlsx-formula-subset.md](./xlsx-formula-subset.md)
+
 ## 現状サマリ
 
 2026-03-18 時点で、`local-data` の Excel 系ファイルは 10 件。
@@ -21,19 +28,27 @@
 - `TF0ffdef6d-9a19-4593-bdde-924d9e0aba2d7153cdcc_wac-2a2872261254.xlsx`
   - `計算`: formulas `2317`, resolved `2317`, fallback `0`, ast ok `2317`, ast ng `0`
   - parse / fallback は解消済み。AST parse 観点でも解消済み
+  - 効く仕様論点: 数式 evaluator 優先度、表示差分
 - `TFc2b640a6-8ee1-4258-9669-a8ab0b41240fb1a9c9ca_wac-2fedb8d0a784.xlsx`
   - `イベント プランナー`: images `18`, merges `174`
   - 画像と結合セルが多く、レイアウト由来の意味落ち確認に向く
+  - 効く仕様論点: レイアウト分解、表検出、画像アンカー保持
 - `TF97739ac3-cc1c-40fb-8682-f809e067145e8f18ec64_wac-912bbff00931.xlsx`
   - `月間プランナー`: merges `71`, formulas `128`, resolved `128`
   - 数式は解けているが、見た目の意味再現を確認したい
+  - 効く仕様論点: 表検出、レイアウト分解、表示差分
 - `TFe6ae6c3f-7542-4b5a-80ce-d131a04ae548d10af21f_wac-3845acf76347.xlsx`
   - `To Do リスト`: リストブロック化確認に使用
   - `買い物リスト`: 会計書式ゼロ値 `¥ -` の確認に使用
+  - 効く仕様論点: リスト化、表示形式
 
 ## Workbook 別メモ
 
 ### TF0ffdef6d-9a19-4593-bdde-924d9e0aba2d7153cdcc_wac-2a2872261254.xlsx
+
+効く仕様論点: 数式 evaluator 優先度、表示差分、レイアウト分解
+
+観測結果:
 
 - `老後資金プランナー`
   - formulas `801`, resolved `801`, fallback `0`
@@ -44,18 +59,22 @@
   - images `0`, merges `0`
   - ast parse ok `2317`, ng `0`
 
-次の確認:
+結論:
 
 - `計算` シートは parse / fallback / AST parse ともに解消済み
 - 次は `老後資金プランナー` の巨大表分割方針を詰める
 
-目視差分メモ:
+目視差分:
 
 - `老後資金プランナー` シートは、Excel 上では「グラフ + 入力パネル + 詳細表」の複合レイアウトだが、現状 Markdown では `B1-J59` 全体が 1 つの巨大表として出る
 - 画面上部のグラフ説明や入力セクション見出しまで同一表へ吸われており、人間にとっては読みにくい
 - この種のシートは、巨大表 1 個よりも「導入文 / 入力ブロック / 詳細表 / 画像」のような分割が望ましい
 
 ### TF2a72be1c-7be5-413d-b345-417c06878d3ab665d7ad_wac-acd2741d3bcc.xlsx
+
+効く仕様論点: structured reference / defined name、数式 evaluator 優先度、表示差分
+
+観測結果:
 
 - `課題`
   - formulas `12`, resolved `12`, fallback `0`
@@ -67,16 +86,17 @@
   - formulas `85`, resolved `85`, fallback `0`
   - ast parse ok `85`, ng `0`
 
-確認済み事項:
+結論:
 
 - structured reference, defined name, `EOMONTH`, 反復再解決により fallback `0` まで到達済み
-
-次の確認:
-
 - 表示上の差分が残るかどうかの目視比較
 - AST parse は解消済みなので、以後は表示差分や runtime 適用順の観測が中心
 
 ### TF97739ac3-cc1c-40fb-8682-f809e067145e8f18ec64_wac-912bbff00931.xlsx
+
+効く仕様論点: 表検出、レイアウト分解、画像参照、表示差分
+
+観測結果:
 
 - `月間プランナー`
   - formulas `128`, resolved `128`, fallback `0`
@@ -86,17 +106,21 @@
   - formulas `9`, resolved `9`, fallback `0`
   - ast parse ok `9`, ng `0`
 
-次の確認:
+結論:
 
 - 大量 merge を含むシートで、表検出・地の文・保存画像参照が自然か
 
-目視差分メモ:
+目視差分:
 
 - `月間プランナー` は Excel 上ではカレンダー/ボード系レイアウトだが、現状 Markdown では曜日列ごとに多数の小表へ分解される
 - `目標と優先事項`、前月・翌月ミニカレンダー、各曜日の予定欄が個別表になっており、元の月間カレンダーとしてのまとまりは失われる
 - この種のシートは通常の表検出だけでは不十分で、`カレンダー/ボード系` という別カテゴリの検討が必要
 
 ### TFc2b640a6-8ee1-4258-9669-a8ab0b41240fb1a9c9ca_wac-2fedb8d0a784.xlsx
+
+効く仕様論点: レイアウト分解、表検出、画像アンカー保持、数式 evaluator 優先度
+
+観測結果:
 
 - `イベント プランナー`
   - formulas `11`, resolved `11`, fallback `0`
@@ -112,13 +136,13 @@
   - formulas `6`, resolved `6`, fallback `0`
   - ast parse ok `6`, ng `0`
 
-次の確認:
+結論:
 
 - 多画像シートでのアンカー位置と Markdown 出力の妥当性
 - merge 多用シートでの表/地の文/画像の切り分け
 - `SUBTOTAL`, `UPPER` は AST parse 観点では解消済み。以後は evaluator 優先度と表示差分を確認する
 
-目視差分メモ:
+目視差分:
 
 - `イベント プランナー` は Excel 上では装飾・画像・複数セクションが大きく効くレイアウト文書
 - 現状 Markdown では `C10-AM14` などの広い merge 領域がそのまま巨大表として出ており、`[MERGED←]` が大量に並ぶ
@@ -129,6 +153,10 @@
 - 将来的には `フォームブロック` や `入力パネル` としての別扱いを検討する余地がある
 
 ### TFe6ae6c3f-7542-4b5a-80ce-d131a04ae548d10af21f_wac-3845acf76347.xlsx
+
+効く仕様論点: リスト化、表示形式、軽量レイアウト確認
+
+観測結果:
 
 - `買い物リスト`
   - formulas `20`, resolved `20`, fallback `0`
@@ -142,7 +170,7 @@
 - `共有リスト`
   - formulas `0`, images `1`
 
-確認済み事項:
+結論:
 
 - `To Do リスト` は 1 パラグラフではなく、リストブロックとして扱う実装を追加済み
 - `買い物リスト` の会計書式ゼロ値は `¥0.00` ではなく `¥ -` を優先する実装を追加済み

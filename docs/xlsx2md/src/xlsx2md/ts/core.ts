@@ -71,6 +71,7 @@
     tables: ParsedTable[];
     images: ParsedImageAsset[];
     charts: ParsedChartAsset[];
+    shapes: ParsedShapeAsset[];
     maxRow: number;
     maxCol: number;
   };
@@ -96,6 +97,39 @@
       valuesRef: string;
       axis: "primary" | "secondary";
     }[];
+  };
+
+  type ParsedShapeAsset = {
+    sheetName: string;
+    anchor: string;
+    name: string;
+    kind: string;
+    text: string;
+    widthEmu: number | null;
+    heightEmu: number | null;
+    elementName: string;
+    anchorElementName: string;
+    rawEntries: {
+      key: string;
+      value: string;
+    }[];
+    bbox: {
+      left: number;
+      top: number;
+      right: number;
+      bottom: number;
+    };
+    svgFilename: string | null;
+    svgPath: string | null;
+    svgData: Uint8Array | null;
+  };
+
+  type ShapeBlock = {
+    startRow: number;
+    startCol: number;
+    endRow: number;
+    endCol: number;
+    shapeIndexes: number[];
   };
 
   type ParsedWorkbook = {
@@ -193,6 +227,15 @@
   const textDecoder = new TextDecoder("utf-8");
   const textEncoder = new TextEncoder();
   const crcTable = buildCrc32Table();
+  const drawingHelper = (globalThis as typeof globalThis & {
+    __xlsx2mdOfficeDrawing?: {
+      renderShapeSvg?: (shapeNode: Element, anchor: Element, sheetName: string, shapeIndex: number) => {
+        filename: string;
+        path: string;
+        data: Uint8Array;
+      } | null;
+    };
+  }).__xlsx2mdOfficeDrawing || null;
   let resolveDefinedNameScalarValue: ((sheetName: string, name: string) => string | null) | null = null;
   let resolveDefinedNameRangeRef: ((sheetName: string, name: string) => { sheetName: string; start: string; end: string } | null) | null = null;
   let resolveStructuredRangeRef: ((sheetName: string, text: string) => { sheetName: string; start: string; end: string } | null) | null = null;
@@ -232,6 +275,10 @@
     prosePenalty: -2,
     threshold: 4
   } as const;
+  const DEFAULT_CELL_WIDTH_EMU = 609600;
+  const DEFAULT_CELL_HEIGHT_EMU = 190500;
+  const SHAPE_BLOCK_GAP_X_EMU = DEFAULT_CELL_WIDTH_EMU * 4;
+  const SHAPE_BLOCK_GAP_Y_EMU = DEFAULT_CELL_HEIGHT_EMU * 6;
 
   function buildCrc32Table(): Uint32Array {
     const table = new Uint32Array(256);
@@ -316,6 +363,16 @@
 
   function getFirstChildByLocalName(root: ParentNode, localName: string): Element | null {
     return getElementsByLocalName(root, localName)[0] || null;
+  }
+
+  function getDirectChildByLocalName(root: ParentNode | null, localName: string): Element | null {
+    if (!root) return null;
+    for (const node of Array.from(root.childNodes)) {
+      if (node.nodeType === Node.ELEMENT_NODE && (node as Element).localName === localName) {
+        return node as Element;
+      }
+    }
+    return null;
   }
 
   function decodeXmlText(bytes: Uint8Array): string {
@@ -1272,6 +1329,302 @@
     }
 
     return charts;
+  }
+
+  function parseShapeKind(shapeNode: Element | null): string {
+    if (!shapeNode) return "図形";
+    if (shapeNode.localName === "cxnSp") {
+      const geomNode = getFirstChildByLocalName(getFirstChildByLocalName(shapeNode, "spPr") || shapeNode, "prstGeom");
+      const prst = String(geomNode?.getAttribute("prst") || "").trim();
+      if (prst === "straightConnector1") {
+        return "直線矢印コネクタ";
+      }
+      return prst ? `コネクタ (${prst})` : "コネクタ";
+    }
+    if (shapeNode.localName !== "sp") {
+      return "図形";
+    }
+    const nvSpPr = getFirstChildByLocalName(shapeNode, "nvSpPr");
+    const cNvSpPr = getFirstChildByLocalName(nvSpPr || shapeNode, "cNvSpPr");
+    if (cNvSpPr?.getAttribute("txBox") === "1") {
+      return "テキストボックス";
+    }
+    const geomNode = getFirstChildByLocalName(getFirstChildByLocalName(shapeNode, "spPr") || shapeNode, "prstGeom");
+    const prst = String(geomNode?.getAttribute("prst") || "").trim();
+    if (prst === "rect") {
+      return "長方形";
+    }
+    return prst ? `図形 (${prst})` : "図形";
+  }
+
+  function parseShapeText(shapeNode: Element | null): string {
+    return getElementsByLocalName(shapeNode || document, "t")
+      .map((node) => getTextContent(node))
+      .filter(Boolean)
+      .join("")
+      .trim();
+  }
+
+  function parseShapeExt(anchor: Element, shapeNode: Element | null): { widthEmu: number | null; heightEmu: number | null } {
+    const extNode = getDirectChildByLocalName(anchor, "ext")
+      || getDirectChildByLocalName(
+        getDirectChildByLocalName(getDirectChildByLocalName(shapeNode || anchor, "spPr") || shapeNode || anchor, "xfrm"),
+        "ext"
+      );
+    const widthEmu = Number(extNode?.getAttribute("cx") || "");
+    const heightEmu = Number(extNode?.getAttribute("cy") || "");
+    return {
+      widthEmu: Number.isFinite(widthEmu) ? widthEmu : null,
+      heightEmu: Number.isFinite(heightEmu) ? heightEmu : null
+    };
+  }
+
+  function flattenXmlNodeEntries(
+    node: Element | null,
+    path = "",
+    entries: { key: string; value: string }[] = []
+  ): { key: string; value: string }[] {
+    if (!node) return entries;
+    const nodeName = node.tagName || node.nodeName || node.localName || "node";
+    const currentPath = path ? `${path}/${nodeName}` : nodeName;
+
+    for (const attribute of Array.from(node.attributes)) {
+      entries.push({
+        key: `${currentPath}@${attribute.name}`,
+        value: attribute.value
+      });
+    }
+
+    const directText = Array.from(node.childNodes)
+      .filter((child) => child.nodeType === Node.TEXT_NODE)
+      .map((child) => (child.textContent || "").trim())
+      .filter(Boolean)
+      .join(" ");
+    if (directText) {
+      entries.push({
+        key: `${currentPath}#text`,
+        value: directText
+      });
+    }
+
+    for (const child of Array.from(node.childNodes)) {
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        flattenXmlNodeEntries(child as Element, currentPath, entries);
+      }
+    }
+    return entries;
+  }
+
+  function parseShapeRawEntries(anchor: Element): { key: string; value: string }[] {
+    const entries: { key: string; value: string }[] = [];
+    return flattenXmlNodeEntries(anchor, "", entries);
+  }
+
+  function renderHierarchicalRawEntries(entries: { key: string; value: string }[]): string[] {
+    type RawTreeNode = {
+      children: Map<string, RawTreeNode>;
+      value: string | null;
+    };
+
+    const root: RawTreeNode = {
+      children: new Map<string, RawTreeNode>(),
+      value: null
+    };
+
+    for (const entry of entries) {
+      const parts = entry.key.split("/").filter(Boolean);
+      let current = root;
+      for (const part of parts) {
+        if (!current.children.has(part)) {
+          current.children.set(part, {
+            children: new Map<string, RawTreeNode>(),
+            value: null
+          });
+        }
+        current = current.children.get(part)!;
+      }
+      current.value = entry.value;
+    }
+
+    const lines: string[] = [];
+
+    function visit(node: RawTreeNode, depth: number): void {
+      for (const [key, child] of node.children.entries()) {
+        const indent = " ".repeat(depth * 4);
+        if (child.value !== null) {
+          lines.push(`${indent}- \`${key}\`: \`${child.value}\``);
+        } else {
+          lines.push(`${indent}- \`${key}\``);
+        }
+        visit(child, depth + 1);
+      }
+    }
+
+    visit(root, 0);
+    return lines;
+  }
+
+  function parseAnchorInt(anchor: Element | null, parentName: string, childName: string): number | null {
+    const parent = getFirstChildByLocalName(anchor || document, parentName);
+    const child = getFirstChildByLocalName(parent || anchor || document, childName);
+    const value = Number(getTextContent(child));
+    return Number.isFinite(value) ? value : null;
+  }
+
+  function parseShapeBoundingBox(anchor: Element, shapeNode: Element | null, widthEmu: number | null, heightEmu: number | null): {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+  } {
+    const fromCol = parseAnchorInt(anchor, "from", "col") || 0;
+    const fromRow = parseAnchorInt(anchor, "from", "row") || 0;
+    const fromColOff = parseAnchorInt(anchor, "from", "colOff") || 0;
+    const fromRowOff = parseAnchorInt(anchor, "from", "rowOff") || 0;
+    const toCol = parseAnchorInt(anchor, "to", "col");
+    const toRow = parseAnchorInt(anchor, "to", "row");
+    const toColOff = parseAnchorInt(anchor, "to", "colOff") || 0;
+    const toRowOff = parseAnchorInt(anchor, "to", "rowOff") || 0;
+
+    const left = fromCol * DEFAULT_CELL_WIDTH_EMU + fromColOff;
+    const top = fromRow * DEFAULT_CELL_HEIGHT_EMU + fromRowOff;
+
+    if (toCol !== null && toRow !== null) {
+      return {
+        left,
+        top,
+        right: toCol * DEFAULT_CELL_WIDTH_EMU + toColOff,
+        bottom: toRow * DEFAULT_CELL_HEIGHT_EMU + toRowOff
+      };
+    }
+
+    const ext = parseShapeExt(anchor, shapeNode);
+    return {
+      left,
+      top,
+      right: left + Math.max(1, ext.widthEmu || widthEmu || DEFAULT_CELL_WIDTH_EMU),
+      bottom: top + Math.max(1, ext.heightEmu || heightEmu || DEFAULT_CELL_HEIGHT_EMU)
+    };
+  }
+
+  function bboxGap(a: ParsedShapeAsset["bbox"], b: ParsedShapeAsset["bbox"]): { dx: number; dy: number } {
+    const dx = a.right < b.left
+      ? b.left - a.right
+      : b.right < a.left
+        ? a.left - b.right
+        : 0;
+    const dy = a.bottom < b.top
+      ? b.top - a.bottom
+      : b.bottom < a.top
+        ? a.top - b.bottom
+        : 0;
+    return { dx, dy };
+  }
+
+  function extractShapeBlocks(shapes: ParsedShapeAsset[]): ShapeBlock[] {
+    if (shapes.length === 0) return [];
+    const visited = new Array(shapes.length).fill(false);
+    const blocks: ShapeBlock[] = [];
+
+    for (let i = 0; i < shapes.length; i += 1) {
+      if (visited[i]) continue;
+      const queue = [i];
+      visited[i] = true;
+      const shapeIndexes: number[] = [];
+
+      while (queue.length > 0) {
+        const currentIndex = queue.shift()!;
+        shapeIndexes.push(currentIndex);
+        const current = shapes[currentIndex];
+        for (let j = 0; j < shapes.length; j += 1) {
+          if (visited[j]) continue;
+          const other = shapes[j];
+          const { dx, dy } = bboxGap(current.bbox, other.bbox);
+          if (dx <= SHAPE_BLOCK_GAP_X_EMU && dy <= SHAPE_BLOCK_GAP_Y_EMU) {
+            visited[j] = true;
+            queue.push(j);
+          }
+        }
+      }
+
+      let minLeft = Number.POSITIVE_INFINITY;
+      let minTop = Number.POSITIVE_INFINITY;
+      let maxRight = 0;
+      let maxBottom = 0;
+      for (const index of shapeIndexes) {
+        const bbox = shapes[index].bbox;
+        minLeft = Math.min(minLeft, bbox.left);
+        minTop = Math.min(minTop, bbox.top);
+        maxRight = Math.max(maxRight, bbox.right);
+        maxBottom = Math.max(maxBottom, bbox.bottom);
+      }
+      blocks.push({
+        startCol: Math.floor(minLeft / DEFAULT_CELL_WIDTH_EMU) + 1,
+        startRow: Math.floor(minTop / DEFAULT_CELL_HEIGHT_EMU) + 1,
+        endCol: Math.floor(maxRight / DEFAULT_CELL_WIDTH_EMU) + 1,
+        endRow: Math.floor(maxBottom / DEFAULT_CELL_HEIGHT_EMU) + 1,
+        shapeIndexes: shapeIndexes.sort((a, b) => a - b)
+      });
+    }
+
+    return blocks.sort((a, b) => (a.startRow - b.startRow) || (a.startCol - b.startCol));
+  }
+
+  function parseDrawingShapes(
+    files: Map<string, Uint8Array>,
+    sheetName: string,
+    sheetPath: string
+  ): ParsedShapeAsset[] {
+    const sheetRels = parseRelationships(files, buildRelsPath(sheetPath), sheetPath);
+    const shapes: ParsedShapeAsset[] = [];
+    let shapeCounter = 1;
+
+    for (const drawingPath of sheetRels.values()) {
+      if (!/\/drawings\/.+\.xml$/i.test(drawingPath)) continue;
+      const drawingBytes = files.get(drawingPath);
+      if (!drawingBytes) continue;
+      const drawingDoc = xmlToDocument(decodeXmlText(drawingBytes));
+      const anchors = getElementsByLocalName(drawingDoc, "oneCellAnchor").concat(getElementsByLocalName(drawingDoc, "twoCellAnchor"));
+
+      for (const anchor of anchors) {
+        const from = getFirstChildByLocalName(anchor, "from");
+        const colNode = getFirstChildByLocalName(from || anchor, "col");
+        const rowNode = getFirstChildByLocalName(from || anchor, "row");
+        const col = Number(getTextContent(colNode)) + 1;
+        const row = Number(getTextContent(rowNode)) + 1;
+        if (!Number.isFinite(col) || !Number.isFinite(row) || col <= 0 || row <= 0) {
+          continue;
+        }
+
+        if (getElementsByLocalName(anchor, "blip").length > 0) continue;
+        if (getElementsByLocalName(anchor, "chart").length > 0) continue;
+
+        const shapeNode = getFirstChildByLocalName(anchor, "sp") || getFirstChildByLocalName(anchor, "cxnSp");
+        if (!shapeNode) continue;
+        const cNvPr = getFirstChildByLocalName(getFirstChildByLocalName(shapeNode, shapeNode.localName === "sp" ? "nvSpPr" : "nvCxnSpPr") || shapeNode, "cNvPr");
+        const { widthEmu, heightEmu } = parseShapeExt(anchor, shapeNode);
+        const svgAsset = drawingHelper?.renderShapeSvg?.(shapeNode, anchor, sheetName, shapeCounter) || null;
+        shapes.push({
+          sheetName,
+          anchor: `${colToLetters(col)}${row}`,
+          name: String(cNvPr?.getAttribute("name") || "").trim() || "図形",
+          kind: parseShapeKind(shapeNode),
+          text: parseShapeText(shapeNode),
+          widthEmu,
+          heightEmu,
+          elementName: `xdr:${shapeNode.localName}`,
+          anchorElementName: anchor.tagName || anchor.nodeName || anchor.localName || "anchor",
+          rawEntries: parseShapeRawEntries(anchor),
+          bbox: parseShapeBoundingBox(anchor, shapeNode, widthEmu, heightEmu),
+          svgFilename: svgAsset?.filename || null,
+          svgPath: svgAsset?.path || null,
+          svgData: svgAsset?.data || null
+        });
+        shapeCounter += 1;
+      }
+    }
+
+    return shapes;
   }
 
   function extractCellOutputValue(
@@ -3917,6 +4270,7 @@
     const tables = parseWorksheetTables(files, doc, sheetName, sheetPath);
     const images = parseDrawingImages(files, sheetName, sheetPath);
     const charts = parseDrawingCharts(files, sheetName, sheetPath);
+    const shapes = parseDrawingShapes(files, sheetName, sheetPath);
     let maxRow = 0;
     let maxCol = 0;
     for (const cell of cells) {
@@ -3936,6 +4290,7 @@
       tables,
       images,
       charts,
+      shapes,
       maxRow,
       maxCol
     };
@@ -4484,6 +4839,8 @@
 
   function convertSheetToMarkdown(workbook: ParsedWorkbook, sheet: ParsedSheet, options: MarkdownOptions = {}): MarkdownFile {
     const charts = sheet.charts || [];
+    const shapes = sheet.shapes || [];
+    const shapeBlocks = extractShapeBlocks(shapes);
     const treatFirstRowAsHeader = options.treatFirstRowAsHeader !== false;
     const tables = detectTableCandidates(sheet);
     const narrativeBlocks = extractNarrativeBlocks(sheet, tables, options);
@@ -4608,6 +4965,33 @@
         })
       ].join("\n")
       : "";
+    const shapeSection = shapes.length > 0
+      ? [
+        "",
+        "## 図ブロック",
+        "",
+        ...shapeBlocks.map((block, blockIndex) => [
+          `### 図ブロック${String(blockIndex + 1).padStart(3, "0")} (${formatRange(block.startRow, block.startCol, block.endRow, block.endCol)})`,
+          `- 図形: ${block.shapeIndexes.map((shapeIndex) => `図形${String(shapeIndex + 1).padStart(3, "0")}`).join(", ")}`,
+          `- anchorRange: ${colToLetters(block.startCol)}${block.startRow}-${colToLetters(block.endCol)}${block.endRow}`
+        ].join("\n")),
+        "",
+        "## 図形",
+        "",
+        ...shapes.map((shape, index) => {
+          const lines = [
+            `### 図形${String(index + 1).padStart(3, "0")} (${shape.anchor})`,
+            ...renderHierarchicalRawEntries(shape.rawEntries)
+          ];
+          if (shape.svgPath) {
+            lines.push(`- SVG: ${shape.svgPath}`);
+            lines.push("");
+            lines.push(`![${shape.svgFilename || `shape_${String(index + 1).padStart(3, "0")}.svg`}](${shape.svgPath})`);
+          }
+          return lines.join("\n");
+        })
+      ].join("\n")
+      : "";
     const markdown = [
       `# ${sheet.name}`,
       "",
@@ -4619,6 +5003,7 @@
       "",
       body || "_抽出できる本文はありませんでした。_",
       chartSection,
+      shapeSection,
       imageSection
     ].join("\n");
 
@@ -4694,6 +5079,13 @@
         entries.push({
           name: `output/${image.path}`,
           data: image.data
+        });
+      }
+      for (const shape of sheet.shapes || []) {
+        if (!shape.svgPath || !shape.svgData) continue;
+        entries.push({
+          name: `output/${shape.svgPath}`,
+          data: shape.svgData
         });
       }
     }

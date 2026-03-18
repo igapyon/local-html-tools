@@ -10,6 +10,7 @@ const TARGETS = [
     srcHtml: "docs/xlsx2md/xlsx2md-src.html",
     outHtml: "docs/xlsx2md/xlsx2md.html",
     tsOrder: [
+      "src/xlsx2md/ts/office-drawing.ts",
       "src/xlsx2md/ts/formula/tokenizer.ts",
       "src/xlsx2md/ts/formula/parser.ts",
       "src/xlsx2md/ts/formula/evaluator.ts",

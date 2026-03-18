@@ -4,13 +4,33 @@
 
 現時点では、仕様・実装・自動テストをこの配下で独立して進めています。
 
+文書の役割は段階的に分かれています。
+
+- `README.md`
+  - 入口説明と全体像
+- `xlsx2md-spec.md`
+  - 人間が意図と設計方針を理解するための上位仕様
+- `xlsx2md-impl-spec.md`
+  - 現行実装の詳細仕様と再実装・保守のための文書
+- `xlsx-formula-subset.md`
+  - 数式対応範囲の補助文書
+
 ## 現在の状態
 
+- 実装済み
 - `.xlsx` をブラウザ内で読み込み、全シートを自動で Markdown 化できる
 - 出力モードとして `display / raw / both` を切り替えられる
-- 画像、表、地の文、リスト、セクション分割を扱う
+- 画像、表、地の文、リストを扱う
+- Excel グラフは画像ではなく、タイトル・系列・参照範囲・副軸などの意味情報として Markdown に出せる
+- DrawingML 図形は、要約ではなくタグ名・属性名を保った raw 寄りの階層 Markdown として出せる
+- 単純図形 (`rect / line / arrow / text box`) は、raw ダンプを残したまま SVG アセットとしても出せる
 - 数式は `cached value` 優先で、必要時のみ自前 evaluator が補完する
 - fixture と `local-data` を使った検証を継続している
+
+- 未対応または将来改善
+- 専用の `セクション分割ブロック` は未導入で、レイアウト中心シートは現在も通常の表検出と地の文抽出をベースに扱う
+- カレンダー / ボード / ダッシュボード系の自然な分解は改善余地がある
+- dynamic array / spill や複雑な Excel 表現は段階的対応の途中である
 
 ## 主な特徴
 
@@ -18,7 +38,8 @@
 - `.xlsx` 選択後に自動で Markdown 生成まで進む
 - Markdown を主表示とし、解析系 UI は補助情報として扱う
 - 保存ファイル名は安全側へサニタイズする
-- レイアウト中心シートは、見た目再現ではなく `セクション / 表 / リスト / 画像` へ分解して扱う
+- レイアウト中心シートは、見た目再現ではなく `表 / リスト / 画像 / 補助セクション` への分解を優先する
+- グラフや図形についても、見た目再現より意味情報や raw metadata を Markdown へ落とすことを優先する
 
 ## 方針
 
@@ -29,12 +50,12 @@
 - UI は `lht-cmn/` を利用する
 - 実装の正本ソースは TypeScript とする
 - 自動テストを前提とする
-- 出力モードは `display / raw / both` を扱えるようにする
+- 出力モードは `display / raw / both` を扱う
 - `raw` / `both` で保存する Markdown や ZIP は、ファイル名にモードサフィックスを付けて区別できるようにする
 - `Markdown+assets ZIP保存` は、既定で `連結 Markdown 1 本 + assets/` の構成とする
 - 保存ファイル名は安全側へサニタイズし、シート名の空白や一部記号をそのまま使わないことがある
 - 表候補外の縦並び短文は、地の文として連結せず箇条書きへ変換することがある
-- レイアウト中心シートは、見た目再現ではなく `セクション / 表 / リスト / 画像` へ分解して扱う
+- レイアウト中心シートは、見た目再現ではなく `表 / リスト / 画像 / 補助セクション` を優先して扱う
 - 空欄の多いフォーム風の罫線領域は、現時点では情報脱落を避けるため表として残すことがある。一方で、横に広く疎なフォーム領域は表候補から外して地の文やセクションへ寄せることもある
 - 数式は `cached value` を優先し、自前 evaluator は未計算保存や欠損時の補助として扱う
 - 数式診断では、`resolved / fallback / unsupported` に加えて、`cached / ast / legacy / formula` の解決経路を表示する
@@ -120,17 +141,31 @@ both: 2024/3/17 [raw=45368]
 - `イベント プランナー`、`月間プランナー`、`老後資金プランナー` のようなレイアウト中心シートでは、巨大な 1 表へ吸い込まず `セクション / 表 / リスト / 画像` のまとまりを優先する
 - 現在は最小実装として、縦方向に大きな空白がある場所でセクションを分け、Markdown 上では `---` で区切る
 - セクション先頭の短い単行テキストは、見出し候補として `###` へ昇格することがある
+- Excel グラフは `## グラフ` セクションで、anchor・タイトル・種別・系列・参照範囲・副軸を Markdown 化する
+- DrawingML 図形は `## 図形` セクションで、`xdr:*` / `a:*` のタグ名・属性名を保った階層ダンプとして Markdown 化する
+- 単純図形 (`rect / line / arrow / text box`) は、図形セクションの raw ダンプを保持したまま `SVG` アセット参照も併記する
 - ただしフォーム風領域、カレンダー、ボード、ダッシュボードの完全再現はまだ対象外で、今後の改善余地として扱う
 
 ## 既知の制約
 
+- 未対応寄り
 - `spill` / dynamic array は最小対応の段階で、`A1#` のような表現や runtime 入口はあるが、実データ fixture による十分な検証はこれから
 - 配列定数や `space intersection` は最小対応済みだが、Excel 互換としてはまだ限定的
+- 専用の `セクション分割ブロック` は未導入で、レイアウト中心シートも現在は通常の表検出と地の文抽出を優先する
 - フォーム風領域は現時点では保守的に扱う
   - 表として残す場合がある
   - 横に広く疎なものは narrative / section 側へ寄せる場合がある
+- 図形は raw metadata のダンプに対応し、単純図形 (`rect / line / arrow / text box`) は SVG アセット化にも対応している
+- SmartArt は現時点では意味解釈対象にせず、fallback 扱いとする
+- グラフは当面、タイトル・系列・参照範囲・副軸などのテキストメタデータ出力を標準とし、SVG 化は着手しない
+- DrawingML の接続先解釈や複雑図形の完全意味解釈は未対応
 - カレンダー / ボード / ダッシュボード系は、通常表としての自然な表現が難しく、現在は `セクション / 表 / リスト / 画像` への分解を優先している
 - Excel 数式全体を完全再実装しているわけではなく、通常は `cached value` を主に使い、自前 evaluator は補助として働く
+
+- 実装済み寄り
+- `display / raw / both` の切替
+- 数式診断での `resolved / fallback / unsupported` と `cached / ast / legacy / formula` 表示
+- 空文字の `cached value` を `cached` とみなす扱い
 
 ## 現在の構成イメージ
 
@@ -138,6 +173,7 @@ both: 2024/3/17 [raw=45368]
 docs/xlsx2md/
 ├── README.md
 ├── xlsx2md-spec.md
+├── xlsx2md-impl-spec.md
 ├── xlsx-formula-subset.md
 ├── xlsx2md-src.html
 ├── xlsx2md.html
@@ -177,11 +213,13 @@ docs/xlsx2md/
     └── ...
 ```
 
-仕様の詳細は [xlsx2md-spec.md](./xlsx2md-spec.md) を参照してください。
+上位仕様と設計方針は [xlsx2md-spec.md](./xlsx2md-spec.md) を参照してください。
 
-Excel 数式サブセットの設計メモは [xlsx-formula-subset.md](/Users/igapyon/Documents/git/local-html-tools/docs/xlsx2md/xlsx-formula-subset.md) を参照してください。
+現行実装に即した詳細仕様は [xlsx2md-impl-spec.md](./xlsx2md-impl-spec.md) を参照してください。
 
-fixture 用 Excel ブックの作成メモは [tests/fixtures/README.md](/Users/igapyon/Documents/git/local-html-tools/docs/xlsx2md/tests/fixtures/README.md) を参照してください。
+Excel 数式サブセットの設計メモは [xlsx-formula-subset.md](./xlsx-formula-subset.md) を参照してください。
+
+fixture 用 Excel ブックの作成メモは [tests/fixtures/README.md](./tests/fixtures/README.md) を参照してください。
 
 git に入れない実データや一時検証用の `.xlsx` は `docs/xlsx2md/local-data/` に配置します。このディレクトリは `.gitignore` 対象です。
 
@@ -195,7 +233,7 @@ Excel 数式の文法整理の参考資料として、`ClosedXML.Parser` の ABN
 
 - 取得元リポジトリ: <https://github.com/ClosedXML/ClosedXML.Parser>
 - 参照ファイル: `MS-XLSX-parser-grammar.abnf`
-- ローカル配置先: [references/MS-XLSX-parser-grammar.abnf](/Users/igapyon/Documents/git/local-html-tools/docs/xlsx2md/references/MS-XLSX-parser-grammar.abnf)
+- ローカル配置先: [references/MS-XLSX-parser-grammar.abnf](./references/MS-XLSX-parser-grammar.abnf)
 - 利用目的: `xlsx2md` における Excel 数式サブセット文法の整理と、将来の AST ベース実装検討のための参照
 
 ライセンス確認メモ:
