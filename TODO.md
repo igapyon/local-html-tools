@@ -265,6 +265,7 @@
   - `NOW` など volatile 関数の完全再計算
 - [xlsx2md][未対応整理] レイアウト未対応
   - `セクション分割ブロック` の導入
+  - 現行 `xlsx2md-spec.md` では将来構想として整理し、現行実装の正本は通常の表検出 + 地の文抽出を優先する
   - `カレンダー / ボード / ダッシュボード系` シートの専用扱い
   - レイアウト中心シートの完全再現は対象外であり、`セクション / 表 / リスト / 画像` 分解で扱う
   - `イベント プランナー` のようなフォーム風罫線領域は、現時点では保守的に扱う。表として残す場合もあるが、横に広く疎で merge が多い領域は narrative / section 側へ寄せてよい。将来 `フォームブロック / 入力パネル` へ改善する可能性あり
@@ -272,6 +273,18 @@
   - `DrawingML -> SVG` は将来候補
     - 第一候補の参照 OSS は Microsoft 製の Open XML SDK
     - まずは `rect / line / arrow / text box` のような単純図形のみを対象にできるか検討する
+  - 次の fixture 候補:
+    - `shape/shape-flowchart-sample01.xlsx`
+      - フローチャート図形 4-6 個 + connector
+      - raw dump / SVG / 図ブロック clustering の確認
+    - `shape/shape-block-arrow-sample01.xlsx`
+      - ブロック矢印を 4-6 個
+      - 上段と下段の別 block も試せるとよい
+    - `shape/shape-callout-sample01.xlsx`
+      - 吹き出し 3-4 個 + 短いテキスト
+      - 図形テキスト抽出と block 化の確認
+  - グラフは当面、意味情報のテキスト化で固定し、`Chart -> SVG` は保留とする
+  - SmartArt は現時点では fallback とし、意味解釈や SVG 化の対象外とする
 - [xlsx2md][仕様整理] `セクション分割ブロック` の基本仕様は `xlsx2md-spec.md` へ追記済み。次段は実装導入順の決定
 - [xlsx2md][実装メモ] `core.ts` に no-op の `extractSectionBlocks(...)` を追加済み。将来は `convertSheetToMarkdown(...)` の Markdown 組み立て直前で利用する
 - [xlsx2md][未対応整理] 方針未確定

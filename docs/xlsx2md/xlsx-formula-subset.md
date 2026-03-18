@@ -12,12 +12,20 @@
 
 参照元:
 
-- [MS-XLSX-parser-grammar.abnf](/Users/igapyon/Documents/git/local-html-tools/docs/xlsx2md/references/MS-XLSX-parser-grammar.abnf)
+- [MS-XLSX-parser-grammar.abnf](./references/MS-XLSX-parser-grammar.abnf)
 - 出典プロジェクト: <https://github.com/ClosedXML/ClosedXML.Parser>
 
 ## 位置づけ
 
 この文書は、Excel 数式の完全仕様ではありません。
+
+## 対応状況サマリ
+
+| 区分 | 内容 |
+| --- | --- |
+| 実装済み | `cached value` 優先、`AST evaluator`、既存 resolver、`definedNames`、sheet scope name、structured reference の一部、shared formula 展開 |
+| 部分対応 | dynamic array / spill、配列定数、`space intersection`、lookup 系や集計系の一部、表示形式再適用との組み合わせ |
+| 未対応 | Excel 数式の完全互換、lambda 系、future function 群、外部 Workbook 参照の完全解決、dynamic array の全面対応 |
 
 - 対象は `xlsx2md` が実務上扱いたいサブセットに限る
 - `cached value` を優先する現在方針は維持する

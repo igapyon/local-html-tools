@@ -1582,6 +1582,7 @@ lht-preview-output {
   
   
   
+  
   <script>
 (()=>{function s(o,e,t,r){var i=arguments.length,n=i<3?e:r===null?r=Object.getOwnPropertyDescriptor(e,t):r,a;if(typeof Reflect=="object"&&typeof Reflect.decorate=="function")n=Reflect.decorate(o,e,t,r);else for(var d=o.length-1;d>=0;d--)(a=o[d])&&(n=(i<3?a(n):i>3?a(e,t,n):a(e,t))||n);return i>3&&n&&Object.defineProperty(e,t,n),n}var E=o=>(e,t)=>{t!==void 0?t.addInitializer(()=>{customElements.define(o,e)}):customElements.define(o,e)};var Qe=globalThis,et=Qe.ShadowRoot&&(Qe.ShadyCSS===void 0||Qe.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,Bt=Symbol(),$r=new WeakMap,Ne=class{constructor(e,t,r){if(this._$cssResult$=!0,r!==Bt)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o,t=this.t;if(et&&e===void 0){let r=t!==void 0&&t.length===1;r&&(e=$r.get(t)),e===void 0&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),r&&$r.set(t,e))}return e}toString(){return this.cssText}},Tr=o=>new Ne(typeof o=="string"?o:o+"",void 0,Bt),g=(o,...e)=>{let t=o.length===1?o[0]:e.reduce((r,i,n)=>r+(a=>{if(a._$cssResult$===!0)return a.cssText;if(typeof a=="number")return a;throw Error("Value passed to 'css' function must be a 'css' function result: "+a+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+o[n+1],o[0]);return new Ne(t,o,Bt)},Sr=(o,e)=>{if(et)o.adoptedStyleSheets=e.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(let t of e){let r=document.createElement("style"),i=Qe.litNonce;i!==void 0&&r.setAttribute("nonce",i),r.textContent=t.cssText,o.appendChild(r)}},Ft=et?o=>o:o=>o instanceof CSSStyleSheet?(e=>{let t="";for(let r of e.cssRules)t+=r.cssText;return Tr(t)})(o):o;var{is:Io,defineProperty:ko,getOwnPropertyDescriptor:Oo,getOwnPropertyNames:Ro,getOwnPropertySymbols:Po,getPrototypeOf:Lo}=Object,ce=globalThis,Ir=ce.trustedTypes,Do=Ir?Ir.emptyScript:"",zo=ce.reactiveElementPolyfillSupport,Be=(o,e)=>o,Fe={toAttribute(o,e){switch(e){case Boolean:o=o?Do:null;break;case Object:case Array:o=o==null?o:JSON.stringify(o)}return o},fromAttribute(o,e){let t=o;switch(e){case Boolean:t=o!==null;break;case Number:t=o===null?null:Number(o);break;case Object:case Array:try{t=JSON.parse(o)}catch{t=null}}return t}},tt=(o,e)=>!Io(o,e),kr={attribute:!0,type:String,converter:Fe,reflect:!1,useDefault:!1,hasChanged:tt};Symbol.metadata??(Symbol.metadata=Symbol("metadata")),ce.litPropertyMetadata??(ce.litPropertyMetadata=new WeakMap);var re=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??(this.l=[])).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=kr){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){let r=Symbol(),i=this.getPropertyDescriptor(e,r,t);i!==void 0&&ko(this.prototype,e,i)}}static getPropertyDescriptor(e,t,r){let{get:i,set:n}=Oo(this.prototype,e)??{get(){return this[t]},set(a){this[t]=a}};return{get:i,set(a){let d=i?.call(this);n?.call(this,a),this.requestUpdate(e,d,r)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??kr}static _$Ei(){if(this.hasOwnProperty(Be("elementProperties")))return;let e=Lo(this);e.finalize(),e.l!==void 0&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(Be("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(Be("properties"))){let t=this.properties,r=[...Ro(t),...Po(t)];for(let i of r)this.createProperty(i,t[i])}let e=this[Symbol.metadata];if(e!==null){let t=litPropertyMetadata.get(e);if(t!==void 0)for(let[r,i]of t)this.elementProperties.set(r,i)}this._$Eh=new Map;for(let[t,r]of this.elementProperties){let i=this._$Eu(t,r);i!==void 0&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){let t=[];if(Array.isArray(e)){let r=new Set(e.flat(1/0).reverse());for(let i of r)t.unshift(Ft(i))}else e!==void 0&&t.push(Ft(e));return t}static _$Eu(e,t){let r=t.attribute;return r===!1?void 0:typeof r=="string"?r:typeof e=="string"?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??(this._$EO=new Set)).add(e),this.renderRoot!==void 0&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){let e=new Map,t=this.constructor.elementProperties;for(let r of t.keys())this.hasOwnProperty(r)&&(e.set(r,this[r]),delete this[r]);e.size>0&&(this._$Ep=e)}createRenderRoot(){let e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return Sr(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,r){this._$AK(e,r)}_$ET(e,t){let r=this.constructor.elementProperties.get(e),i=this.constructor._$Eu(e,r);if(i!==void 0&&r.reflect===!0){let n=(r.converter?.toAttribute!==void 0?r.converter:Fe).toAttribute(t,r.type);this._$Em=e,n==null?this.removeAttribute(i):this.setAttribute(i,n),this._$Em=null}}_$AK(e,t){let r=this.constructor,i=r._$Eh.get(e);if(i!==void 0&&this._$Em!==i){let n=r.getPropertyOptions(i),a=typeof n.converter=="function"?{fromAttribute:n.converter}:n.converter?.fromAttribute!==void 0?n.converter:Fe;this._$Em=i;let d=a.fromAttribute(t,n.type);this[i]=d??this._$Ej?.get(i)??d,this._$Em=null}}requestUpdate(e,t,r,i=!1,n){if(e!==void 0){let a=this.constructor;if(i===!1&&(n=this[e]),r??(r=a.getPropertyOptions(e)),!((r.hasChanged??tt)(n,t)||r.useDefault&&r.reflect&&n===this._$Ej?.get(e)&&!this.hasAttribute(a._$Eu(e,r))))return;this.C(e,t,r)}this.isUpdatePending===!1&&(this._$ES=this._$EP())}C(e,t,{useDefault:r,reflect:i,wrapped:n},a){r&&!(this._$Ej??(this._$Ej=new Map)).has(e)&&(this._$Ej.set(e,a??t??this[e]),n!==!0||a!==void 0)||(this._$AL.has(e)||(this.hasUpdated||r||(t=void 0),this._$AL.set(e,t)),i===!0&&this._$Em!==e&&(this._$Eq??(this._$Eq=new Set)).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}let e=this.scheduleUpdate();return e!=null&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??(this.renderRoot=this.createRenderRoot()),this._$Ep){for(let[i,n]of this._$Ep)this[i]=n;this._$Ep=void 0}let r=this.constructor.elementProperties;if(r.size>0)for(let[i,n]of r){let{wrapped:a}=n,d=this[i];a!==!0||this._$AL.has(i)||d===void 0||this.C(i,void 0,n,d)}}let e=!1,t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(r=>r.hostUpdate?.()),this.update(t)):this._$EM()}catch(r){throw e=!1,this._$EM(),r}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&(this._$Eq=this._$Eq.forEach(t=>this._$ET(t,this[t]))),this._$EM()}updated(e){}firstUpdated(e){}};re.elementStyles=[],re.shadowRootOptions={mode:"open"},re[Be("elementProperties")]=new Map,re[Be("finalized")]=new Map,zo?.({ReactiveElement:re}),(ce.reactiveElementVersions??(ce.reactiveElementVersions=[])).push("2.1.2");var Mo={attribute:!0,type:String,converter:Fe,reflect:!1,hasChanged:tt},No=(o=Mo,e,t)=>{let{kind:r,metadata:i}=t,n=globalThis.litPropertyMetadata.get(i);if(n===void 0&&globalThis.litPropertyMetadata.set(i,n=new Map),r==="setter"&&((o=Object.create(o)).wrapped=!0),n.set(t.name,o),r==="accessor"){let{name:a}=t;return{set(d){let c=e.get.call(this);e.set.call(this,d),this.requestUpdate(a,c,o,!0,d)},init(d){return d!==void 0&&this.C(a,void 0,o,d),d}}}if(r==="setter"){let{name:a}=t;return function(d){let c=this[a];e.call(this,d),this.requestUpdate(a,c,o,!0,d)}}throw Error("Unsupported decorator location: "+r)};function l(o){return(e,t)=>typeof t=="object"?No(o,e,t):((r,i,n)=>{let a=i.hasOwnProperty(n);return i.constructor.createProperty(n,r),a?Object.getOwnPropertyDescriptor(i,n):void 0})(o,e,t)}function k(o){return l({...o,state:!0,attribute:!1})}var Q=(o,e,t)=>(t.configurable=!0,t.enumerable=!0,Reflect.decorate&&typeof e!="object"&&Object.defineProperty(o,e,t),t);function S(o,e){return(t,r,i)=>{let n=a=>a.renderRoot?.querySelector(o)??null;if(e){let{get:a,set:d}=typeof r=="object"?t:i??(()=>{let c=Symbol();return{get(){return this[c]},set(h){this[c]=h}}})();return Q(t,r,{get(){let c=a.call(this);return c===void 0&&(c=n(this),(c!==null||this.hasUpdated)&&d.call(this,c)),c}})}return Q(t,r,{get(){return n(this)}})}}var Bo;function Or(o){return(e,t)=>Q(e,t,{get(){return(this.renderRoot??Bo??(Bo=document.createDocumentFragment())).querySelectorAll(o)}})}function N(o){return(e,t)=>{let{slot:r,selector:i}=o??{},n="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){let a=this.renderRoot?.querySelector(n),d=a?.assignedElements(o)??[];return i===void 0?d:d.filter(c=>c.matches(i))}})}}function rt(o){return(e,t)=>{let{slot:r}=o??{},i="slot"+(r?`[name=${r}]`:":not([name])");return Q(e,t,{get(){return this.renderRoot?.querySelector(i)?.assignedNodes(o)??[]}})}}var qe=globalThis,Rr=o=>o,ot=qe.trustedTypes,Pr=ot?ot.createPolicy("lit-html",{createHTML:o=>o}):void 0,qt="$lit$",oe=`lit$${Math.random().toFixed(9).slice(2)}$`,Vt="?"+oe,Fo=`<${Vt}>`,_e=document,Ve=()=>_e.createComment(""),He=o=>o===null||typeof o!="object"&&typeof o!="function",Ht=Array.isArray,Br=o=>Ht(o)||typeof o?.[Symbol.iterator]=="function",Ut=`[ 	
 \f\r]`,Ue=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,Lr=/-->/g,Dr=/>/g,ye=RegExp(`>|${Ut}(?:([^\\s"'>=/]+)(${Ut}*=${Ut}*(?:[^ 	
@@ -3707,6 +3708,165 @@ if (!customElements.get("lht-page-menu")) {
   </script>
 
   <script>
+(() => {
+    const textEncoder = new TextEncoder();
+    function getDirectChildByLocalName(root, localName) {
+        if (!root)
+            return null;
+        for (const node of Array.from(root.childNodes)) {
+            if (node.nodeType === Node.ELEMENT_NODE && node.localName === localName) {
+                return node;
+            }
+        }
+        return null;
+    }
+    function getElementsByLocalName(root, localName) {
+        if (!root)
+            return [];
+        const elements = Array.from(root.getElementsByTagName("*"));
+        return elements.filter((element) => element.localName === localName);
+    }
+    function getTextContent(node) {
+        return ((node === null || node === void 0 ? void 0 : node.textContent) || "").replace(/\r\n/g, "\n");
+    }
+    function createSafeSheetAssetDir(sheetName) {
+        return sheetName.replace(/[\\/:*?"<>|]+/g, "_").trim() || "Sheet";
+    }
+    function escapeXml(text) {
+        return String(text || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&apos;");
+    }
+    function emuToPx(emu, fallback) {
+        if (!Number.isFinite(emu) || emu <= 0)
+            return fallback;
+        return Math.max(1, Math.round(emu / 9525));
+    }
+    function parseHexColor(root) {
+        const srgb = getElementsByLocalName(root, "srgbClr")[0] || null;
+        if (srgb === null || srgb === void 0 ? void 0 : srgb.getAttribute("val")) {
+            return `#${String(srgb.getAttribute("val")).trim()}`;
+        }
+        const scheme = getElementsByLocalName(root, "schemeClr")[0] || null;
+        const schemeVal = String((scheme === null || scheme === void 0 ? void 0 : scheme.getAttribute("val")) || "").trim();
+        const schemeMap = {
+            accent1: "#4472C4",
+            accent2: "#ED7D31",
+            accent3: "#A5A5A5",
+            accent4: "#FFC000",
+            accent5: "#5B9BD5",
+            accent6: "#70AD47",
+            tx1: "#000000",
+            tx2: "#44546A",
+            lt1: "#FFFFFF",
+            lt2: "#E7E6E6"
+        };
+        return schemeMap[schemeVal] || null;
+    }
+    function parseShapeText(shapeNode) {
+        return getElementsByLocalName(shapeNode, "t")
+            .map((node) => getTextContent(node).trim())
+            .filter(Boolean)
+            .join("\n")
+            .trim();
+    }
+    function parseShapeKind(shapeNode) {
+        if (!shapeNode)
+            return null;
+        if (shapeNode.localName === "cxnSp") {
+            return "connector";
+        }
+        if (shapeNode.localName !== "sp") {
+            return null;
+        }
+        const nvSpPr = getDirectChildByLocalName(shapeNode, "nvSpPr");
+        const cNvSpPr = getDirectChildByLocalName(nvSpPr, "cNvSpPr");
+        if ((cNvSpPr === null || cNvSpPr === void 0 ? void 0 : cNvSpPr.getAttribute("txBox")) === "1") {
+            return "textbox";
+        }
+        const spPr = getDirectChildByLocalName(shapeNode, "spPr");
+        const prstGeom = getDirectChildByLocalName(spPr, "prstGeom");
+        if (String((prstGeom === null || prstGeom === void 0 ? void 0 : prstGeom.getAttribute("prst")) || "").trim() === "rect") {
+            return "rect";
+        }
+        return null;
+    }
+    function parseShapeDimensions(anchor, shapeNode) {
+        const extNode = getDirectChildByLocalName(anchor, "ext")
+            || getDirectChildByLocalName(getDirectChildByLocalName(getDirectChildByLocalName(shapeNode || anchor, "spPr"), "xfrm"), "ext");
+        const widthEmu = Number((extNode === null || extNode === void 0 ? void 0 : extNode.getAttribute("cx")) || "");
+        const heightEmu = Number((extNode === null || extNode === void 0 ? void 0 : extNode.getAttribute("cy")) || "");
+        return {
+            widthPx: emuToPx(widthEmu, 160),
+            heightPx: emuToPx(heightEmu, 48)
+        };
+    }
+    function renderRectLikeSvg(shapeNode, anchor, text, treatAsTextbox) {
+        const { widthPx, heightPx } = parseShapeDimensions(anchor, shapeNode);
+        const spPr = getDirectChildByLocalName(shapeNode, "spPr");
+        const fillColor = parseHexColor(getDirectChildByLocalName(spPr, "solidFill")) || (treatAsTextbox ? "#FFFFFF" : "#F3F3F3");
+        const lineNode = getDirectChildByLocalName(spPr, "ln");
+        const strokeColor = parseHexColor(lineNode) || "#333333";
+        const strokeWidth = Math.max(1, Math.round(Number((lineNode === null || lineNode === void 0 ? void 0 : lineNode.getAttribute("w")) || "") / 9525) || 1);
+        const safeText = escapeXml(text);
+        const textMarkup = safeText
+            ? `<text x="${Math.round(widthPx / 2)}" y="${Math.round(heightPx / 2)}" text-anchor="middle" dominant-baseline="middle" font-size="14" font-family="sans-serif" fill="#000000">${safeText}</text>`
+            : "";
+        return [
+            `<svg xmlns="http://www.w3.org/2000/svg" width="${widthPx}" height="${heightPx}" viewBox="0 0 ${widthPx} ${heightPx}">`,
+            `  <rect x="1" y="1" width="${Math.max(1, widthPx - 2)}" height="${Math.max(1, heightPx - 2)}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>`,
+            textMarkup ? `  ${textMarkup}` : "",
+            `</svg>`
+        ].filter(Boolean).join("\n");
+    }
+    function renderConnectorSvg(shapeNode, anchor) {
+        const { widthPx, heightPx } = parseShapeDimensions(anchor, shapeNode);
+        const spPr = getDirectChildByLocalName(shapeNode, "spPr");
+        const lineNode = getDirectChildByLocalName(spPr, "ln");
+        const strokeColor = parseHexColor(lineNode) || "#333333";
+        const strokeWidth = Math.max(1, Math.round(Number((lineNode === null || lineNode === void 0 ? void 0 : lineNode.getAttribute("w")) || "") / 9525) || 1);
+        const effectiveHeight = Math.max(heightPx, 24);
+        const y = Math.round(effectiveHeight / 2);
+        return [
+            `<svg xmlns="http://www.w3.org/2000/svg" width="${widthPx}" height="${effectiveHeight}" viewBox="0 0 ${widthPx} ${effectiveHeight}">`,
+            `  <defs>`,
+            `    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">`,
+            `      <path d="M0,0 L0,6 L9,3 z" fill="${strokeColor}"/>`,
+            `    </marker>`,
+            `  </defs>`,
+            `  <line x1="2" y1="${y}" x2="${Math.max(2, widthPx - 4)}" y2="${y}" stroke="${strokeColor}" stroke-width="${strokeWidth}" marker-end="url(#arrow)"/>`,
+            `</svg>`
+        ].join("\n");
+    }
+    function renderShapeSvg(shapeNode, anchor, sheetName, shapeIndex) {
+        const kind = parseShapeKind(shapeNode);
+        if (!kind)
+            return null;
+        let svg = "";
+        if (kind === "connector") {
+            svg = renderConnectorSvg(shapeNode, anchor);
+        }
+        else {
+            svg = renderRectLikeSvg(shapeNode, anchor, parseShapeText(shapeNode), kind === "textbox");
+        }
+        const safeDir = createSafeSheetAssetDir(sheetName);
+        const filename = `shape_${String(shapeIndex).padStart(3, "0")}.svg`;
+        return {
+            filename,
+            path: `assets/${safeDir}/${filename}`,
+            data: textEncoder.encode(`${svg}\n`)
+        };
+    }
+    globalThis.__xlsx2mdOfficeDrawing = {
+        renderShapeSvg
+    };
+})();
+  </script>
+
+  <script>
 (function initXlsx2mdFormulaTokenizer(global) {
     var _a;
     var _b;
@@ -5507,6 +5667,7 @@ if (!customElements.get("lht-page-menu")) {
     const textDecoder = new TextDecoder("utf-8");
     const textEncoder = new TextEncoder();
     const crcTable = buildCrc32Table();
+    const drawingHelper = globalThis.__xlsx2mdOfficeDrawing || null;
     let resolveDefinedNameScalarValue = null;
     let resolveDefinedNameRangeRef = null;
     let resolveStructuredRangeRef = null;
@@ -5546,6 +5707,10 @@ if (!customElements.get("lht-page-menu")) {
         prosePenalty: -2,
         threshold: 4
     };
+    const DEFAULT_CELL_WIDTH_EMU = 609600;
+    const DEFAULT_CELL_HEIGHT_EMU = 190500;
+    const SHAPE_BLOCK_GAP_X_EMU = DEFAULT_CELL_WIDTH_EMU * 4;
+    const SHAPE_BLOCK_GAP_Y_EMU = DEFAULT_CELL_HEIGHT_EMU * 6;
     function buildCrc32Table() {
         const table = new Uint32Array(256);
         for (let i = 0; i < 256; i += 1) {
@@ -5619,6 +5784,16 @@ if (!customElements.get("lht-page-menu")) {
     }
     function getFirstChildByLocalName(root, localName) {
         return getElementsByLocalName(root, localName)[0] || null;
+    }
+    function getDirectChildByLocalName(root, localName) {
+        if (!root)
+            return null;
+        for (const node of Array.from(root.childNodes)) {
+            if (node.nodeType === Node.ELEMENT_NODE && node.localName === localName) {
+                return node;
+            }
+        }
+        return null;
     }
     function decodeXmlText(bytes) {
         return textDecoder.decode(bytes);
@@ -6487,6 +6662,263 @@ if (!customElements.get("lht-page-menu")) {
             }
         }
         return charts;
+    }
+    function parseShapeKind(shapeNode) {
+        if (!shapeNode)
+            return "図形";
+        if (shapeNode.localName === "cxnSp") {
+            const geomNode = getFirstChildByLocalName(getFirstChildByLocalName(shapeNode, "spPr") || shapeNode, "prstGeom");
+            const prst = String((geomNode === null || geomNode === void 0 ? void 0 : geomNode.getAttribute("prst")) || "").trim();
+            if (prst === "straightConnector1") {
+                return "直線矢印コネクタ";
+            }
+            return prst ? `コネクタ (${prst})` : "コネクタ";
+        }
+        if (shapeNode.localName !== "sp") {
+            return "図形";
+        }
+        const nvSpPr = getFirstChildByLocalName(shapeNode, "nvSpPr");
+        const cNvSpPr = getFirstChildByLocalName(nvSpPr || shapeNode, "cNvSpPr");
+        if ((cNvSpPr === null || cNvSpPr === void 0 ? void 0 : cNvSpPr.getAttribute("txBox")) === "1") {
+            return "テキストボックス";
+        }
+        const geomNode = getFirstChildByLocalName(getFirstChildByLocalName(shapeNode, "spPr") || shapeNode, "prstGeom");
+        const prst = String((geomNode === null || geomNode === void 0 ? void 0 : geomNode.getAttribute("prst")) || "").trim();
+        if (prst === "rect") {
+            return "長方形";
+        }
+        return prst ? `図形 (${prst})` : "図形";
+    }
+    function parseShapeText(shapeNode) {
+        return getElementsByLocalName(shapeNode || document, "t")
+            .map((node) => getTextContent(node))
+            .filter(Boolean)
+            .join("")
+            .trim();
+    }
+    function parseShapeExt(anchor, shapeNode) {
+        const extNode = getDirectChildByLocalName(anchor, "ext")
+            || getDirectChildByLocalName(getDirectChildByLocalName(getDirectChildByLocalName(shapeNode || anchor, "spPr") || shapeNode || anchor, "xfrm"), "ext");
+        const widthEmu = Number((extNode === null || extNode === void 0 ? void 0 : extNode.getAttribute("cx")) || "");
+        const heightEmu = Number((extNode === null || extNode === void 0 ? void 0 : extNode.getAttribute("cy")) || "");
+        return {
+            widthEmu: Number.isFinite(widthEmu) ? widthEmu : null,
+            heightEmu: Number.isFinite(heightEmu) ? heightEmu : null
+        };
+    }
+    function flattenXmlNodeEntries(node, path = "", entries = []) {
+        if (!node)
+            return entries;
+        const nodeName = node.tagName || node.nodeName || node.localName || "node";
+        const currentPath = path ? `${path}/${nodeName}` : nodeName;
+        for (const attribute of Array.from(node.attributes)) {
+            entries.push({
+                key: `${currentPath}@${attribute.name}`,
+                value: attribute.value
+            });
+        }
+        const directText = Array.from(node.childNodes)
+            .filter((child) => child.nodeType === Node.TEXT_NODE)
+            .map((child) => (child.textContent || "").trim())
+            .filter(Boolean)
+            .join(" ");
+        if (directText) {
+            entries.push({
+                key: `${currentPath}#text`,
+                value: directText
+            });
+        }
+        for (const child of Array.from(node.childNodes)) {
+            if (child.nodeType === Node.ELEMENT_NODE) {
+                flattenXmlNodeEntries(child, currentPath, entries);
+            }
+        }
+        return entries;
+    }
+    function parseShapeRawEntries(anchor) {
+        const entries = [];
+        return flattenXmlNodeEntries(anchor, "", entries);
+    }
+    function renderHierarchicalRawEntries(entries) {
+        const root = {
+            children: new Map(),
+            value: null
+        };
+        for (const entry of entries) {
+            const parts = entry.key.split("/").filter(Boolean);
+            let current = root;
+            for (const part of parts) {
+                if (!current.children.has(part)) {
+                    current.children.set(part, {
+                        children: new Map(),
+                        value: null
+                    });
+                }
+                current = current.children.get(part);
+            }
+            current.value = entry.value;
+        }
+        const lines = [];
+        function visit(node, depth) {
+            for (const [key, child] of node.children.entries()) {
+                const indent = " ".repeat(depth * 4);
+                if (child.value !== null) {
+                    lines.push(`${indent}- \`${key}\`: \`${child.value}\``);
+                }
+                else {
+                    lines.push(`${indent}- \`${key}\``);
+                }
+                visit(child, depth + 1);
+            }
+        }
+        visit(root, 0);
+        return lines;
+    }
+    function parseAnchorInt(anchor, parentName, childName) {
+        const parent = getFirstChildByLocalName(anchor || document, parentName);
+        const child = getFirstChildByLocalName(parent || anchor || document, childName);
+        const value = Number(getTextContent(child));
+        return Number.isFinite(value) ? value : null;
+    }
+    function parseShapeBoundingBox(anchor, shapeNode, widthEmu, heightEmu) {
+        const fromCol = parseAnchorInt(anchor, "from", "col") || 0;
+        const fromRow = parseAnchorInt(anchor, "from", "row") || 0;
+        const fromColOff = parseAnchorInt(anchor, "from", "colOff") || 0;
+        const fromRowOff = parseAnchorInt(anchor, "from", "rowOff") || 0;
+        const toCol = parseAnchorInt(anchor, "to", "col");
+        const toRow = parseAnchorInt(anchor, "to", "row");
+        const toColOff = parseAnchorInt(anchor, "to", "colOff") || 0;
+        const toRowOff = parseAnchorInt(anchor, "to", "rowOff") || 0;
+        const left = fromCol * DEFAULT_CELL_WIDTH_EMU + fromColOff;
+        const top = fromRow * DEFAULT_CELL_HEIGHT_EMU + fromRowOff;
+        if (toCol !== null && toRow !== null) {
+            return {
+                left,
+                top,
+                right: toCol * DEFAULT_CELL_WIDTH_EMU + toColOff,
+                bottom: toRow * DEFAULT_CELL_HEIGHT_EMU + toRowOff
+            };
+        }
+        const ext = parseShapeExt(anchor, shapeNode);
+        return {
+            left,
+            top,
+            right: left + Math.max(1, ext.widthEmu || widthEmu || DEFAULT_CELL_WIDTH_EMU),
+            bottom: top + Math.max(1, ext.heightEmu || heightEmu || DEFAULT_CELL_HEIGHT_EMU)
+        };
+    }
+    function bboxGap(a, b) {
+        const dx = a.right < b.left
+            ? b.left - a.right
+            : b.right < a.left
+                ? a.left - b.right
+                : 0;
+        const dy = a.bottom < b.top
+            ? b.top - a.bottom
+            : b.bottom < a.top
+                ? a.top - b.bottom
+                : 0;
+        return { dx, dy };
+    }
+    function extractShapeBlocks(shapes) {
+        if (shapes.length === 0)
+            return [];
+        const visited = new Array(shapes.length).fill(false);
+        const blocks = [];
+        for (let i = 0; i < shapes.length; i += 1) {
+            if (visited[i])
+                continue;
+            const queue = [i];
+            visited[i] = true;
+            const shapeIndexes = [];
+            while (queue.length > 0) {
+                const currentIndex = queue.shift();
+                shapeIndexes.push(currentIndex);
+                const current = shapes[currentIndex];
+                for (let j = 0; j < shapes.length; j += 1) {
+                    if (visited[j])
+                        continue;
+                    const other = shapes[j];
+                    const { dx, dy } = bboxGap(current.bbox, other.bbox);
+                    if (dx <= SHAPE_BLOCK_GAP_X_EMU && dy <= SHAPE_BLOCK_GAP_Y_EMU) {
+                        visited[j] = true;
+                        queue.push(j);
+                    }
+                }
+            }
+            let minLeft = Number.POSITIVE_INFINITY;
+            let minTop = Number.POSITIVE_INFINITY;
+            let maxRight = 0;
+            let maxBottom = 0;
+            for (const index of shapeIndexes) {
+                const bbox = shapes[index].bbox;
+                minLeft = Math.min(minLeft, bbox.left);
+                minTop = Math.min(minTop, bbox.top);
+                maxRight = Math.max(maxRight, bbox.right);
+                maxBottom = Math.max(maxBottom, bbox.bottom);
+            }
+            blocks.push({
+                startCol: Math.floor(minLeft / DEFAULT_CELL_WIDTH_EMU) + 1,
+                startRow: Math.floor(minTop / DEFAULT_CELL_HEIGHT_EMU) + 1,
+                endCol: Math.floor(maxRight / DEFAULT_CELL_WIDTH_EMU) + 1,
+                endRow: Math.floor(maxBottom / DEFAULT_CELL_HEIGHT_EMU) + 1,
+                shapeIndexes: shapeIndexes.sort((a, b) => a - b)
+            });
+        }
+        return blocks.sort((a, b) => (a.startRow - b.startRow) || (a.startCol - b.startCol));
+    }
+    function parseDrawingShapes(files, sheetName, sheetPath) {
+        var _a;
+        const sheetRels = parseRelationships(files, buildRelsPath(sheetPath), sheetPath);
+        const shapes = [];
+        let shapeCounter = 1;
+        for (const drawingPath of sheetRels.values()) {
+            if (!/\/drawings\/.+\.xml$/i.test(drawingPath))
+                continue;
+            const drawingBytes = files.get(drawingPath);
+            if (!drawingBytes)
+                continue;
+            const drawingDoc = xmlToDocument(decodeXmlText(drawingBytes));
+            const anchors = getElementsByLocalName(drawingDoc, "oneCellAnchor").concat(getElementsByLocalName(drawingDoc, "twoCellAnchor"));
+            for (const anchor of anchors) {
+                const from = getFirstChildByLocalName(anchor, "from");
+                const colNode = getFirstChildByLocalName(from || anchor, "col");
+                const rowNode = getFirstChildByLocalName(from || anchor, "row");
+                const col = Number(getTextContent(colNode)) + 1;
+                const row = Number(getTextContent(rowNode)) + 1;
+                if (!Number.isFinite(col) || !Number.isFinite(row) || col <= 0 || row <= 0) {
+                    continue;
+                }
+                if (getElementsByLocalName(anchor, "blip").length > 0)
+                    continue;
+                if (getElementsByLocalName(anchor, "chart").length > 0)
+                    continue;
+                const shapeNode = getFirstChildByLocalName(anchor, "sp") || getFirstChildByLocalName(anchor, "cxnSp");
+                if (!shapeNode)
+                    continue;
+                const cNvPr = getFirstChildByLocalName(getFirstChildByLocalName(shapeNode, shapeNode.localName === "sp" ? "nvSpPr" : "nvCxnSpPr") || shapeNode, "cNvPr");
+                const { widthEmu, heightEmu } = parseShapeExt(anchor, shapeNode);
+                const svgAsset = ((_a = drawingHelper === null || drawingHelper === void 0 ? void 0 : drawingHelper.renderShapeSvg) === null || _a === void 0 ? void 0 : _a.call(drawingHelper, shapeNode, anchor, sheetName, shapeCounter)) || null;
+                shapes.push({
+                    sheetName,
+                    anchor: `${colToLetters(col)}${row}`,
+                    name: String((cNvPr === null || cNvPr === void 0 ? void 0 : cNvPr.getAttribute("name")) || "").trim() || "図形",
+                    kind: parseShapeKind(shapeNode),
+                    text: parseShapeText(shapeNode),
+                    widthEmu,
+                    heightEmu,
+                    elementName: `xdr:${shapeNode.localName}`,
+                    anchorElementName: anchor.tagName || anchor.nodeName || anchor.localName || "anchor",
+                    rawEntries: parseShapeRawEntries(anchor),
+                    bbox: parseShapeBoundingBox(anchor, shapeNode, widthEmu, heightEmu),
+                    svgFilename: (svgAsset === null || svgAsset === void 0 ? void 0 : svgAsset.filename) || null,
+                    svgPath: (svgAsset === null || svgAsset === void 0 ? void 0 : svgAsset.path) || null,
+                    svgData: (svgAsset === null || svgAsset === void 0 ? void 0 : svgAsset.data) || null
+                });
+                shapeCounter += 1;
+            }
+        }
+        return shapes;
     }
     function extractCellOutputValue(cellElement, sharedStrings, cellStyle, formulaOverride = "") {
         const type = (cellElement.getAttribute("t") || "").trim();
@@ -8666,6 +9098,7 @@ if (!customElements.get("lht-page-menu")) {
         const tables = parseWorksheetTables(files, doc, sheetName, sheetPath);
         const images = parseDrawingImages(files, sheetName, sheetPath);
         const charts = parseDrawingCharts(files, sheetName, sheetPath);
+        const shapes = parseDrawingShapes(files, sheetName, sheetPath);
         let maxRow = 0;
         let maxCol = 0;
         for (const cell of cells) {
@@ -8689,6 +9122,7 @@ if (!customElements.get("lht-page-menu")) {
             tables,
             images,
             charts,
+            shapes,
             maxRow,
             maxCol
         };
@@ -9205,6 +9639,8 @@ if (!customElements.get("lht-page-menu")) {
     function convertSheetToMarkdown(workbook, sheet, options = {}) {
         var _a;
         const charts = sheet.charts || [];
+        const shapes = sheet.shapes || [];
+        const shapeBlocks = extractShapeBlocks(shapes);
         const treatFirstRowAsHeader = options.treatFirstRowAsHeader !== false;
         const tables = detectTableCandidates(sheet);
         const narrativeBlocks = extractNarrativeBlocks(sheet, tables, options);
@@ -9320,6 +9756,33 @@ if (!customElements.get("lht-page-menu")) {
                 })
             ].join("\n")
             : "";
+        const shapeSection = shapes.length > 0
+            ? [
+                "",
+                "## 図ブロック",
+                "",
+                ...shapeBlocks.map((block, blockIndex) => [
+                    `### 図ブロック${String(blockIndex + 1).padStart(3, "0")} (${formatRange(block.startRow, block.startCol, block.endRow, block.endCol)})`,
+                    `- 図形: ${block.shapeIndexes.map((shapeIndex) => `図形${String(shapeIndex + 1).padStart(3, "0")}`).join(", ")}`,
+                    `- anchorRange: ${colToLetters(block.startCol)}${block.startRow}-${colToLetters(block.endCol)}${block.endRow}`
+                ].join("\n")),
+                "",
+                "## 図形",
+                "",
+                ...shapes.map((shape, index) => {
+                    const lines = [
+                        `### 図形${String(index + 1).padStart(3, "0")} (${shape.anchor})`,
+                        ...renderHierarchicalRawEntries(shape.rawEntries)
+                    ];
+                    if (shape.svgPath) {
+                        lines.push(`- SVG: ${shape.svgPath}`);
+                        lines.push("");
+                        lines.push(`![${shape.svgFilename || `shape_${String(index + 1).padStart(3, "0")}.svg`}](${shape.svgPath})`);
+                    }
+                    return lines.join("\n");
+                })
+            ].join("\n")
+            : "";
         const markdown = [
             `# ${sheet.name}`,
             "",
@@ -9331,6 +9794,7 @@ if (!customElements.get("lht-page-menu")) {
             "",
             body || "_抽出できる本文はありませんでした。_",
             chartSection,
+            shapeSection,
             imageSection
         ].join("\n");
         return {
@@ -9402,6 +9866,14 @@ if (!customElements.get("lht-page-menu")) {
                 entries.push({
                     name: `output/${image.path}`,
                     data: image.data
+                });
+            }
+            for (const shape of sheet.shapes || []) {
+                if (!shape.svgPath || !shape.svgData)
+                    continue;
+                entries.push({
+                    name: `output/${shape.svgPath}`,
+                    data: shape.svgData
                 });
             }
         }
