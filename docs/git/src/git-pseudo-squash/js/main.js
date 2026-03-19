@@ -372,13 +372,33 @@
         ? element.value
         : element.textContent;
       if (!text) return;
+      copyPlainText(text);
+      showToast("コピーしました");
+    }
+
+    function copyPlainText(text) {
+      if (!text) return;
       const temp = document.createElement("textarea");
       temp.value = text;
       document.body.appendChild(temp);
       temp.select();
       document.execCommand("copy");
       document.body.removeChild(temp);
-      showToast("コピーしました");
+    }
+
+    function formatBackupBranchTimestamp(date = new Date()) {
+      const year = String(date.getFullYear());
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day}-${hours}${minutes}`;
+    }
+
+    function copyBackupBranchCommand() {
+      const command = `git branch backup/${formatBackupBranchTimestamp()}`;
+      copyPlainText(command);
+      showToast("Backup 用ブランチ作成コマンドをコピーしました");
     }
 
     function showToast(message) {

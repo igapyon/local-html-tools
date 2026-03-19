@@ -350,7 +350,8 @@
         locked: raw?.locked === true,
         remoteName: entryType === "git" ? (String(raw?.remoteName || "origin").trim() || "origin") : "",
         createdAt: Number(raw?.createdAt || raw?.updatedAt || Date.now()),
-        updatedAt: Number(raw?.updatedAt || Date.now())
+        updatedAt: Number(raw?.updatedAt || Date.now()),
+        lastOpenedAt: Number(raw?.lastOpenedAt || 0)
       };
     }
 
@@ -409,6 +410,8 @@
           baseBranch: entry.baseBranch,
           baseScope: entry.baseScope,
           remoteName: entry.remoteName,
+          createdAt: Number(entry.createdAt || 0),
+          lastOpenedAt: Number(entry.lastOpenedAt || 0),
           memoKey,
           memo: String(memos[memoKey]?.memo || "").trim(),
           gitCurrentDir: String(memos[memoKey]?.gitCurrentDir || "").trim(),
@@ -418,6 +421,11 @@
         createdGroup.displayName = isGitEntry(entry)
           ? buildDisplayName(entry)
           : buildUrlOnlyDisplayTitle(createdGroup.repoUrl, createdGroup.memo);
+        return;
+      });
+      groupedMap.forEach((group) => {
+        group.lastOpenedAt = Math.max(0, ...group.entries.map((entry) => Number(entry.lastOpenedAt || 0)));
+        group.createdAt = Math.max(0, ...group.entries.map((entry) => Number(entry.createdAt || 0)));
       });
       return Array.from(groupedMap.values());
     }
@@ -477,6 +485,34 @@
     function markToolUsed(entryId, tool) {
       recentActions = updateRecentActions(recentActions, entryId, tool);
       saveRecentActions();
+    }
+
+    function markEntryOpened(entryId) {
+      const entryIndex = entries.findIndex((item) => item.id === entryId);
+      if (entryIndex < 0) return;
+      entries[entryIndex] = {
+        ...entries[entryIndex],
+        lastOpenedAt: Date.now()
+      };
+      saveEntries();
+      renderEntries();
+    }
+
+    function markGroupOpened(groupKey) {
+      if (!groupKey) return;
+      const now = Date.now();
+      let changed = false;
+      entries = entries.map((entry) => {
+        if (buildGroupKey(entry) !== groupKey) return entry;
+        changed = true;
+        return {
+          ...entry,
+          lastOpenedAt: now
+        };
+      });
+      if (!changed) return;
+      saveEntries();
+      renderEntries();
     }
 
     function openBranchDiff(entry) {
@@ -663,7 +699,7 @@
               </div>
               <div class="md-entry-url-row">
                 <div class="md-entry-url">${escapeHtml(group.repoUrl)}</div>
-                ${isOpenableExternalUrl(group.repoUrl) ? `<button type="button" class="md-entry-link-btn" data-action="open-repo-url" data-repo-url="${escapeHtml(group.repoUrl)}" title="URL を開く" aria-label="URL を開く">${getButtonIconSvg("open-external")}</button>` : ""}
+                ${isOpenableExternalUrl(group.repoUrl) ? `<button type="button" class="md-entry-link-btn" data-action="open-repo-url" data-group-key="${escapeHtml(group.key)}" data-repo-url="${escapeHtml(group.repoUrl)}" title="URL を開く" aria-label="URL を開く">${getButtonIconSvg("open-external")}</button>` : ""}
               </div>
             </div>
             ${baseSection}
@@ -781,6 +817,7 @@
               </div>
             </div>
             <div class="md-entry-actions md-work-row__actions">
+              <button type="button" class="md-button md-button--surface" data-action="open-url-only-entry">${getButtonIconSvg("open-external")}<span>開く</span></button>
               <button type="button" class="md-button md-button--surface" data-action="edit-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("edit")}<span>変更</span></button>
               <button type="button" class="md-button md-button--danger" data-action="delete-entry" ${entry.locked ? "disabled" : ""}>${getButtonIconSvg("delete")}<span>削除</span></button>
               <button type="button" class="md-button ${entry.locked ? "md-button--lock-active" : "md-button--surface"}" data-action="toggle-lock">${getButtonIconSvg(entry.locked ? "lock" : "unlock")}<span>${entry.locked ? "解除" : "ロック"}</span></button>
@@ -814,10 +851,13 @@
     function renderEntries() {
       const list = document.getElementById("entriesList");
       if (!list) return;
-      const visibleEntries = entries
-        .slice()
-        .sort((left, right) => Number(right.createdAt || 0) - Number(left.createdAt || 0));
-      const visibleGroups = groupEntriesByBase(visibleEntries);
+      const visibleGroups = groupEntriesByBase(entries.slice())
+        .sort((left, right) => {
+          const openedDiff = Number(right.lastOpenedAt || 0) - Number(left.lastOpenedAt || 0);
+          if (openedDiff !== 0) return openedDiff;
+          return Number(right.createdAt || 0) - Number(left.createdAt || 0);
+        });
+      const visibleEntries = visibleGroups.flatMap((group) => group.entries);
 
       updateEmptyGuide(visibleEntries.length);
       updatePrimaryActionsState();
@@ -896,6 +936,7 @@
       if (action === "open-repo-url") {
         const repoUrl = button.getAttribute("data-repo-url");
         if (!isOpenableExternalUrl(repoUrl)) return;
+        markGroupOpened(button.getAttribute("data-group-key"));
         window.open(repoUrl, "_blank", "noopener,noreferrer");
         return;
       }
@@ -907,12 +948,19 @@
 
       if (action === "open-branch-diff") {
         markToolUsed(entryId, "branch-diff");
+        markEntryOpened(entryId);
         openBranchDiff(entry);
         return;
       }
       if (action === "open-pseudo-squash") {
         markToolUsed(entryId, "pseudo-squash");
+        markEntryOpened(entryId);
         openPseudoSquash(entry);
+        return;
+      }
+      if (action === "open-url-only-entry") {
+        markEntryOpened(entryId);
+        openRepoUrl(entry);
         return;
       }
       if (action === "edit-entry") {
