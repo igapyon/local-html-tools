@@ -497,6 +497,32 @@ window.__gitPseudoSquashTest = {
     expect(window.__gitPseudoSquashTest.getUseCurrentBranchSelected()).toBe(false);
   });
 
+  it("prioritizes query baseBranch over persisted base-branch history", () => {
+    installLocalStorageMock();
+    localStorage.setItem("gitPseudoSquash.squashBaseBranch", "devel");
+    localStorage.setItem("gitPseudoSquash.squashBaseBranchHistory", '["devel","main"]');
+    mountGitPseudoSquashDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-pseudo-squash.html?baseBranch=devel2&workBranch=feature-a"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitPseudoSquashTest = {
+  normalizeCommitMessageForPr,
+  regenerateAllCommands,
+  getUseCurrentBranchSelected,
+  toggleOriginLock,
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams,
+  buildBranchDiffUrlFromPlannedDiff
+};`;
+    new Function(instrumentedCode)();
+
+    expect(document.getElementById("squashBaseBranch").value).toBe("devel2");
+  });
+
   it("builds branch-diff URL with HEAD when current branch mode is enabled", () => {
     bootGitPseudoSquashPage();
 

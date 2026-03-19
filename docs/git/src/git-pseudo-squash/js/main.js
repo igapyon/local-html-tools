@@ -1473,10 +1473,12 @@
     function loadPersistedBaseBranch() {
       const input = document.getElementById("squashBaseBranch");
       if (!input) return;
+      const params = readCurrentQueryParams();
+      const queryBaseBranch = String(params.get("baseBranch") || "").trim();
       try {
         const stored = localStorage.getItem(BASE_BRANCH_STORAGE_KEY);
         const history = getStoredBaseBranchHistory();
-        const restored = stored && stored.trim() ? stored.trim() : (history[0] || "");
+        const restored = queryBaseBranch || (stored && stored.trim() ? stored.trim() : (history[0] || ""));
         if (restored) {
           input.value = restored;
           if (!history.includes(restored)) {
