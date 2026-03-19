@@ -136,7 +136,7 @@
 .md-entry-head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
   flex-wrap: wrap;
 }
@@ -145,6 +145,8 @@
   min-width: 0;
   display: grid;
   gap: 0.35rem;
+  flex: 0 1 auto;
+  max-width: 100%;
 }
 
 .md-entry-title-row {
@@ -163,6 +165,7 @@
 
 .md-entry-base-box .md-ref-value {
   margin-left: 0;
+  font-size: 1.02rem;
 }
 
 .md-entry-title {

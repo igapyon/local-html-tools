@@ -2622,6 +2622,12 @@ lht-index-card-link {
           <lht-help-tooltip label="作業開始の説明">
             基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
           </lht-help-tooltip>
+          <button type="button" class="md-button md-button--surface md-button--compact md-button--with-icon md-title-action-btn" onclick="copyBackupBranchCommand()" title="backup 用ブランチ作成コマンドをコピー" aria-label="backup 用ブランチ作成コマンドをコピー">
+            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
+            </svg>
+            <span>Backup</span>
+          </button>
         </span>
       </div>
       <lht-command-block command-id="createBranchCmd"></lht-command-block>
@@ -5302,13 +5308,33 @@ if (!customElements.get("lht-page-menu")) {
         ? element.value
         : element.textContent;
       if (!text) return;
+      copyPlainText(text);
+      showToast("コピーしました");
+    }
+
+    function copyPlainText(text) {
+      if (!text) return;
       const temp = document.createElement("textarea");
       temp.value = text;
       document.body.appendChild(temp);
       temp.select();
       document.execCommand("copy");
       document.body.removeChild(temp);
-      showToast("コピーしました");
+    }
+
+    function formatBackupBranchTimestamp(date = new Date()) {
+      const year = String(date.getFullYear());
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day}-${hours}${minutes}`;
+    }
+
+    function copyBackupBranchCommand() {
+      const command = `git branch backup/${formatBackupBranchTimestamp()}`;
+      copyPlainText(command);
+      showToast("Backup 用ブランチ作成コマンドをコピーしました");
     }
 
     function showToast(message) {

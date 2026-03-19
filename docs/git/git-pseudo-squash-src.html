@@ -153,6 +153,12 @@ limitations under the License.
           <lht-help-tooltip label="作業開始の説明">
             基点から作業ブランチを切るステップです。この下で作成コマンドを生成します。
           </lht-help-tooltip>
+          <button type="button" class="md-button md-button--surface md-button--compact md-button--with-icon md-title-action-btn" onclick="copyBackupBranchCommand()" title="backup 用ブランチ作成コマンドをコピー" aria-label="backup 用ブランチ作成コマンドをコピー">
+            <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <use href="#md-icon-copy" xlink:href="#md-icon-copy"></use>
+            </svg>
+            <span>Backup</span>
+          </button>
         </span>
       </div>
       <lht-command-block command-id="createBranchCmd"></lht-command-block>
