@@ -38,6 +38,7 @@ function mountGitPseudoSquashDom() {
     <button id="openBranchDiffBtn" type="button">compare</button>
     <button id="saveToWorkBranchListBtn" type="button">save</button>
     <button id="openRepoUrlBtn" type="button">open</button>
+    <button id="copyGitCurrentDirBtn" type="button" class="md-hidden">copy dir</button>
     <div id="toast"></div>
     <dialog id="normalizeDiffDialog"></dialog>
     <div id="normalizeDiffBefore"></div>
@@ -121,6 +122,7 @@ describe("git-pseudo-squash main", () => {
     window.alert = vi.fn();
     window.__LHT_NAVIGATE__ = vi.fn();
     window.open = vi.fn();
+    document.execCommand = vi.fn(() => true);
     window.history.replaceState({}, "", "/docs/git/git-pseudo-squash.html");
   });
 
@@ -332,6 +334,7 @@ PR本文:
   });
 
   it("adds current pseudo-squash settings to git-work-list and navigates back", () => {
+    const nowSpy = vi.spyOn(Date, "now").mockReturnValue(1700000000000);
     bootGitPseudoSquashPage();
 
     document.getElementById("repoUrl").value = "https://example.com/repo-a";
@@ -352,14 +355,17 @@ PR本文:
     expect(savedEntries[0].compareScope).toBe("local");
     expect(savedEntries[0].compareUseHead).toBe(true);
     expect(savedEntries[0].remoteName).toBe("upstream");
+    expect(savedEntries[0].lastOpenedAt).toBe(1700000000000);
     expect(getSavedJsonByKey("gitWorkList.recentActions")).toEqual({
       "branch-diff": [],
       "pseudo-squash": [savedEntries[0].id]
     });
     expect(window.__LHT_NAVIGATE__).toHaveBeenCalledWith("git-work-list.html");
+    nowSpy.mockRestore();
   });
 
   it("keeps lock state when updating an existing work-branch-list entry", () => {
+    const nowSpy = vi.spyOn(Date, "now").mockReturnValue(1700000001234);
     localStorage.setItem("gitWorkList.entries", JSON.stringify([
       {
         id: "existing-id",
@@ -371,7 +377,8 @@ PR本文:
         compareUseHead: false,
         locked: true,
         remoteName: "origin",
-        updatedAt: 1
+        updatedAt: 1,
+        lastOpenedAt: 9
       }
     ]));
 
@@ -388,10 +395,12 @@ PR本文:
     expect(savedEntries[0].id).toBe("existing-id");
     expect(savedEntries[0].locked).toBe(true);
     expect(savedEntries[0].createdAt).toBe(1);
+    expect(savedEntries[0].lastOpenedAt).toBe(1700000001234);
     expect(getSavedJsonByKey("gitWorkList.recentActions")).toEqual({
       "branch-diff": [],
       "pseudo-squash": ["existing-id"]
     });
+    nowSpy.mockRestore();
   });
 
   it("applies repo, branch, scope, and remote from URL params", () => {
@@ -472,6 +481,31 @@ window.__gitPseudoSquashTest = {
     expect(window.__gitPseudoSquashTest.getUseCurrentBranchSelected()).toBe(false);
   });
 
+  it("prioritizes query useCurrentBranch=true over persisted current-branch preference", () => {
+    installLocalStorageMock();
+    localStorage.setItem("gitPseudoSquash.ui.useCurrentBranch", "false");
+    mountGitPseudoSquashDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-pseudo-squash.html?baseBranch=devel&workBranch=feature-a&useCurrentBranch=true"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitPseudoSquashTest = {
+  normalizeCommitMessageForPr,
+  regenerateAllCommands,
+  getUseCurrentBranchSelected,
+  toggleOriginLock,
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams,
+  buildBranchDiffUrlFromPlannedDiff
+};`;
+    new Function(instrumentedCode)();
+
+    expect(window.__gitPseudoSquashTest.getUseCurrentBranchSelected()).toBe(true);
+  });
+
   it("prioritizes query useCurrentBranch=false over persisted current-branch preference", () => {
     installLocalStorageMock();
     localStorage.setItem("gitPseudoSquash.ui.useCurrentBranch", "true");
@@ -495,6 +529,54 @@ window.__gitPseudoSquashTest = {
     new Function(instrumentedCode)();
 
     expect(window.__gitPseudoSquashTest.getUseCurrentBranchSelected()).toBe(false);
+  });
+
+  it("keeps current-branch mode on by default when query and persisted value are both absent", () => {
+    mountGitPseudoSquashDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-pseudo-squash.html?baseBranch=devel&workBranch=feature-a"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitPseudoSquashTest = {
+  normalizeCommitMessageForPr,
+  regenerateAllCommands,
+  getUseCurrentBranchSelected,
+  toggleOriginLock,
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams,
+  buildBranchDiffUrlFromPlannedDiff
+};`;
+    new Function(instrumentedCode)();
+
+    expect(window.__gitPseudoSquashTest.getUseCurrentBranchSelected()).toBe(true);
+  });
+
+  it("keeps current-branch mode on when persisted value is invalid", () => {
+    installLocalStorageMock();
+    localStorage.setItem("gitPseudoSquash.ui.useCurrentBranch", "broken");
+    mountGitPseudoSquashDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-pseudo-squash.html?baseBranch=devel&workBranch=feature-a"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitPseudoSquashTest = {
+  normalizeCommitMessageForPr,
+  regenerateAllCommands,
+  getUseCurrentBranchSelected,
+  toggleOriginLock,
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams,
+  buildBranchDiffUrlFromPlannedDiff
+};`;
+    new Function(instrumentedCode)();
+
+    expect(window.__gitPseudoSquashTest.getUseCurrentBranchSelected()).toBe(true);
   });
 
   it("prioritizes query baseBranch over persisted base-branch history", () => {
@@ -570,5 +652,80 @@ window.__gitPseudoSquashTest = {
     document.getElementById("openRepoUrlBtn").click();
 
     expect(window.open).toHaveBeenCalledWith("https://example.com/repo-a", "_blank", "noopener,noreferrer");
+  });
+
+  it("shows git current directory copy button when saved in git-work-list memos", () => {
+    installLocalStorageMock();
+    localStorage.setItem("gitWorkList.memos", JSON.stringify({
+      "https://example.com/repo-a::devel": {
+        memo: "memo",
+        gitCurrentDir: "/tmp/repo-a"
+      }
+    }));
+    mountGitPseudoSquashDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&workBranch=feature-a"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitPseudoSquashTest = {
+  normalizeCommitMessageForPr,
+  regenerateAllCommands,
+  getUseCurrentBranchSelected,
+  toggleOriginLock,
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams,
+  buildBranchDiffUrlFromPlannedDiff
+};`;
+    new Function(instrumentedCode)();
+
+    const copyButton = document.getElementById("copyGitCurrentDirBtn");
+    expect(copyButton.classList.contains("md-hidden")).toBe(false);
+    expect(copyButton.title).toBe("/tmp/repo-a");
+  });
+
+  it("copies git current directory from the URL row action button", () => {
+    installLocalStorageMock();
+    localStorage.setItem("gitWorkList.memos", JSON.stringify({
+      "https://example.com/repo-a::devel": {
+        memo: "memo",
+        gitCurrentDir: "/tmp/repo-a"
+      }
+    }));
+    mountGitPseudoSquashDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&workBranch=feature-a"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitPseudoSquashTest = {
+  normalizeCommitMessageForPr,
+  regenerateAllCommands,
+  getUseCurrentBranchSelected,
+  toggleOriginLock,
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams,
+  buildBranchDiffUrlFromPlannedDiff
+};`;
+    new Function(instrumentedCode)();
+
+    document.getElementById("copyGitCurrentDirBtn").click();
+
+    expect(document.execCommand).toHaveBeenCalledWith("copy");
+    expect(document.getElementById("toast").show).toHaveBeenCalledWith("git カレントディレクトリをコピーしました", 2200);
+  });
+
+  it("keeps git current directory copy button hidden when no saved path exists", () => {
+    bootGitPseudoSquashPage();
+
+    document.getElementById("repoUrl").value = "https://example.com/repo-a";
+    document.getElementById("squashBaseBranch").value = "devel";
+    document.getElementById("repoUrl").dispatchEvent(new Event("input"));
+
+    expect(document.getElementById("copyGitCurrentDirBtn").classList.contains("md-hidden")).toBe(true);
   });
 });

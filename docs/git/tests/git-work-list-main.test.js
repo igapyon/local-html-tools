@@ -388,6 +388,39 @@ describe("git-work-list main", () => {
     expect(document.getElementById("entriesList").textContent).toContain("feature-b");
   });
 
+  it("sorts work rows within the same group by last opened time", () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "a",
+        repoUrl: "https://example.com/repo-a",
+        baseBranch: "devel",
+        baseScope: "remote",
+        compareBranch: "feature-a",
+        compareScope: "local",
+        remoteName: "origin",
+        createdAt: 1,
+        lastOpenedAt: 10
+      },
+      {
+        id: "b",
+        repoUrl: "https://example.com/repo-a",
+        baseBranch: "devel",
+        baseScope: "remote",
+        compareBranch: "feature-b",
+        compareScope: "local",
+        remoteName: "origin",
+        createdAt: 2,
+        lastOpenedAt: 20
+      }
+    ]));
+
+    bootPage();
+
+    const workRows = Array.from(document.querySelectorAll(".md-entry-group .md-work-row .md-ref-value"))
+      .map((node) => node.textContent.trim());
+    expect(workRows).toEqual(["feature-b", "feature-a"]);
+  });
+
   it("shows a newly added entry at the top of the list", () => {
     localStorage.setItem("gitWorkList.entries", JSON.stringify([
       {

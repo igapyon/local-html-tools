@@ -393,6 +393,12 @@
       ].join("::");
     }
 
+    function compareEntriesByRecentOrder(left, right) {
+      const openedDiff = Number(right?.lastOpenedAt || 0) - Number(left?.lastOpenedAt || 0);
+      if (openedDiff !== 0) return openedDiff;
+      return Number(right?.createdAt || 0) - Number(left?.createdAt || 0);
+    }
+
     function groupEntriesByBase(visibleEntries) {
       const groupedMap = new Map();
       visibleEntries.forEach((entry) => {
@@ -424,6 +430,7 @@
         return;
       });
       groupedMap.forEach((group) => {
+        group.entries.sort(compareEntriesByRecentOrder);
         group.lastOpenedAt = Math.max(0, ...group.entries.map((entry) => Number(entry.lastOpenedAt || 0)));
         group.createdAt = Math.max(0, ...group.entries.map((entry) => Number(entry.createdAt || 0)));
       });
@@ -852,11 +859,7 @@
       const list = document.getElementById("entriesList");
       if (!list) return;
       const visibleGroups = groupEntriesByBase(entries.slice())
-        .sort((left, right) => {
-          const openedDiff = Number(right.lastOpenedAt || 0) - Number(left.lastOpenedAt || 0);
-          if (openedDiff !== 0) return openedDiff;
-          return Number(right.createdAt || 0) - Number(left.createdAt || 0);
-        });
+        .sort(compareEntriesByRecentOrder);
       const visibleEntries = visibleGroups.flatMap((group) => group.entries);
 
       updateEmptyGuide(visibleEntries.length);

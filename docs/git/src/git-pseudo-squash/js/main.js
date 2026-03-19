@@ -728,6 +728,7 @@
     const UI_SQUASH_REMOTE_STORAGE_KEY = "gitPseudoSquash.ui.squashRemote";
     const UI_USE_CURRENT_BRANCH_STORAGE_KEY = "gitPseudoSquash.ui.useCurrentBranch";
     const WORK_LIST_STORAGE_KEY = "gitWorkList.entries";
+    const WORK_LIST_MEMO_STORAGE_KEY = "gitWorkList.memos";
     const RECENT_ACTIONS_KEY = "gitWorkList.recentActions";
     let baseBranchDefaultSuggestions = [];
     let baseBranchCurrentSuggestions = [];
@@ -765,6 +766,74 @@
 
     function readCurrentQueryParams() {
       return new URLSearchParams(window.location.search || "");
+    }
+
+    function buildWorkListMemoKey(repoUrl, baseBranch) {
+      return `${normalizeRepoUrl(repoUrl)}::${String(baseBranch || "").trim()}`;
+    }
+
+    function normalizeWorkListMemos(rawMemos) {
+      if (!rawMemos || typeof rawMemos !== "object" || Array.isArray(rawMemos)) {
+        return {};
+      }
+      const nextMemos = {};
+      Object.entries(rawMemos).forEach(([key, value]) => {
+        const normalizedKey = String(key || "").trim();
+        if (!normalizedKey) return;
+        if (typeof value === "string") {
+          const normalizedMemo = value.trim();
+          if (normalizedMemo) {
+            nextMemos[normalizedKey] = {
+              memo: normalizedMemo,
+              gitCurrentDir: ""
+            };
+          }
+          return;
+        }
+        if (!value || typeof value !== "object" || Array.isArray(value)) return;
+        const normalizedMemo = String(value.memo || "").trim();
+        const normalizedGitCurrentDir = String(value.gitCurrentDir || "").trim();
+        if (normalizedMemo || normalizedGitCurrentDir) {
+          nextMemos[normalizedKey] = {
+            memo: normalizedMemo,
+            gitCurrentDir: normalizedGitCurrentDir
+          };
+        }
+      });
+      return nextMemos;
+    }
+
+    function loadWorkListMemos() {
+      try {
+        const raw = localStorage.getItem(WORK_LIST_MEMO_STORAGE_KEY);
+        if (!raw) return {};
+        return normalizeWorkListMemos(JSON.parse(raw));
+      } catch (_) {
+        return {};
+      }
+    }
+
+    function getGitCurrentDirectoryForCurrentContext() {
+      const repoUrl = document.getElementById("repoUrl")?.value.trim() || "";
+      const baseBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
+      if (!repoUrl || !baseBranch) return "";
+      const memoKey = buildWorkListMemoKey(repoUrl, baseBranch);
+      return String(loadWorkListMemos()[memoKey]?.gitCurrentDir || "").trim();
+    }
+
+    function updateGitCurrentDirectoryAction() {
+      const button = document.getElementById("copyGitCurrentDirBtn");
+      if (!button) return;
+      const gitCurrentDir = getGitCurrentDirectoryForCurrentContext();
+      if (gitCurrentDir) {
+        button.dataset.gitCurrentDir = gitCurrentDir;
+        button.title = gitCurrentDir;
+        button.classList.remove("md-hidden");
+        return;
+      }
+      delete button.dataset.gitCurrentDir;
+      button.title = "git カレントディレクトリをコピー";
+      button.classList.add("md-hidden");
     }
 
     function applyQueryParams() {
@@ -824,6 +893,7 @@
           setSwitchSelected("lockOrigin", false);
         }
       }
+      updateGitCurrentDirectoryAction();
     }
 
     function createWorkBranchListEntryId() {
@@ -846,7 +916,8 @@
         locked: raw?.locked === true,
         remoteName: String(raw?.remoteName || "origin").trim() || "origin",
         createdAt: Number(raw?.createdAt || raw?.updatedAt || Date.now()),
-        updatedAt: Number(raw?.updatedAt || Date.now())
+        updatedAt: Number(raw?.updatedAt || Date.now()),
+        lastOpenedAt: Number(raw?.lastOpenedAt || 0)
       };
     }
 
@@ -966,6 +1037,7 @@
         entry.baseBranch === baseBranch &&
         entry.compareBranch === compareBranch
       ));
+      const now = Date.now();
       const nextEntry = normalizeWorkBranchListEntry({
         id: existingIndex >= 0 ? entries[existingIndex].id : createWorkBranchListEntryId(),
         repoUrl,
@@ -976,8 +1048,9 @@
         compareUseHead: getUseCurrentBranchSelected(),
         locked: existingIndex >= 0 ? entries[existingIndex].locked === true : false,
         remoteName,
-        createdAt: existingIndex >= 0 ? entries[existingIndex].createdAt : Date.now(),
-        updatedAt: Date.now()
+        createdAt: existingIndex >= 0 ? entries[existingIndex].createdAt : now,
+        updatedAt: now,
+        lastOpenedAt: now
       });
 
       if (existingIndex >= 0) {
@@ -1012,6 +1085,13 @@
       const repoUrl = document.getElementById("repoUrl")?.value.trim() || "";
       if (!isOpenableExternalUrl(repoUrl)) return;
       window.open(repoUrl, "_blank", "noopener,noreferrer");
+    }
+
+    function copyGitCurrentDirectory() {
+      const gitCurrentDir = getGitCurrentDirectoryForCurrentContext();
+      if (!gitCurrentDir) return;
+      copyPlainText(gitCurrentDir);
+      showToast("git カレントディレクトリをコピーしました");
     }
 
     function buildBranchDiffUrlFromPlannedDiff() {
@@ -1551,6 +1631,20 @@
       button.addEventListener("click", openRepoUrl);
     }
 
+    function setupCopyGitCurrentDirectoryButton() {
+      const button = document.getElementById("copyGitCurrentDirBtn");
+      if (!button) return;
+      button.addEventListener("click", copyGitCurrentDirectory);
+      const sync = () => updateGitCurrentDirectoryAction();
+      ["repoUrl", "squashBaseBranch"].forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener("input", sync);
+        element.addEventListener("change", sync);
+      });
+      updateGitCurrentDirectoryAction();
+    }
+
     applyQueryParams();
     setupBaseBranchSuggestions();
     setupBaseBranchCombobox();
@@ -1570,4 +1664,5 @@
     setupWorkBranchListButton();
     setupBranchDiffButton();
     setupOpenRepoUrlButton();
+    setupCopyGitCurrentDirectoryButton();
     setupCodeSelectAll();
