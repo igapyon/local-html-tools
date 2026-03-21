@@ -1355,7 +1355,7 @@ describe("prompt-gen main", () => {
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
     expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
     expect(promptOutput.textContent).toBe(
-      "このアプリは原則として Single-file Web App であるようにしてください。変更の過程でこれが崩れていることがたまにあります。ビルド後の html ファイルは、CDN や別ファイルの CSS / JS ファイルを利用していないことを確認してください。"
+      "このアプリは、外部依存なしの Single-file Web App を維持してください。開発時に分割ソースを使うことは構いませんが、最終的な配布物は単一 HTML として完結している必要があります。ビルド後の HTML は、CDN、別ファイルの CSS / JS / 画像 / フォント、外部モジュール、外部 API に依存してはいけません。\n\nまた、インターネット接続がない環境でも全機能が動作することを必須としてください。fetch、XMLHttpRequest、WebSocket、EventSource、動的 import、外部 URL 参照、外部 iframe など、実行時にネットワーク接続を必要とする実装は導入してはいけません。通信が必要な既存実装や、単一 HTML 性を崩す依存が残る場合は、その箇所と理由を明示してください。\n\n開発中にソースを分割すること自体は問題ありませんが、最終成果物では配布用 HTML 単体で全機能が完結して動作することを確認してください。必要であれば、どの依存が単一 HTML 性またはオフライン動作を崩しているか、どこでインライン化や自己完結性が失われているかも示してください。"
     );
   });
 
@@ -1379,6 +1379,86 @@ describe("prompt-gen main", () => {
 
     expect(promptOutput.textContent).toContain("A simplified cute illustration of `a small fox`");
     expect(promptOutput.textContent).toContain("Washi Collage Whisper");
+  });
+
+  it("generates an AI prompt writing prompt without subject input", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptArgsSection = document.getElementById("promptArgsSection");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "A854";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
+    expect(promptOutput.textContent).toContain("生成AIプロンプトを作文します");
+    expect(promptOutput.textContent).toContain("人間向けの説明");
+  });
+
+  it("generates a Qiita article writing prompt after subject input", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptArgsSection = document.getElementById("promptArgsSection");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "A861";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(false);
+    expect(promptOutput.textContent).toBe("");
+
+    const subjectInput = document.getElementById("subjectInput");
+    subjectInput.value = "Vitest で DOM テストを追加した時のハマりどころ";
+    subjectInput.dispatchEvent(new Event("input"));
+
+    expect(promptOutput.textContent).toContain("# Context");
+    expect(promptOutput.textContent).toContain("# Instructions");
+    expect(promptOutput.textContent).toContain("# Examples");
+    expect(promptOutput.textContent).toContain("テーマ・メモは `Vitest で DOM テストを追加した時のハマりどころ` です");
+  });
+
+  it("generates a note article writing prompt after subject input", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptArgsSection = document.getElementById("promptArgsSection");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "A862";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(false);
+    expect(promptOutput.textContent).toBe("");
+
+    const subjectInput = document.getElementById("subjectInput");
+    subjectInput.value = "生成AIで趣味アプリ開発を続けていて感じたこと";
+    subjectInput.dispatchEvent(new Event("input"));
+
+    expect(promptOutput.textContent).toContain("# Context");
+    expect(promptOutput.textContent).toContain("# Instructions");
+    expect(promptOutput.textContent).toContain("# Examples");
+    expect(promptOutput.textContent).toContain("テーマ・メモは `生成AIで趣味アプリ開発を続けていて感じたこと` です");
+  });
+
+  it("generates an explanation clarity prompt without subject input", async () => {
+    await bootPromptPage();
+
+    const promptSearch = document.getElementById("promptSearch");
+    const promptArgsSection = document.getElementById("promptArgsSection");
+    const promptOutput = document.getElementById("promptOutput");
+
+    promptSearch.value = "A863";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
+    expect(promptOutput.textContent).toContain("技術作文や技術説明の文章を整理します");
+    expect(promptOutput.textContent).toContain("話題ラベル");
   });
 
   it("sanitizes commit id by replacing backticks and truncating before embedding", async () => {
