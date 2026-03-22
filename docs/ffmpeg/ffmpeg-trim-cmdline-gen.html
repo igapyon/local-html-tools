@@ -2127,10 +2127,6 @@ lht-index-card-link {
       help-text="出力ファイル名の連番に利用します。"
     ></lht-text-field-help>
 
-    <button onclick="generateClipCommand()" class="md-button md-button--primary md-field-block">
-      切り出しコマンド生成
-    </button>
-
     <lht-command-block command-id="clipCmd"></lht-command-block>
 
     <div id="toast" class="md-snackbar md-hidden">
@@ -4276,8 +4272,12 @@ if (!customElements.get("lht-page-menu")) {
       const startInput = document.getElementById("start").value.trim();
       const endInput = document.getElementById("end").value.trim();
       const partNumber = document.getElementById("partNumber").value.trim() || "1";
-
-      if (!fileInput) return alert("入力ファイル名を入力してください。");
+      const commandNode = document.getElementById("clipCmd");
+      if (!commandNode) return;
+      if (!fileInput) {
+        commandNode.textContent = "";
+        return;
+      }
 
       const startSec = startInput ? parseTime(startInput) : NaN;
       const endSec = endInput ? parseTime(endInput) : NaN;
@@ -4303,7 +4303,7 @@ if (!customElements.get("lht-page-menu")) {
       const outFile = `${baseName}-part${partNumber}.${extension}`;
       const cmd = `ffmpeg${ssPart} -i ${fileInput}${tPart} -c copy ${outFile}`;
 
-      document.getElementById("clipCmd").textContent = cmd;
+      commandNode.textContent = cmd;
     }
 
     function showToast(message) {
@@ -4316,6 +4316,16 @@ if (!customElements.get("lht-page-menu")) {
         toast.classList.add("md-hidden");
       }, 2000);
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      ["filename", "start", "end", "partNumber"].forEach((id) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.addEventListener("input", generateClipCommand);
+        input.addEventListener("change", generateClipCommand);
+      });
+      generateClipCommand();
+    });
   </script>
 </body>
 </html>

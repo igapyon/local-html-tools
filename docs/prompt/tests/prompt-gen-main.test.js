@@ -1393,7 +1393,7 @@ describe("prompt-gen main", () => {
 
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
     expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
-    expect(promptOutput.textContent).toContain("生成AIプロンプトを作文します");
+    expect(promptOutput.textContent).toContain("構造化された生成AIプロンプトの作文を支援してください");
     expect(promptOutput.textContent).toContain("人間向けの説明");
   });
 
