@@ -890,7 +890,7 @@ ${getSoftHallucinationPreventionInstruction()}`
   },
   {
     id: "co-writing-tech-post-request",
-    label: "851: いがぴょんのテック投稿執筆支援",
+    label: "851: いがぴょんのテック系執筆支援",
     keywords: ["writing", "co-writing", "draft", "blog", "facebook", "post", "tech blog", "伴走", "執筆", "投稿", "下書き", "文体", "ブログ", "facebook投稿", "日本語文章", "伴走執筆", "igapyon", "いがぴょん", "伊賀", "てっく", "とうこう", "ばんそう", "しっぴつ", "したがき", "ぶんたい", "ぶろぐ", "にほんごぶんしょう"],
     requiresCommitId: false,
     buildBody: () => `# 統合プロンプト
@@ -1442,10 +1442,13 @@ Hind Legs & Tail
   },
   {
     id: "ai-prompt-writing-request",
-    label: "854: 生成AIプロンプト作文",
+    label: "854: 構造化された生成AIプロンプトの作文",
     keywords: ["ai prompt", "prompt writing", "prompt design", "llm prompt", "system prompt", "instruction writing", "生成AI", "プロンプト", "作文", "プロンプト作文", "指示文", "設計", "ぷろんぷと", "さくぶん", "しじぶん"],
     requiresCommitId: false,
-    buildBody: () => `これから、生成AIのみならず人間も理解できるよう、前半は人間向けの説明、後半は生成AI向けの本文、必要に応じて例を示す補助セクションも持つ、構造化された生成AIプロンプトを作文します。
+    outputMarkdown: true,
+    buildBody: () => `これから、生成AIのみならず人間も理解できるよう、前半は人間向けの説明、後半は生成AI向けの本文、必要に応じて例を示す補助セクションも持つ、構造化された生成AIプロンプトの作文を支援してください。この依頼は、完成したプロンプトを一方的に出力することだけを目的とするものではなく、必要に応じて構成案、不足点、改善案を示しながら、最終的に実際に使えるプロンプト本文まで組み立てていくためのものです。
+
+ここで作成するのは、「# Context」、「# Instructions」、「# Examples」という構造を持った生成AIプロンプトです。背景や意図は「# Context」、生成AIに実際にさせたい内容は「# Instructions」、期待する入出力や文体の例は「# Examples」に整理して記述してください。
 
 まず最初に、これから何をするためのプロンプトなのか、どのような構造のプロンプトなのか、何を重視するプロンプトなのかが伝わる短いリード文またはリード段落を置いてください。
 
@@ -1453,6 +1456,7 @@ Hind Legs & Tail
 
 「# Context」には、必要に応じて次のような内容を記述してください。
 
+- 一発出力ではなく、対話的に構築していくものであるという前提
 - これからどのような二層構造のプロンプトを作文するのかという冒頭説明
 - 何をするためのプロンプトなのかという短いリード文
 - なぜこのコンテキストやプロンプトを作成するのか
@@ -1470,6 +1474,10 @@ Hind Legs & Tail
 
 「# Instructions」には、必要に応じて次のような内容を記述してください。
 
+- まず構成案を示すこと
+- 次に不足点や曖昧な点を整理すること
+- 必要ならユーザーに確認すること
+- その後に完成版のプロンプト本文を組み立てること
 - 生成AIに何をさせたいのか
 - 生成AIに何をさせたくないのか
 - どの観点や優先順位で判断してほしいのか
@@ -1484,6 +1492,8 @@ Hind Legs & Tail
 
 - 「# Context」と「# Instructions」を混ぜず、背景説明と実施内容を分けて書く
 - 冒頭には、全体像がすぐ分かる短いリード文またはリード段落を置く
+- これは完成したプロンプトの一発出力ではなく、プロンプト作文を支援する依頼であることを意識する
+- 必要に応じて、構成案、不足点、改善案を示しながら、最終的に実際に使えるプロンプト本文まで組み立てる
 - 「# Context」は、生成AIに直接命令するには曖昧でもよいが、全体像や意図を伝える役割を持つ
 - 「# Instructions」は、生成AIが実際に行動へ移せるだけの具体性を持たせる
 - 「# Examples」は原則として追加し、期待する例を示す
@@ -1491,11 +1501,12 @@ Hind Legs & Tail
 - ただし、箇条書きについては体言止めになってもよい
 - 抽象語だけで済ませず、必要なら判断基準や優先順位を書く
 - 後から見返して修正しやすいように、背景、方針、制約、出力形式、実施手順を分離して書く
+- 良いプロンプトの基準として、人間が読んで理解できること、生成AIが誤解しにくいこと、構造が分離されていることを意識する
 `
   },
   {
     id: "qiita-article-writing-request",
-    label: "861: Qiita記事作文",
+    label: "861: いがぴょんのQiita記事作文",
     keywords: ["qiita", "qiita article", "tech article", "markdown article", "article draft", "記事作文", "記事執筆", "技術記事", "qiita記事", "qiita投稿", "きじさくぶん", "きじしっぴつ", "ぎじゅつきじ", "とうこう"],
     requiresCommitId: false,
     requiresSubject: true,
@@ -1561,7 +1572,7 @@ Hind Legs & Tail
   },
   {
     id: "note-article-writing-request",
-    label: "862: Note記事作文",
+    label: "862: いがぴょんのNote記事作文",
     keywords: ["note", "note article", "essay", "column", "markdown article", "article draft", "記事作文", "記事執筆", "note記事", "note投稿", "読み物", "コラム", "えっせい", "きじさくぶん", "きじしっぴつ", "よみもの"],
     requiresCommitId: false,
     requiresSubject: true,
@@ -1633,6 +1644,7 @@ Hind Legs & Tail
     label: "863: 説明文をわかりやすく整理",
     keywords: ["explanation", "clarity", "clear writing", "plain language", "title", "heading", "topic label", "説明", "説明文", "わかりやすく", "整理", "タイトル", "見出し", "話題ラベル", "ぶんしょう", "せつめい", "わかりやすい", "せいり", "みだし"],
     requiresCommitId: false,
+    outputMarkdown: true,
     buildBody: () => `これから、技術作文や技術説明の文章を整理します。
 
 まず前提として、技術者が技術作文で陥りがちなパターンを、以下のように示します。

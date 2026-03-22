@@ -12,8 +12,12 @@
       const startInput = document.getElementById("start").value.trim();
       const endInput = document.getElementById("end").value.trim();
       const partNumber = document.getElementById("partNumber").value.trim() || "1";
-
-      if (!fileInput) return alert("入力ファイル名を入力してください。");
+      const commandNode = document.getElementById("clipCmd");
+      if (!commandNode) return;
+      if (!fileInput) {
+        commandNode.textContent = "";
+        return;
+      }
 
       const startSec = startInput ? parseTime(startInput) : NaN;
       const endSec = endInput ? parseTime(endInput) : NaN;
@@ -39,7 +43,7 @@
       const outFile = `${baseName}-part${partNumber}.${extension}`;
       const cmd = `ffmpeg${ssPart} -i ${fileInput}${tPart} -c copy ${outFile}`;
 
-      document.getElementById("clipCmd").textContent = cmd;
+      commandNode.textContent = cmd;
     }
 
     function showToast(message) {
@@ -52,3 +56,13 @@
         toast.classList.add("md-hidden");
       }, 2000);
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      ["filename", "start", "end", "partNumber"].forEach((id) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.addEventListener("input", generateClipCommand);
+        input.addEventListener("change", generateClipCommand);
+      });
+      generateClipCommand();
+    });

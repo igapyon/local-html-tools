@@ -28,6 +28,7 @@
 - [横展開] music/git 以外の全アプリでも `lht-preview-output`（プレビュー表示＋コピー導線）を適用し、表示領域の重複実装を共通化する
 - [横展開] music/git 以外の全アプリでも `lht-command-block`（コマンド表示ブロック）を適用し、コマンド表示・コピー導線を共通化する
 - [ffmpeg] `docs/ffmpeg/ffmpeg-youtube-mkv-gen.html` を YouTube 専用命名から汎用寄りへ再設計する（ツール名・説明文・spec・出力プリセット差分の整理）
+- [ffmpeg][UI方針] 入力変更だけで確定できるコマンド生成については、生成ボタンを省略し、自動更新へ寄せられるかを各ツールで見直す
 - [mikuproject][仕様検討] `CSV + ParentID` を「まず押さえるべき、よくある交換形式」の第1候補として整理する。最小列は `ID / ParentID / Name`、実用候補は `Start / Finish / PredecessorID / Resource / PercentComplete / WBS` を含めて比較する
 - [mikuproject][仕様検討] `Mermaid + gantt` を可視化・共有向けの片方向エクスポート候補として整理する。`ProjectModel -> Mermaid gantt` の最小出力対象を `Task / Milestone / Start / Finish / Predecessor` 中心で定義し、落ちる情報を明記する
 - [ルール横展開] 表示制御属性は `active` に統一し、既存の `md-hidden` / `md-visible` 依存を段階的に削減する
@@ -49,6 +50,8 @@
 - [prompt-gen][仕様検討] 追加定義の削除 UI は初版で「追加ボタン全削除」のみとし、個別削除は次段階に回す
 - [prompt-gen][仕様検討] 追加ボタンの投入 UI を決める（JSON 入力欄、取り込みボタン、エラー表示、保存完了通知）
 - [prompt-gen][仕様検討] Single-file Web App 方針のまま成立することを確認し、README / prompt README への反映要否を整理する
+- [prompt-gen][名称見直し] `A863: 説明文をわかりやすく整理` は意図に対してやや弱いため、タイトル・見出し・話題ラベル導出を含む役割が伝わる名称へ見直す
+- [prompt-gen][仕様検討] `A851` `A854` `A861` `A862` `A863` に幻想防止を入れるかどうかを検討する
 - [prompt-gen][仕様検討] 出力オプション候補を整理する。スイッチや選択UIで切り替え可能なものを優先し、本文そのものの差し替えが必要なものとは分けて扱う
 - [prompt-gen][仕様検討][出力オプション候補] `Markdown出力` 系: 形式保証をどこまで共通オプション化できるか整理する（見出し順、必須項目、空欄時の書き方、箇条書き数など）
 - [prompt-gen][仕様検討][出力オプション候補] `幻想防止` 系: 情報不足時の挙動を共通オプション化できるか整理する（不明と書く、追加質問する、条件不足なら出力を控える等）
