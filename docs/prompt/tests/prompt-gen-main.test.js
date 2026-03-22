@@ -1395,9 +1395,11 @@ describe("prompt-gen main", () => {
     expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
     expect(promptOutput.textContent).toContain("構造化された生成AIプロンプトの作文を支援してください");
     expect(promptOutput.textContent).toContain("人間向けの説明");
+    expect(promptOutput.textContent).toContain("伴走型の振る舞いを既定とする");
+    expect(promptOutput.textContent).toContain("初回応答では完成版をいきなり出さず");
   });
 
-  it("generates a Qiita article writing prompt after subject input", async () => {
+  it("generates a companion-style Qiita article writing prompt without subject input", async () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
@@ -1408,23 +1410,18 @@ describe("prompt-gen main", () => {
     promptSearch.dispatchEvent(new Event("input"));
 
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
-    expect(promptArgsSection.classList.contains("md-hidden")).toBe(false);
-    expect(promptOutput.textContent).toBe("");
-
-    const subjectInput = document.getElementById("subjectInput");
-    subjectInput.value = "Vitest で DOM テストを追加した時のハマりどころ";
-    subjectInput.dispatchEvent(new Event("input"));
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
 
     expect(promptOutput.textContent).toContain("これは、Qiita 向けの技術記事を作るための構造化プロンプトです");
     expect(promptOutput.textContent).toContain("# Context");
     expect(promptOutput.textContent).toContain("# Instructions");
     expect(promptOutput.textContent).toContain("# Rules");
     expect(promptOutput.textContent).toContain("# Examples");
-    expect(promptOutput.textContent).toContain("テーマ・メモは `Vitest で DOM テストを追加した時のハマりどころ` です");
-    expect(promptOutput.textContent).not.toContain("テーマ・メモは ``Vitest で DOM テストを追加した時のハマりどころ`` です");
+    expect(promptOutput.textContent).toContain("初回応答では、いきなり完成記事を書かず");
+    expect(promptOutput.textContent).toContain("仮の subject を導出する");
   });
 
-  it("generates a note article writing prompt after subject input", async () => {
+  it("generates a companion-style note article writing prompt without subject input", async () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
@@ -1435,20 +1432,15 @@ describe("prompt-gen main", () => {
     promptSearch.dispatchEvent(new Event("input"));
 
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
-    expect(promptArgsSection.classList.contains("md-hidden")).toBe(false);
-    expect(promptOutput.textContent).toBe("");
-
-    const subjectInput = document.getElementById("subjectInput");
-    subjectInput.value = "生成AIで趣味アプリ開発を続けていて感じたこと";
-    subjectInput.dispatchEvent(new Event("input"));
+    expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
 
     expect(promptOutput.textContent).toContain("これは、note 向けの記事を作るための構造化プロンプトです");
     expect(promptOutput.textContent).toContain("# Context");
     expect(promptOutput.textContent).toContain("# Instructions");
     expect(promptOutput.textContent).toContain("# Rules");
     expect(promptOutput.textContent).toContain("# Examples");
-    expect(promptOutput.textContent).toContain("テーマ・メモは `生成AIで趣味アプリ開発を続けていて感じたこと` です");
-    expect(promptOutput.textContent).not.toContain("テーマ・メモは ``生成AIで趣味アプリ開発を続けていて感じたこと`` です");
+    expect(promptOutput.textContent).toContain("初回応答では、いきなり完成記事を書かず");
+    expect(promptOutput.textContent).toContain("仮の subject を導出する");
   });
 
   it("generates an explanation clarity prompt without subject input", async () => {
@@ -1463,8 +1455,13 @@ describe("prompt-gen main", () => {
 
     expect(document.querySelectorAll(".md-chip-button")).toHaveLength(1);
     expect(promptArgsSection.classList.contains("md-hidden")).toBe(true);
-    expect(promptOutput.textContent).toContain("技術作文や技術説明の文章を整理します");
+    expect(promptOutput.textContent).toContain("これは、技術作文や技術説明の文章を、伴走しながらわかりやすく整理するための構造化プロンプトです");
+    expect(promptOutput.textContent).toContain("# Context");
+    expect(promptOutput.textContent).toContain("# Instructions");
+    expect(promptOutput.textContent).toContain("# Rules");
+    expect(promptOutput.textContent).toContain("# Examples");
     expect(promptOutput.textContent).toContain("話題ラベル");
+    expect(promptOutput.textContent).toContain("初回応答では、いきなり本文を書き直さず");
   });
 
   it("sanitizes commit id by replacing backticks and truncating before embedding", async () => {
