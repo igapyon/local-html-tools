@@ -1415,10 +1415,12 @@ describe("prompt-gen main", () => {
     subjectInput.value = "Vitest で DOM テストを追加した時のハマりどころ";
     subjectInput.dispatchEvent(new Event("input"));
 
+    expect(promptOutput.textContent).toContain("これは、Qiita 向けの技術記事を作るための構造化プロンプトです");
     expect(promptOutput.textContent).toContain("# Context");
     expect(promptOutput.textContent).toContain("# Instructions");
+    expect(promptOutput.textContent).toContain("# Rules");
     expect(promptOutput.textContent).toContain("# Examples");
-    expect(promptOutput.textContent).toContain("テーマ・メモは `Vitest で DOM テストを追加した時のハマりどころ` です");
+    expect(promptOutput.textContent).toContain("テーマ・メモは ``Vitest で DOM テストを追加した時のハマりどころ`` です");
   });
 
   it("generates a note article writing prompt after subject input", async () => {
@@ -1439,10 +1441,12 @@ describe("prompt-gen main", () => {
     subjectInput.value = "生成AIで趣味アプリ開発を続けていて感じたこと";
     subjectInput.dispatchEvent(new Event("input"));
 
+    expect(promptOutput.textContent).toContain("これは、note 向けの記事を作るための構造化プロンプトです");
     expect(promptOutput.textContent).toContain("# Context");
     expect(promptOutput.textContent).toContain("# Instructions");
+    expect(promptOutput.textContent).toContain("# Rules");
     expect(promptOutput.textContent).toContain("# Examples");
-    expect(promptOutput.textContent).toContain("テーマ・メモは `生成AIで趣味アプリ開発を続けていて感じたこと` です");
+    expect(promptOutput.textContent).toContain("テーマ・メモは ``生成AIで趣味アプリ開発を続けていて感じたこと`` です");
   });
 
   it("generates an explanation clarity prompt without subject input", async () => {
