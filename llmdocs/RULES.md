@@ -10,9 +10,11 @@
 ## ドキュメント運用フロー
 
 - 本格的な作業を始める前に、`CONTEXT.md`、`ARCHITECTURE.md`、`STATE.md`、`TODO.md`、`SESSION.md` を読む。
-- 新しいタスクが必要なら、まず `TODO.md` を更新する。
+- 新しいタスクが必要なら、まず該当する `TODO` を更新する。
+  - 中長期バックログや未着手アイデアはルート `TODO.md`
+  - 直近で実際に動かす作業は `llmdocs/TODO.md`
 - 実装前に現在のフォーカスを `SESSION.md` に記録する。
-- 作業完了後は `TODO.md`、`STATE.md`、`SESSION.md` を更新する。
+- 作業完了後は必要に応じて `TODO.md` / `llmdocs/TODO.md`、`STATE.md`、`SESSION.md` を更新する。
 - コンポーネント責務、ビルド関係、システム構造が変わったら `ARCHITECTURE.md` を更新する。
 
 ## 編集ガイドライン

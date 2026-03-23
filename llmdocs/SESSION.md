@@ -2,31 +2,26 @@
 
 ## フォーカス
 
-Git 一覧ツール、`git-branch-diff`、`git-pseudo-squash` の責務を整理し、比較は `git-branch-diff` に集約した。
+ルート文書と `llmdocs/` 文書の役割を整理し、重複や古さが目立っていた md 群を現在の構成に合わせて更新した。
 
 ## 完了済み
 
-- リポジトリに `llmdocs/` がまだ存在しないことを確認した。
-- 既存のルート文書と package scripts を確認した。
-- 初期の `llmdocs/` 文書群を作成し、現在のリポジトリ構造に合わせた。
-- 新規 Git 一覧ツールを追加するため、既存 `docs/git/` ツール構成とビルド導線を確認した。
-- `git-work-list` のソース、spec、テスト、README / index 導線、ビルド登録を追加した。
-- `npm run build:git`、`node scripts/build-docs-index.mjs`、Git 関連テストを実行し、通過を確認した。
-- `git-work-list` 一覧カードに SVG アイコン付きアクションを追加した。
-- `git-branch-diff` 側で `baseBranch` / `baseScope` / `workBranch` / `workScope` / `remoteName` の URL 引数を読み取り、フォーム反映と自動再生成を行うようにした。
-- `git-branch-diff` から `git-work-list` へ現在の比較条件を保存して戻る導線を追加した。
-- `git-pseudo-squash` に `repoUrl` 入力欄つきの `一覧` 導線を追加し、保存して `git-work-list` へ戻れるようにした。
-- `git-work-list` から `git-pseudo-squash` へ `まとめる` ボタンで遷移し、`repoUrl` / `baseBranch` / `baseScope` / `workBranch` / `remoteName` を初期反映できるようにした。
-- `git-branch-diff` に `HEAD` スイッチを追加し、`git-pseudo-squash` 側の比較コマンド表示は廃止した。
-- `git-pseudo-squash` はフッターの `比較` ボタンから `git-branch-diff` へ移動する構成に整理した。
-- `git-work-list` では `HEAD` を作業ブランチ名として保存せず、作業ブランチ名と `compareUseHead` フラグを分離して保持するようにした。
-- `git-work-list` を、同じリポジトリ URL と基準ブランチを親カードにまとめ、作業ブランチを子行として並べる表示へ再構成した。
+- `README.md` を、実ファイル構成、公開対象、ビルド運用、TODO の使い分けに合わせて更新した
+- `THIRD_PARTY_NOTICES.md` を、実際に利用している依存関係と同梱物に合わせて更新した
+- ルート `ARCHITECTURE.md` を、UI 方針中心の文書から全体設計書へ再構成した
+- `GLOSSARY.md` に、現行アーキテクチャと運用で頻出する用語を追加した
+- ルート `TODO.md` を中長期バックログへ整理した
+- `llmdocs/TODO.md` を直近の作業キューへ整理した
+- `llmdocs/RULES.md` に、2 系統の TODO の使い分けを明記した
+- `llmdocs/ARCHITECTURE.md` を、ルート `ARCHITECTURE.md` を正本とする短い要約版へ整理した
+- `llmdocs/STATE.md` を、ドキュメント整理後の現状に合わせて更新した
+- `docs/git/README.md` と `docs/password/README.md` の古い記述を整理した
 
 ## 次の一手
 
-次は `git-branch-diff` / `git-pseudo-squash` 側の後続 URL 引数として、`diffMode` / `useTripleDot` / `useStat200` / `lockOrigin` などを必要に応じて追加するか、`git-work-list` の親子表示を前提に細かな操作性を詰める。
+次は、必要なら `docs/prompt/README.md` のようなカテゴリ内長文 README について、役割が「仕様」「設計背景」「バックログ」のどれに寄っているかを見直し、必要なものだけを残す。
 
 ## メモ
 
-- ルート文書には、引き続きより豊富な履歴情報が残っている。
-- `llmdocs/` は短く、最新で、実務に使える状態を保つ。
+- `llmdocs/` は、短く、最新で、作業再開時に役立つ状態を保つ
+- 具体的な設計の正本はルート文書側に寄せ、`llmdocs/` では重複を増やさない

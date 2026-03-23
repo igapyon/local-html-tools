@@ -2,7 +2,16 @@
 
 This project includes the following third-party software:
 
-## Material Design
+## @material/web
+- Project: https://github.com/material-components/material-web
+- Version: 2.4.1
+- License: Apache-2.0
+
+`@material/web` is bundled into `lht-cmn/vendor/material-web-outlined-text-field.bundle.js` and used by shared `lht-*` UI components.
+
+## Referenced Design Specifications
+
+### Material Design
 - Project: https://m3.material.io/
 - License: N/A (Design specification)
 
@@ -10,6 +19,7 @@ Material Design is a design specification by Google and is referenced in this pr
 
 ## ImageTracerJS
 - Project: https://jankovicsandras.github.io/imagetracerjs/
+- Version: 1.2.6
 - License: The Unlicense
 
 This is free and unencumbered software released into the public domain.
@@ -59,6 +69,7 @@ Mermaid is used for diagram rendering in `docs/diagram/mermaid-to-svg.html`.
 
 ## Viz.js (Graphviz renderer)
 - Project: https://github.com/mdaines/viz-js
+- Version: 2.1.2
 - License: MIT
 
 Viz.js is used for DOT diagram rendering in `docs/diagram/graphviz-dot-to-svg.html`.
@@ -76,9 +87,13 @@ Verovio is used for MusicXML score rendering in `docs/music/musicxml-to-svg.html
 
 ## JSZip
 - Project: https://github.com/Stuk/jszip
+- Version: 3.10.1
 - License: MIT or GPL-3.0
 
 JSZip is used for ZIP archive generation in `docs/music/musicxml-to-svg.html`.
+
+This distribution contains bundled third-party code:
+- pako (MIT)
 
 ## midi-writer-js
 - Project: https://github.com/grimmdude/MidiWriterJS

@@ -22,6 +22,9 @@
   - [Task List](llmdocs/TODO.md)
   - [Current Session](llmdocs/SESSION.md)
 - 運用ルールは [Development Rules](llmdocs/RULES.md) を参照してください
+- TODO の使い分け:
+  - ルート `TODO.md` は中長期バックログ
+  - `llmdocs/TODO.md` は直近で実際に動かす作業キュー
 
 ## 前提条件
 
@@ -92,6 +95,7 @@
 docs/
 ├── index.html           # トップページ（ツール一覧へのリンク）
 ├── diagram/             # 図表系ツール
+├── knowledge-timeline/  # 知識タイムライン系ツール
 ├── music/               # 楽譜変換系ツール
 │   ├── *-src.html       # music向け開発テンプレート（手編集対象）
 │   ├── *.html           # music向け配布用生成物（手編集しない）
@@ -249,6 +253,34 @@ docs/
   - 変更は `docs/index-src.html` を編集する
   - PRには生成済み `docs/index.html` を含める
 
+### password 運用（src編集 + 生成）
+
+- 対象: `docs/password/password-gen.html`
+- 配布: `docs/password/password-gen.html`（単一HTML、生成物）
+- 開発:
+  - `docs/password/password-gen-src.html`
+  - `docs/password/src/password-gen/css/app.css`
+  - `docs/password/src/password-gen/js/main.js`
+- ビルド: `npm run build:password`（`scripts/build-password.mjs`）
+- ルール:
+  - `docs/password/password-gen.html` は直接編集しない
+  - 変更は `password-gen-src.html` と `src/password-gen/` 配下を編集する
+  - PRには生成済み `docs/password/password-gen.html` を含める
+
+### knowledge-timeline 運用（src編集 + 生成）
+
+- 対象: `docs/knowledge-timeline/composers.html`
+- 配布: `docs/knowledge-timeline/composers.html`（単一HTML、生成物）
+- 開発:
+  - `docs/knowledge-timeline/composers-src.html`
+  - `docs/knowledge-timeline/src/composers/css/app.css`
+  - `docs/knowledge-timeline/src/composers/js/*.js`
+- ビルド: `npm run build:knowledge-timeline`（`scripts/build-knowledge-timeline.mjs`）
+- ルール:
+  - `docs/knowledge-timeline/composers.html` は直接編集しない
+  - 変更は `composers-src.html` と `src/composers/` 配下を編集する
+  - PRには生成済み `docs/knowledge-timeline/composers.html` を含める
+
 #### ffmpeg の lht 共通部品 置換済み範囲
 
 - 全8ページ適用済み:
@@ -264,8 +296,7 @@ docs/
 
 ### PR作成時のルール
 
-- `docs/index.html` の「更新日」を忘れずに更新する
-- `docs/index.html` の「最終更新日時（更新日）」を忘れずに更新する
+- `docs/index-src.html` を変更した場合は `npm run build:docs` を実行し、生成済み `docs/index.html` をPRに含める
 - PRテキスト作成は「特定のコミット以降の全変更」を求められる前提でまとめる
   - 例：「`<コミット>` 以降の変更内容全てのための PRテキスト」
 - PRテキストの基本構成は「タイトル / 概要 / 変更点 / 影響」で統一する
@@ -303,6 +334,7 @@ URL加工系ツールです。
 
 - **amazon-dp-extract.html**: Amazon URL から dp/ASIN を抽出します。
 - **facebook-fbclid-remove.html**: URL から Facebook識別子（fbclid）を除去します。
+- **url-memo.html**: URL とメモをローカルで一覧管理し、検索起点で再利用しやすくします。
 - **url-encode-decode.html**: URLのエンコードとデコードを行います。
 - **mime-base64.html**: MIME Base64のエンコードとデコードを行います。
 - **utm-remove.html**: URL から utm_* パラメータを削除します。
@@ -340,22 +372,24 @@ URL加工系ツールです。
 - **musicxml-to-abc.html**: MusicXMLをABC記法へ変換し、ABCを保存します。
 - **abc-to-musicxml.html**: ABC記法をMusicXMLへ変換し、MusicXMLを保存します。
 - **musicxml-to-midi.html**: MusicXMLをMIDIへ変換し、.midを保存します。
+- **midi-to-musicxml.html**: MIDIをMusicXMLへ変換します。
 
 ## text
 
 テキスト系ツールです。
 
 - **text-viewer.html**: テキストをペーストして、読みやすく表示します。マークダウン形式にも対応しています。
-- **text-processing.html**: 改行付きテキストを半角空白区切りに変換します。
+- **text-processing.html**: テキストを即時に変換・整形します。文字変換、行変換、空白変換を組み合わせて使えます。
+- **file-rename-cmdline-gen.html**: ファイル名リストから連番リネーム用のコマンドを生成します。
+- **text2spreadsheetml.html**: ベタテキスト、CSV、TAB区切りファイルを SpreadsheetML 2003 XML に変換します。
+- **japanese-romaji-guide.html**: 日本語ローマ字表記のメモを確認できます。
 
 ## xlsx2md
 
 `xlsx2md` は、このリポジトリから独立して運用するようになりました。  
 現在の正本リポジトリは <https://github.com/igapyon/xlsx2md> です。  
-このリポジトリ上の `docs/xlsx2md/` には、移行案内用の `README.md` のみを残しています。
-
-- **xlsx2md.html**: Excel 設計書 (`.xlsx`) をローカルで解析し、地の文・表・結合セル情報を保ちながら Markdown へ変換します。
-- 独立前は `docs/xlsx2md/` に配置し、`text` カテゴリから分離して運用していました。
+このリポジトリ上の `docs/xlsx2md/` には、移行案内用の `README.md` のみを残しています。  
+独立前は `docs/xlsx2md/` に配置し、`text` カテゴリから分離して運用していました。
 
 ## life
 
@@ -363,6 +397,12 @@ URL加工系ツールです。
 
 - **forgot-items-check.html**: 忘れ物チェック用のリストを生成します。
 - **japan-weather.html**: 日本の天気情報（地域別）を確認できます（オンライン取得）。
+
+## knowledge-timeline
+
+知識を時系列で俯瞰するツールです。
+
+- **composers.html**: クラシック作曲家の生没年・主要作品・時代背景を同一時間軸で確認できます。
 
 ## git
 
@@ -377,7 +417,7 @@ Git補助ツールです。
 
 ## GitHub Pages
 
-GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/diagram/`、`docs/music/`、`docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/` 配下にあります。  
+GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/diagram/`、`docs/knowledge-timeline/`、`docs/music/`、`docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/`、`docs/prompt/`、`docs/project/` 配下にあります。  
 公開URL: https://igapyon.github.io/local-html-tools/
 
 ## Third-Party Notices

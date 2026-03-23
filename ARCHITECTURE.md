@@ -1,10 +1,78 @@
 # ARCHITECTURE
 
+## システム概要
+
+このリポジトリは、`docs/` 配下に多数の独立したローカル Web ツールを持つ Static Web App 集である。配布形態は原則として「各ツールが単一 HTML で自己完結する」ことを維持しつつ、開発時には `*-src.html` や `src/` 配下の分割ソースを用いて保守性を確保する。
+
+アーキテクチャ上の大きな柱は次の 3 点である。
+
+- **単一HTML配布**: 利用者には外部依存のない単一 HTML を渡す
+- **LHT UI 抽象化**: 画面側は原則 `lht-*` を利用し、共通 UI の契約を `lht-cmn/` に集約する
+- **生成物と手編集対象の分離**: `*.html` を生成物として扱い、`*-src.html` や `src/` を編集対象に寄せる
+
+## 主要領域
+
+- `docs/`
+  - 利用者向けの各ツールをカテゴリ別に配置する公開領域
+  - `git`、`music`、`ffmpeg`、`diagram`、`grep`、`text`、`link`、`life`、`img`、`prompt`、`password`、`project`、`knowledge-timeline` などを含む
+- `scripts/`
+  - `build-*.mjs` 系のビルドエントリポイント群
+  - 共通の単一 HTML 生成ヘルパー `scripts/lib/single-html.mjs`
+- `lht-cmn/`
+  - 共有 UI コンポーネント層、CSS、JS、vendor アセット、カタログ、テスト
+- `md3/`
+  - 参照用途寄りの Material Design 関連アセット。実運用の UI ロジックは `lht-cmn/` を中心にする
+
+## 配布モデル
+
+配布物の基本単位は各ツールごとの単一 HTML である。最終成果物では、ローカル参照の CSS と JavaScript を HTML にインライン化し、外部 CDN なしで開ける状態を目指す。
+
+- `docs/*/*.html`
+  - 配布対象となる単一ファイル出力
+- `docs/*/*-src.html`
+  - 単一 HTML を生成するための編集対象テンプレート
+- `docs/*/src/`
+  - 複雑なツールで使う分割 CSS / TS / JS
+- `scripts/lib/single-html.mjs`
+  - `link rel="stylesheet"` と `script src` のローカル参照をインライン化し、自己完結した HTML を生成する
+
+## ビルドアーキテクチャ
+
+ビルドはカテゴリ単位の `scripts/build-*.mjs` で構成される。各スクリプトは対象ツールのソース配置を知っており、必要に応じて TypeScript から JavaScript への変換を行った上で、最終的に単一 HTML を生成する。
+
+- `npm run build:all`
+  - 各カテゴリのビルドを順に実行し、最後にテストを流す
+- `npm run build:docs`
+  - `docs/index-src.html` から `docs/index.html` を生成し、更新日プレースホルダも解決する
+- `npm run build:git:material`
+  - `@material/web` 由来の vendor bundle を `lht-cmn/vendor/` に生成する
+- `npm run build:prompt` / `npm run build:project` / `npm run build:music`
+  - TypeScript を JavaScript へ変換してから最終 HTML を生成する代表例
+
+## 開発モード
+
+このリポジトリには、開発のしかたが異なる複数のモードがある。
+
+### src 編集 + 生成型
+
+`*-src.html` を正本として編集し、ビルドで `*.html` を生成する方式。
+
+- 対象例: `life`、`link`、`text`、`img`、`docs/index`
+- 変更後は対応する `npm run build:*` を実行し、生成済み HTML を更新する
+
+### 分割ソース型
+
+`*-src.html` に加えて `src/css`、`src/js`、`src/ts` を持ち、保守性を高める方式。
+
+- 対象例: `music`、`prompt`、`project`、`diagram`、`ffmpeg`、`grep`、`password`、`knowledge-timeline`
+- 複雑なロジック、テスト、型付き実装を分離しやすい
+- 生成物の `*.html` は直接編集しない
+
 ## UIレイヤー方針（LHT）
 
 - 方針の正本は `lht-cmn/README.md` とする
 - 本書では要点のみ扱う:
-  - 画面側のUIは `lht-*` Web Components を基本とする
+  - 画面側の UI は `lht-*` Web Components を基本とする
   - Material Web は `lht-cmn` 内部で優先利用する
   - 実運用の共通スタイルは `lht-cmn/css/components.css` に集約する
 
@@ -45,14 +113,6 @@
   - `active`、`show()`、`hide()` など表示制御 API の標準化
   - `role`、`aria-live`、`aria-hidden` などアクセシビリティ契約の標準化
 
-### `lht-cmn` を使う理由
-
-- 各ページで重複していた UI 実装を削減できる
-- 画面間の見た目と操作感を揃えやすい
-- 共通部品単位でレビューできるため、修正影響の把握がしやすい
-- 生成 AI を含む変更作業で、個別画面ごとの独自実装を増やさずに済む
-- 単一 HTML 生成を維持しつつ、開発時の再利用性と変更容易性を確保できる
-
 ### 代表的な共通コンポーネント
 
 - **入力系**: `lht-text-field-help`, `lht-select-help`, `lht-switch-help`
@@ -61,9 +121,37 @@
 - **操作補助系**: `lht-file-select`, `lht-input-mode-toggle`
 - **状態表示系**: `lht-loading-overlay`, `lht-toast`, `lht-error-alert`
 
+## 画面パターン
+
+このリポジトリの画面は、大きくいくつかのパターンに整理できる。
+
+### 自動生成型
+
+`git-pseudo-squash.html` のように、入力変更に応じて出力を即時更新する方式。
+
+- 入力値が確定次第、自動で出力を更新してよいケースに向く
+- 出力はコードブロックで常時表示し、コピー操作を主導線にする
+- 入力不足時は空欄または必須メッセージで抑制する
+
+### 多段フロー型
+
+`ffmpeg-loudnorm-cmdline-gen.html` のように、生成結果と手元の実行結果を往復させながら次段へ進む方式。
+
+- 「設定 → コマンド生成 → 実行 → 実行結果貼り付け → 次の生成」のような流れを扱う
+- 各段階は見出しで区切り、上から下へ読めるようにする
+- 生成ボタン、結果表示、コピー導線を段階ごとに揃える
+
+### 変換・プレビュー型
+
+`diagram`、`musicxml-to-svg`、`mikuproject` の一部のように、入力や読込データをブラウザ内で変換し、プレビューや保存へつなぐ方式。
+
+- SVG や中間テキストなど、可視な成果物をその場で確認できる
+- ダウンロード、コピー、エラー表示を近接配置し、試行錯誤しやすくする
+- 外部サービスではなくブラウザ内処理を優先する
+
 ## Material Design 実装ガイド
 
-本プロジェクトでは、外部CSSに依存せず Material Design 系の見た目と操作感を再現する。画面側は原則 `lht-*` を利用し、`md-*` は `lht-cmn` 内部実装として扱う。詳細ルールやコンポーネント仕様は `lht-cmn/README.md` を参照する。
+本プロジェクトでは、外部 CSS に依存せず Material Design 系の見た目と操作感を再現する。画面側は原則 `lht-*` を利用し、`md-*` は `lht-cmn` 内部実装として扱う。詳細ルールやコンポーネント仕様は `lht-cmn/README.md` を参照する。
 
 ### 基本トークン
 
@@ -78,23 +166,6 @@
 - **表示**: `md-tooltip-group:hover` で `md-tooltip-content` をフェードイン
 - **幅**: 標準 `20rem`、必要なら `md-tooltip--wide`
 
-#### 実装の基本形（参考）
-
-```html
-<span class="md-tooltip-group">
-  <span class="md-info-chip">
-    <svg aria-hidden="true" viewBox="0 0 24 24" class="md-info-icon" fill="none">
-      <circle cx="12" cy="12" r="9" fill="#cbbcf0"/>
-      <rect x="11" y="10" width="2" height="7" rx="1" fill="#ffffff"/>
-      <circle cx="12" cy="7.5" r="1" fill="#ffffff"/>
-    </svg>
-  </span>
-  <span class="md-tooltip-content md-tooltip">
-    説明文…
-  </span>
-</span>
-```
-
 ### 主要コンポーネント
 
 - **レイアウト**: `md-page` `md-shell` `md-card` `md-section`
@@ -103,64 +174,10 @@
 - **コード表示**: `md-code-block` `md-code` `md-copy-button`
 - **トースト**: `md-snackbar` `md-hidden` `md-visible`
 
-### 追加クラス（用途別）
+## アーキテクチャ上の優先事項
 
-`git-pseudo-squash.html` を基準にしつつ、以下はツール固有で追加されたクラス群。
-
-- **find-gen.html**
-  - グリッド系: `md-grid` `md-grid-2` `md-grid-3`
-  - フォーム行: `md-form-row` `md-form-row--nowrap`
-- **text-processing.html**
-  - テキストボタン: `md-text-button`
-  - オプションカード: `md-option-card`
-  - トグル: `md-toggle` `md-toggle-input` `md-toggle-track`
-  - アコーディオン: `md-accordion`
-  - 出力枠: `md-output` `md-output-wrap`
-
-## ボタンなし（自動生成）パターン
-
-`git-pseudo-squash.html` のように、入力変更に応じてコマンドが即時更新されるUIでは、明示的な「生成」ボタンを置かない。
-
-### 使いどころ
-
-- 入力値が確定次第、自動で出力を更新して良いケース
-- 複数ステップのコマンドを連続で提示するフロー型の画面
-
-### 表示ルール
-
-- 出力はコードブロック（`<code>`）で常時表示する
-- コピー操作のみの最小ボタン（📋）は右上に付与してよい
-- 入力不足時は空欄 or 必須メッセージで抑制し、冗長なボタンは置かない
-
-## ボタンあり・多段フロー（loudnorm 型）
-
-`docs/ffmpeg/ffmpeg-loudnorm-cmdline-gen.html` のように、段階的にコマンドを生成し、実行結果を入力して次のコマンドを作るツールの基本設計。
-
-### 使いどころ
-
-- 「設定 → コマンド生成 → 実行 → 実行結果貼り付け → 次の生成」のように多段の手順が必要なケース
-- 実行結果（ffmpeg 出力など）を取り込んで最終コマンドを確定するケース
-
-### 表示・操作ルール
-
-- 各段階は見出し（`h2`）で区切り、番号付きで流れが一目で追えるようにする
-- 生成操作は明示的なボタン（緑）で行い、結果は直下にコードブロックで表示する
-- 実行結果の貼り付け欄は「次の段階」の直前に配置する
-- 次の段階のボタンは、必要情報が揃ってから押す前提で配置し、未入力時はアラートで指示する
-- 生成結果はコピー用ボタン（📋）を右上に付与して手戻りを減らす
-
-## music ディレクトリの例外運用
-
-`docs/music/` は「配布は単一HTML」「開発は分割ソース」を採用する。
-
-- 開発用テンプレート: `docs/music/*-src.html`
-- 分割ソース: `docs/music/src/...`（`css` / `ts` / `js`）
-- 配布用生成物: `docs/music/*.html`
-- ビルドスクリプト: `scripts/build-music.mjs`
-
-運用ルール:
-
-- 手編集対象は `*-src.html` と `src/` のみ
-- `*.html` は生成物として扱い、直接編集しない
-- 変更後は `npm run build:music` で再生成する
-- PRには `docs/music/*.html` を含める
+- 単一ファイルでの配布を維持する
+- `lht-*` を通じた共有 UI 抽象化を優先する
+- ツールページ間の重複実装を減らす
+- 編集対象ソースと生成物を明確に分離する
+- ベンダー依存を局所化し、画面側へ漏らしにくくする
