@@ -7048,6 +7048,28 @@ README.md、新規 markdown、一部設定ファイルについては UTF-8 を�
 - 文字コード確認を省略したまま既存ソースコードを編集すること
 
 作業開始前に、この制約を理解した旨を短く確認してから進めてください。`
+    },
+    {
+        id: "minimal-scope-change-request",
+        label: "A751: 要求達成に必要な範囲だけを変更",
+        keywords: ["A751", "751", "minimal scope change", "scoped change", "focused change", "minimal impact", "必要最小限", "必要な範囲だけ", "要求達成", "影響範囲", "無関係な変更をしない", "リファクタしない", "整形しない", "命名変更しない", "周辺最適化しない", "ひつようさいしょうげん", "ようきゅうたっせい", "えいきょうはんい", "りふぁくたしない", "せいけいしない", "めいめいへんこうしない"],
+        requiresCommitId: false,
+        buildBody: () => "今回の要求を満たすために必要な範囲だけを変更してください。無関係なリファクタ、整形、命名変更、周辺最適化は行わないでください。差分の小ささ自体ではなく、意図と影響範囲を限定することを優先してください。"
+    },
+    {
+        id: "canonical-resource-receiving-request",
+        label: "A752: 正本受領中は OK のみ回答",
+        keywords: ["A752", "752", "canonical source receiving", "resource receiving", "receive only", "ok only", "handover intake", "正本受領", "受領中", "OKのみ", "受け取り専念", "中身に反応しない", "解説しない", "指摘しない", "渡し終えたら反応", "せいほんじゅりょう", "じゅりょうちゅう", "おーけーのみ", "うけとりせんねん", "なかみにはんのうしない"],
+        requiresCommitId: false,
+        buildBody: () => "これから正本となるソースコード、markdown、関連資料を順次渡します。私が受領完了を明示するまでは、中身の要約、解説、評価、改善提案、不具合指摘、質問は行わず、各回の応答は厳密に `OK` のみとしてください。まだ処理や分析は開始せず、受け取りに専念してください。私が「これで渡し終えた」と伝えてから、はじめて内容に基づく応答を開始してください。"
+    },
+    {
+        id: "canonical-resource-return-request",
+        label: "A753: 正本返却時は全文を出力",
+        keywords: ["A753", "753", "canonical source return", "return full text", "full content output", "no diff", "changed files only", "正本返却", "全文出力", "差分ではなく全文", "変更したものだけ", "未変更は不要", "省略しない", "完成後全文", "せいほんへんきゃく", "ぜんぶんしゅつりょく", "さぶんではなくぜんぶん", "みへんこうはふよう", "しょうりゃくしない"],
+        requiresCommitId: false,
+        outputMarkdown: true,
+        buildBody: () => "正本を返却する際は、未変更のものは出力せず、変更した正本だけを漏れなく出力してください。各対象について、差分や抜粋ではなく完成後の全文を提示してください。`...` などの省略記法は使わないでください。"
     }
 ];
   </script>
