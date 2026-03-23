@@ -24,6 +24,11 @@ const TARGETS = [
     id: "text-viewer",
     srcHtml: "docs/text/text-viewer-src.html",
     outHtml: "docs/text/text-viewer.html"
+  },
+  {
+    id: "text2spreadsheetml",
+    srcHtml: "docs/text/text2spreadsheetml-src.html",
+    outHtml: "docs/text/text2spreadsheetml.html"
   }
 ];
 

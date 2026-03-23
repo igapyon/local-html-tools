@@ -1,0 +1,1391 @@
+<!--
+Copyright 2026 Toshiki Iga
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>text2spreadsheetml</title>
+  <link rel="stylesheet" href="../../lht-cmn/css/components.css">
+  <script src="../../lht-cmn/vendor/material-web-outlined-text-field.bundle.js"></script>
+  <script src="../../lht-cmn/js/components.js" defer></script>
+  <style>
+    :root {
+      --md-danger: #b3261e;
+      --md-sys-color-background: #f6f4f8;
+      --md-sys-color-focus-ring: rgba(98, 0, 238, 0.28);
+      --md-sys-color-on-primary: #ffffff;
+      --md-sys-color-on-surface: #1c1b1f;
+      --md-sys-color-on-surface-variant: #49454f;
+      --md-sys-color-outline: #c8c5d0;
+      --md-sys-color-primary: #6200ee;
+      --md-sys-color-surface: #ffffff;
+      --md-sys-color-surface-variant: #f4f1f7;
+      --md-typography-body-small: 0.875rem;
+    }
+
+    body {
+      margin: 0;
+      background: var(--md-sys-color-background);
+      color: var(--md-sys-color-on-surface);
+      font-family: "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", sans-serif;
+    }
+
+    .md-page {
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .md-shell {
+      max-width: 1120px;
+      margin: 0 auto;
+      background: var(--md-sys-color-surface);
+      border: 1px solid #ece7f3;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(26, 20, 34, 0.08);
+      padding: 28px;
+      position: relative;
+    }
+
+    .md-headline {
+      font-size: 1.65rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 0 0 1.2rem;
+      padding-right: 2.8rem;
+    }
+
+    .md-section {
+      margin-top: 28px;
+    }
+
+    .md-section-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 0 0 0.75rem;
+    }
+
+    .md-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .md-grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .md-card {
+      border: 1px solid #ece7f3;
+      border-radius: 18px;
+      background: #fcfbfd;
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(41, 35, 58, 0.04);
+    }
+
+    .md-label {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .md-required {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.14rem 0.4rem;
+      border-radius: 999px;
+      font-size: 0.54rem;
+      font-weight: 700;
+      background: #eceaf1;
+      color: #49454f;
+    }
+
+    .md-input,
+    .md-select,
+    .md-textarea,
+    .md-file {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 12px;
+      border: 1px solid var(--md-sys-color-outline);
+      background: #fff;
+      padding: 0.78rem 0.82rem;
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface);
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .md-file {
+      padding: 0.62rem 0.82rem;
+    }
+
+    .md-textarea {
+      min-height: 13rem;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      line-height: 1.45;
+    }
+
+    .md-input:focus,
+    .md-select:focus,
+    .md-textarea:focus,
+    .md-file:focus {
+      outline: none;
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px var(--md-sys-color-focus-ring);
+    }
+
+    .md-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    .md-row + .md-row {
+      margin-top: 16px;
+    }
+
+    .md-field {
+      min-width: 0;
+      display: block;
+    }
+
+    .md-field > lht-text-field-help,
+    .md-field > lht-select-help {
+      display: block;
+    }
+
+    .md-radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .md-radio {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      border: 1px solid #e1dbea;
+      border-radius: 999px;
+      background: #fff;
+      padding: 0.58rem 0.9rem;
+      cursor: pointer;
+      font-size: 0.92rem;
+    }
+
+    .md-radio input {
+      margin: 0;
+    }
+
+    .md-checks {
+      display: grid;
+      gap: 10px;
+    }
+
+    .md-check-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.93rem;
+    }
+
+    .md-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .md-button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.72rem 1.15rem;
+      font-size: 0.93rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+    }
+
+    .md-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .md-button--primary {
+      background: var(--md-sys-color-primary);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(98, 0, 238, 0.24);
+    }
+
+    .md-button--primary:hover {
+      background: #5400d1;
+    }
+
+    .md-button--secondary {
+      background: #efe7fb;
+      color: #4c347a;
+    }
+
+    .md-button--secondary:hover {
+      background: #e6daf8;
+    }
+
+    .md-button--surface {
+      background: #f5f2f8;
+      color: #3d3845;
+    }
+
+    .md-button--surface:hover {
+      background: #eee9f3;
+    }
+
+    .md-code-block {
+      position: relative;
+      margin-top: 0.5rem;
+    }
+
+    .md-code {
+      display: block;
+      white-space: pre;
+      overflow-x: auto;
+      background: var(--md-sys-color-surface-variant);
+      border: 1px solid #e5e0ec;
+      border-radius: 14px;
+      padding: 0.95rem;
+      padding-right: 3rem;
+      min-height: 5rem;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .md-copy-button {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.55rem;
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 17px;
+      background: #f7f2fa;
+      cursor: pointer;
+    }
+
+    .md-copy-button:hover {
+      background: #efe8f5;
+    }
+
+    .md-meta {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .md-metric {
+      border: 1px solid #e7e2eb;
+      border-radius: 14px;
+      padding: 0.85rem 0.9rem;
+      background: #fff;
+    }
+
+    .md-metric-label {
+      font-size: 0.77rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .md-metric-value {
+      margin-top: 0.28rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .md-table-wrap {
+      overflow: auto;
+      border: 1px solid #e7e2eb;
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .md-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .md-table th,
+    .md-table td {
+      border-bottom: 1px solid #eee8f2;
+      border-right: 1px solid #f1edf5;
+      padding: 0.55rem 0.65rem;
+      vertical-align: top;
+      text-align: left;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-width: 6rem;
+    }
+
+    .md-table th {
+      background: #f1f8f4;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .md-note,
+    .md-warning,
+    .md-error {
+      margin: 0.5rem 0 0;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .md-note {
+      color: #5f5a6b;
+    }
+
+    .md-warning {
+      color: #8a5300;
+    }
+
+    .md-error {
+      color: var(--md-danger);
+    }
+
+    .md-info-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      color: #4a4458;
+      background: transparent;
+    }
+
+    .md-info-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .md-tooltip-group {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .md-tooltip-content {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+      z-index: 50;
+      width: min(28rem, 88vw);
+    }
+
+    .md-tooltip-group:hover .md-tooltip-content {
+      opacity: 1;
+    }
+
+    .md-tooltip {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .md-hidden {
+      display: none !important;
+    }
+
+    .md-snackbar-host {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 200;
+    }
+
+    .md-snackbar-host.md-visible {
+      opacity: 1;
+    }
+
+    .md-snackbar {
+      background: #2b2831;
+      color: #f7f4fb;
+      border-radius: 12px;
+      padding: 0.72rem 1rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 900px) {
+      .md-grid-2,
+      .md-row,
+      .md-meta {
+        grid-template-columns: 1fr;
+      }
+
+      .md-page {
+        padding: 16px;
+      }
+
+      .md-shell {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body class="md-page">
+  <main>
+    <section class="md-shell">
+      <lht-page-hero
+        title="text2spreadsheetml"
+        subtitle="ベタテキスト、CSV、TAB区切りファイルから SpreadsheetML 2003 XML を生成します。"
+        icon="📊"
+        help-label="text2spreadsheetml の説明"
+        help-wide
+        menu-home-href="../index.html"
+        menu-home-label="トップへ戻る">
+        ベタテキスト、CSV、TAB区切りファイルを SpreadsheetML 2003 XML に変換します。<br><br>
+        MVP では値を壊さないことを優先し、全セルを `String` として出力します。数値や日付の型変換は行わず、Excel 上で後から必要に応じて操作する前提です。
+      </lht-page-hero>
+
+      <section class="md-section md-card">
+        <h2 class="md-section-title">入力方式</h2>
+        <div class="md-radio-group">
+          <label class="md-radio"><input type="radio" name="inputMode" value="text" checked>ベタテキスト</label>
+          <label class="md-radio"><input type="radio" name="inputMode" value="csv">CSV ファイル</label>
+          <label class="md-radio"><input type="radio" name="inputMode" value="tsv">TAB 区切りファイル</label>
+        </div>
+        <p class="md-note">MVP では、どの入力方式でも内部的には表データへ正規化してから 1 シートの SpreadsheetML 2003 を生成します。</p>
+      </section>
+
+      <section class="md-section md-grid md-grid-2">
+        <div class="md-card">
+          <h2 class="md-section-title">入力データ</h2>
+
+          <div id="textInputSection">
+            <div class="md-radio-group" style="margin-bottom: 12px;">
+              <label class="md-radio"><input type="radio" name="textInputMode" value="direct" checked>直接入力</label>
+              <label class="md-radio"><input type="radio" name="textInputMode" value="file">テキストファイル</label>
+            </div>
+            <lht-text-field-help
+              field-id="inputText"
+              label="入力テキスト"
+              type="textarea"
+              rows="12"
+              required
+              placeholder="name,age,joined&#10;Alice,30,2026-03-01&#10;Bob,28,2026-03-15"
+              help-text="区切り文字付きの表テキストを貼り付けます。CSV風、TAB区切り、パイプ区切りなどを読み取り設定に合わせて解釈します。">
+            </lht-text-field-help>
+            <div id="textFileInputSection" class="md-hidden" style="margin-top: 12px;">
+              <lht-file-select
+                input-id="textInputFile"
+                button-id="textInputFileButton"
+                file-name-id="textInputFileName"
+                button-label="テキストファイルを選択"
+                accept=".txt,.csv,.tsv,text/plain,text/csv,text/tab-separated-values"
+                placeholder="未選択"
+                show-file-name>
+              </lht-file-select>
+              <p id="textFileStatus" class="md-note">テキストファイルを選択するとブラウザ内で読み込みます。サーバ送信は行いません。</p>
+            </div>
+          </div>
+
+          <div id="fileInputSection" class="md-hidden">
+            <lht-file-select
+              input-id="inputFile"
+              button-id="inputFileButton"
+              file-name-id="inputFileName"
+              button-label="入力ファイルを選択"
+              accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain"
+              placeholder="未選択"
+              show-file-name>
+            </lht-file-select>
+            <p id="fileStatus" class="md-note">ファイルを選択するとブラウザ内で読み込みます。サーバ送信は行いません。</p>
+          </div>
+
+          <div class="md-actions" style="margin-top: 14px;">
+            <button type="button" class="md-button md-button--secondary" onclick="applySample()">サンプル投入</button>
+            <button type="button" class="md-button md-button--surface" onclick="clearUiPreferences()">設定をクリア</button>
+          </div>
+        </div>
+
+        <div class="md-card">
+          <h2 class="md-section-title">読み取り設定</h2>
+          <div class="md-row">
+            <div class="md-field">
+              <lht-select-help field-id="delimiterSelect" label="区切り文字" help-text="ベタテキストをどの区切り文字で列分割するかを指定します。">
+                <script type="application/json" slot="options">[
+                  { "value": "comma", "label": "カンマ (,)" },
+                  { "value": "tab", "label": "TAB" },
+                  { "value": "space", "label": "半角空白", "selected": true },
+                  { "value": "pipe", "label": "パイプ (|)" },
+                  { "value": "semicolon", "label": "セミコロン (;)" }
+                ]</script>
+              </lht-select-help>
+            </div>
+            <div class="md-field">
+              <lht-text-field-help field-id="sheetName" label="シート名" required value="Sheet1" placeholder="Sheet1" help-text="SpreadsheetML 2003 で出力するワークシート名です。"></lht-text-field-help>
+            </div>
+          </div>
+          <div class="md-row">
+            <div class="md-field">
+              <lht-text-field-help field-id="workbookName" label="Workbook 名" value="text2spreadsheetml" placeholder="text2spreadsheetml" help-text="DocumentProperties の Title と保存ファイル名の初期値に使います。"></lht-text-field-help>
+            </div>
+            <div class="md-field">
+              <lht-text-field-help field-id="downloadFilename" label="保存ファイル名" value="text2spreadsheetml.xml" placeholder="text2spreadsheetml.xml" help-text=".xml 保存時のファイル名です。未入力時は Workbook 名から補います。"></lht-text-field-help>
+            </div>
+          </div>
+          <div class="md-row">
+            <div class="md-field">
+              <lht-select-help field-id="typeInferenceMode" label="項目型" help-text="文字列固定か、限定数値推論かを選びます。限定数値推論では、先頭ゼロ付き整数が1つでもある列は String にフォールバックします。">
+                <script type="application/json" slot="options">[
+                  { "value": "string", "label": "文字列固定", "selected": true },
+                  { "value": "limitedNumeric", "label": "限定数値推論" }
+                ]</script>
+              </lht-select-help>
+            </div>
+          </div>
+          <div class="md-checks" style="margin-top: 10px;">
+            <lht-switch-help switch-id="hasHeader" label="1行目をヘッダとして扱う" checked></lht-switch-help>
+            <lht-switch-help switch-id="ignoreEmptyLines" label="空行を無視" checked></lht-switch-help>
+            <lht-switch-help switch-id="trimCells" label="各セルの前後空白を trim" checked></lht-switch-help>
+            <div id="csvQuoteModeWrap" class="md-hidden">
+              <lht-switch-help switch-id="csvQuoteMode" label="ダブルクォート付き CSV を解釈" help-label="ダブルクォート付き CSV の説明">CSV の `&quot;...&quot;` による囲みを解釈します。MVP では CSV 向けの簡易対応です。</lht-switch-help>
+            </div>
+          </div>
+          <p class="md-note">文字列固定では全セル `String`、限定数値推論では列単位で `Number` / `String` を判定します。</p>
+          <p id="configWarning" class="md-warning"></p>
+        </div>
+      </section>
+
+      <section class="md-section md-card">
+        <h2 class="md-section-title">プレビュー</h2>
+        <div class="md-meta">
+          <div class="md-metric"><div class="md-metric-label">行数</div><div id="rowCount" class="md-metric-value">0</div></div>
+          <div class="md-metric"><div class="md-metric-label">列数</div><div id="columnCount" class="md-metric-value">0</div></div>
+          <div class="md-metric"><div class="md-metric-label">ヘッダ</div><div id="headerState" class="md-metric-value">OFF</div></div>
+          <div class="md-metric"><div class="md-metric-label">セル型</div><div id="cellTypeModeLabel" class="md-metric-value">String</div></div>
+        </div>
+        <p id="columnTypeSummary" class="md-note"></p>
+        <p id="parseError" class="md-error"></p>
+        <p id="parseWarning" class="md-warning"></p>
+        <div class="md-table-wrap" style="margin-top: 12px;">
+          <table class="md-table">
+            <thead id="previewHead"></thead>
+            <tbody id="previewBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="md-section md-card">
+        <h2 class="md-section-title">SpreadsheetML 2003 XML</h2>
+        <div class="md-actions">
+          <button type="button" class="md-button md-button--primary" onclick="downloadGeneratedXml()">.xml を保存</button>
+        </div>
+        <lht-command-block command-id="xmlOutput"></lht-command-block>
+      </section>
+    </section>
+  </main>
+
+  <lht-toast id="toast"></lht-toast>
+
+  <script>
+    const STORAGE_KEYS = {
+      inputMode: "text2spreadsheetml.ui.inputMode",
+      textInputMode: "text2spreadsheetml.ui.textInputMode",
+      delimiter: "text2spreadsheetml.ui.delimiter",
+      typeInferenceMode: "text2spreadsheetml.ui.typeInferenceMode",
+      hasHeader: "text2spreadsheetml.ui.hasHeader",
+      ignoreEmptyLines: "text2spreadsheetml.ui.ignoreEmptyLines",
+      trimCells: "text2spreadsheetml.ui.trimCells",
+      csvQuoteMode: "text2spreadsheetml.ui.csvQuoteMode",
+      sheetName: "text2spreadsheetml.ui.sheetName",
+      workbookName: "text2spreadsheetml.ui.workbookName",
+      downloadFilename: "text2spreadsheetml.ui.downloadFilename",
+      inputText: "text2spreadsheetml.ui.inputText"
+    };
+
+    let currentFileText = "";
+    let currentFileName = "";
+    let latestGeneratedXml = "";
+
+    function getStoredString(key) {
+      try {
+        const value = localStorage.getItem(key);
+        return value == null ? null : value;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function getStoredBoolean(key) {
+      const raw = getStoredString(key);
+      if (raw === "true") return true;
+      if (raw === "false") return false;
+      return null;
+    }
+
+    function setStoredValue(key, value) {
+      try {
+        localStorage.setItem(key, String(value));
+      } catch (error) {
+        // localStorage が使えない環境でも継続
+      }
+    }
+
+    function showToast(message) {
+      const host = document.getElementById("toast");
+      if (!host) return;
+      if (typeof host.show === "function") {
+        host.show(message, 1800);
+        return;
+      }
+    }
+
+    function copyToClipboard(elementId) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      const text = element.textContent || "";
+      if (!text) {
+        showToast("コピーする内容がありません");
+        return;
+      }
+      navigator.clipboard.writeText(text)
+        .then(() => showToast("コピーしました"))
+        .catch(() => showToast("コピーに失敗しました"));
+    }
+
+    function getInputMode() {
+      const checked = document.querySelector('input[name="inputMode"]:checked');
+      return checked ? checked.value : "text";
+    }
+
+    function getTextInputMode() {
+      const checked = document.querySelector('input[name="textInputMode"]:checked');
+      return checked ? checked.value : "direct";
+    }
+
+    function getDelimiterValue() {
+      const value = document.getElementById("delimiterSelect")?.value || "comma";
+      switch (value) {
+        case "tab":
+          return "\t";
+        case "space":
+          return " ";
+        case "pipe":
+          return "|";
+        case "semicolon":
+          return ";";
+        default:
+          return ",";
+      }
+    }
+
+    function updateInputModeUi() {
+      const inputMode = getInputMode();
+      const textInputSection = document.getElementById("textInputSection");
+      const fileInputSection = document.getElementById("fileInputSection");
+      const textFileInputSection = document.getElementById("textFileInputSection");
+      const inputText = document.getElementById("inputText");
+      const delimiterSelect = document.getElementById("delimiterSelect");
+      const csvQuoteMode = document.getElementById("csvQuoteMode");
+      const csvQuoteModeWrap = document.getElementById("csvQuoteModeWrap");
+      const textInputMode = getTextInputMode();
+
+      textInputSection.classList.toggle("md-hidden", inputMode !== "text");
+      fileInputSection.classList.toggle("md-hidden", inputMode === "text");
+      textFileInputSection.classList.toggle("md-hidden", !(inputMode === "text" && textInputMode === "file"));
+      inputText.classList.toggle("md-hidden", !(inputMode === "text" && textInputMode === "direct"));
+      csvQuoteModeWrap.classList.toggle("md-hidden", inputMode !== "csv");
+
+      if (inputMode === "csv") {
+        delimiterSelect.value = "comma";
+        delimiterSelect.disabled = true;
+        csvQuoteMode.checked = true;
+      } else if (inputMode === "tsv") {
+        delimiterSelect.value = "tab";
+        delimiterSelect.disabled = true;
+        csvQuoteMode.checked = false;
+      } else {
+        if (!delimiterSelect.disabled && (delimiterSelect.value === "comma" || delimiterSelect.value === "tab")) {
+          delimiterSelect.value = "space";
+        }
+        delimiterSelect.disabled = false;
+      }
+
+      updateFileAccept();
+    }
+
+    function updateFileAccept() {
+      const inputFile = document.getElementById("inputFile");
+      if (!inputFile) return;
+      const inputMode = getInputMode();
+      if (inputMode === "csv") {
+        inputFile.setAttribute("accept", ".csv,text/csv");
+      } else if (inputMode === "tsv") {
+        inputFile.setAttribute("accept", ".tsv,.txt,text/tab-separated-values,text/plain");
+      } else {
+        inputFile.setAttribute("accept", ".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain");
+      }
+    }
+
+    function sanitizeSheetName(value) {
+      const raw = String(value || "").trim() || "Sheet1";
+      return raw.replace(/[\\/:*?\[\]]/g, "_").slice(0, 31) || "Sheet1";
+    }
+
+    function sanitizeFilename(value) {
+      const base = String(value || "").trim() || "text2spreadsheetml.xml";
+      const normalized = base.replace(/[<>:"/\\|?*\u0000-\u001F]/g, "_").replace(/\s+/g, "_");
+      return normalized.toLowerCase().endsWith(".xml") ? normalized : `${normalized}.xml`;
+    }
+
+    function escapeXml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+    }
+
+    function parseCsvWithQuotes(text) {
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let inQuotes = false;
+
+      for (let index = 0; index < text.length; index += 1) {
+        const char = text[index];
+        const next = text[index + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            cell += '"';
+            index += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+          continue;
+        }
+
+        if (char === "," && !inQuotes) {
+          row.push(cell);
+          cell = "";
+          continue;
+        }
+
+        if ((char === "\n" || char === "\r") && !inQuotes) {
+          if (char === "\r" && next === "\n") {
+            index += 1;
+          }
+          row.push(cell);
+          rows.push(row);
+          row = [];
+          cell = "";
+          continue;
+        }
+
+        cell += char;
+      }
+
+      if (inQuotes) {
+        throw new Error("CSV のダブルクォートが閉じられていません。");
+      }
+
+      row.push(cell);
+      rows.push(row);
+      return rows;
+    }
+
+    function parseDelimitedText(text, options) {
+      const normalized = String(text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+      if (options.csvQuoteMode && options.delimiter === ",") {
+        return parseCsvWithQuotes(normalized);
+      }
+      if (options.delimiter === " ") {
+        return normalized.split("\n").map((line) => {
+          const trimmedLine = options.trimCells ? line.trim() : line;
+          if (!trimmedLine) return [""];
+          return trimmedLine.split(/ +/);
+        });
+      }
+      return normalized.split("\n").map((line) => line.split(options.delimiter));
+    }
+
+    function normalizeRows(rows, options) {
+      const warnings = [];
+      const filtered = [];
+
+      rows.forEach((row) => {
+        const cells = Array.isArray(row) ? row.slice() : [];
+        const values = options.trimCells
+          ? cells.map((cell) => String(cell).trim())
+          : cells.map((cell) => String(cell));
+        const isCompletelyEmpty = values.every((cell) => cell === "");
+        if (options.ignoreEmptyLines && isCompletelyEmpty) {
+          return;
+        }
+        filtered.push(values);
+      });
+
+      let maxColumns = 0;
+      filtered.forEach((row) => {
+        if (row.length > maxColumns) maxColumns = row.length;
+      });
+
+      if (!filtered.length) {
+        return { rows: [], maxColumns: 0, warnings };
+      }
+
+      filtered.forEach((row, rowIndex) => {
+        if (row.length !== maxColumns) {
+          warnings.push(`行 ${rowIndex + 1} の列数が揃っていないため、末尾を空セルで補完しました。`);
+        }
+        while (row.length < maxColumns) {
+          row.push("");
+        }
+      });
+
+      return { rows: filtered, maxColumns, warnings };
+    }
+
+    function buildPreviewModel(rows, options) {
+      const normalized = normalizeRows(rows, options);
+      const allRows = normalized.rows;
+      const headerLabels = [];
+      const dataRows = [];
+
+      if (!allRows.length) {
+        return {
+          headerLabels,
+          dataRows,
+          warnings: normalized.warnings,
+          rowCount: 0,
+          columnCount: 0
+        };
+      }
+
+      if (options.hasHeader) {
+        allRows[0].forEach((value) => headerLabels.push(value || ""));
+        allRows.slice(1).forEach((row) => dataRows.push(row));
+      } else {
+        for (let index = 0; index < normalized.maxColumns; index += 1) {
+          headerLabels.push(`Column${index + 1}`);
+        }
+        allRows.forEach((row) => dataRows.push(row));
+      }
+
+      return {
+        headerLabels,
+        dataRows,
+        warnings: normalized.warnings,
+        rowCount: dataRows.length + (options.hasHeader ? 1 : 0),
+        columnCount: normalized.maxColumns
+      };
+    }
+
+    function isLeadingZeroInteger(value) {
+      return /^-?0\d+$/.test(value);
+    }
+
+    function isNumericCandidate(value) {
+      return /^-?(?:0|[1-9]\d*)(?:\.\d+)?$/.test(value);
+    }
+
+    function inferColumnTypes(previewModel, options) {
+      const columnTypes = Array.from({ length: previewModel.columnCount }, () => "String");
+      const warnings = [];
+
+      if (options.typeInferenceMode !== "limitedNumeric") {
+        return { columnTypes, warnings };
+      }
+
+      for (let index = 0; index < previewModel.columnCount; index += 1) {
+        const values = previewModel.dataRows
+          .map((row) => row[index] || "")
+          .filter((value) => value !== "");
+
+        if (!values.length) continue;
+
+        if (values.some((value) => isLeadingZeroInteger(value))) {
+          warnings.push(`${previewModel.headerLabels[index] || `Column${index + 1}`} は先頭ゼロ付き整数を含むため String に固定しました。`);
+          continue;
+        }
+
+        if (values.every((value) => isNumericCandidate(value))) {
+          columnTypes[index] = "Number";
+        }
+      }
+
+      return { columnTypes, warnings };
+    }
+
+    function buildWorkbookModel(previewModel, options) {
+      const inferred = inferColumnTypes(previewModel, options);
+      const rows = [];
+      if (options.hasHeader) {
+        rows.push({
+          isHeader: true,
+          cells: previewModel.headerLabels.map((value) => ({ value, type: "String" }))
+        });
+      }
+      previewModel.dataRows.forEach((row) => {
+        rows.push({
+          isHeader: false,
+          cells: row.map((value, index) => ({
+            value,
+            type: inferred.columnTypes[index] || "String"
+          }))
+        });
+      });
+      return {
+        workbookName: options.workbookName,
+        sheetName: options.sheetName,
+        rows,
+        columnTypes: inferred.columnTypes,
+        inferenceWarnings: inferred.warnings
+      };
+    }
+
+    function generateSpreadsheetMlXml(model) {
+      const createdIso = new Date().toISOString();
+      const rowsXml = model.rows.map((row) => {
+        const cellsXml = row.cells.map((cell) => {
+          const styleId = row.isHeader ? ' ss:StyleID="Header"' : "";
+          return `      <Cell${styleId}><Data ss:Type="${cell.type}">${escapeXml(cell.value)}</Data></Cell>`;
+        }).join("\n");
+        return `    <Row>\n${cellsXml}\n    </Row>`;
+      }).join("\n");
+
+      return `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+    <Author>local-html-tools</Author>
+    <LastAuthor>local-html-tools</LastAuthor>
+    <Created>${escapeXml(createdIso)}</Created>
+    <Company>local-html-tools</Company>
+    <Title>${escapeXml(model.workbookName)}</Title>
+  </DocumentProperties>
+  <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+    <ProtectStructure>False</ProtectStructure>
+    <ProtectWindows>False</ProtectWindows>
+  </ExcelWorkbook>
+  <Styles>
+    <Style ss:ID="Default" ss:Name="Normal">
+      <Alignment ss:Vertical="Bottom"/>
+      <Borders/>
+      <Font ss:FontName="Calibri" ss:Size="11"/>
+      <Interior/>
+      <NumberFormat/>
+      <Protection/>
+    </Style>
+    <Style ss:ID="Header">
+      <Font ss:Bold="1"/>
+      <Interior ss:Color="#E7F4EE" ss:Pattern="Solid"/>
+    </Style>
+  </Styles>
+  <Worksheet ss:Name="${escapeXml(model.sheetName)}">
+    <Table>
+${rowsXml}
+    </Table>
+  </Worksheet>
+</Workbook>`;
+    }
+
+    function renderPreview(previewModel, options) {
+      const previewHead = document.getElementById("previewHead");
+      const previewBody = document.getElementById("previewBody");
+      const rowCount = document.getElementById("rowCount");
+      const columnCount = document.getElementById("columnCount");
+      const headerState = document.getElementById("headerState");
+      const cellTypeModeLabel = document.getElementById("cellTypeModeLabel");
+      const columnTypeSummary = document.getElementById("columnTypeSummary");
+      const inferred = inferColumnTypes(previewModel, options);
+
+      rowCount.textContent = String(previewModel.rowCount);
+      columnCount.textContent = String(previewModel.columnCount);
+      headerState.textContent = options.hasHeader ? "ON" : "OFF";
+      cellTypeModeLabel.textContent = options.typeInferenceMode === "limitedNumeric" ? "列判定" : "String";
+      columnTypeSummary.textContent = previewModel.columnCount
+        ? inferred.columnTypes.map((type, index) => `${previewModel.headerLabels[index] || `Column${index + 1}`}=${type}`).join(" / ")
+        : "";
+
+      if (!previewModel.columnCount) {
+        previewHead.innerHTML = "";
+        previewBody.innerHTML = '<tr><td>ここにプレビューが表示されます</td></tr>';
+        columnTypeSummary.textContent = "";
+        return;
+      }
+
+      previewHead.innerHTML = `<tr>${previewModel.headerLabels.map((cell) => `<th>${escapeXml(cell || "")}</th>`).join("")}</tr>`;
+
+      const rowsForPreview = previewModel.dataRows.slice(0, 20);
+      previewBody.innerHTML = rowsForPreview.map((row) => {
+        return `<tr>${row.map((cell) => `<td>${escapeXml(cell || "")}</td>`).join("")}</tr>`;
+      }).join("");
+    }
+
+    function getSourceText() {
+      const inputMode = getInputMode();
+      if (inputMode === "text") {
+        if (getTextInputMode() === "file") {
+          return currentFileText;
+        }
+        return document.getElementById("inputText")?.value || "";
+      }
+      return currentFileText;
+    }
+
+    function updateDownloadFilenameFromWorkbook() {
+      const workbookName = document.getElementById("workbookName")?.value || "text2spreadsheetml";
+      const filenameInput = document.getElementById("downloadFilename");
+      if (!filenameInput) return;
+      const currentValue = filenameInput.value.trim();
+      if (!currentValue || currentValue === "text2spreadsheetml.xml" || currentValue === sanitizeFilename(`${workbookName}.xml`)) {
+        filenameInput.value = sanitizeFilename(`${workbookName}.xml`);
+      }
+    }
+
+    function regenerateAll() {
+      updateInputModeUi();
+
+      const parseError = document.getElementById("parseError");
+      const parseWarning = document.getElementById("parseWarning");
+      const configWarning = document.getElementById("configWarning");
+      const xmlOutput = document.getElementById("xmlOutput");
+
+      parseError.textContent = "";
+      parseWarning.textContent = "";
+      configWarning.textContent = "";
+
+      const inputMode = getInputMode();
+      const options = {
+        delimiter: getDelimiterValue(),
+        typeInferenceMode: document.getElementById("typeInferenceMode")?.value || "string",
+        hasHeader: !!document.getElementById("hasHeader")?.checked,
+        ignoreEmptyLines: !!document.getElementById("ignoreEmptyLines")?.checked,
+        trimCells: !!document.getElementById("trimCells")?.checked,
+        csvQuoteMode: !!document.getElementById("csvQuoteMode")?.checked,
+        sheetName: sanitizeSheetName(document.getElementById("sheetName")?.value || "Sheet1"),
+        workbookName: (document.getElementById("workbookName")?.value || "text2spreadsheetml").trim() || "text2spreadsheetml"
+      };
+
+      const sourceText = getSourceText();
+      if (!sourceText.trim()) {
+        latestGeneratedXml = "";
+        xmlOutput.textContent = "";
+        renderPreview({ headerLabels: [], dataRows: [], rowCount: 0, columnCount: 0 }, options);
+        if (inputMode === "text" && getTextInputMode() === "direct") {
+          parseError.textContent = "入力テキストを入れてください。";
+        } else {
+          parseError.textContent = "入力ファイルを選択してください。";
+        }
+        return;
+      }
+
+      const rawSheetName = (document.getElementById("sheetName")?.value || "").trim();
+      if (!rawSheetName) {
+        configWarning.textContent = "シート名が空のため、Sheet1 を使用します。";
+      } else if (rawSheetName !== options.sheetName) {
+        configWarning.textContent = `シート名は SpreadsheetML 向けに ${options.sheetName} へ調整して出力します。`;
+      }
+
+      let rows;
+      try {
+        rows = parseDelimitedText(sourceText, options);
+      } catch (error) {
+        latestGeneratedXml = "";
+        xmlOutput.textContent = "";
+        renderPreview({ headerLabels: [], dataRows: [], rowCount: 0, columnCount: 0 }, options);
+        parseError.textContent = error instanceof Error ? error.message : "入力データの解析に失敗しました。";
+        return;
+      }
+
+      const previewModel = buildPreviewModel(rows, options);
+      renderPreview(previewModel, options);
+
+      if (!previewModel.columnCount) {
+        latestGeneratedXml = "";
+        xmlOutput.textContent = "";
+        parseError.textContent = "表データとして解釈できる内容がありません。";
+        return;
+      }
+
+      if (previewModel.warnings.length) {
+        parseWarning.textContent = Array.from(new Set(previewModel.warnings)).slice(0, 3).join(" ");
+      }
+
+      const model = buildWorkbookModel(previewModel, options);
+      if (model.inferenceWarnings.length) {
+        parseWarning.textContent = [parseWarning.textContent, ...model.inferenceWarnings].filter(Boolean).join(" ");
+      }
+      latestGeneratedXml = generateSpreadsheetMlXml(model);
+      xmlOutput.textContent = latestGeneratedXml;
+    }
+
+    function downloadGeneratedXml() {
+      if (!latestGeneratedXml) {
+        showToast("保存する XML がありません");
+        return;
+      }
+      const filenameInput = document.getElementById("downloadFilename");
+      const filename = sanitizeFilename(filenameInput?.value || "text2spreadsheetml.xml");
+      if (filenameInput) filenameInput.value = filename;
+      const blob = new Blob([latestGeneratedXml], { type: "application/xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+      showToast(".xml を保存しました");
+    }
+
+    function applySample() {
+      const sample = [
+        "id,name,joined,note",
+        "001,Alice,2026-03-01,first user",
+        "002,Bob,2026-03-15,keep as string",
+        "003,Carol,2026-03-20,\"quoted, sample\""
+      ].join("\n");
+      const textInput = document.getElementById("inputText");
+      const modeRadio = document.querySelector('input[name="inputMode"][value="text"]');
+      const textModeRadio = document.querySelector('input[name="textInputMode"][value="direct"]');
+      if (modeRadio) modeRadio.checked = true;
+      if (textModeRadio) textModeRadio.checked = true;
+      if (textInput) textInput.value = sample;
+      currentFileText = "";
+      currentFileName = "";
+      document.getElementById("textInputFile").value = "";
+      document.getElementById("textFileStatus").textContent = "テキストファイルを選択するとブラウザ内で読み込みます。サーバ送信は行いません。";
+      document.getElementById("delimiterSelect").value = "comma";
+      document.getElementById("typeInferenceMode").value = "string";
+      document.getElementById("csvQuoteMode").checked = true;
+      updateInputModeUi();
+      regenerateAll();
+    }
+
+    function clearUiPreferences() {
+      const confirmed = confirm("ローカルに保存されているこのツールの設定をクリアします。よろしいですか？");
+      if (!confirmed) return;
+      Object.values(STORAGE_KEYS).forEach((key) => {
+        try {
+          localStorage.removeItem(key);
+        } catch (error) {
+          // 継続
+        }
+      });
+      const defaultMode = document.querySelector('input[name="inputMode"][value="text"]');
+      const defaultTextInputMode = document.querySelector('input[name="textInputMode"][value="direct"]');
+      if (defaultMode) defaultMode.checked = true;
+      if (defaultTextInputMode) defaultTextInputMode.checked = true;
+      document.getElementById("delimiterSelect").value = "space";
+      document.getElementById("typeInferenceMode").value = "string";
+      document.getElementById("hasHeader").checked = true;
+      document.getElementById("ignoreEmptyLines").checked = true;
+      document.getElementById("trimCells").checked = true;
+      document.getElementById("csvQuoteMode").checked = false;
+      document.getElementById("sheetName").value = "Sheet1";
+      document.getElementById("workbookName").value = "text2spreadsheetml";
+      document.getElementById("downloadFilename").value = "text2spreadsheetml.xml";
+      document.getElementById("inputText").value = "";
+      document.getElementById("inputFile").value = "";
+      document.getElementById("textInputFile").value = "";
+      document.getElementById("fileStatus").textContent = "ファイルを選択するとブラウザ内で読み込みます。サーバ送信は行いません。";
+      document.getElementById("textFileStatus").textContent = "テキストファイルを選択するとブラウザ内で読み込みます。サーバ送信は行いません。";
+      currentFileText = "";
+      currentFileName = "";
+      regenerateAll();
+      showToast("設定をクリアしました");
+    }
+
+    function loadPersistedInputs() {
+      const inputMode = getStoredString(STORAGE_KEYS.inputMode);
+      const textInputMode = getStoredString(STORAGE_KEYS.textInputMode);
+      const delimiter = getStoredString(STORAGE_KEYS.delimiter);
+      const typeInferenceMode = getStoredString(STORAGE_KEYS.typeInferenceMode);
+      const sheetName = getStoredString(STORAGE_KEYS.sheetName);
+      const workbookName = getStoredString(STORAGE_KEYS.workbookName);
+      const downloadFilename = getStoredString(STORAGE_KEYS.downloadFilename);
+      const inputText = getStoredString(STORAGE_KEYS.inputText);
+
+      if (inputMode) {
+        const radio = document.querySelector(`input[name="inputMode"][value="${inputMode}"]`);
+        if (radio) radio.checked = true;
+      }
+      if (textInputMode) {
+        const radio = document.querySelector(`input[name="textInputMode"][value="${textInputMode}"]`);
+        if (radio) radio.checked = true;
+      }
+      if (delimiter && document.querySelector(`#delimiterSelect option[value="${delimiter}"]`)) {
+        document.getElementById("delimiterSelect").value = delimiter;
+      }
+      if (typeInferenceMode && document.querySelector(`#typeInferenceMode option[value="${typeInferenceMode}"]`)) {
+        document.getElementById("typeInferenceMode").value = typeInferenceMode;
+      }
+      const hasHeader = getStoredBoolean(STORAGE_KEYS.hasHeader);
+      const ignoreEmptyLines = getStoredBoolean(STORAGE_KEYS.ignoreEmptyLines);
+      const trimCells = getStoredBoolean(STORAGE_KEYS.trimCells);
+      const csvQuoteMode = getStoredBoolean(STORAGE_KEYS.csvQuoteMode);
+      if (hasHeader !== null) document.getElementById("hasHeader").checked = hasHeader;
+      if (ignoreEmptyLines !== null) document.getElementById("ignoreEmptyLines").checked = ignoreEmptyLines;
+      if (trimCells !== null) document.getElementById("trimCells").checked = trimCells;
+      if (csvQuoteMode !== null) document.getElementById("csvQuoteMode").checked = csvQuoteMode;
+      if (sheetName !== null) document.getElementById("sheetName").value = sheetName;
+      if (workbookName !== null) document.getElementById("workbookName").value = workbookName;
+      if (downloadFilename !== null) document.getElementById("downloadFilename").value = downloadFilename;
+      if (inputText !== null) document.getElementById("inputText").value = inputText;
+    }
+
+    function savePersistedInputs() {
+      setStoredValue(STORAGE_KEYS.inputMode, getInputMode());
+      setStoredValue(STORAGE_KEYS.textInputMode, getTextInputMode());
+      setStoredValue(STORAGE_KEYS.delimiter, document.getElementById("delimiterSelect").value);
+      setStoredValue(STORAGE_KEYS.typeInferenceMode, document.getElementById("typeInferenceMode").value);
+      setStoredValue(STORAGE_KEYS.hasHeader, document.getElementById("hasHeader").checked);
+      setStoredValue(STORAGE_KEYS.ignoreEmptyLines, document.getElementById("ignoreEmptyLines").checked);
+      setStoredValue(STORAGE_KEYS.trimCells, document.getElementById("trimCells").checked);
+      setStoredValue(STORAGE_KEYS.csvQuoteMode, document.getElementById("csvQuoteMode").checked);
+      setStoredValue(STORAGE_KEYS.sheetName, document.getElementById("sheetName").value);
+      setStoredValue(STORAGE_KEYS.workbookName, document.getElementById("workbookName").value);
+      setStoredValue(STORAGE_KEYS.downloadFilename, document.getElementById("downloadFilename").value);
+      setStoredValue(STORAGE_KEYS.inputText, document.getElementById("inputText").value);
+    }
+
+    function handleFileInputChange(event, statusId = "fileStatus") {
+      const file = event.target.files && event.target.files[0];
+      const fileStatus = document.getElementById(statusId);
+      currentFileText = "";
+      currentFileName = "";
+
+      if (!file) {
+        fileStatus.textContent = "ファイルを選択するとブラウザ内で読み込みます。サーバ送信は行いません。";
+        regenerateAll();
+        return;
+      }
+
+      currentFileName = file.name;
+      const reader = new FileReader();
+      reader.onload = () => {
+        currentFileText = typeof reader.result === "string" ? reader.result : "";
+        fileStatus.textContent = `${file.name} を読み込みました。`;
+        if (!document.getElementById("workbookName").value.trim() || document.getElementById("workbookName").value === "text2spreadsheetml") {
+          const suggested = file.name.replace(/\.[^.]+$/, "");
+          document.getElementById("workbookName").value = suggested || "text2spreadsheetml";
+          updateDownloadFilenameFromWorkbook();
+        }
+        regenerateAll();
+        savePersistedInputs();
+      };
+      reader.onerror = () => {
+        fileStatus.textContent = `${file.name} の読み込みに失敗しました。`;
+        regenerateAll();
+      };
+      reader.readAsText(file, "UTF-8");
+    }
+
+    function setupEvents() {
+      document.querySelectorAll('input[name="inputMode"]').forEach((radio) => {
+        radio.addEventListener("change", () => {
+          updateInputModeUi();
+          savePersistedInputs();
+          regenerateAll();
+        });
+      });
+
+      document.querySelectorAll('input[name="textInputMode"]').forEach((radio) => {
+        radio.addEventListener("change", () => {
+          updateInputModeUi();
+          savePersistedInputs();
+          regenerateAll();
+        });
+      });
+
+      [
+        "delimiterSelect",
+        "typeInferenceMode",
+        "hasHeader",
+        "ignoreEmptyLines",
+        "trimCells",
+        "csvQuoteMode",
+        "sheetName",
+        "downloadFilename",
+        "inputText"
+      ].forEach((id) => {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.addEventListener("input", () => {
+          savePersistedInputs();
+          regenerateAll();
+        });
+        element.addEventListener("change", () => {
+          savePersistedInputs();
+          regenerateAll();
+        });
+      });
+
+      const workbookName = document.getElementById("workbookName");
+      workbookName.addEventListener("input", () => {
+        updateDownloadFilenameFromWorkbook();
+        savePersistedInputs();
+        regenerateAll();
+      });
+      workbookName.addEventListener("change", () => {
+        updateDownloadFilenameFromWorkbook();
+        savePersistedInputs();
+        regenerateAll();
+      });
+
+      document.getElementById("inputFile").addEventListener("change", (event) => handleFileInputChange(event, "fileStatus"));
+      document.getElementById("textInputFile").addEventListener("change", (event) => handleFileInputChange(event, "textFileStatus"));
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadPersistedInputs();
+      updateInputModeUi();
+      updateDownloadFilenameFromWorkbook();
+      setupEvents();
+      regenerateAll();
+    });
+  </script>
+</body>
+</html>
