@@ -16,6 +16,7 @@
 - [prompt-definitions-popular 再編案](./prompt-definitions-popular-reorganization.md)
 - [docs/prompt TODO](./TODO.md)
 - [prompt 履歴メモ](./prompt-history.md)
+- [Qiita 記事メモ](../../articles/qiita/20260324-prompt-gen-outline.md)
 
 ## 対象ファイル
 
