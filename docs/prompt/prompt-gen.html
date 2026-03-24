@@ -4161,7 +4161,19 @@ const promptDefinitions = [
         keywords: ["pr", "pull request", "github pr", "markdown", "tilde", "pr作成依頼", "prタイトル", "pr本文", "文面", "作成", "github", "ぷるりく", "ぴーあーる", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
         requiresCommitId: true,
         buildBody: (commitId) => commitId
-            ? `対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。PRタイトルとPR本文を出力してください。
+            ? `対象コミット ${commitId} における変更内容について、PRタイトルとPR本文を markdown テキスト形式で作文してください。
+
+# Context
+
+- Git作業の指定コミットの変更内容をもとに、プルリクエストに記載するテキストを作成したい。
+
+# Instructions
+
+- 指定された変更内容に基づいて、PRタイトルとPR本文を Markdown テキスト形式で作成してください。
+
+# Rules
+
+- 絶対パス、ホームディレクトリ、作業ディレクトリは出力しないでください。
 
 ${getStrictHallucinationPreventionInstruction()}
 
