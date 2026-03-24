@@ -1321,6 +1321,7 @@ describe("prompt-gen main", () => {
     commitId.dispatchEvent(new Event("input"));
 
     expect(promptOutput.textContent).toContain("対象コミット `abc1234` における変更内容について");
+    expect(promptOutput.textContent).toContain("# Context");
     expect(promptOutput.textContent).toContain("PRタイトルとPR本文");
   });
 
