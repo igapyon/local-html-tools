@@ -82,15 +82,30 @@
       <section class="md-note-card" aria-label="WBS xlsx export options">
         <h3 class="md-note-card__title">WBS XLSX の祝日指定</h3>
         <p class="md-note-card__text">
-          `WBS XLSX Export` では、`YYYY-MM-DD` 形式の祝日を改行またはカンマ区切りで指定できます。指定した日付は WBS 日付帯で祝日色として表示します。
+          `WBS XLSX Export` では、`ProjectModel` から補完した既定祝日と、`YYYY-MM-DD` 形式で指定した追加祝日を合成して WBS 日付帯へ反映します。
+        </p>
+        <p class="md-note-card__text">
+          既定祝日は、現在の `ProjectModel` に含まれる `Calendar.Exceptions` の非稼働日例外から補完します。追加祝日は改行またはカンマ区切りで入力できます。
         </p>
         <div class="md-form-grid">
           <lht-text-field-help
             field-id="wbsHolidayDatesInput"
-            label="WBS 祝日"
+            label="WBS 既定祝日"
             rows="3"
-            placeholder="2026-03-20&#10;2026-03-21"
+            placeholder="2026-03-20"
+            readonly
+            help-text="現在の ProjectModel から自動補完します。"></lht-text-field-help>
+        </div>
+        <div class="md-form-grid">
+          <lht-text-field-help
+            field-id="wbsExtraHolidayDatesInput"
+            label="WBS 追加祝日"
+            rows="3"
+            placeholder="2026-03-21&#10;2026-03-22"
             help-text="WBS XLSX Export のみで使用します。重複は自動でまとめます。"></lht-text-field-help>
+        </div>
+        <div class="md-panel-actions">
+          <button id="resetWbsHolidayDatesBtn" type="button" class="md-button md-button--surface">WBS 祝日を既定値へ戻す</button>
         </div>
       </section>
 

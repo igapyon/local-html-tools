@@ -57,6 +57,7 @@ function mountDom() {
     <button id="exportCsvBtn" type="button">CSV を生成</button>
     <button id="exportXlsxBtn" type="button">XLSX Export</button>
     <button id="exportWbsXlsxBtn" type="button">WBS XLSX Export</button>
+    <button id="resetWbsHolidayDatesBtn" type="button">WBS 祝日を既定値へ戻す</button>
     <button id="parseCsvBtn" type="button">CSV を解析</button>
     <button id="importXlsxBtn" type="button">XLSX Import</button>
     <button id="downloadXmlBtn" type="button">XML Export</button>
@@ -94,9 +95,11 @@ function mountDom() {
     </section>
     <section class="md-note-card">
       <h3 class="md-note-card__title">WBS XLSX の祝日指定</h3>
-      <p class="md-note-card__text">WBS XLSX Export では、YYYY-MM-DD 形式の祝日を改行またはカンマ区切りで指定できます。指定した日付は WBS 日付帯で祝日色として表示します。</p>
+      <p class="md-note-card__text">WBS XLSX Export では、ProjectModel から補完した既定祝日と、YYYY-MM-DD 形式で指定した追加祝日を合成して WBS 日付帯へ反映します。</p>
+      <p class="md-note-card__text">既定祝日は、現在の ProjectModel に含まれる Calendar.Exceptions の非稼働日例外から補完します。追加祝日は改行またはカンマ区切りで入力できます。</p>
     </section>
     <textarea id="wbsHolidayDatesInput"></textarea>
+    <textarea id="wbsExtraHolidayDatesInput"></textarea>
     <textarea id="xmlInput"></textarea>
     <div id="summaryProjectName"></div>
     <div id="summaryTaskCount"></div>
@@ -178,7 +181,11 @@ describe("mikuproject main", () => {
     expect(document.body.textContent).toContain("Calendars: Name / IsBaseCalendar / BaseCalendarUID");
     expect(document.body.textContent).toContain("Calendars の WeekDays / Exceptions / WorkWeeks");
     expect(document.body.textContent).toContain("WBS XLSX の祝日指定");
-    expect(document.body.textContent).toContain("YYYY-MM-DD 形式の祝日");
+    expect(document.body.textContent).toContain("既定祝日と");
+    expect(document.body.textContent).toContain("追加祝日を合成");
+    expect(document.body.textContent).toContain("非稼働日例外から補完");
+    expect(document.getElementById("wbsHolidayDatesInput").value).toBe("");
+    expect(document.getElementById("wbsExtraHolidayDatesInput").value).toBe("");
     expect(document.querySelector(".md-feedback-stack")?.classList.contains("md-hidden")).toBe(true);
   });
 
@@ -683,6 +690,7 @@ describe("mikuproject main", () => {
 
   it("downloads current wbs xlsx", () => {
     bootPage();
+    const exportSpy = vi.spyOn(globalThis.__mikuprojectWbsXlsx, "exportWbsWorkbook");
 
     document.getElementById("parseXmlBtn").click();
     document.getElementById("exportWbsXlsxBtn").click();
@@ -691,7 +699,13 @@ describe("mikuproject main", () => {
     expect(HTMLAnchorElement.prototype.click).toHaveBeenCalled();
     const clickedAnchor = HTMLAnchorElement.prototype.click.mock.instances.at(-1);
     expect(clickedAnchor.download).toBe("mikuproject-wbs-202603162312.xlsx");
+    expect(document.getElementById("wbsHolidayDatesInput").value).toBe("2026-03-20");
+    expect(document.getElementById("wbsExtraHolidayDatesInput").value).toBe("");
+    expect(exportSpy.mock.calls.at(-1)?.[1]).toEqual({
+      holidayDates: ["2026-03-20"]
+    });
     expect(document.getElementById("statusMessage").textContent).toContain("WBS XLSX ファイルをエクスポートしました");
+    expect(document.getElementById("statusMessage").textContent).toContain("祝日 1 件");
   });
 
   it("downloads current wbs xlsx with configured holidays", async () => {
@@ -699,7 +713,7 @@ describe("mikuproject main", () => {
     const exportSpy = vi.spyOn(globalThis.__mikuprojectWbsXlsx, "exportWbsWorkbook");
 
     document.getElementById("parseXmlBtn").click();
-    document.getElementById("wbsHolidayDatesInput").value = "2026-03-20, 2026-03-20\n2026-03-21";
+    document.getElementById("wbsExtraHolidayDatesInput").value = "2026-03-20, 2026-03-20\n2026-03-21";
     document.getElementById("exportWbsXlsxBtn").click();
 
     expect(exportSpy).toHaveBeenCalled();
@@ -709,8 +723,30 @@ describe("mikuproject main", () => {
     const workbook = exportSpy.mock.results.at(-1)?.value;
     const sheet = workbook.sheets[0];
     expect(sheet.rows[3].cells[0].value).toContain("Holidays=2");
-    expect(sheet.rows[6].cells[22].fillColor).toBe("#FCE4EC");
+    expect(sheet.rows[9].cells[23].fillColor).toBe("#FCE4EC");
     expect(document.getElementById("statusMessage").textContent).toContain("祝日 2 件");
+  });
+
+  it("fills wbs holiday input from model defaults when xml is parsed", () => {
+    bootPage();
+
+    document.getElementById("parseXmlBtn").click();
+
+    expect(document.getElementById("wbsHolidayDatesInput").value).toBe("2026-03-20");
+    expect(document.getElementById("wbsExtraHolidayDatesInput").value).toBe("");
+  });
+
+  it("resets wbs holiday input back to model defaults", () => {
+    bootPage();
+
+    document.getElementById("parseXmlBtn").click();
+    document.getElementById("wbsExtraHolidayDatesInput").value = "2026-03-25\n2026-03-26";
+    document.getElementById("resetWbsHolidayDatesBtn").click();
+
+    expect(document.getElementById("wbsHolidayDatesInput").value).toBe("2026-03-20");
+    expect(document.getElementById("wbsExtraHolidayDatesInput").value).toBe("");
+    expect(document.getElementById("statusMessage").textContent).toContain("WBS 祝日入力を既定値へ戻しました");
+    expect(document.getElementById("statusMessage").textContent).toContain("1 件");
   });
 
   it("imports xlsx edits back into the current model and xml", async () => {
