@@ -1742,8 +1742,7 @@ lht-index-card-link {
       help-wide
       menu-home-href="../index.html"
       menu-home-label="トップへ戻る">
-      リポジトリ URL、基準ブランチ、作業ブランチ、ローカル/リモートの扱いをまとめて保存し、一覧で管理します。<br><br>
-      複数リポジトリ・複数作業を並行で扱うときの「今どの組み合わせを見ていたか」を忘れにくくするためのローカル専用メモ兼一覧ツールです。
+      複数 Git リポジトリの作業状況を一覧管理し、ここから個別のリポジトリ作業をおこないます。
     </lht-page-hero>
 
     <section class="md-section md-stack-md">
@@ -1854,7 +1853,7 @@ lht-index-card-link {
             <lht-text-field-help field-id="memoText" label="メモ" placeholder="必要なメモを入力" help-text="保存は全文、一覧表示は先頭 16 文字までです。長い内容は hover で全文を確認できます。"></lht-text-field-help>
           </div>
           <div class="md-form-grid md-form-grid-1">
-            <lht-text-field-help field-id="gitCurrentDirectory" label="git カレントディレクトリ" placeholder="例: /path/to/repo" help-text="この作業を行うローカルの git カレントディレクトリを記録します。"></lht-text-field-help>
+            <lht-text-field-help field-id="gitCurrentDirectory" label="カレントディレクトリ" placeholder="例: /path/to/repo" help-text="この作業を行うローカルの git カレントディレクトリを記録します。"></lht-text-field-help>
           </div>
         </div>
 
@@ -4542,11 +4541,14 @@ if (!customElements.get("lht-page-menu")) {
         baseScope: readSelectValue("baseScope", "remote"),
         compareBranch: entryType === "git" ? readText("compareBranch") : "",
         compareScope: readSelectValue("compareScope", "local"),
-        compareUseHead: false,
+        compareUseHead: entryType === "git"
+          ? (existingEntry ? existingEntry.compareUseHead === true : true)
+          : false,
         locked: existingEntry?.locked === true,
         remoteName: entryType === "git" ? (readText("remoteName") || "origin") : "",
         createdAt: existingEntry?.createdAt || Date.now(),
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        lastOpenedAt: existingEntry ? Number(existingEntry.lastOpenedAt || 0) : Date.now()
       });
     }
 

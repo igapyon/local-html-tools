@@ -31,8 +31,7 @@
     function getTextArea(id) {
         return getElement(id);
     }
-    function parseWbsHolidayDates() {
-        const raw = getTextArea("wbsHolidayDatesInput").value.trim();
+    function parseHolidayDateList(raw) {
         if (!raw) {
             return [];
         }
@@ -55,6 +54,29 @@
             holidays.push(dateText);
         }
         return holidays;
+    }
+    function parseWbsDefaultHolidayDates() {
+        return parseHolidayDateList(getTextArea("wbsHolidayDatesInput").value.trim());
+    }
+    function parseWbsAdditionalHolidayDates() {
+        return parseHolidayDateList(getTextArea("wbsExtraHolidayDatesInput").value.trim());
+    }
+    function syncWbsHolidayDatesInput(model) {
+        const input = getTextArea("wbsHolidayDatesInput");
+        if (!model) {
+            input.value = "";
+            getTextArea("wbsExtraHolidayDatesInput").value = "";
+            return;
+        }
+        input.value = mikuprojectWbsXlsx.collectWbsHolidayDates(model).join("\n");
+    }
+    function resetWbsHolidayDatesInput() {
+        const model = ensureCurrentModel();
+        const holidayDates = mikuprojectWbsXlsx.collectWbsHolidayDates(model);
+        getTextArea("wbsHolidayDatesInput").value = holidayDates.join("\n");
+        getTextArea("wbsExtraHolidayDatesInput").value = "";
+        setStatus(`WBS 祝日入力を既定値へ戻しました${holidayDates.length > 0 ? ` (${holidayDates.length} 件)` : ""}`);
+        showToast("WBS 祝日を既定値へ戻しました");
     }
     function showToast(message) {
         const toast = document.getElementById("toast");
@@ -423,6 +445,7 @@
             .replace(/'/g, "&#39;");
     }
     function updateSummary(model) {
+        syncWbsHolidayDatesInput(model);
         getElement("summaryProjectName").textContent = (model === null || model === void 0 ? void 0 : model.project.name) || "-";
         getElement("summaryTaskCount").textContent = String((model === null || model === void 0 ? void 0 : model.tasks.length) || 0);
         getElement("summaryResourceCount").textContent = String((model === null || model === void 0 ? void 0 : model.resources.length) || 0);
@@ -591,8 +614,13 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     }
     function exportCurrentWbsXlsx() {
         const model = ensureCurrentModel();
-        const holidayDates = parseWbsHolidayDates();
-        const workbook = mikuprojectWbsXlsx.exportWbsWorkbook(model, { holidayDates });
+        const defaultHolidayDates = parseWbsDefaultHolidayDates();
+        const additionalHolidayDates = parseWbsAdditionalHolidayDates();
+        const effectiveHolidayDates = Array.from(new Set([...defaultHolidayDates, ...additionalHolidayDates]));
+        const workbook = mikuprojectWbsXlsx.exportWbsWorkbook(model, { holidayDates: effectiveHolidayDates });
+        if (defaultHolidayDates.length === 0 && effectiveHolidayDates.length > 0) {
+            getTextArea("wbsHolidayDatesInput").value = effectiveHolidayDates.join("\n");
+        }
         const codec = new mikuprojectExcelIo.XlsxWorkbookCodec();
         const bytes = codec.exportWorkbook(workbook);
         const now = new Date();
@@ -604,7 +632,7 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
             String(now.getMinutes()).padStart(2, "0")
         ].join("");
         downloadBlob(new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), `mikuproject-wbs-${stamp}.xlsx`);
-        setStatus(`WBS XLSX ファイルをエクスポートしました${holidayDates.length > 0 ? ` (祝日 ${holidayDates.length} 件)` : ""}`);
+        setStatus(`WBS XLSX ファイルをエクスポートしました${effectiveHolidayDates.length > 0 ? ` (祝日 ${effectiveHolidayDates.length} 件)` : ""}`);
         showToast("WBS XLSX を保存しました");
     }
     async function importXlsxFromFile(file) {
@@ -759,6 +787,14 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
             }
             catch (error) {
                 setStatus(error instanceof Error ? error.message : "WBS XLSX エクスポートに失敗しました");
+            }
+        });
+        getElement("resetWbsHolidayDatesBtn").addEventListener("click", () => {
+            try {
+                resetWbsHolidayDatesInput();
+            }
+            catch (error) {
+                setStatus(error instanceof Error ? error.message : "WBS 祝日入力のリセットに失敗しました");
             }
         });
         getElement("parseCsvBtn").addEventListener("click", () => {

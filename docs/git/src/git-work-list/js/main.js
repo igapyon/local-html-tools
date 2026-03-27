@@ -546,11 +546,14 @@
         baseScope: readSelectValue("baseScope", "remote"),
         compareBranch: entryType === "git" ? readText("compareBranch") : "",
         compareScope: readSelectValue("compareScope", "local"),
-        compareUseHead: false,
+        compareUseHead: entryType === "git"
+          ? (existingEntry ? existingEntry.compareUseHead === true : true)
+          : false,
         locked: existingEntry?.locked === true,
         remoteName: entryType === "git" ? (readText("remoteName") || "origin") : "",
         createdAt: existingEntry?.createdAt || Date.now(),
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        lastOpenedAt: existingEntry ? Number(existingEntry.lastOpenedAt || 0) : Date.now()
       });
     }
 

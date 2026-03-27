@@ -28,6 +28,14 @@
       return trimmed.replace(/\/+$/, "");
     }
 
+    function extractRepoName(repoUrl) {
+      const trimmed = String(repoUrl || "").trim().replace(/\/+$/, "");
+      if (!trimmed) return "";
+      const normalized = trimmed.replace(/\.git$/i, "");
+      const parts = normalized.split(/[/:]/).filter(Boolean);
+      return parts[parts.length - 1] || normalized;
+    }
+
     function isOpenableExternalUrl(url) {
       return /^https?:\/\//i.test(String(url || "").trim());
     }
@@ -102,6 +110,21 @@
       repoUrlField.readOnly = !!locked;
       repoUrlField.classList.toggle("md-disabled", !!locked);
       repoUrlField.setAttribute("aria-readonly", locked ? "true" : "false");
+    }
+
+    function updateRepoDisplay() {
+      const card = document.getElementById("repoDisplayCard");
+      const nameNode = document.getElementById("repoDisplayName");
+      if (!card || !nameNode) return;
+      const repoUrl = document.getElementById("repoUrl")?.value.trim() || "";
+      const repoName = extractRepoName(repoUrl);
+      if (!repoName) {
+        nameNode.textContent = "";
+        card.classList.add("md-hidden");
+        return;
+      }
+      nameNode.textContent = repoName;
+      card.classList.remove("md-hidden");
     }
 
     function updateBaseScope() {
@@ -354,9 +377,11 @@
     }
 
     function setupWorkBranchListButton() {
-      const button = document.getElementById("saveToWorkBranchListBtn");
-      if (!button) return;
-      button.addEventListener("click", saveToWorkBranchListAndOpen);
+      ["saveToWorkBranchListBtn", "saveToWorkBranchListInlineBtn"].forEach((id) => {
+        const button = document.getElementById(id);
+        if (!button) return;
+        button.addEventListener("click", saveToWorkBranchListAndOpen);
+      });
     }
 
     function setupBranchDiffButton() {
@@ -822,18 +847,25 @@
     }
 
     function updateGitCurrentDirectoryAction() {
-      const button = document.getElementById("copyGitCurrentDirBtn");
-      if (!button) return;
+      const buttons = [
+        document.getElementById("copyGitCurrentDirBtn"),
+        document.getElementById("copyGitCurrentDirBackupBtn")
+      ].filter(Boolean);
+      if (buttons.length === 0) return;
       const gitCurrentDir = getGitCurrentDirectoryForCurrentContext();
       if (gitCurrentDir) {
-        button.dataset.gitCurrentDir = gitCurrentDir;
-        button.title = gitCurrentDir;
-        button.classList.remove("md-hidden");
+        buttons.forEach((button) => {
+          button.dataset.gitCurrentDir = gitCurrentDir;
+          button.title = gitCurrentDir;
+          button.classList.remove("md-hidden");
+        });
         return;
       }
-      delete button.dataset.gitCurrentDir;
-      button.title = "git カレントディレクトリをコピー";
-      button.classList.add("md-hidden");
+      buttons.forEach((button) => {
+        delete button.dataset.gitCurrentDir;
+        button.title = "git カレントディレクトリをコピー";
+        button.classList.add("md-hidden");
+      });
     }
 
     function applyQueryParams() {
@@ -894,6 +926,7 @@
         }
       }
       updateGitCurrentDirectoryAction();
+      updateRepoDisplay();
     }
 
     function createWorkBranchListEntryId() {
@@ -1626,15 +1659,19 @@
     }
 
     function setupOpenRepoUrlButton() {
-      const button = document.getElementById("openRepoUrlBtn");
-      if (!button) return;
-      button.addEventListener("click", openRepoUrl);
+      ["openRepoUrlBtn", "openRepoUrlBackupBtn"].forEach((id) => {
+        const button = document.getElementById(id);
+        if (!button) return;
+        button.addEventListener("click", openRepoUrl);
+      });
     }
 
     function setupCopyGitCurrentDirectoryButton() {
-      const button = document.getElementById("copyGitCurrentDirBtn");
-      if (!button) return;
-      button.addEventListener("click", copyGitCurrentDirectory);
+      ["copyGitCurrentDirBtn", "copyGitCurrentDirBackupBtn"].forEach((id) => {
+        const button = document.getElementById(id);
+        if (!button) return;
+        button.addEventListener("click", copyGitCurrentDirectory);
+      });
       const sync = () => updateGitCurrentDirectoryAction();
       ["repoUrl", "squashBaseBranch"].forEach((id) => {
         const element = document.getElementById(id);
@@ -1643,6 +1680,15 @@
         element.addEventListener("change", sync);
       });
       updateGitCurrentDirectoryAction();
+    }
+
+    function setupRepoDisplay() {
+      const repoUrlField = document.getElementById("repoUrl");
+      if (!repoUrlField) return;
+      const sync = () => updateRepoDisplay();
+      repoUrlField.addEventListener("input", sync);
+      repoUrlField.addEventListener("change", sync);
+      updateRepoDisplay();
     }
 
     applyQueryParams();
@@ -1665,4 +1711,5 @@
     setupBranchDiffButton();
     setupOpenRepoUrlButton();
     setupCopyGitCurrentDirectoryButton();
+    setupRepoDisplay();
     setupCodeSelectAll();

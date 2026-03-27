@@ -38,30 +38,7 @@ if (typeof wbsXlsx?.exportWbsWorkbook !== "function") {
 const codec = new excelIo.XlsxWorkbookCodec();
 const model = xml.importMsProjectXml(xml.SAMPLE_XML);
 const workbook = projectXlsx.exportProjectWorkbook(model);
-const holidayDates = Array.from(new Set(
-  model.calendars.flatMap((calendar) => calendar.exceptions || [])
-    .filter((exception) => (exception.workingTimes || []).length === 0)
-    .flatMap((exception) => {
-      const from = (exception.fromDate || "").slice(0, 10);
-      const to = (exception.toDate || "").slice(0, 10);
-      if (!from) {
-        return [];
-      }
-      if (!to || to === from) {
-        return [from];
-      }
-      const days = [];
-      const start = new Date(`${from}T00:00:00`);
-      const finish = new Date(`${to}T00:00:00`);
-      for (const cursor = new Date(start.getTime()); cursor.getTime() <= finish.getTime(); cursor.setDate(cursor.getDate() + 1)) {
-        const year = cursor.getFullYear();
-        const month = String(cursor.getMonth() + 1).padStart(2, "0");
-        const day = String(cursor.getDate()).padStart(2, "0");
-        days.push(`${year}-${month}-${day}`);
-      }
-      return days;
-    })
-));
+const holidayDates = wbsXlsx.collectWbsHolidayDates(model);
 const wbsWorkbook = wbsXlsx.exportWbsWorkbook(model, { holidayDates });
 
 const bytes = codec.exportWorkbook(workbook);

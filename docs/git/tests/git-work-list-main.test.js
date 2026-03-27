@@ -182,6 +182,19 @@ describe("git-work-list main", () => {
     expect(squashButton.classList.contains("md-button--surface")).toBe(true);
   });
 
+  it("defaults new git entries to current-branch mode on", () => {
+    bootPage();
+
+    document.getElementById("repoUrl").value = "https://example.com/repo-a";
+    document.getElementById("baseBranch").value = "main";
+    document.getElementById("compareBranch").value = "feature-a";
+    window.__gitWorkListTest.saveCurrentEntry();
+
+    const savedEntries = getSavedJsonByKey("gitWorkList.entries");
+    expect(savedEntries).toHaveLength(1);
+    expect(savedEntries[0].compareUseHead).toBe(true);
+  });
+
   it("locks repoUrl in edit dialog when an existing URL is loaded", () => {
     bootPage();
 
@@ -432,6 +445,32 @@ describe("git-work-list main", () => {
         compareScope: "remote",
         remoteName: "origin",
         createdAt: 1
+      }
+    ]));
+
+    bootPage();
+
+    document.getElementById("repoUrl").value = "https://example.com/repo-b";
+    document.getElementById("baseBranch").value = "devel";
+    document.getElementById("compareBranch").value = "feature-b";
+    window.__gitWorkListTest.saveCurrentEntry();
+
+    const entriesHtml = document.getElementById("entriesList").textContent;
+    expect(entriesHtml.indexOf("repo-b")).toBeLessThan(entriesHtml.indexOf("repo-a"));
+  });
+
+  it("shows a newly added entry above entries with recent open history", () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "a",
+        repoUrl: "https://example.com/repo-a",
+        baseBranch: "main",
+        baseScope: "remote",
+        compareBranch: "feature-a",
+        compareScope: "remote",
+        remoteName: "origin",
+        createdAt: 1,
+        lastOpenedAt: 999999
       }
     ]));
 

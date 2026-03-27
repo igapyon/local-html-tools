@@ -37,8 +37,12 @@ function mountGitPseudoSquashDom() {
     <div id="pushCmd"></div>
     <button id="openBranchDiffBtn" type="button">compare</button>
     <button id="saveToWorkBranchListBtn" type="button">save</button>
+    <button id="saveToWorkBranchListInlineBtn" type="button">save inline</button>
     <button id="openRepoUrlBtn" type="button">open</button>
+    <button id="openRepoUrlBackupBtn" type="button">open backup</button>
     <button id="copyGitCurrentDirBtn" type="button" class="md-hidden">copy dir</button>
+    <button id="copyGitCurrentDirBackupBtn" type="button" class="md-hidden">copy dir backup</button>
+    <div id="repoDisplayCard" class="md-hidden"><p id="repoDisplayName"></p></div>
     <div id="toast"></div>
     <dialog id="normalizeDiffDialog"></dialog>
     <div id="normalizeDiffBefore"></div>
@@ -654,6 +658,38 @@ window.__gitPseudoSquashTest = {
     expect(window.open).toHaveBeenCalledWith("https://example.com/repo-a", "_blank", "noopener,noreferrer");
   });
 
+  it("shows repository display name above base branch when repoUrl exists", () => {
+    bootGitPseudoSquashPage();
+
+    document.getElementById("repoUrl").value = "https://github.com/igapyon/local-html-tools";
+    document.getElementById("repoUrl").dispatchEvent(new Event("input"));
+
+    expect(document.getElementById("repoDisplayCard").classList.contains("md-hidden")).toBe(false);
+    expect(document.getElementById("repoDisplayName").textContent).toBe("local-html-tools");
+  });
+
+  it("hides repository display name when repoUrl is empty", () => {
+    bootGitPseudoSquashPage();
+
+    const repoUrl = document.getElementById("repoUrl");
+    repoUrl.value = "https://github.com/igapyon/local-html-tools";
+    repoUrl.dispatchEvent(new Event("input"));
+    repoUrl.value = "";
+    repoUrl.dispatchEvent(new Event("input"));
+
+    expect(document.getElementById("repoDisplayCard").classList.contains("md-hidden")).toBe(true);
+    expect(document.getElementById("repoDisplayName").textContent).toBe("");
+  });
+
+  it("opens repoUrl in a new tab from the backup row action button", () => {
+    bootGitPseudoSquashPage();
+
+    document.getElementById("repoUrl").value = "https://example.com/repo-a";
+    document.getElementById("openRepoUrlBackupBtn").click();
+
+    expect(window.open).toHaveBeenCalledWith("https://example.com/repo-a", "_blank", "noopener,noreferrer");
+  });
+
   it("shows git current directory copy button when saved in git-work-list memos", () => {
     installLocalStorageMock();
     localStorage.setItem("gitWorkList.memos", JSON.stringify({
@@ -682,8 +718,11 @@ window.__gitPseudoSquashTest = {
     new Function(instrumentedCode)();
 
     const copyButton = document.getElementById("copyGitCurrentDirBtn");
+    const backupCopyButton = document.getElementById("copyGitCurrentDirBackupBtn");
     expect(copyButton.classList.contains("md-hidden")).toBe(false);
     expect(copyButton.title).toBe("/tmp/repo-a");
+    expect(backupCopyButton.classList.contains("md-hidden")).toBe(false);
+    expect(backupCopyButton.title).toBe("/tmp/repo-a");
   });
 
   it("copies git current directory from the URL row action button", () => {
@@ -719,6 +758,39 @@ window.__gitPseudoSquashTest = {
     expect(document.getElementById("toast").show).toHaveBeenCalledWith("git カレントディレクトリをコピーしました", 2200);
   });
 
+  it("copies git current directory from the backup row action button", () => {
+    installLocalStorageMock();
+    localStorage.setItem("gitWorkList.memos", JSON.stringify({
+      "https://example.com/repo-a::devel": {
+        memo: "memo",
+        gitCurrentDir: "/tmp/repo-a"
+      }
+    }));
+    mountGitPseudoSquashDom();
+    window.history.replaceState(
+      {},
+      "",
+      "/docs/git/git-pseudo-squash.html?repoUrl=https%3A%2F%2Fexample.com%2Frepo-a&baseBranch=devel&workBranch=feature-a"
+    );
+    const instrumentedCode = `${mainCode}
+window.__gitPseudoSquashTest = {
+  normalizeCommitMessageForPr,
+  regenerateAllCommands,
+  getUseCurrentBranchSelected,
+  toggleOriginLock,
+  clearUiPreferences,
+  saveToWorkBranchListAndOpen,
+  applyQueryParams,
+  buildBranchDiffUrlFromPlannedDiff
+};`;
+    new Function(instrumentedCode)();
+
+    document.getElementById("copyGitCurrentDirBackupBtn").click();
+
+    expect(document.execCommand).toHaveBeenCalledWith("copy");
+    expect(document.getElementById("toast").show).toHaveBeenCalledWith("git カレントディレクトリをコピーしました", 2200);
+  });
+
   it("keeps git current directory copy button hidden when no saved path exists", () => {
     bootGitPseudoSquashPage();
 
@@ -727,5 +799,6 @@ window.__gitPseudoSquashTest = {
     document.getElementById("repoUrl").dispatchEvent(new Event("input"));
 
     expect(document.getElementById("copyGitCurrentDirBtn").classList.contains("md-hidden")).toBe(true);
+    expect(document.getElementById("copyGitCurrentDirBackupBtn").classList.contains("md-hidden")).toBe(true);
   });
 });
