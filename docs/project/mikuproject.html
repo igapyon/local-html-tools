@@ -1148,6 +1148,63 @@ lht-index-card-link {
   font-weight: 600;
 }
 
+.md-save-state {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.md-save-state--dirty {
+  color: #8a5a1c;
+  background: #fff8ef;
+  border-color: #efcfaa;
+}
+
+.md-save-state--clean {
+  color: #225b4d;
+  background: #eefaf5;
+  border-color: #c7e6d9;
+}
+
+.md-feedback-stack {
+  display: grid;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(247, 250, 253, 0.92) 0%, rgba(255, 255, 255, 0.92) 100%);
+  border: 1px solid rgba(213, 222, 231, 0.75);
+}
+
+.md-feedback-stack.md-hidden {
+  display: none;
+}
+
+.md-feedback-stack__title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #28485a;
+}
+
+.md-feedback-stack__text {
+  color: #5d7482;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.md-feedback-stack__label {
+  margin-top: 2px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #607787;
+}
+
 .md-issues {
   border: 1px solid #efc9a6;
   border-radius: 16px;
@@ -1183,6 +1240,120 @@ lht-index-card-link {
 
 .md-issues__item + .md-issues__item {
   margin-top: 4px;
+}
+
+.md-note-card {
+  border: 1px solid #cfe2dc;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f3fbf9 0%, #ffffff 100%);
+  padding: 16px 18px;
+}
+
+.md-note-card__title {
+  margin: 0 0 8px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #1f4f4a;
+}
+
+.md-note-card__text {
+  margin: 0;
+  color: #3f5f5b;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.md-note-card__text + .md-note-card__text,
+.md-note-list + .md-note-card__text {
+  margin-top: 8px;
+}
+
+.md-note-list {
+  margin: 8px 0 0;
+  padding-left: 1.2rem;
+  color: #345450;
+  font-size: 0.86rem;
+}
+
+.md-note-list li + li {
+  margin-top: 4px;
+}
+
+.md-xlsx-summary {
+  border: 1px solid #cde3f5;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f5faff 0%, #ffffff 100%);
+  padding: 14px 16px;
+  color: #325067;
+}
+
+.md-xlsx-summary.md-hidden {
+  display: none;
+}
+
+.md-xlsx-summary__title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.md-xlsx-summary__counts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.md-xlsx-summary__count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.8rem;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #e9f3fc;
+  color: #2c5570;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.md-xlsx-summary__unchanged {
+  margin-bottom: 10px;
+  color: #5b7382;
+  font-size: 0.84rem;
+}
+
+.md-xlsx-summary__section + .md-xlsx-summary__section {
+  margin-top: 12px;
+}
+
+.md-xlsx-summary__section-title {
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #2b5169;
+}
+
+.md-xlsx-summary__list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.md-xlsx-summary__item + .md-xlsx-summary__item {
+  margin-top: 4px;
+}
+
+.md-xlsx-summary__item-title {
+  font-weight: 700;
+  color: #244559;
+}
+
+.md-xlsx-summary__item-body {
+  margin-top: 3px;
+  color: #466172;
+}
+
+.md-xlsx-summary__hint {
+  margin-top: 12px;
+  color: #516b7b;
+  font-size: 0.84rem;
 }
 
 .md-summary-grid {
@@ -1335,14 +1506,67 @@ lht-index-card-link {
         <button id="exportMermaidBtn" type="button" class="md-button md-button--surface">Mermaid を生成</button>
         <button id="downloadMermaidSvgBtn" type="button" class="md-button md-button--surface" disabled>SVG保存</button>
         <button id="exportCsvBtn" type="button" class="md-button md-button--surface">CSV を生成</button>
+        <button id="exportXlsxBtn" type="button" class="md-button md-button--surface">XLSX Export</button>
+        <button id="exportWbsXlsxBtn" type="button" class="md-button md-button--surface">WBS XLSX Export</button>
         <button id="parseCsvBtn" type="button" class="md-button md-button--surface">CSV を解析</button>
+        <button id="importXlsxBtn" type="button" class="md-button md-button--surface">XLSX Import</button>
         <button id="downloadXmlBtn" type="button" class="md-button md-button--surface">XML Export</button>
         <button id="roundTripBtn" type="button" class="md-button md-button--surface">再読込テスト</button>
         <input id="importXmlInput" type="file" accept=".xml,text/xml,application/xml" class="md-hidden" />
+        <input id="importXlsxInput" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="md-hidden" />
       </div>
 
       <div id="statusMessage" class="md-status">未実行</div>
-      <div id="validationIssues" class="md-issues md-hidden" aria-live="polite"></div>
+      <div id="xmlSaveState" class="md-save-state md-save-state--dirty" aria-live="polite">XML 保存状態: 未保存</div>
+      <div class="md-feedback-stack md-hidden" aria-label="import feedback">
+        <div class="md-feedback-stack__title">取込結果</div>
+        <div class="md-feedback-stack__text">XLSX Import 後は、ここで差分反映と検証結果を確認します。</div>
+        <div class="md-feedback-stack__label">検証メッセージ</div>
+        <div id="validationIssues" class="md-issues md-hidden" aria-live="polite"></div>
+        <div class="md-feedback-stack__label">差分要約</div>
+        <div id="xlsxImportSummary" class="md-xlsx-summary md-hidden" aria-live="polite"></div>
+      </div>
+
+      <section class="md-note-card" aria-label="XLSX import export notes">
+        <h3 class="md-note-card__title">XLSX 編集の扱い</h3>
+        <p class="md-note-card__text">
+          `.xlsx` は `MS Project XML` の代替正本ではなく、確認と限定編集のための周辺表現として扱います。
+        </p>
+        <p class="md-note-card__text">
+          現在の `XLSX Import` で反映するのは限定列のみです。
+        </p>
+        <p class="md-note-card__text">
+          反映結果は、`Project / Tasks / Resources / Assignments / Calendars` ごとの件数と、`UID` 単位の差分要約として画面上に表示します。
+        </p>
+        <p class="md-note-card__text"><strong>反映対象</strong></p>
+        <ul class="md-note-list">
+          <li>`Project`: `Name / Title / Author / Company / StartDate / FinishDate / CurrentDate / StatusDate / CalendarUID / MinutesPerDay / MinutesPerWeek / DaysPerMonth / ScheduleFromStart`</li>
+          <li>`Tasks`: `Name / Start / Finish / PercentComplete / PercentWorkComplete`</li>
+          <li>`Resources`: `Name / Group / MaxUnits`</li>
+          <li>`Assignments`: `Units / Work / PercentWorkComplete`</li>
+          <li>`Calendars`: `Name / IsBaseCalendar / BaseCalendarUID`</li>
+        </ul>
+        <p class="md-note-card__text"><strong>現在は反映しないもの</strong></p>
+        <ul class="md-note-list">
+          <li>対象外の列や未対応シートの編集</li>
+          <li>`Calendars` の `WeekDays / Exceptions / WorkWeeks` と、`Baseline / TimephasedData / ExtendedAttributes`</li>
+        </ul>
+      </section>
+
+      <section class="md-note-card" aria-label="WBS xlsx export options">
+        <h3 class="md-note-card__title">WBS XLSX の祝日指定</h3>
+        <p class="md-note-card__text">
+          `WBS XLSX Export` では、`YYYY-MM-DD` 形式の祝日を改行またはカンマ区切りで指定できます。指定した日付は WBS 日付帯で祝日色として表示します。
+        </p>
+        <div class="md-form-grid">
+          <lht-text-field-help
+            field-id="wbsHolidayDatesInput"
+            label="WBS 祝日"
+            rows="3"
+            placeholder="2026-03-20&#10;2026-03-21"
+            help-text="WBS XLSX Export のみで使用します。重複は自動でまとめます。"></lht-text-field-help>
+        </div>
+      </section>
 
       <div class="md-form-grid">
         <lht-text-field-help field-id="xmlInput" label="MS Project XML" rows="16" placeholder="ここに XML を入力" help-text="MS Project XML を読み込みます。"></lht-text-field-help>
@@ -1423,6 +1647,9 @@ lht-index-card-link {
 
     <lht-toast id="toast"></lht-toast>
   </div>
+  
+  
+  
   
   
   
@@ -5592,6 +5819,888 @@ if (!customElements.get("lht-page-menu")) {
 
   <script>
 (() => {
+    const TEXT_ENCODER = new TextEncoder();
+    const TEXT_DECODER = new TextDecoder();
+    const INVALID_SHEET_NAME_PATTERN = /[:\\/?*\[\]]/;
+    const CRC32_TABLE = buildCrc32Table();
+    const NUMBER_FORMATS = ["general", "integer", "decimal", "date", "datetime", "percent"];
+    const HORIZONTAL_ALIGNS = ["left", "center", "right"];
+    const BORDER_STYLES = ["thin"];
+    const STYLE_KEY_DELIMITER = "::";
+    const DEFAULT_STYLE = { numberFormat: "general" };
+    class XlsxWorkbookCodec {
+        exportWorkbook(workbook) {
+            const normalizedWorkbook = normalizeWorkbook(workbook);
+            const entries = this.createWorkbookEntries(normalizedWorkbook);
+            return packZip(entries);
+        }
+        importWorkbook(bytes) {
+            const entries = this.unpackEntries(bytes);
+            return parseWorkbookEntries(entries);
+        }
+        listEntries(bytes) {
+            return Object.keys(this.unpackEntries(bytes)).sort();
+        }
+        unpackEntries(bytes) {
+            return unpackZip(bytes);
+        }
+        createWorkbookEntries(workbook) {
+            const styleBook = createStyleBook(workbook);
+            const worksheetRelationships = workbook.sheets.map((sheet, index) => ({
+                relationshipId: `rId${index + 1}`,
+                target: `worksheets/sheet${index + 1}.xml`,
+                name: sheet.name
+            }));
+            const worksheetEntries = workbook.sheets.map((sheet, index) => ({
+                name: `xl/worksheets/sheet${index + 1}.xml`,
+                data: encodeUtf8(buildWorksheetXml(sheet, styleBook))
+            }));
+            const entries = [
+                {
+                    name: "[Content_Types].xml",
+                    data: encodeUtf8(buildContentTypesXml(workbook.sheets.length, styleBook.styles.length > 1))
+                },
+                {
+                    name: "_rels/.rels",
+                    data: encodeUtf8(buildRootRelationshipsXml())
+                },
+                {
+                    name: "xl/_rels/workbook.xml.rels",
+                    data: encodeUtf8(buildWorkbookRelationshipsXml(worksheetRelationships, styleBook.styles.length > 1))
+                },
+                {
+                    name: "xl/workbook.xml",
+                    data: encodeUtf8(buildWorkbookXml(worksheetRelationships))
+                }
+            ];
+            if (styleBook.styles.length > 1) {
+                entries.push({
+                    name: "xl/styles.xml",
+                    data: encodeUtf8(buildStylesXml(styleBook.styles))
+                });
+            }
+            entries.push(...worksheetEntries);
+            return entries;
+        }
+    }
+    function normalizeWorkbook(workbook) {
+        if (!workbook || !Array.isArray(workbook.sheets) || workbook.sheets.length === 0) {
+            throw new Error("Workbook must contain at least one sheet");
+        }
+        const seenNames = new Set();
+        return {
+            sheets: workbook.sheets.map((sheet) => {
+                if (!sheet || typeof sheet.name !== "string") {
+                    throw new Error("Each sheet must have a valid sheet name");
+                }
+                validateSheetName(sheet.name);
+                const canonicalName = sheet.name.toLocaleLowerCase();
+                if (seenNames.has(canonicalName)) {
+                    throw new Error(`Duplicate sheet name is not allowed: ${sheet.name}`);
+                }
+                seenNames.add(canonicalName);
+                return {
+                    name: sheet.name,
+                    columns: Array.isArray(sheet.columns) ? sheet.columns.map((column) => normalizeColumn(column)) : undefined,
+                    mergedRanges: Array.isArray(sheet.mergedRanges) ? sheet.mergedRanges.map((range) => normalizeMergedRange(range)) : undefined,
+                    rows: Array.isArray(sheet.rows)
+                        ? sheet.rows.map((row) => ({
+                            height: normalizeOptionalPositiveNumber(row === null || row === void 0 ? void 0 : row.height, "Row height"),
+                            cells: Array.isArray(row === null || row === void 0 ? void 0 : row.cells)
+                                ? row.cells.map((cell) => normalizeCell(cell))
+                                : []
+                        }))
+                        : []
+                };
+            })
+        };
+    }
+    function normalizeColumn(column) {
+        if (!column) {
+            return {};
+        }
+        return {
+            width: normalizeOptionalPositiveNumber(column.width, "Column width")
+        };
+    }
+    function normalizeCell(cell) {
+        if (!cell) {
+            return {};
+        }
+        if (cell.value !== undefined && typeof cell.value !== "string" && typeof cell.value !== "number" && typeof cell.value !== "boolean") {
+            throw new Error("Cell value must be string, number, or boolean");
+        }
+        if (cell.formula !== undefined && typeof cell.formula !== "string") {
+            throw new Error("Cell formula must be a string");
+        }
+        if (cell.numberFormat !== undefined && !NUMBER_FORMATS.includes(cell.numberFormat)) {
+            throw new Error(`Unsupported cell number format: ${cell.numberFormat}`);
+        }
+        if (cell.horizontalAlign !== undefined && !HORIZONTAL_ALIGNS.includes(cell.horizontalAlign)) {
+            throw new Error(`Unsupported cell horizontal align: ${cell.horizontalAlign}`);
+        }
+        if (cell.border !== undefined && !BORDER_STYLES.includes(cell.border)) {
+            throw new Error(`Unsupported cell border: ${cell.border}`);
+        }
+        if (cell.fillColor !== undefined) {
+            assertColor(cell.fillColor);
+        }
+        return {
+            value: cell.value,
+            formula: cell.formula,
+            numberFormat: cell.numberFormat,
+            horizontalAlign: cell.horizontalAlign,
+            bold: cell.bold === true ? true : undefined,
+            fillColor: cell.fillColor ? normalizeColor(cell.fillColor) : undefined,
+            border: cell.border
+        };
+    }
+    function normalizeMergedRange(range) {
+        if (typeof range !== "string") {
+            throw new Error("Merged range must be a string");
+        }
+        const trimmed = range.trim().toUpperCase();
+        if (!/^[A-Z]+\d+:[A-Z]+\d+$/.test(trimmed)) {
+            throw new Error(`Invalid merged range: ${range}`);
+        }
+        return trimmed;
+    }
+    function normalizeOptionalPositiveNumber(value, label) {
+        if (value === undefined) {
+            return undefined;
+        }
+        if (!Number.isFinite(value) || value <= 0) {
+            throw new Error(`${label} must be a finite positive number`);
+        }
+        return value;
+    }
+    function validateSheetName(name) {
+        if (!name || !name.trim()) {
+            throw new Error("Sheet name must not be empty");
+        }
+        if (name.length > 31) {
+            throw new Error(`Sheet name is too long: ${name}`);
+        }
+        if (INVALID_SHEET_NAME_PATTERN.test(name)) {
+            throw new Error(`Sheet name contains invalid characters: ${name}`);
+        }
+        if (name.startsWith("'") || name.endsWith("'")) {
+            throw new Error(`Sheet name must not start or end with apostrophe: ${name}`);
+        }
+    }
+    function assertColor(color) {
+        if (!/^#?[0-9a-fA-F]{6}$/.test(color)) {
+            throw new Error(`Unsupported color format: ${color}`);
+        }
+    }
+    function normalizeColor(color) {
+        const hex = color.startsWith("#") ? color.slice(1) : color;
+        return `FF${hex.toUpperCase()}`;
+    }
+    function denormalizeColor(color) {
+        if (!color) {
+            return undefined;
+        }
+        const normalized = color.toUpperCase();
+        if (/^[0-9A-F]{8}$/.test(normalized)) {
+            return `#${normalized.slice(2)}`;
+        }
+        if (/^[0-9A-F]{6}$/.test(normalized)) {
+            return `#${normalized}`;
+        }
+        return undefined;
+    }
+    function buildContentTypesXml(sheetCount, includeStyles) {
+        const worksheetOverrides = Array.from({ length: sheetCount }, (_unused, index) => (`<Override PartName="/xl/worksheets/sheet${index + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`)).join("");
+        const stylesOverride = includeStyles
+            ? `<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>`
+            : "";
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  ${worksheetOverrides}
+  ${stylesOverride}
+</Types>`;
+    }
+    function buildRootRelationshipsXml() {
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+    }
+    function buildWorkbookRelationshipsXml(relationships, includeStyles) {
+        const worksheetNodes = relationships.map((relationship) => (`<Relationship Id="${escapeXml(relationship.relationshipId)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="${escapeXml(relationship.target)}"/>`)).join("");
+        const stylesNode = includeStyles
+            ? `<Relationship Id="rId${relationships.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>`
+            : "";
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  ${worksheetNodes}
+  ${stylesNode}
+</Relationships>`;
+    }
+    function buildWorkbookXml(relationships) {
+        const sheets = relationships.map((relationship, index) => (`<sheet name="${escapeXml(relationship.name)}" sheetId="${index + 1}" r:id="${escapeXml(relationship.relationshipId)}"/>`)).join("");
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>${sheets}</sheets>
+</workbook>`;
+    }
+    function buildWorksheetXml(sheet, styleBook) {
+        const colsXml = buildColumnsXml(sheet.columns);
+        const mergeCellsXml = buildMergeCellsXml(sheet.mergedRanges);
+        const rows = sheet.rows.map((row, rowIndex) => buildWorksheetRowXml(row, rowIndex, styleBook)).filter(Boolean).join("");
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  ${colsXml}
+  <sheetData>${rows}</sheetData>
+  ${mergeCellsXml}
+</worksheet>`;
+    }
+    function buildColumnsXml(columns) {
+        if (!columns || columns.length === 0 || columns.every((column) => column.width === undefined)) {
+            return "";
+        }
+        const cols = columns.map((column, index) => (column.width !== undefined
+            ? `<col min="${index + 1}" max="${index + 1}" width="${formatNumber(column.width)}" customWidth="1"/>`
+            : "")).filter(Boolean).join("");
+        return cols ? `<cols>${cols}</cols>` : "";
+    }
+    function buildMergeCellsXml(mergedRanges) {
+        if (!mergedRanges || mergedRanges.length === 0) {
+            return "";
+        }
+        const mergeCells = mergedRanges
+            .map((range) => `<mergeCell ref="${range}"/>`)
+            .join("");
+        return `<mergeCells count="${mergedRanges.length}">${mergeCells}</mergeCells>`;
+    }
+    function buildWorksheetRowXml(row, rowIndex, styleBook) {
+        const cells = row.cells
+            .map((cell, cellIndex) => buildWorksheetCellXml(cell, rowIndex, cellIndex, styleBook))
+            .filter(Boolean)
+            .join("");
+        if (!cells) {
+            return "";
+        }
+        const heightAttributes = row.height !== undefined
+            ? ` ht="${formatNumber(row.height)}" customHeight="1"`
+            : "";
+        return `<row r="${rowIndex + 1}"${heightAttributes}>${cells}</row>`;
+    }
+    function buildWorksheetCellXml(cell, rowIndex, cellIndex, styleBook) {
+        const reference = `${encodeColumnName(cellIndex)}${rowIndex + 1}`;
+        const styleIndex = resolveStyleIndex(cell, styleBook);
+        const styleAttribute = styleIndex > 0 ? ` s="${styleIndex}"` : "";
+        if (cell.formula !== undefined) {
+            const formulaXml = `<f>${escapeXml(cell.formula)}</f>`;
+            const valueXml = buildFormulaValueXml(cell.value);
+            const typeAttribute = getCellTypeAttribute(cell.value, true);
+            return `<c r="${reference}"${styleAttribute}${typeAttribute}>${formulaXml}${valueXml}</c>`;
+        }
+        if (cell.value === undefined) {
+            return "";
+        }
+        if (typeof cell.value === "string") {
+            return `<c r="${reference}"${styleAttribute} t="inlineStr"><is><t>${escapeXml(cell.value)}</t></is></c>`;
+        }
+        if (typeof cell.value === "number") {
+            return `<c r="${reference}"${styleAttribute}><v>${formatNumber(cell.value)}</v></c>`;
+        }
+        return `<c r="${reference}"${styleAttribute} t="b"><v>${cell.value ? "1" : "0"}</v></c>`;
+    }
+    function buildFormulaValueXml(value) {
+        if (value === undefined) {
+            return "";
+        }
+        if (typeof value === "string") {
+            return `<v>${escapeXml(value)}</v>`;
+        }
+        if (typeof value === "number") {
+            return `<v>${formatNumber(value)}</v>`;
+        }
+        return `<v>${value ? "1" : "0"}</v>`;
+    }
+    function getCellTypeAttribute(value, hasFormula) {
+        if (!hasFormula) {
+            return "";
+        }
+        if (typeof value === "string") {
+            return ` t="str"`;
+        }
+        if (typeof value === "boolean") {
+            return ` t="b"`;
+        }
+        return "";
+    }
+    function formatNumber(value) {
+        if (!Number.isFinite(value)) {
+            throw new Error(`Cell number must be finite: ${value}`);
+        }
+        return String(value);
+    }
+    function createStyleBook(workbook) {
+        const styles = [DEFAULT_STYLE];
+        const styleIndexByKey = new Map([[styleKey(DEFAULT_STYLE), 0]]);
+        for (const sheet of workbook.sheets) {
+            for (const row of sheet.rows) {
+                for (const cell of row.cells) {
+                    const descriptor = getStyleDescriptor(cell);
+                    if (!descriptor) {
+                        continue;
+                    }
+                    const key = styleKey(descriptor);
+                    if (!styleIndexByKey.has(key)) {
+                        styleIndexByKey.set(key, styles.length);
+                        styles.push(descriptor);
+                    }
+                }
+            }
+        }
+        return { styles, styleIndexByKey };
+    }
+    function getStyleDescriptor(cell) {
+        if (!cell.numberFormat && !cell.horizontalAlign && !cell.bold && !cell.fillColor && !cell.border) {
+            return null;
+        }
+        return {
+            numberFormat: cell.numberFormat || "general",
+            horizontalAlign: cell.horizontalAlign,
+            bold: cell.bold === true ? true : undefined,
+            fillColor: cell.fillColor,
+            border: cell.border
+        };
+    }
+    function styleKey(style) {
+        return [
+            style.numberFormat,
+            style.horizontalAlign || "",
+            style.bold ? "bold" : "",
+            style.fillColor || "",
+            style.border || ""
+        ].join(STYLE_KEY_DELIMITER);
+    }
+    function resolveStyleIndex(cell, styleBook) {
+        const descriptor = getStyleDescriptor(cell);
+        if (!descriptor) {
+            return 0;
+        }
+        return styleBook.styleIndexByKey.get(styleKey(descriptor)) || 0;
+    }
+    function buildStylesXml(styles) {
+        const fonts = dedupeDescriptors(styles.map((style) => ({ bold: style.bold })), fontKey, { bold: undefined });
+        const fills = dedupeDescriptors(styles.map((style) => ({ fillColor: style.fillColor })), fillKey, { fillColor: undefined });
+        const borders = dedupeDescriptors(styles.map((style) => ({ border: style.border })), borderKey, { border: undefined });
+        const styleNodes = styles.map((style) => {
+            const numFmtId = mapNumberFormatId(style.numberFormat);
+            const fontId = fonts.indexByKey.get(fontKey({ bold: style.bold })) || 0;
+            const fillId = fills.indexByKey.get(fillKey({ fillColor: style.fillColor })) || 0;
+            const borderId = borders.indexByKey.get(borderKey({ border: style.border })) || 0;
+            const applyNumberFormat = numFmtId !== 0 ? ` applyNumberFormat="1"` : "";
+            const applyAlignment = style.horizontalAlign ? ` applyAlignment="1"` : "";
+            const applyFont = fontId !== 0 ? ` applyFont="1"` : "";
+            const applyFill = fillId !== 0 ? ` applyFill="1"` : "";
+            const applyBorder = borderId !== 0 ? ` applyBorder="1"` : "";
+            const alignmentNode = style.horizontalAlign
+                ? `<alignment horizontal="${style.horizontalAlign}"/>`
+                : "";
+            return `<xf numFmtId="${numFmtId}" fontId="${fontId}" fillId="${fillId}" borderId="${borderId}" xfId="0"${applyNumberFormat}${applyAlignment}${applyFont}${applyFill}${applyBorder}>${alignmentNode}</xf>`;
+        }).join("");
+        return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <numFmts count="0"/>
+  <fonts count="${fonts.items.length}">
+    ${fonts.items.map(buildFontXml).join("")}
+  </fonts>
+  <fills count="${fills.items.length}">
+    ${fills.items.map(buildFillXml).join("")}
+  </fills>
+  <borders count="${borders.items.length}">
+    ${borders.items.map(buildBorderXml).join("")}
+  </borders>
+  <cellStyleXfs count="1">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
+  </cellStyleXfs>
+  <cellXfs count="${styles.length}">
+    ${styleNodes}
+  </cellXfs>
+  <cellStyles count="1">
+    <cellStyle name="Normal" xfId="0" builtinId="0"/>
+  </cellStyles>
+</styleSheet>`;
+    }
+    function dedupeDescriptors(items, keyFn, defaultItem) {
+        const uniqueItems = [defaultItem];
+        const indexByKey = new Map([[keyFn(defaultItem), 0]]);
+        for (const item of items) {
+            const key = keyFn(item);
+            if (!indexByKey.has(key)) {
+                indexByKey.set(key, uniqueItems.length);
+                uniqueItems.push(item);
+            }
+        }
+        return { items: uniqueItems, indexByKey };
+    }
+    function fontKey(font) {
+        return font.bold ? "bold" : "";
+    }
+    function fillKey(fill) {
+        return fill.fillColor || "";
+    }
+    function borderKey(border) {
+        return border.border || "";
+    }
+    function buildFontXml(font) {
+        return font.bold ? `<font><b/></font>` : `<font/>`;
+    }
+    function buildFillXml(fill) {
+        if (!fill.fillColor) {
+            return `<fill><patternFill patternType="none"/></fill>`;
+        }
+        return `<fill><patternFill patternType="solid"><fgColor rgb="${fill.fillColor}"/><bgColor indexed="64"/></patternFill></fill>`;
+    }
+    function buildBorderXml(border) {
+        if (!border.border) {
+            return `<border/>`;
+        }
+        return `<border><left style="${border.border}"/><right style="${border.border}"/><top style="${border.border}"/><bottom style="${border.border}"/><diagonal/></border>`;
+    }
+    function mapNumberFormatId(numberFormat) {
+        switch (numberFormat) {
+            case "integer":
+                return 1;
+            case "decimal":
+                return 2;
+            case "date":
+                return 14;
+            case "datetime":
+                return 22;
+            case "percent":
+                return 10;
+            case "general":
+            default:
+                return 0;
+        }
+    }
+    function parseWorkbookEntries(entries) {
+        const workbookXml = decodeRequiredEntry(entries, "xl/workbook.xml");
+        const workbookRelsXml = decodeRequiredEntry(entries, "xl/_rels/workbook.xml.rels");
+        const stylesXml = entries["xl/styles.xml"] ? decodeUtf8(entries["xl/styles.xml"]) : null;
+        const workbookDocument = parseXmlDocument(workbookXml);
+        const relationshipsDocument = parseXmlDocument(workbookRelsXml);
+        const styleBook = parseStylesXml(stylesXml);
+        const relationshipMap = new Map();
+        const relationshipElements = Array.from(relationshipsDocument.getElementsByTagNameNS("http://schemas.openxmlformats.org/package/2006/relationships", "Relationship"));
+        for (const relationshipElement of relationshipElements) {
+            const id = relationshipElement.getAttribute("Id");
+            const target = relationshipElement.getAttribute("Target");
+            if (id && target) {
+                relationshipMap.set(id, normalizeWorkbookTarget(target));
+            }
+        }
+        const sheetElements = Array.from(workbookDocument.getElementsByTagNameNS("http://schemas.openxmlformats.org/spreadsheetml/2006/main", "sheet"));
+        return {
+            sheets: sheetElements.map((sheetElement) => {
+                const name = sheetElement.getAttribute("name") || "";
+                validateSheetName(name);
+                const relationshipId = sheetElement.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id") || sheetElement.getAttribute("r:id");
+                if (!relationshipId) {
+                    throw new Error(`Worksheet relationship id is missing for sheet: ${name}`);
+                }
+                const target = relationshipMap.get(relationshipId);
+                if (!target) {
+                    throw new Error(`Worksheet relationship target is missing for sheet: ${name}`);
+                }
+                const worksheetXml = decodeRequiredEntry(entries, target);
+                return parseWorksheetXml(name, worksheetXml, styleBook);
+            })
+        };
+    }
+    function normalizeWorkbookTarget(target) {
+        return target.startsWith("xl/") ? target : `xl/${target.replace(/^\.\//, "")}`;
+    }
+    function parseWorksheetXml(name, xmlText, styleBook) {
+        const document = parseXmlDocument(xmlText);
+        const rowElements = Array.from(document.getElementsByTagNameNS("http://schemas.openxmlformats.org/spreadsheetml/2006/main", "row"));
+        return {
+            name,
+            columns: parseWorksheetColumns(document),
+            mergedRanges: parseWorksheetMergedRanges(document),
+            rows: rowElements.map((rowElement) => ({
+                height: parseOptionalNumber(rowElement.getAttribute("ht")),
+                cells: parseWorksheetRowCells(rowElement, styleBook)
+            }))
+        };
+    }
+    function parseWorksheetColumns(document) {
+        const colElements = Array.from(document.getElementsByTagNameNS("http://schemas.openxmlformats.org/spreadsheetml/2006/main", "col"));
+        if (colElements.length === 0) {
+            return undefined;
+        }
+        const columns = [];
+        for (const colElement of colElements) {
+            const min = Number(colElement.getAttribute("min") || "0");
+            const max = Number(colElement.getAttribute("max") || "0");
+            const width = parseOptionalNumber(colElement.getAttribute("width"));
+            for (let index = min; index <= max; index += 1) {
+                columns[index - 1] = { width };
+            }
+        }
+        while (columns.length > 0 && !columns[columns.length - 1]) {
+            columns.pop();
+        }
+        return columns.length > 0 ? columns.map((column) => column || {}) : undefined;
+    }
+    function parseWorksheetMergedRanges(document) {
+        const mergeCellElements = Array.from(document.getElementsByTagNameNS("http://schemas.openxmlformats.org/spreadsheetml/2006/main", "mergeCell"));
+        if (mergeCellElements.length === 0) {
+            return undefined;
+        }
+        return mergeCellElements
+            .map((element) => normalizeMergedRange(element.getAttribute("ref") || ""))
+            .filter(Boolean);
+    }
+    function parseWorksheetRowCells(rowElement, styleBook) {
+        const cells = [];
+        const cellElements = Array.from(rowElement.getElementsByTagNameNS("http://schemas.openxmlformats.org/spreadsheetml/2006/main", "c")).filter((element) => element.parentElement === rowElement);
+        for (const cellElement of cellElements) {
+            const reference = cellElement.getAttribute("r") || "";
+            const columnIndex = decodeColumnReference(reference);
+            while (cells.length < columnIndex) {
+                cells.push({});
+            }
+            cells.push(parseWorksheetCell(cellElement, styleBook));
+        }
+        return cells;
+    }
+    function parseWorksheetCell(cellElement, styleBook) {
+        const type = cellElement.getAttribute("t") || "";
+        const styleIndex = Number(cellElement.getAttribute("s") || "0");
+        const formulaElement = findDirectChild(cellElement, "f");
+        const valueElement = findDirectChild(cellElement, "v");
+        const inlineStringElement = findDirectChild(cellElement, "is");
+        let value;
+        if (type === "inlineStr") {
+            const textElement = inlineStringElement ? findDirectChild(inlineStringElement, "t") : null;
+            value = textElement ? (textElement.textContent || "") : "";
+        }
+        else if (type === "b") {
+            value = (valueElement === null || valueElement === void 0 ? void 0 : valueElement.textContent) === "1";
+        }
+        else if (type === "str") {
+            value = (valueElement === null || valueElement === void 0 ? void 0 : valueElement.textContent) || "";
+        }
+        else if (valueElement) {
+            const rawValue = valueElement.textContent || "";
+            value = rawValue === "" ? "" : Number(rawValue);
+        }
+        const style = styleBook[styleIndex] || DEFAULT_STYLE;
+        const cell = {};
+        if (style.numberFormat !== "general") {
+            cell.numberFormat = style.numberFormat;
+        }
+        if (style.horizontalAlign) {
+            cell.horizontalAlign = style.horizontalAlign;
+        }
+        if (style.bold) {
+            cell.bold = true;
+        }
+        if (style.fillColor) {
+            cell.fillColor = denormalizeColor(style.fillColor);
+        }
+        if (style.border) {
+            cell.border = style.border;
+        }
+        if (formulaElement) {
+            cell.formula = formulaElement.textContent || "";
+        }
+        if (value !== undefined) {
+            cell.value = value;
+        }
+        return cell;
+    }
+    function parseStylesXml(xmlText) {
+        if (!xmlText) {
+            return [DEFAULT_STYLE];
+        }
+        const document = parseXmlDocument(xmlText);
+        const fonts = parseFonts(document);
+        const fills = parseFills(document);
+        const borders = parseBorders(document);
+        const xfElements = Array.from(document.getElementsByTagNameNS("http://schemas.openxmlformats.org/spreadsheetml/2006/main", "xf")).filter((element) => { var _a; return ((_a = element.parentElement) === null || _a === void 0 ? void 0 : _a.localName) === "cellXfs"; });
+        if (xfElements.length === 0) {
+            return [DEFAULT_STYLE];
+        }
+        return xfElements.map((xfElement) => {
+            var _a, _b, _c;
+            const numFmtId = Number(xfElement.getAttribute("numFmtId") || "0");
+            const fontId = Number(xfElement.getAttribute("fontId") || "0");
+            const fillId = Number(xfElement.getAttribute("fillId") || "0");
+            const borderId = Number(xfElement.getAttribute("borderId") || "0");
+            const alignmentElement = findDirectChild(xfElement, "alignment");
+            const horizontalAlign = alignmentElement === null || alignmentElement === void 0 ? void 0 : alignmentElement.getAttribute("horizontal");
+            return {
+                numberFormat: parseNumberFormatId(numFmtId),
+                horizontalAlign: horizontalAlign || undefined,
+                bold: ((_a = fonts[fontId]) === null || _a === void 0 ? void 0 : _a.bold) ? true : undefined,
+                fillColor: (_b = fills[fillId]) === null || _b === void 0 ? void 0 : _b.fillColor,
+                border: (_c = borders[borderId]) === null || _c === void 0 ? void 0 : _c.border
+            };
+        });
+    }
+    function parseFonts(document) {
+        return Array.from(document.getElementsByTagNameNS("http://schemas.openxmlformats.org/spreadsheetml/2006/main", "font")).map((fontElement) => ({
+            bold: findDirectChild(fontElement, "b") ? true : undefined
+        }));
+    }
+    function parseFills(document) {
+        return Array.from(document.getElementsByTagNameNS("http://schemas.openxmlformats.org/spreadsheetml/2006/main", "fill")).map((fillElement) => {
+            const patternFill = findDirectChild(fillElement, "patternFill");
+            const fgColor = patternFill ? findDirectChild(patternFill, "fgColor") : null;
+            return {
+                fillColor: (fgColor === null || fgColor === void 0 ? void 0 : fgColor.getAttribute("rgb")) || undefined
+            };
+        });
+    }
+    function parseBorders(document) {
+        return Array.from(document.getElementsByTagNameNS("http://schemas.openxmlformats.org/spreadsheetml/2006/main", "border")).map((borderElement) => {
+            const left = findDirectChild(borderElement, "left");
+            const style = left === null || left === void 0 ? void 0 : left.getAttribute("style");
+            return {
+                border: style && BORDER_STYLES.includes(style) ? style : undefined
+            };
+        });
+    }
+    function parseNumberFormatId(numFmtId) {
+        switch (numFmtId) {
+            case 1:
+                return "integer";
+            case 2:
+                return "decimal";
+            case 10:
+                return "percent";
+            case 14:
+                return "date";
+            case 22:
+                return "datetime";
+            default:
+                return "general";
+        }
+    }
+    function parseOptionalNumber(value) {
+        if (!value) {
+            return undefined;
+        }
+        return Number(value);
+    }
+    function findDirectChild(element, localName) {
+        for (const childNode of Array.from(element.childNodes)) {
+            if (childNode.nodeType !== Node.ELEMENT_NODE) {
+                continue;
+            }
+            const childElement = childNode;
+            if (childElement.localName === localName) {
+                return childElement;
+            }
+        }
+        return null;
+    }
+    function parseXmlDocument(xmlText) {
+        const document = new DOMParser().parseFromString(xmlText, "application/xml");
+        if (document.querySelector("parsererror")) {
+            throw new Error("Failed to parse XML document");
+        }
+        return document;
+    }
+    function decodeRequiredEntry(entries, name) {
+        const bytes = entries[name];
+        if (!bytes) {
+            throw new Error(`Required ZIP entry is missing: ${name}`);
+        }
+        return decodeUtf8(bytes);
+    }
+    function encodeUtf8(value) {
+        return TEXT_ENCODER.encode(value);
+    }
+    function decodeUtf8(bytes) {
+        return TEXT_DECODER.decode(bytes);
+    }
+    function escapeXml(value) {
+        return value
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&apos;");
+    }
+    function encodeColumnName(columnIndex) {
+        let current = columnIndex + 1;
+        let result = "";
+        while (current > 0) {
+            const remainder = (current - 1) % 26;
+            result = String.fromCharCode(65 + remainder) + result;
+            current = Math.floor((current - 1) / 26);
+        }
+        return result;
+    }
+    function decodeColumnReference(reference) {
+        const match = /^([A-Z]+)\d+$/i.exec(reference);
+        if (!match) {
+            throw new Error(`Invalid cell reference: ${reference}`);
+        }
+        const letters = match[1].toUpperCase();
+        let value = 0;
+        for (const character of letters) {
+            value = (value * 26) + (character.charCodeAt(0) - 64);
+        }
+        return value - 1;
+    }
+    function packZip(entries) {
+        const localParts = [];
+        const centralParts = [];
+        let offset = 0;
+        for (const entry of entries) {
+            const nameBytes = encodeUtf8(entry.name);
+            const crc32 = computeCrc32(entry.data);
+            const localHeader = new Uint8Array(30 + nameBytes.length);
+            const localView = new DataView(localHeader.buffer);
+            localView.setUint32(0, 0x04034b50, true);
+            localView.setUint16(4, 20, true);
+            localView.setUint16(6, 0, true);
+            localView.setUint16(8, 0, true);
+            localView.setUint16(10, 0, true);
+            localView.setUint16(12, 0, true);
+            localView.setUint32(14, crc32, true);
+            localView.setUint32(18, entry.data.byteLength, true);
+            localView.setUint32(22, entry.data.byteLength, true);
+            localView.setUint16(26, nameBytes.length, true);
+            localView.setUint16(28, 0, true);
+            localHeader.set(nameBytes, 30);
+            const centralHeader = new Uint8Array(46 + nameBytes.length);
+            const centralView = new DataView(centralHeader.buffer);
+            centralView.setUint32(0, 0x02014b50, true);
+            centralView.setUint16(4, 20, true);
+            centralView.setUint16(6, 20, true);
+            centralView.setUint16(8, 0, true);
+            centralView.setUint16(10, 0, true);
+            centralView.setUint16(12, 0, true);
+            centralView.setUint16(14, 0, true);
+            centralView.setUint32(16, crc32, true);
+            centralView.setUint32(20, entry.data.byteLength, true);
+            centralView.setUint32(24, entry.data.byteLength, true);
+            centralView.setUint16(28, nameBytes.length, true);
+            centralView.setUint16(30, 0, true);
+            centralView.setUint16(32, 0, true);
+            centralView.setUint16(34, 0, true);
+            centralView.setUint16(36, 0, true);
+            centralView.setUint32(38, 0, true);
+            centralView.setUint32(42, offset, true);
+            centralHeader.set(nameBytes, 46);
+            localParts.push(localHeader, entry.data);
+            centralParts.push(centralHeader);
+            offset += localHeader.byteLength + entry.data.byteLength;
+        }
+        const centralDirectoryOffset = offset;
+        const centralDirectorySize = centralParts.reduce((sum, part) => sum + part.byteLength, 0);
+        const endOfCentralDirectory = new Uint8Array(22);
+        const endView = new DataView(endOfCentralDirectory.buffer);
+        endView.setUint32(0, 0x06054b50, true);
+        endView.setUint16(4, 0, true);
+        endView.setUint16(6, 0, true);
+        endView.setUint16(8, entries.length, true);
+        endView.setUint16(10, entries.length, true);
+        endView.setUint32(12, centralDirectorySize, true);
+        endView.setUint32(16, centralDirectoryOffset, true);
+        endView.setUint16(20, 0, true);
+        return concatUint8Arrays([...localParts, ...centralParts, endOfCentralDirectory]);
+    }
+    function unpackZip(bytes) {
+        const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+        const endOffset = findEndOfCentralDirectoryOffset(bytes);
+        const totalEntries = view.getUint16(endOffset + 10, true);
+        const centralDirectoryOffset = view.getUint32(endOffset + 16, true);
+        const entries = {};
+        let pointer = centralDirectoryOffset;
+        for (let index = 0; index < totalEntries; index += 1) {
+            if (view.getUint32(pointer, true) !== 0x02014b50) {
+                throw new Error("Invalid ZIP central directory header");
+            }
+            const compressionMethod = view.getUint16(pointer + 10, true);
+            const compressedSize = view.getUint32(pointer + 20, true);
+            const uncompressedSize = view.getUint32(pointer + 24, true);
+            const fileNameLength = view.getUint16(pointer + 28, true);
+            const extraLength = view.getUint16(pointer + 30, true);
+            const commentLength = view.getUint16(pointer + 32, true);
+            const localHeaderOffset = view.getUint32(pointer + 42, true);
+            const fileName = decodeUtf8(bytes.subarray(pointer + 46, pointer + 46 + fileNameLength));
+            const localView = new DataView(bytes.buffer, bytes.byteOffset + localHeaderOffset, bytes.byteLength - localHeaderOffset);
+            if (localView.getUint32(0, true) !== 0x04034b50) {
+                throw new Error(`Invalid ZIP local header for entry: ${fileName}`);
+            }
+            const localFileNameLength = localView.getUint16(26, true);
+            const localExtraLength = localView.getUint16(28, true);
+            const dataOffset = localHeaderOffset + 30 + localFileNameLength + localExtraLength;
+            const data = bytes.slice(dataOffset, dataOffset + compressedSize);
+            if (compressionMethod !== 0) {
+                throw new Error(`Unsupported ZIP compression method for entry ${fileName}: ${compressionMethod}`);
+            }
+            if (compressedSize !== uncompressedSize) {
+                throw new Error(`Stored ZIP entry size mismatch: ${fileName}`);
+            }
+            entries[fileName] = data;
+            pointer += 46 + fileNameLength + extraLength + commentLength;
+        }
+        return entries;
+    }
+    function findEndOfCentralDirectoryOffset(bytes) {
+        for (let index = bytes.byteLength - 22; index >= 0; index -= 1) {
+            if (bytes[index] === 0x50 &&
+                bytes[index + 1] === 0x4b &&
+                bytes[index + 2] === 0x05 &&
+                bytes[index + 3] === 0x06) {
+                return index;
+            }
+        }
+        throw new Error("ZIP end of central directory not found");
+    }
+    function concatUint8Arrays(parts) {
+        const totalLength = parts.reduce((sum, part) => sum + part.byteLength, 0);
+        const result = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const part of parts) {
+            result.set(part, offset);
+            offset += part.byteLength;
+        }
+        return result;
+    }
+    function computeCrc32(bytes) {
+        let crc = 0xffffffff;
+        for (const byte of bytes) {
+            crc = (crc >>> 8) ^ CRC32_TABLE[(crc ^ byte) & 0xff];
+        }
+        return (crc ^ 0xffffffff) >>> 0;
+    }
+    function buildCrc32Table() {
+        const table = new Uint32Array(256);
+        for (let index = 0; index < 256; index += 1) {
+            let value = index;
+            for (let bit = 0; bit < 8; bit += 1) {
+                value = (value & 1) !== 0 ? (0xedb88320 ^ (value >>> 1)) : (value >>> 1);
+            }
+            table[index] = value >>> 0;
+        }
+        return table;
+    }
+    globalThis.__mikuprojectExcelIo = {
+        XlsxWorkbookCodec
+    };
+})();
+  </script>
+
+  <script>
+(() => {
     const SAMPLE_XML = `<?xml version="1.0" encoding="UTF-8"?>
 <Project xmlns="http://schemas.microsoft.com/project">
   <Name>Sample Project</Name>
@@ -7811,14 +8920,882 @@ if (!customElements.get("lht-page-menu")) {
 
   <script>
 (() => {
+    const HEADER_FILL = "#D9EAF7";
+    function exportProjectWorkbook(model) {
+        return {
+            sheets: [
+                buildProjectSheet(model),
+                buildTasksSheet(model),
+                buildResourcesSheet(model),
+                buildAssignmentsSheet(model),
+                buildCalendarsSheet(model)
+            ]
+        };
+    }
+    function importProjectWorkbook(workbook, baseModel) {
+        return importProjectWorkbookDetailed(workbook, baseModel).model;
+    }
+    function importProjectWorkbookDetailed(workbook, baseModel) {
+        const nextModel = cloneProjectModel(baseModel);
+        const changes = [];
+        importProjectSheet(workbook, nextModel, changes);
+        importTasksSheet(workbook, nextModel, changes);
+        importResourcesSheet(workbook, nextModel, changes);
+        importAssignmentsSheet(workbook, nextModel, changes);
+        importCalendarsSheet(workbook, nextModel, changes);
+        return {
+            model: nextModel,
+            changes
+        };
+    }
+    function importProjectSheet(workbook, model, changes) {
+        const projectSheet = workbook.sheets.find((sheet) => sheet.name === "Project");
+        if (!projectSheet) {
+            return;
+        }
+        const valueByField = new Map();
+        for (const row of projectSheet.rows.slice(3)) {
+            const field = readStringCell(row.cells[0]);
+            if (!field) {
+                continue;
+            }
+            valueByField.set(field, row.cells[1]);
+        }
+        const projectLabel = model.project.name;
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "name", "Name", readStringCell(valueByField.get("Name")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "title", "Title", readStringCell(valueByField.get("Title")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "author", "Author", readStringCell(valueByField.get("Author")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "company", "Company", readStringCell(valueByField.get("Company")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "startDate", "StartDate", readStringCell(valueByField.get("StartDate")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "finishDate", "FinishDate", readStringCell(valueByField.get("FinishDate")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "currentDate", "CurrentDate", readStringCell(valueByField.get("CurrentDate")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "statusDate", "StatusDate", readStringCell(valueByField.get("StatusDate")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "calendarUID", "CalendarUID", readStringCell(valueByField.get("CalendarUID")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "minutesPerDay", "MinutesPerDay", readNumberCell(valueByField.get("MinutesPerDay")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "minutesPerWeek", "MinutesPerWeek", readNumberCell(valueByField.get("MinutesPerWeek")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "daysPerMonth", "DaysPerMonth", readNumberCell(valueByField.get("DaysPerMonth")));
+        assignIfChanged(changes, "project", "project", projectLabel, model.project, "scheduleFromStart", "ScheduleFromStart", readBooleanCell(valueByField.get("ScheduleFromStart")));
+    }
+    function buildProjectSheet(model) {
+        const project = model.project;
+        const rows = [
+            titleRow("Project"),
+            titleRow("Basic Info"),
+            headerRow(["Field", "Value"]),
+            keyValueRow("Name", project.name),
+            keyValueRow("Title", project.title),
+            keyValueRow("Author", project.author),
+            keyValueRow("Company", project.company),
+            keyValueRow("StartDate", project.startDate),
+            keyValueRow("FinishDate", project.finishDate),
+            keyValueRow("CurrentDate", project.currentDate),
+            keyValueRow("StatusDate", project.statusDate),
+            titleRow("Settings"),
+            keyValueRow("CalendarUID", project.calendarUID),
+            keyValueRow("MinutesPerDay", project.minutesPerDay),
+            keyValueRow("MinutesPerWeek", project.minutesPerWeek),
+            keyValueRow("DaysPerMonth", project.daysPerMonth),
+            keyValueRow("ScheduleFromStart", project.scheduleFromStart),
+            keyValueRow("OutlineCodes", project.outlineCodes.length),
+            keyValueRow("WBSMasks", project.wbsMasks.length),
+            keyValueRow("ExtendedAttributes", project.extendedAttributes.length)
+        ];
+        return {
+            name: "Project",
+            columns: [{ width: 24 }, { width: 32 }],
+            mergedRanges: ["A1:B1", "A2:B2", "A11:B11"],
+            rows
+        };
+    }
+    function buildTasksSheet(model) {
+        return {
+            name: "Tasks",
+            columns: [
+                { width: 10 }, { width: 8 }, { width: 28 }, { width: 12 },
+                { width: 14 }, { width: 12 }, { width: 20 }, { width: 20 },
+                { width: 14 }, { width: 16 }, { width: 18 }, { width: 12 },
+                { width: 12 }, { width: 12 }, { width: 12 }, { width: 18 }
+            ],
+            mergedRanges: ["A1:P1", "A2:P2"],
+            rows: [
+                sectionTitleRow("Tasks", 16),
+                sectionTitleRow("Task List", 16),
+                headerRow([
+                    "UID", "ID", "Name", "OutlineLevel", "OutlineNumber", "WBS",
+                    "Start", "Finish", "Duration", "PercentComplete", "PercentWorkComplete",
+                    "Milestone", "Summary", "Critical", "CalendarUID", "Predecessors"
+                ]),
+                ...model.tasks.map((task) => ({
+                    cells: [
+                        cell(task.uid),
+                        cell(task.id),
+                        cell(task.name),
+                        cell(task.outlineLevel),
+                        cell(task.outlineNumber),
+                        cell(task.wbs),
+                        cell(task.start),
+                        cell(task.finish),
+                        cell(task.duration),
+                        cell(task.percentComplete),
+                        cell(task.percentWorkComplete),
+                        cell(task.milestone),
+                        cell(task.summary),
+                        cell(task.critical),
+                        cell(task.calendarUID),
+                        cell(task.predecessors.map((item) => item.predecessorUid).join(", "))
+                    ]
+                }))
+            ]
+        };
+    }
+    function buildResourcesSheet(model) {
+        return {
+            name: "Resources",
+            columns: [
+                { width: 10 }, { width: 8 }, { width: 24 }, { width: 10 },
+                { width: 12 }, { width: 18 }, { width: 12 }, { width: 12 },
+                { width: 14 }, { width: 14 }, { width: 12 }, { width: 14 },
+                { width: 14 }, { width: 14 }
+            ],
+            mergedRanges: ["A1:N1", "A2:N2"],
+            rows: [
+                sectionTitleRow("Resources", 14),
+                sectionTitleRow("Resource List", 14),
+                headerRow([
+                    "UID", "ID", "Name", "Type", "Initials", "Group", "MaxUnits",
+                    "CalendarUID", "StandardRate", "OvertimeRate", "CostPerUse",
+                    "Work", "ActualWork", "RemainingWork"
+                ]),
+                ...model.resources.map((resource) => ({
+                    cells: [
+                        cell(resource.uid),
+                        cell(resource.id),
+                        cell(resource.name),
+                        cell(resource.type),
+                        cell(resource.initials),
+                        cell(resource.group),
+                        cell(resource.maxUnits),
+                        cell(resource.calendarUID),
+                        cell(resource.standardRate),
+                        cell(resource.overtimeRate),
+                        cell(resource.costPerUse),
+                        cell(resource.work),
+                        cell(resource.actualWork),
+                        cell(resource.remainingWork)
+                    ]
+                }))
+            ]
+        };
+    }
+    function buildAssignmentsSheet(model) {
+        const taskNameByUid = new Map(model.tasks.map((task) => [task.uid, task.name]));
+        const resourceNameByUid = new Map(model.resources.map((resource) => [resource.uid, resource.name]));
+        return {
+            name: "Assignments",
+            columns: [
+                { width: 10 }, { width: 10 }, { width: 24 }, { width: 12 },
+                { width: 24 }, { width: 20 }, { width: 20 }, { width: 10 },
+                { width: 14 }, { width: 14 }, { width: 14 }, { width: 18 }
+            ],
+            mergedRanges: ["A1:L1", "A2:L2"],
+            rows: [
+                sectionTitleRow("Assignments", 12),
+                sectionTitleRow("Assignment List", 12),
+                headerRow([
+                    "UID", "TaskUID", "TaskName", "ResourceUID", "ResourceName", "Start",
+                    "Finish", "Units", "Work", "ActualWork", "RemainingWork", "PercentWorkComplete"
+                ]),
+                ...model.assignments.map((assignment) => ({
+                    cells: [
+                        cell(assignment.uid),
+                        cell(assignment.taskUid),
+                        cell(taskNameByUid.get(assignment.taskUid)),
+                        cell(assignment.resourceUid),
+                        cell(resourceNameByUid.get(assignment.resourceUid)),
+                        cell(assignment.start),
+                        cell(assignment.finish),
+                        cell(assignment.units),
+                        cell(assignment.work),
+                        cell(assignment.actualWork),
+                        cell(assignment.remainingWork),
+                        cell(assignment.percentWorkComplete)
+                    ]
+                }))
+            ]
+        };
+    }
+    function buildCalendarsSheet(model) {
+        return {
+            name: "Calendars",
+            columns: [
+                { width: 10 }, { width: 24 }, { width: 14 }, { width: 16 },
+                { width: 10 }, { width: 12 }, { width: 10 }
+            ],
+            mergedRanges: ["A1:G1", "A2:G2"],
+            rows: [
+                sectionTitleRow("Calendars", 7),
+                sectionTitleRow("Calendar List", 7),
+                headerRow([
+                    "UID", "Name", "IsBaseCalendar", "BaseCalendarUID", "WeekDays", "Exceptions", "WorkWeeks"
+                ]),
+                ...model.calendars.map((calendar) => ({
+                    cells: [
+                        cell(calendar.uid),
+                        cell(calendar.name),
+                        cell(calendar.isBaseCalendar),
+                        cell(calendar.baseCalendarUID),
+                        cell(calendar.weekDays.length),
+                        cell(calendar.exceptions.length),
+                        cell(calendar.workWeeks.length)
+                    ]
+                }))
+            ]
+        };
+    }
+    function headerRow(labels) {
+        return {
+            height: 24,
+            cells: labels.map((label) => ({
+                value: label,
+                bold: true,
+                fillColor: HEADER_FILL,
+                border: "thin",
+                horizontalAlign: "center"
+            }))
+        };
+    }
+    function titleRow(title) {
+        return {
+            height: 28,
+            cells: [
+                {
+                    value: title,
+                    bold: true,
+                    fillColor: HEADER_FILL,
+                    border: "thin",
+                    horizontalAlign: "center"
+                },
+                {}
+            ]
+        };
+    }
+    function sectionTitleRow(title, columnCount) {
+        return {
+            height: 26,
+            cells: [
+                {
+                    value: title,
+                    bold: true,
+                    fillColor: HEADER_FILL,
+                    border: "thin",
+                    horizontalAlign: "center"
+                },
+                ...Array.from({ length: Math.max(0, columnCount - 1) }, () => ({}))
+            ]
+        };
+    }
+    function keyValueRow(label, value) {
+        return {
+            cells: [
+                {
+                    value: label,
+                    bold: true,
+                    fillColor: HEADER_FILL,
+                    border: "thin"
+                },
+                cell(value)
+            ]
+        };
+    }
+    function cell(value) {
+        if (value === undefined) {
+            return {};
+        }
+        return {
+            value,
+            border: "thin"
+        };
+    }
+    function cloneProjectModel(model) {
+        return JSON.parse(JSON.stringify(model));
+    }
+    function importTasksSheet(workbook, model, changes) {
+        const tasksSheet = workbook.sheets.find((sheet) => sheet.name === "Tasks");
+        if (!tasksSheet) {
+            return;
+        }
+        const columnIndexByLabel = readHeaderMap(tasksSheet, 2);
+        const uidColumnIndex = columnIndexByLabel.get("UID");
+        if (uidColumnIndex === undefined) {
+            return;
+        }
+        const taskByUid = new Map(model.tasks.map((task) => [task.uid, task]));
+        for (const row of tasksSheet.rows.slice(3)) {
+            const uid = readStringCell(row.cells[uidColumnIndex]);
+            if (!uid) {
+                continue;
+            }
+            const task = taskByUid.get(uid);
+            if (!task) {
+                continue;
+            }
+            const taskLabel = task.name;
+            assignIfChanged(changes, "tasks", task.uid, taskLabel, task, "name", "Name", readStringCellAt(row.cells, columnIndexByLabel.get("Name")));
+            assignIfChanged(changes, "tasks", task.uid, taskLabel, task, "start", "Start", readStringCellAt(row.cells, columnIndexByLabel.get("Start")));
+            assignIfChanged(changes, "tasks", task.uid, taskLabel, task, "finish", "Finish", readStringCellAt(row.cells, columnIndexByLabel.get("Finish")));
+            assignIfChanged(changes, "tasks", task.uid, taskLabel, task, "percentComplete", "PercentComplete", readNumberCellAt(row.cells, columnIndexByLabel.get("PercentComplete")));
+            assignIfChanged(changes, "tasks", task.uid, taskLabel, task, "percentWorkComplete", "PercentWorkComplete", readNumberCellAt(row.cells, columnIndexByLabel.get("PercentWorkComplete")));
+        }
+    }
+    function importResourcesSheet(workbook, model, changes) {
+        const resourcesSheet = workbook.sheets.find((sheet) => sheet.name === "Resources");
+        if (!resourcesSheet) {
+            return;
+        }
+        const columnIndexByLabel = readHeaderMap(resourcesSheet, 2);
+        const uidColumnIndex = columnIndexByLabel.get("UID");
+        if (uidColumnIndex === undefined) {
+            return;
+        }
+        const resourceByUid = new Map(model.resources.map((resource) => [resource.uid, resource]));
+        for (const row of resourcesSheet.rows.slice(3)) {
+            const uid = readStringCell(row.cells[uidColumnIndex]);
+            if (!uid) {
+                continue;
+            }
+            const resource = resourceByUid.get(uid);
+            if (!resource) {
+                continue;
+            }
+            const resourceLabel = resource.name;
+            assignIfChanged(changes, "resources", resource.uid, resourceLabel, resource, "name", "Name", readStringCellAt(row.cells, columnIndexByLabel.get("Name")));
+            assignIfChanged(changes, "resources", resource.uid, resourceLabel, resource, "group", "Group", readStringCellAt(row.cells, columnIndexByLabel.get("Group")));
+            assignIfChanged(changes, "resources", resource.uid, resourceLabel, resource, "maxUnits", "MaxUnits", readNumberCellAt(row.cells, columnIndexByLabel.get("MaxUnits")));
+        }
+    }
+    function importAssignmentsSheet(workbook, model, changes) {
+        const assignmentsSheet = workbook.sheets.find((sheet) => sheet.name === "Assignments");
+        if (!assignmentsSheet) {
+            return;
+        }
+        const columnIndexByLabel = readHeaderMap(assignmentsSheet, 2);
+        const uidColumnIndex = columnIndexByLabel.get("UID");
+        if (uidColumnIndex === undefined) {
+            return;
+        }
+        const assignmentByUid = new Map(model.assignments.map((assignment) => [assignment.uid, assignment]));
+        for (const row of assignmentsSheet.rows.slice(3)) {
+            const uid = readStringCell(row.cells[uidColumnIndex]);
+            if (!uid) {
+                continue;
+            }
+            const assignment = assignmentByUid.get(uid);
+            if (!assignment) {
+                continue;
+            }
+            const assignmentLabel = `TaskUID=${assignment.taskUid}`;
+            assignIfChanged(changes, "assignments", assignment.uid, assignmentLabel, assignment, "units", "Units", readNumberCellAt(row.cells, columnIndexByLabel.get("Units")));
+            assignIfChanged(changes, "assignments", assignment.uid, assignmentLabel, assignment, "work", "Work", readStringCellAt(row.cells, columnIndexByLabel.get("Work")));
+            assignIfChanged(changes, "assignments", assignment.uid, assignmentLabel, assignment, "percentWorkComplete", "PercentWorkComplete", readNumberCellAt(row.cells, columnIndexByLabel.get("PercentWorkComplete")));
+        }
+    }
+    function importCalendarsSheet(workbook, model, changes) {
+        const calendarsSheet = workbook.sheets.find((sheet) => sheet.name === "Calendars");
+        if (!calendarsSheet) {
+            return;
+        }
+        const columnIndexByLabel = readHeaderMap(calendarsSheet, 2);
+        const uidColumnIndex = columnIndexByLabel.get("UID");
+        if (uidColumnIndex === undefined) {
+            return;
+        }
+        const calendarByUid = new Map(model.calendars.map((calendar) => [calendar.uid, calendar]));
+        for (const row of calendarsSheet.rows.slice(3)) {
+            const uid = readStringCell(row.cells[uidColumnIndex]);
+            if (!uid) {
+                continue;
+            }
+            const calendar = calendarByUid.get(uid);
+            if (!calendar) {
+                continue;
+            }
+            const calendarLabel = calendar.name;
+            assignIfChanged(changes, "calendars", calendar.uid, calendarLabel, calendar, "name", "Name", readStringCellAt(row.cells, columnIndexByLabel.get("Name")));
+            assignIfChanged(changes, "calendars", calendar.uid, calendarLabel, calendar, "isBaseCalendar", "IsBaseCalendar", readBooleanCellAt(row.cells, columnIndexByLabel.get("IsBaseCalendar")));
+            assignIfChanged(changes, "calendars", calendar.uid, calendarLabel, calendar, "baseCalendarUID", "BaseCalendarUID", readStringCellAt(row.cells, columnIndexByLabel.get("BaseCalendarUID")));
+        }
+    }
+    function readHeaderMap(sheet, headerRowIndex) {
+        const headerRow = sheet.rows[headerRowIndex];
+        const columnIndexByLabel = new Map();
+        if (!headerRow) {
+            return columnIndexByLabel;
+        }
+        headerRow.cells.forEach((cell, index) => {
+            if (typeof cell.value === "string" && cell.value) {
+                columnIndexByLabel.set(cell.value, index);
+            }
+        });
+        return columnIndexByLabel;
+    }
+    function readStringCellAt(cells, index) {
+        if (index === undefined) {
+            return undefined;
+        }
+        return readStringCell(cells[index]);
+    }
+    function readNumberCellAt(cells, index) {
+        if (index === undefined) {
+            return undefined;
+        }
+        return readNumberCell(cells[index]);
+    }
+    function readBooleanCellAt(cells, index) {
+        if (index === undefined) {
+            return undefined;
+        }
+        return readBooleanCell(cells[index]);
+    }
+    function readStringCell(cell) {
+        if (!cell || cell.value === undefined) {
+            return undefined;
+        }
+        if (typeof cell.value === "string") {
+            return cell.value;
+        }
+        if (typeof cell.value === "number" || typeof cell.value === "boolean") {
+            return String(cell.value);
+        }
+        return undefined;
+    }
+    function readNumberCell(cell) {
+        if (!cell || cell.value === undefined) {
+            return undefined;
+        }
+        if (typeof cell.value === "number" && Number.isFinite(cell.value)) {
+            return cell.value;
+        }
+        if (typeof cell.value === "string" && cell.value.trim() !== "") {
+            const parsed = Number(cell.value);
+            return Number.isFinite(parsed) ? parsed : undefined;
+        }
+        return undefined;
+    }
+    function readBooleanCell(cell) {
+        if (!cell || cell.value === undefined) {
+            return undefined;
+        }
+        if (typeof cell.value === "boolean") {
+            return cell.value;
+        }
+        if (typeof cell.value === "number") {
+            return cell.value !== 0;
+        }
+        if (typeof cell.value === "string") {
+            if (cell.value === "true" || cell.value === "TRUE" || cell.value === "1") {
+                return true;
+            }
+            if (cell.value === "false" || cell.value === "FALSE" || cell.value === "0") {
+                return false;
+            }
+        }
+        return undefined;
+    }
+    function assignIfChanged(changes, scope, uid, label, target, key, field, value) {
+        if (value === undefined) {
+            return;
+        }
+        const before = target[key];
+        if (before === value) {
+            return;
+        }
+        target[key] = value;
+        changes.push({
+            scope,
+            uid,
+            label,
+            field,
+            before: before,
+            after: value
+        });
+    }
+    globalThis.__mikuprojectProjectXlsx = {
+        exportProjectWorkbook,
+        importProjectWorkbook,
+        importProjectWorkbookDetailed
+    };
+})();
+  </script>
+
+  <script>
+(() => {
+    const HEADER_FILL = "#D9EAF7";
+    const PHASE_FILL = "#EEF7E8";
+    const MILESTONE_FILL = "#FFF4E0";
+    const BAND_FILL = "#F4F7FB";
+    const ACTIVE_BAND_FILL = "#9FD5C9";
+    const PROGRESS_BAND_FILL = "#5BAE9C";
+    const WEEKEND_BAND_FILL = "#F1F1F1";
+    const TODAY_BAND_FILL = "#FFE6A7";
+    const TODAY_ACTIVE_BAND_FILL = "#F3C96B";
+    const TODAY_PROGRESS_BAND_FILL = "#D89A2B";
+    const HOLIDAY_BAND_FILL = "#FCE4EC";
+    function exportWbsWorkbook(model, options = {}) {
+        const resourceNameByUid = new Map(model.resources.map((resource) => [resource.uid, resource.name]));
+        const predecessorNameByUid = new Map(model.tasks.map((task) => [task.uid, task.name]));
+        const calendarNameByUid = new Map(model.calendars.map((calendar) => [calendar.uid, calendar.name]));
+        const resourceNamesByTaskUid = new Map();
+        const holidaySet = new Set((options.holidayDates || []).map((day) => day.slice(0, 10)));
+        for (const assignment of model.assignments) {
+            const resourceName = resourceNameByUid.get(assignment.resourceUid);
+            if (!resourceName) {
+                continue;
+            }
+            const resourceNames = resourceNamesByTaskUid.get(assignment.taskUid) || [];
+            if (!resourceNames.includes(resourceName)) {
+                resourceNames.push(resourceName);
+            }
+            resourceNamesByTaskUid.set(assignment.taskUid, resourceNames);
+        }
+        const dateBand = buildDateBand(model.project.startDate, model.project.finishDate);
+        const fixedHeaders = [
+            "UID",
+            "ID",
+            "WBS",
+            "Kind",
+            "OutlineLevel",
+            "Name",
+            "Start",
+            "Finish",
+            "Duration",
+            "PercentComplete",
+            "PercentWorkComplete",
+            "Milestone",
+            "Summary",
+            "Critical",
+            "Owner",
+            "Calendar",
+            "Resources",
+            "Predecessors"
+        ];
+        const totalColumns = fixedHeaders.length + dateBand.length;
+        const lastColumnRef = columnName(totalColumns);
+        return {
+            sheets: [
+                {
+                    name: "WBS",
+                    columns: [
+                        { width: 8 }, { width: 8 }, { width: 14 }, { width: 12 }, { width: 12 }, { width: 34 },
+                        { width: 20 }, { width: 20 }, { width: 14 }, { width: 14 },
+                        { width: 18 }, { width: 12 }, { width: 12 }, { width: 12 },
+                        { width: 20 }, { width: 14 }, { width: 24 }, { width: 22 },
+                        ...dateBand.map(() => ({ width: 6 }))
+                    ],
+                    mergedRanges: [`A1:${lastColumnRef}1`, `A2:${lastColumnRef}2`, `A3:${lastColumnRef}3`, `A4:${lastColumnRef}4`],
+                    rows: [
+                        sectionTitleRow("WBS", totalColumns),
+                        sectionTitleRow(model.project.name || "Project", totalColumns),
+                        infoRow(`Title=${model.project.title || "-"} / Calendar=${model.project.calendarUID || "-"} / ScheduleFromStart=${model.project.scheduleFromStart ? "true" : "false"}`, totalColumns),
+                        infoRow(`Start=${model.project.startDate || "-"} / Finish=${model.project.finishDate || "-"} / CurrentDate=${model.project.currentDate || "-"} / Holidays=${holidaySet.size}`, totalColumns),
+                        sectionTitleRow("Task View", totalColumns),
+                        todayGuideRow(fixedHeaders.length, dateBand, model.project.currentDate, holidaySet),
+                        headerRow([
+                            ...fixedHeaders,
+                            ...dateBand.map((day) => dateHeaderCell(day, model.project.currentDate, holidaySet))
+                        ]),
+                        ...model.tasks.map((task) => ({
+                            cells: [
+                                taskCell(task, task.uid, "center"),
+                                taskCell(task, task.id, "center"),
+                                taskCell(task, task.wbs || task.outlineNumber, "center"),
+                                taskCell(task, classifyTaskKind(task), "center"),
+                                taskCell(task, task.outlineLevel, "center"),
+                                taskCell(task, formatTaskLabel(task)),
+                                taskCell(task, task.start),
+                                taskCell(task, task.finish),
+                                taskCell(task, task.duration, "center"),
+                                taskCell(task, task.percentComplete, "center"),
+                                taskCell(task, task.percentWorkComplete, "center"),
+                                taskCell(task, task.milestone, "center"),
+                                taskCell(task, task.summary, "center"),
+                                taskCell(task, task.critical, "center"),
+                                taskCell(task, firstResourceName(resourceNamesByTaskUid.get(task.uid)), "center"),
+                                taskCell(task, formatCalendarLabel(task.calendarUID || model.project.calendarUID, calendarNameByUid), "center"),
+                                taskCell(task, (resourceNamesByTaskUid.get(task.uid) || []).join(", ")),
+                                taskCell(task, task.predecessors.map((item) => predecessorNameByUid.get(item.predecessorUid) || item.predecessorUid).join(", ")),
+                                ...dateBand.map((day) => dateBandCell(task, day, model.project.currentDate, holidaySet))
+                            ]
+                        }))
+                    ]
+                }
+            ]
+        };
+    }
+    function formatTaskLabel(task) {
+        return `${"  ".repeat(Math.max(0, task.outlineLevel - 1))}${task.name}`;
+    }
+    function classifyTaskKind(task) {
+        if (task.summary) {
+            return "phase";
+        }
+        if (task.milestone) {
+            return "milestone";
+        }
+        return "task";
+    }
+    function firstResourceName(resourceNames) {
+        if (!resourceNames || resourceNames.length === 0) {
+            return "";
+        }
+        return resourceNames[0];
+    }
+    function formatCalendarLabel(calendarUID, calendarNameByUid) {
+        if (!calendarUID) {
+            return "-";
+        }
+        const calendarName = calendarNameByUid.get(calendarUID);
+        return calendarName ? `${calendarUID} ${calendarName}` : calendarUID;
+    }
+    function sectionTitleRow(title, columnCount) {
+        return {
+            height: 28,
+            cells: [
+                {
+                    value: title,
+                    bold: true,
+                    fillColor: HEADER_FILL,
+                    border: "thin",
+                    horizontalAlign: "center"
+                },
+                ...Array.from({ length: Math.max(0, columnCount - 1) }, () => ({}))
+            ]
+        };
+    }
+    function infoRow(text, columnCount) {
+        return {
+            height: 24,
+            cells: [
+                {
+                    value: text,
+                    border: "thin",
+                    horizontalAlign: "left"
+                },
+                ...Array.from({ length: Math.max(0, columnCount - 1) }, () => ({}))
+            ]
+        };
+    }
+    function headerRow(labels) {
+        return {
+            height: 24,
+            cells: labels.map((label) => {
+                if (typeof label === "string") {
+                    return {
+                        value: label,
+                        bold: true,
+                        fillColor: HEADER_FILL,
+                        border: "thin",
+                        horizontalAlign: "center"
+                    };
+                }
+                return {
+                    border: "thin",
+                    horizontalAlign: "center",
+                    ...label
+                };
+            })
+        };
+    }
+    function todayGuideRow(fixedColumnCount, dateBand, currentDate, holidaySet) {
+        return {
+            height: 22,
+            cells: [
+                ...Array.from({ length: fixedColumnCount }, (_, index) => (index === 5
+                    ? {
+                        value: "Today",
+                        bold: true,
+                        border: "thin",
+                        horizontalAlign: "right"
+                    }
+                    : {})),
+                ...dateBand.map((day) => ({
+                    value: isSameDay(day, currentDate) ? "▼" : "",
+                    bold: true,
+                    border: "thin",
+                    horizontalAlign: "center",
+                    fillColor: isSameDay(day, currentDate) ? TODAY_BAND_FILL : (holidaySet.has(day) ? HOLIDAY_BAND_FILL : BAND_FILL)
+                }))
+            ]
+        };
+    }
+    function cell(value) {
+        if (value === undefined || value === "") {
+            return {};
+        }
+        return {
+            value,
+            border: "thin"
+        };
+    }
+    function taskCell(task, value, horizontalAlign = "left") {
+        if (value === undefined || value === "") {
+            return {};
+        }
+        return {
+            value,
+            border: "thin",
+            horizontalAlign,
+            bold: task.summary || task.milestone || false,
+            fillColor: task.summary ? PHASE_FILL : (task.milestone ? MILESTONE_FILL : undefined)
+        };
+    }
+    function dateHeaderCell(day, currentDate, holidaySet) {
+        const isToday = isSameDay(day, currentDate);
+        const isWeekendDay = isWeekend(day);
+        const isHoliday = holidaySet.has(day);
+        return {
+            value: formatDateLabel(day),
+            bold: true,
+            border: "thin",
+            horizontalAlign: "center",
+            fillColor: isToday ? TODAY_BAND_FILL : (isHoliday ? HOLIDAY_BAND_FILL : (isWeekendDay ? WEEKEND_BAND_FILL : HEADER_FILL))
+        };
+    }
+    function dateBandCell(task, day, currentDate, holidaySet) {
+        const active = includesDay(task.start, task.finish, day);
+        const isToday = isSameDay(day, currentDate);
+        const isWeekendDay = isWeekend(day);
+        const isHoliday = holidaySet.has(day);
+        const complete = active && isCompletedDay(task, day);
+        return {
+            value: active ? "■" : "",
+            border: "thin",
+            horizontalAlign: "center",
+            fillColor: active
+                ? (complete
+                    ? (isToday ? TODAY_PROGRESS_BAND_FILL : PROGRESS_BAND_FILL)
+                    : (isToday ? TODAY_ACTIVE_BAND_FILL : ACTIVE_BAND_FILL))
+                : (isToday ? TODAY_BAND_FILL : (isHoliday ? HOLIDAY_BAND_FILL : (isWeekendDay ? WEEKEND_BAND_FILL : BAND_FILL)))
+        };
+    }
+    function buildDateBand(startDate, finishDate) {
+        const start = parseDateOnly(startDate);
+        const finish = parseDateOnly(finishDate);
+        if (!start || !finish || start.getTime() > finish.getTime()) {
+            return [];
+        }
+        const days = [];
+        const cursor = new Date(start.getTime());
+        while (cursor.getTime() <= finish.getTime()) {
+            days.push(formatDateOnly(cursor));
+            cursor.setDate(cursor.getDate() + 1);
+        }
+        return days;
+    }
+    function includesDay(startDate, finishDate, day) {
+        const start = parseDateOnly(startDate);
+        const finish = parseDateOnly(finishDate);
+        const target = parseDateOnly(day);
+        if (!start || !finish || !target) {
+            return false;
+        }
+        return start.getTime() <= target.getTime() && target.getTime() <= finish.getTime();
+    }
+    function isCompletedDay(task, day) {
+        const start = parseDateOnly(task.start);
+        const finish = parseDateOnly(task.finish);
+        const target = parseDateOnly(day);
+        if (!start || !finish || !target) {
+            return false;
+        }
+        const totalDays = Math.floor((finish.getTime() - start.getTime()) / 86400000) + 1;
+        if (totalDays <= 0) {
+            return false;
+        }
+        const percent = Math.max(0, Math.min(100, task.percentComplete || 0));
+        const completedDays = Math.floor(totalDays * (percent / 100));
+        const dayIndex = Math.floor((target.getTime() - start.getTime()) / 86400000);
+        return dayIndex >= 0 && dayIndex < completedDays;
+    }
+    function isSameDay(day, other) {
+        return day === (other || "").slice(0, 10);
+    }
+    function isWeekend(day) {
+        const target = parseDateOnly(day);
+        if (!target) {
+            return false;
+        }
+        const weekday = target.getDay();
+        return weekday === 0 || weekday === 6;
+    }
+    function parseDateOnly(value) {
+        if (!value || value.length < 10) {
+            return null;
+        }
+        const dateOnly = value.slice(0, 10);
+        const [yearText, monthText, dayText] = dateOnly.split("-");
+        const year = Number(yearText);
+        const month = Number(monthText);
+        const day = Number(dayText);
+        if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) {
+            return null;
+        }
+        return new Date(year, month - 1, day);
+    }
+    function formatDateOnly(value) {
+        return [
+            value.getFullYear(),
+            String(value.getMonth() + 1).padStart(2, "0"),
+            String(value.getDate()).padStart(2, "0")
+        ].join("-");
+    }
+    function formatDateLabel(day) {
+        const target = parseDateOnly(day);
+        if (!target) {
+            return day;
+        }
+        const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        return `${String(target.getMonth() + 1).padStart(2, "0")}/${String(target.getDate()).padStart(2, "0")} ${weekdays[target.getDay()]}`;
+    }
+    function columnName(index) {
+        let current = index;
+        let name = "";
+        while (current > 0) {
+            const remainder = (current - 1) % 26;
+            name = String.fromCharCode(65 + remainder) + name;
+            current = Math.floor((current - 1) / 26);
+        }
+        return name;
+    }
+    globalThis.__mikuprojectWbsXlsx = {
+        exportWbsWorkbook
+    };
+})();
+  </script>
+
+  <script>
+(() => {
     const mikuprojectXml = globalThis.__mikuprojectXml;
     if (!mikuprojectXml) {
         throw new Error("mikuproject XML module is not loaded");
+    }
+    const mikuprojectExcelIo = globalThis.__mikuprojectExcelIo;
+    if (!mikuprojectExcelIo) {
+        throw new Error("mikuproject Excel IO module is not loaded");
+    }
+    const mikuprojectProjectXlsx = globalThis.__mikuprojectProjectXlsx;
+    if (!mikuprojectProjectXlsx) {
+        throw new Error("mikuproject Project XLSX module is not loaded");
+    }
+    const mikuprojectWbsXlsx = globalThis.__mikuprojectWbsXlsx;
+    if (!mikuprojectWbsXlsx) {
+        throw new Error("mikuproject WBS XLSX module is not loaded");
     }
     const mermaidApi = globalThis.mermaid;
     let currentModel = null;
     let currentMermaidSvg = "";
     let mermaidRenderCount = 0;
+    let lastSavedXmlText = "";
+    let lastSavedXmlStamp = "";
     function getElement(id) {
         const element = document.getElementById(id);
         if (!element) {
@@ -7828,6 +9805,31 @@ if (!customElements.get("lht-page-menu")) {
     }
     function getTextArea(id) {
         return getElement(id);
+    }
+    function parseWbsHolidayDates() {
+        const raw = getTextArea("wbsHolidayDatesInput").value.trim();
+        if (!raw) {
+            return [];
+        }
+        const seen = new Set();
+        const holidays = [];
+        for (const token of raw.split(/[\s,、;]+/)) {
+            const value = token.trim();
+            if (!value) {
+                continue;
+            }
+            const match = value.match(/^(\d{4}-\d{2}-\d{2})/);
+            if (!match) {
+                continue;
+            }
+            const dateText = match[1];
+            if (seen.has(dateText)) {
+                continue;
+            }
+            seen.add(dateText);
+            holidays.push(dateText);
+        }
+        return holidays;
     }
     function showToast(message) {
         const toast = document.getElementById("toast");
@@ -7911,6 +9913,35 @@ if (!customElements.get("lht-page-menu")) {
     }
     function setStatus(message) {
         getElement("statusMessage").textContent = message;
+    }
+    function formatSaveStamp(date) {
+        return [
+            date.getFullYear(),
+            String(date.getMonth() + 1).padStart(2, "0"),
+            String(date.getDate()).padStart(2, "0")
+        ].join("-") + " " + [
+            String(date.getHours()).padStart(2, "0"),
+            String(date.getMinutes()).padStart(2, "0")
+        ].join(":");
+    }
+    function updateXmlSaveState(isDirty) {
+        const node = getElement("xmlSaveState");
+        node.textContent = isDirty
+            ? "XML 保存状態: 未保存"
+            : `XML 保存状態: 保存済み (${lastSavedXmlStamp || "-"})`;
+        node.classList.toggle("md-save-state--dirty", isDirty);
+        node.classList.toggle("md-save-state--clean", !isDirty);
+    }
+    function markXmlDirty() {
+        updateXmlSaveState(true);
+    }
+    function markXmlSavedCurrent() {
+        lastSavedXmlText = getTextArea("xmlInput").value;
+        lastSavedXmlStamp = formatSaveStamp(new Date());
+        updateXmlSaveState(false);
+    }
+    function refreshXmlSaveState() {
+        updateXmlSaveState(getTextArea("xmlInput").value !== lastSavedXmlText);
     }
     function renderPreviewList(containerId, items) {
         const container = getElement(containerId);
@@ -8019,9 +10050,12 @@ if (!customElements.get("lht-page-menu")) {
     }
     function renderValidationIssues(issues) {
         const container = getElement("validationIssues");
+        const label = container.previousElementSibling;
         if (issues.length === 0) {
             container.classList.add("md-hidden");
             container.innerHTML = "";
+            label === null || label === void 0 ? void 0 : label.classList.add("md-hidden");
+            updateFeedbackVisibility();
             return;
         }
         const sections = ["project", "tasks", "resources", "assignments", "calendars"];
@@ -8033,6 +10067,7 @@ if (!customElements.get("lht-page-menu")) {
             calendars: "Calendars"
         };
         container.classList.remove("md-hidden");
+        label === null || label === void 0 ? void 0 : label.classList.remove("md-hidden");
         container.innerHTML = `
       <div class="md-issues__title">検証メッセージ</div>
       ${sections
@@ -8052,6 +10087,115 @@ if (!customElements.get("lht-page-menu")) {
         })
             .join("")}
     `;
+        updateFeedbackVisibility();
+    }
+    function renderXlsxImportSummary(changes) {
+        const container = getElement("xlsxImportSummary");
+        const label = container.previousElementSibling;
+        if (changes.length === 0) {
+            container.classList.add("md-hidden");
+            container.innerHTML = "";
+            label === null || label === void 0 ? void 0 : label.classList.add("md-hidden");
+            updateFeedbackVisibility();
+            return;
+        }
+        const scopeLabel = {
+            project: "Project",
+            tasks: "Tasks",
+            resources: "Resources",
+            assignments: "Assignments",
+            calendars: "Calendars"
+        };
+        const scopeCounts = {
+            project: 0,
+            tasks: 0,
+            resources: 0,
+            assignments: 0,
+            calendars: 0
+        };
+        const groupedByScope = new Map();
+        const groupedChanges = new Map();
+        for (const change of changes) {
+            const groupKey = `${change.scope}:${change.uid}:${change.label}`;
+            const currentGroup = groupedChanges.get(groupKey);
+            if (currentGroup) {
+                currentGroup.items.push({
+                    field: change.field,
+                    before: change.before,
+                    after: change.after
+                });
+                continue;
+            }
+            groupedChanges.set(groupKey, {
+                scope: change.scope,
+                uid: change.uid,
+                label: change.label,
+                items: [{
+                        field: change.field,
+                        before: change.before,
+                        after: change.after
+                    }]
+            });
+            scopeCounts[change.scope] += 1;
+        }
+        for (const group of groupedChanges.values()) {
+            const scopedGroups = groupedByScope.get(group.scope) || [];
+            scopedGroups.push({
+                uid: group.uid,
+                label: group.label,
+                items: group.items
+            });
+            groupedByScope.set(group.scope, scopedGroups);
+        }
+        const changedScopes = ["project", "tasks", "resources", "assignments", "calendars"].filter((scope) => scopeCounts[scope] > 0);
+        const unchangedScopes = ["project", "tasks", "resources", "assignments", "calendars"].filter((scope) => scopeCounts[scope] === 0);
+        container.classList.remove("md-hidden");
+        label === null || label === void 0 ? void 0 : label.classList.remove("md-hidden");
+        container.innerHTML = `
+      <div class="md-xlsx-summary__title">XLSX Import 反映結果</div>
+      <div class="md-xlsx-summary__counts">
+        ${changedScopes.map((scope) => `<span class="md-xlsx-summary__count">${scopeLabel[scope]} ${scopeCounts[scope]}</span>`).join("")}
+      </div>
+      ${unchangedScopes.length > 0 ? `<div class="md-xlsx-summary__unchanged">変更なし: ${unchangedScopes.map((scope) => scopeLabel[scope]).join(", ")}</div>` : ""}
+      ${changedScopes.map((scope) => `
+        <div class="md-xlsx-summary__section">
+          <div class="md-xlsx-summary__section-title">${scopeLabel[scope]}</div>
+          <ul class="md-xlsx-summary__list">
+            ${(groupedByScope.get(scope) || []).map((group) => `
+              <li class="md-xlsx-summary__item">
+                <div class="md-xlsx-summary__item-title">UID=${group.uid} ${escapeHtml(group.label)}</div>
+                <div class="md-xlsx-summary__item-body">
+                  ${group.items.map((item) => `${escapeHtml(item.field)}: ${escapeHtml(formatChangeValue(item.before))} -> ${escapeHtml(formatChangeValue(item.after))}`).join(" / ")}
+                </div>
+              </li>
+            `).join("")}
+          </ul>
+        </div>
+      `).join("")}
+      <div class="md-xlsx-summary__hint">反映後の XML は更新済みです。必要なら XML Export で保存できます。</div>
+    `;
+        updateFeedbackVisibility();
+    }
+    function updateFeedbackVisibility() {
+        const stack = document.querySelector(".md-feedback-stack");
+        const validationIssues = getElement("validationIssues");
+        const xlsxImportSummary = getElement("xlsxImportSummary");
+        const shouldShow = !validationIssues.classList.contains("md-hidden") || !xlsxImportSummary.classList.contains("md-hidden");
+        stack === null || stack === void 0 ? void 0 : stack.classList.toggle("md-hidden", !shouldShow);
+    }
+    function formatChangeValue(value) {
+        if (value === undefined) {
+            return "(empty)";
+        }
+        return String(value);
+    }
+    function escapeHtml(value) {
+        return value
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
     }
     function updateSummary(model) {
         getElement("summaryProjectName").textContent = (model === null || model === void 0 ? void 0 : model.project.name) || "-";
@@ -8128,6 +10272,7 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     }
     function loadSample() {
         getTextArea("xmlInput").value = mikuprojectXml.SAMPLE_XML;
+        markXmlDirty();
         setStatus("サンプル XML を読み込みました");
     }
     async function importXmlFromFile(file) {
@@ -8136,12 +10281,25 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
         }
         const xmlText = await file.text();
         getTextArea("xmlInput").value = xmlText;
+        markXmlDirty();
         currentModel = mikuprojectXml.importMsProjectXml(xmlText);
         const issues = mikuprojectXml.validateProjectModel(currentModel);
         updateSummary(currentModel);
         renderValidationIssues(issues);
+        renderXlsxImportSummary([]);
         setStatus(issues.length > 0 ? `XML ファイルを読み込んで解析しました。検証で ${issues.length} 件の問題があります` : "XML ファイルを読み込んで解析しました");
         showToast("XML を読み込んで解析しました");
+    }
+    function ensureCurrentModel() {
+        if (currentModel) {
+            return currentModel;
+        }
+        const xmlText = getTextArea("xmlInput").value.trim();
+        if (!xmlText) {
+            throw new Error("内部モデルがありません");
+        }
+        currentModel = mikuprojectXml.importMsProjectXml(xmlText);
+        return currentModel;
     }
     function parseCurrentXml() {
         const xmlText = getTextArea("xmlInput").value.trim();
@@ -8153,6 +10311,7 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
         const issues = mikuprojectXml.validateProjectModel(currentModel);
         updateSummary(currentModel);
         renderValidationIssues(issues);
+        renderXlsxImportSummary([]);
         setStatus(issues.length > 0 ? `XML を解析しました。検証で ${issues.length} 件の問題があります` : "XML を内部モデルへ変換しました");
         showToast("XML を解析しました");
     }
@@ -8162,7 +10321,9 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
             return;
         }
         getTextArea("xmlInput").value = mikuprojectXml.exportMsProjectXml(currentModel);
+        markXmlDirty();
         renderValidationIssues([]);
+        renderXlsxImportSummary([]);
         setStatus("内部モデルから XML を再生成しました");
         showToast("XML を再生成しました");
     }
@@ -8186,6 +10347,65 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
         setStatus("内部モデルから CSV + ParentID を生成しました");
         showToast("CSV を生成しました");
     }
+    function exportCurrentXlsx() {
+        const model = ensureCurrentModel();
+        const workbook = mikuprojectProjectXlsx.exportProjectWorkbook(model);
+        const codec = new mikuprojectExcelIo.XlsxWorkbookCodec();
+        const bytes = codec.exportWorkbook(workbook);
+        const now = new Date();
+        const stamp = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, "0"),
+            String(now.getDate()).padStart(2, "0"),
+            String(now.getHours()).padStart(2, "0"),
+            String(now.getMinutes()).padStart(2, "0")
+        ].join("");
+        downloadBlob(new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), `mikuproject-export-${stamp}.xlsx`);
+        setStatus("XLSX ファイルをエクスポートしました");
+        showToast("XLSX を保存しました");
+    }
+    function exportCurrentWbsXlsx() {
+        const model = ensureCurrentModel();
+        const holidayDates = parseWbsHolidayDates();
+        const workbook = mikuprojectWbsXlsx.exportWbsWorkbook(model, { holidayDates });
+        const codec = new mikuprojectExcelIo.XlsxWorkbookCodec();
+        const bytes = codec.exportWorkbook(workbook);
+        const now = new Date();
+        const stamp = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, "0"),
+            String(now.getDate()).padStart(2, "0"),
+            String(now.getHours()).padStart(2, "0"),
+            String(now.getMinutes()).padStart(2, "0")
+        ].join("");
+        downloadBlob(new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), `mikuproject-wbs-${stamp}.xlsx`);
+        setStatus(`WBS XLSX ファイルをエクスポートしました${holidayDates.length > 0 ? ` (祝日 ${holidayDates.length} 件)` : ""}`);
+        showToast("WBS XLSX を保存しました");
+    }
+    async function importXlsxFromFile(file) {
+        if (!file) {
+            return;
+        }
+        const baseModel = ensureCurrentModel();
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const codec = new mikuprojectExcelIo.XlsxWorkbookCodec();
+        const workbook = codec.importWorkbook(bytes);
+        const result = mikuprojectProjectXlsx.importProjectWorkbookDetailed(workbook, baseModel);
+        currentModel = result.model;
+        const issues = mikuprojectXml.validateProjectModel(currentModel);
+        updateSummary(currentModel);
+        renderValidationIssues(issues);
+        renderXlsxImportSummary(result.changes);
+        if (result.changes.length > 0) {
+            getTextArea("xmlInput").value = mikuprojectXml.exportMsProjectXml(currentModel);
+            markXmlDirty();
+        }
+        const summaryText = result.changes.length > 0
+            ? `XLSX を読み込んで ${result.changes.length} 件の変更を反映しました。XML は再生成済みで、必要なら XML Export で保存できます`
+            : "XLSX に反映対象の変更はありませんでした。XML は未変更です";
+        setStatus(issues.length > 0 ? `${summaryText}。検証で ${issues.length} 件の問題があります` : summaryText);
+        showToast("XLSX を反映しました");
+    }
     function parseCurrentCsv() {
         const csvText = getTextArea("csvInput").value.trim();
         if (!csvText) {
@@ -8196,6 +10416,7 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
         const issues = mikuprojectXml.validateProjectModel(currentModel);
         updateSummary(currentModel);
         renderValidationIssues(issues);
+        renderXlsxImportSummary([]);
         setStatus(issues.length > 0 ? `CSV を解析しました。検証で ${issues.length} 件の問題があります` : "CSV + ParentID を内部モデルへ変換しました");
         showToast("CSV を解析しました");
     }
@@ -8222,6 +10443,7 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
         link.click();
         document.body.removeChild(link);
         window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+        markXmlSavedCurrent();
         setStatus("XML ファイルをエクスポートしました");
         showToast("XML を保存しました");
     }
@@ -8298,6 +10520,22 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
                 setStatus(error instanceof Error ? error.message : "CSV 生成に失敗しました");
             }
         });
+        getElement("exportXlsxBtn").addEventListener("click", () => {
+            try {
+                exportCurrentXlsx();
+            }
+            catch (error) {
+                setStatus(error instanceof Error ? error.message : "XLSX エクスポートに失敗しました");
+            }
+        });
+        getElement("exportWbsXlsxBtn").addEventListener("click", () => {
+            try {
+                exportCurrentWbsXlsx();
+            }
+            catch (error) {
+                setStatus(error instanceof Error ? error.message : "WBS XLSX エクスポートに失敗しました");
+            }
+        });
         getElement("parseCsvBtn").addEventListener("click", () => {
             try {
                 parseCurrentCsv();
@@ -8305,6 +10543,9 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
             catch (error) {
                 setStatus(error instanceof Error ? error.message : "CSV 解析に失敗しました");
             }
+        });
+        getElement("importXlsxBtn").addEventListener("click", () => {
+            getElement("importXlsxInput").click();
         });
         getElement("downloadXmlBtn").addEventListener("click", () => {
             try {
@@ -8337,11 +10578,30 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
                 }
             }
         });
+        getElement("importXlsxInput").addEventListener("change", async (event) => {
+            const input = event.target;
+            const file = (input === null || input === void 0 ? void 0 : input.files) && input.files[0];
+            try {
+                await importXlsxFromFile(file);
+            }
+            catch (error) {
+                setStatus(error instanceof Error ? error.message : "XLSX 読み込みに失敗しました");
+            }
+            finally {
+                if (input) {
+                    input.value = "";
+                }
+            }
+        });
+        getTextArea("xmlInput").addEventListener("input", () => {
+            refreshXmlSaveState();
+        });
     }
     function initialize() {
         bindEvents();
         updateSummary(null);
         renderValidationIssues([]);
+        renderXlsxImportSummary([]);
         updateMermaidSvgButton();
         clearMermaidError();
         loadSample();

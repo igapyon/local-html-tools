@@ -16,6 +16,51 @@
     throw new Error("mikuproject XML module is not loaded");
   }
 
+  const mikuprojectExcelIo = (globalThis as typeof globalThis & {
+    __mikuprojectExcelIo?: {
+      XlsxWorkbookCodec: new () => {
+        exportWorkbook: (workbook: unknown) => Uint8Array;
+        importWorkbook: (bytes: Uint8Array) => unknown;
+      };
+    };
+  }).__mikuprojectExcelIo;
+
+  if (!mikuprojectExcelIo) {
+    throw new Error("mikuproject Excel IO module is not loaded");
+  }
+
+  const mikuprojectProjectXlsx = (globalThis as typeof globalThis & {
+    __mikuprojectProjectXlsx?: {
+      exportProjectWorkbook: (model: ProjectModel) => unknown;
+      importProjectWorkbook: (workbook: unknown, baseModel: ProjectModel) => ProjectModel;
+      importProjectWorkbookDetailed: (workbook: unknown, baseModel: ProjectModel) => {
+        model: ProjectModel;
+        changes: Array<{
+          scope: "project" | "tasks" | "resources" | "assignments" | "calendars";
+          uid: string;
+          label: string;
+          field: string;
+          before: string | number | boolean | undefined;
+          after: string | number | boolean;
+        }>;
+      };
+    };
+  }).__mikuprojectProjectXlsx;
+
+  if (!mikuprojectProjectXlsx) {
+    throw new Error("mikuproject Project XLSX module is not loaded");
+  }
+
+  const mikuprojectWbsXlsx = (globalThis as typeof globalThis & {
+    __mikuprojectWbsXlsx?: {
+      exportWbsWorkbook: (model: ProjectModel, options?: { holidayDates?: string[] }) => unknown;
+    };
+  }).__mikuprojectWbsXlsx;
+
+  if (!mikuprojectWbsXlsx) {
+    throw new Error("mikuproject WBS XLSX module is not loaded");
+  }
+
   const mermaidApi = (globalThis as typeof globalThis & {
     mermaid?: {
       initialize: (config: Record<string, unknown>) => void;
@@ -26,6 +71,8 @@
   let currentModel: ProjectModel | null = null;
   let currentMermaidSvg = "";
   let mermaidRenderCount = 0;
+  let lastSavedXmlText = "";
+  let lastSavedXmlStamp = "";
 
   function getElement<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);
@@ -37,6 +84,32 @@
 
   function getTextArea(id: string): HTMLTextAreaElement {
     return getElement<HTMLTextAreaElement>(id);
+  }
+
+  function parseWbsHolidayDates(): string[] {
+    const raw = getTextArea("wbsHolidayDatesInput").value.trim();
+    if (!raw) {
+      return [];
+    }
+    const seen = new Set<string>();
+    const holidays: string[] = [];
+    for (const token of raw.split(/[\s,、;]+/)) {
+      const value = token.trim();
+      if (!value) {
+        continue;
+      }
+      const match = value.match(/^(\d{4}-\d{2}-\d{2})/);
+      if (!match) {
+        continue;
+      }
+      const dateText = match[1];
+      if (seen.has(dateText)) {
+        continue;
+      }
+      seen.add(dateText);
+      holidays.push(dateText);
+    }
+    return holidays;
   }
 
   function showToast(message: string): void {
@@ -131,6 +204,40 @@
 
   function setStatus(message: string): void {
     getElement<HTMLElement>("statusMessage").textContent = message;
+  }
+
+  function formatSaveStamp(date: Date): string {
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0")
+    ].join("-") + " " + [
+      String(date.getHours()).padStart(2, "0"),
+      String(date.getMinutes()).padStart(2, "0")
+    ].join(":");
+  }
+
+  function updateXmlSaveState(isDirty: boolean): void {
+    const node = getElement<HTMLElement>("xmlSaveState");
+    node.textContent = isDirty
+      ? "XML 保存状態: 未保存"
+      : `XML 保存状態: 保存済み (${lastSavedXmlStamp || "-"})`;
+    node.classList.toggle("md-save-state--dirty", isDirty);
+    node.classList.toggle("md-save-state--clean", !isDirty);
+  }
+
+  function markXmlDirty(): void {
+    updateXmlSaveState(true);
+  }
+
+  function markXmlSavedCurrent(): void {
+    lastSavedXmlText = getTextArea("xmlInput").value;
+    lastSavedXmlStamp = formatSaveStamp(new Date());
+    updateXmlSaveState(false);
+  }
+
+  function refreshXmlSaveState(): void {
+    updateXmlSaveState(getTextArea("xmlInput").value !== lastSavedXmlText);
   }
 
   function renderPreviewList(containerId: string, items: string[]): void {
@@ -251,9 +358,12 @@
 
   function renderValidationIssues(issues: ValidationIssue[]): void {
     const container = getElement<HTMLElement>("validationIssues");
+    const label = container.previousElementSibling as HTMLElement | null;
     if (issues.length === 0) {
       container.classList.add("md-hidden");
       container.innerHTML = "";
+      label?.classList.add("md-hidden");
+      updateFeedbackVisibility();
       return;
     }
     const sections: ValidationIssue["scope"][] = ["project", "tasks", "resources", "assignments", "calendars"];
@@ -265,6 +375,7 @@
       calendars: "Calendars"
     };
     container.classList.remove("md-hidden");
+    label?.classList.remove("md-hidden");
     container.innerHTML = `
       <div class="md-issues__title">検証メッセージ</div>
       ${sections
@@ -284,6 +395,143 @@
         })
         .join("")}
     `;
+    updateFeedbackVisibility();
+  }
+
+  function renderXlsxImportSummary(changes: Array<{
+    scope: "project" | "tasks" | "resources" | "assignments" | "calendars";
+    uid: string;
+    label: string;
+    field: string;
+    before: string | number | boolean | undefined;
+    after: string | number | boolean;
+  }>): void {
+    const container = getElement<HTMLElement>("xlsxImportSummary");
+    const label = container.previousElementSibling as HTMLElement | null;
+    if (changes.length === 0) {
+      container.classList.add("md-hidden");
+      container.innerHTML = "";
+      label?.classList.add("md-hidden");
+      updateFeedbackVisibility();
+      return;
+    }
+    const scopeLabel: Record<"project" | "tasks" | "resources" | "assignments" | "calendars", string> = {
+      project: "Project",
+      tasks: "Tasks",
+      resources: "Resources",
+      assignments: "Assignments",
+      calendars: "Calendars"
+    };
+    const scopeCounts: Record<"project" | "tasks" | "resources" | "assignments" | "calendars", number> = {
+      project: 0,
+      tasks: 0,
+      resources: 0,
+      assignments: 0,
+      calendars: 0
+    };
+    const groupedByScope = new Map<"project" | "tasks" | "resources" | "assignments" | "calendars", Array<{
+      uid: string;
+      label: string;
+      items: Array<{
+        field: string;
+        before: string | number | boolean | undefined;
+        after: string | number | boolean;
+      }>;
+    }>>();
+    const groupedChanges = new Map<string, {
+      scope: "project" | "tasks" | "resources" | "assignments" | "calendars";
+      uid: string;
+      label: string;
+      items: Array<{
+        field: string;
+        before: string | number | boolean | undefined;
+        after: string | number | boolean;
+      }>;
+    }>();
+    for (const change of changes) {
+      const groupKey = `${change.scope}:${change.uid}:${change.label}`;
+      const currentGroup = groupedChanges.get(groupKey);
+      if (currentGroup) {
+        currentGroup.items.push({
+          field: change.field,
+          before: change.before,
+          after: change.after
+        });
+        continue;
+      }
+      groupedChanges.set(groupKey, {
+        scope: change.scope,
+        uid: change.uid,
+        label: change.label,
+        items: [{
+          field: change.field,
+          before: change.before,
+          after: change.after
+        }]
+      });
+      scopeCounts[change.scope] += 1;
+    }
+    for (const group of groupedChanges.values()) {
+      const scopedGroups = groupedByScope.get(group.scope) || [];
+      scopedGroups.push({
+        uid: group.uid,
+        label: group.label,
+        items: group.items
+      });
+      groupedByScope.set(group.scope, scopedGroups);
+    }
+    const changedScopes = (["project", "tasks", "resources", "assignments", "calendars"] as const).filter((scope) => scopeCounts[scope] > 0);
+    const unchangedScopes = (["project", "tasks", "resources", "assignments", "calendars"] as const).filter((scope) => scopeCounts[scope] === 0);
+    container.classList.remove("md-hidden");
+    label?.classList.remove("md-hidden");
+    container.innerHTML = `
+      <div class="md-xlsx-summary__title">XLSX Import 反映結果</div>
+      <div class="md-xlsx-summary__counts">
+        ${changedScopes.map((scope) => `<span class="md-xlsx-summary__count">${scopeLabel[scope]} ${scopeCounts[scope]}</span>`).join("")}
+      </div>
+      ${unchangedScopes.length > 0 ? `<div class="md-xlsx-summary__unchanged">変更なし: ${unchangedScopes.map((scope) => scopeLabel[scope]).join(", ")}</div>` : ""}
+      ${changedScopes.map((scope) => `
+        <div class="md-xlsx-summary__section">
+          <div class="md-xlsx-summary__section-title">${scopeLabel[scope]}</div>
+          <ul class="md-xlsx-summary__list">
+            ${(groupedByScope.get(scope) || []).map((group) => `
+              <li class="md-xlsx-summary__item">
+                <div class="md-xlsx-summary__item-title">UID=${group.uid} ${escapeHtml(group.label)}</div>
+                <div class="md-xlsx-summary__item-body">
+                  ${group.items.map((item) => `${escapeHtml(item.field)}: ${escapeHtml(formatChangeValue(item.before))} -> ${escapeHtml(formatChangeValue(item.after))}`).join(" / ")}
+                </div>
+              </li>
+            `).join("")}
+          </ul>
+        </div>
+      `).join("")}
+      <div class="md-xlsx-summary__hint">反映後の XML は更新済みです。必要なら XML Export で保存できます。</div>
+    `;
+    updateFeedbackVisibility();
+  }
+
+  function updateFeedbackVisibility(): void {
+    const stack = document.querySelector<HTMLElement>(".md-feedback-stack");
+    const validationIssues = getElement<HTMLElement>("validationIssues");
+    const xlsxImportSummary = getElement<HTMLElement>("xlsxImportSummary");
+    const shouldShow = !validationIssues.classList.contains("md-hidden") || !xlsxImportSummary.classList.contains("md-hidden");
+    stack?.classList.toggle("md-hidden", !shouldShow);
+  }
+
+  function formatChangeValue(value: string | number | boolean | undefined): string {
+    if (value === undefined) {
+      return "(empty)";
+    }
+    return String(value);
+  }
+
+  function escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function updateSummary(model: ProjectModel | null): void {
@@ -362,6 +610,7 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
 
   function loadSample(): void {
     getTextArea("xmlInput").value = mikuprojectXml.SAMPLE_XML;
+    markXmlDirty();
     setStatus("サンプル XML を読み込みました");
   }
 
@@ -371,12 +620,26 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     }
     const xmlText = await file.text();
     getTextArea("xmlInput").value = xmlText;
+    markXmlDirty();
     currentModel = mikuprojectXml.importMsProjectXml(xmlText);
     const issues = mikuprojectXml.validateProjectModel(currentModel);
     updateSummary(currentModel);
     renderValidationIssues(issues);
+    renderXlsxImportSummary([]);
     setStatus(issues.length > 0 ? `XML ファイルを読み込んで解析しました。検証で ${issues.length} 件の問題があります` : "XML ファイルを読み込んで解析しました");
     showToast("XML を読み込んで解析しました");
+  }
+
+  function ensureCurrentModel(): ProjectModel {
+    if (currentModel) {
+      return currentModel;
+    }
+    const xmlText = getTextArea("xmlInput").value.trim();
+    if (!xmlText) {
+      throw new Error("内部モデルがありません");
+    }
+    currentModel = mikuprojectXml.importMsProjectXml(xmlText);
+    return currentModel;
   }
 
   function parseCurrentXml(): void {
@@ -389,6 +652,7 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     const issues = mikuprojectXml.validateProjectModel(currentModel);
     updateSummary(currentModel);
     renderValidationIssues(issues);
+    renderXlsxImportSummary([]);
     setStatus(issues.length > 0 ? `XML を解析しました。検証で ${issues.length} 件の問題があります` : "XML を内部モデルへ変換しました");
     showToast("XML を解析しました");
   }
@@ -399,7 +663,9 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
       return;
     }
     getTextArea("xmlInput").value = mikuprojectXml.exportMsProjectXml(currentModel);
+    markXmlDirty();
     renderValidationIssues([]);
+    renderXlsxImportSummary([]);
     setStatus("内部モデルから XML を再生成しました");
     showToast("XML を再生成しました");
   }
@@ -426,6 +692,74 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     showToast("CSV を生成しました");
   }
 
+  function exportCurrentXlsx(): void {
+    const model = ensureCurrentModel();
+    const workbook = mikuprojectProjectXlsx.exportProjectWorkbook(model);
+    const codec = new mikuprojectExcelIo.XlsxWorkbookCodec();
+    const bytes = codec.exportWorkbook(workbook);
+    const now = new Date();
+    const stamp = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+      String(now.getHours()).padStart(2, "0"),
+      String(now.getMinutes()).padStart(2, "0")
+    ].join("");
+    downloadBlob(
+      new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
+      `mikuproject-export-${stamp}.xlsx`
+    );
+    setStatus("XLSX ファイルをエクスポートしました");
+    showToast("XLSX を保存しました");
+  }
+
+  function exportCurrentWbsXlsx(): void {
+    const model = ensureCurrentModel();
+    const holidayDates = parseWbsHolidayDates();
+    const workbook = mikuprojectWbsXlsx.exportWbsWorkbook(model, { holidayDates });
+    const codec = new mikuprojectExcelIo.XlsxWorkbookCodec();
+    const bytes = codec.exportWorkbook(workbook);
+    const now = new Date();
+    const stamp = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+      String(now.getHours()).padStart(2, "0"),
+      String(now.getMinutes()).padStart(2, "0")
+    ].join("");
+    downloadBlob(
+      new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
+      `mikuproject-wbs-${stamp}.xlsx`
+    );
+    setStatus(`WBS XLSX ファイルをエクスポートしました${holidayDates.length > 0 ? ` (祝日 ${holidayDates.length} 件)` : ""}`);
+    showToast("WBS XLSX を保存しました");
+  }
+
+  async function importXlsxFromFile(file: File | null | undefined): Promise<void> {
+    if (!file) {
+      return;
+    }
+    const baseModel = ensureCurrentModel();
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const codec = new mikuprojectExcelIo.XlsxWorkbookCodec();
+    const workbook = codec.importWorkbook(bytes);
+    const result = mikuprojectProjectXlsx.importProjectWorkbookDetailed(workbook, baseModel);
+    currentModel = result.model;
+    const issues = mikuprojectXml.validateProjectModel(currentModel);
+    updateSummary(currentModel);
+    renderValidationIssues(issues);
+    renderXlsxImportSummary(result.changes);
+    if (result.changes.length > 0) {
+      getTextArea("xmlInput").value = mikuprojectXml.exportMsProjectXml(currentModel);
+      markXmlDirty();
+    }
+    const summaryText = result.changes.length > 0
+      ? `XLSX を読み込んで ${result.changes.length} 件の変更を反映しました。XML は再生成済みで、必要なら XML Export で保存できます`
+      : "XLSX に反映対象の変更はありませんでした。XML は未変更です";
+    setStatus(issues.length > 0 ? `${summaryText}。検証で ${issues.length} 件の問題があります` : summaryText);
+    showToast("XLSX を反映しました");
+  }
+
   function parseCurrentCsv(): void {
     const csvText = getTextArea("csvInput").value.trim();
     if (!csvText) {
@@ -436,6 +770,7 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     const issues = mikuprojectXml.validateProjectModel(currentModel);
     updateSummary(currentModel);
     renderValidationIssues(issues);
+    renderXlsxImportSummary([]);
     setStatus(issues.length > 0 ? `CSV を解析しました。検証で ${issues.length} 件の問題があります` : "CSV + ParentID を内部モデルへ変換しました");
     showToast("CSV を解析しました");
   }
@@ -463,6 +798,7 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     link.click();
     document.body.removeChild(link);
     window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+    markXmlSavedCurrent();
     setStatus("XML ファイルをエクスポートしました");
     showToast("XML を保存しました");
   }
@@ -538,12 +874,29 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
         setStatus(error instanceof Error ? error.message : "CSV 生成に失敗しました");
       }
     });
+    getElement<HTMLButtonElement>("exportXlsxBtn").addEventListener("click", () => {
+      try {
+        exportCurrentXlsx();
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : "XLSX エクスポートに失敗しました");
+      }
+    });
+    getElement<HTMLButtonElement>("exportWbsXlsxBtn").addEventListener("click", () => {
+      try {
+        exportCurrentWbsXlsx();
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : "WBS XLSX エクスポートに失敗しました");
+      }
+    });
     getElement<HTMLButtonElement>("parseCsvBtn").addEventListener("click", () => {
       try {
         parseCurrentCsv();
       } catch (error) {
         setStatus(error instanceof Error ? error.message : "CSV 解析に失敗しました");
       }
+    });
+    getElement<HTMLButtonElement>("importXlsxBtn").addEventListener("click", () => {
+      getElement<HTMLInputElement>("importXlsxInput").click();
     });
     getElement<HTMLButtonElement>("downloadXmlBtn").addEventListener("click", () => {
       try {
@@ -572,12 +925,29 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
         }
       }
     });
+    getElement<HTMLInputElement>("importXlsxInput").addEventListener("change", async (event) => {
+      const input = event.target as HTMLInputElement | null;
+      const file = input?.files && input.files[0];
+      try {
+        await importXlsxFromFile(file);
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : "XLSX 読み込みに失敗しました");
+      } finally {
+        if (input) {
+          input.value = "";
+        }
+      }
+    });
+    getTextArea("xmlInput").addEventListener("input", () => {
+      refreshXmlSaveState();
+    });
   }
 
   function initialize(): void {
     bindEvents();
     updateSummary(null);
     renderValidationIssues([]);
+    renderXlsxImportSummary([]);
     updateMermaidSvgButton();
     clearMermaidError();
     loadSample();

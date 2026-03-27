@@ -15,6 +15,9 @@
 - このリポジトリ流儀の single-file web app とする
 - ローカルで動作する HTML ツールとして構築する
 - まずは UI よりも、MS Project XML の入出力と内部モデル化を優先する
+- `MS Project XML` を意味の基軸として扱う
+- 内部では `ProjectModel` を中立表現として扱う
+- `.xlsx` は確認・可視化・限定編集のための周辺表現として扱う
 - 仕様判断に迷った場合は、独自都合よりも `MS Project 仕様` に立ち返って判断する
 - `MS Project` 実機は未保有である
 
@@ -34,6 +37,62 @@ STEP 1 の目的は、`MS Project XML` を意味的に往復できる状態を�
 
 - 目標は「元の XML と完全一致」ではない
 - 目標は「意味的に往復できる」ことである
+
+## `.xlsx` の位置づけ
+
+`mikuproject` における `.xlsx` は、`MS Project XML` の代替正本ではない。
+
+- `MS Project XML` は意味の基軸
+- `ProjectModel` は内部の中立表現
+- `.xlsx` は確認・可視化・限定編集のための周辺表現
+
+したがって、`.xlsx` 対応は `MS Project XML` の仕様を置き換えるためではなく、`ProjectModel` を介した補助入出力として追加する。
+
+現時点で想定する経路は次のとおり。
+
+- `MS Project XML -> ProjectModel -> .xlsx`
+- `.xlsx -> ProjectModel -> MS Project XML`
+
+ただし、`.xlsx -> ProjectModel` は自由編集をそのまま受け入れるのではなく、編集可能な列を限定した部分更新として扱う。
+
+現時点の `.xlsx` 周りは、実装済みの限定 import/export として次のように整理できる。
+
+### 現状実装
+
+- 構造忠実な汎用 workbook export/import
+  - `Project / Tasks / Resources / Assignments / Calendars` を `ProjectModel` 構造に沿って扱う
+- 表示専用の `WBS` workbook export
+  - `Tasks` 中心の別 workbook として `.xlsx` 出力できる
+  - 現時点では export 専用であり、import は扱わない
+  - `WBS XLSX Export` では、`YYYY-MM-DD` 形式の祝日を UI から指定できる
+  - 指定した祝日は WBS 日付帯で祝日色として表示する
+  - sample 生成では、`Calendar.Exceptions` のうち `WorkingTimes` を持たない日付例外を祝日候補として WBS workbook へ反映する
+
+現時点で `XLSX Import` の反映対象としている列は次のとおり。
+
+- `Project`: `Name / Title / Author / Company / StartDate / FinishDate / CurrentDate / StatusDate / CalendarUID / MinutesPerDay / MinutesPerWeek / DaysPerMonth / ScheduleFromStart`
+- `Tasks`: `Name / Start / Finish / PercentComplete / PercentWorkComplete`
+- `Resources`: `Name / Group / MaxUnits`
+- `Assignments`: `Units / Work / PercentWorkComplete`
+- `Calendars`: `Name / IsBaseCalendar / BaseCalendarUID`
+
+一覧で見ると次のとおり。
+
+| Sheet | Editable Columns | Notes |
+| --- | --- | --- |
+| `Project` | `Name / Title / Author / Company / StartDate / FinishDate / CurrentDate / StatusDate / CalendarUID / MinutesPerDay / MinutesPerWeek / DaysPerMonth / ScheduleFromStart` | project 単位の部分更新として扱う |
+| `Tasks` | `Name / Start / Finish / PercentComplete / PercentWorkComplete` | `UID` をキーに部分更新する |
+| `Resources` | `Name / Group / MaxUnits` | `UID` をキーに部分更新する |
+| `Assignments` | `Units / Work / PercentWorkComplete` | `UID` をキーに部分更新する |
+| `Calendars` | `Name / IsBaseCalendar / BaseCalendarUID` | `UID` をキーに部分更新する |
+
+### 現時点で反映対象外のもの
+
+これ以外の列や、未対応シートの編集は、現在の `XLSX Import` では反映対象としない。特に `Calendars` では、`WeekDays / Exceptions / WorkWeeks` はまだ反映対象外とする。
+
+### UI 上の確認手段
+
+`XLSX Import` 後の validation では、`Calendars.BaseCalendarUID` が既存 Calendar を指していない場合や、自身を指している場合の warning も、差分要約と並べて確認できるようにする。
 
 ## STEP 1 の完了条件
 
@@ -64,6 +123,11 @@ preview / validation の現状メモ:
 注意:
 
 - これらは STEP 1 の主目的そのものではなく、意味的ラウンドトリップを確認しやすくするための補助機能である
+- `.xlsx` 表示や `.xlsx import/export` も、同様に確認と限定編集のための補助機能として扱う
+- `XLSX Import` の反映結果は、`Tasks / Resources / Assignments` ごとの件数と `UID` 単位の差分要約で確認できるようにする
+- `XLSX Import` 後も validation を走らせ、反映結果と検証メッセージを同時に確認できるようにする
+- validation では、`PercentComplete` の範囲外や `Start > Finish` のような編集結果も UI 上で追えるようにする
+- validation が残っていても、`XML Export` はその時点の XML をそのまま保存できるようにする
 
 ## STEP 1 の入力データ前提
 
@@ -257,6 +321,9 @@ STEP 1 では、MS Project XML のうち、次の情報を優先して扱う。
 ## STEP 1 で後回しにするもの
 
 STEP 1 では、次のようなものは後回し候補とする。
+
+- `.xlsx import` における自由編集の全面対応
+- `Calendars / Baseline / TimephasedData / ExtendedAttributes` の `.xlsx` 編集反映
 
 - 表示設定
 - UI レイアウト情報

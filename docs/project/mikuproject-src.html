@@ -32,14 +32,67 @@
         <button id="exportMermaidBtn" type="button" class="md-button md-button--surface">Mermaid を生成</button>
         <button id="downloadMermaidSvgBtn" type="button" class="md-button md-button--surface" disabled>SVG保存</button>
         <button id="exportCsvBtn" type="button" class="md-button md-button--surface">CSV を生成</button>
+        <button id="exportXlsxBtn" type="button" class="md-button md-button--surface">XLSX Export</button>
+        <button id="exportWbsXlsxBtn" type="button" class="md-button md-button--surface">WBS XLSX Export</button>
         <button id="parseCsvBtn" type="button" class="md-button md-button--surface">CSV を解析</button>
+        <button id="importXlsxBtn" type="button" class="md-button md-button--surface">XLSX Import</button>
         <button id="downloadXmlBtn" type="button" class="md-button md-button--surface">XML Export</button>
         <button id="roundTripBtn" type="button" class="md-button md-button--surface">再読込テスト</button>
         <input id="importXmlInput" type="file" accept=".xml,text/xml,application/xml" class="md-hidden" />
+        <input id="importXlsxInput" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="md-hidden" />
       </div>
 
       <div id="statusMessage" class="md-status">未実行</div>
-      <div id="validationIssues" class="md-issues md-hidden" aria-live="polite"></div>
+      <div id="xmlSaveState" class="md-save-state md-save-state--dirty" aria-live="polite">XML 保存状態: 未保存</div>
+      <div class="md-feedback-stack md-hidden" aria-label="import feedback">
+        <div class="md-feedback-stack__title">取込結果</div>
+        <div class="md-feedback-stack__text">XLSX Import 後は、ここで差分反映と検証結果を確認します。</div>
+        <div class="md-feedback-stack__label">検証メッセージ</div>
+        <div id="validationIssues" class="md-issues md-hidden" aria-live="polite"></div>
+        <div class="md-feedback-stack__label">差分要約</div>
+        <div id="xlsxImportSummary" class="md-xlsx-summary md-hidden" aria-live="polite"></div>
+      </div>
+
+      <section class="md-note-card" aria-label="XLSX import export notes">
+        <h3 class="md-note-card__title">XLSX 編集の扱い</h3>
+        <p class="md-note-card__text">
+          `.xlsx` は `MS Project XML` の代替正本ではなく、確認と限定編集のための周辺表現として扱います。
+        </p>
+        <p class="md-note-card__text">
+          現在の `XLSX Import` で反映するのは限定列のみです。
+        </p>
+        <p class="md-note-card__text">
+          反映結果は、`Project / Tasks / Resources / Assignments / Calendars` ごとの件数と、`UID` 単位の差分要約として画面上に表示します。
+        </p>
+        <p class="md-note-card__text"><strong>反映対象</strong></p>
+        <ul class="md-note-list">
+          <li>`Project`: `Name / Title / Author / Company / StartDate / FinishDate / CurrentDate / StatusDate / CalendarUID / MinutesPerDay / MinutesPerWeek / DaysPerMonth / ScheduleFromStart`</li>
+          <li>`Tasks`: `Name / Start / Finish / PercentComplete / PercentWorkComplete`</li>
+          <li>`Resources`: `Name / Group / MaxUnits`</li>
+          <li>`Assignments`: `Units / Work / PercentWorkComplete`</li>
+          <li>`Calendars`: `Name / IsBaseCalendar / BaseCalendarUID`</li>
+        </ul>
+        <p class="md-note-card__text"><strong>現在は反映しないもの</strong></p>
+        <ul class="md-note-list">
+          <li>対象外の列や未対応シートの編集</li>
+          <li>`Calendars` の `WeekDays / Exceptions / WorkWeeks` と、`Baseline / TimephasedData / ExtendedAttributes`</li>
+        </ul>
+      </section>
+
+      <section class="md-note-card" aria-label="WBS xlsx export options">
+        <h3 class="md-note-card__title">WBS XLSX の祝日指定</h3>
+        <p class="md-note-card__text">
+          `WBS XLSX Export` では、`YYYY-MM-DD` 形式の祝日を改行またはカンマ区切りで指定できます。指定した日付は WBS 日付帯で祝日色として表示します。
+        </p>
+        <div class="md-form-grid">
+          <lht-text-field-help
+            field-id="wbsHolidayDatesInput"
+            label="WBS 祝日"
+            rows="3"
+            placeholder="2026-03-20&#10;2026-03-21"
+            help-text="WBS XLSX Export のみで使用します。重複は自動でまとめます。"></lht-text-field-help>
+        </div>
+      </section>
 
       <div class="md-form-grid">
         <lht-text-field-help field-id="xmlInput" label="MS Project XML" rows="16" placeholder="ここに XML を入力" help-text="MS Project XML を読み込みます。"></lht-text-field-help>
@@ -121,7 +174,10 @@
     <lht-toast id="toast"></lht-toast>
   </div>
   <script src="src/mikuproject/js/types.js"></script>
+  <script src="src/mikuproject/js/excel-io.js"></script>
   <script src="src/mikuproject/js/msproject-xml.js"></script>
+  <script src="src/mikuproject/js/project-xlsx.js"></script>
+  <script src="src/mikuproject/js/wbs-xlsx.js"></script>
   <script src="src/mikuproject/js/main.js"></script>
 </body>
 </html>
