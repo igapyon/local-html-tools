@@ -15,7 +15,7 @@
     const BAND_FILL = "#F4F7FB";
     const ACTIVE_BAND_FILL = "#9FD5C9";
     const PROGRESS_BAND_FILL = "#5BAE9C";
-    const WEEKEND_BAND_FILL = "#F1F1F1";
+    const WEEKEND_BAND_FILL = "#C9D3E1";
     const WEEK_START_BAND_FILL = "#E3EEF9";
     const MONTH_BOUNDARY_WEEK_FILL = "#D6E7F8";
     const MONTH_START_HEADER_FILL = "#DCEAF7";
@@ -93,13 +93,13 @@
             `A1:${lastColumnRef}1`,
             `A2:${lastColumnRef}2`
         ];
-        const projectInfoBlock = projectInfoRows(model.project, calendarNameByUid, holidaySet.size, totalColumns, 5, rows.length + 1);
-        rows.push(...projectInfoBlock.rows);
+        const projectInfoBlock = projectInfoRows(model.project, calendarNameByUid, holidaySet.size, totalColumns, 0, rows.length + 1);
+        overlayRows(rows, 2, projectInfoBlock.rows, totalColumns);
         mergedRanges.push(...projectInfoBlock.mergedRanges);
-        rows.push(emptyRow(totalColumns, 28));
-        const summaryBlock = displaySummaryRows(dateBand.length, countBusinessDays(dateBand, holidaySet), model.project.currentDate, model.tasks.length, model.resources.length, model.assignments.length, model.calendars.length, totalColumns, 5, rows.length + 1, options.displayDaysBeforeBaseDate, options.displayDaysAfterBaseDate, options.useBusinessDaysForDisplayRange, options.useBusinessDaysForProgressBand);
-        rows.push(...summaryBlock.rows);
+        const summaryBlock = displaySummaryRows(dateBand.length, countBusinessDays(dateBand, holidaySet), model.project.currentDate, model.tasks.length, model.resources.length, model.assignments.length, model.calendars.length, totalColumns, 5, 3, options.displayDaysBeforeBaseDate, options.displayDaysAfterBaseDate, options.useBusinessDaysForDisplayRange, options.useBusinessDaysForProgressBand);
+        overlayRows(rows, 2, summaryBlock.rows, totalColumns);
         mergedRanges.push(...summaryBlock.mergedRanges);
+        rows.push(emptyRow(totalColumns, 28));
         rows.push(taskViewRow((model.project.currentDate || "-").slice(0, 10) || "-", totalColumns));
         const weekBandRanges = buildWeekBandRanges(dateBand, dateBandStartColumnIndex, rows.length + 1);
         rows.push(weekBandRow(fixedHeaders.length + 1, weekBandRanges, dateBand.length));
@@ -115,9 +115,11 @@
                 }
                 : label),
             dividerCell(),
-            ...dateBand.map((day) => dateHeaderCell(day, model.project.currentDate, holidaySet))
+            ...dateBand.map((day) => dateNumberCell(day, model.project.currentDate, holidaySet))
         ]));
+        rows.push(weekdayRow(fixedHeaders.length + 1, dateBand, model.project.currentDate, holidaySet));
         rows.push(...model.tasks.map((task) => ({
+            height: taskRowHeight(task),
             cells: [
                 identifierCell(task, task.uid),
                 identifierCell(task, task.id),
@@ -167,6 +169,26 @@
             height,
             cells: Array.from({ length: columnCount }, () => ({}))
         };
+    }
+    function overlayRows(rows, startIndex, blockRows, columnCount) {
+        blockRows.forEach((blockRow, offset) => {
+            const rowIndex = startIndex + offset;
+            if (!rows[rowIndex]) {
+                rows[rowIndex] = emptyRow(columnCount);
+            }
+            const targetRow = rows[rowIndex];
+            if ((blockRow.height || 0) > (targetRow.height || 0)) {
+                targetRow.height = blockRow.height;
+            }
+            blockRow.cells.forEach((cell, cellIndex) => {
+                if (hasCellContent(cell)) {
+                    targetRow.cells[cellIndex] = cell;
+                }
+            });
+        });
+    }
+    function hasCellContent(cell) {
+        return !!cell && Object.keys(cell).length > 0;
     }
     function formatTaskLabel(task) {
         const prefix = task.summary ? "> " : (task.milestone ? "* " : "- ");
@@ -310,10 +332,19 @@
             { label: "祝日", value: holidayCount, fillColor: SUMMARY_SCHEDULE_FILL }
         ];
         return {
-            mergedRanges: [`${columnName(startColumnIndex + 1)}${startRowNumber}:${columnName(startColumnIndex + 2)}${startRowNumber}`],
+            mergedRanges: [
+                `${columnName(startColumnIndex + 1)}${startRowNumber}:${columnName(startColumnIndex + 4)}${startRowNumber}`,
+                ...items.map((_, index) => {
+                    const rowNumber = startRowNumber + index + 1;
+                    return [
+                        `${columnName(startColumnIndex + 1)}${rowNumber}:${columnName(startColumnIndex + 2)}${rowNumber}`,
+                        `${columnName(startColumnIndex + 3)}${rowNumber}:${columnName(startColumnIndex + 4)}${rowNumber}`
+                    ];
+                }).flat()
+            ],
             rows: [
-                blockHeaderRow(columnCount, startColumnIndex, "プロジェクト"),
-                ...items.map((item) => summaryPairRow(columnCount, startColumnIndex, item.label, item.value, item.fillColor))
+                projectBlockHeaderRow(columnCount, startColumnIndex, "プロジェクト"),
+                ...items.map((item) => projectPairRow(columnCount, startColumnIndex, item.label, item.value, item.fillColor))
             ]
         };
     }
@@ -437,6 +468,52 @@
         };
         return { height: 24, cells };
     }
+    function projectBlockHeaderRow(columnCount, startColumnIndex, title) {
+        const cells = Array.from({ length: columnCount }, () => ({}));
+        cells[startColumnIndex] = {
+            value: title,
+            border: "thin",
+            horizontalAlign: "left",
+            bold: true,
+            fillColor: HEADER_ID_FILL
+        };
+        for (let offset = 1; offset < 4; offset += 1) {
+            cells[startColumnIndex + offset] = {
+                value: "",
+                border: "thin",
+                fillColor: HEADER_ID_FILL
+            };
+        }
+        return { height: 24, cells };
+    }
+    function projectPairRow(columnCount, startColumnIndex, label, value, fillColor) {
+        const cells = Array.from({ length: columnCount }, () => ({}));
+        cells[startColumnIndex] = {
+            value: label,
+            border: "thin",
+            horizontalAlign: "right",
+            bold: true,
+            fillColor
+        };
+        cells[startColumnIndex + 1] = {
+            value: "",
+            border: "thin",
+            fillColor
+        };
+        cells[startColumnIndex + 2] = {
+            value,
+            border: "thin",
+            horizontalAlign: typeof value === "number" ? "center" : "left",
+            bold: true,
+            fillColor
+        };
+        cells[startColumnIndex + 3] = {
+            value: "",
+            border: "thin",
+            fillColor
+        };
+        return { height: 22, cells };
+    }
     function summaryPairRow(columnCount, startColumnIndex, label, value, fillColor) {
         const cells = Array.from({ length: columnCount }, () => ({}));
         cells[startColumnIndex] = summaryStatCell(label, fillColor, false);
@@ -488,6 +565,15 @@
                     ...label
                 };
             })
+        };
+    }
+    function weekdayRow(fixedColumnCount, dateBand, currentDate, holidaySet) {
+        return {
+            height: 24,
+            cells: [
+                ...Array.from({ length: fixedColumnCount }, () => ({})),
+                ...dateBand.map((day) => weekdayCell(day, currentDate, holidaySet))
+            ]
         };
     }
     function dividerCell() {
@@ -586,6 +672,7 @@
             value,
             border: "thin",
             horizontalAlign,
+            wrapText: horizontalAlign === "left" ? true : undefined,
             bold: task.summary || task.milestone || false,
             fillColor: task.summary
                 ? PHASE_FILL
@@ -595,6 +682,16 @@
                         ? NAME_COLUMN_FILL
                         : (horizontalAlign === "center" ? SCHEDULE_COLUMN_FILL : undefined)))
         };
+    }
+    function taskRowHeight(task) {
+        const labelLength = formatTaskLabel(task).length;
+        if (labelLength > 36) {
+            return 34;
+        }
+        if (labelLength > 24) {
+            return 28;
+        }
+        return undefined;
     }
     function kindCell(task) {
         return {
@@ -656,14 +753,28 @@
     function formatWbsDate(value) {
         return value ? value.slice(0, 10) : "-";
     }
-    function dateHeaderCell(day, currentDate, holidaySet) {
+    function dateNumberCell(day, currentDate, holidaySet) {
         const isToday = isSameDay(day, currentDate);
         const isWeekendDay = isWeekend(day);
         const isHoliday = holidaySet.has(day);
         const weekStart = isWeekStart(day);
         const monthStart = isMonthStart(day);
         return {
-            value: isToday ? `[${formatDateLabel(day)} *]` : formatDateLabel(day),
+            value: formatDateValue(day),
+            bold: true,
+            border: "thin",
+            horizontalAlign: "center",
+            fillColor: isToday ? TODAY_BAND_FILL : (isHoliday ? HOLIDAY_BAND_FILL : (isWeekendDay ? WEEKEND_BAND_FILL : (monthStart ? MONTH_START_HEADER_FILL : (weekStart ? WEEK_START_BAND_FILL : HEADER_FILL))))
+        };
+    }
+    function weekdayCell(day, currentDate, holidaySet) {
+        const isToday = isSameDay(day, currentDate);
+        const isWeekendDay = isWeekend(day);
+        const isHoliday = holidaySet.has(day);
+        const weekStart = isWeekStart(day);
+        const monthStart = isMonthStart(day);
+        return {
+            value: formatWeekdayValue(day),
             bold: true,
             border: "thin",
             horizontalAlign: "center",
@@ -786,7 +897,7 @@
             ranges.push({
                 range: `${startColumn}${rowNumber}:${endColumn}${rowNumber}`,
                 startIndex: chunkStart,
-                label: formatWeekLabel(chunkDays),
+                label: formatWeekLabel(weekStart, chunkDays),
                 hasMonthBoundary: chunkDays.some((day) => isMonthStart(day))
             });
             chunkStart = chunkEnd + 1;
@@ -848,7 +959,7 @@
         if (!target) {
             return false;
         }
-        return target.getDay() === 1;
+        return target.getDay() === 0;
     }
     function isMonthStart(day) {
         const target = parseDateOnly(day);
@@ -900,31 +1011,38 @@
             String(value.getDate()).padStart(2, "0")
         ].join("-");
     }
-    function formatDateLabel(day) {
+    function formatDateValue(day) {
+        const target = parseDateOnly(day);
+        if (!target) {
+            return day;
+        }
+        return `${target.getMonth() + 1}/${target.getDate()}`;
+    }
+    function formatWeekdayValue(day) {
         const target = parseDateOnly(day);
         if (!target) {
             return day;
         }
         const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        return `${String(target.getMonth() + 1).padStart(2, "0")}/${String(target.getDate()).padStart(2, "0")} ${weekdays[target.getDay()]}`;
+        return weekdays[target.getDay()];
     }
     function formatWeekKey(day) {
         const target = parseDateOnly(day);
         if (!target) {
             return day;
         }
-        const monday = new Date(target.getTime());
-        const offset = (monday.getDay() + 6) % 7;
-        monday.setDate(monday.getDate() - offset);
-        return formatDateOnly(monday);
+        const sunday = new Date(target.getTime());
+        const offset = sunday.getDay();
+        sunday.setDate(sunday.getDate() - offset);
+        return formatDateOnly(sunday);
     }
-    function formatWeekLabel(days) {
+    function formatWeekLabel(weekKey, days) {
         if (days.length === 0) {
             return "週";
         }
-        const start = parseDateOnly(days[0]);
+        const start = parseDateOnly(weekKey);
         if (!start) {
-            return days[0];
+            return weekKey;
         }
         const monthSet = new Set(days.map((day) => {
             const target = parseDateOnly(day);

@@ -87,20 +87,32 @@
     function useBusinessDaysForWbsProgressBand() {
         return getInput("wbsBusinessDayProgressInput").checked;
     }
+    function updateWbsHolidaySummary(holidayDates) {
+        const summary = getElement("wbsHolidaySummary");
+        if (holidayDates.length === 0) {
+            summary.textContent = "既定祝日: 0 件";
+            return;
+        }
+        summary.textContent = `既定祝日: ${holidayDates.length} 件 (${holidayDates.join(", ")})`;
+    }
     function syncWbsHolidayDatesInput(model) {
         const input = getTextArea("wbsHolidayDatesInput");
         if (!model) {
             input.value = "";
             getTextArea("wbsExtraHolidayDatesInput").value = "";
+            updateWbsHolidaySummary([]);
             return;
         }
-        input.value = mikuprojectWbsXlsx.collectWbsHolidayDates(model).join("\n");
+        const holidayDates = mikuprojectWbsXlsx.collectWbsHolidayDates(model);
+        input.value = holidayDates.join("\n");
+        updateWbsHolidaySummary(holidayDates);
     }
     function resetWbsHolidayDatesInput() {
         const model = ensureCurrentModel();
         const holidayDates = mikuprojectWbsXlsx.collectWbsHolidayDates(model);
         getTextArea("wbsHolidayDatesInput").value = holidayDates.join("\n");
         getTextArea("wbsExtraHolidayDatesInput").value = "";
+        updateWbsHolidaySummary(holidayDates);
         setStatus(`WBS 祝日入力を既定値へ戻しました${holidayDates.length > 0 ? ` (${holidayDates.length} 件)` : ""}`);
         showToast("WBS 祝日を既定値へ戻しました");
     }
