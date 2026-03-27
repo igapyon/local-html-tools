@@ -160,6 +160,32 @@ describe("mikuproject excel io", () => {
     expect(imported).toEqual(workbook);
   });
 
+  it("round-trips wrapped text alignment", () => {
+    const excelIo = bootExcelIoModule();
+    const codec = new excelIo.XlsxWorkbookCodec();
+    const workbook = {
+      sheets: [
+        {
+          name: "Wrapped",
+          rows: [
+            {
+              cells: [
+                { value: "Long task name", horizontalAlign: "left", wrapText: true }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    const bytes = codec.exportWorkbook(workbook);
+    const imported = codec.importWorkbook(bytes);
+    const stylesXml = decodeUtf8(codec.unpackEntries(bytes)["xl/styles.xml"]);
+
+    expect(imported).toEqual(workbook);
+    expect(stylesXml).toContain('wrapText="1"');
+  });
+
   it("round-trips bold, fill color, and border styles", () => {
     const excelIo = bootExcelIoModule();
     const codec = new excelIo.XlsxWorkbookCodec();

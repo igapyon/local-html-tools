@@ -145,6 +145,7 @@
             formula: cell.formula,
             numberFormat: cell.numberFormat,
             horizontalAlign: cell.horizontalAlign,
+            wrapText: cell.wrapText === true ? true : undefined,
             bold: cell.bold === true ? true : undefined,
             fillColor: cell.fillColor ? normalizeColor(cell.fillColor) : undefined,
             border: cell.border
@@ -379,12 +380,13 @@
         return { styles, styleIndexByKey };
     }
     function getStyleDescriptor(cell) {
-        if (!cell.numberFormat && !cell.horizontalAlign && !cell.bold && !cell.fillColor && !cell.border) {
+        if (!cell.numberFormat && !cell.horizontalAlign && !cell.wrapText && !cell.bold && !cell.fillColor && !cell.border) {
             return null;
         }
         return {
             numberFormat: cell.numberFormat || "general",
             horizontalAlign: cell.horizontalAlign,
+            wrapText: cell.wrapText === true ? true : undefined,
             bold: cell.bold === true ? true : undefined,
             fillColor: cell.fillColor,
             border: cell.border
@@ -394,6 +396,7 @@
         return [
             style.numberFormat,
             style.horizontalAlign || "",
+            style.wrapText ? "wrap" : "",
             style.bold ? "bold" : "",
             style.fillColor || "",
             style.border || ""
@@ -416,12 +419,16 @@
             const fillId = fills.indexByKey.get(fillKey({ fillColor: style.fillColor })) || 0;
             const borderId = borders.indexByKey.get(borderKey({ border: style.border })) || 0;
             const applyNumberFormat = numFmtId !== 0 ? ` applyNumberFormat="1"` : "";
-            const applyAlignment = style.horizontalAlign ? ` applyAlignment="1"` : "";
+            const applyAlignment = style.horizontalAlign || style.wrapText ? ` applyAlignment="1"` : "";
             const applyFont = fontId !== 0 ? ` applyFont="1"` : "";
             const applyFill = fillId !== 0 ? ` applyFill="1"` : "";
             const applyBorder = borderId !== 0 ? ` applyBorder="1"` : "";
-            const alignmentNode = style.horizontalAlign
-                ? `<alignment horizontal="${style.horizontalAlign}"/>`
+            const alignmentAttributes = [
+                style.horizontalAlign ? ` horizontal="${style.horizontalAlign}"` : "",
+                style.wrapText ? ` wrapText="1"` : ""
+            ].join("");
+            const alignmentNode = alignmentAttributes
+                ? `<alignment${alignmentAttributes}/>`
                 : "";
             return `<xf numFmtId="${numFmtId}" fontId="${fontId}" fillId="${fillId}" borderId="${borderId}" xfId="0"${applyNumberFormat}${applyAlignment}${applyFont}${applyFill}${applyBorder}>${alignmentNode}</xf>`;
         }).join("");
@@ -637,6 +644,9 @@
         if (style.horizontalAlign) {
             cell.horizontalAlign = style.horizontalAlign;
         }
+        if (style.wrapText) {
+            cell.wrapText = true;
+        }
         if (style.bold) {
             cell.bold = true;
         }
@@ -677,6 +687,7 @@
             return {
                 numberFormat: parseNumberFormatId(numFmtId),
                 horizontalAlign: horizontalAlign || undefined,
+                wrapText: (alignmentElement === null || alignmentElement === void 0 ? void 0 : alignmentElement.getAttribute("wrapText")) === "1" ? true : undefined,
                 bold: ((_a = fonts[fontId]) === null || _a === void 0 ? void 0 : _a.bold) ? true : undefined,
                 fillColor: (_b = fills[fillId]) === null || _b === void 0 ? void 0 : _b.fillColor,
                 border: (_c = borders[borderId]) === null || _c === void 0 ? void 0 : _c.border

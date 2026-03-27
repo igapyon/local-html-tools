@@ -102,6 +102,7 @@ function mountDom() {
     <input id="wbsDisplayDaysAfterInput" />
     <input id="wbsBusinessDayRangeInput" type="checkbox" />
     <input id="wbsBusinessDayProgressInput" type="checkbox" />
+    <div id="wbsHolidaySummary"></div>
     <textarea id="wbsHolidayDatesInput"></textarea>
     <textarea id="wbsExtraHolidayDatesInput"></textarea>
     <textarea id="xmlInput"></textarea>
@@ -193,6 +194,7 @@ describe("mikuproject main", () => {
     expect(document.body.textContent).toContain("進捗帯も営業日基準へ切り替えられます");
     expect(document.getElementById("wbsHolidayDatesInput").value).toBe("");
     expect(document.getElementById("wbsExtraHolidayDatesInput").value).toBe("");
+    expect(document.getElementById("wbsHolidaySummary").textContent).toBe("既定祝日: 0 件");
     expect(document.getElementById("wbsDisplayDaysBeforeInput").value).toBe("");
     expect(document.getElementById("wbsDisplayDaysAfterInput").value).toBe("");
     expect(document.getElementById("wbsBusinessDayRangeInput").checked).toBe(false);
@@ -741,10 +743,10 @@ describe("mikuproject main", () => {
     });
     const workbook = exportSpy.mock.results.at(-1)?.value;
     const sheet = workbook.sheets[0];
-    const projectInfoHeaderIndex = sheet.rows.findIndex((row) => row.cells[5]?.value === "プロジェクト / 情報");
-    expect(sheet.rows[projectInfoHeaderIndex + 7].cells[6].value).toBe(2);
+    const projectInfoHeaderIndex = sheet.rows.findIndex((row) => row.cells[0]?.value === "プロジェクト");
+    expect(sheet.rows[projectInfoHeaderIndex + 7].cells[2].value).toBe(2);
     const headerRowIndex = sheet.rows.findIndex((row) => row.cells[0]?.value === "UID");
-    const holidayColumnIndex = sheet.rows[headerRowIndex].cells.findIndex((cell) => cell.value === "03/20 Fri");
+    const holidayColumnIndex = sheet.rows[headerRowIndex].cells.findIndex((cell) => cell.value === "3/20");
     expect(sheet.rows[headerRowIndex].cells[holidayColumnIndex].fillColor).toBe("#FCE4EC");
     expect(document.getElementById("statusMessage").textContent).toContain("祝日 2 件");
   });
@@ -814,6 +816,8 @@ describe("mikuproject main", () => {
 
     expect(document.getElementById("wbsHolidayDatesInput").value).toBe("2026-03-20");
     expect(document.getElementById("wbsExtraHolidayDatesInput").value).toBe("");
+    expect(document.getElementById("wbsHolidaySummary").textContent).toContain("既定祝日: 1 件");
+    expect(document.getElementById("wbsHolidaySummary").textContent).toContain("2026-03-20");
   });
 
   it("resets wbs holiday input back to model defaults", () => {
@@ -825,6 +829,7 @@ describe("mikuproject main", () => {
 
     expect(document.getElementById("wbsHolidayDatesInput").value).toBe("2026-03-20");
     expect(document.getElementById("wbsExtraHolidayDatesInput").value).toBe("");
+    expect(document.getElementById("wbsHolidaySummary").textContent).toContain("既定祝日: 1 件");
     expect(document.getElementById("statusMessage").textContent).toContain("WBS 祝日入力を既定値へ戻しました");
     expect(document.getElementById("statusMessage").textContent).toContain("1 件");
   });
