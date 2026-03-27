@@ -82,6 +82,7 @@
                 return {
                     name: sheet.name,
                     columns: Array.isArray(sheet.columns) ? sheet.columns.map((column) => normalizeColumn(column)) : undefined,
+                    freezePane: normalizeFreezePane(sheet.freezePane),
                     mergedRanges: Array.isArray(sheet.mergedRanges) ? sheet.mergedRanges.map((range) => normalizeMergedRange(range)) : undefined,
                     rows: Array.isArray(sheet.rows)
                         ? sheet.rows.map((row) => ({
@@ -101,6 +102,20 @@
         }
         return {
             width: normalizeOptionalPositiveNumber(column.width, "Column width")
+        };
+    }
+    function normalizeFreezePane(freezePane) {
+        if (!freezePane) {
+            return undefined;
+        }
+        const rowSplit = normalizeOptionalPositiveInteger(freezePane.rowSplit, "Freeze pane rowSplit");
+        const colSplit = normalizeOptionalPositiveInteger(freezePane.colSplit, "Freeze pane colSplit");
+        if (rowSplit === undefined && colSplit === undefined) {
+            return undefined;
+        }
+        return {
+            rowSplit,
+            colSplit
         };
     }
     function normalizeCell(cell) {
@@ -151,6 +166,15 @@
         }
         if (!Number.isFinite(value) || value <= 0) {
             throw new Error(`${label} must be a finite positive number`);
+        }
+        return value;
+    }
+    function normalizeOptionalPositiveInteger(value, label) {
+        if (value === undefined) {
+            return undefined;
+        }
+        if (!Number.isInteger(value) || value <= 0) {
+            throw new Error(`${label} must be a positive integer`);
         }
         return value;
     }
@@ -229,15 +253,28 @@
 </workbook>`;
     }
     function buildWorksheetXml(sheet, styleBook) {
+        const sheetViewsXml = buildSheetViewsXml(sheet.freezePane);
         const colsXml = buildColumnsXml(sheet.columns);
         const mergeCellsXml = buildMergeCellsXml(sheet.mergedRanges);
         const rows = sheet.rows.map((row, rowIndex) => buildWorksheetRowXml(row, rowIndex, styleBook)).filter(Boolean).join("");
         return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  ${sheetViewsXml}
   ${colsXml}
   <sheetData>${rows}</sheetData>
   ${mergeCellsXml}
 </worksheet>`;
+    }
+    function buildSheetViewsXml(freezePane) {
+        if (!freezePane || (!freezePane.rowSplit && !freezePane.colSplit)) {
+            return "";
+        }
+        const xSplit = freezePane.colSplit ? ` xSplit="${freezePane.colSplit}"` : "";
+        const ySplit = freezePane.rowSplit ? ` ySplit="${freezePane.rowSplit}"` : "";
+        const topLeftCell = encodeCellReference(freezePane.rowSplit || 0, freezePane.colSplit || 0);
+        const topLeftCellAttribute = topLeftCell ? ` topLeftCell="${topLeftCell}"` : "";
+        const activePane = resolveActivePane(freezePane);
+        return `<sheetViews><sheetView workbookViewId="0"><pane${xSplit}${ySplit}${topLeftCellAttribute} activePane="${activePane}" state="frozen"/></sheetView></sheetViews>`;
     }
     function buildColumnsXml(columns) {
         if (!columns || columns.length === 0 || columns.every((column) => column.width === undefined)) {
@@ -507,6 +544,7 @@
         return {
             name,
             columns: parseWorksheetColumns(document),
+            freezePane: parseWorksheetFreezePane(document),
             mergedRanges: parseWorksheetMergedRanges(document),
             rows: rowElements.map((rowElement) => ({
                 height: parseOptionalNumber(rowElement.getAttribute("ht")),
@@ -541,6 +579,21 @@
         return mergeCellElements
             .map((element) => normalizeMergedRange(element.getAttribute("ref") || ""))
             .filter(Boolean);
+    }
+    function parseWorksheetFreezePane(document) {
+        const paneElement = document.getElementsByTagNameNS("http://schemas.openxmlformats.org/spreadsheetml/2006/main", "pane")[0];
+        if (!paneElement || paneElement.getAttribute("state") !== "frozen") {
+            return undefined;
+        }
+        const rowSplit = parseOptionalNumber(paneElement.getAttribute("ySplit"));
+        const colSplit = parseOptionalNumber(paneElement.getAttribute("xSplit"));
+        if (rowSplit === undefined && colSplit === undefined) {
+            return undefined;
+        }
+        return {
+            rowSplit,
+            colSplit
+        };
     }
     function parseWorksheetRowCells(rowElement, styleBook) {
         const cells = [];
@@ -724,6 +777,21 @@
             current = Math.floor((current - 1) / 26);
         }
         return result;
+    }
+    function encodeCellReference(rowIndex, columnIndex) {
+        if (rowIndex <= 0 && columnIndex <= 0) {
+            return "";
+        }
+        return `${encodeColumnName(columnIndex)}${rowIndex + 1}`;
+    }
+    function resolveActivePane(freezePane) {
+        if (freezePane.rowSplit && freezePane.colSplit) {
+            return "bottomRight";
+        }
+        if (freezePane.rowSplit) {
+            return "bottomLeft";
+        }
+        return "topRight";
     }
     function decodeColumnReference(reference) {
         const match = /^([A-Z]+)\d+$/i.exec(reference);

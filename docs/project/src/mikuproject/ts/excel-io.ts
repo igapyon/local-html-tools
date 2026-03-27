@@ -23,9 +23,15 @@
     width?: number;
   };
 
+  type XlsxFreezePaneModel = {
+    rowSplit?: number;
+    colSplit?: number;
+  };
+
   type XlsxSheetModel = {
     name: string;
     columns?: XlsxColumnModel[];
+    freezePane?: XlsxFreezePaneModel;
     mergedRanges?: string[];
     rows: XlsxRowModel[];
   };
@@ -157,6 +163,7 @@
         return {
           name: sheet.name,
           columns: Array.isArray(sheet.columns) ? sheet.columns.map((column) => normalizeColumn(column)) : undefined,
+          freezePane: normalizeFreezePane(sheet.freezePane),
           mergedRanges: Array.isArray(sheet.mergedRanges) ? sheet.mergedRanges.map((range) => normalizeMergedRange(range)) : undefined,
           rows: Array.isArray(sheet.rows)
             ? sheet.rows.map((row) => ({
@@ -177,6 +184,21 @@
     }
     return {
       width: normalizeOptionalPositiveNumber(column.width, "Column width")
+    };
+  }
+
+  function normalizeFreezePane(freezePane: XlsxFreezePaneModel | undefined): XlsxFreezePaneModel | undefined {
+    if (!freezePane) {
+      return undefined;
+    }
+    const rowSplit = normalizeOptionalPositiveInteger(freezePane.rowSplit, "Freeze pane rowSplit");
+    const colSplit = normalizeOptionalPositiveInteger(freezePane.colSplit, "Freeze pane colSplit");
+    if (rowSplit === undefined && colSplit === undefined) {
+      return undefined;
+    }
+    return {
+      rowSplit,
+      colSplit
     };
   }
 
@@ -230,6 +252,16 @@
     }
     if (!Number.isFinite(value) || value <= 0) {
       throw new Error(`${label} must be a finite positive number`);
+    }
+    return value;
+  }
+
+  function normalizeOptionalPositiveInteger(value: number | undefined, label: string): number | undefined {
+    if (value === undefined) {
+      return undefined;
+    }
+    if (!Number.isInteger(value) || value <= 0) {
+      throw new Error(`${label} must be a positive integer`);
     }
     return value;
   }
@@ -331,15 +363,29 @@
   }
 
   function buildWorksheetXml(sheet: XlsxSheetModel, styleBook: StyleBook): string {
+    const sheetViewsXml = buildSheetViewsXml(sheet.freezePane);
     const colsXml = buildColumnsXml(sheet.columns);
     const mergeCellsXml = buildMergeCellsXml(sheet.mergedRanges);
     const rows = sheet.rows.map((row, rowIndex) => buildWorksheetRowXml(row, rowIndex, styleBook)).filter(Boolean).join("");
     return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  ${sheetViewsXml}
   ${colsXml}
   <sheetData>${rows}</sheetData>
   ${mergeCellsXml}
 </worksheet>`;
+  }
+
+  function buildSheetViewsXml(freezePane: XlsxFreezePaneModel | undefined): string {
+    if (!freezePane || (!freezePane.rowSplit && !freezePane.colSplit)) {
+      return "";
+    }
+    const xSplit = freezePane.colSplit ? ` xSplit="${freezePane.colSplit}"` : "";
+    const ySplit = freezePane.rowSplit ? ` ySplit="${freezePane.rowSplit}"` : "";
+    const topLeftCell = encodeCellReference(freezePane.rowSplit || 0, freezePane.colSplit || 0);
+    const topLeftCellAttribute = topLeftCell ? ` topLeftCell="${topLeftCell}"` : "";
+    const activePane = resolveActivePane(freezePane);
+    return `<sheetViews><sheetView workbookViewId="0"><pane${xSplit}${ySplit}${topLeftCellAttribute} activePane="${activePane}" state="frozen"/></sheetView></sheetViews>`;
   }
 
   function buildColumnsXml(columns: XlsxColumnModel[] | undefined): string {
@@ -659,6 +705,7 @@
     return {
       name,
       columns: parseWorksheetColumns(document),
+      freezePane: parseWorksheetFreezePane(document),
       mergedRanges: parseWorksheetMergedRanges(document),
       rows: rowElements.map((rowElement) => ({
         height: parseOptionalNumber(rowElement.getAttribute("ht")),
@@ -701,6 +748,25 @@
     return mergeCellElements
       .map((element) => normalizeMergedRange(element.getAttribute("ref") || ""))
       .filter(Boolean);
+  }
+
+  function parseWorksheetFreezePane(document: XMLDocument): XlsxFreezePaneModel | undefined {
+    const paneElement = document.getElementsByTagNameNS(
+      "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
+      "pane"
+    )[0];
+    if (!paneElement || paneElement.getAttribute("state") !== "frozen") {
+      return undefined;
+    }
+    const rowSplit = parseOptionalNumber(paneElement.getAttribute("ySplit"));
+    const colSplit = parseOptionalNumber(paneElement.getAttribute("xSplit"));
+    if (rowSplit === undefined && colSplit === undefined) {
+      return undefined;
+    }
+    return {
+      rowSplit,
+      colSplit
+    };
   }
 
   function parseWorksheetRowCells(rowElement: Element, styleBook: StyleDescriptor[]): XlsxCellModel[] {
@@ -916,6 +982,23 @@
       current = Math.floor((current - 1) / 26);
     }
     return result;
+  }
+
+  function encodeCellReference(rowIndex: number, columnIndex: number): string {
+    if (rowIndex <= 0 && columnIndex <= 0) {
+      return "";
+    }
+    return `${encodeColumnName(columnIndex)}${rowIndex + 1}`;
+  }
+
+  function resolveActivePane(freezePane: XlsxFreezePaneModel): string {
+    if (freezePane.rowSplit && freezePane.colSplit) {
+      return "bottomRight";
+    }
+    if (freezePane.rowSplit) {
+      return "bottomLeft";
+    }
+    return "topRight";
   }
 
   function decodeColumnReference(reference: string): number {

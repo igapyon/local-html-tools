@@ -237,6 +237,51 @@ describe("mikuproject excel io", () => {
     expect(imported.sheets[0].rows[3].cells[1].value).toBe("Value3");
   });
 
+  it("round-trips frozen pane settings", () => {
+    const excelIo = bootExcelIoModule();
+    const codec = new excelIo.XlsxWorkbookCodec();
+    const workbook = {
+      sheets: [
+        {
+          name: "Frozen",
+          freezePane: {
+            rowSplit: 2,
+            colSplit: 3
+          },
+          rows: [
+            {
+              cells: [
+                { value: "A" },
+                { value: "B" },
+                { value: "C" },
+                { value: "D" }
+              ]
+            },
+            {
+              cells: [
+                { value: 1 },
+                { value: 2 },
+                { value: 3 },
+                { value: 4 }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    const bytes = codec.exportWorkbook(workbook);
+    const imported = codec.importWorkbook(bytes);
+    const sheetXml = decodeUtf8(codec.unpackEntries(bytes)["xl/worksheets/sheet1.xml"]);
+
+    expect(imported).toEqual(workbook);
+    expect(sheetXml).toContain("<sheetViews>");
+    expect(sheetXml).toContain('xSplit="3"');
+    expect(sheetXml).toContain('ySplit="2"');
+    expect(sheetXml).toContain('topLeftCell="D3"');
+    expect(sheetXml).toContain('state="frozen"');
+  });
+
   it("rejects duplicate or invalid sheet names", () => {
     const excelIo = bootExcelIoModule();
     const codec = new excelIo.XlsxWorkbookCodec();

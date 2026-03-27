@@ -774,26 +774,6 @@
       showToast("メモを保存しました");
     }
 
-    function quoteShellPath(value) {
-      const text = String(value || "");
-      if (!text) return "''";
-      return `'${text.replace(/'/g, `'\"'\"'`)}'`;
-    }
-
-    async function copyGitStatusCommand() {
-      const gitCurrentDirectoryField = document.getElementById("gitCurrentDirectory");
-      const gitCurrentDir = gitCurrentDirectoryField ? String(gitCurrentDirectoryField.value || "").trim() : "";
-      if (!gitCurrentDir) {
-        showToast("git カレントディレクトリを入力してください");
-        return;
-      }
-      const commandText = `cd ${quoteShellPath(gitCurrentDir)}\ngit status -sb`;
-      const copied = await copyTextToClipboard(commandText);
-      if (copied) {
-        showToast("cd + git status をコピーしました");
-      }
-    }
-
     async function copyTextToClipboard(text) {
       const normalizedText = String(text || "");
       if (!normalizedText) return false;
@@ -1046,12 +1026,6 @@
       const saveMemoButton = document.getElementById("saveMemoBtn");
       if (saveMemoButton) {
         saveMemoButton.addEventListener("click", saveMemo);
-      }
-      const copyGitStatusCommandButton = document.getElementById("copyGitStatusCommandBtn");
-      if (copyGitStatusCommandButton) {
-        copyGitStatusCommandButton.addEventListener("click", () => {
-          copyGitStatusCommand();
-        });
       }
       const memoDialog = getMemoDialog();
       if (memoDialog && !memoDialog.dataset.boundOutsideClose) {

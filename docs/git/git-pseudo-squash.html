@@ -2026,7 +2026,7 @@ lht-index-card-link {
     }
     .md-headline__icon { margin-right: 0.5rem; }
 
-    .md-section { margin-bottom: 1rem; }
+    .md-section { margin-bottom: 0.7rem; }
     .md-stack-md > * + * { margin-top: 0.75rem; }
     .md-stack-sm > * + * { margin-top: 0.5rem; }
 
@@ -2047,13 +2047,14 @@ lht-index-card-link {
 
     .md-section-title { font-size: 1rem; font-weight: 600; color: #3f3b46; }
 
-    .md-flow-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; }
+    .md-flow-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.12rem 0; }
     .md-title-info-row { display: inline-flex; align-items: center; gap: 0.08rem; }
     .md-title-info-row .md-section-title { margin: 0; }
     .md-title-info-row .md-info-chip { margin-left: 0; }
     .md-title-action-btn { margin-left: 0.35rem; }
     .md-title-action-icon { margin-left: 0.25rem; }
-    .md-flow-divider { display: flex; justify-content: center; padding: 0.5rem 0; }
+    .md-flow-divider { display: flex; justify-content: center; padding: 0.08rem 0; margin-top: 0.42rem; }
+    .md-flow-divider--after-create { padding-top: 0.24rem; }
 
     .md-diff-dialog {
       width: min(780px, calc(100vw - 2rem));
@@ -2146,12 +2147,12 @@ lht-index-card-link {
     .md-copy-button { position: absolute; top: 0.5rem; right: 0.5rem; }
     .md-copy-button--bottom-right { top: auto; right: 0.5rem; bottom: 0.5rem; }
     md-icon-button.md-copy-button {
-      width: 32px;
-      height: 32px;
-      border-radius: 16px;
-      --md-icon-button-icon-size: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      --md-icon-button-icon-size: 20px;
       --md-icon-button-icon-color: #3f3b46;
-      --md-icon-button-state-layer-shape: 16px;
+      --md-icon-button-state-layer-shape: 20px;
       --md-icon-button-hover-state-layer-color: #3f3b46;
       --md-icon-button-hover-state-layer-opacity: 0.08;
       --md-icon-button-pressed-state-layer-color: #3f3b46;
@@ -2422,6 +2423,27 @@ lht-index-card-link {
       flex: 0 0 auto;
     }
 
+    .md-input-action--inline.md-icon-btn--small {
+      width: 38px;
+      height: 38px;
+      border-radius: 19px;
+    }
+
+    .md-input-action--inline .md-icon-small {
+      width: 20px;
+      height: 20px;
+    }
+
+    lht-command-block .md-copy-button--fallback {
+      width: 2.4rem;
+      height: 2.4rem;
+    }
+
+    lht-command-block .md-copy-button--fallback .md-icon-small {
+      width: 18px;
+      height: 18px;
+    }
+
     md-outlined-text-field.md-disabled {
       opacity: 0.68;
     }
@@ -2670,6 +2692,7 @@ lht-index-card-link {
       <div id="squashRemoteRow">
         <lht-text-field-help field-id="squashRemote" label="squashリモート" placeholder="例: origin" value="origin" help-text="squash 作業で使う fetch / push のリモート名です。通常は origin です。「作業をまとめる（squash）」のコマンドに反映されます。基点のリモートと同じにしておくと混乱しにくいです。"></lht-text-field-help>
       </div>
+      <input id="repoUrl" type="hidden" value="" />
     </div>
 
     <section id="commonFields" class="md-section md-stack-md">
@@ -2699,7 +2722,7 @@ lht-index-card-link {
       </div>
       <lht-command-block command-id="createBranchCmd"></lht-command-block>
 
-      <div class="md-flow-divider">
+      <div class="md-flow-divider md-flow-divider--after-create">
         <svg aria-hidden="true" viewBox="0 0 420 64" class="md-flow-strip" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="4" y="8" width="412" height="48" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
           <rect x="18" y="18" width="70" height="28" rx="8" fill="#DDEBFF" />
@@ -2756,11 +2779,11 @@ lht-index-card-link {
           <lht-switch-help switch-id="useCurrentBranch" label="現在ブランチで作業" help-label="現在ブランチで作業の説明" checked on-change="toggleCurrentBranch">
             現在チェックアウト中のブランチを作業ブランチとして扱います。チェックを外すと、作業ブランチ名で switch するコマンドが含まれます。
           </lht-switch-help>
-          <a class="md-button md-button--surface md-button--compact md-button--with-icon md-title-action-btn" href="../prompt/prompt-gen.html?q=A501&id=A501" title="生成AIで整理" aria-label="生成AIで整理">
+          <a class="md-button md-button--surface md-button--compact md-button--with-icon md-title-action-btn" href="../prompt/prompt-gen.html?q=A501&id=A501" title="生成AIで作文" aria-label="生成AIで作文">
             <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <use href="#md-icon-auto-fix" xlink:href="#md-icon-auto-fix"></use>
             </svg>
-            <span>生成AIで整理</span>
+            <span>生成AIで作文</span>
           </a>
         </span>
       </div>
@@ -2801,62 +2824,6 @@ lht-index-card-link {
       </span>
     </div>
     <lht-command-block command-id="pushCmd"></lht-command-block>
-
-    <div class="md-flow-row md-footer-flow">
-      <svg aria-hidden="true" viewBox="0 0 64 64" class="md-step-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="56" height="56" rx="12" fill="#F8FAFC" stroke="#E2E8F0" />
-        <path d="M18 46h28" stroke="#93C5FD" stroke-width="3.5" stroke-linecap="round"/>
-        <path d="M32 18v20" stroke="#A78BFA" stroke-width="3.5" stroke-linecap="round"/>
-        <path d="M24 26l8-8 8 8" stroke="#A78BFA" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="46" cy="24" r="5" fill="#86EFAC"/>
-        <rect x="18" y="42" width="28" height="8" rx="4" fill="#BFDBFE"/>
-      </svg>
-      <span class="md-title-info-row">
-        <p class="md-section-title">一覧連携</p>
-        <lht-help-tooltip label="一覧連携の説明">
-          ここでは、この作業内容を `Git 作業一覧` に保存したり、比較専用の画面へ移動したりできます。
-          squash の実行手順そのものではなく、作業管理と画面遷移のための補助エリアです。
-        </lht-help-tooltip>
-      </span>
-    </div>
-
-    <div class="md-bottom-actions">
-      <button id="saveToWorkBranchListBtn" type="button" class="md-button md-button--primary md-button--with-icon">
-        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4 7h16"></path>
-          <path d="M4 12h16"></path>
-          <path d="M4 17h16"></path>
-        </svg>
-        <span>一覧</span>
-      </button>
-      <button id="openBranchDiffBtn" type="button" class="md-button md-button--surface md-button--with-icon">
-        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M7 7h8"></path>
-          <path d="M11 3l4 4-4 4"></path>
-          <path d="M17 17H9"></path>
-          <path d="M13 13l-4 4 4 4"></path>
-        </svg>
-        <span>比較</span>
-      </button>
-      <div class="md-bottom-actions__field">
-        <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" placeholder="例: https://github.com/igapyon/local-html-tools" help-text="Git 作業一覧へ戻すときの保存先識別に使います。"></lht-text-field-help>
-      </div>
-      <button id="openRepoUrlBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" title="URL を開く" aria-label="URL を開く">
-        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M14 5h5v5"></path>
-          <path d="M10 14 19 5"></path>
-          <path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"></path>
-        </svg>
-      </button>
-      <button id="copyGitCurrentDirBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface md-hidden" title="git カレントディレクトリをコピー" aria-label="git カレントディレクトリをコピー">
-        <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="7" width="14" height="12" rx="2"></rect>
-          <rect x="13" y="3" width="8" height="8" rx="2"></rect>
-          <path d="M15.5 7h3"></path>
-          <path d="M17 5.5v3"></path>
-        </svg>
-      </button>
-    </div>
 
     <lht-toast id="toast"></lht-toast>
 

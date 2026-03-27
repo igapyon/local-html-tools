@@ -1858,7 +1858,6 @@ lht-index-card-link {
         </div>
 
         <div class="md-dialog__footer">
-          <button id="copyGitStatusCommandBtn" type="button" class="md-button md-button--secondary">cd + git status</button>
           <button id="saveMemoBtn" type="button" class="md-button md-button--primary">保存</button>
         </div>
       </form>
@@ -4769,26 +4768,6 @@ if (!customElements.get("lht-page-menu")) {
       showToast("メモを保存しました");
     }
 
-    function quoteShellPath(value) {
-      const text = String(value || "");
-      if (!text) return "''";
-      return `'${text.replace(/'/g, `'\"'\"'`)}'`;
-    }
-
-    async function copyGitStatusCommand() {
-      const gitCurrentDirectoryField = document.getElementById("gitCurrentDirectory");
-      const gitCurrentDir = gitCurrentDirectoryField ? String(gitCurrentDirectoryField.value || "").trim() : "";
-      if (!gitCurrentDir) {
-        showToast("git カレントディレクトリを入力してください");
-        return;
-      }
-      const commandText = `cd ${quoteShellPath(gitCurrentDir)}\ngit status -sb`;
-      const copied = await copyTextToClipboard(commandText);
-      if (copied) {
-        showToast("cd + git status をコピーしました");
-      }
-    }
-
     async function copyTextToClipboard(text) {
       const normalizedText = String(text || "");
       if (!normalizedText) return false;
@@ -5041,12 +5020,6 @@ if (!customElements.get("lht-page-menu")) {
       const saveMemoButton = document.getElementById("saveMemoBtn");
       if (saveMemoButton) {
         saveMemoButton.addEventListener("click", saveMemo);
-      }
-      const copyGitStatusCommandButton = document.getElementById("copyGitStatusCommandBtn");
-      if (copyGitStatusCommandButton) {
-        copyGitStatusCommandButton.addEventListener("click", () => {
-          copyGitStatusCommand();
-        });
       }
       const memoDialog = getMemoDialog();
       if (memoDialog && !memoDialog.dataset.boundOutsideClose) {

@@ -949,7 +949,7 @@
     }
     .md-headline__icon { margin-right: 0.5rem; }
 
-    .md-section { margin-bottom: 1rem; }
+    .md-section { margin-bottom: 0.7rem; }
     .md-stack-md > * + * { margin-top: 0.75rem; }
     .md-stack-sm > * + * { margin-top: 0.5rem; }
 
@@ -970,13 +970,14 @@
 
     .md-section-title { font-size: 1rem; font-weight: 600; color: #3f3b46; }
 
-    .md-flow-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; }
+    .md-flow-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.12rem 0; }
     .md-title-info-row { display: inline-flex; align-items: center; gap: 0.08rem; }
     .md-title-info-row .md-section-title { margin: 0; }
     .md-title-info-row .md-info-chip { margin-left: 0; }
     .md-title-action-btn { margin-left: 0.35rem; }
     .md-title-action-icon { margin-left: 0.25rem; }
-    .md-flow-divider { display: flex; justify-content: center; padding: 0.5rem 0; }
+    .md-flow-divider { display: flex; justify-content: center; padding: 0.08rem 0; margin-top: 0.42rem; }
+    .md-flow-divider--after-create { padding-top: 0.24rem; }
 
     .md-diff-dialog {
       width: min(780px, calc(100vw - 2rem));
@@ -1069,12 +1070,12 @@
     .md-copy-button { position: absolute; top: 0.5rem; right: 0.5rem; }
     .md-copy-button--bottom-right { top: auto; right: 0.5rem; bottom: 0.5rem; }
     md-icon-button.md-copy-button {
-      width: 32px;
-      height: 32px;
-      border-radius: 16px;
-      --md-icon-button-icon-size: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      --md-icon-button-icon-size: 20px;
       --md-icon-button-icon-color: #3f3b46;
-      --md-icon-button-state-layer-shape: 16px;
+      --md-icon-button-state-layer-shape: 20px;
       --md-icon-button-hover-state-layer-color: #3f3b46;
       --md-icon-button-hover-state-layer-opacity: 0.08;
       --md-icon-button-pressed-state-layer-color: #3f3b46;
@@ -1343,6 +1344,27 @@
 
     .md-input-action--inline {
       flex: 0 0 auto;
+    }
+
+    .md-input-action--inline.md-icon-btn--small {
+      width: 38px;
+      height: 38px;
+      border-radius: 19px;
+    }
+
+    .md-input-action--inline .md-icon-small {
+      width: 20px;
+      height: 20px;
+    }
+
+    lht-command-block .md-copy-button--fallback {
+      width: 2.4rem;
+      height: 2.4rem;
+    }
+
+    lht-command-block .md-copy-button--fallback .md-icon-small {
+      width: 18px;
+      height: 18px;
     }
 
     md-outlined-text-field.md-disabled {

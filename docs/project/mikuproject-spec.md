@@ -67,6 +67,7 @@ STEP 1 の目的は、`MS Project XML` を意味的に往復できる状態を�
   - `WBS XLSX Export` では、`ProjectModel` から補完した既定祝日と、UI で指定した追加祝日を合成して扱う
   - 指定した祝日は WBS 日付帯で祝日色として表示する
   - sample 生成では、`Calendar.Exceptions` のうち非稼働日例外を祝日候補として WBS workbook へ反映する
+  - レイアウトは表示専用として継続改善し、上部サマリ、凡例、Week/BaseDate ガイド、日付帯の視認性を段階的に整える
 
 現時点で `XLSX Import` の反映対象としている列は次のとおり。
 
