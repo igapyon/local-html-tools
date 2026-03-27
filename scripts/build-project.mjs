@@ -11,7 +11,10 @@ const TARGETS = [
     outHtml: "docs/project/mikuproject.html",
     tsOrder: [
       "src/mikuproject/ts/types.ts",
+      "src/mikuproject/ts/excel-io.ts",
       "src/mikuproject/ts/msproject-xml.ts",
+      "src/mikuproject/ts/project-xlsx.ts",
+      "src/mikuproject/ts/wbs-xlsx.ts",
       "src/mikuproject/ts/main.ts"
     ]
   }

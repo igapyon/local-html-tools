@@ -86,6 +86,63 @@
   font-weight: 600;
 }
 
+.md-save-state {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.md-save-state--dirty {
+  color: #8a5a1c;
+  background: #fff8ef;
+  border-color: #efcfaa;
+}
+
+.md-save-state--clean {
+  color: #225b4d;
+  background: #eefaf5;
+  border-color: #c7e6d9;
+}
+
+.md-feedback-stack {
+  display: grid;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(247, 250, 253, 0.92) 0%, rgba(255, 255, 255, 0.92) 100%);
+  border: 1px solid rgba(213, 222, 231, 0.75);
+}
+
+.md-feedback-stack.md-hidden {
+  display: none;
+}
+
+.md-feedback-stack__title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #28485a;
+}
+
+.md-feedback-stack__text {
+  color: #5d7482;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.md-feedback-stack__label {
+  margin-top: 2px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #607787;
+}
+
 .md-issues {
   border: 1px solid #efc9a6;
   border-radius: 16px;
@@ -121,6 +178,120 @@
 
 .md-issues__item + .md-issues__item {
   margin-top: 4px;
+}
+
+.md-note-card {
+  border: 1px solid #cfe2dc;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f3fbf9 0%, #ffffff 100%);
+  padding: 16px 18px;
+}
+
+.md-note-card__title {
+  margin: 0 0 8px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #1f4f4a;
+}
+
+.md-note-card__text {
+  margin: 0;
+  color: #3f5f5b;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.md-note-card__text + .md-note-card__text,
+.md-note-list + .md-note-card__text {
+  margin-top: 8px;
+}
+
+.md-note-list {
+  margin: 8px 0 0;
+  padding-left: 1.2rem;
+  color: #345450;
+  font-size: 0.86rem;
+}
+
+.md-note-list li + li {
+  margin-top: 4px;
+}
+
+.md-xlsx-summary {
+  border: 1px solid #cde3f5;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f5faff 0%, #ffffff 100%);
+  padding: 14px 16px;
+  color: #325067;
+}
+
+.md-xlsx-summary.md-hidden {
+  display: none;
+}
+
+.md-xlsx-summary__title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.md-xlsx-summary__counts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.md-xlsx-summary__count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.8rem;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #e9f3fc;
+  color: #2c5570;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.md-xlsx-summary__unchanged {
+  margin-bottom: 10px;
+  color: #5b7382;
+  font-size: 0.84rem;
+}
+
+.md-xlsx-summary__section + .md-xlsx-summary__section {
+  margin-top: 12px;
+}
+
+.md-xlsx-summary__section-title {
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #2b5169;
+}
+
+.md-xlsx-summary__list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.md-xlsx-summary__item + .md-xlsx-summary__item {
+  margin-top: 4px;
+}
+
+.md-xlsx-summary__item-title {
+  font-weight: 700;
+  color: #244559;
+}
+
+.md-xlsx-summary__item-body {
+  margin-top: 3px;
+  color: #466172;
+}
+
+.md-xlsx-summary__hint {
+  margin-top: 12px;
+  color: #516b7b;
+  font-size: 0.84rem;
 }
 
 .md-summary-grid {
