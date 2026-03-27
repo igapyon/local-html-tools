@@ -54,7 +54,16 @@
   const mikuprojectWbsXlsx = (globalThis as typeof globalThis & {
     __mikuprojectWbsXlsx?: {
       collectWbsHolidayDates: (model: ProjectModel) => string[];
-      exportWbsWorkbook: (model: ProjectModel, options?: { holidayDates?: string[] }) => unknown;
+      exportWbsWorkbook: (
+        model: ProjectModel,
+        options?: {
+          holidayDates?: string[];
+          displayDaysBeforeBaseDate?: number;
+          displayDaysAfterBaseDate?: number;
+          useBusinessDaysForDisplayRange?: boolean;
+          useBusinessDaysForProgressBand?: boolean;
+        }
+      ) => unknown;
     };
   }).__mikuprojectWbsXlsx;
 
@@ -85,6 +94,10 @@
 
   function getTextArea(id: string): HTMLTextAreaElement {
     return getElement<HTMLTextAreaElement>(id);
+  }
+
+  function getInput(id: string): HTMLInputElement {
+    return getElement<HTMLInputElement>(id);
   }
 
   function parseHolidayDateList(raw: string): string[] {
@@ -118,6 +131,34 @@
 
   function parseWbsAdditionalHolidayDates(): string[] {
     return parseHolidayDateList(getTextArea("wbsExtraHolidayDatesInput").value.trim());
+  }
+
+  function parseOptionalNonNegativeInteger(raw: string): number | undefined {
+    const value = raw.trim();
+    if (!value) {
+      return undefined;
+    }
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return undefined;
+    }
+    return Math.max(0, Math.floor(parsed));
+  }
+
+  function parseWbsDisplayDaysBeforeBaseDate(): number | undefined {
+    return parseOptionalNonNegativeInteger(getInput("wbsDisplayDaysBeforeInput").value);
+  }
+
+  function parseWbsDisplayDaysAfterBaseDate(): number | undefined {
+    return parseOptionalNonNegativeInteger(getInput("wbsDisplayDaysAfterInput").value);
+  }
+
+  function useBusinessDaysForWbsDisplayRange(): boolean {
+    return getInput("wbsBusinessDayRangeInput").checked;
+  }
+
+  function useBusinessDaysForWbsProgressBand(): boolean {
+    return getInput("wbsBusinessDayProgressInput").checked;
   }
 
   function syncWbsHolidayDatesInput(model: ProjectModel | null): void {
@@ -745,8 +786,18 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
     const model = ensureCurrentModel();
     const defaultHolidayDates = parseWbsDefaultHolidayDates();
     const additionalHolidayDates = parseWbsAdditionalHolidayDates();
+    const displayDaysBeforeBaseDate = parseWbsDisplayDaysBeforeBaseDate();
+    const displayDaysAfterBaseDate = parseWbsDisplayDaysAfterBaseDate();
+    const useBusinessDaysForDisplayRange = useBusinessDaysForWbsDisplayRange();
+    const useBusinessDaysForProgressBand = useBusinessDaysForWbsProgressBand();
     const effectiveHolidayDates = Array.from(new Set([...defaultHolidayDates, ...additionalHolidayDates]));
-    const workbook = mikuprojectWbsXlsx.exportWbsWorkbook(model, { holidayDates: effectiveHolidayDates });
+    const workbook = mikuprojectWbsXlsx.exportWbsWorkbook(model, {
+      holidayDates: effectiveHolidayDates,
+      displayDaysBeforeBaseDate,
+      displayDaysAfterBaseDate,
+      useBusinessDaysForDisplayRange,
+      useBusinessDaysForProgressBand
+    });
     if (defaultHolidayDates.length === 0 && effectiveHolidayDates.length > 0) {
       getTextArea("wbsHolidayDatesInput").value = effectiveHolidayDates.join("\n");
     }
@@ -764,7 +815,11 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
       new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
       `mikuproject-wbs-${stamp}.xlsx`
     );
-    setStatus(`WBS XLSX ファイルをエクスポートしました${effectiveHolidayDates.length > 0 ? ` (祝日 ${effectiveHolidayDates.length} 件)` : ""}`);
+    const displayRangeText = displayDaysBeforeBaseDate !== undefined || displayDaysAfterBaseDate !== undefined
+      ? ` / 表示期間 ${useBusinessDaysForDisplayRange ? "営業日" : "暦日"} 基準日前 ${displayDaysBeforeBaseDate || 0} 日, 基準日後 ${displayDaysAfterBaseDate || 0} 日`
+      : "";
+    const progressBandText = useBusinessDaysForProgressBand ? " / 進捗帯 営業日" : "";
+    setStatus(`WBS XLSX ファイルをエクスポートしました${effectiveHolidayDates.length > 0 ? ` (祝日 ${effectiveHolidayDates.length} 件)` : ""}${displayRangeText}${progressBandText}`);
     showToast("WBS XLSX を保存しました");
   }
 

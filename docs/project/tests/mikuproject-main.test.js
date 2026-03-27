@@ -96,8 +96,12 @@ function mountDom() {
     <section class="md-note-card">
       <h3 class="md-note-card__title">WBS XLSX の祝日指定</h3>
       <p class="md-note-card__text">WBS XLSX Export では、ProjectModel から補完した既定祝日と、YYYY-MM-DD 形式で指定した追加祝日を合成して WBS 日付帯へ反映します。</p>
-      <p class="md-note-card__text">既定祝日は、現在の ProjectModel に含まれる Calendar.Exceptions の非稼働日例外から補完します。追加祝日は改行またはカンマ区切りで入力できます。</p>
+      <p class="md-note-card__text">既定祝日は、現在の ProjectModel に含まれる Calendar.Exceptions の非稼働日例外から補完します。追加祝日は改行またはカンマ区切りで入力できます。表示期間を空欄にすると全期間、数値を入れると BaseDate 前後の日数で切り出します。営業日ベースを選ぶと土日祝を飛ばします。進捗帯も営業日基準へ切り替えられます。</p>
     </section>
+    <input id="wbsDisplayDaysBeforeInput" />
+    <input id="wbsDisplayDaysAfterInput" />
+    <input id="wbsBusinessDayRangeInput" type="checkbox" />
+    <input id="wbsBusinessDayProgressInput" type="checkbox" />
     <textarea id="wbsHolidayDatesInput"></textarea>
     <textarea id="wbsExtraHolidayDatesInput"></textarea>
     <textarea id="xmlInput"></textarea>
@@ -184,8 +188,15 @@ describe("mikuproject main", () => {
     expect(document.body.textContent).toContain("既定祝日と");
     expect(document.body.textContent).toContain("追加祝日を合成");
     expect(document.body.textContent).toContain("非稼働日例外から補完");
+    expect(document.body.textContent).toContain("BaseDate 前後の日数で切り出します");
+    expect(document.body.textContent).toContain("営業日ベースを選ぶと土日祝を飛ばします");
+    expect(document.body.textContent).toContain("進捗帯も営業日基準へ切り替えられます");
     expect(document.getElementById("wbsHolidayDatesInput").value).toBe("");
     expect(document.getElementById("wbsExtraHolidayDatesInput").value).toBe("");
+    expect(document.getElementById("wbsDisplayDaysBeforeInput").value).toBe("");
+    expect(document.getElementById("wbsDisplayDaysAfterInput").value).toBe("");
+    expect(document.getElementById("wbsBusinessDayRangeInput").checked).toBe(false);
+    expect(document.getElementById("wbsBusinessDayProgressInput").checked).toBe(false);
     expect(document.querySelector(".md-feedback-stack")?.classList.contains("md-hidden")).toBe(true);
   });
 
@@ -702,7 +713,11 @@ describe("mikuproject main", () => {
     expect(document.getElementById("wbsHolidayDatesInput").value).toBe("2026-03-20");
     expect(document.getElementById("wbsExtraHolidayDatesInput").value).toBe("");
     expect(exportSpy.mock.calls.at(-1)?.[1]).toEqual({
-      holidayDates: ["2026-03-20"]
+      holidayDates: ["2026-03-20"],
+      displayDaysBeforeBaseDate: undefined,
+      displayDaysAfterBaseDate: undefined,
+      useBusinessDaysForDisplayRange: false,
+      useBusinessDaysForProgressBand: false
     });
     expect(document.getElementById("statusMessage").textContent).toContain("WBS XLSX ファイルをエクスポートしました");
     expect(document.getElementById("statusMessage").textContent).toContain("祝日 1 件");
@@ -718,13 +733,78 @@ describe("mikuproject main", () => {
 
     expect(exportSpy).toHaveBeenCalled();
     expect(exportSpy.mock.calls.at(-1)?.[1]).toEqual({
-      holidayDates: ["2026-03-20", "2026-03-21"]
+      holidayDates: ["2026-03-20", "2026-03-21"],
+      displayDaysBeforeBaseDate: undefined,
+      displayDaysAfterBaseDate: undefined,
+      useBusinessDaysForDisplayRange: false,
+      useBusinessDaysForProgressBand: false
     });
     const workbook = exportSpy.mock.results.at(-1)?.value;
     const sheet = workbook.sheets[0];
-    expect(sheet.rows[3].cells[0].value).toContain("Holidays=2");
-    expect(sheet.rows[9].cells[23].fillColor).toBe("#FCE4EC");
+    const projectInfoHeaderIndex = sheet.rows.findIndex((row) => row.cells[5]?.value === "プロジェクト / 情報");
+    expect(sheet.rows[projectInfoHeaderIndex + 7].cells[6].value).toBe(2);
+    const headerRowIndex = sheet.rows.findIndex((row) => row.cells[0]?.value === "UID");
+    const holidayColumnIndex = sheet.rows[headerRowIndex].cells.findIndex((cell) => cell.value === "03/20 Fri");
+    expect(sheet.rows[headerRowIndex].cells[holidayColumnIndex].fillColor).toBe("#FCE4EC");
     expect(document.getElementById("statusMessage").textContent).toContain("祝日 2 件");
+  });
+
+  it("downloads current wbs xlsx with configured display range", async () => {
+    bootPage();
+    const exportSpy = vi.spyOn(globalThis.__mikuprojectWbsXlsx, "exportWbsWorkbook");
+
+    document.getElementById("parseXmlBtn").click();
+    document.getElementById("wbsDisplayDaysBeforeInput").value = "1";
+    document.getElementById("wbsDisplayDaysAfterInput").value = "2";
+    document.getElementById("exportWbsXlsxBtn").click();
+
+    expect(exportSpy).toHaveBeenCalled();
+    expect(exportSpy.mock.calls.at(-1)?.[1]).toEqual({
+      holidayDates: ["2026-03-20"],
+      displayDaysBeforeBaseDate: 1,
+      displayDaysAfterBaseDate: 2,
+      useBusinessDaysForDisplayRange: false,
+      useBusinessDaysForProgressBand: false
+    });
+    expect(document.getElementById("statusMessage").textContent).toContain("表示期間 暦日 基準日前 1 日, 基準日後 2 日");
+  });
+
+  it("downloads current wbs xlsx with business-day display range", async () => {
+    bootPage();
+    const exportSpy = vi.spyOn(globalThis.__mikuprojectWbsXlsx, "exportWbsWorkbook");
+
+    document.getElementById("parseXmlBtn").click();
+    document.getElementById("wbsDisplayDaysBeforeInput").value = "1";
+    document.getElementById("wbsDisplayDaysAfterInput").value = "2";
+    document.getElementById("wbsBusinessDayRangeInput").checked = true;
+    document.getElementById("exportWbsXlsxBtn").click();
+
+    expect(exportSpy.mock.calls.at(-1)?.[1]).toEqual({
+      holidayDates: ["2026-03-20"],
+      displayDaysBeforeBaseDate: 1,
+      displayDaysAfterBaseDate: 2,
+      useBusinessDaysForDisplayRange: true,
+      useBusinessDaysForProgressBand: false
+    });
+    expect(document.getElementById("statusMessage").textContent).toContain("表示期間 営業日 基準日前 1 日, 基準日後 2 日");
+  });
+
+  it("downloads current wbs xlsx with business-day progress band", async () => {
+    bootPage();
+    const exportSpy = vi.spyOn(globalThis.__mikuprojectWbsXlsx, "exportWbsWorkbook");
+
+    document.getElementById("parseXmlBtn").click();
+    document.getElementById("wbsBusinessDayProgressInput").checked = true;
+    document.getElementById("exportWbsXlsxBtn").click();
+
+    expect(exportSpy.mock.calls.at(-1)?.[1]).toEqual({
+      holidayDates: ["2026-03-20"],
+      displayDaysBeforeBaseDate: undefined,
+      displayDaysAfterBaseDate: undefined,
+      useBusinessDaysForDisplayRange: false,
+      useBusinessDaysForProgressBand: true
+    });
+    expect(document.getElementById("statusMessage").textContent).toContain("進捗帯 営業日");
   });
 
   it("fills wbs holiday input from model defaults when xml is parsed", () => {
@@ -924,7 +1004,7 @@ describe("mikuproject main", () => {
     expect(document.getElementById("xlsxImportSummary").textContent).toContain("Title: Sample Project Title -> Title From XLSX");
     expect(document.getElementById("xlsxImportSummary").textContent).toContain("Company: Local HTML Tools -> Company From XLSX");
     expect(document.getElementById("xlsxImportSummary").textContent).toContain("StartDate: 2026-03-16T09:00:00 -> 2026-03-15T09:00:00");
-    expect(document.getElementById("xlsxImportSummary").textContent).toContain("FinishDate: 2026-03-20T18:00:00 -> 2026-03-28T18:00:00");
+    expect(document.getElementById("xlsxImportSummary").textContent).toContain("FinishDate: 2026-03-31T18:00:00 -> 2026-03-28T18:00:00");
     expect(document.querySelectorAll("#xlsxImportSummary .md-xlsx-summary__section")).toHaveLength(1);
     expect(document.querySelectorAll("#xlsxImportSummary .md-xlsx-summary__item")).toHaveLength(1);
   });

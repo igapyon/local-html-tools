@@ -31,6 +31,9 @@
     function getTextArea(id) {
         return getElement(id);
     }
+    function getInput(id) {
+        return getElement(id);
+    }
     function parseHolidayDateList(raw) {
         if (!raw) {
             return [];
@@ -60,6 +63,29 @@
     }
     function parseWbsAdditionalHolidayDates() {
         return parseHolidayDateList(getTextArea("wbsExtraHolidayDatesInput").value.trim());
+    }
+    function parseOptionalNonNegativeInteger(raw) {
+        const value = raw.trim();
+        if (!value) {
+            return undefined;
+        }
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) {
+            return undefined;
+        }
+        return Math.max(0, Math.floor(parsed));
+    }
+    function parseWbsDisplayDaysBeforeBaseDate() {
+        return parseOptionalNonNegativeInteger(getInput("wbsDisplayDaysBeforeInput").value);
+    }
+    function parseWbsDisplayDaysAfterBaseDate() {
+        return parseOptionalNonNegativeInteger(getInput("wbsDisplayDaysAfterInput").value);
+    }
+    function useBusinessDaysForWbsDisplayRange() {
+        return getInput("wbsBusinessDayRangeInput").checked;
+    }
+    function useBusinessDaysForWbsProgressBand() {
+        return getInput("wbsBusinessDayProgressInput").checked;
     }
     function syncWbsHolidayDatesInput(model) {
         const input = getTextArea("wbsHolidayDatesInput");
@@ -616,8 +642,18 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
         const model = ensureCurrentModel();
         const defaultHolidayDates = parseWbsDefaultHolidayDates();
         const additionalHolidayDates = parseWbsAdditionalHolidayDates();
+        const displayDaysBeforeBaseDate = parseWbsDisplayDaysBeforeBaseDate();
+        const displayDaysAfterBaseDate = parseWbsDisplayDaysAfterBaseDate();
+        const useBusinessDaysForDisplayRange = useBusinessDaysForWbsDisplayRange();
+        const useBusinessDaysForProgressBand = useBusinessDaysForWbsProgressBand();
         const effectiveHolidayDates = Array.from(new Set([...defaultHolidayDates, ...additionalHolidayDates]));
-        const workbook = mikuprojectWbsXlsx.exportWbsWorkbook(model, { holidayDates: effectiveHolidayDates });
+        const workbook = mikuprojectWbsXlsx.exportWbsWorkbook(model, {
+            holidayDates: effectiveHolidayDates,
+            displayDaysBeforeBaseDate,
+            displayDaysAfterBaseDate,
+            useBusinessDaysForDisplayRange,
+            useBusinessDaysForProgressBand
+        });
         if (defaultHolidayDates.length === 0 && effectiveHolidayDates.length > 0) {
             getTextArea("wbsHolidayDatesInput").value = effectiveHolidayDates.join("\n");
         }
@@ -632,7 +668,11 @@ WorkWeek1=${formatCalendarWorkWeekSummary(calendar)}</div>
             String(now.getMinutes()).padStart(2, "0")
         ].join("");
         downloadBlob(new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), `mikuproject-wbs-${stamp}.xlsx`);
-        setStatus(`WBS XLSX ファイルをエクスポートしました${effectiveHolidayDates.length > 0 ? ` (祝日 ${effectiveHolidayDates.length} 件)` : ""}`);
+        const displayRangeText = displayDaysBeforeBaseDate !== undefined || displayDaysAfterBaseDate !== undefined
+            ? ` / 表示期間 ${useBusinessDaysForDisplayRange ? "営業日" : "暦日"} 基準日前 ${displayDaysBeforeBaseDate || 0} 日, 基準日後 ${displayDaysAfterBaseDate || 0} 日`
+            : "";
+        const progressBandText = useBusinessDaysForProgressBand ? " / 進捗帯 営業日" : "";
+        setStatus(`WBS XLSX ファイルをエクスポートしました${effectiveHolidayDates.length > 0 ? ` (祝日 ${effectiveHolidayDates.length} 件)` : ""}${displayRangeText}${progressBandText}`);
         showToast("WBS XLSX を保存しました");
     }
     async function importXlsxFromFile(file) {
