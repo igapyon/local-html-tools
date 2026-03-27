@@ -34,6 +34,7 @@
 - 上記シート粒度が `MS Project XML` / `ProjectModel` の構造に由来することを明記する
 - Excel 側の独自都合ではなく、まずは `MS Project XML` の構造に忠実な workbook 構成を優先する
 - WBS 帳票的な見せ方は、別ビュー・別 workbook として export を継続改善する
+- `WBS XLSX Export` は表示専用 workbook として、上部サマリ、凡例、Week/BaseDate ガイド、日付帯の視認性改善を継続する
 - `WBS XLSX Export` では、`ProjectModel` 由来の既定祝日と、UI から入力した追加祝日を分けて扱えるように保つ
 - WBS sample 生成では、`Calendar.Exceptions` のうち非稼働日例外を祝日候補として日付帯へ反映する
 - `build-project-xlsx-sample.mjs` を静的 workbook 直書きから `project-xlsx.ts` 利用へ切り替える

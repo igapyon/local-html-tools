@@ -12,6 +12,10 @@
     sheets: Array<{
       name: string;
       columns?: Array<{ width?: number }>;
+      freezePane?: {
+        rowSplit?: number;
+        colSplit?: number;
+      };
       mergedRanges?: string[];
       rows: Array<{
         height?: number;
@@ -33,6 +37,7 @@
   const PHASE_FILL = "#EEF7E8";
   const TASK_KIND_FILL = "#EEF2F6";
   const MILESTONE_FILL = "#FFF4E0";
+  const IDENTIFIER_FILL = "#F7F9FC";
   const PLACEHOLDER_FILL = "#F5F7FA";
   const BAND_FILL = "#F4F7FB";
   const ACTIVE_BAND_FILL = "#9FD5C9";
@@ -46,6 +51,7 @@
   const TODAY_PROGRESS_BAND_FILL = "#D89A2B";
   const HOLIDAY_BAND_FILL = "#FCE4EC";
   const DIVIDER_FILL = "#C5D1DB";
+  const BASEDATE_GUIDE_TAIL_FILL = "#FFF8E1";
 
   function collectWbsHolidayDates(model: ProjectModel): string[] {
     const holidaySet = new Set<string>();
@@ -112,11 +118,15 @@
       sheets: [
         {
           name: "WBS",
+          freezePane: {
+            rowSplit: 10,
+            colSplit: 19
+          },
           columns: [
-            { width: 8 }, { width: 8 }, { width: 14 }, { width: 12 }, { width: 12 }, { width: 34 },
-            { width: 20 }, { width: 20 }, { width: 14 }, { width: 14 },
+            { width: 8 }, { width: 8 }, { width: 12 }, { width: 10 }, { width: 10 }, { width: 42 },
+            { width: 18 }, { width: 18 }, { width: 12 }, { width: 14 },
             { width: 18 }, { width: 12 }, { width: 12 }, { width: 12 },
-            { width: 20 }, { width: 14 }, { width: 24 }, { width: 22 }, { width: 3 },
+            { width: 16 }, { width: 12 }, { width: 20 }, { width: 18 }, { width: 3 },
             ...dateBand.map(() => ({ width: 6 }))
           ],
           mergedRanges: [
@@ -133,27 +143,35 @@
             infoRow(`Start=${model.project.startDate || "-"} / Finish=${model.project.finishDate || "-"} / CurrentDate=${model.project.currentDate || "-"} / Holidays=${holidaySet.size}`, totalColumns),
             displaySummaryRow(dateBand.length, model.project.currentDate, model.tasks.length, model.resources.length, model.assignments.length, model.calendars.length, totalColumns),
             legendRow(totalColumns),
-            sectionTitleRow(`Task View / BaseDate=${(model.project.currentDate || "-").slice(0, 10) || "-"}`, totalColumns),
+            taskViewRow((model.project.currentDate || "-").slice(0, 10) || "-", totalColumns),
             weekBandRow(fixedHeaders.length + 1, weekBandRanges, dateBand.length),
             todayGuideRow(fixedHeaders.length + 1, dateBand, model.project.currentDate, holidaySet),
             headerRow([
-              ...fixedHeaders,
+              ...fixedHeaders.map((label) => label === "Name"
+                ? {
+                    value: label,
+                    bold: true,
+                    fillColor: headerFillForLabel(label),
+                    border: "thin" as const,
+                    horizontalAlign: "left" as const
+                  }
+                : label),
               dividerCell(),
               ...dateBand.map((day) => dateHeaderCell(day, model.project.currentDate, holidaySet))
             ]),
             ...model.tasks.map((task) => ({
               cells: [
-                taskCell(task, task.uid, "center"),
-                taskCell(task, task.id, "center"),
-                taskCell(task, task.wbs || task.outlineNumber, "center"),
+                identifierCell(task, task.uid),
+                identifierCell(task, task.id),
+                identifierCell(task, task.wbs || task.outlineNumber),
                 kindCell(task),
-                taskCell(task, task.outlineLevel, "center"),
+                identifierCell(task, task.outlineLevel),
                 taskCell(task, formatTaskLabel(task)),
-                taskCell(task, task.start),
-                taskCell(task, task.finish),
+                taskCell(task, task.start, "center"),
+                taskCell(task, task.finish, "center"),
                 taskCell(task, task.duration, "center"),
-                taskCell(task, task.percentComplete, "center"),
-                taskCell(task, task.percentWorkComplete, "center"),
+                progressCell(task, task.percentComplete),
+                progressCell(task, task.percentWorkComplete),
                 flagCell(task, task.milestone, "M"),
                 flagCell(task, task.summary, "S"),
                 flagCell(task, task.critical, "!"),
@@ -217,7 +235,7 @@
     return {
       value: displayValue,
       border: "thin",
-      horizontalAlign,
+      horizontalAlign: placeholder ? "center" : horizontalAlign,
       bold: task.summary || task.milestone || false,
       fillColor: placeholder ? PLACEHOLDER_FILL : (task.summary ? PHASE_FILL : (task.milestone ? MILESTONE_FILL : undefined))
     };
@@ -239,6 +257,31 @@
     };
   }
 
+  function taskViewRow(baseDate: string, columnCount: number) {
+    return {
+      height: 26,
+      cells: Array.from({ length: columnCount }, (_, index) => {
+        if (index === 0) {
+          return {
+            value: `Task View | BaseDate=${baseDate}`,
+            bold: true,
+            fillColor: "#EAF3FB",
+            border: "thin" as const,
+            horizontalAlign: "left" as const
+          };
+        }
+        if (index < 12) {
+          return {
+            value: "",
+            fillColor: "#EAF3FB",
+            border: "thin" as const
+          };
+        }
+        return {};
+      })
+    };
+  }
+
   function infoRow(text: string, columnCount: number) {
     return {
       height: 24,
@@ -256,7 +299,7 @@
   function legendRow(columnCount: number) {
     const items: WbsXlsxCellLike[] = [
       {
-        value: "Legend",
+        value: "Legend / 記号",
         bold: true,
         border: "thin",
         horizontalAlign: "center"
@@ -361,13 +404,38 @@
         bold: true,
         border: "thin" as const,
         horizontalAlign: "center" as const,
-        fillColor: item.hasMonthBoundary ? MONTH_BOUNDARY_WEEK_FILL : (index % 2 === 0 ? "#EDF4FB" : "#E4EEF8")
+        fillColor: item.hasMonthBoundary ? MONTH_BOUNDARY_WEEK_FILL : (index % 2 === 0 ? "#EDF4FB" : "#EAF1F9")
       };
     });
     return {
       height: 22,
       cells: [
-        ...Array.from({ length: fixedColumnCount }, () => ({})),
+        ...Array.from({ length: fixedColumnCount }, (_, index) => {
+          if (index === 5) {
+            return {
+              value: "Week",
+              bold: true,
+              border: "thin" as const,
+              horizontalAlign: "right" as const,
+              fillColor: "#E3EEF9"
+            };
+          }
+          if (index > 5 && index < 9) {
+            return {
+              value: "",
+              border: "thin" as const,
+              fillColor: "#E3EEF9"
+            };
+          }
+          if (index === 5 || index === 9) {
+            return {
+              value: "",
+              border: "thin" as const,
+              fillColor: "#E3EEF9"
+            };
+          }
+          return {};
+        }),
         ...bandCells
       ]
     };
@@ -384,6 +452,8 @@
   ) {
     const displayWeeks = displayDays > 0 ? Math.ceil(displayDays / 7) : 0;
     const items: WbsXlsxCellLike[] = [
+      summaryStatCell("Summary", HEADER_ID_FILL),
+      summaryStatCell("", HEADER_FILL),
       summaryStatCell("DisplayDays", HEADER_SCHEDULE_FILL),
       summaryStatCell(displayDays, HEADER_SCHEDULE_FILL),
       summaryStatCell("DisplayWeeks", HEADER_SCHEDULE_FILL),
@@ -477,20 +547,44 @@
     return {
       height: 22,
       cells: [
-        ...Array.from({ length: fixedColumnCount }, (_, index) => (index === 5
-          ? {
-              value: "Today",
+        ...Array.from({ length: fixedColumnCount }, (_, index) => {
+          if (index === 5) {
+            return {
+              value: "BaseDate",
               bold: true,
               border: "thin" as const,
-              horizontalAlign: "right" as const
-            }
-          : {})),
-        ...dateBand.map((day) => ({
-          value: isSameDay(day, currentDate) ? "TODAY" : "",
+              horizontalAlign: "right" as const,
+              fillColor: "#FFEFC2"
+            };
+          }
+          if (index > 5 && index < 9) {
+            return {
+              value: "",
+              border: "thin" as const,
+              fillColor: "#FFEFC2"
+            };
+          }
+          if (index === 5 || index === 9) {
+            return {
+              value: "",
+              border: "thin" as const,
+              fillColor: "#FFEFC2"
+            };
+          }
+          return {};
+        }),
+        ...dateBand.map((day, index) => ({
+          value: isSameDay(day, currentDate) ? "▼BaseDate" : "",
           bold: true,
           border: "thin" as const,
           horizontalAlign: "center" as const,
-          fillColor: isSameDay(day, currentDate) ? TODAY_BAND_FILL : (holidaySet.has(day) ? HOLIDAY_BAND_FILL : (isWeekStart(day) ? WEEK_START_BAND_FILL : BAND_FILL))
+          fillColor: isSameDay(day, currentDate)
+            ? TODAY_BAND_FILL
+            : (holidaySet.has(day)
+              ? HOLIDAY_BAND_FILL
+              : (isWeekStart(day)
+                ? WEEK_START_BAND_FILL
+                : (index < 3 ? BASEDATE_GUIDE_TAIL_FILL : BAND_FILL)))
         }))
       ]
     };
@@ -533,12 +627,35 @@
     };
   }
 
+  function identifierCell(task: TaskModel, value: string | number | boolean | undefined): WbsXlsxCellLike {
+    if (value === undefined || value === "") {
+      return {};
+    }
+    return {
+      value,
+      border: "thin",
+      horizontalAlign: "center",
+      bold: task.summary || task.milestone || false,
+      fillColor: task.summary ? PHASE_FILL : (task.milestone ? MILESTONE_FILL : IDENTIFIER_FILL)
+    };
+  }
+
   function flagCell(task: TaskModel, enabled: boolean | undefined, marker: string): WbsXlsxCellLike {
     return {
       value: enabled ? marker : "",
       border: "thin",
       horizontalAlign: "center",
       bold: !!enabled,
+      fillColor: task.summary ? PHASE_FILL : (task.milestone ? MILESTONE_FILL : undefined)
+    };
+  }
+
+  function progressCell(task: TaskModel, value: number | undefined): WbsXlsxCellLike {
+    return {
+      value: value === undefined || value === null ? "" : `${value}%`,
+      border: "thin",
+      horizontalAlign: "center",
+      bold: task.summary || task.milestone || false,
       fillColor: task.summary ? PHASE_FILL : (task.milestone ? MILESTONE_FILL : undefined)
     };
   }
@@ -550,7 +667,7 @@
     const weekStart = isWeekStart(day);
     const monthStart = isMonthStart(day);
     return {
-      value: isToday ? `${formatDateLabel(day)} *` : formatDateLabel(day),
+      value: isToday ? `[${formatDateLabel(day)} *]` : formatDateLabel(day),
       bold: true,
       border: "thin",
       horizontalAlign: "center",
