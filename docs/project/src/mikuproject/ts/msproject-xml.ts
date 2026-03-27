@@ -10,7 +10,7 @@
   <SaveVersion>14</SaveVersion>
   <CurrentDate>2026-03-16T09:00:00</CurrentDate>
   <StartDate>2026-03-16T09:00:00</StartDate>
-  <FinishDate>2026-03-20T18:00:00</FinishDate>
+  <FinishDate>2026-03-31T18:00:00</FinishDate>
   <ScheduleFromStart>1</ScheduleFromStart>
   <DefaultStartTime>09:00:00</DefaultStartTime>
   <DefaultFinishTime>18:00:00</DefaultFinishTime>
