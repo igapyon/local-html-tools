@@ -15,7 +15,7 @@
 ## 技術スタック
 
 - 静的 HTML、CSS、JavaScript
-- 一部モジュールでは TypeScript を利用。特に `docs/music/`、`docs/prompt/`、`docs/project/` などが中心
+- 一部モジュールでは TypeScript を利用。特に `docs/music/`、`docs/prompt/` などが中心
 - `scripts/` 配下の Node.js ビルドスクリプト
 - バンドル補助としての `esbuild`
 - テスト用の `vitest` と `jsdom`
