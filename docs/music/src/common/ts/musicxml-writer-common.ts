@@ -1,3 +1,8 @@
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const MusicXmlWriterCommon = (() => {
   function escapeXml(value) {
     return String(value)

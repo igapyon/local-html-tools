@@ -1,3 +1,8 @@
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const MusicXmlCommon = (() => {
   function readTextFileUtf8(file, onLoad, onError) {
     const reader = new FileReader();

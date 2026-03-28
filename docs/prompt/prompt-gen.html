@@ -1,17 +1,6 @@
 <!--
 Copyright 2026 Toshiki Iga
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+SPDX-License-Identifier: Apache-2.0
 -->
 <!DOCTYPE html>
 <html lang="ja">
@@ -3796,6 +3785,10 @@ if (!customElements.get("lht-page-menu")) {
   </script>
 
   <script>
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
 const strictHallucinationPreventionInstruction = `○ハルシネーション防止のため、次のルールに従ってください。
 - 禁止: (1)今回のこの会話（セッション）および入力内容に明示されていない情報を、補完して記入してはいけません。 (2)会話にない情報を、もっともらしく埋めてはいけません。 (3)根拠がない内容を、確定情報として記載してはいけません。
 - 代替行動: (1)情報不足の項目がある場合は、必要な追加質問を行ってください。 (2)追加質問できない場合、または質問後も根拠が不足する場合は、"不明" "未確認" "要確認" などと明示してください。 (3)判断材料が不足している場合は、無理に結論を書かず、不足している点を明示してください。
@@ -4137,6 +4130,10 @@ function getTodoReflectionInstruction() {
   </script>
 
   <script>
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
 function unwrapPromptVariable(value) {
     const normalized = String(value || "").trim();
     const match = normalized.match(/^`([\s\S]*)`$/);
@@ -7087,6 +7084,10 @@ README.md、新規 markdown、一部設定ファイルについては UTF-8 を�
   </script>
 
   <script>
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
 const aiExpansionPromptDefinitions = [
     {
         id: "ai-expansion-directory-markdown-check-request",
@@ -7248,6 +7249,10 @@ ${getMarkdownFenceInstruction()}`
   </script>
 
   <script>
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
 const aiSuggestPromptDefinitions = [
     {
         id: "ai-suggest-canonical-markdown-request",
@@ -7463,6 +7468,10 @@ ${getSoftHallucinationPreventionInstruction()}`
   </script>
 
   <script>
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
 function appendStrictInstruction(body) {
     return `${body}\n\n${getStrictHallucinationPreventionInstruction()}`;
 }
@@ -9247,6 +9256,10 @@ ${getMarkdownFenceInstruction()}`
   </script>
 
   <script>
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
 async function initializePromptPage() {
     const SERIES_VISIBILITY_STORAGE_KEY = "promptGenSeriesVisibility";
     const CUSTOM_PROMPT_STORAGE_KEY = "promptGenCustomPrompt";

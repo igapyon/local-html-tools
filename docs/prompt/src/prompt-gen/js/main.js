@@ -1,3 +1,7 @@
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
 async function initializePromptPage() {
     const SERIES_VISIBILITY_STORAGE_KEY = "promptGenSeriesVisibility";
     const CUSTOM_PROMPT_STORAGE_KEY = "promptGenCustomPrompt";
