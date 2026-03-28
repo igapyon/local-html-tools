@@ -1348,7 +1348,7 @@ class LhtCommandBlock extends HTMLElement {
   createCopyButton(label, onClick) {
     const hasMdIconButton = !!(window.customElements && window.customElements.get("md-icon-button"));
     const button = document.createElement(hasMdIconButton ? "md-icon-button" : "button");
-    button.className = `md-copy-button md-copy-button--surface${hasMdIconButton ? "" : " md-copy-button--fallback"}`;
+    button.className = `md-copy-button md-copy-button--prominent md-copy-button--surface${hasMdIconButton ? "" : " md-copy-button--fallback"}`;
     if (!hasMdIconButton) {
       button.type = "button";
     }

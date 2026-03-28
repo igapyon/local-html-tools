@@ -64,10 +64,12 @@ SPDX-License-Identifier: Apache-2.0
 
     <section id="baseBlock" class="md-section md-stack-md">
       <div class="md-stack-md">
-        <div id="repoDisplayCard" class="md-repo-display-card md-hidden" aria-live="polite">
-          <p id="repoDisplayName" class="md-repo-display-name"></p>
+        <div id="repoDisplayWrap" class="md-repo-display-wrap md-hidden" aria-live="polite">
+          <div id="repoDisplayCard" class="md-repo-display-card">
+            <p id="repoDisplayName" class="md-repo-display-name"></p>
+          </div>
           <span class="md-repo-display-actions">
-            <button id="copyGitCurrentDirBackupBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface md-hidden" title="git カレントディレクトリをコピー" aria-label="git カレントディレクトリをコピー">
+            <button id="copyGitCurrentDirBackupBtn" type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface md-hidden" title="git カレントディレクトリをコピー" aria-label="git カレントディレクトリをコピー">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                 <rect x="13" y="3" width="8" height="8" rx="2"></rect>
@@ -75,14 +77,14 @@ SPDX-License-Identifier: Apache-2.0
                 <path d="M17 5.5v3"></path>
               </svg>
             </button>
-            <button id="openRepoUrlBackupBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" title="リポジトリ URL を開く" aria-label="リポジトリ URL を開く">
+            <button id="openRepoUrlBackupBtn" type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface" title="リポジトリ URL を開く" aria-label="リポジトリ URL を開く">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M14 5h5v5"></path>
                 <path d="M10 14 19 5"></path>
                 <path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"></path>
               </svg>
             </button>
-            <button id="saveToWorkBranchListInlineBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" title="Git 作業一覧へ保存" aria-label="Git 作業一覧へ保存">
+            <button id="saveToWorkBranchListInlineBtn" type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface" title="Git 作業一覧へ保存" aria-label="Git 作業一覧へ保存">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M4 7h16"></path>
                 <path d="M4 12h16"></path>
@@ -94,7 +96,7 @@ SPDX-License-Identifier: Apache-2.0
         <div class="md-form-row md-form-row--nowrap">
           <lht-text-field-help field-id="squashBaseBranch" label="基点ブランチ" required autocomplete="on" placeholder="例: devel" value="devel" help-text="基点は git 作業の差分の起点として利用されます。git 作業をどこが基点なのか確認しましょう。基点が違うと差分がずれるため要確認です。設定の順番を揃えると意図した差分になりやすいです。"></lht-text-field-help>
           <md-menu id="baseBranchMenu" anchor="squashBaseBranch" positioning="popover" quick no-navigation-wrap></md-menu>
-          <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="clearBaseBranchHistory()" title="基点ブランチ履歴をクリア" aria-label="基点ブランチ履歴をクリア">
+          <button type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface" onclick="clearBaseBranchHistory()" title="基点ブランチ履歴をクリア" aria-label="基点ブランチ履歴をクリア">
             <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <use href="#md-icon-trash" xlink:href="#md-icon-trash"></use>
             </svg>
@@ -103,7 +105,7 @@ SPDX-License-Identifier: Apache-2.0
         <div class="md-form-row md-form-row--nowrap">
           <div class="md-input-wrap md-input-wrap--inline">
             <lht-text-field-help field-id="workBranch" label="作業ブランチ" required placeholder="例: tiga0129a" field-class="md-outlined-field" help-text="これから作業するブランチ名です。未作成なら作成先として使います。生成コマンドにそのまま反映されます。"></lht-text-field-help>
-            <button type="button" class="md-icon-btn md-icon-btn--small md-input-action--inline" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
+            <button type="button" class="md-icon-btn md-icon-btn--prominent md-input-action--inline" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <use href="#md-icon-refresh" xlink:href="#md-icon-refresh"></use>
               </svg>
@@ -217,7 +219,7 @@ SPDX-License-Identifier: Apache-2.0
             </svg>
             <span>PR整形</span>
           </button>
-          <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface md-title-action-icon" onclick="openNormalizeDiffDialog()" title="整形差分を表示" aria-label="整形差分を表示">
+          <button type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface md-title-action-icon" onclick="openNormalizeDiffDialog()" title="整形差分を表示" aria-label="整形差分を表示">
             <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="9"></circle>
               <path d="M12 10v6"></path>
@@ -288,7 +290,7 @@ SPDX-License-Identifier: Apache-2.0
     <dialog id="normalizeDiffDialog" class="md-diff-dialog">
       <div class="md-diff-dialog__head">
         <h3 class="md-diff-dialog__title">PR整形の差分</h3>
-        <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="closeNormalizeDiffDialog()" title="閉じる" aria-label="閉じる">
+        <button type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface" onclick="closeNormalizeDiffDialog()" title="閉じる" aria-label="閉じる">
           <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M6 6l12 12"></path>
             <path d="M18 6l-12 12"></path>
