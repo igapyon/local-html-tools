@@ -71,18 +71,24 @@
       font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
     }
 
-    .md-repo-display-card {
+    .md-repo-display-wrap {
       display: inline-flex;
       align-items: center;
       gap: 0.45rem;
+      max-width: 100%;
+      margin-top: 0.32rem;
+      margin-bottom: 0.52rem;
+    }
+
+    .md-repo-display-card {
+      display: inline-flex;
+      align-items: center;
       max-width: 100%;
       padding: 0.28rem 0.78rem;
       border: 1px solid #e3dcef;
       border-radius: 999px;
       background: #fbf9ff;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
-      margin-top: 0.32rem;
-      margin-bottom: 0.52rem;
     }
 
     .md-repo-display-name {
@@ -100,7 +106,6 @@
       align-items: center;
       gap: 0.3rem;
       flex: 0 0 auto;
-      margin-left: 0.15rem;
     }
 
     .md-grid {

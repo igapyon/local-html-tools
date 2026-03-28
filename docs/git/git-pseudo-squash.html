@@ -93,6 +93,12 @@ lht-help-tooltip .md-tooltip--rich {
   background: #ebe6f3;
 }
 
+.md-icon-btn--prominent {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+}
+
 .md-menu-button {
   position: absolute;
   top: 16px;
@@ -360,9 +366,27 @@ lht-command-block .md-copy-button--fallback {
   padding: 0;
 }
 
+lht-command-block .md-copy-button--fallback.md-copy-button--prominent {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
 lht-command-block .md-copy-button--fallback .md-icon-small {
   width: 16px;
   height: 16px;
+}
+
+lht-command-block .md-copy-button--fallback.md-copy-button--prominent .md-icon-small {
+  width: 20px;
+  height: 20px;
+}
+
+lht-command-block md-icon-button.md-copy-button.md-copy-button--prominent {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  --md-icon-button-icon-size: 20px;
+  --md-icon-button-state-layer-shape: 20px;
 }
 
 lht-text-field-help {
@@ -1137,18 +1161,24 @@ lht-index-card-link {
       font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
     }
 
-    .md-repo-display-card {
+    .md-repo-display-wrap {
       display: inline-flex;
       align-items: center;
       gap: 0.45rem;
+      max-width: 100%;
+      margin-top: 0.32rem;
+      margin-bottom: 0.52rem;
+    }
+
+    .md-repo-display-card {
+      display: inline-flex;
+      align-items: center;
       max-width: 100%;
       padding: 0.28rem 0.78rem;
       border: 1px solid #e3dcef;
       border-radius: 999px;
       background: #fbf9ff;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
-      margin-top: 0.32rem;
-      margin-bottom: 0.52rem;
     }
 
     .md-repo-display-name {
@@ -1166,7 +1196,6 @@ lht-index-card-link {
       align-items: center;
       gap: 0.3rem;
       flex: 0 0 auto;
-      margin-left: 0.15rem;
     }
 
     .md-grid {
@@ -2595,10 +2624,12 @@ lht-index-card-link {
 
     <section id="baseBlock" class="md-section md-stack-md">
       <div class="md-stack-md">
-        <div id="repoDisplayCard" class="md-repo-display-card md-hidden" aria-live="polite">
-          <p id="repoDisplayName" class="md-repo-display-name"></p>
+        <div id="repoDisplayWrap" class="md-repo-display-wrap md-hidden" aria-live="polite">
+          <div id="repoDisplayCard" class="md-repo-display-card">
+            <p id="repoDisplayName" class="md-repo-display-name"></p>
+          </div>
           <span class="md-repo-display-actions">
-            <button id="copyGitCurrentDirBackupBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface md-hidden" title="git カレントディレクトリをコピー" aria-label="git カレントディレクトリをコピー">
+            <button id="copyGitCurrentDirBackupBtn" type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface md-hidden" title="git カレントディレクトリをコピー" aria-label="git カレントディレクトリをコピー">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                 <rect x="13" y="3" width="8" height="8" rx="2"></rect>
@@ -2606,14 +2637,14 @@ lht-index-card-link {
                 <path d="M17 5.5v3"></path>
               </svg>
             </button>
-            <button id="openRepoUrlBackupBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" title="リポジトリ URL を開く" aria-label="リポジトリ URL を開く">
+            <button id="openRepoUrlBackupBtn" type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface" title="リポジトリ URL を開く" aria-label="リポジトリ URL を開く">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M14 5h5v5"></path>
                 <path d="M10 14 19 5"></path>
                 <path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"></path>
               </svg>
             </button>
-            <button id="saveToWorkBranchListInlineBtn" type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" title="Git 作業一覧へ保存" aria-label="Git 作業一覧へ保存">
+            <button id="saveToWorkBranchListInlineBtn" type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface" title="Git 作業一覧へ保存" aria-label="Git 作業一覧へ保存">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M4 7h16"></path>
                 <path d="M4 12h16"></path>
@@ -2625,7 +2656,7 @@ lht-index-card-link {
         <div class="md-form-row md-form-row--nowrap">
           <lht-text-field-help field-id="squashBaseBranch" label="基点ブランチ" required autocomplete="on" placeholder="例: devel" value="devel" help-text="基点は git 作業の差分の起点として利用されます。git 作業をどこが基点なのか確認しましょう。基点が違うと差分がずれるため要確認です。設定の順番を揃えると意図した差分になりやすいです。"></lht-text-field-help>
           <md-menu id="baseBranchMenu" anchor="squashBaseBranch" positioning="popover" quick no-navigation-wrap></md-menu>
-          <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="clearBaseBranchHistory()" title="基点ブランチ履歴をクリア" aria-label="基点ブランチ履歴をクリア">
+          <button type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface" onclick="clearBaseBranchHistory()" title="基点ブランチ履歴をクリア" aria-label="基点ブランチ履歴をクリア">
             <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <use href="#md-icon-trash" xlink:href="#md-icon-trash"></use>
             </svg>
@@ -2634,7 +2665,7 @@ lht-index-card-link {
         <div class="md-form-row md-form-row--nowrap">
           <div class="md-input-wrap md-input-wrap--inline">
             <lht-text-field-help field-id="workBranch" label="作業ブランチ" required placeholder="例: tiga0129a" field-class="md-outlined-field" help-text="これから作業するブランチ名です。未作成なら作成先として使います。生成コマンドにそのまま反映されます。"></lht-text-field-help>
-            <button type="button" class="md-icon-btn md-icon-btn--small md-input-action--inline" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
+            <button type="button" class="md-icon-btn md-icon-btn--prominent md-input-action--inline" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <use href="#md-icon-refresh" xlink:href="#md-icon-refresh"></use>
               </svg>
@@ -2748,7 +2779,7 @@ lht-index-card-link {
             </svg>
             <span>PR整形</span>
           </button>
-          <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface md-title-action-icon" onclick="openNormalizeDiffDialog()" title="整形差分を表示" aria-label="整形差分を表示">
+          <button type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface md-title-action-icon" onclick="openNormalizeDiffDialog()" title="整形差分を表示" aria-label="整形差分を表示">
             <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="9"></circle>
               <path d="M12 10v6"></path>
@@ -2819,7 +2850,7 @@ lht-index-card-link {
     <dialog id="normalizeDiffDialog" class="md-diff-dialog">
       <div class="md-diff-dialog__head">
         <h3 class="md-diff-dialog__title">PR整形の差分</h3>
-        <button type="button" class="md-icon-btn md-icon-btn--small md-icon-btn--surface" onclick="closeNormalizeDiffDialog()" title="閉じる" aria-label="閉じる">
+        <button type="button" class="md-icon-btn md-icon-btn--prominent md-icon-btn--surface" onclick="closeNormalizeDiffDialog()" title="閉じる" aria-label="閉じる">
           <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M6 6l12 12"></path>
             <path d="M18 6l-12 12"></path>
@@ -4653,7 +4684,7 @@ class LhtCommandBlock extends HTMLElement {
   createCopyButton(label, onClick) {
     const hasMdIconButton = !!(window.customElements && window.customElements.get("md-icon-button"));
     const button = document.createElement(hasMdIconButton ? "md-icon-button" : "button");
-    button.className = `md-copy-button md-copy-button--surface${hasMdIconButton ? "" : " md-copy-button--fallback"}`;
+    button.className = `md-copy-button md-copy-button--prominent md-copy-button--surface${hasMdIconButton ? "" : " md-copy-button--fallback"}`;
     if (!hasMdIconButton) {
       button.type = "button";
     }
@@ -5080,6 +5111,7 @@ if (!customElements.get("lht-page-menu")) {
     }
 
     function updateRepoDisplay() {
+      const wrap = document.getElementById("repoDisplayWrap");
       const card = document.getElementById("repoDisplayCard");
       const nameNode = document.getElementById("repoDisplayName");
       if (!card || !nameNode) return;
@@ -5087,10 +5119,16 @@ if (!customElements.get("lht-page-menu")) {
       const repoName = extractRepoName(repoUrl);
       if (!repoName) {
         nameNode.textContent = "";
+        if (wrap) {
+          wrap.classList.add("md-hidden");
+        }
         card.classList.add("md-hidden");
         return;
       }
       nameNode.textContent = repoName;
+      if (wrap) {
+        wrap.classList.remove("md-hidden");
+      }
       card.classList.remove("md-hidden");
     }
 

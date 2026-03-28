@@ -1090,6 +1090,12 @@ lht-help-tooltip .md-tooltip--rich {
   background: #ebe6f3;
 }
 
+.md-icon-btn--prominent {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+}
+
 .md-menu-button {
   position: absolute;
   top: 16px;
@@ -1357,9 +1363,27 @@ lht-command-block .md-copy-button--fallback {
   padding: 0;
 }
 
+lht-command-block .md-copy-button--fallback.md-copy-button--prominent {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
 lht-command-block .md-copy-button--fallback .md-icon-small {
   width: 16px;
   height: 16px;
+}
+
+lht-command-block .md-copy-button--fallback.md-copy-button--prominent .md-icon-small {
+  width: 20px;
+  height: 20px;
+}
+
+lht-command-block md-icon-button.md-copy-button.md-copy-button--prominent {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  --md-icon-button-icon-size: 20px;
+  --md-icon-button-state-layer-shape: 20px;
 }
 
 lht-text-field-help {
@@ -3956,7 +3980,7 @@ class LhtCommandBlock extends HTMLElement {
   createCopyButton(label, onClick) {
     const hasMdIconButton = !!(window.customElements && window.customElements.get("md-icon-button"));
     const button = document.createElement(hasMdIconButton ? "md-icon-button" : "button");
-    button.className = `md-copy-button md-copy-button--surface${hasMdIconButton ? "" : " md-copy-button--fallback"}`;
+    button.className = `md-copy-button md-copy-button--prominent md-copy-button--surface${hasMdIconButton ? "" : " md-copy-button--fallback"}`;
     if (!hasMdIconButton) {
       button.type = "button";
     }

@@ -113,6 +113,7 @@
     }
 
     function updateRepoDisplay() {
+      const wrap = document.getElementById("repoDisplayWrap");
       const card = document.getElementById("repoDisplayCard");
       const nameNode = document.getElementById("repoDisplayName");
       if (!card || !nameNode) return;
@@ -120,10 +121,16 @@
       const repoName = extractRepoName(repoUrl);
       if (!repoName) {
         nameNode.textContent = "";
+        if (wrap) {
+          wrap.classList.add("md-hidden");
+        }
         card.classList.add("md-hidden");
         return;
       }
       nameNode.textContent = repoName;
+      if (wrap) {
+        wrap.classList.remove("md-hidden");
+      }
       card.classList.remove("md-hidden");
     }
 
