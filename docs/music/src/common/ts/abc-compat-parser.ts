@@ -1,3 +1,8 @@
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 (function (global) {
   const abcCommon = global["AbcCommon"] || (typeof AbcCommon !== "undefined" ? AbcCommon : null);
 

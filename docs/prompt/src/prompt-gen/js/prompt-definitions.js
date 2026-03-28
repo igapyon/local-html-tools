@@ -1,3 +1,7 @@
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
 function unwrapPromptVariable(value) {
     const normalized = String(value || "").trim();
     const match = normalized.match(/^`([\s\S]*)`$/);

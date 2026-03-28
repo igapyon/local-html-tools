@@ -1,3 +1,8 @@
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const MusicXmlSynthScheduleCommon = (() => {
   const musicXmlCommonRef = window["MusicXmlCommon"] || (typeof MusicXmlCommon !== "undefined" ? MusicXmlCommon : null);
   if (!musicXmlCommonRef) {

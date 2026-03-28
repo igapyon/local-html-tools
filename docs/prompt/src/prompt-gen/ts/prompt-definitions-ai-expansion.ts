@@ -1,3 +1,8 @@
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const aiExpansionPromptDefinitions = [
   {
     id: "ai-expansion-directory-markdown-check-request",

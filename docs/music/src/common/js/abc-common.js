@@ -1,3 +1,7 @@
+/*
+ * Copyright 2026 Toshiki Iga
+ * SPDX-License-Identifier: Apache-2.0
+ */
 const AbcCommon = (() => {
     function gcd(a, b) {
         let x = Math.abs(Number(a) || 0);
