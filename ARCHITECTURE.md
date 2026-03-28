@@ -46,7 +46,7 @@
   - `docs/index-src.html` から `docs/index.html` を生成し、更新日プレースホルダも解決する
 - `npm run build:git:material`
   - `@material/web` 由来の vendor bundle を `lht-cmn/vendor/` に生成する
-- `npm run build:prompt` / `npm run build:project` / `npm run build:music`
+- `npm run build:prompt` / `npm run build:music`
   - TypeScript を JavaScript へ変換してから最終 HTML を生成する代表例
 
 ## 開発モード
@@ -143,7 +143,7 @@
 
 ### 変換・プレビュー型
 
-`diagram`、`musicxml-to-svg`、`mikuproject` の一部のように、入力や読込データをブラウザ内で変換し、プレビューや保存へつなぐ方式。
+`diagram` や `musicxml-to-svg` のように、入力や読込データをブラウザ内で変換し、プレビューや保存へつなぐ方式。
 
 - SVG や中間テキストなど、可視な成果物をその場で確認できる
 - ダウンロード、コピー、エラー表示を近接配置し、試行錯誤しやすくする

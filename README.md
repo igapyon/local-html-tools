@@ -108,7 +108,6 @@ docs/
 ├── text/                # テキスト系ツール
 ├── life/                # 生活系ツール
 ├── link/                # URL加工系ツール
-├── project/             # MS Project XML 入出力実験ツール
 ├── xlsx2md/             # 独立前の xlsx2md 関連資料・実装控え
 └── password/            # パスワード生成ツール
 ```
@@ -213,23 +212,11 @@ docs/
   - 変更は `*-src.html` を編集する
   - PRには生成済み `docs/text/*.html` を含める
 
-### project 運用（src編集 + 生成）
+### project / mikuproject の移管
 
-- 対象: `docs/project/mikuproject.html`
-- 配布: `docs/project/mikuproject.html`（単一HTML、生成物）
-- 開発:
-  - `docs/project/mikuproject-src.html`
-  - `docs/project/src/mikuproject/css/app.css`
-  - `docs/project/src/mikuproject/ts/*.ts`
-  - `docs/project/tests/mikuproject-main.test.js`
-  - `docs/project/mikuproject-spec.md`
-  - `docs/project/mikuproject-gap-notes.md`
-- ビルド: `npm run build:project`（`scripts/build-project.mjs`）
-- ルール:
-  - `docs/project/mikuproject.html` は直接編集しない
-  - 変更は `mikuproject-src.html` と `src/mikuproject/` 配下を編集する
-  - `scripts/build-project.mjs` は `ts -> js` を行ってから single-file の `mikuproject.html` を生成する
-  - PRには生成済み `docs/project/mikuproject.html` を含める
+- `docs/project` は独立した別プロジェクトへ移管済み
+- 引っ越し先: `https://github.com/igapyon/mikuproject`
+- このリポジトリの主対象は `local-html-tools` 本体であり、`mikuproject` の継続的な開発・管理は移管先でおこなう
 
 ### img 運用（src編集 + 生成）
 
@@ -417,7 +404,7 @@ Git補助ツールです。
 
 ## GitHub Pages
 
-GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/diagram/`、`docs/knowledge-timeline/`、`docs/music/`、`docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/`、`docs/prompt/`、`docs/project/` 配下にあります。  
+GitHub Pages で公開する場合は `docs/index.html` が入口になります。ツール本体は `docs/diagram/`、`docs/knowledge-timeline/`、`docs/music/`、`docs/ffmpeg/`、`docs/git/`、`docs/link/`、`docs/password/`、`docs/grep/`、`docs/img/`、`docs/text/`、`docs/life/`、`docs/prompt/` 配下にあります。`mikuproject` は独立プロジェクトとして `https://github.com/igapyon/mikuproject` へ移管しました。  
 公開URL: https://igapyon.github.io/local-html-tools/
 
 ## Third-Party Notices
