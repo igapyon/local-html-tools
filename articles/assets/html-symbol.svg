@@ -1,0 +1,51 @@
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">HTML symbol</title>
+  <desc id="desc">An HTML symbol with a web page sheet and markup brackets.</desc>
+  <defs>
+    <linearGradient id="panel" x1="214" y1="194" x2="987" y2="1010" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E66D3B"/>
+      <stop offset="1" stop-color="#B9461D"/>
+    </linearGradient>
+    <linearGradient id="sheet" x1="324" y1="322" x2="864" y2="894" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFCFB"/>
+      <stop offset="1" stop-color="#F7E1D8"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="454" y1="540" x2="756" y2="772" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F4B398"/>
+      <stop offset="1" stop-color="#E98258"/>
+    </linearGradient>
+    <filter id="shadow" x="164" y="156" width="872" height="900" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="20"/>
+      <feGaussianBlur stdDeviation="26"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.72549 0 0 0 0 0.27451 0 0 0 0 0.113725 0 0 0 0.22 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <rect x="216" y="208" width="768" height="784" rx="154" fill="url(#panel)"/>
+    <path d="M332 304C332 281.909 349.909 264 372 264H722.118C732.726 264 742.9 268.214 750.402 275.716L863.284 388.598C870.786 396.1 875 406.274 875 416.882V896C875 918.091 857.091 936 835 936H372C349.909 936 332 918.091 332 896V304Z" fill="url(#sheet)"/>
+    <path d="M744 264V374C744 396.091 761.909 414 784 414H875" fill="#F0C8B7"/>
+
+    <rect x="404" y="384" width="188" height="40" rx="20" fill="#C45128"/>
+    <rect x="404" y="468" width="330" height="28" rx="14" fill="#E0A084"/>
+    <rect x="404" y="522" width="268" height="28" rx="14" fill="#E9B6A0"/>
+
+    <rect x="404" y="620" width="392" height="182" rx="38" fill="url(#accent)"/>
+
+    <g stroke="#8E3618" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M504 672L450 711L504 750"/>
+      <path d="M696 672L750 711L696 750"/>
+      <path d="M612 656L590 766"/>
+    </g>
+
+    <g fill="#FFECE4">
+      <rect x="424" y="842" width="108" height="24" rx="12"/>
+      <rect x="554" y="842" width="172" height="24" rx="12"/>
+    </g>
+  </g>
+</svg>

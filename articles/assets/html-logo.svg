@@ -1,0 +1,27 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">html wordmark orange</title>
+  <desc id="desc">The letters html in an HTML inspired orange color.</desc>
+  <g filter="url(#shadow)">
+    <text
+      x="800"
+      y="520"
+      text-anchor="middle"
+      fill="#C45128"
+      font-family="'Avenir Next', 'Futura', 'Trebuchet MS', sans-serif"
+      font-size="290"
+      font-weight="800"
+      letter-spacing="8">html</text>
+  </g>
+  <defs>
+    <filter id="shadow" x="288" y="190" width="1024" height="412" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="16"/>
+      <feGaussianBlur stdDeviation="18"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.768627 0 0 0 0 0.317647 0 0 0 0 0.156863 0 0 0 0.22 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+</svg>
