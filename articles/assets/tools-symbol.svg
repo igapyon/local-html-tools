@@ -1,0 +1,50 @@
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Tools symbol</title>
+  <desc id="desc">A tools symbol with a wrench and screwdriver.</desc>
+  <defs>
+    <linearGradient id="panel" x1="214" y1="194" x2="987" y2="1010" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5F6C7D"/>
+      <stop offset="1" stop-color="#343C47"/>
+    </linearGradient>
+    <linearGradient id="plate" x1="324" y1="322" x2="864" y2="894" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FBFCFE"/>
+      <stop offset="1" stop-color="#E2E7EE"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="420" y1="442" x2="784" y2="790" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#A9B5C6"/>
+      <stop offset="1" stop-color="#6F7C90"/>
+    </linearGradient>
+    <filter id="shadow" x="164" y="156" width="872" height="900" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="20"/>
+      <feGaussianBlur stdDeviation="26"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.203922 0 0 0 0 0.235294 0 0 0 0 0.278431 0 0 0 0.2 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <rect x="216" y="208" width="768" height="784" rx="154" fill="url(#panel)"/>
+    <rect x="314" y="296" width="572" height="612" rx="72" fill="url(#plate)"/>
+
+    <rect x="314" y="296" width="572" height="136" rx="72" fill="#3B4654"/>
+    <rect x="382" y="348" width="170" height="30" rx="15" fill="#EEF2F7" fill-opacity="0.96"/>
+    <circle cx="794" cy="364" r="20" fill="#EEF2F7"/>
+    <circle cx="730" cy="364" r="20" fill="#C8D0DC"/>
+
+    <g transform="rotate(-40 488 690)">
+      <rect x="452" y="472" width="72" height="312" rx="34" fill="url(#metal)"/>
+      <path d="M452 444C452 408.654 480.654 380 516 380H520C555.346 380 584 408.654 584 444V470H452V444Z" fill="#7B8799"/>
+      <rect x="452" y="780" width="132" height="78" rx="34" fill="#566170"/>
+      <circle cx="488" cy="518" r="13" fill="#EBEFF4" fill-opacity="0.7"/>
+    </g>
+
+    <g transform="rotate(40 700 666)">
+      <rect x="666" y="468" width="68" height="330" rx="32" fill="url(#metal)"/>
+      <path d="M650 390C650 351.34 681.34 320 720 320C731.443 320 742.246 322.746 751.781 327.613L721.328 358.066C712.353 367.041 712.353 381.595 721.328 390.57L743.43 412.672C752.405 421.647 766.959 421.647 775.934 412.672L806.387 382.219C811.254 391.754 814 402.557 814 414C814 452.66 782.66 484 744 484C736.586 484 729.441 482.848 722.734 480.712L722 798H666L665.266 480.712C658.559 482.848 651.414 484 644 484C605.34 484 574 452.66 574 414C574 402.557 576.746 391.754 581.613 382.219L612.066 412.672C621.041 421.647 635.595 421.647 644.57 412.672L666.672 390.57C675.647 381.595 675.647 367.041 666.672 358.066L636.219 327.613C645.754 322.746 656.557 320 668 320C706.66 320 738 351.34 738 390" fill="#7B8799"/>
+    </g>
+  </g>
+</svg>
