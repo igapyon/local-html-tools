@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "npm run build:all",
     "build:music": "node scripts/build-music.mjs",
     "build:git:material": "node scripts/build-git-material-web.mjs",
     "build:git": "npm run build:git:material && node scripts/build-git.mjs",

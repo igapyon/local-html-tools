@@ -37,6 +37,7 @@ function mountDom() {
       <option value="remote">remote</option>
       <option value="local" selected>local</option>
     </select>
+    <input id="repoNameFilter" value="" />
     <input id="remoteName" value="origin" />
     <button id="closeDialogBtn" type="button">close</button>
     <button id="saveEntryBtn" type="button">save</button>
@@ -399,6 +400,61 @@ describe("git-work-list main", () => {
     expect(document.querySelectorAll(".md-entry-title")).toHaveLength(1);
     expect(document.getElementById("entriesList").textContent).toContain("feature-a");
     expect(document.getElementById("entriesList").textContent).toContain("feature-b");
+  });
+
+  it("filters groups by repository display name", () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "a",
+        repoUrl: "https://example.com/repo-alpha",
+        baseBranch: "main",
+        baseScope: "remote",
+        compareBranch: "feature-a",
+        compareScope: "local",
+        remoteName: "origin"
+      },
+      {
+        id: "b",
+        repoUrl: "https://example.com/repo-beta",
+        baseBranch: "main",
+        baseScope: "remote",
+        compareBranch: "feature-b",
+        compareScope: "local",
+        remoteName: "origin"
+      }
+    ]));
+
+    bootPage();
+
+    document.getElementById("repoNameFilter").value = "beta";
+    document.getElementById("repoNameFilter").dispatchEvent(new Event("input"));
+
+    const entriesText = document.getElementById("entriesList").textContent;
+    expect(entriesText).toContain("repo-beta");
+    expect(entriesText).not.toContain("repo-alpha");
+  });
+
+  it("shows filter-specific empty message when no repository matches", () => {
+    localStorage.setItem("gitWorkList.entries", JSON.stringify([
+      {
+        id: "a",
+        repoUrl: "https://example.com/repo-alpha",
+        baseBranch: "main",
+        baseScope: "remote",
+        compareBranch: "feature-a",
+        compareScope: "local",
+        remoteName: "origin"
+      }
+    ]));
+
+    bootPage();
+
+    document.getElementById("repoNameFilter").value = "zzz";
+    document.getElementById("repoNameFilter").dispatchEvent(new Event("input"));
+
+    expect(document.getElementById("entriesList").textContent).toBe("");
+    expect(document.getElementById("emptyGuide").hidden).toBe(false);
+    expect(document.getElementById("emptyGuide").textContent).toContain("zzz");
   });
 
   it("sorts work rows within the same group by last opened time", () => {
