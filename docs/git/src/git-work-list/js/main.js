@@ -84,6 +84,10 @@
       }
     }
 
+    function readRepoNameFilter() {
+      return readText("repoNameFilter").toLowerCase();
+    }
+
     function getDialog() {
       return document.getElementById("entryDialog");
     }
@@ -674,9 +678,15 @@
     function updateEmptyGuide(visibleCount) {
       const guide = document.getElementById("emptyGuide");
       if (!guide) return;
+      const repoNameFilter = readRepoNameFilter();
       if (entries.length === 0) {
         guide.hidden = false;
         guide.textContent = "まだ登録がありません。追加ボタンから登録してください。";
+        return;
+      }
+      if (visibleCount === 0 && repoNameFilter) {
+        guide.hidden = false;
+        guide.textContent = `「${repoNameFilter}」に一致するリポジトリはありません。`;
         return;
       }
       guide.hidden = true;
@@ -841,7 +851,14 @@
     function renderEntries() {
       const list = document.getElementById("entriesList");
       if (!list) return;
+      const repoNameFilter = readRepoNameFilter();
       const visibleGroups = groupEntriesByBase(entries.slice())
+        .filter((group) => {
+          if (!repoNameFilter) return true;
+          const displayName = String(group.displayName || "").toLowerCase();
+          const repoUrl = String(group.repoUrl || "").toLowerCase();
+          return displayName.includes(repoNameFilter) || repoUrl.includes(repoNameFilter);
+        })
         .sort(compareEntriesByRecentOrder);
       const visibleEntries = visibleGroups.flatMap((group) => group.entries);
 
@@ -999,6 +1016,10 @@
         entryTypeField.addEventListener("change", () => {
           updateEntryTypeUi(readSelectValue("entryType", "git"));
         });
+      }
+      const repoNameFilterField = document.getElementById("repoNameFilter");
+      if (repoNameFilterField) {
+        repoNameFilterField.addEventListener("input", renderEntries);
       }
       const closeButton = document.getElementById("closeDialogBtn");
       if (closeButton) {
