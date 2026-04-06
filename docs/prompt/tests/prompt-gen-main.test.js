@@ -1325,13 +1325,19 @@ describe("prompt-gen main", () => {
     expect(promptOutput.textContent).toContain("PRタイトルとPR本文");
   });
 
-  it("shows Git pseudo-squash link only for A501", async () => {
+  it("shows Git pseudo-squash link for A501 and A502 only", async () => {
     await bootPromptPage();
 
     const promptSearch = document.getElementById("promptSearch");
     const gitPseudoSquashLink = document.getElementById("gitPseudoSquashLink");
 
     promptSearch.value = "A501";
+    promptSearch.dispatchEvent(new Event("input"));
+
+    expect(gitPseudoSquashLink.classList.contains("md-hidden")).toBe(false);
+    expect(gitPseudoSquashLink.getAttribute("href")).toBe("../git/git-work-list.html");
+
+    promptSearch.value = "A502";
     promptSearch.dispatchEvent(new Event("input"));
 
     expect(gitPseudoSquashLink.classList.contains("md-hidden")).toBe(false);

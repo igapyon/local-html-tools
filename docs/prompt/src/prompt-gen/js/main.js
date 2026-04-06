@@ -840,7 +840,7 @@ async function initializePromptPage() {
             return;
         }
         promptOutputTitle.textContent = selectedDefinition.label;
-        if (getDefinitionLabelCode(selectedDefinition) === "A501") {
+        if (["A501", "A502"].includes(getDefinitionLabelCode(selectedDefinition))) {
             gitPseudoSquashLink === null || gitPseudoSquashLink === void 0 ? void 0 : gitPseudoSquashLink.classList.remove("md-hidden");
         }
         const help = document.createElement("lht-help-tooltip");
