@@ -81,7 +81,7 @@ ${getMarkdownFenceInstruction()}`
     keywords: ["release", "github release", "release notes", "github", "markdown", "tilde", "リリース", "release文面", "release本文", "文面", "作成", "りりーす", "りりーすのーと", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
     requiresCommitId: true,
     buildBody: (commitId: string) => commitId
-      ? `${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文を作成してください。
+      ? `${commitId} 以降に行われた変更(${commitId}での変更内容も含む)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文を作成してください。
 
 ${getStrictHallucinationPreventionInstruction()}
 

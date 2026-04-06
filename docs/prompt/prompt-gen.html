@@ -4207,7 +4207,7 @@ ${getMarkdownFenceInstruction()}`
         keywords: ["release", "github release", "release notes", "github", "markdown", "tilde", "リリース", "release文面", "release本文", "文面", "作成", "りりーす", "りりーすのーと", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
         requiresCommitId: true,
         buildBody: (commitId) => commitId
-            ? `${commitId} よりも後に行われた変更(${commitId}での変更内容は除外する)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文を作成してください。
+            ? `${commitId} 以降に行われた変更(${commitId}での変更内容も含む)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文を作成してください。
 
 ${getStrictHallucinationPreventionInstruction()}
 
@@ -10122,7 +10122,7 @@ async function initializePromptPage() {
             return;
         }
         promptOutputTitle.textContent = selectedDefinition.label;
-        if (getDefinitionLabelCode(selectedDefinition) === "A501") {
+        if (["A501", "A502"].includes(getDefinitionLabelCode(selectedDefinition))) {
             gitPseudoSquashLink === null || gitPseudoSquashLink === void 0 ? void 0 : gitPseudoSquashLink.classList.remove("md-hidden");
         }
         const help = document.createElement("lht-help-tooltip");
