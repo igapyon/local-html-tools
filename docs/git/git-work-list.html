@@ -1814,6 +1814,10 @@ lht-index-card-link {
 
         <div class="md-dialog__body md-stack-md">
           <div class="md-form-grid md-form-grid-1">
+            <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" required placeholder="例: https://github.com/igapyon/local-html-tools" help-text="リポジトリを識別する URL や clone URL を入力します。HTTPS / SSH / ローカルパスのどれでも構いません。表示名は URL の末尾から自動で組み立てます。"></lht-text-field-help>
+          </div>
+
+          <div class="md-form-grid md-form-grid-1">
             <lht-select-help field-id="entryType" label="種別" help-text="Git 連携を使う通常登録か、URL とメモだけを管理する登録かを選びます。">
               <script type="application/json" slot="options">[
                 { "value": "git", "label": "Git連携あり", "selected": true },
@@ -1822,25 +1826,21 @@ lht-index-card-link {
             </lht-select-help>
           </div>
 
-          <div class="md-form-grid md-form-grid-1">
-            <lht-text-field-help field-id="repoUrl" label="リポジトリ URL" required placeholder="例: https://github.com/igapyon/local-html-tools" help-text="リポジトリを識別する URL や clone URL を入力します。HTTPS / SSH / ローカルパスのどれでも構いません。表示名は URL の末尾から自動で組み立てます。"></lht-text-field-help>
-          </div>
-
           <div id="gitFields" class="md-form-grid md-form-grid-4">
-            <lht-text-field-help field-id="baseBranch" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。"></lht-text-field-help>
             <lht-select-help field-id="baseScope" label="基準の扱い" help-text="基準ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
               <script type="application/json" slot="options">[
                 { "value": "remote", "label": "リモート", "selected": true },
                 { "value": "local", "label": "ローカル" }
               ]</script>
             </lht-select-help>
-            <lht-text-field-help field-id="compareBranch" label="作業ブランチ" required placeholder="例: feature" help-text="いま確認したい作業対象ブランチです。"></lht-text-field-help>
+            <lht-text-field-help field-id="baseBranch" label="基準ブランチ" required placeholder="例: main" help-text="比較の基準にするブランチです。"></lht-text-field-help>
             <lht-select-help field-id="compareScope" label="作業の扱い" help-text="作業ブランチをローカルとして扱うか、リモート参照として扱うかを選びます。">
               <script type="application/json" slot="options">[
                 { "value": "remote", "label": "リモート" },
                 { "value": "local", "label": "ローカル", "selected": true }
               ]</script>
             </lht-select-help>
+            <lht-text-field-help field-id="compareBranch" label="作業ブランチ" required placeholder="例: feature" help-text="いま確認したい作業対象ブランチです。"></lht-text-field-help>
           </div>
 
           <div id="gitRemoteField" class="md-form-grid md-form-grid-1">
@@ -1872,10 +1872,10 @@ lht-index-card-link {
 
         <div class="md-dialog__body md-stack-md">
           <div class="md-form-grid md-form-grid-1">
-            <lht-text-field-help field-id="memoText" label="メモ" placeholder="必要なメモを入力" help-text="保存は全文、一覧表示は先頭 16 文字までです。長い内容は hover で全文を確認できます。"></lht-text-field-help>
+            <lht-text-field-help field-id="gitCurrentDirectory" label="カレントディレクトリ" placeholder="例: /path/to/repo" help-text="この作業を行うローカルの git カレントディレクトリを記録します。"></lht-text-field-help>
           </div>
           <div class="md-form-grid md-form-grid-1">
-            <lht-text-field-help field-id="gitCurrentDirectory" label="カレントディレクトリ" placeholder="例: /path/to/repo" help-text="この作業を行うローカルの git カレントディレクトリを記録します。"></lht-text-field-help>
+            <lht-text-field-help field-id="memoText" label="メモ" placeholder="必要なメモを入力" help-text="保存は全文、一覧表示は先頭 16 文字までです。長い内容は hover で全文を確認できます。"></lht-text-field-help>
           </div>
         </div>
 
