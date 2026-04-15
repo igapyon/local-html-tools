@@ -242,6 +242,32 @@ PR本文:
     expect(rebaseCmd.textContent).not.toContain("PR本文:");
   });
 
+  it("normalizes English PR headings by removing # PR Title and # PR Body lines", () => {
+    bootGitPseudoSquashPage();
+
+    const commitMessage = document.getElementById("commitMessage");
+    const rebaseCmd = document.getElementById("rebaseCmd");
+    commitMessage.value = `# PR Title
+
+prompt-gen の GitHub 導線追加
+
+# PR Body
+
+変更内容です。
+補足です。`;
+
+    window.__gitPseudoSquashTest.normalizeCommitMessageForPr();
+
+    expect(commitMessage.value).toBe(`prompt-gen の GitHub 導線追加
+
+変更内容です。
+補足です。`);
+    expect(rebaseCmd.textContent).toContain("prompt-gen の GitHub 導線追加");
+    expect(rebaseCmd.textContent).toContain("変更内容です。");
+    expect(rebaseCmd.textContent).not.toContain("# PR Title");
+    expect(rebaseCmd.textContent).not.toContain("# PR Body");
+  });
+
   it("generates PowerShell rebase command with here-string and no git switch in current branch mode", () => {
     bootGitPseudoSquashPage();
 
