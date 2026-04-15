@@ -560,7 +560,7 @@
         return false;
       }
       const headingText = normalized.replace(/^#{1,6}\s*/, "").trim().toLowerCase();
-      return /^(?:pr\s*テキスト|pr\s*text|pr\s*本文)\s*[:：]?$/.test(headingText);
+      return /^(?:pr\s*テキスト|pr\s*text|pr\s*本文|pr\s*body)\s*[:：]?$/.test(headingText);
     }
 
     function isPrTitleLabelLine(line) {
@@ -570,7 +570,7 @@
 
     function isPrTextLabelLine(line) {
       const normalized = String(line || "").trim().toLowerCase();
-      return /^(?:pr\s*テキスト|pr\s*text|pr\s*本文)\s*[:：]\s*$/.test(normalized);
+      return /^(?:pr\s*テキスト|pr\s*text|pr\s*本文|pr\s*body)\s*[:：]\s*$/.test(normalized);
     }
 
     function isTildeFenceStartLine(line) {

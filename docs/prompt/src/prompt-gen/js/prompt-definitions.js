@@ -39,6 +39,19 @@ const promptDefinitions = [
 # Rules
 
 - 絶対パス、ホームディレクトリ、作業ディレクトリは出力しないでください。
+- 回答は日本語で記述してください。
+
+# Examples
+
+\`\`\`markdown
+# PR Title
+
+(Title of PR)
+
+# PR Body
+
+(Body of PR)
+\`\`\`
 
 ${getStrictHallucinationPreventionInstruction()}
 
@@ -51,7 +64,7 @@ ${getMarkdownFenceInstruction()}`
         keywords: ["release", "github release", "release notes", "github", "markdown", "tilde", "リリース", "release文面", "release本文", "文面", "作成", "りりーす", "りりーすのーと", "まーくだうん", "ちるだ", "ぶんめん", "さくせい", "ぎっとはぶ"],
         requiresCommitId: true,
         buildBody: (commitId) => commitId
-            ? `${commitId} 以降に行われた変更(${commitId}での変更内容も含む)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。リリースタイトルとリリース本文を作成してください。
+            ? `${commitId} から HEAD までに行われた変更(${commitId}での変更内容も含む)について、GitHub Release 用のリリースタイトルとリリース本文を markdown テキスト形式で作文してください。
 
 ${getStrictHallucinationPreventionInstruction()}
 
