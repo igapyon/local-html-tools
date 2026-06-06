@@ -2664,7 +2664,7 @@ lht-index-card-link {
         </div>
         <div class="md-form-row md-form-row--nowrap">
           <div class="md-input-wrap md-input-wrap--inline">
-            <lht-text-field-help field-id="workBranch" label="作業ブランチ" required placeholder="例: tiga0129a" field-class="md-outlined-field" help-text="これから作業するブランチ名です。未作成なら作成先として使います。生成コマンドにそのまま反映されます。"></lht-text-field-help>
+            <lht-text-field-help field-id="workBranch" label="作業ブランチ" required placeholder="例: devel-tiga0129a" field-class="md-outlined-field" help-text="これから作業するブランチ名です。未作成なら作成先として使います。生成コマンドにそのまま反映されます。"></lht-text-field-help>
             <button type="button" class="md-icon-btn md-icon-btn--prominent md-input-action--inline" onclick="updateWorkBranchWithCurrentTime()" title="現在日時で更新" aria-label="現在日時で作業ブランチを更新">
               <svg viewBox="0 0 24 24" class="md-icon-small" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <use href="#md-icon-refresh" xlink:href="#md-icon-refresh"></use>
@@ -5045,6 +5045,18 @@ if (!customElements.get("lht-page-menu")) {
       return s1 + s2 + s3;
     }
 
+    function buildTimedWorkBranchName(date = new Date()) {
+      const baseBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
+      const pad = (num) => String(num).padStart(2, "0");
+      const mm = pad(date.getMonth() + 1);
+      const dd = pad(date.getDate());
+      const hh = date.getHours();
+      const min = date.getMinutes();
+      const timeStr = convertTimeToThreeChars(hh, min);
+      const suffix = `tiga${mm}${dd}${timeStr}`;
+      return baseBranch ? `${baseBranch}-${suffix}` : suffix;
+    }
+
     function getUseCurrentBranchSelected() {
       const useCurrentBranch = document.getElementById("useCurrentBranch");
       if (!useCurrentBranch) return true;
@@ -5191,28 +5203,14 @@ if (!customElements.get("lht-page-menu")) {
     function setDefaultWorkBranch() {
       const input = document.getElementById("workBranch");
       if (!input || input.value.trim()) return;
-      const now = new Date();
-      const pad = (num) => String(num).padStart(2, "0");
-      const mm = pad(now.getMonth() + 1);
-      const dd = pad(now.getDate());
-      const hh = now.getHours();
-      const min = now.getMinutes();
-      const timeStr = convertTimeToThreeChars(hh, min);
-      input.value = `tiga${mm}${dd}${timeStr}`;
+      input.value = buildTimedWorkBranchName();
       regenerateAllCommands();
     }
 
     function updateWorkBranchWithCurrentTime() {
       const input = document.getElementById("workBranch");
       if (!input) return;
-      const now = new Date();
-      const pad = (num) => String(num).padStart(2, "0");
-      const mm = pad(now.getMonth() + 1);
-      const dd = pad(now.getDate());
-      const hh = now.getHours();
-      const min = now.getMinutes();
-      const timeStr = convertTimeToThreeChars(hh, min);
-      input.value = `tiga${mm}${dd}${timeStr}`;
+      input.value = buildTimedWorkBranchName();
       regenerateAllCommands();
       const saved = upsertWorkBranchListEntry({
         requireRepoUrl: false,
