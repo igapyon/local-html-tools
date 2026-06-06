@@ -23,7 +23,7 @@
 | ID | ラベル | 型 | 初期値 | 現行挙動 |
 |---|---|---|---|---|
 | `squashBaseBranch` | 基点ブランチ | text | `devel` | datalist候補あり。履歴クリアボタンあり。 |
-| `workBranch` | 作業ブランチ | text | 空 | 初期化時、空なら `tigaMMddxxx` 形式で自動補完。 |
+| `workBranch` | 作業ブランチ | text | 空 | 初期化時、空なら `<squashBaseBranch>-tigaMMddxxx` 形式で自動補完。基点ブランチが空なら `tigaMMddxxx`。 |
 | `shellEnvPowerShell` | PowerShell | checkbox | OFF | ONでPowerShell向け、OFFでPOSIX向けコマンド。 |
 | `lockOrigin` | リモート + origin と作業 | checkbox | ON | ONで `baseRemote`/`squashRemote` を `origin` に固定して入力を隠す。 |
 | `squashBaseScope` | 基点の参照先 | select | `remote` | `remote`/`local` 切替。 |

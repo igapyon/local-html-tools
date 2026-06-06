@@ -355,7 +355,7 @@ prompt-gen の GitHub 導線追加
     expect(window.__gitPseudoSquashTest.getUseCurrentBranchSelected()).toBe(true);
     expect(document.getElementById("squashBaseBranch").value).toBe("devel");
     expect(document.getElementById("commitMessage").value).toBe("");
-    expect(document.getElementById("workBranch").value).toMatch(/^tiga\d{4}[a-z]{3}$/);
+    expect(document.getElementById("workBranch").value).toMatch(/^devel-tiga\d{4}[a-z]{3}$/);
     expect(localStorage.removeItem).toHaveBeenCalledWith("gitPseudoSquash.ui.baseRemote");
     expect(localStorage.removeItem).toHaveBeenCalledWith("gitPseudoSquash.ui.squashRemote");
     expect(localStorage.removeItem).toHaveBeenCalledWith("gitPseudoSquash.ui.useCurrentBranch");

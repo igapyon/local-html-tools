@@ -47,6 +47,18 @@
       return s1 + s2 + s3;
     }
 
+    function buildTimedWorkBranchName(date = new Date()) {
+      const baseBranch = document.getElementById("squashBaseBranch")?.value.trim() || "";
+      const pad = (num) => String(num).padStart(2, "0");
+      const mm = pad(date.getMonth() + 1);
+      const dd = pad(date.getDate());
+      const hh = date.getHours();
+      const min = date.getMinutes();
+      const timeStr = convertTimeToThreeChars(hh, min);
+      const suffix = `tiga${mm}${dd}${timeStr}`;
+      return baseBranch ? `${baseBranch}-${suffix}` : suffix;
+    }
+
     function getUseCurrentBranchSelected() {
       const useCurrentBranch = document.getElementById("useCurrentBranch");
       if (!useCurrentBranch) return true;
@@ -193,28 +205,14 @@
     function setDefaultWorkBranch() {
       const input = document.getElementById("workBranch");
       if (!input || input.value.trim()) return;
-      const now = new Date();
-      const pad = (num) => String(num).padStart(2, "0");
-      const mm = pad(now.getMonth() + 1);
-      const dd = pad(now.getDate());
-      const hh = now.getHours();
-      const min = now.getMinutes();
-      const timeStr = convertTimeToThreeChars(hh, min);
-      input.value = `tiga${mm}${dd}${timeStr}`;
+      input.value = buildTimedWorkBranchName();
       regenerateAllCommands();
     }
 
     function updateWorkBranchWithCurrentTime() {
       const input = document.getElementById("workBranch");
       if (!input) return;
-      const now = new Date();
-      const pad = (num) => String(num).padStart(2, "0");
-      const mm = pad(now.getMonth() + 1);
-      const dd = pad(now.getDate());
-      const hh = now.getHours();
-      const min = now.getMinutes();
-      const timeStr = convertTimeToThreeChars(hh, min);
-      input.value = `tiga${mm}${dd}${timeStr}`;
+      input.value = buildTimedWorkBranchName();
       regenerateAllCommands();
       const saved = upsertWorkBranchListEntry({
         requireRepoUrl: false,
